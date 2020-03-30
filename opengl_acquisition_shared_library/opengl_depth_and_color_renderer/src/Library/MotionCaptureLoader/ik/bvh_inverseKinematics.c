@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <time.h>
 
 #include "bvh_inverseKinematics.h"
 #include "levmar.h"
@@ -28,6 +29,35 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
+
+
+
+unsigned long tickBaseIK = 0;
+
+
+unsigned long GetTickCountMicrosecondsIK()
+{
+    struct timespec ts;
+    if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0)
+        {
+            return 0;
+        }
+
+    if (tickBaseIK==0)
+        {
+            tickBaseIK = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+            return 0;
+        }
+
+    return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBaseIK;
+}
+
+
+unsigned long GetTickCountMillisecondsIK()
+{
+    return (unsigned long) GetTickCountMicrosecondsIK()/1000;
+}
+
 
 struct ikChainParts
 {
@@ -627,16 +657,17 @@ float calculateChainLoss(
 }
 
 
-float iterateChainLoss(
+float iteratePartLoss(
                          struct ikProblem * problem,
-                         unsigned int chainID
+                         unsigned int chainID,
+                         unsigned int partID
                         )
 {
  unsigned int consecutiveBadSteps=0;
  unsigned int mIDS[3];
- mIDS[0]= problem->chain[chainID].part[0].mIDStart;
- mIDS[1]= problem->chain[chainID].part[0].mIDStart+1;
- mIDS[2]= problem->chain[chainID].part[0].mIDStart+2;
+ mIDS[0]= problem->chain[chainID].part[partID].mIDStart;
+ mIDS[1]= problem->chain[chainID].part[partID].mIDStart+1;
+ mIDS[2]= problem->chain[chainID].part[partID].mIDStart+2;
  float originalValues[3]={0};
  float delta[3]={0};
  float bestDelta[3]={0};
@@ -651,20 +682,26 @@ float iterateChainLoss(
  currentValues[1] = originalValues[1];
  currentValues[2] = originalValues[2];
 
+ float bestValues[3]={0};
+ bestValues[0] = originalValues[0];
+ bestValues[1] = originalValues[1];
+ bestValues[2] = originalValues[2];
 
- float bestLoss = calculateChainLoss(problem,chainID);
- //Random
- float loss=bestLoss;
 
- float d=0.5;
+ float initialLoss = calculateChainLoss(problem,chainID);
+ float bestLoss = initialLoss;
+ float loss=initialLoss;
+
+ float d=1.0;
+ float lambda=10.5;
 
  delta[0] = d;
  delta[1] = d;
  delta[2] = d;
 
  fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
- fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",loss,originalValues[0],originalValues[1],originalValues[2]);
-
+ fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
+ unsigned long startTime = GetTickCountMicrosecondsIK();
 
  float losses[3];
  for (unsigned int i=0; i<1000; i++)
@@ -683,13 +720,13 @@ float iterateChainLoss(
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
  //-------------------
 
-   if (loss!=losses[0]) { delta[0] = (float) delta[0] / ( loss - losses[0]); } else
+   if (loss!=losses[0]) { delta[0] = (float) lambda * delta[0] / ( loss - losses[0]); } else
                         { delta[0] = 0; }
 
-   if (loss!=losses[1]) { delta[1] = (float) delta[1] / ( loss - losses[1]); } else
+   if (loss!=losses[1]) { delta[1] = (float) lambda * delta[1] / ( loss - losses[1]); } else
                         { delta[1] = 0; }
 
-   if (loss!=losses[2]) { delta[2] = (float) delta[2] / ( loss - losses[2]); } else
+   if (loss!=losses[2]) { delta[2] = (float) lambda * delta[2] / ( loss - losses[2]); } else
                         { delta[2] = 0; }
 
 
@@ -709,6 +746,10 @@ float iterateChainLoss(
      bestDelta[0]=delta[0];
      bestDelta[1]=delta[1];
      bestDelta[2]=delta[2];
+
+     bestValues[0]=currentValues[0];
+     bestValues[1]=currentValues[1];
+     bestValues[2]=currentValues[2];
      consecutiveBadSteps=0;
      fprintf(stderr,"%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",i,loss,currentValues[0],currentValues[1],currentValues[2]);
    } else
@@ -717,9 +758,20 @@ float iterateChainLoss(
      fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
    }
 
-   if (consecutiveBadSteps>4) { break; }
- }
+   //Keep optimization from getting stuck..
+   if (delta[0]==0) { delta[0]=0.01; }
+   if (delta[1]==0) { delta[1]=0.01; }
+   if (delta[2]==0) { delta[2]=0.01; }
 
+
+   if (consecutiveBadSteps>4) { fprintf(stderr,"Early Stopping\n"); break; }
+ }
+ unsigned long endTime = GetTickCountMicrosecondsIK();
+
+
+  fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
+  fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
+  fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
 
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + bestDelta[0];
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1] + bestDelta[1];
@@ -730,49 +782,32 @@ float iterateChainLoss(
 }
 
 
-int bruteForceChange(
-                     struct BVH_MotionCapture * mc,
-                     struct simpleRenderer *renderer,
-                     struct MotionBuffer * solution,
-                     float * averageError,
-                     unsigned int fromElement,
-                     unsigned int toElement,
-                     unsigned int budget,
-                     struct BVH_Transform * bvhSourceTransform,
-                     struct BVH_Transform * bvhTargetTransform
-                    )
+
+
+
+
+
+
+float iterateChainLoss(
+                         struct ikProblem * problem,
+                         unsigned int chainID
+                        )
 {
-  unsigned int degreesOfFreedomForTheProblem = toElement - fromElement + 1;
-  unsigned int budgetPerDoF=(unsigned int) budget/degreesOfFreedomForTheProblem;
-  fprintf(stdout,"Trying to solve a %u D.o.F. problem with a budget of %u tries..\n",degreesOfFreedomForTheProblem,budget);
+ for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+ {
+   if (!problem->chain[chainID].part[partID].endEffector)
+   {
+    iteratePartLoss(
+                    problem,
+                    chainID,
+                    partID
+                   );
+   }
+ }
 
-
-  char jointName[256]={0};
-
-  for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
-  {
-    if (bvh_getMotionChannelName(mc,mID,jointName,256))
-    {
-     fprintf(stdout,"%s ",jointName);
-    } else
-    {
-     fprintf(stdout,"mID=%u ",mID);
-    }
-  }
-  fprintf(stdout,"\n______________________\n");
-
-
-  for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
-  {
-    for (int i=0; i<budgetPerDoF; i++)
-    {
-
-    }
-  }
-
-
- return 1;
+ return calculateChainLoss(problem,chainID);
 }
+
 
 
 int gatherBVH2DDistaces(
@@ -865,14 +900,32 @@ float approximateTargetFromMotionBuffer(
 
   float loss;
 
-  loss=calculateChainLoss( &problem, 0 );
-
-
   loss = iterateChainLoss(
                           &problem,
                           0
                          );
 
+
+   loss = iterateChainLoss(
+                            &problem,
+                            1
+                          );
+
+   loss = iterateChainLoss(
+                            &problem,
+                            2
+                          );
+
+
+   loss = iterateChainLoss(
+                            &problem,
+                            3
+                          );
+
+   loss = iterateChainLoss(
+                            &problem,
+                            4
+                          );
 
  return loss;
 }
