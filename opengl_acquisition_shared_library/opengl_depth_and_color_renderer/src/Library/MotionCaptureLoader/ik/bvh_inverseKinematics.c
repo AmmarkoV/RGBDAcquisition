@@ -243,8 +243,9 @@ void compareTwoMotionBuffers(const char * msg,struct MotionBuffer * guessA,struc
   {
     float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
     float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
-    if (diffA<diffB) { fprintf(stderr,GREEN "%0.2f " ,diffB-diffA); } else
-                     { fprintf(stderr,RED "%0.2f "   ,diffA-diffB); }
+    if ( (diffA==0.0) && (diffA==diffB) ) { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
+    if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
+                                          { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
   }
   fprintf(stderr,NORMAL "\n___________\n");
 }
@@ -772,7 +773,7 @@ float iteratePartLoss(
  float loss=initialLoss;
 
  float d=0.2;
- float lambda=0.5;
+ float lambda=5.5;
 
  delta[0] = d;
  delta[1] = d;
@@ -1061,22 +1062,20 @@ int BVHTestIK(
   fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
 
 
-  //Compare with ground truth..!
-  struct MotionBuffer * groundTruth = mallocNewSolutionBuffer(mc);
-
+  //Load all motion buffers
+  struct MotionBuffer * groundTruth     = mallocNewSolutionBuffer(mc);
   struct MotionBuffer * initialSolution = mallocNewSolutionBuffer(mc);
-  struct MotionBuffer * solution = mallocNewSolutionBuffer(mc);
+  struct MotionBuffer * solution        = mallocNewSolutionBuffer(mc);
 
 
   if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) )
   {
-    if ( ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) && ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) ) )
+    if (
+          ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) &&
+          ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) ) &&
+          ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
+       )
       {
-
-       if ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) )
-       {
-
-
         if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
          {
             bvh_removeTranslationFromTransform(
@@ -1096,13 +1095,12 @@ int BVHTestIK(
             result=1;
 
 
+            //-------------------------------------------------------------------------------------------------------------
             compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
             compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
-
-            compareTwoMotionBuffers("Improvement",solution,initialSolution,groundTruth);
+            //-------------------------------------------------------------------------------------------------------------
+            compareTwoMotionBuffers("Improvement",initialSolution,solution,groundTruth);
          }
-        }
-
       }
     freeSolutionBuffer(solution);
     freeSolutionBuffer(initialSolution);
