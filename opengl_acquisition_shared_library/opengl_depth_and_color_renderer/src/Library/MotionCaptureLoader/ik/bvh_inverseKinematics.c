@@ -131,6 +131,20 @@ void freeSolutionBuffer(struct MotionBuffer * mb)
 }
 //---------------------------------------------------------
 
+int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
+{
+  if (src->bufferSize != dst->bufferSize)
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return 0;
+  }
+
+  for (unsigned int i=0; i<dst->bufferSize; i++)
+  {
+    dst->motion[i] = src->motion[i];
+  }
+  return 1;
+}
 
 struct MotionBuffer * mallocNewSolutionBuffer(struct BVH_MotionCapture * mc)
 {
@@ -172,6 +186,70 @@ struct MotionBuffer * mallocNewSolutionBufferAndCopy(struct BVH_MotionCapture * 
 
 
 
+void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if (guess->bufferSize != groundTruth->bufferSize)
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return ;
+  }
+
+  //--------------------------------------------------
+  fprintf(stderr,"Guess : ");
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,guess->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+  fprintf(stderr,"Truth : ");
+  for (unsigned int i=0; i<groundTruth->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,groundTruth->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+
+
+  fprintf(stderr,"Diff : ");
+
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    float diff=fabs(groundTruth->motion[i] - guess->motion[i]);
+    if (fabs(diff)<0.1) { fprintf(stderr,GREEN "%0.2f " ,diff); } else
+                         { fprintf(stderr,RED "%0.2f " ,diff); }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
+void compareTwoMotionBuffers(const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if ( (guessA->bufferSize != groundTruth->bufferSize) || (guessB->bufferSize != groundTruth->bufferSize) )
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return ;
+  }
+
+
+  fprintf(stderr,"Diff : ");
+  for (unsigned int i=0; i<guessA->bufferSize; i++)
+  {
+    float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
+    float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
+    if (diffA<diffB) { fprintf(stderr,GREEN "%0.2f " ,diffB-diffA); } else
+                     { fprintf(stderr,RED "%0.2f "   ,diffA-diffB); }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
 void clear_line()
 {
   fputs("\033[A\033[2K\033[A\033[2K",stdout);
@@ -209,7 +287,7 @@ int prepareProblem(
   problem->renderer = renderer;
   problem->initialSolution = solution ;
 
-  problem->currentSolution = mallocNewSolutionBuffer(mc);
+  problem->currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
 
   //2D Projections Targeted
   //----------------------------------------------------------
@@ -660,7 +738,8 @@ float calculateChainLoss(
 float iteratePartLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
-                         unsigned int partID
+                         unsigned int partID,
+                         unsigned int iterations
                         )
 {
  unsigned int consecutiveBadSteps=0;
@@ -692,19 +771,30 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- float d=1.0;
- float lambda=10.5;
+ float d=0.2;
+ float lambda=0.5;
 
  delta[0] = d;
  delta[1] = d;
  delta[2] = d;
 
+ /*
+  fprintf(stderr,"The received solution to improve : ");
+  for (unsigned int i=0; i<problem->chain[chainID].currentSolution->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,problem->chain[chainID].currentSolution->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+*/
+
+ fprintf(stderr,"\nOptimizing %s \n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
  fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
  fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
  float losses[3];
- for (unsigned int i=0; i<1000; i++)
+ for (unsigned int i=0; i<iterations; i++)
  {
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
@@ -759,9 +849,9 @@ float iteratePartLoss(
    }
 
    //Keep optimization from getting stuck..
-   if (delta[0]==0) { delta[0]=0.01; }
-   if (delta[1]==0) { delta[1]=0.01; }
-   if (delta[2]==0) { delta[2]=0.01; }
+   if (delta[0]==0) { delta[0]=0.1; }
+   if (delta[1]==0) { delta[1]=0.1; }
+   if (delta[2]==0) { delta[2]=0.1; }
 
 
    if (consecutiveBadSteps>4) { fprintf(stderr,"Early Stopping\n"); break; }
@@ -790,9 +880,13 @@ float iteratePartLoss(
 
 float iterateChainLoss(
                          struct ikProblem * problem,
-                         unsigned int chainID
+                         unsigned int chainID,
+                         unsigned int iterations
                         )
 {
+
+ copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
+
  for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
  {
    if (!problem->chain[chainID].part[partID].endEffector)
@@ -800,10 +894,13 @@ float iterateChainLoss(
     iteratePartLoss(
                     problem,
                     chainID,
-                    partID
+                    partID,
+                    iterations
                    );
    }
  }
+
+ copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
 
  return calculateChainLoss(problem,chainID);
 }
@@ -898,37 +995,46 @@ float approximateTargetFromMotionBuffer(
               &problem
              );
 
+
+  unsigned int maximumIterations=1000;
   float loss;
 
   loss = iterateChainLoss(
                           &problem,
-                          0
+                          0,
+                          maximumIterations
                          );
 
-
    loss = iterateChainLoss(
                             &problem,
-                            1
+                            1,
+                            maximumIterations
                           );
 
    loss = iterateChainLoss(
                             &problem,
-                            2
+                            2,
+                            maximumIterations
                           );
 
 
    loss = iterateChainLoss(
                             &problem,
-                            3
+                            3,
+                            maximumIterations
                           );
 
    loss = iterateChainLoss(
                             &problem,
-                            4
+                            4,
+                            maximumIterations
                           );
 
+
+   copyMotionBuffer(solution,problem.currentSolution);
  return loss;
 }
+
 
 
 
@@ -954,32 +1060,53 @@ int BVHTestIK(
 
   fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
 
+
+  //Compare with ground truth..!
+  struct MotionBuffer * groundTruth = mallocNewSolutionBuffer(mc);
+
+  struct MotionBuffer * initialSolution = mallocNewSolutionBuffer(mc);
   struct MotionBuffer * solution = mallocNewSolutionBuffer(mc);
 
-  if (  (solution!=0) )
+
+  if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) )
   {
-    if ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) )
-    {
-      if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+    if ( ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) && ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) ) )
       {
-        bvh_removeTranslationFromTransform(
-                                            mc,
-                                            &bvhTargetTransform
-                                          );
 
-        float error2D = approximateTargetFromMotionBuffer(
-                                                         mc,
-                                                         &renderer,
-                                                         solution,
-                                                         0,
-                                                         &bvhTargetTransform
-                                                        );
+       if ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) )
+       {
 
-        fprintf(stderr,"2D Distance is %0.2f\n",error2D);
-        result=1;
+
+        if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+         {
+            bvh_removeTranslationFromTransform(
+                                                mc,
+                                                &bvhTargetTransform
+                                              );
+
+            float error2D = approximateTargetFromMotionBuffer(
+                                                              mc,
+                                                              &renderer,
+                                                              solution,
+                                                              0,
+                                                              &bvhTargetTransform
+                                                              );
+
+            fprintf(stderr,"2D Distance is %0.2f\n",error2D);
+            result=1;
+
+
+            compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
+            compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
+
+            compareTwoMotionBuffers("Improvement",solution,initialSolution,groundTruth);
+         }
+        }
+
       }
-    }
     freeSolutionBuffer(solution);
+    freeSolutionBuffer(initialSolution);
+    freeSolutionBuffer(groundTruth);
   }
 
  return result;
