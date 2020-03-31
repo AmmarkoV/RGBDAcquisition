@@ -31,6 +31,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 
+#define DISCARD_POSITIONAL_COMPONENT 0
 
 unsigned long tickBaseIK = 0;
 
@@ -325,14 +326,21 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
 
-  if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=0; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=2; //First Rotation
-   ++partID;
-  }
+
+  #if DISCARD_POSITIONAL_COMPONENT
+   fprintf(stderr,"Ignoring positional component..\n");
+  #else
+   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
+   {
+     problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+     problem->chain[chainID].part[partID].jID=thisJID;
+     problem->chain[chainID].part[partID].mIDStart=0; //First Rotation
+     problem->chain[chainID].part[partID].mIDEnd=2; //First Rotation
+     ++partID;
+   }
+
+  #endif // DISCARD_POSITIONAL_COMPONENT
+
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
@@ -654,12 +662,14 @@ float calculateChainLoss(
                                          )
         )
       {
-      /*
+
+       #if DISCARD_POSITIONAL_COMPONENT
         bvh_removeTranslationFromTransform(
                                             problem->mc,
                                             &problem->chain[chainID].current2DProjectionTransform
                                           );
-     */
+       #endif // DISCARD_POSITIONAL_COMPONENT
+
       if (
           (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0)) &&
           (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
@@ -712,7 +722,6 @@ float iteratePartLoss(
 
  float originalLoss = calculateChainLoss(problem,chainID);
 
- float losses[3];
 
  float originalValues[3];
  originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
@@ -724,10 +733,15 @@ float iteratePartLoss(
  previousValues[1] = originalValues[1];
  previousValues[2] = originalValues[2];
 
+ float previousLoss[3];
+
+
  float currentValues[3];
  currentValues[0] = originalValues[0];
  currentValues[1] = originalValues[1];
  currentValues[2] = originalValues[2];
+
+ float currentLoss[3];
 
  float bestValues[3];
  bestValues[0] = originalValues[0];
@@ -736,6 +750,11 @@ float iteratePartLoss(
 
 
  float initialLoss = calculateChainLoss(problem,chainID);
+
+ previousLoss[0]=initialLoss;
+ previousLoss[1]=initialLoss;
+ previousLoss[2]=initialLoss;
+
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
@@ -775,9 +794,9 @@ float iteratePartLoss(
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1] + delta[1];
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2] + delta[2];
  //-------------------
-   losses[0]=calculateChainLoss(problem,chainID);
-   losses[1]=losses[0];
-   losses[2]=losses[0];
+   currentLoss[0]=calculateChainLoss(problem,chainID);
+   currentLoss[1]=currentLoss[0];
+   currentLoss[2]=currentLoss[0];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
@@ -786,29 +805,33 @@ float iteratePartLoss(
  #else
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-   losses[0]=calculateChainLoss(problem,chainID);
+   currentLoss[0]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
-   losses[1]=calculateChainLoss(problem,chainID);
+   currentLoss[1]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
-   losses[2]=calculateChainLoss(problem,chainID);
+   currentLoss[2]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
  //-------------------
  #endif
 
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
-   gradient = (float) 0.5 * (loss - losses[0]);
+   gradient = (float) 0.5 * (previousLoss[0] - currentLoss[0]);
    delta[0] += (float) lr *  gradient;
 
-   gradient = (float)  0.5 * (loss - losses[1]);
+   gradient = (float)  0.5 * (previousLoss[1] - currentLoss[1]);
    delta[1] += (float) lr * gradient;
 
-   gradient = (float)  0.5 * (loss - losses[2]);
+   gradient = (float)  0.5 * (previousLoss[2] - currentLoss[2]);
    delta[2] += (float) lr * gradient;
+
+   previousLoss[0]=currentLoss[0];
+   previousLoss[1]=currentLoss[1];
+   previousLoss[2]=currentLoss[2];
 
    previousValues[0] = currentValues[0];
    previousValues[1] = currentValues[1];
@@ -840,6 +863,9 @@ float iteratePartLoss(
    {
      ++consecutiveBadSteps;
      fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
+     delta[0]=0;
+     delta[1]=0;
+     delta[2]=0;
    }
 
 
@@ -1065,12 +1091,14 @@ int BVHTestIK(
       {
         if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
          {
-         /*
+            #if DISCARD_POSITIONAL_COMPONENT
             bvh_removeTranslationFromTransform(
                                                 mc,
                                                 &bvhTargetTransform
                                               );
-         */
+            #endif // DISCARD_POSITIONAL_COMPONENT
+
+
             float error2D = approximateTargetFromMotionBuffer(
                                                               mc,
                                                               &renderer,
