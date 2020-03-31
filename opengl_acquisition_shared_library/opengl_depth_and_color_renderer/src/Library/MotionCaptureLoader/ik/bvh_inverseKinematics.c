@@ -226,7 +226,7 @@ void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct Mo
 }
 
 
-void compareTwoMotionBuffers(const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
+void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
 {
   fprintf(stderr,"%s \n",msg);
   fprintf(stderr,"___________\n");
@@ -247,7 +247,10 @@ void compareTwoMotionBuffers(const char * msg,struct MotionBuffer * guessA,struc
     {
      if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
                                            { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
-     fprintf(stderr,NORMAL "(%0.2f->%0.2f/%0.2f) ",guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
+
+     unsigned int jID=mc->motionToJointLookup[i].jointID;
+     unsigned int chID=mc->motionToJointLookup[i].channelID;
+     fprintf(stderr,NORMAL "(%s#%u/%0.2f->%0.2f/%0.2f) ",mc->jointHierarchy[jID].jointName,chID,guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
     }
   }
   fprintf(stderr,NORMAL "\n___________\n");
@@ -709,10 +712,17 @@ float iteratePartLoss(
 
  float originalLoss = calculateChainLoss(problem,chainID);
 
+ float losses[3];
+
  float originalValues[3];
  originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
+
+ float previousValues[3];
+ previousValues[0] = originalValues[0];
+ previousValues[1] = originalValues[1];
+ previousValues[2] = originalValues[2];
 
  float currentValues[3];
  currentValues[0] = originalValues[0];
@@ -729,11 +739,10 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- float maxD=5.0;
- float d=0.1;
- float lambda=1.0;
+ float d=0.01;
+ float lr=0.01;
  float gradient;
-
+ unsigned int maximumConsecutiveBadLoss=8;
  float bestDelta[3]={0};
  float delta[3]={0};
  delta[0] = d;
@@ -755,17 +764,8 @@ float iteratePartLoss(
  fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
- float losses[3];
- for (unsigned int i=0; i<iterations+1000; i++)
+ for (unsigned int i=0; i<iterations; i++)
  {
-/*
-   if (lambda>1.0)
-   {
-     lambda=lambda/2;
-   } else
-   {
-    lambda=1.0;
-   }*/
 
  #define SHARE_LOSS 0
 
@@ -785,50 +785,34 @@ float iteratePartLoss(
  //-------------------
  #else
  //-------------------
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
-   losses[0]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
+   losses[0]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
  //-------------------
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1] + delta[1];
-   losses[1]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
+   losses[1]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
  //-------------------
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2] + delta[2];
-   losses[2]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
+   losses[2]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
  //-------------------
  #endif
 
 
+   //We multiply by 0.5 to do a "One Half Mean Squared Error"
+   gradient = (float) 0.5 * (loss - losses[0]);
+   delta[0] += (float) lr *  gradient;
 
-   gradient = (float)  (loss - losses[0]);
-   if (loss!=losses[0]) { delta[0] = (float) lambda * delta[0] * gradient; } else
-                        { delta[0] = 0; }
+   gradient = (float)  0.5 * (loss - losses[1]);
+   delta[1] += (float) lr * gradient;
 
-   gradient = (float)   (loss - losses[1]);
-   if (loss!=losses[1]) { delta[1] = (float) lambda * delta[1] * gradient; } else
-                        { delta[1] = 0; }
+   gradient = (float)  0.5 * (loss - losses[2]);
+   delta[2] += (float) lr * gradient;
 
-   gradient = (float)   (loss - losses[2]);
-   if (loss!=losses[2]) { delta[2] = (float) lambda * delta[2] * gradient; } else
-                        { delta[2] = 0; }
-
-   if (delta[0]<-1 * maxD) { delta[0]=-1 * maxD; } else
-   if (delta[0]>maxD) { delta[0]=maxD; }
-   if (delta[1]<-1 * maxD) { delta[1]=-1 * maxD; } else
-   if (delta[1]>maxD) { delta[1]=maxD; }
-   if (delta[2]<-1 * maxD) { delta[2]=-1 * maxD; } else
-   if (delta[2]>maxD) { delta[2]=maxD; }
-
-   //Keep optimization from getting stuck..
-   if (delta[0]==0) { delta[0]=0.001; }
-   if (delta[1]==0) { delta[1]=0.001; }
-   if (delta[2]==0) { delta[2]=0.001; }
-
-   delta[0]*=0.98;
-   delta[1]*=0.98;
-   delta[2]*=0.98;
-
+   previousValues[0] = currentValues[0];
+   previousValues[1] = currentValues[1];
+   previousValues[2] = currentValues[2];
 
    currentValues[0]+=delta[0];
    currentValues[1]+=delta[1];
@@ -840,7 +824,7 @@ float iteratePartLoss(
    loss=calculateChainLoss(problem,chainID);
 
 
-   if (loss<bestLoss)
+   if ( (loss<bestLoss) && ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
    {
      bestLoss=loss;
      bestDelta[0]=delta[0];
@@ -860,7 +844,7 @@ float iteratePartLoss(
 
 
 
-   if (consecutiveBadSteps>4) { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); break; }
+   if (consecutiveBadSteps>maximumConsecutiveBadLoss) { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); break; }
  }
  unsigned long endTime = GetTickCountMicrosecondsIK();
 
@@ -869,9 +853,9 @@ float iteratePartLoss(
   fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
   fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
 
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + bestDelta[0];
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1] + bestDelta[1];
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2] + bestDelta[2];
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
 
   return bestLoss;
 
@@ -1103,7 +1087,7 @@ int BVHTestIK(
             //compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
             //compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
             //-------------------------------------------------------------------------------------------------------------
-            compareTwoMotionBuffers("Improvement",initialSolution,solution,groundTruth);
+            compareTwoMotionBuffers(mc,"Improvement",initialSolution,solution,groundTruth);
          }
       }
     freeSolutionBuffer(solution);
