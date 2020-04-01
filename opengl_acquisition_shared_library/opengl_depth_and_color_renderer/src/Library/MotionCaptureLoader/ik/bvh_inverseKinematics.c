@@ -31,7 +31,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-#define DISCARD_POSITIONAL_COMPONENT 0
+#define DISCARD_POSITIONAL_COMPONENT 1
 
 unsigned long tickBaseIK = 0;
 
@@ -758,10 +758,11 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
+ float e=0.001;
  float d=0.01;
  float lr=0.01;
  float gradient;
- unsigned int maximumConsecutiveBadLoss=8;
+ unsigned int maximumConsecutiveBadLoss=4;
  float bestDelta[3]={0};
  float delta[3]={0};
  delta[0] = d;
@@ -820,13 +821,13 @@ float iteratePartLoss(
 
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
-   gradient = (float) 0.5 * (previousLoss[0] - currentLoss[0]);
+   gradient = (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
    delta[0] += (float) lr *  gradient;
 
-   gradient = (float)  0.5 * (previousLoss[1] - currentLoss[1]);
+   gradient = (float)  0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
    delta[1] += (float) lr * gradient;
 
-   gradient = (float)  0.5 * (previousLoss[2] - currentLoss[2]);
+   gradient = (float)  0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
    delta[2] += (float) lr * gradient;
 
    previousLoss[0]=currentLoss[0];
@@ -863,9 +864,6 @@ float iteratePartLoss(
    {
      ++consecutiveBadSteps;
      fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
-     delta[0]=0;
-     delta[1]=0;
-     delta[2]=0;
    }
 
 
@@ -1013,6 +1011,9 @@ float approximateTargetFromMotionBuffer(
   unsigned int maximumIterations=1000;
   float loss;
 
+  for (int t=0; t<3; t++)
+  {
+
   loss = iterateChainLoss(
                           &problem,
                           0,
@@ -1043,7 +1044,7 @@ float approximateTargetFromMotionBuffer(
                             4,
                             maximumIterations
                           );
-
+  }
 
    copyMotionBuffer(solution,problem.currentSolution);
  return loss;
