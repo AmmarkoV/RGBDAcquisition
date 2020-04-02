@@ -817,7 +817,7 @@ float iteratePartLoss(
  unsigned int maximumConsecutiveBadLoss=4;
  float e=0.001;
  float d=0.01;
- float lr=0.001;
+ float lr=0.0021;
  float gradient;
 
  delta[0] = d;
@@ -871,13 +871,13 @@ float iteratePartLoss(
 
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
-   gradient = (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
+   gradient =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
    delta[0] += (float) lr *  gradient;
 
-   gradient = (float)  0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
+   gradient =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
    delta[1] += (float) lr * gradient;
 
-   gradient = (float)  0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
+   gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
    delta[2] += (float) lr * gradient;
 
    previousLoss[0]=currentLoss[0];
@@ -980,7 +980,9 @@ float approximateTargetFromMotionBuffer(
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
                                          float * averageError,
-                                         struct BVH_Transform * bvhTargetTransform
+                                         struct BVH_Transform * bvhTargetTransform,
+                                         float * initialMAE,
+                                         float * finalMAE
                                         )
 {
 
@@ -1002,7 +1004,6 @@ float approximateTargetFromMotionBuffer(
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  float initialMAE = 0;
   struct BVH_Transform bvhCurrentTransform={0};
 
   float forcePosition[3];
@@ -1027,7 +1028,7 @@ float approximateTargetFromMotionBuffer(
                                             &bvhCurrentTransform
                                           );
        #endif // DISCARD_POSITIONAL_COMPONENT
-        initialMAE = meanSquaredBVH2DDistace(
+        *initialMAE = meanSquaredBVH2DDistace(
                                              mc,
                                              renderer,
                                              1,
@@ -1101,12 +1102,9 @@ float approximateTargetFromMotionBuffer(
 
 
 
-     //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  float finalMAE = 0;
-
-
+  //---------------------------------------------------------------------------------------
   forcePosition[0] = solution->motion[0];
   forcePosition[1] = solution->motion[1];
   forcePosition[2] = solution->motion[2];
@@ -1128,7 +1126,7 @@ float approximateTargetFromMotionBuffer(
                                             &bvhCurrentTransform
                                           );
        #endif // DISCARD_POSITIONAL_COMPONENT
-        finalMAE  = meanSquaredBVH2DDistace(
+        *finalMAE  = meanSquaredBVH2DDistace(
                                              mc,
                                              renderer,
                                              1,
@@ -1163,7 +1161,6 @@ float approximateTargetFromMotionBuffer(
                       renderer
                      );
 
- fprintf(stderr,"MAE went from %0.2f to %0.2f \n",initialMAE,finalMAE);
 
 
 
@@ -1195,6 +1192,7 @@ int BVHTestIK(
 
   fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
 
+  float initialMAE=0.0,finalMAE=0.0;
 
   //Load all motion buffers
   struct MotionBuffer * groundTruth     = mallocNewSolutionBuffer(mc);
@@ -1210,8 +1208,6 @@ int BVHTestIK(
           ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
        )
       {
-
-
        initialSolution->motion[0]=0;
        initialSolution->motion[1]=0;
        initialSolution->motion[2]=distance;
@@ -1242,7 +1238,9 @@ int BVHTestIK(
                                                               &renderer,
                                                               solution,
                                                               0,
-                                                              &bvhTargetTransform
+                                                              &bvhTargetTransform,
+                                                              &initialMAE,
+                                                              &finalMAE
                                                              );
 
             fprintf(stderr,"Final 2D Distance is %0.2f\n",error2D);
@@ -1254,6 +1252,8 @@ int BVHTestIK(
             //compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
             //-------------------------------------------------------------------------------------------------------------
             compareTwoMotionBuffers(mc,"Improvement",initialSolution,solution,groundTruth);
+
+            fprintf(stderr,"MAE went from %0.2f to %0.2f \n",initialMAE,finalMAE);
          }
       }
     freeSolutionBuffer(solution);
