@@ -244,12 +244,12 @@ void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,stru
   {
     float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
     float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
-    if ( (diffA==0.0) && (diffA==diffB) ) { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
+    if ( (diffA==0.0) && (diffA==diffB) )  { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
     {
      if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
                                            { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
 
-     unsigned int jID=mc->motionToJointLookup[i].jointID;
+     unsigned int jID =mc->motionToJointLookup[i].jointID;
      unsigned int chID=mc->motionToJointLookup[i].channelID;
      fprintf(stderr,NORMAL "(%s#%u/%0.2f->%0.2f/%0.2f) ",mc->jointHierarchy[jID].jointName,chID,guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
     }
@@ -271,7 +271,7 @@ float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
   float diffX = (float) aX-bX;
   float diffY = (float) aY-bY;
     //We calculate the distance here..!
-  return (diffX*diffX)+(diffY*diffY);
+  return (diffX*diffX) + (diffY*diffY);
 }
 
 
@@ -281,6 +281,59 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
 }
 
 
+float meanSquaredBVH2DDistace(
+                              struct BVH_MotionCapture * mc,
+                              struct simpleRenderer *renderer,
+                              int useAllJoints,
+                              BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
+                              struct BVH_Transform * bvhSourceTransform,
+                              struct BVH_Transform * bvhTargetTransform
+                             )
+{
+   if (
+        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
+        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
+      )
+      {
+       //-----------------
+       float sumOf2DDistances=0.0;
+       unsigned int numberOfSamples=0;
+       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              int isSelected = 1;
+
+              if (mc->selectedJoints!=0)
+              {
+                if (!mc->selectedJoints[jID])
+                {
+                  isSelected=0;
+                }
+              }
+
+               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
+               {
+                float thisSquared2DDistance=getSquared2DPointDistance(
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
+                                                                     );
+               fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
+               fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
+
+               numberOfSamples+=1;
+               sumOf2DDistances+=thisSquared2DDistance;
+              }
+            }
+
+       if (numberOfSamples>0)
+       {
+         return (float)  sumOf2DDistances/numberOfSamples;
+       }
+     } //-----------------
+
+ return 0.0;
+}
 
 int prepareProblem(
                    struct ikProblem * problem,
@@ -649,7 +702,7 @@ float calculateChainLoss(
                         )
 {
   unsigned int numberOfSamples=0;
-  float loss=0;
+  float loss=0.0;
   if (chainID<problem->numberOfChains)
   {
    //fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
@@ -748,6 +801,8 @@ float iteratePartLoss(
  bestValues[1] = originalValues[1];
  bestValues[2] = originalValues[2];
 
+ float bestDelta[3]={0};
+ float delta[3]={0};
 
  float initialLoss = calculateChainLoss(problem,chainID);
 
@@ -758,26 +813,20 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
+ unsigned int maximumConsecutiveBadLoss=4;
  float e=0.001;
  float d=0.01;
- float lr=0.01;
+ float lr=0.001;
  float gradient;
- unsigned int maximumConsecutiveBadLoss=4;
- float bestDelta[3]={0};
- float delta[3]={0};
+
  delta[0] = d;
  delta[1] = d;
  delta[2] = d;
+ //currentValues[0] += d;
+ //currentValues[1] += d;
+ //currentValues[2] += d;
 
- /*
-  fprintf(stderr,"The received solution to improve : ");
-  for (unsigned int i=0; i<problem->chain[chainID].currentSolution->bufferSize; i++)
-  {
-    fprintf(stderr,"%0.2f " ,problem->chain[chainID].currentSolution->motion[i]);
-  }
-  fprintf(stderr,"\n");
-  //--------------------------------------------------
-*/
+
 
  fprintf(stderr,"\nOptimizing %s \n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
  fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
@@ -921,66 +970,6 @@ float iterateChainLoss(
 
 
 
-int gatherBVH2DDistaces(
-                        double * result,
-                        unsigned int resultSize,
-                        struct BVH_MotionCapture * mc,
-                        struct simpleRenderer *renderer,
-                        int useAllJoints,
-                        BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-                        struct BVH_Transform * bvhSourceTransform,
-                        struct BVH_Transform * bvhTargetTransform
-                       )
-{
-   unsigned int numberOfSamples=0;
-
-   if (
-        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
-        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
-      )
-      {
-       //-----------------
-       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-            {
-              int isSelected = 1;
-
-              if (mc->selectedJoints!=0)
-              {
-                if (!mc->selectedJoints[jID])
-                {
-                  isSelected=0;
-                }
-              }
-
-               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
-               {
-                float thisSquared2DDistance=getSquared2DPointDistance(
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                                                     );
-
-               if (numberOfSamples<resultSize)
-               {
-                 result[numberOfSamples]= (double) thisSquared2DDistance;
-               } else
-               {
-                 fprintf(stderr,"gatherBVH2DDistaces: overflow..\n");
-                 return 0;
-               }
-
-               numberOfSamples+=1;
-              }
-            }
-
-     } //-----------------
-
- return  (numberOfSamples>0);
-}
-
-
-
 
 
 
@@ -1006,6 +995,44 @@ float approximateTargetFromMotionBuffer(
                 );
 
   viewProblem(&problem);
+
+
+
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  float initialMAE = 0;
+  struct BVH_Transform bvhCurrentTransform={0};
+
+  if (
+         bvh_loadTransformForMotionBuffer(
+                                          mc,
+                                          solution,
+                                          &bvhCurrentTransform
+                                         )
+        )
+      {
+       #if DISCARD_POSITIONAL_COMPONENT
+        bvh_removeTranslationFromTransform(
+                                            mc,
+                                            &bvhCurrentTransform
+                                          );
+       #endif // DISCARD_POSITIONAL_COMPONENT
+        initialMAE = meanSquaredBVH2DDistace(
+                                             mc,
+                                             renderer,
+                                             1,
+                                             0,
+                                             &bvhCurrentTransform,
+                                             bvhTargetTransform
+                                            );
+
+      }
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+
+
 
 
   unsigned int maximumIterations=1000;
@@ -1047,6 +1074,50 @@ float approximateTargetFromMotionBuffer(
   }
 
    copyMotionBuffer(solution,problem.currentSolution);
+
+
+
+
+
+
+     //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  float finalMAE = 0;
+
+  if (
+         bvh_loadTransformForMotionBuffer(
+                                          mc,
+                                          solution,
+                                          &bvhCurrentTransform
+                                         )
+        )
+      {
+       #if DISCARD_POSITIONAL_COMPONENT
+        bvh_removeTranslationFromTransform(
+                                            mc,
+                                            &bvhCurrentTransform
+                                          );
+       #endif // DISCARD_POSITIONAL_COMPONENT
+        finalMAE  = meanSquaredBVH2DDistace(
+                                             mc,
+                                             renderer,
+                                             1,
+                                             0,
+                                             &bvhCurrentTransform,
+                                             bvhTargetTransform
+                                            );
+
+      }
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+
+
+ fprintf(stderr,"MAE went from %0.2f to %0.2f \n",initialMAE,finalMAE);
+
+
+
  return loss;
 }
 
@@ -1106,9 +1177,9 @@ int BVHTestIK(
                                                               solution,
                                                               0,
                                                               &bvhTargetTransform
-                                                              );
+                                                             );
 
-            fprintf(stderr,"2D Distance is %0.2f\n",error2D);
+            fprintf(stderr,"Final 2D Distance is %0.2f\n",error2D);
             result=1;
 
 
