@@ -14,6 +14,7 @@
 #include "bvh_inverseKinematics.h"
 #include "levmar.h"
 
+#include "../export/bvh_to_svg.h"
 #include "../edit/bvh_cut_paste.h"
 
 #define MAXIMUM_CHAINS 10
@@ -31,7 +32,8 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-#define DISCARD_POSITIONAL_COMPONENT 1
+#define DISCARD_POSITIONAL_COMPONENT 0
+const float distance=-150;
 
 unsigned long tickBaseIK = 0;
 
@@ -379,7 +381,7 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
 
-
+/*
   #if DISCARD_POSITIONAL_COMPONENT
    fprintf(stderr,"Ignoring positional component..\n");
   #else
@@ -391,9 +393,8 @@ int prepareProblem(
      problem->chain[chainID].part[partID].mIDEnd=2; //First Rotation
      ++partID;
    }
-
   #endif // DISCARD_POSITIONAL_COMPONENT
-
+*/
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
@@ -1004,10 +1005,18 @@ float approximateTargetFromMotionBuffer(
   float initialMAE = 0;
   struct BVH_Transform bvhCurrentTransform={0};
 
+  float forcePosition[3];
+  forcePosition[0] = solution->motion[0];
+  forcePosition[1] = solution->motion[1];
+  forcePosition[2] = solution->motion[2];
+  solution->motion[0]=0;
+  solution->motion[1]=0;
+  solution->motion[2]=distance;
+
   if (
          bvh_loadTransformForMotionBuffer(
                                           mc,
-                                          solution,
+                                          solution->motion,
                                           &bvhCurrentTransform
                                          )
         )
@@ -1027,7 +1036,19 @@ float approximateTargetFromMotionBuffer(
                                              bvhTargetTransform
                                             );
 
+        solution->motion[0]=forcePosition[0];
+        solution->motion[1]=forcePosition[1];
+        solution->motion[2]=forcePosition[2];
       }
+
+  dumpBVHToSVGFrame(
+                     "initial.svg",
+                      mc,
+                      &bvhCurrentTransform,
+                      0,
+                      renderer
+                     );
+
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -1085,10 +1106,18 @@ float approximateTargetFromMotionBuffer(
   //---------------------------------------------------------------------------------------
   float finalMAE = 0;
 
+
+  forcePosition[0] = solution->motion[0];
+  forcePosition[1] = solution->motion[1];
+  forcePosition[2] = solution->motion[2];
+  solution->motion[0]=0;
+  solution->motion[1]=0;
+  solution->motion[2]=distance;
+
   if (
          bvh_loadTransformForMotionBuffer(
                                           mc,
-                                          solution,
+                                          solution->motion,
                                           &bvhCurrentTransform
                                          )
         )
@@ -1108,11 +1137,31 @@ float approximateTargetFromMotionBuffer(
                                              bvhTargetTransform
                                             );
 
+
+        solution->motion[0]=forcePosition[0];
+        solution->motion[1]=forcePosition[1];
+        solution->motion[2]=forcePosition[2];
+
       }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 
+  dumpBVHToSVGFrame(
+                     "target.svg",
+                      mc,
+                      bvhTargetTransform,
+                      1,
+                      renderer
+                     );
+
+  dumpBVHToSVGFrame(
+                     "solution.svg",
+                      mc,
+                      &bvhCurrentTransform,
+                      0,
+                      renderer
+                     );
 
  fprintf(stderr,"MAE went from %0.2f to %0.2f \n",initialMAE,finalMAE);
 
@@ -1161,7 +1210,24 @@ int BVHTestIK(
           ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
        )
       {
-        if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+
+
+       initialSolution->motion[0]=0;
+       initialSolution->motion[1]=0;
+       initialSolution->motion[2]=distance;
+
+
+       solution->motion[0]=0;
+       solution->motion[1]=0;
+       solution->motion[2]=distance;
+
+
+       groundTruth->motion[0]=0;
+       groundTruth->motion[1]=0;
+       groundTruth->motion[2]=distance;
+
+
+        if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform) )
          {
             #if DISCARD_POSITIONAL_COMPONENT
             bvh_removeTranslationFromTransform(
