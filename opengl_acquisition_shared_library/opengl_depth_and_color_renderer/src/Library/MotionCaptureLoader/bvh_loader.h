@@ -531,6 +531,16 @@ int bvh_selectJointsToHide2D(
  int bvh_removeSelectedFrames(struct BVH_MotionCapture * bvhMotion,unsigned int * framesToRemove);
 
 
+
+
+void freeMotionBuffer(struct MotionBuffer * mb);
+int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src);
+struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc);
+struct MotionBuffer * mallocNewMotionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy);
+void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct MotionBuffer * groundTruth);
+void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth);
+
+
 /**
 * @brief Print BVH information on stderr
 * @ingroup BVH

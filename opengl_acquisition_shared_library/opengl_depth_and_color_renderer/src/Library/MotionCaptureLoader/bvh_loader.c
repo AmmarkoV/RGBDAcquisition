@@ -1044,6 +1044,168 @@ int bvh_selectJointsToHide2D(
 
 
 
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+///                                        MOTION BUFFER
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+void freeMotionBuffer(struct MotionBuffer * mb)
+{
+ if (mb!=0)
+ {
+  if(mb->motion!=0)
+   {
+     free(mb->motion);
+     mb->motion=0;
+   }
+  free(mb);
+ }
+}
+//---------------------------------------------------------
+
+int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
+{
+  if (src->bufferSize != dst->bufferSize)
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return 0;
+  }
+
+  for (unsigned int i=0; i<dst->bufferSize; i++)
+  {
+    dst->motion[i] = src->motion[i];
+  }
+  return 1;
+}
+
+struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
+{
+  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
+  if (newBuffer!=0)
+  {
+    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
+    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
+    if (newBuffer->motion!=0)
+    {
+      memset(newBuffer->motion,0,sizeof(float) * newBuffer->bufferSize);
+    }
+  }
+
+  return newBuffer;
+}
+//---------------------------------------------------------
+
+
+struct MotionBuffer * mallocNewMotionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy)
+{
+  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
+  if (newBuffer!=0)
+  {
+    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
+    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
+    if (newBuffer->motion!=0)
+    {
+      for (unsigned int i=0; i<newBuffer->bufferSize; i++)
+      {
+        newBuffer->motion[i]=whatToCopy->motion[i];
+      }
+    }
+  }
+
+  return newBuffer;
+}
+//---------------------------------------------------------
+
+
+
+void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if (guess->bufferSize != groundTruth->bufferSize)
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return ;
+  }
+
+  //--------------------------------------------------
+  fprintf(stderr,"Guess : ");
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,guess->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+  fprintf(stderr,"Truth : ");
+  for (unsigned int i=0; i<groundTruth->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,groundTruth->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+
+
+  fprintf(stderr,"Diff : ");
+
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    float diff=fabs(groundTruth->motion[i] - guess->motion[i]);
+    if (fabs(diff)<0.1) { fprintf(stderr,GREEN "%0.2f " ,diff); } else
+                         { fprintf(stderr,RED "%0.2f " ,diff); }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
+void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if ( (guessA->bufferSize != groundTruth->bufferSize) || (guessB->bufferSize != groundTruth->bufferSize) )
+  {
+    fprintf(stderr,"Buffer Size mismatch..\n");
+    return ;
+  }
+
+
+  fprintf(stderr,"Diff : ");
+  for (unsigned int i=0; i<guessA->bufferSize; i++)
+  {
+    float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
+    float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
+    if ( (diffA==0.0) && (diffA==diffB) )  { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
+    {
+     if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
+                                           { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
+
+     unsigned int jID =mc->motionToJointLookup[i].jointID;
+     unsigned int chID=mc->motionToJointLookup[i].channelID;
+     fprintf(stderr,NORMAL "(%s#%u/%0.2f->%0.2f/%0.2f) ",mc->jointHierarchy[jID].jointName,chID,guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
+    }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
+
+
+
+
+
 
 
 

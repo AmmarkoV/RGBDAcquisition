@@ -17,8 +17,6 @@
 #include "../export/bvh_to_svg.h"
 #include "../edit/bvh_cut_paste.h"
 
-#define MAXIMUM_CHAINS 10
-#define MAXIMUM_PARTS_OF_CHAIN 10
 
 
 #define NORMAL   "\033[0m"
@@ -61,203 +59,6 @@ unsigned long GetTickCountMillisecondsIK()
     return (unsigned long) GetTickCountMicrosecondsIK()/1000;
 }
 
-
-struct ikChainParts
-{
- BVHJointID jID;
- BVHMotionChannelID mIDStart;
- BVHMotionChannelID mIDEnd;
- char evaluated;
- char endEffector;
-};
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-struct ikChain
-{
-  unsigned int jobID;
-  unsigned int groupID;
-
-  unsigned int numberOfParts;
-  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
-
-  struct MotionBuffer * currentSolution;
-  struct BVH_Transform current2DProjectionTransform;
-
-  float initialError;
-  float previousError;
-  float currentError;
-};
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-struct ikProblem
-{
- //BVH file that reflects our problem
- struct BVH_MotionCapture * mc;
- //Renderer that handles 3D projections
- struct simpleRenderer *renderer;
-
-
- //Initial solution
- struct MotionBuffer * initialSolution;
- //Current solution
- struct MotionBuffer * currentSolution;
-
- //2D Projections Targeted
- struct BVH_Transform * bvhTarget2DProjectionTransform;
-
- //Chain of subproblems that need to be solved
- unsigned int numberOfChains;
- unsigned int numberOfGroups;
- unsigned int numberOfJobsPerGroup;
-
- struct ikChain chain[MAXIMUM_CHAINS];
-};
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-void freeSolutionBuffer(struct MotionBuffer * mb)
-{
- if (mb!=0)
- {
-  if(mb->motion!=0)
-   {
-     free(mb->motion);
-     mb->motion=0;
-   }
-  free(mb);
- }
-}
-//---------------------------------------------------------
-
-int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
-{
-  if (src->bufferSize != dst->bufferSize)
-  {
-    fprintf(stderr,"Buffer Size mismatch..\n");
-    return 0;
-  }
-
-  for (unsigned int i=0; i<dst->bufferSize; i++)
-  {
-    dst->motion[i] = src->motion[i];
-  }
-  return 1;
-}
-
-struct MotionBuffer * mallocNewSolutionBuffer(struct BVH_MotionCapture * mc)
-{
-  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
-  if (newBuffer!=0)
-  {
-    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
-    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
-    if (newBuffer->motion!=0)
-    {
-      memset(newBuffer->motion,0,sizeof(float) * newBuffer->bufferSize);
-    }
-  }
-
-  return newBuffer;
-}
-//---------------------------------------------------------
-
-
-struct MotionBuffer * mallocNewSolutionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy)
-{
-  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
-  if (newBuffer!=0)
-  {
-    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
-    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
-    if (newBuffer->motion!=0)
-    {
-      for (unsigned int i=0; i<newBuffer->bufferSize; i++)
-      {
-        newBuffer->motion[i]=whatToCopy->motion[i];
-      }
-    }
-  }
-
-  return newBuffer;
-}
-//---------------------------------------------------------
-
-
-
-void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct MotionBuffer * groundTruth)
-{
-  fprintf(stderr,"%s \n",msg);
-  fprintf(stderr,"___________\n");
-
-  if (guess->bufferSize != groundTruth->bufferSize)
-  {
-    fprintf(stderr,"Buffer Size mismatch..\n");
-    return ;
-  }
-
-  //--------------------------------------------------
-  fprintf(stderr,"Guess : ");
-  for (unsigned int i=0; i<guess->bufferSize; i++)
-  {
-    fprintf(stderr,"%0.2f " ,guess->motion[i]);
-  }
-  fprintf(stderr,"\n");
-  //--------------------------------------------------
-  fprintf(stderr,"Truth : ");
-  for (unsigned int i=0; i<groundTruth->bufferSize; i++)
-  {
-    fprintf(stderr,"%0.2f " ,groundTruth->motion[i]);
-  }
-  fprintf(stderr,"\n");
-  //--------------------------------------------------
-
-
-  fprintf(stderr,"Diff : ");
-
-  for (unsigned int i=0; i<guess->bufferSize; i++)
-  {
-    float diff=fabs(groundTruth->motion[i] - guess->motion[i]);
-    if (fabs(diff)<0.1) { fprintf(stderr,GREEN "%0.2f " ,diff); } else
-                         { fprintf(stderr,RED "%0.2f " ,diff); }
-  }
-  fprintf(stderr,NORMAL "\n___________\n");
-}
-
-
-void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
-{
-  fprintf(stderr,"%s \n",msg);
-  fprintf(stderr,"___________\n");
-
-  if ( (guessA->bufferSize != groundTruth->bufferSize) || (guessB->bufferSize != groundTruth->bufferSize) )
-  {
-    fprintf(stderr,"Buffer Size mismatch..\n");
-    return ;
-  }
-
-
-  fprintf(stderr,"Diff : ");
-  for (unsigned int i=0; i<guessA->bufferSize; i++)
-  {
-    float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
-    float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
-    if ( (diffA==0.0) && (diffA==diffB) )  { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
-    {
-     if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
-                                           { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
-
-     unsigned int jID =mc->motionToJointLookup[i].jointID;
-     unsigned int chID=mc->motionToJointLookup[i].channelID;
-     fprintf(stderr,NORMAL "(%s#%u/%0.2f->%0.2f/%0.2f) ",mc->jointHierarchy[jID].jointName,chID,guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
-    }
-  }
-  fprintf(stderr,NORMAL "\n___________\n");
-}
 
 
 void clear_line()
@@ -302,13 +103,13 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
 
 
 float meanBVH2DDistace(
-                              struct BVH_MotionCapture * mc,
-                              struct simpleRenderer *renderer,
-                              int useAllJoints,
-                              BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-                              struct BVH_Transform * bvhSourceTransform,
-                              struct BVH_Transform * bvhTargetTransform
-                             )
+                       struct BVH_MotionCapture * mc,
+                       struct simpleRenderer *renderer,
+                       int useAllJoints,
+                       BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
+                       struct BVH_Transform * bvhSourceTransform,
+                       struct BVH_Transform * bvhTargetTransform
+                      )
 {
    if (
         (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
@@ -366,7 +167,7 @@ float meanBVH3DDistace(
                         struct BVH_Transform * bvhSourceTransform,
                         float * targetMotionBuffer,
                         struct BVH_Transform * bvhTargetTransform
-                       )
+                      )
 {
 
   if (targetMotionBuffer==0) { return NAN;}
@@ -456,7 +257,7 @@ int prepareProblem(
   problem->renderer = renderer;
   problem->initialSolution = solution ;
 
-  problem->currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
   //2D Projections Targeted
   //----------------------------------------------------------
@@ -485,7 +286,7 @@ int prepareProblem(
   //----------------------------------------------------------
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 /*
   #if DISCARD_POSITIONAL_COMPONENT
@@ -568,7 +369,7 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 
 
@@ -618,7 +419,7 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 
 
@@ -668,7 +469,7 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 
   if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
@@ -716,7 +517,7 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
   if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
   {
@@ -880,8 +681,6 @@ float iteratePartLoss(
  mIDS[1]= problem->chain[chainID].part[partID].mIDStart+1;
  mIDS[2]= problem->chain[chainID].part[partID].mIDStart+2;
 
- float originalLoss = calculateChainLoss(problem,chainID);
-
 
  float originalValues[3];
  originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
@@ -908,7 +707,6 @@ float iteratePartLoss(
  bestValues[1] = originalValues[1];
  bestValues[2] = originalValues[2];
 
- float bestDelta[3]={0};
  float delta[3]={0};
 
  float initialLoss = calculateChainLoss(problem,chainID);
@@ -1007,10 +805,6 @@ float iteratePartLoss(
    if ( (loss<bestLoss) && ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
    {
      bestLoss=loss;
-     bestDelta[0]=delta[0];
-     bestDelta[1]=delta[1];
-     bestDelta[2]=delta[2];
-
      bestValues[0]=currentValues[0];
      bestValues[1]=currentValues[1];
      bestValues[2]=currentValues[2];
@@ -1091,7 +885,8 @@ float approximateTargetFromMotionBuffer(
                                          float * initialMAEInPixels,
                                          float * finalMAEInPixels,
                                          float * initialMAEInMM,
-                                         float * finalMAEInMM
+                                         float * finalMAEInMM,
+                                         int dumpScreenshots
                                         )
 {
 
@@ -1162,6 +957,8 @@ float approximateTargetFromMotionBuffer(
         solution->motion[2]=forcePosition[2];
       }
 
+  if (dumpScreenshots)
+  {
   dumpBVHToSVGFrame(
                      "initial.svg",
                       mc,
@@ -1169,7 +966,7 @@ float approximateTargetFromMotionBuffer(
                       0,
                       renderer
                      );
-
+  }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -1183,11 +980,11 @@ float approximateTargetFromMotionBuffer(
   for (int t=0; t<3; t++)
   {
 
-  loss = iterateChainLoss(
-                          &problem,
-                          0,
-                          maximumIterations
-                         );
+   loss = iterateChainLoss(
+                           &problem,
+                           0,
+                           maximumIterations
+                          );
 
    loss = iterateChainLoss(
                             &problem,
@@ -1274,6 +1071,8 @@ float approximateTargetFromMotionBuffer(
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 
+  if (dumpScreenshots)
+  {
   dumpBVHToSVGFrame(
                      "target.svg",
                       mc,
@@ -1289,6 +1088,8 @@ float approximateTargetFromMotionBuffer(
                       0,
                       renderer
                      );
+
+ }
 
 
  return loss;
@@ -1308,6 +1109,8 @@ int BVHTestIK(
 {
   int result=0;
 
+  int dumpScreenshots = 1;
+
   struct BVH_Transform bvhTargetTransform={0};
 
   struct simpleRenderer renderer={0};
@@ -1323,9 +1126,9 @@ int BVHTestIK(
   float initialMAEInMM=0.0,finalMAEInMM=0.0;
 
   //Load all motion buffers
-  struct MotionBuffer * groundTruth     = mallocNewSolutionBuffer(mc);
-  struct MotionBuffer * initialSolution = mallocNewSolutionBuffer(mc);
-  struct MotionBuffer * solution        = mallocNewSolutionBuffer(mc);
+  struct MotionBuffer * groundTruth     = mallocNewMotionBuffer(mc);
+  struct MotionBuffer * initialSolution = mallocNewMotionBuffer(mc);
+  struct MotionBuffer * solution        = mallocNewMotionBuffer(mc);
 
 
   if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) )
@@ -1371,7 +1174,8 @@ int BVHTestIK(
                                                               &initialMAEInPixels,
                                                               &finalMAEInPixels,
                                                               &initialMAEInMM,
-                                                              &finalMAEInMM
+                                                              &finalMAEInMM,
+                                                              dumpScreenshots
                                                              );
 
             fprintf(stderr,"Final 2D Distance is %0.2f\n",error2D);
@@ -1389,9 +1193,15 @@ int BVHTestIK(
 
 
   //-------------------------------------------------------------------------------------------------
+
+  if (dumpScreenshots)
+  {
   int i=system("convert initial.svg initial.png");
-  system("convert target.svg target.png");
-  system("convert solution.svg solution.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert target.svg target.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert solution.svg solution.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
 
   FILE * html=fopen("report.html","w");
   if (html!=0)
@@ -1419,14 +1229,16 @@ int BVHTestIK(
     fprintf(html,"</body></html>");
     fclose(html);
   }
+
+ }
  //-------------------------------------------------------------------------------------------------
 
 
          }
       }
-    freeSolutionBuffer(solution);
-    freeSolutionBuffer(initialSolution);
-    freeSolutionBuffer(groundTruth);
+    freeMotionBuffer(solution);
+    freeMotionBuffer(initialSolution);
+    freeMotionBuffer(groundTruth);
   }
 
  return result;
