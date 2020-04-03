@@ -358,17 +358,40 @@ float meanBVH2DDistace(
 
 
 float meanBVH3DDistace(
-                              struct BVH_MotionCapture * mc,
-                              struct simpleRenderer *renderer,
-                              int useAllJoints,
-                              BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-                              struct BVH_Transform * bvhSourceTransform,
-                              struct BVH_Transform * bvhTargetTransform
-                             )
+                        struct BVH_MotionCapture * mc,
+                        struct simpleRenderer *renderer,
+                        int useAllJoints,
+                        BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
+                        float * sourceMotionBuffer,
+                        struct BVH_Transform * bvhSourceTransform,
+                        float * targetMotionBuffer,
+                        struct BVH_Transform * bvhTargetTransform
+                       )
 {
+
+  if (targetMotionBuffer==0) { return NAN;}
+
    if (
-        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
-        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
+        (
+          performPointProjectionsForMotionBuffer(
+                                                 mc,
+                                                 bvhSourceTransform,
+                                                 sourceMotionBuffer,
+                                                 renderer,
+                                                 0,
+                                                 0
+                                                )
+        ) &&
+        (
+          performPointProjectionsForMotionBuffer(
+                                                 mc,
+                                                 bvhTargetTransform,
+                                                 targetMotionBuffer,
+                                                 renderer,
+                                                 0,
+                                                 0
+                                                )
+        )
       )
       {
        //-----------------
@@ -389,14 +412,19 @@ float meanBVH3DDistace(
                if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
                {
                 float this3DDistance=get3DPointDistance(
-                                                               (float) bvhSourceTransform->joint[jID].pos3D[0],
+                                                         (float) bvhSourceTransform->joint[jID].pos3D[0],
+                                                         (float) bvhSourceTransform->joint[jID].pos3D[1],
+                                                         (float) bvhSourceTransform->joint[jID].pos3D[2],
+                                                         (float) bvhTargetTransform->joint[jID].pos3D[0],
+                                                         (float) bvhTargetTransform->joint[jID].pos3D[1],
+                                                         (float) bvhTargetTransform->joint[jID].pos3D[2]
+                                                        );
+               fprintf(stderr,"%0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f : ",(float) bvhSourceTransform->joint[jID].pos3D[0],
                                                                (float) bvhSourceTransform->joint[jID].pos3D[1],
                                                                (float) bvhSourceTransform->joint[jID].pos3D[2],
                                                                (float) bvhTargetTransform->joint[jID].pos3D[0],
                                                                (float) bvhTargetTransform->joint[jID].pos3D[1],
-                                                               (float) bvhTargetTransform->joint[jID].pos3D[2]
-                                                              );
-               fprintf(stderr,"%0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
+                                                               (float) bvhTargetTransform->joint[jID].pos3D[2]);
                fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this3DDistance);
 
                numberOfSamples+=1;
@@ -1058,6 +1086,7 @@ float approximateTargetFromMotionBuffer(
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
                                          float * averageError,
+                                         struct MotionBuffer * groundTruth,
                                          struct BVH_Transform * bvhTargetTransform,
                                          float * initialMAEInPixels,
                                          float * finalMAEInPixels,
@@ -1122,7 +1151,9 @@ float approximateTargetFromMotionBuffer(
                                        renderer,
                                        1,
                                        0,
+                                       solution->motion,
                                        &bvhCurrentTransform,
+                                       groundTruth->motion,
                                        bvhTargetTransform
                                       );
 
@@ -1229,7 +1260,9 @@ float approximateTargetFromMotionBuffer(
                                        renderer,
                                        1,
                                        0,
+                                       solution->motion,
                                        &bvhCurrentTransform,
+                                       groundTruth->motion,
                                        bvhTargetTransform
                                       );
         solution->motion[0]=forcePosition[0];
@@ -1256,8 +1289,6 @@ float approximateTargetFromMotionBuffer(
                       0,
                       renderer
                      );
-
-
 
 
  return loss;
@@ -1335,6 +1366,7 @@ int BVHTestIK(
                                                               &renderer,
                                                               solution,
                                                               0,
+                                                              groundTruth,
                                                               &bvhTargetTransform,
                                                               &initialMAEInPixels,
                                                               &finalMAEInPixels,
@@ -1353,7 +1385,43 @@ int BVHTestIK(
             compareTwoMotionBuffers(mc,"Improvement",initialSolution,solution,groundTruth);
 
             fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
-            fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM,finalMAEInMM);
+            fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
+
+
+  //-------------------------------------------------------------------------------------------------
+  int i=system("convert initial.svg initial.png");
+  system("convert target.svg target.png");
+  system("convert solution.svg solution.png");
+
+  FILE * html=fopen("report.html","w");
+  if (html!=0)
+  {
+    fprintf(html,"<html><body><br>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<table><tr>\n");
+    fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
+    fprintf(html,"</tr>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<tr>\n");
+    fprintf(html,"<td align=\"center\">Initial Pose (frame %u)</td>\n",fIDSource);
+    fprintf(html,"<td align=\"center\">Target Pose (frame %u)</td>\n",fIDTarget);
+    fprintf(html,"<td align=\"center\">Solution</td>\n");
+    fprintf(html,"</tr>\n");
+    fprintf(html,"</table>\n");
+    //------------------------------------------------------------
+
+    fprintf(html,"<br><br><br><br>");
+    fprintf(html,"MAE in 2D Pixels went from %0.2f to %0.2f <br>",initialMAEInPixels,finalMAEInPixels);
+    fprintf(html,"MAE in 3D mm went from %0.2f to %0.2f <br>",initialMAEInMM*10,finalMAEInMM*10);
+
+    fprintf(html,"</body></html>");
+    fclose(html);
+  }
+ //-------------------------------------------------------------------------------------------------
+
+
          }
       }
     freeSolutionBuffer(solution);
