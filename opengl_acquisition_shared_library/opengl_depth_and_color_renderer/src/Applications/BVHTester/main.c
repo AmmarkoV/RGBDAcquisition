@@ -47,34 +47,36 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
+void prepare4x4Human36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
 {
-    double rXM[9],rYM[9],rZM[9];
-    double intermediateR[9];
+    float rXM[16],rYM[16],rZM[16];
+    float intermediateR[16];
 
     //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
-    rXM[0]=1.0; rXM[1]=0.0;     rXM[2]=0.0;
-    rXM[3]=0.0; rXM[4]=cos(rX); rXM[5]=-sin(rX);
-    rXM[6]=0.0; rXM[7]=sin(rX); rXM[8]=cos(rX);
+    rXM[0]=1.0;  rXM[1]=0.0;     rXM[2]=0.0;        rXM[3]=0.0;
+    rXM[4]=0.0;  rXM[5]=cos(rX); rXM[6]=-sin(rX);   rXM[7]=0.0;
+    rXM[8]=0.0;  rXM[9]=sin(rX); rXM[10]=cos(rX);   rXM[11]=0.0;
+    rXM[12]=0.0; rXM[13]=0.0;    rXM[14]=0.0;       rXM[15]=1.0;
 
     //R1y=np.matrix([[np.cos(Ry),0,np.sin(Ry)], [0,1,0], [-np.sin(Ry),0,np.cos(Ry)]])     #[cos(obj.Params(2)) 0 sin(obj.Params(2)); 0 1 0; -sin(obj.Params(2)) 0 cos(obj.Params(2))]
-    rYM[0]=cos(rY);  rYM[1]=0.0; rYM[2]=sin(rY);
-    rYM[3]=0.0;      rYM[4]=1.0; rYM[5]=0.0;
-    rYM[6]=-sin(rY); rYM[7]=0.0; rYM[8]=cos(rY);
+    rYM[0]=cos(rY);  rYM[1]=0.0;  rYM[2]=sin(rY);   rYM[3]=0.0;
+    rYM[4]=0.0;      rYM[5]=1.0;  rYM[6]=0.0;       rYM[7]=0.0;
+    rYM[8]=-sin(rY); rYM[9]=0.0;  rYM[10]=cos(rY);  rYM[11]=0.0;
+    rYM[12]=0.0;     rYM[13]=0.0; rYM[14]=0.0;      rYM[15]=1.0;
 
     //R1z=np.matrix([[np.cos(Rz),-np.sin(Rz),0], [np.sin(Rz),np.cos(Rz),0], [0,0,1]])     #[cos(obj.Params(3)) -sin(obj.Params(3)) 0; sin(obj.Params(3)) cos(obj.Params(3)) 0; 0 0 1]
-    rZM[0]=cos(rZ); rZM[1]=-sin(rZ); rZM[2]=0.0;
-    rZM[3]=sin(rZ); rZM[4]=cos(rZ);  rZM[5]=0.0;
-    rZM[6]=0.0;     rZM[7]=0.0;      rZM[8]=1.0;
+    rZM[0]=cos(rZ); rZM[1]=-sin(rZ); rZM[2]=0.0;    rZM[3]=0.0;
+    rZM[4]=sin(rZ); rZM[5]=cos(rZ);  rZM[6]=0.0;    rZM[7]=0.0;
+    rZM[8]=0.0;     rZM[9]=0.0;      rZM[10]=1.0;   rZM[11]=0.0;
+    rYM[12]=0.0;    rZM[13]=0.0;     rZM[14]=0.0;   rZM[15]=1.0;
 
-    multiplyThree4x4Matrices(
-                              intermediateR ,
+    multiplyThree4x4FMatrices(
+                              rotationMatrix ,
                               rXM ,
                               rYM,
                               rZM
                             );
 
-     copy4x4DMatrixToF(rotationMatrix,intermediateR);
 }
 
 
@@ -262,15 +264,17 @@ int main(int argc,const char **argv)
 
           if (i+4>=argc)  { incorrectArguments(); }
 
+          unsigned int sourceFrame=atoi(argv[i+1]);
+          unsigned int targetFrame=atoi(argv[i+2]);
           unsigned int iterations=atoi(argv[i+3]);
           unsigned int epochs=atoi(argv[i+4]);
 
-           BVHTestIK(
+           bvhTestIK(
                       &bvhMotion,
                       iterations,
                       epochs,
-                      atoi(argv[i+1]),
-                      atoi(argv[i+2])
+                      sourceFrame,
+                      targetFrame
                     );
 
           exit(0);
@@ -324,8 +328,8 @@ int main(int argc,const char **argv)
           unsigned int width=atoi(argv[i+16]);
           unsigned int height=atoi(argv[i+17]);
           //-------------------------------------------------------------------------------
-          prepareHuman36MRotationMatrix(renderingConfiguration.R,rX,rY,rZ);
-          copy3x3FMatrixTo4x4F(renderingConfiguration.viewMatrix,renderingConfiguration.R);
+          prepare4x4Human36MRotationMatrix(renderingConfiguration.viewMatrix,rX,rY,rZ);
+          //copy3x3FMatrixTo4x4F(renderingConfiguration.viewMatrix,renderingConfiguration.R);
 
           // 0  1  2  3
           // 4  5  6  7

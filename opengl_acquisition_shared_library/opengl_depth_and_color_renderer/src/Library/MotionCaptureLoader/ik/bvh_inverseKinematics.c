@@ -247,7 +247,6 @@ int prepareProblem(
                    struct BVH_MotionCapture * mc,
                    struct simpleRenderer *renderer,
                    struct MotionBuffer * solution,
-                   float * averageError,
                    struct BVH_Transform * bvhTargetTransform
                   )
 {
@@ -860,7 +859,6 @@ float approximateTargetFromMotionBuffer(
                                          struct MotionBuffer * solution,
                                          unsigned int iterations,
                                          unsigned int epochs,
-                                         float * averageError,
                                          struct MotionBuffer * groundTruth,
                                          struct BVH_Transform * bvhTargetTransform,
                                          float * initialMAEInPixels,
@@ -878,7 +876,6 @@ float approximateTargetFromMotionBuffer(
                  mc,
                  renderer,
                  solution,
-                 averageError,
                  bvhTargetTransform
                 );
 
@@ -1088,11 +1085,11 @@ int writeHTML(
 {
   if (dumpScreenshots)
   {
-  int i=system("convert initial.svg initial.png");
+  int i=system("convert initial.svg initial.png&");
   if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert target.svg target.png");
+  i=system("convert target.svg target.png&");
   if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert solution.svg solution.png");
+  i=system("convert solution.svg solution.png&");
   if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
 
   FILE * html=fopen("report.html","w");
@@ -1130,7 +1127,7 @@ int writeHTML(
 
 //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
 
-int BVHTestIK(
+int bvhTestIK(
               struct BVH_MotionCapture * mc,
               unsigned int iterations,
               unsigned int epochs,
@@ -1201,7 +1198,6 @@ int BVHTestIK(
                                                               solution,
                                                               iterations,
                                                               epochs,
-                                                              0,
                                                               groundTruth,
                                                               &bvhTargetTransform,
                                                               &initialMAEInPixels,

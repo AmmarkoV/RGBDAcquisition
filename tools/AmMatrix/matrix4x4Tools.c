@@ -897,6 +897,19 @@ int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
 }
 
 
+int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC)
+{
+  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+
+  int i=0;
+  float tmp[16];
+  i+=multiplyTwo4x4FMatrices(tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4FMatrices(result , matrixA , tmp);
+
+  return (i==2);
+}
+
+
 int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }

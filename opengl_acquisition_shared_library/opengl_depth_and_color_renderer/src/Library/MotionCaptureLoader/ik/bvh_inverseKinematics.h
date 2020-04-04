@@ -73,7 +73,7 @@ struct ikProblem
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-int BVHTestIK(
+int bvhTestIK(
               struct BVH_MotionCapture * mc,
               unsigned int iterations,
               unsigned int epochs,

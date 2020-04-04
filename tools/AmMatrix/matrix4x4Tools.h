@@ -170,7 +170,7 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 static const char * ROTATION_ORDER_NAMESA[] =
 {
   "ROTATION_ORDER_NONE", //0
-  "ROTATION_ORDER_XYZ",//1 
+  "ROTATION_ORDER_XYZ",//1
   "ROTATION_ORDER_XZY",//2
   "ROTATION_ORDER_YXZ",//3
   "ROTATION_ORDER_YZX",//4
@@ -180,8 +180,8 @@ static const char * ROTATION_ORDER_NAMESA[] =
   //--------------------
   "INVALID_ROTATION_ORDER"
 };
- 
- 
+
+
 
 enum ROTATION_ORDER
 {
@@ -302,6 +302,8 @@ int multiplyFour4x4Matrices(double * result , double * matrixA , double * matrix
 */
 int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
 
+
+int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 /**
 * @brief Multiply a 4x4 matrix with a Vector (3D Point)  A*V

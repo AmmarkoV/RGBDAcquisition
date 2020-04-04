@@ -729,6 +729,7 @@ int bvh_removeTranslationFromTransform(
                                        struct BVH_Transform * bvhTransform
                                       )
 {
+  fprintf(stderr,"bvh_removeTranslationFromTransform not correctly implemented");
   BVHJointID rootJID=0;
 
   if ( bvh_getRootJointID(bvhMotion,&rootJID) )
@@ -738,6 +739,9 @@ int bvh_removeTranslationFromTransform(
      bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].pos3D[0]-bvhTransform->joint[rootJID].pos3D[0];
      bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].pos3D[1]-bvhTransform->joint[rootJID].pos3D[1];
      bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].pos3D[2]-bvhTransform->joint[rootJID].pos3D[2];
+
+     bvhTransform->joint[jID].pos2D[0]=bvhTransform->joint[jID].pos2D[0]-bvhTransform->joint[rootJID].pos2D[0];
+     bvhTransform->joint[jID].pos2D[1]=bvhTransform->joint[jID].pos2D[1]-bvhTransform->joint[rootJID].pos2D[1];
     }
   }
 
