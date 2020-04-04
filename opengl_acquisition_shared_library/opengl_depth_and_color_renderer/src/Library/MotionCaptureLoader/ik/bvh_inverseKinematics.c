@@ -36,6 +36,15 @@ const float distance=-150;
 unsigned long tickBaseIK = 0;
 
 
+void clear_line()
+{
+  fputs("\033[A\033[2K\033[A\033[2K",stdout);
+  rewind(stdout);
+  int i=ftruncate(1,0);
+  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
+}
+
+
 unsigned long GetTickCountMicrosecondsIK()
 {
     struct timespec ts;
@@ -60,16 +69,6 @@ unsigned long GetTickCountMillisecondsIK()
 }
 
 
-
-void clear_line()
-{
-  fputs("\033[A\033[2K\033[A\033[2K",stdout);
-  rewind(stdout);
-  int i=ftruncate(1,0);
-  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
-}
-
-
 float getSquared3DPointDistance(float aX,float aY,float aZ,float bX,float bY,float bZ)
 {
   float diffX = (float) aX-bX;
@@ -84,7 +83,6 @@ float get3DPointDistance(float aX,float aY,float aZ,float bX,float bY,float bZ)
 {
   return sqrt(getSquared3DPointDistance(aX,aY,aZ,bX,bY,bZ));
 }
-
 
 
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
@@ -592,7 +590,6 @@ int viewProblem(
              problem->chain[chainID].part[partID].mIDStart,
              problem->chain[chainID].part[partID].mIDEnd
              );
-
      }
    }
    fprintf(stderr,"\n");
@@ -692,21 +689,18 @@ float iteratePartLoss(
  previousValues[1] = originalValues[1];
  previousValues[2] = originalValues[2];
 
- float previousLoss[3];
-
-
  float currentValues[3];
  currentValues[0] = originalValues[0];
  currentValues[1] = originalValues[1];
  currentValues[2] = originalValues[2];
-
- float currentLoss[3];
 
  float bestValues[3];
  bestValues[0] = originalValues[0];
  bestValues[1] = originalValues[1];
  bestValues[2] = originalValues[2];
 
+ float previousLoss[3];
+ float currentLoss[3];
  float delta[3]={0};
 
  float initialLoss = calculateChainLoss(problem,chainID);
@@ -724,12 +718,15 @@ float iteratePartLoss(
  float lr=0.0021;
  float gradient;
 
+
+ //Give an initial direction..
  delta[0] = d;
  delta[1] = d;
  delta[2] = d;
- //currentValues[0] += d;
- //currentValues[1] += d;
- //currentValues[2] += d;
+
+ currentValues[0] += d;
+ currentValues[1] += d;
+ currentValues[2] += d;
 
 
 
@@ -741,23 +738,6 @@ float iteratePartLoss(
  for (unsigned int i=0; i<iterations; i++)
  {
 
- #define SHARE_LOSS 0
-
- #if SHARE_LOSS
- //-------------------
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1] + delta[1];
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2] + delta[2];
- //-------------------
-   currentLoss[0]=calculateChainLoss(problem,chainID);
-   currentLoss[1]=currentLoss[0];
-   currentLoss[2]=currentLoss[0];
- //-------------------
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
- //-------------------
- #else
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    currentLoss[0]=calculateChainLoss(problem,chainID);
@@ -771,7 +751,6 @@ float iteratePartLoss(
    currentLoss[2]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
  //-------------------
- #endif
 
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
@@ -788,9 +767,9 @@ float iteratePartLoss(
    previousLoss[1]=currentLoss[1];
    previousLoss[2]=currentLoss[2];
 
-   previousValues[0] = currentValues[0];
-   previousValues[1] = currentValues[1];
-   previousValues[2] = currentValues[2];
+   previousValues[0]=currentValues[0];
+   previousValues[1]=currentValues[1];
+   previousValues[2]=currentValues[2];
 
    currentValues[0]+=delta[0];
    currentValues[1]+=delta[1];
@@ -959,7 +938,7 @@ float approximateTargetFromMotionBuffer(
 
   if (dumpScreenshots)
   {
-  dumpBVHToSVGFrame(
+   dumpBVHToSVGFrame(
                      "initial.svg",
                       mc,
                       &bvhCurrentTransform,
@@ -1096,7 +1075,56 @@ float approximateTargetFromMotionBuffer(
 }
 
 
+int writeHTML(
+               unsigned int fIDSource,
+               unsigned int fIDTarget,
+               float initialMAEInPixels,
+               float finalMAEInPixels,
+               float initialMAEInMM,
+               float finalMAEInMM,
+               int dumpScreenshots
+             )
+{
+  if (dumpScreenshots)
+  {
+  int i=system("convert initial.svg initial.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert target.svg target.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert solution.svg solution.png");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
 
+  FILE * html=fopen("report.html","w");
+  if (html!=0)
+  {
+    fprintf(html,"<html><body><br>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<table><tr>\n");
+    fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
+    fprintf(html,"</tr>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<tr>\n");
+    fprintf(html,"<td align=\"center\">Initial Pose (frame %u)</td>\n",fIDSource);
+    fprintf(html,"<td align=\"center\">Target Pose (frame %u)</td>\n",fIDTarget);
+    fprintf(html,"<td align=\"center\">Solution</td>\n");
+    fprintf(html,"</tr>\n");
+    fprintf(html,"</table>\n");
+    //------------------------------------------------------------
+
+    fprintf(html,"<br><br><br><br>");
+    fprintf(html,"MAE in 2D Pixels went from %0.2f to %0.2f <br>",initialMAEInPixels,finalMAEInPixels);
+    fprintf(html,"MAE in 3D mm went from %0.2f to %0.2f <br>",initialMAEInMM*10,finalMAEInMM*10);
+
+    fprintf(html,"</body></html>");
+    fclose(html);
+    return 1;
+  }
+
+ }
+  return 0;
+}
 
 
 //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
@@ -1193,44 +1221,15 @@ int BVHTestIK(
 
 
   //-------------------------------------------------------------------------------------------------
-
-  if (dumpScreenshots)
-  {
-  int i=system("convert initial.svg initial.png");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert target.svg target.png");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert solution.svg solution.png");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-
-  FILE * html=fopen("report.html","w");
-  if (html!=0)
-  {
-    fprintf(html,"<html><body><br>\n");
-    //------------------------------------------------------------
-    fprintf(html,"<table><tr>\n");
-    fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
-    fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
-    fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
-    fprintf(html,"</tr>\n");
-    //------------------------------------------------------------
-    fprintf(html,"<tr>\n");
-    fprintf(html,"<td align=\"center\">Initial Pose (frame %u)</td>\n",fIDSource);
-    fprintf(html,"<td align=\"center\">Target Pose (frame %u)</td>\n",fIDTarget);
-    fprintf(html,"<td align=\"center\">Solution</td>\n");
-    fprintf(html,"</tr>\n");
-    fprintf(html,"</table>\n");
-    //------------------------------------------------------------
-
-    fprintf(html,"<br><br><br><br>");
-    fprintf(html,"MAE in 2D Pixels went from %0.2f to %0.2f <br>",initialMAEInPixels,finalMAEInPixels);
-    fprintf(html,"MAE in 3D mm went from %0.2f to %0.2f <br>",initialMAEInMM*10,finalMAEInMM*10);
-
-    fprintf(html,"</body></html>");
-    fclose(html);
-  }
-
- }
+  writeHTML(
+             fIDSource,
+             fIDTarget,
+             initialMAEInPixels,
+             finalMAEInPixels,
+             initialMAEInMM,
+             finalMAEInMM,
+             dumpScreenshots
+           );
  //-------------------------------------------------------------------------------------------------
 
 
