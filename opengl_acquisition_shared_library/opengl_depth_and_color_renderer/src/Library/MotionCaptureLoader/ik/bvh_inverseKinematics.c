@@ -669,7 +669,7 @@ float iteratePartLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
                          unsigned int partID,
-                         unsigned int iterations
+                         unsigned int epochs
                         )
 {
  unsigned int consecutiveBadSteps=0;
@@ -735,7 +735,7 @@ float iteratePartLoss(
  fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
- for (unsigned int i=0; i<iterations; i++)
+ for (unsigned int i=0; i<epochs; i++)
  {
 
  //-------------------
@@ -824,7 +824,7 @@ float iteratePartLoss(
 float iterateChainLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
-                         unsigned int iterations
+                         unsigned int epochs
                         )
 {
 
@@ -838,7 +838,7 @@ float iterateChainLoss(
                     problem,
                     chainID,
                     partID,
-                    iterations
+                    epochs
                    );
    }
  }
@@ -858,6 +858,8 @@ float approximateTargetFromMotionBuffer(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
+                                         unsigned int iterations,
+                                         unsigned int epochs,
                                          float * averageError,
                                          struct MotionBuffer * groundTruth,
                                          struct BVH_Transform * bvhTargetTransform,
@@ -953,41 +955,40 @@ float approximateTargetFromMotionBuffer(
 
 
 
-  unsigned int maximumIterations=1000;
   float loss;
 
-  for (int t=0; t<3; t++)
+  for (int t=0; t<iterations; t++)
   {
 
    loss = iterateChainLoss(
                            &problem,
                            0,
-                           maximumIterations
+                           epochs
                           );
 
    loss = iterateChainLoss(
                             &problem,
                             1,
-                            maximumIterations
+                            epochs
                           );
 
    loss = iterateChainLoss(
                             &problem,
                             2,
-                            maximumIterations
+                            epochs
                           );
 
 
    loss = iterateChainLoss(
                             &problem,
                             3,
-                            maximumIterations
+                            epochs
                           );
 
    loss = iterateChainLoss(
                             &problem,
                             4,
-                            maximumIterations
+                            epochs
                           );
   }
 
@@ -1131,6 +1132,8 @@ int writeHTML(
 
 int BVHTestIK(
               struct BVH_MotionCapture * mc,
+              unsigned int iterations,
+              unsigned int epochs,
               unsigned int fIDSource,
               unsigned int fIDTarget
              )
@@ -1196,6 +1199,8 @@ int BVHTestIK(
                                                               mc,
                                                               &renderer,
                                                               solution,
+                                                              iterations,
+                                                              epochs,
                                                               0,
                                                               groundTruth,
                                                               &bvhTargetTransform,

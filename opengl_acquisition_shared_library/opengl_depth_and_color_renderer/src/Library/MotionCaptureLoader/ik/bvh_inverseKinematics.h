@@ -75,6 +75,8 @@ struct ikProblem
 
 int BVHTestIK(
               struct BVH_MotionCapture * mc,
+              unsigned int iterations,
+              unsigned int epochs,
               unsigned int fIDSource,
               unsigned int fIDTarget
              );

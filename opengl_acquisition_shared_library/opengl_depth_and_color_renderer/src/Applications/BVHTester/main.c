@@ -260,8 +260,13 @@ int main(int argc,const char **argv)
         {
           //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
 
+          unsigned int iterations=3;
+          unsigned int epochs=100;
+
            BVHTestIK(
                       &bvhMotion,
+                      iterations,
+                      epochs,
                       atoi(argv[i+1]),
                       atoi(argv[i+2])
                     );
