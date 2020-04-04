@@ -258,10 +258,12 @@ int main(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testIK")==0)
         {
-          //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
+          //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 100 3 100
 
-          unsigned int iterations=3;
-          unsigned int epochs=100;
+          if (i+4>=argc)  { incorrectArguments(); }
+
+          unsigned int iterations=atoi(argv[i+3]);
+          unsigned int epochs=atoi(argv[i+4]);
 
            BVHTestIK(
                       &bvhMotion,
