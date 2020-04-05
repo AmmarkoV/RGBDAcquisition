@@ -853,7 +853,7 @@ float iterateChainLoss(
 
 
 
-float approximateTargetFromMotionBuffer(
+float approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
@@ -1192,7 +1192,7 @@ int bvhTestIK(
             #endif // DISCARD_POSITIONAL_COMPONENT
 
 
-            float error2D = approximateTargetFromMotionBuffer(
+            float error2D = approximateBodyFromMotionBufferUsingInverseKinematics(
                                                               mc,
                                                               &renderer,
                                                               solution,
