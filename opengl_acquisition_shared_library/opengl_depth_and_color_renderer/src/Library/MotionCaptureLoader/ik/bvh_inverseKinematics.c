@@ -761,7 +761,7 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- unsigned int maximumConsecutiveBadLoss=4;
+ unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.001;
  float d=0.01;
  float gradient;
@@ -849,7 +849,7 @@ float iteratePartLoss(
 
 
 
-   if (consecutiveBadSteps>maximumConsecutiveBadLoss) { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); break; }
+   if (consecutiveBadSteps>=maximumConsecutiveBadEpochs) { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); break; }
  }
  unsigned long endTime = GetTickCountMicrosecondsIK();
 
