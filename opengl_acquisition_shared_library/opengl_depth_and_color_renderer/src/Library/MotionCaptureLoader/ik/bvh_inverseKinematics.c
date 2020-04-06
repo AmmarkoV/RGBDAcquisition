@@ -1004,37 +1004,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   for (int t=0; t<iterations; t++)
   {
-
-   loss = iterateChainLoss(
-                           &problem,
-                           0,
-                           epochs
-                          );
-
-   loss = iterateChainLoss(
-                            &problem,
-                            1,
-                            epochs
-                          );
-
-   loss = iterateChainLoss(
-                            &problem,
-                            2,
-                            epochs
-                          );
-
-
-   loss = iterateChainLoss(
-                            &problem,
-                            3,
-                            epochs
-                          );
-
-   loss = iterateChainLoss(
-                            &problem,
-                            4,
-                            epochs
-                          );
+   loss = iterateChainLoss(&problem,0,epochs);
+   loss = iterateChainLoss(&problem,1,epochs);
+   loss = iterateChainLoss(&problem,2,epochs);
+   loss = iterateChainLoss(&problem,3,epochs);
+   loss = iterateChainLoss(&problem,4,epochs);
   }
 
    copyMotionBuffer(solution,problem.currentSolution);
