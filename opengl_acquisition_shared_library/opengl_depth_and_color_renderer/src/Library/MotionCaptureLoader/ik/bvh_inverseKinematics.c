@@ -910,6 +910,11 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                             &bvhCurrentTransform
                                           );
        #endif // DISCARD_POSITIONAL_COMPONENT
+
+
+      //----------------------------------------------------
+       if (initialMAEInPixels!=0)
+       {
         *initialMAEInPixels = meanBVH2DDistace(
                                        mc,
                                        renderer,
@@ -918,9 +923,10 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        &bvhCurrentTransform,
                                        bvhTargetTransform
                                       );
+       }
+      //----------------------------------------------------
 
-
-     if (groundTruth!=0)
+      if ( (initialMAEInMM!=0) && (groundTruth!=0) )
        {
         *initialMAEInMM = meanBVH3DDistace(
                                        mc,
@@ -933,6 +939,7 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        bvhTargetTransform
                                       );
        }
+      //----------------------------------------------------
 
         solution->motion[0]=forcePosition[0];
         solution->motion[1]=forcePosition[1];
@@ -1024,6 +1031,11 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                             &bvhCurrentTransform
                                           );
        #endif // DISCARD_POSITIONAL_COMPONENT
+
+
+      //----------------------------------------------------
+      if (finalMAEInPixels!=0)
+       {
         *finalMAEInPixels  = meanBVH2DDistace(
                                        mc,
                                        renderer,
@@ -1032,8 +1044,9 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        &bvhCurrentTransform,
                                        bvhTargetTransform
                                      );
-
-      if (groundTruth!=0)
+      }
+      //----------------------------------------------------
+      if ( (finalMAEInMM!=0) && (groundTruth!=0) )
        {
         *finalMAEInMM = meanBVH3DDistace(
                                        mc,
@@ -1046,6 +1059,8 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        bvhTargetTransform
                                       );
       }
+      //----------------------------------------------------
+
 
         solution->motion[0]=forcePosition[0];
         solution->motion[1]=forcePosition[1];

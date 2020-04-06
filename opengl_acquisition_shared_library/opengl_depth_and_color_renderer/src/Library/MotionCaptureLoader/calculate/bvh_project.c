@@ -182,7 +182,7 @@ int bvh_projectTo2D(
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
         if (bvhTransform->joint[jID].pos3D[3]!=1.0)
-           { fprintf(stderr,"bvh_loadTransformForFrame location for joint %u not normalized..\n",jID); }
+           { fprintf(stderr,"bvh_projectTo2D W coord of joint %u not normalized..\n",jID); }
 
            float pos3DFloat[4];
            pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0];
