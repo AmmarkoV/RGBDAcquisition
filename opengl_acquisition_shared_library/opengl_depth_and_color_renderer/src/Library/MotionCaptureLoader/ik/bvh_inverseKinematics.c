@@ -699,9 +699,16 @@ float calculateChainLoss(
       } //Have a valid 2D transform
  } //Have a valid chain
 
- //I have left 0/0 on purpose to cause NaNs when projection errors occur
-  loss = (float) loss/numberOfSamples;
-  //fprintf(stderr,"loss %0.2f\n",loss);
+  //I have left 0/0 on purpose to cause NaNs when projection errors occur
+  //---------------------------------------------------------------------
+  if (numberOfSamples!=0)
+   {
+     loss = (float) loss/numberOfSamples;
+   } else
+   {
+     loss = NAN;
+   }
+  //---------------------------------------------------------------------
   return loss;
 }
 
@@ -758,7 +765,8 @@ float iteratePartLoss(
  float e=0.001;
  float d=0.01;
  float gradient;
-
+ float distanceFromInitial;
+ float spring = 10.0;
 
  //Give an initial direction..
  delta[0] = d;
@@ -781,15 +789,18 @@ float iteratePartLoss(
 
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-   currentLoss[0]=calculateChainLoss(problem,chainID);
+   distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
+   currentLoss[0]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
-   currentLoss[1]=calculateChainLoss(problem,chainID);
+   distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
+   currentLoss[1]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
-   currentLoss[2]=calculateChainLoss(problem,chainID);
+   distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
+   currentLoss[2]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
  //-------------------
 
