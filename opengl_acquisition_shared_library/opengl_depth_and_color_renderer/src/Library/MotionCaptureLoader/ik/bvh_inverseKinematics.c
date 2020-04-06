@@ -643,8 +643,8 @@ float calculateChainLoss(
        #endif // DISCARD_POSITIONAL_COMPONENT
 
       if (
-          (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0)) &&
-          (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
+          (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
+          // && (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
          )
       {
        for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -1185,10 +1185,7 @@ int bvhTestIK(
   struct BVH_Transform bvhTargetTransform={0};
 
   struct simpleRenderer renderer={0};
-  simpleRendererDefaults(
-                         &renderer,
-                         1920, 1080, 582.18394,   582.52915 // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-                        );
+  simpleRendererDefaults( &renderer, 1920, 1080, 582.18394,   582.52915 );// https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
   simpleRendererInitialize(&renderer);
 
   fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
@@ -1227,12 +1224,15 @@ int bvhTestIK(
 
         if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform) )
          {
+           if  (bvh_projectTo2D(mc,&bvhTargetTransform,&renderer,0,0))
+           {
             #if DISCARD_POSITIONAL_COMPONENT
             bvh_removeTranslationFromTransform(
                                                 mc,
                                                 &bvhTargetTransform
                                               );
             #endif // DISCARD_POSITIONAL_COMPONENT
+
 
 
             if (
@@ -1281,6 +1281,11 @@ int bvhTestIK(
               fprintf(stderr,"Failed to run IK code..\n");
             }
 
+
+           } else
+            {
+              fprintf(stderr,"Could not project 2D points of target..\n");
+            }
          }
       }
     freeMotionBuffer(solution);
