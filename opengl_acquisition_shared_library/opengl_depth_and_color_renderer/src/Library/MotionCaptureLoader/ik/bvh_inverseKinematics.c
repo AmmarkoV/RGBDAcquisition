@@ -44,7 +44,6 @@ void clear_line()
   if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
 }
 
-
 unsigned long GetTickCountMicrosecondsIK()
 {
     struct timespec ts;
@@ -109,10 +108,7 @@ float meanBVH2DDistace(
                        struct BVH_Transform * bvhTargetTransform
                       )
 {
-   if (
-        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0))
-        //&& (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
-      )
+   if (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0))
       {
        //-----------------
        float sumOf2DDistances=0.0;
@@ -256,6 +252,17 @@ float meanBVH3DDistace(
 
 
 
+int cleanProblem(struct ikProblem * problem)
+{
+  freeMotionBuffer(problem->currentSolution);
+
+  for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+  {
+    freeMotionBuffer(problem->chain[chainID].currentSolution);
+  }
+ return 1;
+}
+
 int prepareProblem(
                    struct ikProblem * problem,
                    struct BVH_MotionCapture * mc,
@@ -299,7 +306,7 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
-/*
+
   #if DISCARD_POSITIONAL_COMPONENT
    fprintf(stderr,"Ignoring positional component..\n");
   #else
@@ -312,7 +319,7 @@ int prepareProblem(
      ++partID;
    }
   #endif // DISCARD_POSITIONAL_COMPONENT
-*/
+
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
@@ -749,7 +756,7 @@ float iteratePartLoss(
  unsigned int maximumConsecutiveBadLoss=4;
  float e=0.001;
  float d=0.01;
- float lr=0.0021;
+ float lr=0.001;
  float gradient;
 
 
@@ -928,13 +935,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
   //---------------------------------------------------------------------------------------
   struct BVH_Transform bvhCurrentTransform={0};
 
-  float forcePosition[3];
-  forcePosition[0] = solution->motion[0];
-  forcePosition[1] = solution->motion[1];
-  forcePosition[2] = solution->motion[2];
-  solution->motion[0]=0;
-  solution->motion[1]=0;
-  solution->motion[2]=distance;
 
   if (
          bvh_loadTransformForMotionBuffer(
@@ -981,9 +981,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
        }
       //----------------------------------------------------
 
-        solution->motion[0]=forcePosition[0];
-        solution->motion[1]=forcePosition[1];
-        solution->motion[2]=forcePosition[2];
       }
 
   if (dumpScreenshots)
@@ -1050,12 +1047,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  forcePosition[0] = solution->motion[0];
-  forcePosition[1] = solution->motion[1];
-  forcePosition[2] = solution->motion[2];
-  solution->motion[0]=0;
-  solution->motion[1]=0;
-  solution->motion[2]=distance;
 
   if (
          bvh_loadTransformForMotionBuffer(
@@ -1102,10 +1093,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
       //----------------------------------------------------
 
 
-        solution->motion[0]=forcePosition[0];
-        solution->motion[1]=forcePosition[1];
-        solution->motion[2]=forcePosition[2];
-
       }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -1131,6 +1118,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
  }
 
+
+ //Cleanup allocations needed for the problem..
+ cleanProblem(&problem);
 
  return 1;
 }
