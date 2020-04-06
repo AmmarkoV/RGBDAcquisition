@@ -1028,7 +1028,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                           solution->motion,
                                           &bvhCurrentTransform
                                          )
-        )
+     )
       {
        #if DISCARD_POSITIONAL_COMPONENT
         bvh_removeTranslationFromTransform(
