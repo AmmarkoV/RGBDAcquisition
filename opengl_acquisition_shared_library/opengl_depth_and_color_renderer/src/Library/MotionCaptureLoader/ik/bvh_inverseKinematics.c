@@ -138,7 +138,7 @@ float meanBVH2DDistace(
                                                                       (float) bvhTargetTransform->joint[jID].pos2D[1]
                                                                      );
                fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
-               fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+               fprintf(stderr,"Joint 2D %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
 
                numberOfSamples+=1;
                sumOf2DDistances+=this2DDistance;
@@ -919,6 +919,9 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        bvhTargetTransform
                                       );
 
+
+     if (groundTruth!=0)
+       {
         *initialMAEInMM = meanBVH3DDistace(
                                        mc,
                                        renderer,
@@ -929,6 +932,7 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        groundTruth->motion,
                                        bvhTargetTransform
                                       );
+       }
 
         solution->motion[0]=forcePosition[0];
         solution->motion[1]=forcePosition[1];
@@ -1029,6 +1033,8 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        bvhTargetTransform
                                      );
 
+      if (groundTruth!=0)
+       {
         *finalMAEInMM = meanBVH3DDistace(
                                        mc,
                                        renderer,
@@ -1039,6 +1045,8 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
                                        groundTruth->motion,
                                        bvhTargetTransform
                                       );
+      }
+
         solution->motion[0]=forcePosition[0];
         solution->motion[1]=forcePosition[1];
         solution->motion[2]=forcePosition[2];
