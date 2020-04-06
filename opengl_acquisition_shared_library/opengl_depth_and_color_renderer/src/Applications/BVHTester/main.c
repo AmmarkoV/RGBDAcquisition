@@ -269,8 +269,10 @@ int main(int argc,const char **argv)
           unsigned int iterations=atoi(argv[i+3]);
           unsigned int epochs=atoi(argv[i+4]);
 
+          float learningRate = 0.001;
            bvhTestIK(
                       &bvhMotion,
+                      learningRate,
                       iterations,
                       epochs,
                       sourceFrame,

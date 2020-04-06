@@ -710,6 +710,7 @@ float iteratePartLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
                          unsigned int partID,
+                         float lr,
                          unsigned int epochs
                         )
 {
@@ -756,7 +757,6 @@ float iteratePartLoss(
  unsigned int maximumConsecutiveBadLoss=4;
  float e=0.001;
  float d=0.01;
- float lr=0.001;
  float gradient;
 
 
@@ -865,6 +865,7 @@ float iteratePartLoss(
 float iterateChainLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
+                         float lr,
                          unsigned int epochs
                         )
 {
@@ -879,6 +880,7 @@ float iterateChainLoss(
                     problem,
                     chainID,
                     partID,
+                    lr,
                     epochs
                    );
    }
@@ -899,6 +901,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
+                                         float learningRate,
                                          unsigned int iterations,
                                          unsigned int epochs,
                                          struct MotionBuffer * groundTruth,
@@ -1004,11 +1007,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   for (int t=0; t<iterations; t++)
   {
-   loss = iterateChainLoss(&problem,0,epochs);
-   loss = iterateChainLoss(&problem,1,epochs);
-   loss = iterateChainLoss(&problem,2,epochs);
-   loss = iterateChainLoss(&problem,3,epochs);
-   loss = iterateChainLoss(&problem,4,epochs);
+   loss = iterateChainLoss(&problem,0,learningRate,epochs);
+   loss = iterateChainLoss(&problem,1,learningRate,epochs);
+   loss = iterateChainLoss(&problem,2,learningRate,epochs);
+   loss = iterateChainLoss(&problem,3,learningRate,epochs);
+   loss = iterateChainLoss(&problem,4,learningRate,epochs);
   }
 
    copyMotionBuffer(solution,problem.currentSolution);
@@ -1156,6 +1159,7 @@ int writeHTML(
 
 int bvhTestIK(
               struct BVH_MotionCapture * mc,
+              float lr,
               unsigned int iterations,
               unsigned int epochs,
               unsigned int fIDSource,
@@ -1224,6 +1228,7 @@ int bvhTestIK(
                                                                        mc,
                                                                        &renderer,
                                                                        solution,
+                                                                       lr,
                                                                        iterations,
                                                                        epochs,
                                                                        groundTruth,

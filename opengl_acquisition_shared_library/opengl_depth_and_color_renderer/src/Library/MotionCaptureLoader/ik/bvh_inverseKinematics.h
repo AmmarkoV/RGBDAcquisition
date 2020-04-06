@@ -80,6 +80,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
+                                         float learningRate,
                                          unsigned int iterations,
                                          unsigned int epochs,
                                          struct MotionBuffer * groundTruth,
@@ -94,6 +95,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 int bvhTestIK(
               struct BVH_MotionCapture * mc,
+              float lr,
               unsigned int iterations,
               unsigned int epochs,
               unsigned int fIDSource,
