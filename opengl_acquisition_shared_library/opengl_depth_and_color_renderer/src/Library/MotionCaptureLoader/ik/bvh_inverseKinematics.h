@@ -76,7 +76,7 @@ struct ikProblem
 
 
 //Temporary call that allows outside control..
-float approximateBodyFromMotionBufferUsingInverseKinematics(
+int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,

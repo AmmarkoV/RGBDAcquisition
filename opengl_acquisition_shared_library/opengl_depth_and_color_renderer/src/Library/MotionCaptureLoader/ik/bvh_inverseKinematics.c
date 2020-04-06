@@ -307,7 +307,8 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No hip in armature..\n"); return 0; }
 
   if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
   {
@@ -315,40 +316,45 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No neck in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lshoulder in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rhip in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
 
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lhip in armature..\n"); return 0; }
 
  problem->chain[chainID].numberOfParts=partID;
 
@@ -370,7 +376,7 @@ int prepareProblem(
 
 
 
-  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -378,9 +384,10 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rForeArm",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -388,15 +395,17 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No relbow in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rHand",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rhand in armature..\n"); return 0; }
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -419,8 +428,7 @@ int prepareProblem(
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 
-
-  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -428,9 +436,10 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lshoulder in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -438,15 +447,17 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lelbow in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lHand",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lhand in armature..\n"); return 0; }
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -454,7 +465,6 @@ int prepareProblem(
   //----------------------------------------------------------
   //----------------------------------------------------------
   //----------------------------------------------------------
-
 
 
 
@@ -469,7 +479,7 @@ int prepareProblem(
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
 
-  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -477,9 +487,10 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rhip in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShin",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -487,15 +498,17 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rknee in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -503,7 +516,6 @@ int prepareProblem(
   //----------------------------------------------------------
   //----------------------------------------------------------
   //----------------------------------------------------------
-
 
 
 
@@ -516,7 +528,7 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
-  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -524,9 +536,10 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No hip in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShin",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
@@ -534,15 +547,17 @@ int prepareProblem(
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lknee in armature..\n"); return 0; }
 
-  if (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) )
+  if ( (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lFoot",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
    ++partID;
-  }
+  } else
+  { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -853,7 +868,7 @@ float iterateChainLoss(
 
 
 
-float approximateBodyFromMotionBufferUsingInverseKinematics(
+int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
@@ -871,13 +886,18 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
 
  struct ikProblem problem={0};
 
- prepareProblem(
-                 &problem,
-                 mc,
-                 renderer,
-                 solution,
-                 bvhTargetTransform
-                );
+  if (!prepareProblem(
+                      &problem,
+                      mc,
+                      renderer,
+                      solution,
+                      bvhTargetTransform
+                     )
+     )
+     {
+        fprintf(stderr,"Could not prepare the problem for IK solution\n");
+        return 0;
+     }
 
   viewProblem(&problem);
 
@@ -1092,7 +1112,7 @@ float approximateBodyFromMotionBufferUsingInverseKinematics(
  }
 
 
- return loss;
+ return 1;
 }
 
 
@@ -1215,23 +1235,24 @@ int bvhTestIK(
             #endif // DISCARD_POSITIONAL_COMPONENT
 
 
-            float error2D = approximateBodyFromMotionBufferUsingInverseKinematics(
-                                                              mc,
-                                                              &renderer,
-                                                              solution,
-                                                              iterations,
-                                                              epochs,
-                                                              groundTruth,
-                                                              &bvhTargetTransform,
-                                                              &initialMAEInPixels,
-                                                              &finalMAEInPixels,
-                                                              &initialMAEInMM,
-                                                              &finalMAEInMM,
-                                                              dumpScreenshots
-                                                             );
-
-            fprintf(stderr,"Final 2D Distance is %0.2f\n",error2D);
-            result=1;
+            if (
+                approximateBodyFromMotionBufferUsingInverseKinematics(
+                                                                       mc,
+                                                                       &renderer,
+                                                                       solution,
+                                                                       iterations,
+                                                                       epochs,
+                                                                       groundTruth,
+                                                                       &bvhTargetTransform,
+                                                                       &initialMAEInPixels,
+                                                                       &finalMAEInPixels,
+                                                                       &initialMAEInMM,
+                                                                       &finalMAEInMM,
+                                                                       dumpScreenshots
+                                                                      )
+                )
+            {
+             result=1;
 
 
             //-------------------------------------------------------------------------------------------------------------
@@ -1244,18 +1265,21 @@ int bvhTestIK(
             fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
 
 
-  //-------------------------------------------------------------------------------------------------
-  writeHTML(
-             fIDSource,
-             fIDTarget,
-             initialMAEInPixels,
-             finalMAEInPixels,
-             initialMAEInMM,
-             finalMAEInMM,
-             dumpScreenshots
-           );
- //-------------------------------------------------------------------------------------------------
-
+             //-------------------------------------------------------------------------------------------------
+             writeHTML(
+                       fIDSource,
+                       fIDTarget,
+                       initialMAEInPixels,
+                       finalMAEInPixels,
+                       initialMAEInMM,
+                       finalMAEInMM,
+                       dumpScreenshots
+                     );
+             //-------------------------------------------------------------------------------------------------
+            } else
+            {
+              fprintf(stderr,"Failed to run IK code..\n");
+            }
 
          }
       }
