@@ -132,13 +132,13 @@ float meanBVH2DDistace(
                if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
                {
                 float this2DDistance=get2DPointDistance(
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                                                     );
-               fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
-               fprintf(stderr,"Joint 2D %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+                                                        (float) bvhSourceTransform->joint[jID].pos2D[0],
+                                                        (float) bvhSourceTransform->joint[jID].pos2D[1],
+                                                        (float) bvhTargetTransform->joint[jID].pos2D[0],
+                                                        (float) bvhTargetTransform->joint[jID].pos2D[1]
+                                                       );
+               fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
+               fprintf(stderr,"2D %s distance = %0.1f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
 
                numberOfSamples+=1;
                sumOf2DDistances+=this2DDistance;
@@ -218,13 +218,14 @@ float meanBVH3DDistace(
                                                          (float) bvhTargetTransform->joint[jID].pos3D[1],
                                                          (float) bvhTargetTransform->joint[jID].pos3D[2]
                                                         );
-               fprintf(stderr,"%0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f : ",(float) bvhSourceTransform->joint[jID].pos3D[0],
+
+               fprintf(stderr,"src(%0.1f,%0.1f,%0.1f)->tar(%0.1f,%0.1f,%0.1f) : ",(float) bvhSourceTransform->joint[jID].pos3D[0],
                                                                (float) bvhSourceTransform->joint[jID].pos3D[1],
                                                                (float) bvhSourceTransform->joint[jID].pos3D[2],
                                                                (float) bvhTargetTransform->joint[jID].pos3D[0],
                                                                (float) bvhTargetTransform->joint[jID].pos3D[1],
                                                                (float) bvhTargetTransform->joint[jID].pos3D[2]);
-               fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this3DDistance);
+               fprintf(stderr," %s distance^2 = %0.1f\n",mc->jointHierarchy[jID].jointName,this3DDistance);
 
                numberOfSamples+=1;
                sumOf3DDistances+=this3DDistance;
@@ -1252,7 +1253,9 @@ int bvhTestIK(
                                                                       )
                 )
             {
+             //=======
              result=1;
+             //=======
 
 
             //-------------------------------------------------------------------------------------------------------------
