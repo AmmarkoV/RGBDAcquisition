@@ -763,7 +763,7 @@ float iteratePartLoss(
 
  unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.001;
- float d=0.01;
+ float d=0.005;
  float gradient;
  float distanceFromInitial;
  float spring = 10.0;
