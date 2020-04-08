@@ -89,6 +89,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          float * finalMAEInPixels,
                                          float * initialMAEInMM,
                                          float * finalMAEInMM,
+                                         unsigned int springIgnoresIterativeChanges,
                                          int dumpScreenshots
                                         );
 

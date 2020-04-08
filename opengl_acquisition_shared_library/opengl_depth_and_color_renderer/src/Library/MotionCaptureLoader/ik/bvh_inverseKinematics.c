@@ -718,7 +718,8 @@ float iteratePartLoss(
                          unsigned int chainID,
                          unsigned int partID,
                          float lr,
-                         unsigned int epochs
+                         unsigned int epochs,
+                         unsigned int springIgnoresIterativeChanges
                         )
 {
  unsigned int consecutiveBadSteps=0;
@@ -747,6 +748,14 @@ float iteratePartLoss(
  bestValues[0] = originalValues[0];
  bestValues[1] = originalValues[1];
  bestValues[2] = originalValues[2];
+
+
+if (springIgnoresIterativeChanges)
+ {
+  originalValues[0] = problem->initialSolution->motion[mIDS[0]];
+  originalValues[1] = problem->initialSolution->motion[mIDS[1]];
+  originalValues[2] = problem->initialSolution->motion[mIDS[2]];
+ }
 
  float previousLoss[3];
  float currentLoss[3];
@@ -877,7 +886,8 @@ float iterateChainLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
                          float lr,
-                         unsigned int epochs
+                         unsigned int epochs,
+                         unsigned int springIgnoresIterativeChanges
                         )
 {
 
@@ -892,7 +902,8 @@ float iterateChainLoss(
                     chainID,
                     partID,
                     lr,
-                    epochs
+                    epochs,
+                    springIgnoresIterativeChanges
                    );
    }
  }
@@ -921,6 +932,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          float * finalMAEInPixels,
                                          float * initialMAEInMM,
                                          float * finalMAEInMM,
+                                         unsigned int springIgnoresIterativeChanges,
                                          int dumpScreenshots
                                         )
 {
@@ -1018,11 +1030,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   for (int t=0; t<iterations; t++)
   {
-   loss = iterateChainLoss(&problem,0,learningRate,epochs);
-   loss = iterateChainLoss(&problem,1,learningRate,epochs);
-   loss = iterateChainLoss(&problem,2,learningRate,epochs);
-   loss = iterateChainLoss(&problem,3,learningRate,epochs);
-   loss = iterateChainLoss(&problem,4,learningRate,epochs);
+   loss = iterateChainLoss(&problem,0,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(&problem,1,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(&problem,2,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(&problem,3,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(&problem,4,learningRate,epochs,springIgnoresIterativeChanges);
   }
 
    copyMotionBuffer(solution,problem.currentSolution);
@@ -1232,7 +1244,7 @@ int bvhTestIK(
                                               );
             #endif // DISCARD_POSITIONAL_COMPONENT
 
-
+             unsigned int springIgnoresIterativeChanges=0;
 
             if (
                 approximateBodyFromMotionBufferUsingInverseKinematics(
@@ -1248,6 +1260,7 @@ int bvhTestIK(
                                                                        &finalMAEInPixels,
                                                                        &initialMAEInMM,
                                                                        &finalMAEInMM,
+                                                                       springIgnoresIterativeChanges,
                                                                        dumpScreenshots
                                                                       )
                 )
