@@ -21,6 +21,7 @@ struct ikChainParts
  BVHMotionChannelID mIDStart;
  BVHMotionChannelID mIDEnd;
  char evaluated;
+ char bigChanges;
  char endEffector;
 };
 //---------------------------------------------------------

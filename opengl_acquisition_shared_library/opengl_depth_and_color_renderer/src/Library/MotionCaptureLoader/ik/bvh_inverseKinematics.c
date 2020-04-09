@@ -314,8 +314,9 @@ int prepareProblem(
    {
      problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
      problem->chain[chainID].part[partID].jID=thisJID;
-     problem->chain[chainID].part[partID].mIDStart=0; //First Rotation
-     problem->chain[chainID].part[partID].mIDEnd=2; //First Rotation
+     problem->chain[chainID].part[partID].mIDStart=0; //First Position
+     problem->chain[chainID].part[partID].mIDEnd=2; //First Position
+     problem->chain[chainID].part[partID].bigChanges=1;
      ++partID;
    }
   #endif // DISCARD_POSITIONAL_COMPONENT
@@ -776,6 +777,12 @@ if (springIgnoresIterativeChanges)
  float gradient;
  float distanceFromInitial;
  float spring = 10.0;
+
+
+ if (problem->chain[chainID].part[partID].bigChanges)
+ {
+   d*=100;
+ }
 
  //Give an initial direction..
  delta[0] = d;
