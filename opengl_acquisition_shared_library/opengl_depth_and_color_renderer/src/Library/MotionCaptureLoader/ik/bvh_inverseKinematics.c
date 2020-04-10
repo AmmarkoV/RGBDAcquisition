@@ -778,11 +778,11 @@ if (springIgnoresIterativeChanges)
  float distanceFromInitial;
  float spring = 10.0;
 
-
+/*
  if (problem->chain[chainID].part[partID].bigChanges)
  {
    d*=10;
- }
+ }*/
 
  //Give an initial direction..
  delta[0] = d;
