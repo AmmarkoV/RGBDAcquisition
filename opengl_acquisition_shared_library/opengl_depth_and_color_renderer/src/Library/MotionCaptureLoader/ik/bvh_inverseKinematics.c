@@ -781,7 +781,7 @@ if (springIgnoresIterativeChanges)
 
  if (problem->chain[chainID].part[partID].bigChanges)
  {
-   d*=100;
+   d*=10;
  }
 
  //Give an initial direction..
