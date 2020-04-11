@@ -542,10 +542,16 @@ int bvh_changeJointDimensions(
                               float zPercent
                              )
 {
-   if (bvhMotion==0) { return 0; }
+   if (bvhMotion==0)
+    {
+     fprintf(stderr,"bvh_changeJointDimensions: Cannot work before having loaded a bvh file\n");
+     return 0;
+    }
 
     BVHJointID jID=0;
-   if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
+   //if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
+   if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+
    {
        float xChange =  (float) (bvhMotion->jointHierarchy[jID].offset[0]*xPercent)/100 ;
        float yChange =  (float) (bvhMotion->jointHierarchy[jID].offset[1]*yPercent)/100 ;
@@ -557,6 +563,8 @@ int bvh_changeJointDimensions(
 
        return 1;
    }
+
+ fprintf(stderr,"bvh_changeJointDimensions: Unable to locate joint %s \n",jointName);
  return 0;
 }
 
