@@ -556,6 +556,12 @@ int bvh_changeJointDimensions(
        bvhMotion->jointHierarchy[jID].offset[1] *= yScale;
        bvhMotion->jointHierarchy[jID].offset[2] *= zScale;
 
+       double * m = bvhMotion->jointHierarchy[jID].staticTransformation;
+       m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[jID].offset[0];
+       m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (double) bvhMotion->jointHierarchy[jID].offset[1];
+       m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (double) bvhMotion->jointHierarchy[jID].offset[2];
+       m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
+
        return 1;
    }
 
@@ -578,6 +584,12 @@ int bvh_scaleAllOffsets(
       bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
       bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
       bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
+
+       double * m = bvhMotion->jointHierarchy[jID].staticTransformation;
+       m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[jID].offset[0];
+       m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (double) bvhMotion->jointHierarchy[jID].offset[1];
+       m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (double) bvhMotion->jointHierarchy[jID].offset[2];
+       m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
     }
 
  return 1;
