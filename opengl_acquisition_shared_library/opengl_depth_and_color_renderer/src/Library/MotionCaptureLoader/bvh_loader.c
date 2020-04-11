@@ -537,9 +537,9 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 int bvh_changeJointDimensions(
                               struct BVH_MotionCapture * bvhMotion,
                               const char * jointName,
-                              float xPercent,
-                              float yPercent,
-                              float zPercent
+                              float xScale,
+                              float yScale,
+                              float zScale
                              )
 {
    if (bvhMotion==0)
@@ -551,15 +551,10 @@ int bvh_changeJointDimensions(
     BVHJointID jID=0;
    //if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
    if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
-
    {
-       float xChange =  (float) (bvhMotion->jointHierarchy[jID].offset[0]*xPercent)/100 ;
-       float yChange =  (float) (bvhMotion->jointHierarchy[jID].offset[1]*yPercent)/100 ;
-       float zChange =  (float) (bvhMotion->jointHierarchy[jID].offset[2]*zPercent)/100 ;
-
-       bvhMotion->jointHierarchy[jID].offset[0] += xChange;
-       bvhMotion->jointHierarchy[jID].offset[1] += yChange;
-       bvhMotion->jointHierarchy[jID].offset[2] += zChange;
+       bvhMotion->jointHierarchy[jID].offset[0] *= xScale;
+       bvhMotion->jointHierarchy[jID].offset[1] *= yScale;
+       bvhMotion->jointHierarchy[jID].offset[2] *= zScale;
 
        return 1;
    }

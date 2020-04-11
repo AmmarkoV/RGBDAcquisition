@@ -377,11 +377,11 @@ int bvh_copyMotionFrameToMotionBuffer(
 
 
 int bvh_changeJointDimensions(
-                               struct BVH_MotionCapture * bvhMotion,
-                               const char * jointName,
-                               float xPercent,
-                               float yPercent,
-                               float zPercent
+                              struct BVH_MotionCapture * bvhMotion,
+                              const char * jointName,
+                              float xScale,
+                              float yScale,
+                              float zScale
                              );
 
 
