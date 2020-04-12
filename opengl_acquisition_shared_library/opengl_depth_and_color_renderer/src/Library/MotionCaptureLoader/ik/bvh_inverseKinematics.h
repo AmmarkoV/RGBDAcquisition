@@ -18,6 +18,7 @@ extern "C"
 struct ikChainParts
 {
  BVHJointID jID;
+ float jointImportance;
  BVHMotionChannelID mIDStart;
  BVHMotionChannelID mIDEnd;
  char evaluated;
