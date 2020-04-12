@@ -221,9 +221,6 @@ int bvh_projectTo2D(
                                  pos3DCenterFloat,
                                  0,
                                  0,
-                                 &pos3DCenterFloat[0],
-                                 &pos3DCenterFloat[1],
-                                 &pos3DCenterFloat[2],
                                  &position2DX,
                                  &position2DY,
                                  &position2DW

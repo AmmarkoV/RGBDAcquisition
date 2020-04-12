@@ -48,11 +48,7 @@ int simpleRendererRender(
                          float * position3D,
                          float * center3D,
                          float * objectRotation,
-                         unsigned int rotationOrder,
-                         ///---------------
-                         float * output3DX,
-                         float * output3DY,
-                         float * output3DZ,
+                         unsigned int rotationOrder, 
                          ///---------------
                          float * output2DX,
                          float * output2DY,

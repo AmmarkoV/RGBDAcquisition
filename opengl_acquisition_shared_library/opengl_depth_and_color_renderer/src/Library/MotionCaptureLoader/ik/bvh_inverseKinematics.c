@@ -774,7 +774,7 @@ if (springIgnoresIterativeChanges)
  unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.001;
  float d=0.005;
- float beta = 0.8; // Momentum
+ float beta = 0.9; // Momentum
  float gradient;
  float distanceFromInitial;
  float spring = 10.0;
@@ -824,13 +824,13 @@ if (springIgnoresIterativeChanges)
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
    gradient =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
-   delta[0] += (float) beta * lr *  gradient;
+   delta[0] =  beta * delta[0] + (float) lr *  gradient;
 
    gradient =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
-   delta[1] += (float) beta * lr * gradient;
+   delta[1] =  beta * delta[1] + (float) lr * gradient;
 
    gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
-   delta[2] += (float) beta * lr * gradient;
+   delta[2] =  beta * delta[2] + (float) lr * gradient;
 
    previousLoss[0]=currentLoss[0];
    previousLoss[1]=currentLoss[1];
