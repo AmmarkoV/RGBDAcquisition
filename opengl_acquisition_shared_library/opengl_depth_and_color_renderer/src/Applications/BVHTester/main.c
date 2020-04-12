@@ -381,6 +381,7 @@ int main(int argc,const char **argv)
                                        )
              )
           {
+              fprintf(stderr,RED "failed to change `%s` joint dimensions\n",argv[i+1]);
               haltOnError(immediatelyHaltOnError,"Error while changing joint dimensions..");
           }
         } else
@@ -435,7 +436,11 @@ int main(int argc,const char **argv)
           if (i+1>=argc)  { incorrectArguments();}
           fromBVHFile=argv[i+1];
           //First of all we need to load the BVH file
-          bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
+          if (!bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld))
+          {
+            haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
+          }
+
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
           bvh_ConstrainRotations(&bvhMotion,regularOrientation);
