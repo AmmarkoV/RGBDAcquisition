@@ -371,13 +371,18 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--changeJointDimensions")==0)
         {
           if (i+4>=argc)  { incorrectArguments(); }
-          bvh_changeJointDimensions(
-                                    &bvhMotion,
-                                    argv[i+1],
-                                    atof(argv[i+2]),
-                                    atof(argv[i+3]),
-                                    atof(argv[i+4])
-                                   );
+          if (
+             bvh_changeJointDimensions(
+                                       &bvhMotion,
+                                       argv[i+1],
+                                       atof(argv[i+2]),
+                                       atof(argv[i+3]),
+                                       atof(argv[i+4])
+                                       )
+             )
+          {
+              haltOnError(immediatelyHaltOnError,"Error while changing joint dimensions..");
+          }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--onlyAnimateGivenJoints")==0)
