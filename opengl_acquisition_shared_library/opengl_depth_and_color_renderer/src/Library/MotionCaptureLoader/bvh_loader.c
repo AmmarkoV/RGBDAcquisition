@@ -548,13 +548,31 @@ int bvh_changeJointDimensions(
      return 0;
     }
 
+
+
+
+    //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
+
     BVHJointID jID=0;
    //if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
    if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
    {
-       bvhMotion->jointHierarchy[jID].offset[0] *= xScale;
-       bvhMotion->jointHierarchy[jID].offset[1] *= yScale;
-       bvhMotion->jointHierarchy[jID].offset[2] *= zScale;
+       unsigned int angleX = 0;
+       unsigned int angleY = 1;
+       unsigned int angleZ = 2;
+
+       for (int ch=0; ch<3; ch++)
+       {
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_X) { angleX = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Y) { angleY = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }
+       }
+
+       //fprintf(stderr,"offset was %0.2f %0.2f %0.2f\n",bvhMotion->jointHierarchy[jID].offset[0],bvhMotion->jointHierarchy[jID].offset[1],bvhMotion->jointHierarchy[jID].offset[2]);
+       bvhMotion->jointHierarchy[jID].offset[angleX] *= xScale;
+       bvhMotion->jointHierarchy[jID].offset[angleY] *= yScale;
+       bvhMotion->jointHierarchy[jID].offset[angleZ] *= zScale;
+       //fprintf(stderr,"offset is now %0.2f %0.2f %0.2f\n",bvhMotion->jointHierarchy[jID].offset[0],bvhMotion->jointHierarchy[jID].offset[1],bvhMotion->jointHierarchy[jID].offset[2]);
 
        double * m = bvhMotion->jointHierarchy[jID].staticTransformation;
        m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[jID].offset[0];
@@ -562,10 +580,17 @@ int bvh_changeJointDimensions(
        m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (double) bvhMotion->jointHierarchy[jID].offset[2];
        m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
 
-       return 1;
+      return 1;
    }
 
  fprintf(stderr,"bvh_changeJointDimensions: Unable to locate joint %s \n",jointName);
+ fprintf(stderr,"Joint List : ");
+ for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+ {
+   if (jID!=0) { fprintf(stderr,","); }
+   fprintf(stderr,"%s",bvhMotion->jointHierarchy[jID].jointName);
+ }
+ fprintf(stderr,"\n");
  return 0;
 }
 
@@ -581,9 +606,21 @@ int bvh_scaleAllOffsets(
     BVHJointID jID=0;
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
     {
-      bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
-      bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
-      bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
+
+       unsigned int angleX = 0;
+       unsigned int angleY = 1;
+       unsigned int angleZ = 2;
+
+       for (int ch=0; ch<3; ch++)
+       {
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_X) { angleX = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Y) { angleY = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }
+       }
+
+      bvhMotion->jointHierarchy[jID].offset[angleX] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[angleY] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[angleZ] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
 
        double * m = bvhMotion->jointHierarchy[jID].staticTransformation;
        m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[jID].offset[0];

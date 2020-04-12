@@ -434,7 +434,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=3.0;
    ++partID;
   } else
   { fprintf(stderr,"No rhand in armature..\n"); return 0; }
@@ -489,7 +489,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=3.0;
    ++partID;
   } else
   { fprintf(stderr,"No lhand in armature..\n"); return 0; }
@@ -543,7 +543,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=3.0;
    ++partID;
   } else
   { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
@@ -595,7 +595,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=3.0;
    ++partID;
   } else
   { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
