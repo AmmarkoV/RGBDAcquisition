@@ -773,7 +773,7 @@ if (springIgnoresIterativeChanges)
 
  unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.001;
- float d=0.005;
+ float d=lr; //0.005;
  float beta = 0.9; // Momentum
  float gradient;
  float distanceFromInitial;

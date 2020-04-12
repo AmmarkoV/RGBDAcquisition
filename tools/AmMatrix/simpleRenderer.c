@@ -132,7 +132,12 @@ int simpleRendererRender(
                     )
      )
      { 
-       // fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]); 
+        //If you reach here make sure you have called simpleRendererInitialize
+        /*
+        print4x4FMatrix("modelViewMatrix",sr->modelMatrix,1); 
+        print4x4FMatrix("projectionMatrix",sr->projectionMatrix,1); 
+        fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]); 
+        */
      }
  ///--------------------------------------------------------------------
   *output2DX = windowCoordinates[0];//windowCoordinates[2];
