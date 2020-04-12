@@ -372,7 +372,7 @@ int main(int argc,const char **argv)
         {
           if (i+4>=argc)  { incorrectArguments(); }
           if (
-             bvh_changeJointDimensions(
+              !bvh_changeJointDimensions(
                                        &bvhMotion,
                                        argv[i+1],
                                        atof(argv[i+2]),
