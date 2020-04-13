@@ -765,6 +765,11 @@ if (springIgnoresIterativeChanges)
 
 float initialLoss = calculateChainLoss(problem,chainID);
 
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+#define REMEMBER 0
+#if REMEMBER
 if (problem->previousSolution!=0)
 {
  if (problem->previousSolution->motion!=0)
@@ -785,7 +790,10 @@ if (problem->previousSolution!=0)
    }
   }
 }
-
+#endif // REMEMBER
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
 
  float previousValues[3];
  previousValues[0] = originalValues[0];
@@ -1045,6 +1053,46 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                       );
        }
       //----------------------------------------------------
+
+
+
+      //----------------------------------------------------
+      //----------------------------------------------------
+      //----------------------------------------------------
+      if (problem.previousSolution!=0)
+       {
+        if (problem.previousSolution->motion!=0)
+          {
+              if (
+                   bvh_loadTransformForMotionBuffer(
+                                                    mc,
+                                                    previousSolution->motion,
+                                                    &bvhCurrentTransform
+                                                   )
+                  )
+             {
+               float previousMAEInPixels = meanBVH2DDistace(
+                                       mc,
+                                       renderer,
+                                       1,
+                                       0,
+                                       &bvhCurrentTransform,
+                                       bvhTargetTransform
+                                      );
+                if (previousMAEInPixels < *initialMAEInPixels)
+                {
+                  fprintf(stderr,"Previous MAE seems to be lower so will use this..\n");
+                  float * tmp = solution->motion;
+                  solution->motion = previousSolution->motion;
+                  previousSolution->motion = tmp;
+                }
+             }
+          }
+        }
+      //----------------------------------------------------
+      //----------------------------------------------------
+      //----------------------------------------------------
+
 
       if ( (initialMAEInMM!=0) && (groundTruth!=0) )
        {
