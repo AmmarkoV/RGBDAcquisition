@@ -317,7 +317,7 @@ int prepareProblem(
      problem->chain[chainID].part[partID].mIDStart=0; //First Position
      problem->chain[chainID].part[partID].mIDEnd=2; //First Position
      problem->chain[chainID].part[partID].bigChanges=1;
-     problem->chain[chainID].part[partID].jointImportance=1.0;
+     problem->chain[chainID].part[partID].jointImportance=1.5;
      ++partID;
    }
   #endif // DISCARD_POSITIONAL_COMPONENT
@@ -329,7 +329,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5;
    ++partID;
   } else
   { fprintf(stderr,"No hip in armature..\n"); return 0; }
@@ -412,7 +412,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
    ++partID;
   } else
   { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
@@ -434,7 +434,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=3.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5;
    ++partID;
   } else
   { fprintf(stderr,"No rhand in armature..\n"); return 0; }
@@ -467,7 +467,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
    ++partID;
   } else
   { fprintf(stderr,"No lshoulder in armature..\n"); return 0; }
@@ -489,7 +489,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=3.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5;
    ++partID;
   } else
   { fprintf(stderr,"No lhand in armature..\n"); return 0; }
@@ -521,7 +521,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
    ++partID;
   } else
   { fprintf(stderr,"No rhip in armature..\n"); return 0; }
@@ -543,7 +543,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=3.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5;
    ++partID;
   } else
   { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
@@ -573,7 +573,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
    ++partID;
   } else
   { fprintf(stderr,"No hip in armature..\n"); return 0; }
@@ -595,7 +595,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=3.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5;
    ++partID;
   } else
   { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
