@@ -267,13 +267,15 @@ int prepareProblem(
                    struct ikProblem * problem,
                    struct BVH_MotionCapture * mc,
                    struct simpleRenderer *renderer,
+                   struct MotionBuffer * previousSolution,
                    struct MotionBuffer * solution,
                    struct BVH_Transform * bvhTargetTransform
                   )
 {
   problem->mc = mc;
   problem->renderer = renderer;
-  problem->initialSolution = solution ;
+  problem->previousSolution = previousSolution;
+  problem->initialSolution = solution;
 
   problem->currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
@@ -754,6 +756,37 @@ float iteratePartLoss(
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
+if (springIgnoresIterativeChanges)
+ {
+  originalValues[0] = problem->initialSolution->motion[mIDS[0]];
+  originalValues[1] = problem->initialSolution->motion[mIDS[1]];
+  originalValues[2] = problem->initialSolution->motion[mIDS[2]];
+ }
+
+float initialLoss = calculateChainLoss(problem,chainID);
+
+if (problem->previousSolution!=0)
+{
+ if (problem->previousSolution->motion!=0)
+  {
+   //Maybe previous solution is closer to current?
+   //previousSolution
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = problem->previousSolution->motion[mIDS[0]];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = problem->previousSolution->motion[mIDS[1]];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = problem->previousSolution->motion[mIDS[2]];
+   float previousLoss = calculateChainLoss(problem,chainID);
+   if (previousLoss<initialLoss)
+   {
+     fprintf(stderr,"Previous solution loss (%0.2f) is better than current (%0.2f) \n",previousLoss,initialLoss);
+     originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
+     originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
+     originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
+     initialLoss = previousLoss;
+   }
+  }
+}
+
+
  float previousValues[3];
  previousValues[0] = originalValues[0];
  previousValues[1] = originalValues[1];
@@ -770,18 +803,10 @@ float iteratePartLoss(
  bestValues[2] = originalValues[2];
 
 
-if (springIgnoresIterativeChanges)
- {
-  originalValues[0] = problem->initialSolution->motion[mIDS[0]];
-  originalValues[1] = problem->initialSolution->motion[mIDS[1]];
-  originalValues[2] = problem->initialSolution->motion[mIDS[2]];
- }
-
  float previousLoss[3];
  float currentLoss[3];
  float delta[3]={0};
 
- float initialLoss = calculateChainLoss(problem,chainID);
 
  previousLoss[0]=initialLoss;
  previousLoss[1]=initialLoss;
@@ -949,6 +974,7 @@ float iterateChainLoss(
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
+                                         struct MotionBuffer * previousSolution,
                                          struct MotionBuffer * solution,
                                          float learningRate,
                                          unsigned int iterations,
@@ -970,6 +996,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                       &problem,
                       mc,
                       renderer,
+                      previousSolution,
                       solution,
                       bvhTargetTransform
                      )
@@ -1205,13 +1232,14 @@ int writeHTML(
 }
 
 
-//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
+// ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100
 
 int bvhTestIK(
               struct BVH_MotionCapture * mc,
               float lr,
               unsigned int iterations,
               unsigned int epochs,
+              unsigned int fIDPrevious,
               unsigned int fIDSource,
               unsigned int fIDTarget
              )
@@ -1235,12 +1263,15 @@ int bvhTestIK(
   struct MotionBuffer * groundTruth     = mallocNewMotionBuffer(mc);
   struct MotionBuffer * initialSolution = mallocNewMotionBuffer(mc);
   struct MotionBuffer * solution        = mallocNewMotionBuffer(mc);
+  struct MotionBuffer * previousSolution= mallocNewMotionBuffer(mc);
 
 
-  if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) )
+
+  if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) && (previousSolution!=0) )
   {
     if (
           ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) &&
+          ( bvh_copyMotionFrameToMotionBuffer(mc,previousSolution,fIDPrevious) ) &&
           ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) ) &&
           ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
        )
@@ -1249,6 +1280,9 @@ int bvhTestIK(
        initialSolution->motion[1]=0;
        initialSolution->motion[2]=distance;
 
+       previousSolution->motion[0]=0;
+       previousSolution->motion[1]=0;
+       previousSolution->motion[2]=distance;
 
        solution->motion[0]=0;
        solution->motion[1]=0;
@@ -1277,6 +1311,7 @@ int bvhTestIK(
                 approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                        mc,
                                                                        &renderer,
+                                                                       previousSolution,
                                                                        solution,
                                                                        lr,
                                                                        iterations,
@@ -1330,6 +1365,7 @@ int bvhTestIK(
             }
          }
       }
+    freeMotionBuffer(previousSolution);
     freeMotionBuffer(solution);
     freeMotionBuffer(initialSolution);
     freeMotionBuffer(groundTruth);

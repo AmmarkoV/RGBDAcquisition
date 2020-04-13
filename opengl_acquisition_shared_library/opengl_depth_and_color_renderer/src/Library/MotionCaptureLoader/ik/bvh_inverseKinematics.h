@@ -56,6 +56,8 @@ struct ikProblem
  struct simpleRenderer *renderer;
 
 
+ //Previous solution
+ struct MotionBuffer * previousSolution;
  //Initial solution
  struct MotionBuffer * initialSolution;
  //Current solution
@@ -81,6 +83,7 @@ struct ikProblem
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
+                                         struct MotionBuffer * previousSolution,
                                          struct MotionBuffer * solution,
                                          float learningRate,
                                          unsigned int iterations,
@@ -101,6 +104,7 @@ int bvhTestIK(
               float lr,
               unsigned int iterations,
               unsigned int epochs,
+              unsigned int fIDPrevious,
               unsigned int fIDSource,
               unsigned int fIDTarget
              );
