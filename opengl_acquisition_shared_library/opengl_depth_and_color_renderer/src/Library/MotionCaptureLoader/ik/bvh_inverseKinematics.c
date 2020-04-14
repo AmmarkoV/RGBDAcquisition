@@ -99,6 +99,58 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
 }
 
 
+
+int writeHTML(
+               unsigned int fIDSource,
+               unsigned int fIDTarget,
+               float initialMAEInPixels,
+               float finalMAEInPixels,
+               float initialMAEInMM,
+               float finalMAEInMM,
+               int dumpScreenshots
+             )
+{
+  if (dumpScreenshots)
+  {
+  int i=system("convert initial.svg initial.png&");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert target.svg target.png&");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+  i=system("convert solution.svg solution.png&");
+  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
+
+  FILE * html=fopen("report.html","w");
+  if (html!=0)
+  {
+    fprintf(html,"<html><body><br>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<table><tr>\n");
+    fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
+    fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
+    fprintf(html,"</tr>\n");
+    //------------------------------------------------------------
+    fprintf(html,"<tr>\n");
+    fprintf(html,"<td align=\"center\">Initial Pose (frame %u)</td>\n",fIDSource);
+    fprintf(html,"<td align=\"center\">Target Pose (frame %u)</td>\n",fIDTarget);
+    fprintf(html,"<td align=\"center\">Solution</td>\n");
+    fprintf(html,"</tr>\n");
+    fprintf(html,"</table>\n");
+    //------------------------------------------------------------
+
+    fprintf(html,"<br><br><br><br>");
+    fprintf(html,"MAE in 2D Pixels went from %0.2f to %0.2f <br>",initialMAEInPixels,finalMAEInPixels);
+    fprintf(html,"MAE in 3D mm went from %0.2f to %0.2f <br>",initialMAEInMM*10,finalMAEInMM*10);
+
+    fprintf(html,"</body></html>");
+    fclose(html);
+    return 1;
+  }
+
+ }
+  return 0;
+}
+
 float meanBVH2DDistace(
                        struct BVH_MotionCapture * mc,
                        struct simpleRenderer *renderer,
@@ -108,6 +160,7 @@ float meanBVH2DDistace(
                        struct BVH_Transform * bvhTargetTransform
                       )
 {
+   fprintf(stderr,"\nmeanBVH2DDistace\n");
    if (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0))
       {
        //-----------------
@@ -146,6 +199,7 @@ float meanBVH2DDistace(
                  }
                }
             }
+    fprintf(stderr,"\n");
 
        if (numberOfSamples>0)
        {
@@ -253,53 +307,19 @@ float meanBVH3DDistace(
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
-  if (updatedSolution==0) { return 0; }
+  if (updatedSolution==0)          { return 0; }
   if (problem->currentSolution==0) { return 0; }
   if (problem->initialSolution==0) { return 0; }
 
-  if (updatedSolution->bufferSize != problem->currentSolution->bufferSize)
-    {
-     fprintf(stderr,"Unable to update global current solution for problem they have different size..\n");
-     memcpy(
-             problem->currentSolution->motion,
-             updatedSolution->motion,
-             sizeof(float) * updatedSolution->bufferSize
-           );
-    }
 
-    /*
-  if (updatedSolution->bufferSize != problem->initialSolution->bufferSize)
-    {
-     fprintf(stderr,"Unable to update global initial solution for problem they have different size..\n");
-     memcpy(
-             problem->initialSolution->motion,
-             updatedSolution->motion,
-             sizeof(float) * updatedSolution->bufferSize
-           );
-    }
-   */
-
-
+  if (!copyMotionBuffer(problem->currentSolution,updatedSolution) ) { return 0; }
+  if (!copyMotionBuffer(problem->initialSolution,updatedSolution) ) { return 0; }
 
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
   {
-    if ( (problem->chain[chainID].currentSolution==0) || (problem->chain[chainID].currentSolution->motion==0) )
-    {
-       fprintf(stderr,"Unable to update solution for chain %u, target not properly allocated..\n",chainID);
-    } else
-    if (updatedSolution->bufferSize != problem->chain[chainID].currentSolution->bufferSize)
-    {
-       fprintf(stderr,"Unable to update solution for chain %u they have different size..\n",chainID);
-    } else
-    {
-       memcpy(
-               problem->chain[chainID].currentSolution->motion,
-               updatedSolution->motion,
-               sizeof(float) * updatedSolution->bufferSize
-              );
-    }
+     if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution)) { return 0; }
   }
- return 1;
+  return 1;
 }
 
 int cleanProblem(struct ikProblem * problem)
@@ -798,7 +818,6 @@ float calculateChainLoss(
                                          )
         )
       {
-
        #if DISCARD_POSITIONAL_COMPONENT
         bvh_removeTranslationFromTransform(
                                             problem->mc,
@@ -825,7 +844,7 @@ float calculateChainLoss(
                                                                 tX,
                                                                 tY
                                                                );
-                                                               /*
+         /*
           fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",
           problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
           problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
@@ -877,6 +896,7 @@ float iteratePartLoss(
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
+
 if (springIgnoresIterativeChanges)
  {
   originalValues[0] = problem->initialSolution->motion[mIDS[0]];
@@ -885,6 +905,8 @@ if (springIgnoresIterativeChanges)
  }
 
 float initialLoss = calculateChainLoss(problem,chainID);
+
+ fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName,initialLoss);
 
 //-------------------------------------------
 //-------------------------------------------
@@ -952,11 +974,6 @@ if (problem->previousSolution!=0)
  float distanceFromInitial;
  float spring = 10.0;
 
-/*
- if (problem->chain[chainID].part[partID].bigChanges)
- {
-   d*=10;
- }*/
 
  //Give an initial direction..
  delta[0] = d;
@@ -964,39 +981,51 @@ if (problem->previousSolution!=0)
  delta[2] = d;
 
 
-
+ unsigned int badLosses=0;
  //Are we at a global optimum? ---------------------------------------------------------------------------------
  //-------------------------------------------------------------------------------------------------------------
  for (unsigned int i=0; i<3; i++)
  {
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
-  distanceFromInitial=fabs(currentValues[i]+d - originalValues[i]);
-  float lossPlusD=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+  float lossPlusD=calculateChainLoss(problem,chainID);
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
-  distanceFromInitial=fabs(currentValues[i]-d - originalValues[i]);
-  float lossMinusD=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+  float lossMinusD=calculateChainLoss(problem,chainID);
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = previousValues[i];
 
   if (
-       (initialLoss<lossPlusD) &&
-       (initialLoss<lossMinusD)
+       (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD)
      )
     {
       fprintf(stderr,"Initial #%u value cannot be improved..!\n",i);
+      delta[0] = 0.0;
+      delta[1] = 0.0;
+      delta[2] = 0.0;
+      ++badLosses;
     } else
   if (
        (initialLoss>lossPlusD) && (lossPlusD<lossMinusD)
      )
     {
+      fprintf(stderr,"Initial #%u value can be improved via +d from %0.2f to %0.2f..!\n",i,initialLoss,lossPlusD);
        currentValues[i] += d;
+       initialLoss=lossPlusD;
+       delta[i] = d;
     } else
   if (
        (initialLoss>lossMinusD) && (lossPlusD>lossMinusD)
      )
     {
+      fprintf(stderr,"Initial #%u value can be improved via -d from %0.2f to %0.2f..!\n",i,initialLoss,lossMinusD);
        currentValues[i] -= d;
+       initialLoss=lossMinusD;
+       delta[i] = -d;
     }
  }
+ if (badLosses==3)
+ {
+   return initialLoss;
+ }
+
  //-------------------------------------------------------------------------------------------------------------
 
 
@@ -1007,15 +1036,12 @@ if (problem->previousSolution!=0)
 
 
 
- fprintf(stderr,"\nOptimizing %s \n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
  fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
  fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
  for (unsigned int i=0; i<epochs; i++)
  {
-   int stop[3]={0};
-
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
@@ -1110,7 +1136,7 @@ float iterateChainLoss(
                          unsigned int springIgnoresIterativeChanges
                         )
 {
-
+ //Before we start we will make a copy of the problem->currentSolution to work on improving it..
  copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
 
  for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -1128,6 +1154,7 @@ float iterateChainLoss(
    }
  }
 
+ //After we finish we update the problem->currentSolution with what our chain came up with..
  copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
 
  return calculateChainLoss(problem,chainID);
@@ -1230,11 +1257,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
        {
         if (problem->previousSolution->motion!=0)
           {
+            struct BVH_Transform bvhPrevioustTransform={0};
               if (
                    bvh_loadTransformForMotionBuffer(
                                                     mc,
                                                     previousSolution->motion,
-                                                    &bvhCurrentTransform
+                                                    &bvhPrevioustTransform
                                                    )
                   )
              {
@@ -1243,13 +1271,17 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                        renderer,
                                        1,
                                        0,
-                                       &bvhCurrentTransform,
+                                       &bvhPrevioustTransform,
                                        bvhTargetTransform
                                       );
                 if (previousMAEInPixels < *initialMAEInPixels)
                 {
                   fprintf(stderr,"Previous MAE (%0.2f) seems to be lower than estimation (%0.2f) so will use previous..\n",previousMAEInPixels,*initialMAEInPixels);
-                  updateProblemSolutionToAllChains(problem,previousSolution);
+                  if (!updateProblemSolutionToAllChains(problem,previousSolution))
+                  {
+                    fprintf(stderr,RED "Failed to updated problem solution..\n" NORMAL);
+                    //exit(0);
+                  }
                   //exit(0);
                 }
              }
@@ -1263,15 +1295,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
       if ( (initialMAEInMM!=0) && (groundTruth!=0) )
        {
         *initialMAEInMM = meanBVH3DDistace(
-                                       mc,
-                                       renderer,
-                                       1,
-                                       0,
-                                       problem->initialSolution->motion,
-                                       &bvhCurrentTransform,
-                                       groundTruth->motion,
-                                       bvhTargetTransform
-                                      );
+                                           mc,
+                                           renderer,
+                                           1,
+                                           0,
+                                           problem->initialSolution->motion,
+                                           &bvhCurrentTransform,
+                                           groundTruth->motion,
+                                           bvhTargetTransform
+                                          );
        }
       //----------------------------------------------------
 
@@ -1304,6 +1336,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
    }
   }
 
+   //Retrieve regressed solution
    copyMotionBuffer(solution,problem->currentSolution);
 
 
@@ -1345,7 +1378,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
          if (previousMAEInPixels<*finalMAEInPixels)
          {
            fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
-           copyMotionBuffer(solution,previousSolution);
+           //copyMotionBuffer(solution,previousSolution);
          }
       }
       //----------------------------------------------------
@@ -1397,57 +1430,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
  return 1;
 }
 
-
-int writeHTML(
-               unsigned int fIDSource,
-               unsigned int fIDTarget,
-               float initialMAEInPixels,
-               float finalMAEInPixels,
-               float initialMAEInMM,
-               float finalMAEInMM,
-               int dumpScreenshots
-             )
-{
-  if (dumpScreenshots)
-  {
-  int i=system("convert initial.svg initial.png&");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert target.svg target.png&");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-  i=system("convert solution.svg solution.png&");
-  if (i!=0) { fprintf(stderr,"Error converting image..\n"); }
-
-  FILE * html=fopen("report.html","w");
-  if (html!=0)
-  {
-    fprintf(html,"<html><body><br>\n");
-    //------------------------------------------------------------
-    fprintf(html,"<table><tr>\n");
-    fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
-    fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
-    fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
-    fprintf(html,"</tr>\n");
-    //------------------------------------------------------------
-    fprintf(html,"<tr>\n");
-    fprintf(html,"<td align=\"center\">Initial Pose (frame %u)</td>\n",fIDSource);
-    fprintf(html,"<td align=\"center\">Target Pose (frame %u)</td>\n",fIDTarget);
-    fprintf(html,"<td align=\"center\">Solution</td>\n");
-    fprintf(html,"</tr>\n");
-    fprintf(html,"</table>\n");
-    //------------------------------------------------------------
-
-    fprintf(html,"<br><br><br><br>");
-    fprintf(html,"MAE in 2D Pixels went from %0.2f to %0.2f <br>",initialMAEInPixels,finalMAEInPixels);
-    fprintf(html,"MAE in 3D mm went from %0.2f to %0.2f <br>",initialMAEInMM*10,finalMAEInMM*10);
-
-    fprintf(html,"</body></html>");
-    fclose(html);
-    return 1;
-  }
-
- }
-  return 0;
-}
 
 
 // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100
