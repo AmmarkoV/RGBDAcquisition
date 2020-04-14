@@ -390,10 +390,78 @@ int prepareProblem(
  problem->chain[chainID].numberOfParts=partID;
 
  ++chainID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+  //Chain 1 is the Right Arm
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+
+ if (bvh_getJointIDFromJointName(mc,"chest",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
+   ++partID;
+  } else
+  { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
+
+ if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].jointImportance=0.5;
+   ++partID;
+  } else
+  { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
+
+
+  if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
+   ++partID;
+  } else
+  { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
+
+  if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
+   ++partID;
+  } else
+  { fprintf(stderr,"No relbow in armature..\n"); return 0; }
+
+
+ problem->chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+ //These are first group..
  ++groupID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
+
+
 
 
   //Chain 1 is the Right Arm

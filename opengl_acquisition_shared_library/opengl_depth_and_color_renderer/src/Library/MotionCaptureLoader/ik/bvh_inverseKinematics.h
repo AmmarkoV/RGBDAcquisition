@@ -12,8 +12,8 @@ extern "C"
 #endif
 
 
-#define MAXIMUM_CHAINS 10
-#define MAXIMUM_PARTS_OF_CHAIN 10
+#define MAXIMUM_CHAINS 15
+#define MAXIMUM_PARTS_OF_CHAIN 15
 
 struct ikChainParts
 {
