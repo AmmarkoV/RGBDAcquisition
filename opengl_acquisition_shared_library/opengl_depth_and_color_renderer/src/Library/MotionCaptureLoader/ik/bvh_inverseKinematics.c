@@ -251,15 +251,68 @@ float meanBVH3DDistace(
 }
 
 
+int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
+{
+  if (updatedSolution==0) { return 0; }
+  if (problem->currentSolution==0) { return 0; }
+  if (problem->initialSolution==0) { return 0; }
+
+  if (updatedSolution->bufferSize != problem->currentSolution->bufferSize)
+    {
+     fprintf(stderr,"Unable to update global current solution for problem they have different size..\n");
+     memcpy(
+             problem->currentSolution->motion,
+             updatedSolution->motion,
+             sizeof(float) * updatedSolution->bufferSize
+           );
+    }
+
+    /*
+  if (updatedSolution->bufferSize != problem->initialSolution->bufferSize)
+    {
+     fprintf(stderr,"Unable to update global initial solution for problem they have different size..\n");
+     memcpy(
+             problem->initialSolution->motion,
+             updatedSolution->motion,
+             sizeof(float) * updatedSolution->bufferSize
+           );
+    }
+   */
+
+
+
+  for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+  {
+    if ( (problem->chain[chainID].currentSolution==0) || (problem->chain[chainID].currentSolution->motion==0) )
+    {
+       fprintf(stderr,"Unable to update solution for chain %u, target not properly allocated..\n",chainID);
+    } else
+    if (updatedSolution->bufferSize != problem->chain[chainID].currentSolution->bufferSize)
+    {
+       fprintf(stderr,"Unable to update solution for chain %u they have different size..\n",chainID);
+    } else
+    {
+       memcpy(
+               problem->chain[chainID].currentSolution->motion,
+               updatedSolution->motion,
+               sizeof(float) * updatedSolution->bufferSize
+              );
+    }
+  }
+ return 1;
+}
 
 int cleanProblem(struct ikProblem * problem)
 {
+  freeMotionBuffer(problem->previousSolution);
+  freeMotionBuffer(problem->initialSolution);
   freeMotionBuffer(problem->currentSolution);
 
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
   {
     freeMotionBuffer(problem->chain[chainID].currentSolution);
   }
+
  return 1;
 }
 
@@ -274,10 +327,10 @@ int prepareProblem(
 {
   problem->mc = mc;
   problem->renderer = renderer;
-  problem->previousSolution = previousSolution;
-  problem->initialSolution = solution;
 
-  problem->currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+  problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
+  problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+  problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
 
   //2D Projections Targeted
   //----------------------------------------------------------
@@ -371,7 +424,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5; //Hips are more important to hips upper body can rotate via chest
    ++partID;
   } else
   { fprintf(stderr,"No rhip in armature..\n"); return 0; }
@@ -381,7 +434,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=1.5; //Hips are more important to hips upper body can rotate via chest
 
    ++partID;
   } else
@@ -910,9 +963,47 @@ if (problem->previousSolution!=0)
  delta[1] = d;
  delta[2] = d;
 
- currentValues[0] += d;
- currentValues[1] += d;
- currentValues[2] += d;
+
+
+ //Are we at a global optimum? ---------------------------------------------------------------------------------
+ //-------------------------------------------------------------------------------------------------------------
+ for (unsigned int i=0; i<3; i++)
+ {
+  problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
+  distanceFromInitial=fabs(currentValues[i]+d - originalValues[i]);
+  float lossPlusD=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+  problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
+  distanceFromInitial=fabs(currentValues[i]-d - originalValues[i]);
+  float lossMinusD=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+  problem->chain[chainID].currentSolution->motion[mIDS[i]] = previousValues[i];
+
+  if (
+       (initialLoss<lossPlusD) &&
+       (initialLoss<lossMinusD)
+     )
+    {
+      fprintf(stderr,"Initial #%u value cannot be improved..!\n",i);
+    } else
+  if (
+       (initialLoss>lossPlusD) && (lossPlusD<lossMinusD)
+     )
+    {
+       currentValues[i] += d;
+    } else
+  if (
+       (initialLoss>lossMinusD) && (lossPlusD>lossMinusD)
+     )
+    {
+       currentValues[i] -= d;
+    }
+ }
+ //-------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
 
 
 
@@ -923,6 +1014,7 @@ if (problem->previousSolution!=0)
 
  for (unsigned int i=0; i<epochs; i++)
  {
+   int stop[3]={0};
 
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
@@ -1092,7 +1184,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
   viewProblem(problem);
 
 
-
+  float previousMAEInPixels=1000000; //Big invalid number
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -1102,7 +1194,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
   if (
          bvh_loadTransformForMotionBuffer(
                                           mc,
-                                          solution->motion,
+                                          problem->initialSolution->motion,
                                           &bvhCurrentTransform
                                          )
         )
@@ -1146,7 +1238,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    )
                   )
              {
-               float previousMAEInPixels = meanBVH2DDistace(
+               previousMAEInPixels = meanBVH2DDistace(
                                        mc,
                                        renderer,
                                        1,
@@ -1156,10 +1248,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                       );
                 if (previousMAEInPixels < *initialMAEInPixels)
                 {
-                  fprintf(stderr,"Previous MAE seems to be lower so will use this..\n");
-                  float * tmp = solution->motion;
-                  solution->motion = previousSolution->motion;
-                  previousSolution->motion = tmp;
+                  fprintf(stderr,"Previous MAE (%0.2f) seems to be lower than estimation (%0.2f) so will use previous..\n",previousMAEInPixels,*initialMAEInPixels);
+                  updateProblemSolutionToAllChains(problem,previousSolution);
+                  //exit(0);
                 }
              }
           }
@@ -1176,7 +1267,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                        renderer,
                                        1,
                                        0,
-                                       solution->motion,
+                                       problem->initialSolution->motion,
                                        &bvhCurrentTransform,
                                        groundTruth->motion,
                                        bvhTargetTransform
@@ -1252,6 +1343,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                        &bvhCurrentTransform,
                                        bvhTargetTransform
                                      );
+         if (previousMAEInPixels<*finalMAEInPixels)
+         {
+           fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
+           copyMotionBuffer(solution,previousSolution);
+         }
       }
       //----------------------------------------------------
       if ( (finalMAEInMM!=0) && (groundTruth!=0) )
@@ -1450,10 +1546,10 @@ int bvhTestIK(
                                                                       )
                 )
             {
+             //Important :)
              //=======
              result=1;
              //=======
-
 
             //-------------------------------------------------------------------------------------------------------------
             //compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
