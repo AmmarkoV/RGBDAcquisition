@@ -666,7 +666,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=1.5;
+   problem->chain[chainID].part[partID].jointImportance=2.0;
    ++partID;
   } else
   { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
@@ -718,7 +718,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
-   problem->chain[chainID].part[partID].jointImportance=1.5;
+   problem->chain[chainID].part[partID].jointImportance=2.0;
    ++partID;
   } else
   { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
@@ -1298,11 +1298,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   for (int t=0; t<iterations; t++)
   {
-   loss = iterateChainLoss(problem,0,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(problem,1,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(problem,2,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(problem,3,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(problem,4,learningRate,epochs,springIgnoresIterativeChanges);
+   for (int chainID=0; chainID<problem->numberOfChains; chainID++)
+   {
+    loss = iterateChainLoss(problem,chainID,learningRate,epochs,springIgnoresIterativeChanges);
+   }
   }
 
    copyMotionBuffer(solution,problem->currentSolution);
