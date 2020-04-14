@@ -1065,11 +1065,17 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          int dumpScreenshots
                                         )
 {
+ struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+ if (problem==0)
+     {
+        fprintf(stderr,"Failed to allocate memory for our IK problem..\n");
+        return 0;
+     }
 
- struct ikProblem problem={0};
+ memset(problem,0,sizeof(struct ikProblem));
 
   if (!prepareProblem(
-                      &problem,
+                      problem,
                       mc,
                       renderer,
                       previousSolution,
@@ -1079,10 +1085,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
      )
      {
         fprintf(stderr,"Could not prepare the problem for IK solution\n");
+        free(problem);
         return 0;
      }
 
-  viewProblem(&problem);
+  viewProblem(problem);
 
 
 
@@ -1127,9 +1134,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
       //----------------------------------------------------
       //----------------------------------------------------
       //----------------------------------------------------
-      if (problem.previousSolution!=0)
+      if (problem->previousSolution!=0)
        {
-        if (problem.previousSolution->motion!=0)
+        if (problem->previousSolution->motion!=0)
           {
               if (
                    bvh_loadTransformForMotionBuffer(
@@ -1200,14 +1207,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   for (int t=0; t<iterations; t++)
   {
-   loss = iterateChainLoss(&problem,0,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(&problem,1,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(&problem,2,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(&problem,3,learningRate,epochs,springIgnoresIterativeChanges);
-   loss = iterateChainLoss(&problem,4,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(problem,0,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(problem,1,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(problem,2,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(problem,3,learningRate,epochs,springIgnoresIterativeChanges);
+   loss = iterateChainLoss(problem,4,learningRate,epochs,springIgnoresIterativeChanges);
   }
 
-   copyMotionBuffer(solution,problem.currentSolution);
+   copyMotionBuffer(solution,problem->currentSolution);
 
 
 
@@ -1290,8 +1297,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
  //Cleanup allocations needed for the problem..
- cleanProblem(&problem);
-
+ cleanProblem(problem);
+ free(problem);
  return 1;
 }
 
