@@ -30,6 +30,9 @@
 #define WHITE   "\033[37m"      /* White */
 
 
+//This is a good idea because it reduces jitter..
+#define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 1
+
 #define DISCARD_POSITIONAL_COMPONENT 0
 const float distance=-150;
 
@@ -681,15 +684,31 @@ int prepareProblem(
   } else
   { fprintf(stderr,"No rknee in armature..\n"); return 0; }
 
+
   if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jointImportance=2.0;
    ++partID;
   } else
   { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
+
+
+  if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.R",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.r",&thisJID)) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
+   ++partID;
+  } else
+  { fprintf(stderr,"No R toe in armature..\n"); return 0; }
+
+
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -737,11 +756,25 @@ int prepareProblem(
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jointImportance=2.0;
    ++partID;
   } else
   { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
+
+  if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.L",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.l",&thisJID)) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
+   ++partID;
+  } else
+  { fprintf(stderr,"No L toe in armature..\n"); return 0; }
+
+
 
  problem->chain[chainID].numberOfParts=partID;
  ++chainID;
@@ -981,13 +1014,11 @@ if (problem->previousSolution!=0)
  delta[2] = d;
 
 
- #define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 1
- //This is a bad idea because it will ultimately ignore the solution and propagate wrong poses coming from previous solutions..
 
  #if TRY_TO_STAY_AT_GLOBAL_OPTIMUM
- unsigned int badLosses=0;
  //Are we at a global optimum? ---------------------------------------------------------------------------------
  //-------------------------------------------------------------------------------------------------------------
+ unsigned int badLosses=0;
  for (unsigned int i=0; i<3; i++)
  {
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
