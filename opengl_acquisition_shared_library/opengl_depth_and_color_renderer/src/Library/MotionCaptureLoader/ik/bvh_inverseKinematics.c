@@ -981,7 +981,7 @@ if (problem->previousSolution!=0)
  delta[2] = d;
 
 
- #define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 0
+ #define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 1
  //This is a bad idea because it will ultimately ignore the solution and propagate wrong poses coming from previous solutions..
 
  #if TRY_TO_STAY_AT_GLOBAL_OPTIMUM
@@ -1003,6 +1003,9 @@ if (problem->previousSolution!=0)
       fprintf(stderr,"Initial #%u value seems to be locally optimal but nudged..!\n",i);
       delta[i] = d;
       ++badLosses;
+    } else
+    {
+      fprintf(stderr,"Initial #%u value can be straight-forwardly changed..!\n",i);
     }
  }
  if (badLosses==3)
