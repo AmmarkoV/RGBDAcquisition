@@ -313,7 +313,7 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
 
 
   if (!copyMotionBuffer(problem->currentSolution,updatedSolution) ) { return 0; }
-  if (!copyMotionBuffer(problem->initialSolution,updatedSolution) ) { return 0; }
+  //if (!copyMotionBuffer(problem->initialSolution,updatedSolution) ) { return 0; }
 
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
   {
@@ -981,6 +981,10 @@ if (problem->previousSolution!=0)
  delta[2] = d;
 
 
+ #define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 0
+ //This is a bad idea because it will ultimately ignore the solution and propagate wrong poses coming from previous solutions..
+
+ #if TRY_TO_STAY_AT_GLOBAL_OPTIMUM
  unsigned int badLosses=0;
  //Are we at a global optimum? ---------------------------------------------------------------------------------
  //-------------------------------------------------------------------------------------------------------------
@@ -996,29 +1000,9 @@ if (problem->previousSolution!=0)
        (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD)
      )
     {
-      fprintf(stderr,"Initial #%u value cannot be improved..!\n",i);
-      delta[0] = 0.0;
-      delta[1] = 0.0;
-      delta[2] = 0.0;
+      fprintf(stderr,"Initial #%u value seems to be locally optimal but nudged..!\n",i);
+      delta[i] = d;
       ++badLosses;
-    } else
-  if (
-       (initialLoss>lossPlusD) && (lossPlusD<lossMinusD)
-     )
-    {
-      fprintf(stderr,"Initial #%u value can be improved via +d from %0.2f to %0.2f..!\n",i,initialLoss,lossPlusD);
-       currentValues[i] += d;
-       initialLoss=lossPlusD;
-       delta[i] = d;
-    } else
-  if (
-       (initialLoss>lossMinusD) && (lossPlusD>lossMinusD)
-     )
-    {
-      fprintf(stderr,"Initial #%u value can be improved via -d from %0.2f to %0.2f..!\n",i,initialLoss,lossMinusD);
-       currentValues[i] -= d;
-       initialLoss=lossMinusD;
-       delta[i] = -d;
     }
  }
  if (badLosses==3)
@@ -1026,7 +1010,11 @@ if (problem->previousSolution!=0)
    return initialLoss;
  }
 
+ delta[0] = d;
+ delta[1] = d;
+ delta[2] = d;
  //-------------------------------------------------------------------------------------------------------------
+ #endif // TRY_TO_STAY_AT_GLOBAL_OPTIMUM
 
 
 
@@ -1069,6 +1057,10 @@ if (problem->previousSolution!=0)
 
    gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
    delta[2] =  beta * delta[2] + (float) lr * gradient;
+
+   if (delta[0]!=delta[0]) { delta[0]=0;}
+   if (delta[1]!=delta[1]) { delta[1]=0;}
+   if (delta[2]!=delta[2]) { delta[2]=0;}
 
    previousLoss[0]=currentLoss[0];
    previousLoss[1]=currentLoss[1];
@@ -1277,11 +1269,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                 if (previousMAEInPixels < *initialMAEInPixels)
                 {
                   fprintf(stderr,"Previous MAE (%0.2f) seems to be lower than estimation (%0.2f) so will use previous..\n",previousMAEInPixels,*initialMAEInPixels);
+                  /* THIS WORKS BADLY..!
                   if (!updateProblemSolutionToAllChains(problem,previousSolution))
                   {
                     fprintf(stderr,RED "Failed to updated problem solution..\n" NORMAL);
                     //exit(0);
-                  }
+                  }*/
                   //exit(0);
                 }
              }
@@ -1378,7 +1371,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
          if (previousMAEInPixels<*finalMAEInPixels)
          {
            fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
-           //copyMotionBuffer(solution,previousSolution);
+           copyMotionBuffer(solution,previousSolution);
          }
       }
       //----------------------------------------------------
