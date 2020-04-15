@@ -11,6 +11,7 @@ extern "C"
 {
 #endif
 
+#define IK_VERSION 0.1
 
 #define MAXIMUM_CHAINS 15
 #define MAXIMUM_PARTS_OF_CHAIN 15
@@ -79,23 +80,34 @@ struct ikProblem
 
 
 
+struct ikConfiguration
+{
+  float learningRate;
+  unsigned int iterations;
+  unsigned int epochs;
+  unsigned int considerPreviousSolution;
+  unsigned int springIgnoresIterativeChanges;
+  unsigned int dumpScreenshots;
+  float ikVersion;
+};
+
+
 //Temporary call that allows outside control..
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
+                                         struct ikConfiguration * ikConfig,
+                                         //---------------------------------
                                          struct MotionBuffer * previousSolution,
                                          struct MotionBuffer * solution,
-                                         float learningRate,
-                                         unsigned int iterations,
-                                         unsigned int epochs,
                                          struct MotionBuffer * groundTruth,
+                                         //---------------------------------
                                          struct BVH_Transform * bvhTargetTransform,
+                                         //---------------------------------
                                          float * initialMAEInPixels,
                                          float * finalMAEInPixels,
                                          float * initialMAEInMM,
-                                         float * finalMAEInMM,
-                                         unsigned int springIgnoresIterativeChanges,
-                                         int dumpScreenshots
+                                         float * finalMAEInMM
                                         );
 
 

@@ -1195,19 +1195,18 @@ float iterateChainLoss(
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
+                                         struct ikConfiguration * ikConfig,
+                                         //---------------------------------
                                          struct MotionBuffer * previousSolution,
                                          struct MotionBuffer * solution,
-                                         float learningRate,
-                                         unsigned int iterations,
-                                         unsigned int epochs,
                                          struct MotionBuffer * groundTruth,
+                                         //---------------------------------
                                          struct BVH_Transform * bvhTargetTransform,
+                                         //---------------------------------
                                          float * initialMAEInPixels,
                                          float * finalMAEInPixels,
                                          float * initialMAEInMM,
-                                         float * finalMAEInMM,
-                                         unsigned int springIgnoresIterativeChanges,
-                                         int dumpScreenshots
+                                         float * finalMAEInMM
                                         )
 {
  struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
@@ -1336,7 +1335,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
       }
 
-  if (dumpScreenshots)
+  if (ikConfig->dumpScreenshots)
   {
    dumpBVHToSVGFrame(
                      "initial.svg",
@@ -1355,11 +1354,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
   float loss;
 
-  for (int t=0; t<iterations; t++)
+  for (int t=0; t<ikConfig->iterations; t++)
   {
    for (int chainID=0; chainID<problem->numberOfChains; chainID++)
    {
-    loss = iterateChainLoss(problem,chainID,learningRate,epochs,springIgnoresIterativeChanges);
+    loss = iterateChainLoss(problem,chainID,ikConfig->learningRate,ikConfig->epochs,ikConfig->springIgnoresIterativeChanges);
    }
   }
 
@@ -1430,7 +1429,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 
-  if (dumpScreenshots)
+  if (ikConfig->dumpScreenshots)
   {
   dumpBVHToSVGFrame(
                      "target.svg",
@@ -1532,25 +1531,34 @@ int bvhTestIK(
                                               );
             #endif // DISCARD_POSITIONAL_COMPONENT
 
-             unsigned int springIgnoresIterativeChanges=0;
+            unsigned int springIgnoresIterativeChanges=0;
+
+            struct ikConfiguration ikConfig={0};
+            //------------------------------------
+            ikConfig.learningRate = lr;
+            ikConfig.iterations = iterations;
+            ikConfig.epochs = epochs;
+            ikConfig.springIgnoresIterativeChanges = springIgnoresIterativeChanges;
+            ikConfig.dumpScreenshots = dumpScreenshots;
+            ikConfig.ikVersion = IK_VERSION;
+            //------------------------------------
 
             if (
                 approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                        mc,
                                                                        &renderer,
+                                                                       &ikConfig,
+                                                                       //---------------
                                                                        previousSolution,
                                                                        solution,
-                                                                       lr,
-                                                                       iterations,
-                                                                       epochs,
                                                                        groundTruth,
+                                                                       //-------------------
                                                                        &bvhTargetTransform,
+                                                                       //-------------------
                                                                        &initialMAEInPixels,
                                                                        &finalMAEInPixels,
                                                                        &initialMAEInMM,
-                                                                       &finalMAEInMM,
-                                                                       springIgnoresIterativeChanges,
-                                                                       dumpScreenshots
+                                                                       &finalMAEInMM
                                                                       )
                 )
             {
