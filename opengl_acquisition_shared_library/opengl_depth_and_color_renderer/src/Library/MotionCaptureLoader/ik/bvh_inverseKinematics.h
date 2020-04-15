@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.1
+#define IK_VERSION 0.2
 
 #define MAXIMUM_CHAINS 15
 #define MAXIMUM_PARTS_OF_CHAIN 15
@@ -88,6 +88,7 @@ struct ikConfiguration
   unsigned int considerPreviousSolution;
   unsigned int springIgnoresIterativeChanges;
   unsigned int dumpScreenshots;
+  unsigned int verbose;
   float ikVersion;
 };
 
