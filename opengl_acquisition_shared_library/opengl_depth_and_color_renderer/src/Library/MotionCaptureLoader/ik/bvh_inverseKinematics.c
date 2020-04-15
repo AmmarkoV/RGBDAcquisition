@@ -688,11 +688,11 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
    ++partID;
   } else
   { fprintf(stderr,"No rfoot in armature..\n"); return 0; }
@@ -756,10 +756,10 @@ int prepareProblem(
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jointImportance=2.0;
+   problem->chain[chainID].part[partID].jointImportance=1.0;
    ++partID;
   } else
   { fprintf(stderr,"No lfoot in armature..\n"); return 0; }
