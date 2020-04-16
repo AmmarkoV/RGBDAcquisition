@@ -1188,9 +1188,23 @@ int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D, float * transf
  return 1;
 }
 
+int normalize3DPointFVector(float * vec)
+{
+  if ( vec[3]==1.0 ) { return 1; } else
+  if ( vec[3]==0.0 )
+  {
+    fprintf(stderr,"normalize3DPointFVector cannot be normalized since element 3 is zero\n");
+    return 0;
+  }
 
 
+  vec[0]=vec[0]/vec[3];
+  vec[1]=vec[1]/vec[3];
+  vec[2]=vec[2]/vec[3];
+  vec[3]=1.0; // vec[3]=vec[3]/vec[3];
 
+  return 1;
+}
 
 int normalize3DPointDVector(double * vec)
 {

@@ -344,6 +344,10 @@ int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D, float * transf
 */
 int transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
+
+
+int normalize3DPointFVector(float * vec);
+
 /**
 * @brief Normalize a 4x1 matrix with a Vector (3D Point)
 * @ingroup AmMatrix

@@ -157,7 +157,7 @@ struct BVH_Joint
   unsigned int hierarchyLevel;
   //--------------------
   float offset[3];
-  double staticTransformation[16];
+  float staticTransformation[16];
   //--------------------
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
