@@ -1318,7 +1318,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         return 0;
      }
 
-  viewProblem(problem);
+  //Don't spam console..
+  //viewProblem(problem);
 
 
   float previousMAEInPixels=1000000; //Big invalid number
