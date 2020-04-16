@@ -377,18 +377,24 @@ int prepareProblem(
   BVHJointID thisJID=0;
   //----------------------------------------------------------
 
+
+
+
+
   //Chain 0 is the Hip and all of the rigid torso
   //----------------------------------------------------------
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
 
   #if DISCARD_POSITIONAL_COMPONENT
    fprintf(stderr,"Ignoring positional component..\n");
   #else
    if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
    {
+     bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
      problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
      problem->chain[chainID].part[partID].jID=thisJID;
      problem->chain[chainID].part[partID].mIDStart=0; //First Position
@@ -402,6 +408,7 @@ int prepareProblem(
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
@@ -413,6 +420,7 @@ int prepareProblem(
 
   if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -423,6 +431,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -433,6 +442,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -443,6 +453,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -453,6 +464,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -481,8 +493,11 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
+
  if (bvh_getJointIDFromJointName(mc,"chest",&thisJID) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -495,6 +510,7 @@ int prepareProblem(
 
  if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -506,6 +522,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -516,6 +533,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -548,10 +566,11 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
-
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
 
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -564,6 +583,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rForeArm",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -576,6 +596,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rHand",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -604,9 +625,11 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
 
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -619,6 +642,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -631,6 +655,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lHand",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -658,9 +683,11 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
 
   if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -673,6 +700,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShin",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -686,6 +714,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -699,6 +728,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.R",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.r",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -727,8 +757,11 @@ int prepareProblem(
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
+  bvh_markAllJointsAsUselessInTransform(&problem->chain[chainID].current2DProjectionTransform);
+
   if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -741,6 +774,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShin",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -753,6 +787,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lFoot",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=0;
@@ -765,6 +800,7 @@ int prepareProblem(
 
   if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.L",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.l",&thisJID)) )
   {
+   bvh_markJointAndParentsAsUsefulInTransform(&problem->chain[chainID].current2DProjectionTransform,thisJID);
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -1514,7 +1550,7 @@ int bvhTestIK(
               unsigned int fIDTarget
              )
 {
-  int result=0; 
+  int result=0;
 
   struct BVH_Transform bvhTargetTransform={0};
 

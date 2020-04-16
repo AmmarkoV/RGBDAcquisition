@@ -63,6 +63,7 @@ struct BVH_TransformedJoint
   char pos2DCalculated;
   char isBehindCamera;
   char isOccluded;
+  char skipCalculations;
   float pos2D[2];
 };
 
@@ -84,6 +85,13 @@ int bvh_populateRectangle2DFromProjections(
                                            struct BVH_Transform * bvhTransform,
                                            struct rectangleArea * area
                                           );
+
+
+
+int bvh_markAllJointsAsUselessInTransform(struct BVH_Transform * bvhTransform);
+
+int bvh_markJointAndParentsAsUsefulInTransform(struct BVH_Transform * bvhTransform,BVHJointID jID);
+
 
 int bvh_loadTransformForMotionBuffer(
                                      struct BVH_MotionCapture * bvhMotion ,

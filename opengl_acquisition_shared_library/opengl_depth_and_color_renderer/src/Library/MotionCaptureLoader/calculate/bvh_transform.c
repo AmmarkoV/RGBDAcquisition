@@ -361,6 +361,26 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 
 
 
+int bvh_markAllJointsAsUselessInTransform(
+                                          struct BVH_Transform * bvhTransform
+                                         )
+{
+return 0;
+}
+
+
+
+int bvh_markJointAndParentsAsUsefulInTransform(
+                                    struct BVH_Transform * bvhTransform,
+                                    BVHJointID jID
+                                    )
+{
+return 0;
+}
+
+
+#define USE_DEAD_CODE 1
+
 /*
   This is basically the same code as bvh_loadTransformForFrame
   TODO : merge the two codebases
@@ -375,11 +395,12 @@ int bvh_loadTransformForMotionBuffer(
    if (motionBuffer==0) { return 0; }
    if (bvhTransform==0) { return 0; }
 
-
+  #if USE_DEAD_CODE
    //We can use this to change root joint
    //But this gets unreasonably complicated so it is best not to change anything here..
    float positionOffset[4]={0};
    float rotationOffset[4]={0};
+   #endif // IGNORE_DEAD_CODE
 
 
   unsigned int jID=0;
@@ -390,6 +411,8 @@ int bvh_loadTransformForMotionBuffer(
 
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
+    if (!bvhTransform->joint[jID].skipCalculations)
+    {
      //---
       create4x4FIdentityMatrix(bvhTransform->joint[jID].chainTransformation);
       create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
@@ -397,6 +420,7 @@ int bvh_loadTransformForMotionBuffer(
       create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
       create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
      //---
+    }
    }
 
 
@@ -409,6 +433,8 @@ int bvh_loadTransformForMotionBuffer(
   //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
+    if (!bvhTransform->joint[jID].skipCalculations)
+    {
       //Setup dynamic transformation
       //Get values from our bvhMotion structure
       //fprintf(stderr,"bhv_populatePosXYZRotXYZFromMotionBuffer ");
@@ -425,6 +451,7 @@ int bvh_loadTransformForMotionBuffer(
       float rotY = data[4];
       float rotZ = data[5];
 
+      #if USE_DEAD_CODE
       if (bvhMotion->jointHierarchy[jID].isRoot)
       {
          posX+=positionOffset[0];
@@ -434,6 +461,7 @@ int bvh_loadTransformForMotionBuffer(
          rotY+=rotationOffset[1];
          rotZ+=rotationOffset[2];
       }
+      #endif // USE_DEAD_CODE
 
       create4x4FTranslationMatrix(bvhTransform->joint[jID].dynamicTranslation,posX,posY,posZ);
 
@@ -463,12 +491,17 @@ int bvh_loadTransformForMotionBuffer(
                                                       );
       #endif // USE_BVH_SPECIFIC_ROTATIONS
      }
+
+
+    }
   }
 
   //We will now apply all transformations
   //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
+    if (!bvhTransform->joint[jID].skipCalculations)
+    {
      if (bhv_jointHasParent(bvhMotion,jID))
       {
         //If joint is not Root joint
@@ -537,6 +570,7 @@ int bvh_loadTransformForMotionBuffer(
        bvhTransform->centerPosition[1]=bvhTransform->joint[jID].pos3D[1];
        bvhTransform->centerPosition[2]=bvhTransform->joint[jID].pos3D[2];
       }
+    }
   }
 
 if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
