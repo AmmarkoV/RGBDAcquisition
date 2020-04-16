@@ -395,6 +395,7 @@ int prepareProblem(
    if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
    {
      bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+     problem->chain[chainID].part[partID].partParent=0; //This is the parent
      problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
      problem->chain[chainID].part[partID].jID=thisJID;
      problem->chain[chainID].part[partID].mIDStart=0; //First Position
@@ -409,6 +410,7 @@ int prepareProblem(
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
@@ -421,6 +423,7 @@ int prepareProblem(
   if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -432,6 +435,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -443,6 +447,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -454,6 +459,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -465,6 +471,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -498,6 +505,7 @@ int prepareProblem(
  if (bvh_getJointIDFromJointName(mc,"chest",&thisJID) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -511,6 +519,7 @@ int prepareProblem(
  if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -523,6 +532,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -534,6 +544,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -571,6 +582,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -584,6 +596,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rForeArm",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0; //This is the parent
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -597,6 +610,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rHand",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=1;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -630,6 +644,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -643,6 +658,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -656,6 +672,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lHand",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=1;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -688,6 +705,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -701,6 +719,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShin",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -715,6 +734,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=1;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -729,6 +749,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.R",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.r",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=2;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -762,6 +783,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -775,6 +797,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShin",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=0;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=0;
    problem->chain[chainID].part[partID].jID=thisJID;
@@ -788,6 +811,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lFoot",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=1;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=0;
@@ -801,6 +825,7 @@ int prepareProblem(
   if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.L",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.l",&thisJID)) )
   {
    bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+   problem->chain[chainID].part[partID].partParent=2;
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].endEffector=1;
@@ -869,7 +894,8 @@ int viewProblem(
 
 float calculateChainLoss(
                          struct ikProblem * problem,
-                         unsigned int chainID
+                         unsigned int chainID,
+                         unsigned int partIDStart
                         )
 {
   unsigned int numberOfSamples=0;
@@ -893,13 +919,12 @@ float calculateChainLoss(
                                           );
        #endif // DISCARD_POSITIONAL_COMPONENT
 
-      if (
-          (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
-          // && (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
-         )
+      if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
       {
-       for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+       for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
        {
+         //if ( (partID==partIDStart) || (problem->chain[chainID].part[partID].partParent==partIDStart) )
+         {
          unsigned int jID=problem->chain[chainID].part[partID].jID;
          float tX = problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
          float tY = problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
@@ -922,6 +947,7 @@ float calculateChainLoss(
           fprintf(stderr,"Joint squared %s distance is %0.2f\n",problem->mc->jointHierarchy[jID].jointName,thisSquared2DDistance);*/
           loss+=thisSquared2DDistance * problem->chain[chainID].part[partID].jointImportance;
           ++numberOfSamples;
+         }
          }
        }
      }
@@ -975,7 +1001,7 @@ if (springIgnoresIterativeChanges)
   originalValues[2] = problem->initialSolution->motion[mIDS[2]];
  }
 
-float initialLoss = calculateChainLoss(problem,chainID);
+float initialLoss = calculateChainLoss(problem,chainID,partID);
 
 
 //This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
@@ -1070,9 +1096,9 @@ if (problem->previousSolution!=0)
  for (unsigned int i=0; i<3; i++)
  {
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
-  float lossPlusD=calculateChainLoss(problem,chainID);
+  float lossPlusD=calculateChainLoss(problem,chainID,partID);
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
-  float lossMinusD=calculateChainLoss(problem,chainID);
+  float lossMinusD=calculateChainLoss(problem,chainID,partID);
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = previousValues[i];
 
   if (
@@ -1118,17 +1144,17 @@ if (problem->previousSolution!=0)
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
-   currentLoss[0]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+   currentLoss[0]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
    distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
-   currentLoss[1]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+   currentLoss[1]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
    distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
-   currentLoss[2]=calculateChainLoss(problem,chainID) + spring * distanceFromInitial * distanceFromInitial;
+   currentLoss[2]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
  //-------------------
 
@@ -1162,9 +1188,13 @@ if (problem->previousSolution!=0)
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
-   loss=calculateChainLoss(problem,chainID);
+   loss=calculateChainLoss(problem,chainID,partID);
 
-
+   if (loss==NAN)
+   {
+     if (verbose) { fprintf(stderr,RED "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]); }
+     break;
+   } else
    if ( (loss<bestLoss) && ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
    {
      bestLoss=loss;
@@ -1192,8 +1222,9 @@ if (problem->previousSolution!=0)
  }
  unsigned long endTime = GetTickCountMicrosecondsIK();
 
-        if (verbose)
+        //if (verbose)
              {
+                fprintf(stderr,"Optimization for joint %s \n", problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
                 fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
                 fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
                 fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
@@ -1222,7 +1253,7 @@ if (problem->previousSolution!=0)
 
 
 
-float iterateChainLoss(
+int iterateChainLoss(
                          struct ikProblem * problem,
                          unsigned int chainID,
                          float lr,
@@ -1255,7 +1286,7 @@ float iterateChainLoss(
  //After we finish we update the problem->currentSolution with what our chain came up with..
  copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
 
- return calculateChainLoss(problem,chainID);
+ return 1;
 }
 
 
