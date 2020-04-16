@@ -181,6 +181,8 @@ int bvh_projectTo2D(
       unsigned int jID=0;
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
+        if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
+        {
         if (bvhTransform->joint[jID].pos3D[3]!=1.0)
            { fprintf(stderr,"bvh_projectTo2D W coord of joint %u not normalized..\n",jID); }
 
@@ -245,6 +247,7 @@ int bvh_projectTo2D(
               bvhTransform->joint[jID].pos2DCalculated=1;
            }
 
+        }
         ++pointsDumped;
       } //Joint Loop , render all joint points..
 

@@ -362,20 +362,86 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 
 
 int bvh_markAllJointsAsUselessInTransform(
+                                          struct BVH_MotionCapture * bvhMotion ,
                                           struct BVH_Transform * bvhTransform
                                          )
 {
-return 0;
+  if (bvhMotion==0) { return 0; }
+  if (bvhTransform==0) { return 0; }
+  bvhTransform->useOptimizations=1;
+
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+     bvhTransform->joint[jID].skipCalculations=1;
+   }
+
+  return 1;
 }
 
 
 
 int bvh_markJointAndParentsAsUsefulInTransform(
-                                    struct BVH_Transform * bvhTransform,
-                                    BVHJointID jID
-                                    )
+                                                struct BVH_MotionCapture * bvhMotion ,
+                                                struct BVH_Transform * bvhTransform,
+                                                BVHJointID jID
+                                              )
 {
-return 0;
+  if (bvhMotion==0) { return 0; }
+  if (bvhTransform==0) { return 0; }
+  bvhTransform->useOptimizations=1;
+
+  while (jID!=0)
+      {
+           bvhTransform->joint[jID].skipCalculations=0;
+           jID = bvhMotion->jointHierarchy[jID].parentJoint;
+      }
+
+  bvhTransform->joint[0].skipCalculations=0;
+
+  return 1;
+}
+
+
+int bvh_markJointAndParentsAsUselessInTransform(
+                                                struct BVH_MotionCapture * bvhMotion ,
+                                                struct BVH_Transform * bvhTransform,
+                                                BVHJointID jID
+                                              )
+{
+  if (bvhMotion==0) { return 0; }
+  if (bvhTransform==0) { return 0; }
+  bvhTransform->useOptimizations=1;
+
+  while (jID!=0)
+      {
+           bvhTransform->joint[jID].skipCalculations=1;
+           jID = bvhMotion->jointHierarchy[jID].parentJoint;
+      }
+
+  bvhTransform->joint[0].skipCalculations=1;
+
+  return 1;
+}
+
+
+int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
+                                                        struct BVH_MotionCapture * bvhMotion ,
+                                                        struct BVH_Transform * bvhTransform,
+                                                        BVHJointID jID
+                                                       )
+{
+  if (bvhMotion==0) { return 0; }
+  if (bvhTransform==0) { return 0; }
+
+  bvh_markJointAndParentsAsUselessInTransform(
+                                              bvhMotion ,
+                                              bvhTransform,
+                                              jID
+                                             );
+
+  bvhTransform->joint[jID].skipCalculations=0;
+
+  return 1;
 }
 
 
@@ -411,7 +477,7 @@ int bvh_loadTransformForMotionBuffer(
 
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-    if (!bvhTransform->joint[jID].skipCalculations)
+    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
     {
      //---
       create4x4FIdentityMatrix(bvhTransform->joint[jID].chainTransformation);
@@ -433,7 +499,7 @@ int bvh_loadTransformForMotionBuffer(
   //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-    if (!bvhTransform->joint[jID].skipCalculations)
+    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
     {
       //Setup dynamic transformation
       //Get values from our bvhMotion structure
@@ -500,7 +566,7 @@ int bvh_loadTransformForMotionBuffer(
   //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-    if (!bvhTransform->joint[jID].skipCalculations)
+    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
     {
      if (bhv_jointHasParent(bvhMotion,jID))
       {
