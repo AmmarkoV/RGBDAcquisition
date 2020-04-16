@@ -479,9 +479,9 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
 {
  if (calib==0) { fprintf(stderr,"No calibration file provided , returning null 4x4 transformation matrix \n"); return 0;  }
 
- double * m = alloc4x4Matrix();
+ double * m = malloc4x4DMatrix();
  if (m==0) {fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");  return 0; }
- create4x4IdentityMatrix(m);
+ create4x4DIdentityMatrix(m);
 
  if (! calib->extrinsicParametersSet )
      { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return m; } else
@@ -501,7 +501,7 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
   raw3D[2] = (double) *z;
   raw3D[3] = (double) 1.0;
 
-  result = transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
+  result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
   *x= (float) world3D[0];
   *y= (float) world3D[1];
@@ -517,7 +517,7 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
  if (likely(m!=0))
  {
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
-  free4x4Matrix(&m); // This is the same as free(m); m=0;
+  free4x4DMatrix(&m); // This is the same as free(m); m=0;
   return 1;
  } //End of M allocated!
 

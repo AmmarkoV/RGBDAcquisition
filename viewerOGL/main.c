@@ -99,7 +99,7 @@ int drawObjectAT(GLuint programID,
 
 
        double modelMatrixD[16];
-       create4x4ModelTransformation(
+       create4x4DModelTransformation(
                                     modelMatrixD,
                                     //Rotation Component
                                     roll,//roll
@@ -121,8 +121,8 @@ int drawObjectAT(GLuint programID,
        double MVPD[16];
        float MVP[16];
        getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-       copy4x4DMatrixToF(MVP , MVPD );
-       transpose4x4Matrix(MVP);
+       copy4x4DMatrixTo4x4F(MVP , MVPD );
+       transpose4x4FMatrix(MVP);
       //-------------------------------------------------------------------
 
 
