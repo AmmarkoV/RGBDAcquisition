@@ -17,14 +17,14 @@ extern "C"
 * @ingroup AmMatrix
 * @retval 0=Failure or a pointer to an allocated 3x3 Matrix
 */
-double * alloc4x4Matrix();
+double * malloc4x4DMatrix();
 
 /**
 * @brief Deallocate an existing 3x3 Matrix
 * @ingroup AmMatrix
 * @param  Pointer to a Pointer of an allocated matrix
 */
-void free4x4Matrix(double ** mat);
+void free4x4DMatrix(double ** mat);
 
 
 
@@ -75,7 +75,7 @@ void copy4x4FMatrix(float * out,float * in);
 * @param  Pointer to a double 4x4 output
 * @param  Pointer to a float 4x4 input
 */
-void copy4x4FMatrixToD(double * out,float * in);
+void copy4x4FMatrixTo4x4D(double * out,float * in);
 
 
 /**
@@ -84,16 +84,16 @@ void copy4x4FMatrixToD(double * out,float * in);
 * @param  Pointer to a float 4x4 output
 * @param  Pointer to a double 4x4 input
 */
-void copy4x4DMatrixToF(float * dest, double * m );
+void copy4x4DMatrixTo4x4F(float * dest, double * m );
 
 /**
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
 * @ingroup AmMatrix
 * @param  Input/Output Matrix
 */
-void create4x4IdentityMatrix(double * m) ;
+void create4x4DIdentityMatrix(double * m) ;
 
-void create4x4IdentityMatrixF(float * m);
+void create4x4FIdentityMatrix(float * m);
 
 int is4x4DZeroMatrix(double  * m);
 
@@ -104,7 +104,7 @@ int is4x4FIdentityMatrix(float  * m);
 int is4x4FIdentityMatrixPercisionCompensating(float  * m);
 
 
-void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
+void convert4x4DMatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 
 
 
@@ -118,7 +118,7 @@ void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 * @param  Y Axis Parameter
 * @param  Z Axis Parameter
 */
-void create4x4RotationMatrix(double * m,double angle, double x, double y, double z) ;
+void create4x4DRotationMatrix(double * m,double angle, double x, double y, double z) ;
 
 
 void create4x4FRotationMatrix(float * m , float angle, float x, float y, float z);
@@ -135,7 +135,7 @@ void create4x4FTranslationMatrix(float * matrix , float x, float y, float z);
 * @param  Y Translation
 * @param  Z Translation
 */
-void create4x4TranslationMatrix(double * matrix,double x, double y, double z);
+void create4x4DTranslationMatrix(double * matrix,double x, double y, double z);
 
 
 /**
@@ -147,7 +147,7 @@ void create4x4TranslationMatrix(double * matrix,double x, double y, double z);
 * @param  Scaling on the Z
 * @retval 0=Failure,1=Success
 */
-void create4x4ScalingMatrix(double * matrix,double scaleX, double scaleY, double scaleZ);
+void create4x4DScalingMatrix(double * matrix,double scaleX, double scaleY, double scaleZ);
 
 void create4x4FScalingMatrix(float * matrix , float scaleX, float scaleY, float scaleZ);
 
@@ -162,7 +162,7 @@ void create4x4FScalingMatrix(float * matrix , float scaleX, float scaleY, float 
 * @param  Quaternion on the W
 * @param  Degrees of rotation
 */
-void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double qW);
+void create4x4DQuaternionMatrix(double * m , double qX,double qY,double qZ,double qW);
 
 
 
@@ -209,7 +209,7 @@ enum ROTATION_ORDER
 * @param  Rotation Z in euler angles (0-360)
 * @param  Rotation order given by enum ROTATION_ORDER, typically ROTATION_ORDER_ZYX or ROTATION_ORDER_XYZ
 */
-void create4x4MatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
+void create4x4DMatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
 
 
 void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
@@ -223,7 +223,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, flo
 * @param  Rotation Y in euler angles (0-360)
 * @param  Rotation Z in euler angles (0-360)
 */
-void create4x4MatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, double eulZ);
+void create4x4DMatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, double eulZ);
 
 
 /**
@@ -232,7 +232,7 @@ void create4x4MatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, dou
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4RotationX(double * matrix,double degrees) ;
+void create4x4DRotationX(double * matrix,double degrees) ;
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Rotation on the Y axis
@@ -240,7 +240,7 @@ void create4x4RotationX(double * matrix,double degrees) ;
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4RotationY(double * matrix,double degrees) ;
+void create4x4DRotationY(double * matrix,double degrees) ;
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Rotation on the Z axis
@@ -248,7 +248,7 @@ void create4x4RotationY(double * matrix,double degrees) ;
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4RotationZ(double * matrix,double degrees);
+void create4x4DRotationZ(double * matrix,double degrees);
 
 
 /**
@@ -257,7 +257,7 @@ void create4x4RotationZ(double * matrix,double degrees);
 * @param  Input 4x4 Matrix
 * @retval Det(mat)
 */
-double det4x4Matrix(double * mat) ;
+double det4x4DMatrix(double * mat) ;
 
 /**
 * @brief Invert a 4x4 matrix
@@ -266,10 +266,10 @@ double det4x4Matrix(double * mat) ;
 * @param  Output ( should be already allocated ) 3x3 Matrix
 * @retval 0=failure,1=success
 */
-int invert4x4MatrixD(double * result,double * mat) ;
+int invert4x4DMatrix(double * result,double * mat) ;
 
 
-int transpose4x4Matrix(float * mat);
+int transpose4x4FMatrix(float * mat);
 
 /**
 * @brief Transpose an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
@@ -277,7 +277,7 @@ int transpose4x4Matrix(float * mat);
 * @param  Input/Output Matrix
 * @retval 0=Failure,1=Success
 */
-int transpose4x4MatrixD(double * mat) ;
+int transpose4x4DMatrix(double * mat) ;
 
 
 /**
@@ -288,14 +288,14 @@ int transpose4x4MatrixD(double * mat) ;
 * @param  Input 4x4 Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB);
+int multiplyTwo4x4DMatrices(double * result , double * matrixA , double * matrixB);
 
 
-int multiplyTwo4x4MatricesBuffered(double * result , double * matrixA , double * matrixB);
+int multiplyTwo4x4DMatricesBuffered(double * result , double * matrixA , double * matrixB);
 
-int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC);
+int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
 
-int multiplyFour4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC , double * matrixD);
+int multiplyFour4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC , double * matrixD);
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )
@@ -320,7 +320,7 @@ int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
+int transform3DPointDVectorUsing4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 
 /**
@@ -331,7 +331,7 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int transform3DPointVectorUsing4x4MatrixF(float * resultPoint3D, float * transformation4x4, float * point3D);
+int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D, float * transformation4x4, float * point3D);
 
 /**
 * @brief Multiply a the 3x3 rotational part of a 4x4 matrix with a Normal Vector (3D Point)  A*V
@@ -342,7 +342,7 @@ int transform3DPointVectorUsing4x4MatrixF(float * resultPoint3D, float * transfo
 * @param  Input Vector 4x1 V where W coordinate should be 0
 * @retval 0=failure,1=success
 */
-int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
+int transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 /**
 * @brief Normalize a 4x1 matrix with a Vector (3D Point)
@@ -350,7 +350,7 @@ int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, doubl
 * @param  Input/Output Vector
 * @retval 0=failure,1=success
 */
-int normalize3DPointVector(double * vec);
+int normalize3DPointDVector(double * vec);
 
 void doRPYTransformationF(
                          float *m,
@@ -359,7 +359,7 @@ void doRPYTransformationF(
                          float  yawInDegrees
                         );
 
-void doRPYTransformation(
+void doRPYTransformationD(
                          double *m,
                          double rollInDegrees,
                          double pitchInDegrees,
@@ -389,7 +389,7 @@ void doRPYTransformation(
 * @param  Input/Output Vector
 * @retval 0=failure,1=success
 */
-void create4x4ModelTransformation(
+void create4x4DModelTransformation(
                                   double * m ,
                                   //Rotation Component
                                   double rotationX,//heading
@@ -434,7 +434,7 @@ void create4x4FModelTransformation(
 * @param  Input/Output Vector
 * @retval 0=failure,1=success
 */
-void create4x4CameraModelViewMatrixForRendering(
+void create4x4DCameraModelViewMatrixForRendering(
                                                 double * m ,
                                                 //Rotation Component
                                                 double rotationX_angleDegrees,

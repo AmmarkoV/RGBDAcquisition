@@ -1,6 +1,6 @@
 #include "webInterface.h"
 
- 
+
 
 #if USE_AMMARSERVER
 
@@ -51,7 +51,7 @@ void * prepareCameraControlCallback(struct AmmServer_DynamicRequest  * rqst)
     fprintf(stderr,"Camera is now @ %0.2f %0.2f %0.2f ",sceneToControl->cameraPose.posX,sceneToControl->cameraPose.posY,sceneToControl->cameraPose.posZ);
 
     sceneToControl->useCustomModelViewMatrix=1;
-    create4x4CameraModelViewMatrixForRendering(
+    create4x4DCameraModelViewMatrixForRendering(
                                                     sceneToControl->customModelViewMatrix  ,
                                                     //Rotation Component
                                                     sceneToControl->cameraPose.angleX,
@@ -63,7 +63,7 @@ void * prepareCameraControlCallback(struct AmmServer_DynamicRequest  * rqst)
                                                     sceneToControl->cameraPose.posY,
                                                     sceneToControl->cameraPose.posZ
                                                   );
-    transpose4x4MatrixD(sceneToControl->customModelViewMatrix);
+    transpose4x4DMatrix(sceneToControl->customModelViewMatrix);
 
     setupSceneCameraBeforeRendering(sceneToControl);
   }

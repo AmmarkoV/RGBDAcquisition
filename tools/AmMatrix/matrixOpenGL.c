@@ -55,15 +55,15 @@ void changeYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
   double * invertOp = (double * ) malloc ( sizeof(double) * 16 );
   if (invertOp==0) { return; }
 
-  create4x4IdentityMatrix(invertOp);
+  create4x4DIdentityMatrix(invertOp);
   invertOp[5]=-1;   invertOp[10]=-1;
-  multiplyTwo4x4Matrices(result, matrix, invertOp);
+  multiplyTwo4x4DMatrices(result, matrix, invertOp);
   free(invertOp);
 }
 
 int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
 {
-  double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
+  double * matrix3x3Rotation = malloc4x4DMatrix();    if (matrix3x3Rotation==0) { return 0; }
 
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
@@ -106,14 +106,14 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
 
 
   print4x4DMatrix("ModelView", result4x4,0);
-  free4x4Matrix(&matrix3x3Rotation);
+  free4x4DMatrix(&matrix3x3Rotation);
   return 1;
 }
 
 
 int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
 {
-  double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
+  double * matrix3x3Rotation = malloc4x4DMatrix();    if (matrix3x3Rotation==0) { return 0; }
 
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
@@ -150,9 +150,9 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
    fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   #endif // PRINT_MATRIX_DEBUGGING
 
-  transpose4x4MatrixD(result4x4);
+  transpose4x4DMatrix(result4x4);
 
-  free4x4Matrix(&matrix3x3Rotation);
+  free4x4DMatrix(&matrix3x3Rotation);
   return 1;
 }
 
@@ -210,14 +210,14 @@ void buildOpenGLProjectionForIntrinsics   (
 
    //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
    float identMat[16];
-   float finalFrutstrum[16];
-   create4x4IdentityMatrixF(identMat);
+   float finalFrustrum[16];
+   create4x4FIdentityMatrix(identMat);
    identMat[10]=-1;
-   multiplyTwo4x4FMatrices(finalFrutstrum,identMat,frustum);
-   copy4x4FMatrix(frustum,finalFrutstrum);
+   multiplyTwo4x4FMatrices(finalFrustrum,identMat,frustum);
+   copy4x4FMatrix(frustum,finalFrustrum);
 
    //This should produce our own Row Major Format
-   transpose4x4Matrix(finalFrutstrum);
+   transpose4x4FMatrix(finalFrustrum);
 }
 
 
@@ -274,11 +274,11 @@ void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD
 
    //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
    double identMat[16];
-   double finalFrutstrum[16];
-   create4x4IdentityMatrix(identMat);
+   double finalFrustrum[16];
+   create4x4DIdentityMatrix(identMat);
    identMat[10]=-1;
-   multiplyTwo4x4Matrices(finalFrutstrum,identMat,frustum);
-   copy4x4DMatrix(frustum,finalFrutstrum);
+   multiplyTwo4x4DMatrices(finalFrustrum,identMat,frustum);
+   copy4x4DMatrix(frustum,finalFrustrum);
 
 }
 
@@ -841,7 +841,7 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
      ///THIS IS THE CORRECT WAY TO PERFORM THE MULTIPLICATION WITH OUR ROW MAJOR MATRICES
-     multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
+     multiplyThree4x4DMatrices(output, projectionMatrix , viewMatrix , modelMatrix );
      //print4x4DMatrix("MVP=",output,1);
   }
 
@@ -877,12 +877,12 @@ void prepareRenderingMatrices(
                                                            near,
                                                            far
                                                           );
-     transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
+     transpose4x4DMatrix(projectionMatrixD); //We want our own Row Major format..
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
 
-     create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
+     create4x4DScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
 
      glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
@@ -924,12 +924,12 @@ void correctProjectionMatrixForDifferentViewport(
 	correction[3]= -2.0 * (xC + wC / 2.f) * (1.0 / wC);
 	correction[5]= (1.f / hC);
 	correction[7]= -2.0 * (yC - hC / 2.f) * (1.f / hC);
-    //transpose4x4MatrixD(correction);
+    //transpose4x4DMatrix(correction);
 
 
-    multiplyTwo4x4Matrices(out,correction,projectionMatrix);
+    multiplyTwo4x4DMatrices(out,correction,projectionMatrix);
     //or ?
-    //multiplyTwo4x4Matrices(out,projectionMatrix,correction);
+    //multiplyTwo4x4DMatrices(out,projectionMatrix,correction);
 }
 
 

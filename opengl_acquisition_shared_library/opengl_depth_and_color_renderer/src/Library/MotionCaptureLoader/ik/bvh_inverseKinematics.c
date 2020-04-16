@@ -1386,21 +1386,19 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
 
-  float loss;
-
   for (int t=0; t<ikConfig->iterations; t++)
   {
    for (int chainID=0; chainID<problem->numberOfChains; chainID++)
    {
-    loss = iterateChainLoss(
-                             problem,
-                             chainID,
-                             ikConfig->learningRate,
-                             ikConfig->epochs,
-                             ikConfig->tryMaintainingLocalOptima,
-                             ikConfig->springIgnoresIterativeChanges,
-                             ikConfig->verbose
-                            );
+      iterateChainLoss(
+                       problem,
+                       chainID,
+                       ikConfig->learningRate,
+                       ikConfig->epochs,
+                       ikConfig->tryMaintainingLocalOptima,
+                       ikConfig->springIgnoresIterativeChanges,
+                       ikConfig->verbose
+                      );
    }
   }
 

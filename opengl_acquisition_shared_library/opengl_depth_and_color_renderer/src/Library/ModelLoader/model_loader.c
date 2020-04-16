@@ -376,6 +376,7 @@ void unloadModel(struct Model * mod)
     {
       case TRI_MODEL :
           freeModelTri( (struct TRI_Model *) mod->modelInternalData);
+      break;
       case OBJ_MODEL :
           unloadObj( (struct  OBJ_Model * ) mod->modelInternalData);
       break;
@@ -525,7 +526,7 @@ int drawModelAt(
 
    //fprintf(stderr,"drawModelAt: %s -> %u \n", mod->pathOfModel , rotationOrder);
    double modelTransformation[16];
-   create4x4ModelTransformation(
+   create4x4DModelTransformation(
                                   modelTransformation,
                                   //Rotation Component
                                   (double) rotationX,//heading,
@@ -541,7 +542,7 @@ int drawModelAt(
                                   (double) mod->scaleY,
                                   (double) mod->scaleZ
                                  );
-  transpose4x4MatrixD(modelTransformation); //Because we want to use this in OpenGL
+  transpose4x4DMatrix(modelTransformation); //Because we want to use this in OpenGL
   glMultMatrixd(modelTransformation);
 
 

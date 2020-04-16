@@ -655,7 +655,7 @@ int fillPosWithFrame(
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = 0.0;
 
-         create4x4MatrixFromEulerAnglesWithRotationOrder(
+         create4x4DMatrixFromEulerAnglesWithRotationOrder(
                                                           m,
                                                           rotCur[0],
                                                           rotCur[1],
@@ -663,7 +663,7 @@ int fillPosWithFrame(
                                                           (unsigned int) stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].eulerRotationOrder
                                                         );
 
-         copy4x4DMatrixToF(f,m);
+         copy4x4DMatrixTo4x4F(f,m);
         } else
         //Quaternion Rotation
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -675,7 +675,7 @@ int fillPosWithFrame(
          rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
 
          quaternion2Matrix4x4(m,rotCur,0);
-         copy4x4DMatrixToF(f,m);
+         copy4x4DMatrixTo4x4F(f,m);
         } else
         //Matrix 4x4 Matrix
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -697,7 +697,7 @@ int fillPosWithFrame(
         //---------------------------------------------------------------------------------------------------------------------------------
         {
          //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
-         create4x4IdentityMatrixF(f);
+         create4x4FIdentityMatrix(f);
         }
         //---------------------------------------------------------------------------------------------------------------------------------
        }
@@ -792,15 +792,15 @@ int fillJointsWithInterpolatedFrame(
          //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
          //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
          //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
-         create4x4MatrixFromEulerAnglesWithRotationOrder(
+         create4x4DMatrixFromEulerAnglesWithRotationOrder(
                                                           m,
-                                                          rotTot[0],
-                                                          rotTot[1],
-                                                          rotTot[2],
+                                                          (double) rotTot[0],
+                                                          (double) rotTot[1],
+                                                          (double) rotTot[2],
                                                           (unsigned int) stream->object[ObjID].frame[NextFrame].jointList->joint[i].eulerRotationOrder
                                                         );
          //create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
-         copy4x4DMatrixToF(f,m);
+         copy4x4DMatrixTo4x4F(f,m);
         } else
        if (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)

@@ -588,12 +588,12 @@ int setTRIJointRotationOrder(
     fprintf(stderr,"setTRIJointRotationOrder : joint=%u -> order=%u ",jointToChange,rotationOrder);
     if (rotationOrder<ROTATION_ORDER_NUMBER_OF_NAMES)
     {
-       fprintf(stderr," %s \n",ROTATION_ORDER_NAMESA[rotationOrder]); 
+       fprintf(stderr," %s \n",ROTATION_ORDER_NAMESA[rotationOrder]);
     } else
     {
-       fprintf(stderr,"\n");         
+       fprintf(stderr,"\n");
     }
-    
+
     in->bones[jointToChange].info->eulerRotationOrder = (unsigned char) rotationOrder;
     return 1;
   }
@@ -663,7 +663,7 @@ float * mallocModelTransformJoints(
      for (i=0; i<(*jointDataSizeOutput); i++)
      {
        float * mat = &returnMat[16*i];
-       create4x4IdentityMatrixF(mat);
+       create4x4FIdentityMatrix(mat);
      }
   }
   return returnMat;
@@ -689,7 +689,7 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
      {
        float * mat = &jointData[16*i];
 
-       copy4x4FMatrixToD(m4x4,mat);
+       copy4x4FMatrixTo4x4D(m4x4,mat);
        matrix4x42Quaternion(quaternions,qXqYqZqW,m4x4);
 
        quaternions2Euler(euler,quaternions,qXqYqZqW);
@@ -731,13 +731,13 @@ void recursiveJointHeirarchyTransformerDirect(
 	  // from being so, especially when I try to debug it....
 	  //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
 	  double newRot[16],nodeCopy[16];
-	  copy4x4FMatrixToD(newRot,&jointData[curBone*16]);
+	  copy4x4FMatrixTo4x4D(newRot,&jointData[curBone*16]);
 	  copy4x4DMatrix(nodeCopy,nodeTransformation);
-	  multiplyTwo4x4Matrices( nodeTransformation, nodeCopy,newRot);
+	  multiplyTwo4x4DMatrices( nodeTransformation, nodeCopy,newRot);
 
 
-      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
-      multiplyThree4x4Matrices(
+      multiplyTwo4x4DMatrices(globalTransformation,parentTransform,nodeTransformation);
+      multiplyThree4x4DMatrices(
                                  in->bones[curBone].info->finalVertexTransformation ,
                                  in->header.boneGlobalInverseTransform ,
                                  globalTransformation,
@@ -757,7 +757,7 @@ void recursiveJointHeirarchyTransformerDirect(
       }
     } else
     {
-      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
+      multiplyTwo4x4DMatrices(globalTransformation,parentTransform,nodeTransformation);
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
@@ -805,26 +805,26 @@ void recursiveJointHeirarchyTransformer(
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       double translation[16] , rotation[16] , scaling[16];
-      create4x4IdentityMatrix(translation);
-      create4x4IdentityMatrix(rotation);
-      create4x4IdentityMatrix(scaling);
+      create4x4DIdentityMatrix(translation);
+      create4x4DIdentityMatrix(rotation);
+      create4x4DIdentityMatrix(scaling);
 
-      copy4x4FMatrixToD(rotation,&jointData[curBone*16]);
+      copy4x4FMatrixTo4x4D(rotation,&jointData[curBone*16]);
 
       //Get Translation
       translation[3] =in->bones[curBone].info->localTransformation[3];
       translation[7] =in->bones[curBone].info->localTransformation[7];
       translation[11]=in->bones[curBone].info->localTransformation[11];
 
-      multiplyThree4x4Matrices( currentNodeLocalTransformation, translation,rotation,scaling);
+      multiplyThree4x4DMatrices( currentNodeLocalTransformation, translation,rotation,scaling);
       //print4x4DMatrixTRI("Translation was .. ",translation);
       //print4x4DMatrixTRI("Scaling was .. ",scaling);
       //print4x4DMatrixTRI("Rotation was .. ",rotation);
       //print4x4DMatrixTRI("Node Transformation is now.. \n",currentNodeLocalTransformation);
       }
 
-      multiplyTwo4x4Matrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
-      multiplyThree4x4Matrices(
+      multiplyTwo4x4DMatrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
+      multiplyThree4x4DMatrices(
                                  in->bones[curBone].info->finalVertexTransformation ,
                                  in->header.boneGlobalInverseTransform ,
                                  globalTransformation,
@@ -844,7 +844,7 @@ void recursiveJointHeirarchyTransformer(
       }
     } else
     {
-      multiplyTwo4x4Matrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
+      multiplyTwo4x4DMatrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
@@ -875,7 +875,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
      if ( is4x4DZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
      {
        fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
-       create4x4IdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
+       create4x4DIdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
      }
 
 
@@ -895,7 +895,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        position[3] = 1.0;
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
-       transform3DPointVectorUsing4x4Matrix(transformedPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
+       transform3DPointDVectorUsing4x4DMatrix(transformedPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
 	   triModelOut->vertices[v*3+0] += (float) transformedPosition[0] * w;
 	   triModelOut->vertices[v*3+1] += (float) transformedPosition[1] * w;
 	   triModelOut->vertices[v*3+2] += (float) transformedPosition[2] * w;
@@ -909,7 +909,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        normal[3]   = 0.0;
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
-       transform3DNormalVectorUsing3x3PartOf4x4Matrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
+       transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
 	   triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
 	   triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
 	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
@@ -992,7 +992,7 @@ int doModelTransform(
    }
 
   double initialParentTransform[16]={0};
-  create4x4IdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
+  create4x4DIdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

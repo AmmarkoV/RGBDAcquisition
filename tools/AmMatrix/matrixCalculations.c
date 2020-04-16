@@ -151,12 +151,12 @@ int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float s
  double a4D[16],b4D[16],rD[16];
 
 
- copy4x4FMatrixToD(a4D,a4);
- copy4x4FMatrixToD(b4D,b4);
+ copy4x4FMatrixTo4x4D(a4D,a4);
+ copy4x4FMatrixTo4x4D(b4D,b4);
 
    slerp2RotTransMatrices4x4( rD, a4D, b4D , step );
 
- copy4x4DMatrixToF(result4, rD);
+ copy4x4DMatrixTo4x4F(result4, rD);
  return 1;
 }
 
@@ -338,7 +338,7 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 
 int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  )
 {
-  return transform3DPointVectorUsing4x4Matrix(resultPoint3D,transformation4x4,point3D);
+  return transform3DPointDVectorUsing4x4DMatrix(resultPoint3D,transformation4x4,point3D);
 }
 
 
@@ -435,10 +435,10 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
   objectRotation4x4[e11]=objectPosition[2];
   objectRotation4x4[e15]=1.0;
 
-  transform3DPointVectorUsing4x4Matrix(absoluteOutPoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
+  transform3DPointDVectorUsing4x4DMatrix(absoluteOutPoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
 
   //Normalization is done automatically
-  normalize3DPointVector(absoluteOutPoint3DRotated);
+  normalize3DPointDVector(absoluteOutPoint3DRotated);
 
   return 1;
 }
@@ -463,9 +463,9 @@ int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated
 
 
   double objectInvRotation4x4[4*4]={0};
-  invert4x4MatrixD(objectInvRotation4x4,objectRotation4x4);
+  invert4x4DMatrix(objectInvRotation4x4,objectRotation4x4);
 
-  transform3DPointVectorUsing4x4Matrix(relativeOutPoint3DUnrotated,objectInvRotation4x4,absoluteInPoint3DRotated);
+  transform3DPointDVectorUsing4x4DMatrix(relativeOutPoint3DUnrotated,objectInvRotation4x4,absoluteInPoint3DRotated);
   return 1;
 }
 
@@ -488,7 +488,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOut
      pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
-    normalize3DPointVector(relativeOutPoint3DUnrotated);
+    normalize3DPointDVector(relativeOutPoint3DUnrotated);
 
     return 1;
 }
@@ -518,7 +518,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
     pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
-    normalize3DPointVector(relativeOutPoint3DUnrotated);
+    normalize3DPointDVector(relativeOutPoint3DUnrotated);
 
     return 1;
 }
@@ -534,7 +534,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOut
     pointFromRelationWithObjectToAbsolute(absoluteOutPoint3DRotated,objectPosition,objectRotation3x3,relativeInPoint3DUnrotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
-    normalize3DPointVector(absoluteOutPoint3DRotated);
+    normalize3DPointDVector(absoluteOutPoint3DRotated);
 
     return 1;
 }
@@ -561,7 +561,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
     pointFromRelationWithObjectToAbsolute(absoluteOutPoint3DRotated,objectPosition,objectRotation3x3,relativeInPoint3DUnrotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
-    normalize3DPointVector(absoluteOutPoint3DRotated);
+    normalize3DPointDVector(absoluteOutPoint3DRotated);
 
     return 1;
 }
@@ -587,7 +587,7 @@ void testMatrices()
 
   double Res[16]={0};
 
-  multiplyTwo4x4Matrices(Res,A,B);
+  multiplyTwo4x4DMatrices(Res,A,B);
 /*
   28.000000 26.000000 24.000000 22.000000
   68.000000 66.000000 64.000000 62.000000

@@ -15,29 +15,27 @@ int simpleRendererRender(
                          float * output2DW
                         )
 {
- double modelTransformationD[16];
  float  modelTransformationF[16];
  ///--------------------------------------------------------------------
  ///                       CAMERA MATRICES ETC
  ///--------------------------------------------------------------------
- create4x4ModelTransformation(
-                              modelTransformationD,
+ create4x4FModelTransformation(
+                              modelTransformationF,
                               //Rotation Component
-                              (double) sr->cameraOffsetRotation[0],//heading,
-                              (double) sr->cameraOffsetRotation[1],//pitch,
-                              (double) sr->cameraOffsetRotation[2],//roll,
+                              (float) sr->cameraOffsetRotation[0],//heading,
+                              (float) sr->cameraOffsetRotation[1],//pitch,
+                              (float) sr->cameraOffsetRotation[2],//roll,
                               ROTATION_ORDER_RPY,
                               //Translation Component
-                              (double) sr->cameraOffsetPosition[0],
-                              (double) sr->cameraOffsetPosition[1],
-                              (double) sr->cameraOffsetPosition[2],
+                              (float) sr->cameraOffsetPosition[0],
+                              (float) sr->cameraOffsetPosition[1],
+                              (float) sr->cameraOffsetPosition[2],
                               //Scale Component
-                              (double) 1.0,
-                              (double) 1.0,
-                              (double) 1.0
+                              (float) 1.0,
+                              (float) 1.0,
+                              (float) 1.0
                              );
  ///--------------------------------------------------------------------
- copy4x4DMatrixToF(modelTransformationF,modelTransformationD);
  multiplyTwo4x4FMatrices(sr->modelViewMatrix,sr->viewMatrix,modelTransformationF);
  ///--------------------------------------------------------------------
 
@@ -52,11 +50,11 @@ int simpleRendererRender(
 
   if (objectRotation==0)
     {
-      create4x4IdentityMatrixF(objectMatrixRotation);
+      create4x4FIdentityMatrix(objectMatrixRotation);
     } else
   if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
     {
-      create4x4IdentityMatrixF(objectMatrixRotation);
+      create4x4FIdentityMatrix(objectMatrixRotation);
     } else
   if (rotationOrder==ROTATION_ORDER_RPY)
     {
@@ -78,6 +76,7 @@ int simpleRendererRender(
                                                       rotationOrder
                                                      );
     }
+ ///--------------------------------------------------------------------
 
 
 
@@ -88,10 +87,10 @@ int simpleRendererRender(
    point3D[2]=(float) (position3D[2]-center3D[2]);
    point3D[3]=(float) (1.0);
 
-   transform3DPointVectorUsing4x4MatrixF(
-                                         resultPoint3D,
-                                         objectMatrixRotation,
-                                         point3D
+   transform3DPointFVectorUsing4x4FMatrix(
+                                          resultPoint3D,
+                                          objectMatrixRotation,
+                                          point3D
                                          );
 
 
@@ -108,7 +107,7 @@ int simpleRendererRender(
     final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
     final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
    }
-  final3DPosition[3]=(float) 0.0;//resultPoint3D[3];
+  final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
  ///--------------------------------------------------------------------
 
 
@@ -160,7 +159,7 @@ int simpleRendererRenderUsingPrecalculatedMatrices(
  ///--------------------------------------------------------------------
   float windowCoordinates[3]={0};
 
-  create4x4IdentityMatrixF(sr->modelViewMatrix);
+  create4x4FIdentityMatrix(sr->modelViewMatrix);
 
   if (
        !_glhProjectf(
@@ -237,14 +236,14 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
                                      );
 
    double viewMatrixD[16];
-   create4x4IdentityMatrix(viewMatrixD);
+   create4x4DIdentityMatrix(viewMatrixD);
 
-   create4x4ScalingMatrix(viewMatrixD,0.01,0.01,-0.01);
-   copy4x4DMatrixToF(sr->viewMatrix,viewMatrixD);
+   create4x4DScalingMatrix(viewMatrixD,0.01,0.01,-0.01);
+   copy4x4DMatrixTo4x4F(sr->viewMatrix,viewMatrixD);
 
    //Initialization of matrices not yet used
-   create4x4IdentityMatrixF(sr->modelMatrix);
-   create4x4IdentityMatrixF(sr->modelViewMatrix);
+   create4x4FIdentityMatrix(sr->modelMatrix);
+   create4x4FIdentityMatrix(sr->modelViewMatrix);
 
  return 1;
 }

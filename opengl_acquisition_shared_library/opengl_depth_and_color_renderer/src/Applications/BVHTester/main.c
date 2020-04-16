@@ -50,7 +50,6 @@
 void prepare4x4Human36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
 {
     float rXM[16],rYM[16],rZM[16];
-    float intermediateR[16];
 
     //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
     rXM[0]=1.0;  rXM[1]=0.0;     rXM[2]=0.0;        rXM[3]=0.0;
