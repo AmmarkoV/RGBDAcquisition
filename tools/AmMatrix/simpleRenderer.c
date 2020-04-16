@@ -9,7 +9,7 @@ int simpleRendererRender(
                          float * center3D,
                          float * objectRotation,
                          unsigned int rotationOrder,
-                         ///--------------- 
+                         ///---------------
                          float * output2DX,
                          float * output2DY,
                          float * output2DW
@@ -48,54 +48,51 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
  ///                       OBJECT MATRICES ETC
  ///--------------------------------------------------------------------
-  double objectMatrixRotation[16];
+  float objectMatrixRotation[16];
 
   if (objectRotation==0)
     {
-      create4x4IdentityMatrix(objectMatrixRotation);
+      create4x4IdentityMatrixF(objectMatrixRotation);
     } else
   if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
     {
-      create4x4IdentityMatrix(objectMatrixRotation);
+      create4x4IdentityMatrixF(objectMatrixRotation);
     } else
   if (rotationOrder==ROTATION_ORDER_RPY)
     {
      //This is the old way to do this rotation
-     doRPYTransformation(
-                         objectMatrixRotation,
-                         (double) objectRotation[0],
-                         (double) objectRotation[1],
-                         (double) objectRotation[2]
-                        );
+     doRPYTransformationF(
+                          objectMatrixRotation,
+                          (float) objectRotation[0],
+                          (float) objectRotation[1],
+                          (float) objectRotation[2]
+                         );
     } else
     {
      //fprintf(stderr,"Using new model transform code\n");
-     create4x4MatrixFromEulerAnglesWithRotationOrder(
-                                                     objectMatrixRotation ,
-                                                     (double) objectRotation[0],
-                                                     (double) objectRotation[1],
-                                                     (double) objectRotation[2],
-                                                     rotationOrder
-                                                    );
+     create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                      objectMatrixRotation ,
+                                                      (float) objectRotation[0],
+                                                      (float) objectRotation[1],
+                                                      (float) objectRotation[2],
+                                                      rotationOrder
+                                                     );
     }
 
 
 
-   double point3D[4];
-   double resultPoint3D[4];
+   float point3D[4];
+   float resultPoint3D[4];
+   point3D[0]=(float) (position3D[0]-center3D[0]);
+   point3D[1]=(float) (position3D[1]-center3D[1]);
+   point3D[2]=(float) (position3D[2]-center3D[2]);
+   point3D[3]=(float) (1.0);
 
-
-  point3D[0]=(double) (position3D[0]-center3D[0]);
-  point3D[1]=(double) (position3D[1]-center3D[1]);
-  point3D[2]=(double) (position3D[2]-center3D[2]);
-  point3D[3]=(double) (1.0);
-
-
-  transform3DPointVectorUsing4x4Matrix(
-                                       resultPoint3D,
-                                       objectMatrixRotation,
-                                       point3D
-                                      );
+   transform3DPointVectorUsing4x4MatrixF(
+                                         resultPoint3D,
+                                         objectMatrixRotation,
+                                         point3D
+                                         );
 
 
   float final3DPosition[4];
@@ -131,12 +128,12 @@ int simpleRendererRender(
                      windowCoordinates
                     )
      )
-     { 
+     {
         //If you reach here make sure you have called simpleRendererInitialize
         /*
-        print4x4FMatrix("modelViewMatrix",sr->modelMatrix,1); 
-        print4x4FMatrix("projectionMatrix",sr->projectionMatrix,1); 
-        fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]); 
+        print4x4FMatrix("modelViewMatrix",sr->modelMatrix,1);
+        print4x4FMatrix("projectionMatrix",sr->projectionMatrix,1);
+        fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]);
         */
      }
  ///--------------------------------------------------------------------
@@ -174,8 +171,8 @@ int simpleRendererRenderUsingPrecalculatedMatrices(
                      windowCoordinates
                     )
      )
-     { 
-         //fprintf(stderr,"simpleRendererRenderUsingPrecalculatedMatrices: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",position3D[0],position3D[1],position3D[2]); 
+     {
+         //fprintf(stderr,"simpleRendererRenderUsingPrecalculatedMatrices: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",position3D[0],position3D[1],position3D[2]);
      }
  ///--------------------------------------------------------------------
   *output2DX = windowCoordinates[0];//windowCoordinates[2];

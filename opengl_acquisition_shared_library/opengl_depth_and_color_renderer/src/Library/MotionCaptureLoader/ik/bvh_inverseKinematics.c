@@ -913,6 +913,7 @@ float iteratePartLoss(
                          unsigned int partID,
                          float lr,
                          unsigned int epochs,
+                         unsigned int tryMaintainingLocalOptima,
                          unsigned int springIgnoresIterativeChanges,
                          unsigned int verbose
                         )
@@ -1016,9 +1017,10 @@ if (problem->previousSolution!=0)
 
 
 
- #if TRY_TO_STAY_AT_GLOBAL_OPTIMUM
+ if (tryMaintainingLocalOptima)
+ {
  //Are we at a global optimum? ---------------------------------------------------------------------------------
- //-------------------------------------------------------------------------------------------------------------
+ //Do we care ? ----------------------------------------------------------------------------------
  unsigned int badLosses=0;
  for (unsigned int i=0; i<3; i++)
  {
@@ -1051,8 +1053,7 @@ if (problem->previousSolution!=0)
  delta[1] = d;
  delta[2] = d;
  //-------------------------------------------------------------------------------------------------------------
- #endif // TRY_TO_STAY_AT_GLOBAL_OPTIMUM
-
+ }
 
 
 
@@ -1173,6 +1174,7 @@ float iterateChainLoss(
                          unsigned int chainID,
                          float lr,
                          unsigned int epochs,
+                         unsigned int tryMaintainingLocalOptima,
                          unsigned int springIgnoresIterativeChanges,
                          unsigned int verbose
                         )
@@ -1190,6 +1192,7 @@ float iterateChainLoss(
                     partID,
                     lr,
                     epochs,
+                    tryMaintainingLocalOptima,
                     springIgnoresIterativeChanges,
                     verbose
                    );
@@ -1394,6 +1397,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                              chainID,
                              ikConfig->learningRate,
                              ikConfig->epochs,
+                             ikConfig->tryMaintainingLocalOptima,
                              ikConfig->springIgnoresIterativeChanges,
                              ikConfig->verbose
                             );
@@ -1583,6 +1587,7 @@ int bvhTestIK(
             ikConfig.springIgnoresIterativeChanges = springIgnoresIterativeChanges;
             ikConfig.dumpScreenshots = dumpScreenshots;
             ikConfig.verbose = 1;
+            ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
             ikConfig.ikVersion = IK_VERSION;
             //------------------------------------
 

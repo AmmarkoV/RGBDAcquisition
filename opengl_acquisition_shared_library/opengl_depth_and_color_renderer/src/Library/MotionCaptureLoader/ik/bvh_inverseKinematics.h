@@ -85,6 +85,7 @@ struct ikConfiguration
   unsigned int iterations;
   unsigned int epochs;
   unsigned int considerPreviousSolution;
+  unsigned int tryMaintainingLocalOptima;
   unsigned int springIgnoresIterativeChanges;
   unsigned int dumpScreenshots;
   unsigned int verbose;

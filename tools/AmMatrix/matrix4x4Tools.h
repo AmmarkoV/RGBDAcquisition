@@ -121,6 +121,7 @@ void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 void create4x4RotationMatrix(double * m,double angle, double x, double y, double z) ;
 
 
+void create4x4FRotationMatrix(float * m , float angle, float x, float y, float z);
 
 
 void create4x4FTranslationMatrix(float * matrix , float x, float y, float z);
@@ -148,6 +149,7 @@ void create4x4TranslationMatrix(double * matrix,double x, double y, double z);
 */
 void create4x4ScalingMatrix(double * matrix,double scaleX, double scaleY, double scaleZ);
 
+void create4x4FScalingMatrix(float * matrix , float scaleX, float scaleY, float scaleZ);
 
 
 /**
@@ -208,6 +210,9 @@ enum ROTATION_ORDER
 * @param  Rotation order given by enum ROTATION_ORDER, typically ROTATION_ORDER_ZYX or ROTATION_ORDER_XYZ
 */
 void create4x4MatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
+
+
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
 
 
 /**
@@ -303,10 +308,12 @@ int multiplyFour4x4Matrices(double * result , double * matrixA , double * matrix
 int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
 
 
+int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * matrixB);
+
 int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 /**
-* @brief Multiply a 4x4 matrix with a Vector (3D Point)  A*V
+* @brief Multiply a 4x4 matrix of doubles with a double precision Vector (3D Point)  A*V
 * @ingroup AmMatrix
 * @param  Output Vector ( should be already allocated )
 * @param  Input 4x4 Matrix A
@@ -316,6 +323,15 @@ int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 
+/**
+* @brief Multiply a 4x4 matrix of floats with a float Vector (3D Point)  A*V
+* @ingroup AmMatrix
+* @param  Output Vector ( should be already allocated )
+* @param  Input 4x4 Matrix A
+* @param  Input Vector 4x1 V
+* @retval 0=failure,1=success
+*/
+int transform3DPointVectorUsing4x4MatrixF(float * resultPoint3D, float * transformation4x4, float * point3D);
 
 /**
 * @brief Multiply a the 3x3 rotational part of a 4x4 matrix with a Normal Vector (3D Point)  A*V
@@ -336,6 +352,12 @@ int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, doubl
 */
 int normalize3DPointVector(double * vec);
 
+void doRPYTransformationF(
+                         float *m,
+                         float  rollInDegrees,
+                         float  pitchInDegrees,
+                         float  yawInDegrees
+                        );
 
 void doRPYTransformation(
                          double *m,
@@ -382,7 +404,17 @@ void create4x4ModelTransformation(
 
 
 
-
+void create4x4FModelTransformation(
+                                   float * m ,
+                                  //Rotation Component
+                                  float rotationX,//heading
+                                  float rotationY,//pitch
+                                  float rotationZ,//roll
+                                  unsigned int rotationOrder,
+                                  //Translation Component
+                                  float x, float y, float z ,
+                                  float scaleX, float scaleY, float scaleZ
+                                 );
 
 
 

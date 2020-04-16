@@ -49,6 +49,7 @@ struct rectangleArea
 
 struct BVH_TransformedJoint
 {
+
   double localToWorldTransformation[16];
   double chainTransformation[16];
   double dynamicTranslation[16];
