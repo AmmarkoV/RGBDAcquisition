@@ -462,7 +462,7 @@ int dumpBVHToCSVBody(
              {
                if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
                        fprintf(
-                                       fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
+                                       fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
                                       );
              }
          } else
@@ -471,7 +471,7 @@ int dumpBVHToCSVBody(
              {
                if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
                 fprintf(
-                                fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
+                                fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
                               );
              }
          }

@@ -70,7 +70,6 @@ struct ikProblem
  //Chain of subproblems that need to be solved
  unsigned int numberOfChains;
  unsigned int numberOfGroups;
- unsigned int numberOfJobsPerGroup;
 
  struct ikChain chain[MAXIMUM_CHAINS];
 };

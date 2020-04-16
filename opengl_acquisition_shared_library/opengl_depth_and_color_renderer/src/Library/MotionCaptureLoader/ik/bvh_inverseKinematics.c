@@ -364,12 +364,6 @@ int prepareProblem(
   //----------------------------------------------------------
   problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
- //Chain of subproblems that need to be solved
-  //----------------------------------------------------------
-  problem->numberOfChains = 5;
-  problem->numberOfGroups = 2;
-  problem->numberOfJobsPerGroup = 6;
-
 
 
   //Chain #0 is Joint Hip-> to all its children
@@ -400,7 +394,7 @@ int prepareProblem(
      problem->chain[chainID].part[partID].mIDStart=0; //First Position
      problem->chain[chainID].part[partID].mIDEnd=2; //First Position
      problem->chain[chainID].part[partID].bigChanges=1;
-     problem->chain[chainID].part[partID].jointImportance=1.5;
+     problem->chain[chainID].part[partID].jointImportance=2.0;
      ++partID;
    }
   #endif // DISCARD_POSITIONAL_COMPONENT
@@ -412,7 +406,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
    problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
-   problem->chain[chainID].part[partID].jointImportance=1.5;
+   problem->chain[chainID].part[partID].jointImportance=2.0;
    ++partID;
   } else
   { fprintf(stderr,"No hip in armature..\n"); return 0; }
@@ -504,7 +498,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].jointImportance=0.5;
+   problem->chain[chainID].part[partID].jointImportance=0.5; //Less important because it can be addressed by chest
    ++partID;
   } else
   { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
@@ -515,7 +509,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=1.0; //Less important because it can be addressed by chest
    ++partID;
   } else
   { fprintf(stderr,"No rshoulder in armature..\n"); return 0; }
@@ -525,7 +519,7 @@ int prepareProblem(
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].endEffector=1;
    problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].jointImportance=1.0;
+   problem->chain[chainID].part[partID].jointImportance=1.0; //Less important because it can be addressed by chest
    ++partID;
   } else
   { fprintf(stderr,"No relbow in armature..\n"); return 0; }
