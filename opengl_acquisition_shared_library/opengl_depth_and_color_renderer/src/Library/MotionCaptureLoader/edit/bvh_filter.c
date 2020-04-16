@@ -49,6 +49,7 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
   if (mc->numberOfValuesPerFrame==0)
   {
     fprintf(stderr,RED "filterOutPosesThatAreGimbalLocked: No motion values detected, have you loaded a file?\n" NORMAL);
+    free(framesToRemove);
     return 0;
   }
 
@@ -293,7 +294,7 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
 
 int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv)
 {
- for (int i=0; i<argc; i++)
+ for (unsigned int i=0; i<argc; i++)
  {
    fprintf(stderr,"%02u| %s \n",i,argv[i]);
  }

@@ -1514,9 +1514,7 @@ int bvhTestIK(
               unsigned int fIDTarget
              )
 {
-  int result=0;
-
-  int dumpScreenshots = 1;
+  int result=0; 
 
   struct BVH_Transform bvhTargetTransform={0};
 
@@ -1583,7 +1581,7 @@ int bvhTestIK(
             ikConfig.iterations = iterations;
             ikConfig.epochs = epochs;
             ikConfig.springIgnoresIterativeChanges = springIgnoresIterativeChanges;
-            ikConfig.dumpScreenshots = dumpScreenshots;
+            ikConfig.dumpScreenshots = 1;
             ikConfig.verbose = 1;
             ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
             ikConfig.ikVersion = IK_VERSION;
@@ -1631,7 +1629,7 @@ int bvhTestIK(
                        finalMAEInPixels,
                        initialMAEInMM,
                        finalMAEInMM,
-                       dumpScreenshots
+                       ikConfig.dumpScreenshots
                      );
              //-------------------------------------------------------------------------------------------------
             } else
