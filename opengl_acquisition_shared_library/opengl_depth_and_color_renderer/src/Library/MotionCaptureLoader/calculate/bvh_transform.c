@@ -445,7 +445,25 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 }
 
 
-#define USE_DEAD_CODE 1
+
+
+
+/**
+ * @brief This is a MocapNET orientation.
+ */
+enum MOTIONBUFFER_DATA_FIELDS
+{
+ MOTIONBUFFER_DATA_FIELDS_POSX=0,
+ MOTIONBUFFER_DATA_FIELDS_POSY,
+ MOTIONBUFFER_DATA_FIELDS_POSZ,
+ MOTIONBUFFER_DATA_FIELDS_ROTX,
+ MOTIONBUFFER_DATA_FIELDS_ROTY,
+ MOTIONBUFFER_DATA_FIELDS_ROTZ,
+ //-----------------------------
+ MOTIONBUFFER_DATA_FIELDS_NUMBER
+};
+
+
 
 int bvh_loadTransformForMotionBuffer(
                                      struct BVH_MotionCapture * bvhMotion,
@@ -458,13 +476,6 @@ int bvh_loadTransformForMotionBuffer(
    if (motionBuffer==0) { return 0; }
    if (bvhTransform==0) { return 0; }
 
-  #if USE_DEAD_CODE
-   //We can use this to change root joint
-   //But this gets unreasonably complicated so it is best not to change anything here..
-   float positionOffset[4]={0};
-   float rotationOffset[4]={0};
-   #endif // IGNORE_DEAD_CODE
-
 
   unsigned int jID=0;
   //First of all we need to clean the BVH_Transform structure
@@ -472,24 +483,10 @@ int bvh_loadTransformForMotionBuffer(
   bvhTransform->jointsOccludedIn2DProjection=0;
 
 
-   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-   {
-    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
-    {
-     //---
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].chainTransformation);
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
-     //---
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
-     //---
-    }
-   }
 
-
-  //We need some space to store values
-  //double posX=0.0,posY=0.0,posZ=0.0;
-  //double rotX=0.0,rotY=0.0,rotZ=0.0;
+  //data is the buffer where we will retrieve the values
+  //data[0] -> posX data[1] -> posY data[2] -> posZ
+  //data[3] -> rotX data[4] -> rotY data[5] -> rotZ
   float data[8]={0};
 
   //First of all we need to populate all local transformation in our chain
@@ -505,30 +502,19 @@ int bvh_loadTransformForMotionBuffer(
       {
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
       }
-      //fprintf(stderr,"ok \n ");
 
-      float posX = data[0];
-      float posY = data[1];
-      float posZ = data[2];
-      float rotX = data[3];
-      float rotY = data[4];
-      float rotZ = data[5];
-
-      #if USE_DEAD_CODE
-      if (bvhMotion->jointHierarchy[jID].isRoot)
-      {
-         posX+=positionOffset[0];
-         posY+=positionOffset[1];
-         posZ+=positionOffset[2];
-         rotX+=rotationOffset[0];
-         rotY+=rotationOffset[1];
-         rotZ+=rotationOffset[2];
-      }
-      #endif // USE_DEAD_CODE
-
-      create4x4FTranslationMatrix(bvhTransform->joint[jID].dynamicTranslation,posX,posY,posZ);
+      //We dont need to create an identity matrix and then a translation matrix
+      //create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
+      create4x4FTranslationMatrix(
+                                  bvhTransform->joint[jID].dynamicTranslation,
+                                  data[MOTIONBUFFER_DATA_FIELDS_POSX],
+                                  data[MOTIONBUFFER_DATA_FIELDS_POSY],
+                                  data[MOTIONBUFFER_DATA_FIELDS_POSZ]
+                                 );
 
 
+     //We dont need to create an identity rotation matrix and then write on top of it
+     //create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
      if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder==0)  )
      {
         if (!bvhMotion->jointHierarchy[jID].isEndSite)
@@ -540,16 +526,16 @@ int bvh_loadTransformForMotionBuffer(
        create4x4RotationBVH(
                             bvhTransform->joint[jID].dynamicRotation,
                             bvhMotion->jointHierarchy[jID].channelRotationOrder,
-                            -1*rotX,
-                            -1*rotY,
-                            -1*rotZ
+                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
+                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
+                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ]
                            );
       #else
        create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                        bvhTransform->joint[jID].dynamicRotation,
-                                                       -1*rotX,
-                                                       -1*rotY,
-                                                       -1*rotZ,
+                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
+                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
+                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
                                                       );
       #endif // USE_BVH_SPECIFIC_ROTATIONS
@@ -565,8 +551,15 @@ int bvh_loadTransformForMotionBuffer(
   {
     if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
     {
+     //This will get populated either way..
+     //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
+
      if (bhv_jointHasParent(bvhMotion,jID))
       {
+
+
+       // create4x4FIdentityMatrix(bvhTransform->joint[jID].chainTransformation);
+
         //If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
         multiplyTwo4x4FMatrices(
@@ -583,11 +576,13 @@ int bvh_loadTransformForMotionBuffer(
        //If we are the root node there is no parent..
        //If there is no parent we will only set our position and copy to the final transform
         #if FAST_OFFSET_TRANSLATION
-         create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
-         bvhTransform->joint[jID].localToWorldTransformation[3] =bvhMotion->jointHierarchy[jID].staticTransformation[3]  + bvhTransform->joint[jID].dynamicTranslation[3];
-         bvhTransform->joint[jID].localToWorldTransformation[7] =bvhMotion->jointHierarchy[jID].staticTransformation[7]  + bvhTransform->joint[jID].dynamicTranslation[7];
-         bvhTransform->joint[jID].localToWorldTransformation[11]=bvhMotion->jointHierarchy[jID].staticTransformation[11] + bvhTransform->joint[jID].dynamicTranslation[11];
-         bvhTransform->joint[jID].localToWorldTransformation[15]=1.0;//bvhTransform->joint[jID].staticTransformation[15] + bvhTransform->joint[jID].dynamicTranslation[15];
+         //Skip the matrix multiplication..
+         create4x4FTranslationMatrix(
+                                     bvhTransform->joint[jID].localToWorldTransformation,
+                                     bvhMotion->jointHierarchy[jID].staticTransformation[3]  + bvhTransform->joint[jID].dynamicTranslation[3],
+                                     bvhMotion->jointHierarchy[jID].staticTransformation[7]  + bvhTransform->joint[jID].dynamicTranslation[7],
+                                     bvhMotion->jointHierarchy[jID].staticTransformation[11] + bvhTransform->joint[jID].dynamicTranslation[11]
+                                    );
         #else
          multiplyTwo4x4FMatrices(
                                 //Output AxB

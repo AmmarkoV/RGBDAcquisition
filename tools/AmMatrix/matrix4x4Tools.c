@@ -1,9 +1,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "matrix4x4Tools.h"
+
+#define OPTIMIZED 1
 
 #define PRINT_MATRIX_DEBUGGING 0
 
@@ -122,27 +125,35 @@ void copy3x3FMatrixTo4x4F(float * out,float * in)
 
 void copy4x4FMatrix(float * out,float * in)
 {
+  #if OPTIMIZED
+  memcpy(out,in,16*sizeof(float));
+  #else
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
   out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
   out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
   out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+  #endif // OPTIMIZED
 }
 
 void copy4x4DMatrix(double * out,double * in)
 {
+  #if OPTIMIZED
+  memcpy(out,in,16*sizeof(double));
+  #else
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
   out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
   out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
   out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+  #endif // OPTIMIZED
 }
 
 
 void copy4x4FMatrixTo4x4D(double * out,float * in)
 {
-  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
-  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
-  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
-  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+  out[0]=(double)  in[0];   out[1]= (double) in[1];   out[2]= (double) in[2];  out[3]= (double) in[3];
+  out[4]=(double)  in[4];   out[5]= (double) in[5];   out[6]= (double) in[6];  out[7]= (double) in[7];
+  out[8]=(double)  in[8];   out[9]= (double) in[9];   out[10]=(double) in[10]; out[11]=(double) in[11];
+  out[12]=(double) in[12];  out[13]=(double) in[13];  out[14]=(double) in[14]; out[15]=(double) in[15];
 }
 
 void copy4x4DMatrixTo4x4F(float * dest, double * m )
@@ -156,19 +167,35 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
 
 void create4x4DIdentityMatrix(double * m)
 {
+  #if OPTIMIZED
+   memset(m,0,16*sizeof(double));
+   m[0] = 1.0;
+   m[5] = 1.0;
+   m[10] = 1.0;
+   m[15] = 1.0;
+  #else
     m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
     m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
     m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
     m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+  #endif // OPTIMIZED
 }
 
 
 void create4x4FIdentityMatrix(float * m)
 {
+  #if OPTIMIZED
+   memset(m,0,16*sizeof(float));
+   m[0] = 1.0;
+   m[5] = 1.0;
+   m[10] = 1.0;
+   m[15] = 1.0;
+  #else
     m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
     m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
     m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
     m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+  #endif // OPTIMIZED
 }
 
 int doublePEq(double * element , double value )
@@ -692,11 +719,22 @@ void create4x4DQuaternionMatrix(double * m , double qX,double qY,double qZ,doubl
 }
 
 
-void create4x4FTranslationMatrix(float * matrix , float x, float y, float z)
+void create4x4FTranslationMatrix(float * m , float x, float y, float z)
 {
-    create4x4FIdentityMatrix(matrix);
+  #if OPTIMIZED
+   memset(m,0,16*sizeof(float));
+   m[0] = 1.0;
+   m[3] = x;
+   m[5] = 1.0;
+   m[7] = y;
+   m[10] = 1.0;
+   m[11] = z;
+   m[15] = 1.0;
+  #else
+    create4x4FIdentityMatrix(m);
     // Translate slots.
-    matrix[3] = x; matrix[7] = y; matrix[11] = z;
+    m[3] = x; m[7] = y; m[11] = z;
+  #endif // OPTIMIZED
 }
 
 
