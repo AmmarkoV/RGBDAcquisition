@@ -606,25 +606,13 @@ int bvh_scaleAllOffsets(
                        )
 {
    if (bvhMotion==0) { return 0; }
+   if (scalingRatio==1.0) { return 1; }
 
-    BVHJointID jID=0;
-    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
     {
-
-       unsigned int angleX = 0;
-       unsigned int angleY = 1;
-       unsigned int angleZ = 2;
-
-       for (int ch=0; ch<3; ch++)
-       {
-        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_X) { angleX = ch; }
-        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Y) { angleY = ch; }
-        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }
-       }
-
-      bvhMotion->jointHierarchy[jID].offset[angleX] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
-      bvhMotion->jointHierarchy[jID].offset[angleY] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
-      bvhMotion->jointHierarchy[jID].offset[angleZ] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
 
        float * m = bvhMotion->jointHierarchy[jID].staticTransformation;
        m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (float) bvhMotion->jointHierarchy[jID].offset[0];
