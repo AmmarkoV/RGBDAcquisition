@@ -183,13 +183,13 @@ int bvh_projectTo2D(
       {
         if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
         {
-        if (bvhTransform->joint[jID].pos3D[3]!=1.0)
-           { fprintf(stderr,"bvh_projectTo2D W coord of joint %u not normalized..\n",jID); }
+          if (bvhTransform->joint[jID].pos3D[3]!=1.0)
+             { fprintf(stderr,"bvh_projectTo2D: W coord (%0.2f) of joint %u not normalized..\n",bvhTransform->joint[jID].pos3D[3],jID); }
 
            float pos3DFloat[4];
-           pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0];
-           pos3DFloat[1]=(float)bvhTransform->joint[jID].pos3D[1];
-           pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2];
+           pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
+           pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
+           pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];
            pos3DFloat[3]=1.0;
 
     //Two cases here , we either want to directly render using the matrices in our simplerenderer
@@ -212,9 +212,9 @@ int bvh_projectTo2D(
         else
           {
            float pos3DCenterFloat[4];
-           pos3DCenterFloat[0]=(float)bvhTransform->centerPosition[0];
-           pos3DCenterFloat[1]=(float)bvhTransform->centerPosition[1];
-           pos3DCenterFloat[2]=(float)bvhTransform->centerPosition[2];
+           pos3DCenterFloat[0]= (float) bvhTransform->centerPosition[0];
+           pos3DCenterFloat[1]= (float) bvhTransform->centerPosition[1];
+           pos3DCenterFloat[2]= (float) bvhTransform->centerPosition[2];
            pos3DCenterFloat[3]=1.0;
 
            simpleRendererRender(

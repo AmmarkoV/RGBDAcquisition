@@ -392,6 +392,9 @@ int bvh_getRootJointID(
 {
    if (bvhMotion==0) { return 0; }
 
+  *jID = bvhMotion->rootJointID;
+  return 1;
+  /*
    unsigned int i=0;
    for (i=0; i<bvhMotion->jointHierarchySize; i++)
    {
@@ -402,6 +405,7 @@ int bvh_getRootJointID(
      }
    }
  return 0;
+ */
 }
 
 

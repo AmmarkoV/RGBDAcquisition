@@ -204,6 +204,7 @@ struct BVH_MotionCapture
   float frameTime;
 
   //Joint Hierarchy
+  unsigned int rootJointID;
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE+32]; //End Joints need extra space so lets give them +32 bytes

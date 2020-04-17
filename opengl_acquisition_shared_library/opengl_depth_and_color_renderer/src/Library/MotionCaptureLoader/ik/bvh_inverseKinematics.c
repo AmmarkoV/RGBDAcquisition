@@ -325,7 +325,8 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
 
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
   {
-     if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution)) { return 0; }
+     if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution))
+     { return 0; }
   }
   return 1;
 }
@@ -981,6 +982,7 @@ float iteratePartLoss(
                          unsigned int verbose
                         )
 {
+ unsigned long startTime = GetTickCountMicrosecondsIK();
 
  unsigned int consecutiveBadSteps=0;
  unsigned int mIDS[3];
@@ -990,30 +992,33 @@ float iteratePartLoss(
 
 
  float originalValues[3];
- originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
- originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
- originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
 
-if (springIgnoresIterativeChanges)
+ if (springIgnoresIterativeChanges)
  {
   originalValues[0] = problem->initialSolution->motion[mIDS[0]];
   originalValues[1] = problem->initialSolution->motion[mIDS[1]];
   originalValues[2] = problem->initialSolution->motion[mIDS[2]];
+ } else
+ {
+ originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
+ originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
+ originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
  }
 
-float initialLoss = calculateChainLoss(problem,chainID,partID);
+ //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
+ float initialLoss = calculateChainLoss(problem,chainID,partID);
+
+///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
+ bvh_markJointAsUsefulAndParentsAsUselessInTransform(
+                                                     problem->mc ,
+                                                     &problem->chain[chainID].current2DProjectionTransform,
+                                                     problem->chain[chainID].part[partID].jID
+                                                    );
 
 
-//This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
-   bvh_markJointAsUsefulAndParentsAsUselessInTransform(
-                                                        problem->mc ,
-                                                        &problem->chain[chainID].current2DProjectionTransform,
-                                                        problem->chain[chainID].part[partID].jID
-                                                       );
+ if (verbose) { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName,initialLoss); }
 
- if (verbose)
-             { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName,initialLoss); }
 
 //-------------------------------------------
 //-------------------------------------------
@@ -1026,16 +1031,17 @@ if (problem->previousSolution!=0)
   {
    //Maybe previous solution is closer to current?
    //previousSolution
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = problem->previousSolution->motion[mIDS[0]];
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = problem->previousSolution->motion[mIDS[1]];
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = problem->previousSolution->motion[mIDS[2]];
-   float previousLoss = calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) (problem->previousSolution->motion[mIDS[0]] + originalValues[0]) / 2;
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) (problem->previousSolution->motion[mIDS[1]] + originalValues[1]) / 2;
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) (problem->previousSolution->motion[mIDS[2]] + originalValues[2]) / 2;
+   float previousLoss = calculateChainLoss(problem,chainID,partID);
    if (previousLoss<initialLoss)
    {
      fprintf(stderr,"Previous solution loss (%0.2f) is better than current (%0.2f) \n",previousLoss,initialLoss);
      originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
      originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
      originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
+     lr*=10;
      initialLoss = previousLoss;
    }
   }
@@ -1063,7 +1069,6 @@ if (problem->previousSolution!=0)
 
  float previousLoss[3];
  float currentLoss[3];
- float delta[3]={0};
 
 
  previousLoss[0]=initialLoss;
@@ -1073,8 +1078,8 @@ if (problem->previousSolution!=0)
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- unsigned int maximumConsecutiveBadEpochs=4;
- float e=0.001;
+ unsigned int maximumConsecutiveBadEpochs=3;
+ float e=0.0001;
  float d=lr; //0.005;
  float beta = 0.9; // Momentum
  float gradient;
@@ -1083,12 +1088,13 @@ if (problem->previousSolution!=0)
 
 
  //Give an initial direction..
- delta[0] = d;
- delta[1] = d;
- delta[2] = d;
+ float delta[3]={d,d,d};
 
 
-
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
  if (tryMaintainingLocalOptima)
  {
  //Are we at a global optimum? ---------------------------------------------------------------------------------
@@ -1126,6 +1132,10 @@ if (problem->previousSolution!=0)
  delta[2] = d;
  //-------------------------------------------------------------------------------------------------------------
  }
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
+ ///--------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1138,7 +1148,6 @@ if (problem->previousSolution!=0)
   fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
  }
 
- unsigned long startTime = GetTickCountMicrosecondsIK();
 
  for (unsigned int i=0; i<epochs; i++)
  {
@@ -1236,12 +1245,14 @@ if (problem->previousSolution!=0)
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
 
 
-//This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
+ ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
  bvh_markJointAndParentsAsUsefulInTransform(
                                             problem->mc ,
                                             &problem->chain[chainID].current2DProjectionTransform,
                                             problem->chain[chainID].part[partID].jID
                                            );
+  ///-------------------------------------------------------------------------------------------------------------------------------
+
 
   return bestLoss;
 

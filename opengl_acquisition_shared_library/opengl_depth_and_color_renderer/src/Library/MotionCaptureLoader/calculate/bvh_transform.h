@@ -49,6 +49,16 @@ struct rectangleArea
 
 struct BVH_TransformedJoint
 {
+  //Flags
+  //-----------------
+  char pos2DCalculated;
+  char isBehindCamera;
+  char isOccluded;
+  char skipCalculations;
+  char isChainTrasformationComputed;
+
+  //Transforms
+  //-----------------
   float localToWorldTransformation[16];
   float chainTransformation[16];
   float dynamicTranslation[16];
@@ -60,10 +70,6 @@ struct BVH_TransformedJoint
 
   //Position as 2D X,Y
   //-----------------
-  char pos2DCalculated;
-  char isBehindCamera;
-  char isOccluded;
-  char skipCalculations;
   float pos2D[2];
 };
 
