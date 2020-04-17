@@ -9,6 +9,8 @@ add_library(
             matrix4x4Tools.c
             matrixCalculations.c
             matrixCalculations.h
+            matrixMultiplicationOptimization.c
+            matrixMultiplicationOptimization.h
             matrixOpenGL.c
             matrixOpenGL.h 
             ocvStaging.c

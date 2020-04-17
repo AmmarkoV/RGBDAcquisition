@@ -1,9 +1,30 @@
 #include <immintrin.h>
-#include <intrin.h>
+//#include <intrin.h>
+#include <x86intrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+void mmul_sse(const float * a, const float * b, float * r)
+{
+  __m128 a_line, b_line, r_line;
+  for (int i=0; i<16; i+=4) {
+    // unroll the first step of the loop to avoid having to initialize r_line to zero
+    a_line = _mm_load_ps(a);         // a_line = vec4(column(a, 0))
+    b_line = _mm_set1_ps(b[i]);      // b_line = vec4(b[i][0])
+    r_line = _mm_mul_ps(a_line, b_line); // r_line = a_line * b_line
+    for (int j=1; j<4; j++) {
+      a_line = _mm_load_ps(&a[j*4]); // a_line = vec4(column(a, j))
+      b_line = _mm_set1_ps(b[i+j]);  // b_line = vec4(b[i][j])
+                                     // r_line += a_line * b_line
+      r_line = _mm_add_ps(_mm_mul_ps(a_line, b_line), r_line);
+    }
+    _mm_store_ps(&r[i], r_line);     // r[i] = r_line
+  }
+}
+
+
+/*
 union Mat44 {
     float m[4][4];
     __m128 row[4];
@@ -206,15 +227,6 @@ int main(int argc, char **argv)
     };
     static const int nperfvars = (int) (sizeof(perf_variants) / sizeof(*perf_variants));
     
-    /* 
-       results on my sandy bridge laptop when compiling the code in x64
-       mode with VC2010 using /arch:AVX:
-        all ok.
-                 ref: 59.00 cycles
-                 SSE: 20.52 cycles
-            AVX_4mem: 15.64 cycles
-               AVX_8: 14.13 cycles
-    */
     
     Mat44 Aperf, Bperf, out;
     randmat(Aperf);
@@ -241,3 +253,5 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+*/

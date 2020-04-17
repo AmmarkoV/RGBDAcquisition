@@ -64,7 +64,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
       }
 
   //Try to load the 3D positions of each joint for this particular frame..
-   if (bvh_loadTransformForFrame(mc,fID,bvhTransform))
+   if (bvh_loadTransformForFrame(mc,fID,bvhTransform,1/*Populate extra structures*/))
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
@@ -97,7 +97,7 @@ int performPointProjectionsForFrame(
                                     )
 {
   //Try to load the 3D positions of each joint for this particular frame..
-   if (bvh_loadTransformForFrame(mc,fID,bvhTransform))
+   if (bvh_loadTransformForFrame(mc,fID,bvhTransform,1/*Populate extra structures*/))
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
@@ -119,7 +119,7 @@ int performPointProjectionsForMotionBuffer(
                                            )
 {
   //First load the 3D positions of each joint from a motion buffer (instead of a frame [see performPointProjectionsForFrame]..
-  if (bvh_loadTransformForMotionBuffer(mc,motionBuffer,bvhTransform))
+  if (bvh_loadTransformForMotionBuffer(mc,motionBuffer,bvhTransform,1/*Populate extra structures*/))
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..

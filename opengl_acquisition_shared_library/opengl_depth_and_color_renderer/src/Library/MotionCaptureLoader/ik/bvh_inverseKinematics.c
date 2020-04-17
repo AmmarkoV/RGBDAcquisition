@@ -908,7 +908,8 @@ float calculateChainLoss(
          bvh_loadTransformForMotionBuffer(
                                           problem->mc,
                                           problem->chain[chainID].currentSolution->motion,
-                                          &problem->chain[chainID].current2DProjectionTransform
+                                          &problem->chain[chainID].current2DProjectionTransform,
+                                          0//Dont populate extra structures we dont need them they just take time
                                          )
         )
       {
@@ -1364,7 +1365,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
          bvh_loadTransformForMotionBuffer(
                                           mc,
                                           problem->initialSolution->motion,
-                                          &bvhCurrentTransform
+                                          &bvhCurrentTransform,
+                                          0// We don't need extra structures
                                          )
         )
       {
@@ -1405,7 +1407,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                    bvh_loadTransformForMotionBuffer(
                                                     mc,
                                                     previousSolution->motion,
-                                                    &bvhPrevioustTransform
+                                                    &bvhPrevioustTransform,
+                                                    0//Dont populate extra structures
                                                    )
                   )
              {
@@ -1503,7 +1506,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
          bvh_loadTransformForMotionBuffer(
                                           mc,
                                           solution->motion,
-                                          &bvhCurrentTransform
+                                          &bvhCurrentTransform,
+                                          0// dont use extra structures
                                          )
      )
       {
@@ -1647,7 +1651,7 @@ int bvhTestIK(
        groundTruth->motion[2]=distance;
 
 
-        if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform) )
+        if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform,0) )
          {
            if  (bvh_projectTo2D(mc,&bvhTargetTransform,&renderer,0,0))
            {

@@ -105,15 +105,17 @@ int bvh_markJointAndParentsAsUselessInTransform(
                                               );
 
 int bvh_loadTransformForMotionBuffer(
-                                     struct BVH_MotionCapture * bvhMotion ,
+                                     struct BVH_MotionCapture * bvhMotion,
                                      float * motionBuffer,
-                                     struct BVH_Transform * bvhTransform
-                                    );
+                                     struct BVH_Transform * bvhTransform,
+                                     unsigned int populateTorso
+                                   );
 
 int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
-                               struct BVH_Transform * bvhTransform
+                               struct BVH_Transform * bvhTransform,
+                               unsigned int populateTorso
                                //,float * rotationOffset
                              );
 

@@ -52,6 +52,7 @@ void dumpSphereBody(
                                   mc,
                                   fID ,
                                   bvhTransform
+                                  ,1/*Populate extra structures*/
                                  )
        )
     {

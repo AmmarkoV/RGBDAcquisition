@@ -123,6 +123,7 @@ add_library(OGLRendererSandbox SHARED
             #AmMatrix dependencies 
             ../../../../tools/AmMatrix/matrix3x3Tools.c 
             ../../../../tools/AmMatrix/matrix4x4Tools.c 
+            ../../../../tools/AmMatrix/matrixMultiplicationOptimization.c
             ../../../../tools/AmMatrix/quaternions.c 
             #../../../../tools/AmMatrix/matrixProject.c
             #../../../../tools/AmMatrix/matrixProject.c

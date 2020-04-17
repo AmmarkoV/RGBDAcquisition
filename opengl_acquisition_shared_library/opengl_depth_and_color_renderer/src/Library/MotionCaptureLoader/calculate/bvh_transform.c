@@ -447,14 +447,11 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 
 #define USE_DEAD_CODE 1
 
-/*
-  This is basically the same code as bvh_loadTransformForFrame
-  TODO : merge the two codebases
-*/
 int bvh_loadTransformForMotionBuffer(
-                                     struct BVH_MotionCapture * bvhMotion ,
+                                     struct BVH_MotionCapture * bvhMotion,
                                      float * motionBuffer,
-                                     struct BVH_Transform * bvhTransform
+                                     struct BVH_Transform * bvhTransform,
+                                     unsigned int populateTorso
                                    )
 {
    if (bvhMotion==0)    { return 0; }
@@ -639,10 +636,13 @@ int bvh_loadTransformForMotionBuffer(
     }
   }
 
-if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
-   {
+  if (populateTorso)
+  {
+   if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
+     {
      //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
-   }
+     }
+  }
 
 
   return 1;
@@ -651,9 +651,10 @@ if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
 
 
 int bvh_loadTransformForFrame(
-                               struct BVH_MotionCapture * bvhMotion ,
+                               struct BVH_MotionCapture * bvhMotion,
                                BVHFrameID fID ,
-                               struct BVH_Transform * bvhTransform
+                               struct BVH_Transform * bvhTransform,
+                               unsigned int populateTorso
                              )
 {
   int result = 0;
@@ -666,7 +667,8 @@ int bvh_loadTransformForFrame(
      result = bvh_loadTransformForMotionBuffer(
                                                bvhMotion ,
                                                frameMotionBuffer->motion,
-                                               bvhTransform
+                                               bvhTransform,
+                                               populateTorso
                                               );
     }
     freeMotionBuffer(frameMotionBuffer);

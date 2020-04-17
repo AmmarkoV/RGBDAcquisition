@@ -57,6 +57,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/tests/test.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
+              ../../../../../tools/AmMatrix/matrixMultiplicationOptimization.c
               ../../../../../tools/AmMatrix/matrixOpenGL.c
               ../../../../../tools/AmMatrix/quaternions.c
               ../../../../../tools/AmMatrix/simpleRenderer.c
