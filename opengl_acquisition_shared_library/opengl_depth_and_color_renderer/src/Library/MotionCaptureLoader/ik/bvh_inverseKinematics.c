@@ -1223,7 +1223,7 @@ if (problem->previousSolution!=0)
  }
  unsigned long endTime = GetTickCountMicrosecondsIK();
 
-        //if (verbose)
+        if (verbose)
              {
                 fprintf(stderr,"Optimization for joint %s \n", problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
                 fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
