@@ -54,15 +54,14 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
   }
 
   memset(framesToRemove,0,sizeof(unsigned int) * mc->numberOfFrames);
-
-  unsigned int fID=0,mID=0;
+ 
   unsigned int framesThatWillBeHidden=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
+  for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
   {
      unsigned int mIDOffset = fID * mc->numberOfValuesPerFrame;
 
      //Ignore initial xyz..
-     for (mID=6; mID<mc->numberOfValuesPerFrame; mID++)
+     for (unsigned int mID=6; mID<mc->numberOfValuesPerFrame; mID++)
      {
         #define USE_SIMPLE_THRESHOLD 0
 

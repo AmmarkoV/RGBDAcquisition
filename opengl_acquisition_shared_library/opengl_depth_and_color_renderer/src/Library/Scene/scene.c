@@ -742,6 +742,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
      result = 1;
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
+  if (scene!=0)
   {
     /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n", camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
 

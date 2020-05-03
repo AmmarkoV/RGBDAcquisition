@@ -1078,7 +1078,7 @@ if (problem->previousSolution!=0)
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- unsigned int maximumConsecutiveBadEpochs=3;
+ unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.0001;
  float d=lr; //0.005;
  float beta = 0.9; // Momentum

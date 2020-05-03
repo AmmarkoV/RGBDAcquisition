@@ -466,7 +466,7 @@ int populateImage(struct Image * img , unsigned int width , unsigned int height 
   img->bitsperpixel = bitsPerPixel;
 
   img->pixels = pixels;
-  return  img;
+  return  1;
 }
 
 
