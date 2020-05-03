@@ -246,7 +246,7 @@ int setKeyboardControl(int val)
 
 int startOGLRendererSandbox(int argc,const char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
 {
-  fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
+  //fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   snapsPerformed=0;
 
   //char ** testP=0;

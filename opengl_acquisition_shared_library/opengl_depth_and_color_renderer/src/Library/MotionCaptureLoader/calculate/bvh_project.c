@@ -50,7 +50,7 @@ int bvh_projectTo2DHandleOcclusions(
         fprintf(stderr,"Occlusion checking..\n");
        #endif // DEBUG_TORSO_OCCLUSIONS
 
-       unsigned int jID2=0;
+
        for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
         if (bvhTransform->joint[jID].pos2DCalculated)
@@ -113,7 +113,7 @@ int bvh_projectTo2DHandleOcclusions(
          {
          //Check Joint for occlusion with all other joints that may be in front of it
          //------------------------------------------------------------------------------------------
-         for (jID2=0; jID2<mc->jointHierarchySize; jID2++)
+         for (unsigned int  jID2=0; jID2<mc->jointHierarchySize; jID2++)
           {
            if ( (mc->selectedJoints==0) || (mc->selectedJoints[jID2]) )
            {
