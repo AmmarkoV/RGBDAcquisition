@@ -984,12 +984,12 @@ float iteratePartLoss(
 {
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
- unsigned int consecutiveBadSteps=0;
- unsigned int mIDS[3];
- mIDS[0]= problem->chain[chainID].part[partID].mIDStart;
- mIDS[1]= problem->chain[chainID].part[partID].mIDStart+1;
- mIDS[2]= problem->chain[chainID].part[partID].mIDStart+2;
-
+ unsigned int mIDS[3] = {  
+                                                     problem->chain[chainID].part[partID].mIDStart, 
+                                                     problem->chain[chainID].part[partID].mIDStart+1,
+                                                     problem->chain[chainID].part[partID].mIDStart+2 
+                                                };
+ 
 
  float originalValues[3];
 
@@ -1008,7 +1008,14 @@ float iteratePartLoss(
 
  //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
  float initialLoss = calculateChainLoss(problem,chainID,partID);
-
+ 
+ if (initialLoss==0.0)
+    { 
+             if (verbose) 
+                  { fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName); }
+            return 0;
+    }
+ 
 ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
  bvh_markJointAsUsefulAndParentsAsUselessInTransform(
                                                      problem->mc ,
@@ -1051,33 +1058,17 @@ if (problem->previousSolution!=0)
 //-------------------------------------------
 //-------------------------------------------
 
- float previousValues[3];
- previousValues[0] = originalValues[0];
- previousValues[1] = originalValues[1];
- previousValues[2] = originalValues[2];
+ float previousValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ; 
+ float currentValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ; 
+ float bestValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ; 
 
- float currentValues[3];
- currentValues[0] = originalValues[0];
- currentValues[1] = originalValues[1];
- currentValues[2] = originalValues[2];
-
- float bestValues[3];
- bestValues[0] = originalValues[0];
- bestValues[1] = originalValues[1];
- bestValues[2] = originalValues[2];
-
-
- float previousLoss[3];
- float currentLoss[3];
-
-
- previousLoss[0]=initialLoss;
- previousLoss[1]=initialLoss;
- previousLoss[2]=initialLoss;
+ float previousLoss[3] = { initialLoss , initialLoss , initialLoss };
+ float currentLoss[3]  = { initialLoss , initialLoss , initialLoss };
 
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
+ unsigned int consecutiveBadSteps=0;
  unsigned int maximumConsecutiveBadEpochs=4;
  float e=0.0001;
  float d=lr; //0.005;
@@ -1102,34 +1093,55 @@ if (problem->previousSolution!=0)
  unsigned int badLosses=0;
  for (unsigned int i=0; i<3; i++)
  {
+  float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
   float lossPlusD=calculateChainLoss(problem,chainID,partID);
   problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
   float lossMinusD=calculateChainLoss(problem,chainID,partID);
-  problem->chain[chainID].currentSolution->motion[mIDS[i]] = previousValues[i];
+  problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
 
   if (
-       (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD)
+        (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD)
      )
     {
       if (verbose)
-             { fprintf(stderr,"Initial #%u value seems to be locally optimal but nudged..!\n",i); }
+             { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
       delta[i] = d;
       ++badLosses;
     } else
+  if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
+    {
+      if (verbose)
+             { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
+          delta[i] = d; 
+    }  else  
+  if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
+    {
+      if (verbose)
+             { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
+          delta[i] = -d; 
+    }  else  
     {
      if (verbose)
-             {  fprintf(stderr,"Initial #%u value can be straight-forwardly changed..!\n",i); }
+             {  
+                 fprintf(stderr,"Dont know what to do with #%u value ..\n",i); 
+                 fprintf(stderr,"-d = %0.2f ,   +d = %0.2f, original = %0.2f.\n",lossMinusD,lossPlusD,initialLoss); 
+                delta[i] = d;
+                 ++badLosses; 
+             }
     }
  }
  if (badLosses==3)
  {
+    //We tried nudging all parameters both ways and couldn't improve anything
+    //We are at a local optima and  since tryMaintainingLocalOptima is enabled
+    //we will try to maintain it..!
+    
+      if (verbose)
+             { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
    return initialLoss;
- }
-
- delta[0] = d;
- delta[1] = d;
- delta[2] = d;
+ } 
+ 
  //-------------------------------------------------------------------------------------------------------------
  }
  ///--------------------------------------------------------------------------------------------------------------
@@ -1178,31 +1190,35 @@ if (problem->previousSolution!=0)
 
    gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
    delta[2] =  beta * delta[2] + (float) lr * gradient;
-
+    
+   //Safeguard agains division with zero.. 
    if (delta[0]!=delta[0]) { delta[0]=0;}
    if (delta[1]!=delta[1]) { delta[1]=0;}
    if (delta[2]!=delta[2]) { delta[2]=0;}
-
+   
+   //We remember our new "previous" state
    previousLoss[0]=currentLoss[0];
    previousLoss[1]=currentLoss[1];
    previousLoss[2]=currentLoss[2];
-
    previousValues[0]=currentValues[0];
    previousValues[1]=currentValues[1];
    previousValues[2]=currentValues[2];
 
+   //We advance our current state..
    currentValues[0]+=delta[0];
    currentValues[1]+=delta[1];
    currentValues[2]+=delta[2];
-
+    
+    //We store our new values and calculate our new loss
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
    loss=calculateChainLoss(problem,chainID,partID);
 
    if (loss==NAN)
-   {
-     if (verbose) { fprintf(stderr,RED "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]); }
+   { 
+     //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
+     if (verbose) { fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,currentValues[0],currentValues[1],currentValues[2]); }
      break;
    } else
    if ( (loss<bestLoss) && ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
@@ -1239,11 +1255,12 @@ if (problem->previousSolution!=0)
                 fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
                 fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
              }
-
+  
+  
+   //After finishing with the optimization procedure we store the best result we achieved..!
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
    problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
-
 
  ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
  bvh_markJointAndParentsAsUsefulInTransform(
@@ -1253,9 +1270,7 @@ if (problem->previousSolution!=0)
                                            );
   ///-------------------------------------------------------------------------------------------------------------------------------
 
-
   return bestLoss;
-
 }
 
 
