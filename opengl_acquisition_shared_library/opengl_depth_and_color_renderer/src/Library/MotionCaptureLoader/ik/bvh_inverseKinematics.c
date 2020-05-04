@@ -1161,6 +1161,7 @@ if (problem->previousSolution!=0)
  }
 
 
+unsigned int executedEpochs=epochs;
  for (unsigned int i=0; i<epochs; i++)
  {
  //-------------------
@@ -1219,6 +1220,7 @@ if (problem->previousSolution!=0)
    { 
      //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
      if (verbose) { fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,currentValues[0],currentValues[1],currentValues[2]); }
+     executedEpochs=i;
      break;
    } else
    if ( (loss<bestLoss) && ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
@@ -1243,6 +1245,7 @@ if (problem->previousSolution!=0)
              {
               fprintf(stderr,YELLOW "Early Stopping\n" NORMAL);
              }
+        executedEpochs=i;
         break;
       }
  }
@@ -1254,6 +1257,7 @@ if (problem->previousSolution!=0)
                 fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
                 fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
                 fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
+                fprintf(stderr,"correction rate of %0.2f,%0.2f,%0.2f deg\n",(bestValues[0]-originalValues[0])/executedEpochs,(bestValues[1]-originalValues[1])/executedEpochs,(bestValues[2]-originalValues[2])/executedEpochs);
              }
   
   
