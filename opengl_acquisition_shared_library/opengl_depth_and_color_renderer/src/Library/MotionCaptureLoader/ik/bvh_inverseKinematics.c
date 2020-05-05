@@ -1048,7 +1048,7 @@ if (problem->previousSolution!=0)
      originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
      originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
      originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
-     lr*=10;
+     lr/=10;
      initialLoss = previousLoss;
    }
   }
@@ -1065,6 +1065,8 @@ if (problem->previousSolution!=0)
  float previousLoss[3] = { initialLoss , initialLoss , initialLoss };
  float currentLoss[3]  = { initialLoss , initialLoss , initialLoss };
 
+float currentCorrection[3] = { 0,0,0 };
+
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
@@ -1075,7 +1077,7 @@ if (problem->previousSolution!=0)
  float beta = 0.9; // Momentum
  float gradient;
  float distanceFromInitial;
- float spring = 10.0;
+ float spring = 12.0;
 
 
  //Give an initial direction..
@@ -1184,7 +1186,7 @@ unsigned int executedEpochs=epochs;
 
    //We multiply by 0.5 to do a "One Half Mean Squared Error"
    gradient =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
-   delta[0] =  beta * delta[0] + (float) lr *  gradient;
+   delta[0] =  beta * delta[0] + (float) lr * gradient;
 
    gradient =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
    delta[1] =  beta * delta[1] + (float) lr * gradient;
@@ -1192,12 +1194,15 @@ unsigned int executedEpochs=epochs;
    gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
    delta[2] =  beta * delta[2] + (float) lr * gradient;
     
-   //Safeguard agains division with zero.. 
+   //Safeguard against division with zero.. 
    if (delta[0]!=delta[0]) { delta[0]=0;}
    if (delta[1]!=delta[1]) { delta[1]=0;}
    if (delta[2]!=delta[2]) { delta[2]=0;}
    
    //We remember our new "previous" state
+   currentCorrection[0] = previousValues[0] - currentValues[0];
+   currentCorrection[1] = previousValues[1] - currentValues[1];
+   currentCorrection[2] = previousValues[2] - currentValues[2];
    previousLoss[0]=currentLoss[0];
    previousLoss[1]=currentLoss[1];
    previousLoss[2]=currentLoss[2];
@@ -1230,7 +1235,7 @@ unsigned int executedEpochs=epochs;
      bestValues[1]=currentValues[1];
      bestValues[2]=currentValues[2];
      consecutiveBadSteps=0;
-      if (verbose) { fprintf(stderr,"%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",i,loss,currentValues[0],currentValues[1],currentValues[2]); }
+      if (verbose) { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],currentCorrection[0],currentValues[1],currentCorrection[1],currentValues[2],currentCorrection[2]); }
    } else
    {
      ++consecutiveBadSteps;
