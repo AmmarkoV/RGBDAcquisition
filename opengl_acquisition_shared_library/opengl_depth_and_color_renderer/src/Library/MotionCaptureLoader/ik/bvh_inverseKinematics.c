@@ -166,7 +166,7 @@ int writeHTML(
     return 0;
 }
 
-float meanBVH2DDistace(
+float meanBVH2DDistance(
     struct BVH_MotionCapture * mc,
     struct simpleRenderer *renderer,
     int useAllJoints,
@@ -178,7 +178,7 @@ float meanBVH2DDistace(
 {
     if (verbose)
     {
-        fprintf(stderr,"\nmeanBVH2DDistace\n");
+        fprintf(stderr,"\nmeanBVH2DDistance\n");
     }
     if (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0))
     {
@@ -197,28 +197,38 @@ float meanBVH2DDistace(
                 }
             }
 
-            if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
+            if ( (useAllJoints) || ( (isSelected) && (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
             {
+                ///Warning: When you change this please change calculateChainLoss as well!
+                float sX=bvhSourceTransform->joint[jID].pos2D[0];
+                float sY=bvhSourceTransform->joint[jID].pos2D[1];
                 float tX=bvhTargetTransform->joint[jID].pos2D[0];
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
-                if ( (tX!=0.0) || (tY!=0.0) )
+                if (  
+                         (!bvhSourceTransform->joint[jID].isBehindCamera) &&
+                         (!bvhTargetTransform->joint[jID].isBehindCamera) && 
+                         (  (sX!=0.0) || (sY!=0.0) ) && 
+                         (  (tX!=0.0) || (tY!=0.0) ) 
+                    )
                 {
-                    float this2DDistance=get2DPointDistance(
-                                             (float) bvhSourceTransform->joint[jID].pos2D[0],
-                                             (float) bvhSourceTransform->joint[jID].pos2D[1],
-                                             (float) bvhTargetTransform->joint[jID].pos2D[0],
-                                             (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                         );
+                    float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
+                    
                     if (verbose)
                     {
-                        fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
+                        fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",sX,sY,tX,tY);
                         fprintf(stderr,"2D %s distance = %0.1f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
                     }
 
                     numberOfSamples+=1;
                     sumOf2DDistances+=this2DDistance;
-                }
+                } 
+                /*
+                else if (verbose)
+                {
+                     fprintf(stderr,YELLOW "avoided src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",sX,sY,tX,tY);
+                        fprintf(stderr,"2D %s distance = avoided\n" NORMAL,mc->jointHierarchy[jID].jointName);
+                }*/
             }
         }
         if (verbose)
@@ -232,12 +242,12 @@ float meanBVH2DDistace(
         }
     } //-----------------
 
-    return 0.0;
+    return 0;
 }
 
 
 
-float meanBVH3DDistace(
+float meanBVH3DDistance(
     struct BVH_MotionCapture * mc,
     struct simpleRenderer *renderer,
     int useAllJoints,
@@ -1059,26 +1069,21 @@ float calculateChainLoss(
                     //if ( (partID==partIDStart) || (problem->chain[chainID].part[partID].partParent==partIDStart) )
                     {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
-                        float tX = problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
-                        float tY = problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
+                         
+                        ///Warning: When you change this please change meanBVH2DDistance as well!
+                        float sX=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0];
+                        float sY=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1];
+                        float tX =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
+                        float tY =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
 
-                        if ((tX!=0.0) || (tY!=0.0) )
+                        if (
+                               ((sX!=0.0) || (sY!=0.0)) &&
+                               ((tX!=0.0) || (tY!=0.0)) 
+                            )
                         {
                             //Ignore empty joints ..!
-                            float thisSquared2DDistance=getSquared2DPointDistance(
-                                                            (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
-                                                            (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
-                                                            tX,
-                                                            tY
-                                                        );
-                            /*
-                             fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",
-                             problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
-                             problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
-                             problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0],
-                             problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1]
-                             );
-                             fprintf(stderr,"Joint squared %s distance is %0.2f\n",problem->mc->jointHierarchy[jID].jointName,thisSquared2DDistance);*/
+                            float thisSquared2DDistance=getSquared2DPointDistance(sX,sY,tX,tY); 
+                                                        
                             loss+=thisSquared2DDistance * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
                         }
@@ -1606,7 +1611,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
         {
-            *initialMAEInPixels = meanBVH2DDistace(
+            *initialMAEInPixels = meanBVH2DDistance(
                                       mc,
                                       renderer,
                                       1,
@@ -1637,7 +1642,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                     )
                 )
                 {
-                    previousMAEInPixels = meanBVH2DDistace(
+                    previousMAEInPixels = meanBVH2DDistance(
                                               mc,
                                               renderer,
                                               1,
@@ -1667,7 +1672,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
         if ( (initialMAEInMM!=0) && (groundTruth!=0) )
         {
-            *initialMAEInMM = meanBVH3DDistace(
+            *initialMAEInMM = meanBVH3DDistance(
                                   mc,
                                   renderer,
                                   1,
@@ -1748,7 +1753,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if (finalMAEInPixels!=0)
         {
-            *finalMAEInPixels  = meanBVH2DDistace(
+            *finalMAEInPixels  = meanBVH2DDistance(
                                      mc,
                                      renderer,
                                      1,
@@ -1769,7 +1774,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if ( (finalMAEInMM!=0) && (groundTruth!=0) )
         {
-            *finalMAEInMM = meanBVH3DDistace(
+            *finalMAEInMM = meanBVH3DDistance(
                                 mc,
                                 renderer,
                                 1,
