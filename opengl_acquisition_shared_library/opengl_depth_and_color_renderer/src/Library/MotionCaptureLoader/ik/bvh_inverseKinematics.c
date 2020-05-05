@@ -1131,21 +1131,18 @@ float iteratePartLoss(
     };
 
 
-    float originalValues[3];
-
-
+    float originalValues[3] = {
+         problem->chain[chainID].currentSolution->motion[mIDS[0]],
+         problem->chain[chainID].currentSolution->motion[mIDS[1]],
+         problem->chain[chainID].currentSolution->motion[mIDS[2]]
+    };
+ 
     if (springIgnoresIterativeChanges)
     {
         originalValues[0] = problem->initialSolution->motion[mIDS[0]];
         originalValues[1] = problem->initialSolution->motion[mIDS[1]];
         originalValues[2] = problem->initialSolution->motion[mIDS[2]];
-    }
-    else
-    {
-        originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
-        originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
-        originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
-    }
+    } 
 
 //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
     float initialLoss = calculateChainLoss(problem,chainID,partID);
