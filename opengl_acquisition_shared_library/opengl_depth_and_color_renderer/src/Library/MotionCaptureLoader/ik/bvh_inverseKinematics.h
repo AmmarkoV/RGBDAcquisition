@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.2
+#define IK_VERSION 0.21
 
 #define MAXIMUM_CHAINS 15
 #define MAXIMUM_PARTS_OF_CHAIN 15
@@ -82,6 +82,7 @@ struct ikProblem
 
 struct ikConfiguration
 {
+  float maximumAcceptableStartingLoss;
   float learningRate;
   unsigned int iterations;
   unsigned int epochs;
