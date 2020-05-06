@@ -29,10 +29,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
-//This is a good idea because it reduces jitter..
-#define TRY_TO_STAY_AT_GLOBAL_OPTIMUM 1
-
+ 
 #define DISCARD_POSITIONAL_COMPONENT 0
 const float distance=-150;
 
@@ -206,8 +203,8 @@ float meanBVH2DDistance(
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
                 if (  
-                         (!bvhSourceTransform->joint[jID].isBehindCamera) &&
-                         (!bvhTargetTransform->joint[jID].isBehindCamera) && 
+                         //(!bvhSourceTransform->joint[jID].isBehindCamera) &&
+                         //(!bvhTargetTransform->joint[jID].isBehindCamera) && 
                          (  (sX!=0.0) || (sY!=0.0) ) && 
                          (  (tX!=0.0) || (tY!=0.0) ) 
                     )
@@ -992,9 +989,7 @@ int prepareProblem(
 }
 
 
-int viewProblem(
-    struct ikProblem * problem
-)
+int viewProblem(struct ikProblem * problem)
 {
     fprintf(stderr,"The IK problem we want to solve has %u groups of subproblems\n",problem->numberOfGroups);
     fprintf(stderr,"It is also ultimately divided into %u kinematic chains\n",problem->numberOfChains);
@@ -1035,10 +1030,10 @@ int viewProblem(
 
 
 float calculateChainLoss(
-    struct ikProblem * problem,
-    unsigned int chainID,
-    unsigned int partIDStart
-)
+                                                   struct ikProblem * problem,
+                                                   unsigned int chainID,
+                                                   unsigned int partIDStart
+                                                 )
 {
     unsigned int numberOfSamples=0;
     float loss=0.0;
@@ -1056,10 +1051,7 @@ float calculateChainLoss(
         )
         {
 #if DISCARD_POSITIONAL_COMPONENT
-            bvh_removeTranslationFromTransform(
-                problem->mc,
-                &problem->chain[chainID].current2DProjectionTransform
-            );
+            bvh_removeTranslationFromTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
 #endif // DISCARD_POSITIONAL_COMPONENT
 
             if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
@@ -1095,31 +1087,25 @@ float calculateChainLoss(
     } //Have a valid chain
 
     //I have left 0/0 on purpose to cause NaNs when projection errors occur
-    //---------------------------------------------------------------------
-    if (numberOfSamples!=0)
-    {
-        loss = (float) loss/numberOfSamples;
-    }
-    else
-    {
-        loss = NAN;
-    }
-    //---------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    if (numberOfSamples!=0) { loss = (float) loss/numberOfSamples; }  else
+                                                       { loss = NAN; }
+    //----------------------------------------------------------------------------------------------------------
     return loss;
 }
 
 
 float iteratePartLoss(
-    struct ikProblem * problem,
-    unsigned int chainID,
-    unsigned int partID,
-    float lr,
-    float maximumAcceptableStartingLoss,
-    unsigned int epochs,
-    unsigned int tryMaintainingLocalOptima,
-    unsigned int springIgnoresIterativeChanges,
-    unsigned int verbose
-)
+                                           struct ikProblem * problem,
+                                           unsigned int chainID,
+                                           unsigned int partID,
+                                           float lr,
+                                           float maximumAcceptableStartingLoss,
+                                           unsigned int epochs,
+                                           unsigned int tryMaintainingLocalOptima,
+                                           unsigned int springIgnoresIterativeChanges,
+                                           unsigned int verbose
+                                          )
 {
     unsigned long startTime = GetTickCountMicrosecondsIK();
 
@@ -1144,6 +1130,9 @@ float iteratePartLoss(
         originalValues[2] = problem->initialSolution->motion[mIDS[2]];
     } 
 
+    const char * jointName = problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName;
+
+
 //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
     float initialLoss = calculateChainLoss(problem,chainID,partID);
 
@@ -1151,43 +1140,31 @@ float iteratePartLoss(
     {
         //If our loss is perfect we can't ( and wont ) improve it..
         if (verbose)
-        {
-            fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
-        }
+               { fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,jointName); }
         return initialLoss;
     }
 
     if (maximumAcceptableStartingLoss>0.0)
     {
+        //The positional subproblem gets a pass to help the other joints..
+        int isItThePositionalSubproblem = ( (partID==0) &&  (chainID==0) ); 
+        
         //If we are really.. really.. far from the solution we might not want to try and do IK
-        //as it will improve loss but may lead to a weird incorrect pose
-        if (initialLoss>maximumAcceptableStartingLoss)
+        //as it will improve loss but may lead to a weird incorrect pose 
+        if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) ) //Dont do that chain
         {
             if (verbose)
-            {
-                fprintf(
-                    stderr, RED"\nWon't optimize %s,  exceeded maximum acceptable starting loss by %0.2f%%\n" NORMAL,
-                    problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName,
-                    ((float) 100*initialLoss/maximumAcceptableStartingLoss)
-                );
-            }
+                    { fprintf( stderr, RED"\nWon't optimize %s,  exceeded maximum acceptable starting loss by %0.2f%%\n" NORMAL,jointName, ((float) 100*initialLoss/maximumAcceptableStartingLoss) ); }
             return initialLoss;
         }
     }
 
-///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
-    bvh_markJointAsUsefulAndParentsAsUselessInTransform(
-        problem->mc,
-        &problem->chain[chainID].current2DProjectionTransform,
-        problem->chain[chainID].part[partID].jID
-    );
-
+    ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
+    bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->chain[chainID].part[partID].jID);
+   //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     if (verbose)
-    {
-        fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName,initialLoss);
-    }
-
+          { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",jointName,initialLoss); }
 
 //-------------------------------------------
 //-------------------------------------------
@@ -1227,7 +1204,7 @@ float iteratePartLoss(
     float previousLoss[3] = { initialLoss, initialLoss, initialLoss };
     float currentLoss[3]  = { initialLoss, initialLoss, initialLoss };
 
-    float currentCorrection[3] = { 0,0,0 };
+    float currentCorrection[3] = {0.0,0.0,0.0};
 
     float bestLoss = initialLoss;
     float loss=initialLoss;
@@ -1264,31 +1241,23 @@ float iteratePartLoss(
             float lossMinusD=calculateChainLoss(problem,chainID,partID);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
 
-            if (
-                (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD)
-            )
+            if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
-                if (verbose)
-                {
-                    fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i);
-                }
+                if (verbose) 
+                      { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
                 delta[i] = d;
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
             {
-                if (verbose)
-                {
-                    fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i);
-                }
+                if (verbose) 
+                     { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
                 delta[i] = d;
             }
             else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
             {
                 if (verbose)
-                {
-                    fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i);
-                }
+                    { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
                 delta[i] = -d;
             }
             else
@@ -1309,9 +1278,7 @@ float iteratePartLoss(
             //we will try to maintain it..!
 
             if (verbose)
-            {
-                fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL);
-            }
+                 { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
             return initialLoss;
         }
 
@@ -1366,48 +1333,43 @@ float iteratePartLoss(
         delta[2] =  beta * delta[2] + (float) lr * gradient;
 
         //Safeguard against division with zero..
-        if (delta[0]!=delta[0])
-        {
-            delta[0]=0;
-        }
-        if (delta[1]!=delta[1])
-        {
-            delta[1]=0;
-        }
-        if (delta[2]!=delta[2])
-        {
-            delta[2]=0;
-        }
+        if (delta[0]!=delta[0]) { delta[0]=0; }
+        if (delta[1]!=delta[1]) { delta[1]=0; }
+        if (delta[2]!=delta[2]) { delta[2]=0; }
 
         //We remember our new "previous" state
         currentCorrection[0] = previousValues[0] - currentValues[0];
         currentCorrection[1] = previousValues[1] - currentValues[1];
         currentCorrection[2] = previousValues[2] - currentValues[2];
+        //----------------------------------------------
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
         previousLoss[2]=currentLoss[2];
+        //----------------------------------------------
         previousValues[0]=currentValues[0];
         previousValues[1]=currentValues[1];
         previousValues[2]=currentValues[2];
-
+        //----------------------------------------------
+        
         //We advance our current state..
         currentValues[0]+=delta[0];
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
-
+        //----------------------------------------------
+        
         //We store our new values and calculate our new loss
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
+        //----------------------------------------------
+        
         loss=calculateChainLoss(problem,chainID,partID);
 
         if (loss==NAN)
         {
             //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
             if (verbose)
-            {
-                fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,currentValues[0],currentValues[1],currentValues[2]);
-            }
+                    { fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,currentValues[0],currentValues[1],currentValues[2]); }
             executedEpochs=i;
             break;
         } else
@@ -1419,17 +1381,13 @@ float iteratePartLoss(
             bestValues[2]=currentValues[2];
             consecutiveBadSteps=0;
             if (verbose)
-            {
-                fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],currentCorrection[0],currentValues[1],currentCorrection[1],currentValues[2],currentCorrection[2]);
-            }
+                  { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],currentCorrection[0],currentValues[1],currentCorrection[1],currentValues[2],currentCorrection[2]); }
         }
         else
         {
             ++consecutiveBadSteps;
             if (verbose)
-            {
-                fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
-            }
+                 { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]); }
         }
 
 
@@ -1437,9 +1395,7 @@ float iteratePartLoss(
         if (consecutiveBadSteps>=maximumConsecutiveBadEpochs)
         {
             if (verbose)
-            {
-                fprintf(stderr,YELLOW "Early Stopping\n" NORMAL);
-            }
+                 { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); }
             executedEpochs=i;
             break;
         }
@@ -1448,7 +1404,7 @@ float iteratePartLoss(
 
     if (verbose)
     {
-        fprintf(stderr,"Optimization for joint %s \n", problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName);
+        fprintf(stderr,"Optimization for joint %s \n", jointName);
         fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
         fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
         fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
@@ -1461,12 +1417,8 @@ float iteratePartLoss(
     problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
     problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
 
-///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-    bvh_markJointAndParentsAsUsefulInTransform(
-        problem->mc,
-        &problem->chain[chainID].current2DProjectionTransform,
-        problem->chain[chainID].part[partID].jID
-    );
+   ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
+    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->chain[chainID].part[partID].jID);
     ///-------------------------------------------------------------------------------------------------------------------------------
 
     return bestLoss;
@@ -1490,7 +1442,7 @@ int iterateChainLoss(
     unsigned int verbose
 )
 {
-//Before we start we will make a copy of the problem->currentSolution to work on improving it..
+    //Before we start we will make a copy of the problem->currentSolution to work on improving it..
     copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
 
     for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -1511,7 +1463,7 @@ int iterateChainLoss(
         }
     }
 
-//After we finish we update the problem->currentSolution with what our chain came up with..
+    //After we finish we update the problem->currentSolution with what our chain came up with..
     copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
 
     return 1;
