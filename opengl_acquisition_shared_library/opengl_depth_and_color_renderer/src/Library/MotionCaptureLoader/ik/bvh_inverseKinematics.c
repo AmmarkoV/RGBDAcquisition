@@ -1097,6 +1097,7 @@ float calculateChainLoss(
 
 float iteratePartLoss(
                                            struct ikProblem * problem,
+                                           unsigned int iterationID,
                                            unsigned int chainID,
                                            unsigned int partID,
                                            float lr,
@@ -1164,7 +1165,7 @@ float iteratePartLoss(
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     if (verbose)
-          { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f)\n",jointName,initialLoss); }
+          { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f, iteration %u , chain %u, part %u)\n",jointName,initialLoss,iterationID,chainID,partID); }
 
 //-------------------------------------------
 //-------------------------------------------
@@ -1433,6 +1434,7 @@ float iteratePartLoss(
 
 int iterateChainLoss(
     struct ikProblem * problem,
+    unsigned int iterationID,
     unsigned int chainID,
     float lr,
     float maximumAcceptableStartingLoss,
@@ -1451,6 +1453,7 @@ int iterateChainLoss(
         {
             iteratePartLoss(
                 problem,
+                iterationID,
                 chainID,
                 partID,
                 lr,
@@ -1492,6 +1495,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     float * finalMAEInMM
 )
 {
+    if  ( (solution == 0) || (solution->motion == 0) )
+    {
+        fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
+        return 0;
+    }
+
     if (ikConfig == 0)
     {
         fprintf(stderr,RED "No configuration provided for IK..\n" NORMAL);
@@ -1506,13 +1515,39 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
 
     struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
-    if (problem==0)
+    if (problem!=0)
+    {
+         memset(problem,0,sizeof(struct ikProblem));
+    } else
     {
         fprintf(stderr,"Failed to allocate memory for our IK problem..\n");
         return 0;
     }
+   
 
-    memset(problem,0,sizeof(struct ikProblem));
+ 
+   //TODO : 
+   //Ensure that  pose is not out of the bounds of camera ?
+   //If it is inverse kinematics wont know what to do..
+    if (solution->motion[2]>0)
+    {
+        fprintf(stderr,RED "Warning: Detected pose behind camera! ..\n" NORMAL);
+        if ( (previousSolution!=0) && (previousSolution->motion!=0) )
+        {
+            if (previousSolution->motion[2]<0)
+                    {
+                        fprintf(stderr,GREEN "Fixed ! ..\n" NORMAL);
+                        solution->motion[2]=previousSolution->motion[2]; 
+                    } 
+        }
+
+        if (solution->motion[2]>0)
+        {  
+                 fprintf(stderr,RED "Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
+                 solution->motion[2]=-150;
+        }  
+    }
+
 
     if (!prepareProblem(
                 problem,
@@ -1531,6 +1566,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Don't spam console..
     //viewProblem(problem);
+     
 
 
     float previousMAEInPixels=1000000; //Big invalid number
@@ -1603,6 +1639,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                     if (previousMAEInPixels < *initialMAEInPixels)
                     {
                         fprintf(stderr,"Previous MAE (%0.2f) seems to be lower than estimation (%0.2f) ..\n",previousMAEInPixels,*initialMAEInPixels);
+                        fprintf(stderr,"Doing Nothing about it\n");
                         /* THIS WORKS BADLY..!
                         if (!updateProblemSolutionToAllChains(problem,previousSolution))
                         {
@@ -1653,12 +1690,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
 
-    for (int t=0; t<ikConfig->iterations; t++)
+    for (int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
         for (int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
             iterateChainLoss(
                 problem,
+                iterationID,
                 chainID,
                 ikConfig->learningRate,
                 ikConfig->maximumAcceptableStartingLoss,
@@ -1674,6 +1712,38 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
 
+     fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
+                        problem->initialSolution->motion[0],
+                        problem->initialSolution->motion[1],
+                        problem->initialSolution->motion[2],
+                        problem->initialSolution->motion[3],
+                        problem->initialSolution->motion[4],
+                        problem->initialSolution->motion[5]
+                       );
+
+        if (problem->previousSolution!=0)
+        {
+            if (problem->previousSolution->motion!=0)
+            {
+                  fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
+                        problem->previousSolution->motion[0],
+                        problem->previousSolution->motion[1],
+                        problem->previousSolution->motion[2],
+                        problem->previousSolution->motion[3],
+                        problem->previousSolution->motion[4],
+                        problem->previousSolution->motion[5]
+                       );
+            }
+        }
+
+    fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
+                        solution->motion[0],
+                        solution->motion[1],
+                        solution->motion[2],
+                        solution->motion[3],
+                        solution->motion[4],
+                        solution->motion[5]
+                       );
 
 
 
@@ -1889,6 +1959,7 @@ int bvhTestIK(
 
                         fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
                         fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
+                        
 
 
                         //-------------------------------------------------------------------------------------------------
