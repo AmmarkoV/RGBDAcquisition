@@ -1236,7 +1236,7 @@ if (iterationID==0)
     float d=lr; //0.005;
     float beta = 0.9; // Momentum
     float distanceFromInitial;
-    float spring = 12.0;
+    float spring = 3.0; //Maybe this needs to be much smaller than 12
 
 
 //Give an initial direction..
@@ -1362,7 +1362,7 @@ if (iterationID==0)
                 (fabs(delta[2]>300))
              )
         { 
-            fprintf(stderr,RED "HUGE correction, something is wrong!\n" NORMAL);
+            fprintf(stderr,RED "EXPLODING GRADIENT!\n" NORMAL);
             fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
             fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
             fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
