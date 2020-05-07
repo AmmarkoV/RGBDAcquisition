@@ -1195,7 +1195,7 @@ if (iterationID==0)
             
             if (previousLoss<initialLoss)
             {
-                fprintf(stderr,GREEN "Previous solution loss (%0.2f) is better than current (%0.2f) \n" NORMAL,previousLoss,initialLoss);
+                fprintf(stderr,GREEN "Previous solution for joint %s loss (%0.2f) is better than current (%0.2f) \n" NORMAL,jointName,previousLoss,initialLoss);
                 originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
                 originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
                 originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
