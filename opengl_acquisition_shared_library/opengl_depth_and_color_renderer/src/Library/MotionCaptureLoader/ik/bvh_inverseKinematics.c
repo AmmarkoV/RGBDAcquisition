@@ -30,6 +30,9 @@
 #define WHITE   "\033[37m"      /* White */
 
  
+//Switch to remember previos solutions and not rely only on initial solution
+#define REMEMBER_PREVIOUS_SOLUTION 1
+
 #define DISCARD_POSITIONAL_COMPONENT 0
 const float distance=-150;
 
@@ -1170,30 +1173,45 @@ float iteratePartLoss(
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
-#define REMEMBER 0
-#if REMEMBER
+#if REMEMBER_PREVIOUS_SOLUTION
+if (iterationID==0)
+{
     if (problem->previousSolution!=0)
     {
         if (problem->previousSolution->motion!=0)
         {
             //Maybe previous solution is closer to current?
-            //previousSolution
-            problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) (problem->previousSolution->motion[mIDS[0]] + originalValues[0]) / 2;
-            problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) (problem->previousSolution->motion[mIDS[1]] + originalValues[1]) / 2;
-            problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) (problem->previousSolution->motion[mIDS[2]] + originalValues[2]) / 2;
+            
+            float rememberInitialSolution[3]={
+                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[0]],
+                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[1]],
+                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[2]] 
+                                                                                }; 
+            
+            problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
+            problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) problem->previousSolution->motion[mIDS[1]];
+            problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) problem->previousSolution->motion[mIDS[2]];
             float previousLoss = calculateChainLoss(problem,chainID,partID);
+            
             if (previousLoss<initialLoss)
             {
-                fprintf(stderr,"Previous solution loss (%0.2f) is better than current (%0.2f) \n",previousLoss,initialLoss);
+                fprintf(stderr,GREEN "Previous solution loss (%0.2f) is better than current (%0.2f) \n" NORMAL,previousLoss,initialLoss);
                 originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
                 originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
                 originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
-                lr/=10;
+                //lr/=10;
                 initialLoss = previousLoss;
+            } else
+            {
+                //It is a worse solution Revert back!
+               problem->chain[chainID].currentSolution->motion[mIDS[0]] = rememberInitialSolution[0];
+               problem->chain[chainID].currentSolution->motion[mIDS[1]] = rememberInitialSolution[1];
+               problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2]; 
             }
         }
     }
-#endif // REMEMBER
+}
+#endif // REMEMBER_PREVIOUS_SOLUTION
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
@@ -1204,7 +1222,8 @@ float iteratePartLoss(
 
     float previousLoss[3] = { initialLoss, initialLoss, initialLoss };
     float currentLoss[3]  = { initialLoss, initialLoss, initialLoss };
-
+    float previousDelta[3] = {0.0,0.0,0.0};
+    float gradient[3]={0.0,0.0,0.0};
     float currentCorrection[3] = {0.0,0.0,0.0};
 
     float bestLoss = initialLoss;
@@ -1215,7 +1234,6 @@ float iteratePartLoss(
     float e=0.0001;
     float d=lr; //0.005;
     float beta = 0.9; // Momentum
-    float gradient;
     float distanceFromInitial;
     float spring = 12.0;
 
@@ -1322,21 +1340,44 @@ float iteratePartLoss(
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
 //-------------------
 
-
+        
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
-        gradient =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
-        delta[0] =  beta * delta[0] + (float) lr * gradient;
+        previousDelta[0]=delta[0]; 
+        gradient[0] =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
+        delta[0] =  beta * delta[0] + (float) lr * gradient[0];
 
-        gradient =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
-        delta[1] =  beta * delta[1] + (float) lr * gradient;
+        previousDelta[1]=delta[1]; 
+        gradient[1] =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
+        delta[1] =  beta * delta[1] + (float) lr * gradient[1];
 
-        gradient =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
-        delta[2] =  beta * delta[2] + (float) lr * gradient;
+        previousDelta[2]=delta[2]; 
+        gradient[2] =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
+        delta[2] =  beta * delta[2] + (float) lr * gradient[2];
+
+
+        if  ( 
+                (fabs(delta[0]>300)) ||
+                (fabs(delta[1]>300)) ||
+                (fabs(delta[2]>300))
+             )
+        { 
+            fprintf(stderr,RED "HUGE correction, wtf is wrong ? \n" NORMAL);
+            fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
+            fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
+            fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
+            fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
+            fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
+            fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
+             delta[0]=lr; 
+             delta[1]=lr; 
+             delta[2]=lr; 
+        }
+
 
         //Safeguard against division with zero..
-        if (delta[0]!=delta[0]) { delta[0]=0; }
-        if (delta[1]!=delta[1]) { delta[1]=0; }
-        if (delta[2]!=delta[2]) { delta[2]=0; }
+        if (delta[0]!=delta[0]) { delta[0]=lr; }
+        if (delta[1]!=delta[1]) { delta[1]=lr; }
+        if (delta[2]!=delta[2]) { delta[2]=lr; }
 
         //We remember our new "previous" state
         currentCorrection[0] = previousValues[0] - currentValues[0];
@@ -1365,6 +1406,8 @@ float iteratePartLoss(
         //----------------------------------------------
         
         loss=calculateChainLoss(problem,chainID,partID);
+
+
 
         if (loss==NAN)
         {
