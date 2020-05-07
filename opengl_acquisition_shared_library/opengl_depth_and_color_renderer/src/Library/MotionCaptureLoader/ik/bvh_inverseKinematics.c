@@ -1474,7 +1474,38 @@ int iterateChainLoss(
 
 
 
+int ensureInitialPositionIsInFrustrum(
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * solution,
+    struct MotionBuffer * previousSolution
+    )
+{
+   float closestDistanceToCameraInCM=30; 
+    
+  //TODO : 
+   //Ensure that  pose is not out of the bounds of camera ?
+   //If it is inverse kinematics wont know what to do..
+    if (solution->motion[2]>-1 * closestDistanceToCameraInCM)
+    {
+        fprintf(stderr,RED "Warning: Detected pose behind camera! ..\n" NORMAL);
+        if ( (previousSolution!=0) && (previousSolution->motion!=0) )
+        {
+            if (previousSolution->motion[2] < -1 * closestDistanceToCameraInCM)
+                    {
+                        fprintf(stderr,GREEN "Fixed using previous frame ! ..\n" NORMAL);
+                        solution->motion[2]=previousSolution->motion[2]; 
+                    } 
+        }
 
+        if (solution->motion[2]>-1 * closestDistanceToCameraInCM)
+        {  
+                 fprintf(stderr,RED "Warning: Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
+                 solution->motion[2]=-160;
+        }  
+    }
+     
+     return 1;
+}
 
 
 
@@ -1525,28 +1556,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
    
 
- 
-   //TODO : 
-   //Ensure that  pose is not out of the bounds of camera ?
-   //If it is inverse kinematics wont know what to do..
-    if (solution->motion[2]>0)
-    {
-        fprintf(stderr,RED "Warning: Detected pose behind camera! ..\n" NORMAL);
-        if ( (previousSolution!=0) && (previousSolution->motion!=0) )
-        {
-            if (previousSolution->motion[2]<0)
-                    {
-                        fprintf(stderr,GREEN "Fixed ! ..\n" NORMAL);
-                        solution->motion[2]=previousSolution->motion[2]; 
-                    } 
-        }
+    ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
 
-        if (solution->motion[2]>0)
-        {  
-                 fprintf(stderr,RED "Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
-                 solution->motion[2]=-150;
-        }  
-    }
 
 
     if (!prepareProblem(
