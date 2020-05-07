@@ -1175,7 +1175,7 @@ float iteratePartLoss(
 //-------------------------------------------
 #if REMEMBER_PREVIOUS_SOLUTION
 //We only need to do this on the first iteration
-//We dont want to constantly overwrite values with previous solution
+//We dont want to constantly overwrite values with previous solutions and sabotage next iterations
 if (iterationID==0)
 {
     //If the previous solution is not given then it is impossible to use it
@@ -1196,6 +1196,7 @@ if (iterationID==0)
             
             if (previousLoss<initialLoss)
             {
+                //Congratulations! better solution for free!
                 fprintf(stderr,GREEN "Previous solution for joint %s loss (%0.2f) is better than current (%0.2f) \n" NORMAL,jointName,previousLoss,initialLoss);
                 originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
                 originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
@@ -1204,7 +1205,7 @@ if (iterationID==0)
                 initialLoss = previousLoss;
             } else
             {
-                //Previous solution is a worse solution, we will revert back!
+                //Previous solution is a worse solution,  let's forget about it and revert back!
                problem->chain[chainID].currentSolution->motion[mIDS[0]] = rememberInitialSolution[0];
                problem->chain[chainID].currentSolution->motion[mIDS[1]] = rememberInitialSolution[1];
                problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2]; 
@@ -1361,18 +1362,18 @@ if (iterationID==0)
                 (fabs(delta[2]>300))
              )
         { 
-            fprintf(stderr,RED "HUGE correction, wtf is wrong ? \n" NORMAL);
+            fprintf(stderr,RED "HUGE correction, something is wrong!\n" NORMAL);
             fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
             fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
             fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
             fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
             fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
             fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
+            //Trying to save the day...
              delta[0]=lr; 
              delta[1]=lr; 
              delta[2]=lr; 
         }
-
 
         //Safeguard against division with zero..
         if (delta[0]!=delta[0]) { delta[0]=lr; }
@@ -1404,12 +1405,14 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //----------------------------------------------
-        
         loss=calculateChainLoss(problem,chainID,partID);
+        //----------------------------------------------
+        
 
 
 
-        if (loss==NAN)
+        // If loss is not a number
+        if (loss!=loss)
         {
             //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
             if (verbose)
@@ -1417,8 +1420,9 @@ if (iterationID==0)
             executedEpochs=i;
             break;
         } else
-        if (loss<bestLoss) //&& ( fabs(currentValues[0])<360 ) && ( fabs(currentValues[1])<360 ) && ( fabs(currentValues[2])<360 ) )
+        if (loss<bestLoss)  
         {
+            //Loss has been improved..!
             bestLoss=loss;
             bestValues[0]=currentValues[0];
             bestValues[1]=currentValues[1];
@@ -1428,7 +1432,7 @@ if (iterationID==0)
                   { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],currentCorrection[0],currentValues[1],currentCorrection[1],currentValues[2],currentCorrection[2]); }
         }
         else
-        {
+        { //Loss has not been improved..!
             ++consecutiveBadSteps;
             if (verbose)
                  { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]); }
@@ -1775,19 +1779,16 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                         problem->initialSolution->motion[5]
                        );
 
-        if (problem->previousSolution!=0)
-        {
-            if (problem->previousSolution->motion!=0)
-            {
-                  fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
+        if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
+        { 
+            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
                         problem->previousSolution->motion[0],
                         problem->previousSolution->motion[1],
                         problem->previousSolution->motion[2],
                         problem->previousSolution->motion[3],
                         problem->previousSolution->motion[4],
                         problem->previousSolution->motion[5]
-                       );
-            }
+                       ); 
         }
 
     fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
@@ -1798,10 +1799,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                         solution->motion[4],
                         solution->motion[5]
                        );
-
-
-
-
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
