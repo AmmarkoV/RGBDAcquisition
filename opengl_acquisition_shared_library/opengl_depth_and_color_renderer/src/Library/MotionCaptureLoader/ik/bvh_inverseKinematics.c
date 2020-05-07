@@ -1500,7 +1500,7 @@ int ensureInitialPositionIsInFrustrum(
         if (solution->motion[2]>-1 * closestDistanceToCameraInCM)
         {  
                  fprintf(stderr,RED "Warning: Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
-                 solution->motion[2]=-160;
+                 solution->motion[2]=-140;
         }  
     }
      
