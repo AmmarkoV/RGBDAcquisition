@@ -1667,53 +1667,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
 
 
-
-        //----------------------------------------------------
-        //----------------------------------------------------
-        //----------------------------------------------------
-        if (problem->previousSolution!=0)
-        {
-            if (problem->previousSolution->motion!=0)
-            {
-                struct BVH_Transform bvhPrevioustTransform= {0};
-                if (
-                    bvh_loadTransformForMotionBuffer(
-                        mc,
-                        previousSolution->motion,
-                        &bvhPrevioustTransform,
-                        0//Dont populate extra structures
-                    )
-                )
-                {
-                    previousMAEInPixels = meanBVH2DDistance(
-                                              mc,
-                                              renderer,
-                                              1,
-                                              0,
-                                              &bvhPrevioustTransform,
-                                              bvhTargetTransform,
-                                              ikConfig->verbose
-                                          );
-                    if (previousMAEInPixels < *initialMAEInPixels)
-                    {
-                        fprintf(stderr,"Previous MAE (%0.2f) seems to be lower than estimation (%0.2f) ..\n",previousMAEInPixels,*initialMAEInPixels);
-                        fprintf(stderr,"Doing Nothing about it\n");
-                        /* THIS WORKS BADLY..!
-                        if (!updateProblemSolutionToAllChains(problem,previousSolution))
-                        {
-                          fprintf(stderr,RED "Failed to updated problem solution..\n" NORMAL);
-                          //exit(0);
-                        }*/
-                        //exit(0);
-                    }
-                }
-            }
-        }
-        //----------------------------------------------------
-        //----------------------------------------------------
-        //----------------------------------------------------
-
-
         if ( (initialMAEInMM!=0) && (groundTruth!=0) )
         {
             *initialMAEInMM = meanBVH3DDistance(
