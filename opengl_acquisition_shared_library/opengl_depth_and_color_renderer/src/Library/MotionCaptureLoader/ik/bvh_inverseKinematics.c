@@ -1174,20 +1174,21 @@ float iteratePartLoss(
 //-------------------------------------------
 //-------------------------------------------
 #if REMEMBER_PREVIOUS_SOLUTION
+//We only need to do this on the first iteration
+//We dont want to constantly overwrite values with previous solution
 if (iterationID==0)
 {
-    if (problem->previousSolution!=0)
-    {
-        if (problem->previousSolution->motion!=0)
-        {
-            //Maybe previous solution is closer to current?
-            
+    //If the previous solution is not given then it is impossible to use it
+    if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
+    { 
+           //We need to remember the initial solution we where given 
             float rememberInitialSolution[3]={
                                                                                   problem->chain[chainID].currentSolution->motion[mIDS[0]],
                                                                                   problem->chain[chainID].currentSolution->motion[mIDS[1]],
                                                                                   problem->chain[chainID].currentSolution->motion[mIDS[2]] 
                                                                                 }; 
             
+            //Maybe previous solution is closer to current?
             problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
             problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) problem->previousSolution->motion[mIDS[1]];
             problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) problem->previousSolution->motion[mIDS[2]];
@@ -1203,12 +1204,11 @@ if (iterationID==0)
                 initialLoss = previousLoss;
             } else
             {
-                //It is a worse solution Revert back!
+                //Previous solution is a worse solution, we will revert back!
                problem->chain[chainID].currentSolution->motion[mIDS[0]] = rememberInitialSolution[0];
                problem->chain[chainID].currentSolution->motion[mIDS[1]] = rememberInitialSolution[1];
                problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2]; 
-            }
-        }
+            } 
     }
 }
 #endif // REMEMBER_PREVIOUS_SOLUTION
