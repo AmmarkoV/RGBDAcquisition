@@ -1236,7 +1236,7 @@ if (iterationID==0)
     float d=lr; //0.005;
     float beta = 0.9; // Momentum
     float distanceFromInitial;
-    float spring = 1.0; //Maybe this needs to be much smaller than 12
+    float spring = 15.0; //Maybe this needs to be much smaller than 12
 
 
 //Give an initial direction..
