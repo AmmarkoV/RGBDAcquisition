@@ -22,6 +22,7 @@ int prepareDefaultBodyProblem(
 int bvhTestIK(
               struct BVH_MotionCapture * mc,
               float lr,
+              float spring,
               unsigned int iterations,
               unsigned int epochs,
               unsigned int fIDPrevious,

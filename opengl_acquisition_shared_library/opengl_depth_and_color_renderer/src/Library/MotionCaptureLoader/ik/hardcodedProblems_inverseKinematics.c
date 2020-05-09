@@ -672,6 +672,7 @@ int writeHTML(
 int bvhTestIK(
     struct BVH_MotionCapture * mc,
     float lr,
+    float spring,
     unsigned int iterations,
     unsigned int epochs,
     unsigned int fIDPrevious,
@@ -739,6 +740,7 @@ int bvhTestIK(
                     ikConfig.learningRate = lr;
                     ikConfig.iterations = iterations;
                     ikConfig.epochs = epochs;
+                    ikConfig.spring = spring;
                     ikConfig.springIgnoresIterativeChanges = springIgnoresIterativeChanges;
                     ikConfig.dumpScreenshots = 1;
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this

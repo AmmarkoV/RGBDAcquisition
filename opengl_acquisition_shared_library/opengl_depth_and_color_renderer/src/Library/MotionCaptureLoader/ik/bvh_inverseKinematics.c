@@ -405,6 +405,7 @@ float iteratePartLoss(
                                            float maximumAcceptableStartingLoss,
                                            unsigned int epochs,
                                            unsigned int tryMaintainingLocalOptima,
+                                           float spring,
                                            unsigned int springIgnoresIterativeChanges,
                                            unsigned int verbose
                                           )
@@ -534,8 +535,7 @@ if (iterationID==0)
     float e=0.0001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
-    float distanceFromInitial;
-    float spring = 15.0; //Maybe this needs to be much smaller than 12
+    float distanceFromInitial; 
 
 
 //Give an initial direction..
@@ -774,6 +774,7 @@ int iterateChainLoss(
                                          float maximumAcceptableStartingLoss,
                                          unsigned int epochs,
                                          unsigned int tryMaintainingLocalOptima,
+                                         float spring,
                                          unsigned int springIgnoresIterativeChanges,
                                          unsigned int verbose
                                        )
@@ -794,6 +795,7 @@ int iterateChainLoss(
                                             maximumAcceptableStartingLoss,
                                             epochs,
                                             tryMaintainingLocalOptima,
+                                            spring,
                                             springIgnoresIterativeChanges,
                                             verbose
                                         );
@@ -986,6 +988,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->epochs,
                                                ikConfig->tryMaintainingLocalOptima,
+                                               ikConfig->spring,
                                                ikConfig->springIgnoresIterativeChanges,
                                                ikConfig->verbose
                                              );
