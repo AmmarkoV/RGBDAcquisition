@@ -3,7 +3,6 @@
 
 
 #include "../bvh_loader.h"
-
 #include "../export/bvh_export.h"
 
 #ifdef __cplusplus
@@ -95,6 +94,9 @@ struct ikConfiguration
 };
 
 
+int cleanProblem(struct ikProblem * problem);
+
+
 //Temporary call that allows outside control..
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
@@ -114,15 +116,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                         );
 
 
-int bvhTestIK(
-              struct BVH_MotionCapture * mc,
-              float lr,
-              unsigned int iterations,
-              unsigned int epochs,
-              unsigned int fIDPrevious,
-              unsigned int fIDSource,
-              unsigned int fIDTarget
-             );
 
 int bvh_MirrorJointsThroughIK(
                                struct BVH_MotionCapture * mc,
