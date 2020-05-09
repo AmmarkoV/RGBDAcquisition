@@ -53,6 +53,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/edit/bvh_filter.c 
               ../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c 
               ../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.c 
+              ../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c
               ../../Library/MotionCaptureLoader/ik/levmar.c 
               ../../Library/MotionCaptureLoader/tests/test.c
               ../../Library/TrajectoryParser/InputParser_C.c

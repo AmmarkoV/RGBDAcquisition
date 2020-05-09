@@ -1233,7 +1233,7 @@ if (iterationID==0)
     unsigned int consecutiveBadSteps=0;
     unsigned int maximumConsecutiveBadEpochs=4;
     float e=0.0001;
-    float d=lr; //0.005;
+    float d=lr; //0.0005;
     float beta = 0.9; // Momentum
     float distanceFromInitial;
     float spring = 15.0; //Maybe this needs to be much smaller than 12

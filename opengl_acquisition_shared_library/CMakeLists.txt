@@ -51,6 +51,10 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Library/ModelLoader/model_converter.h
             opengl_depth_and_color_renderer/src/Library/ModelLoader/model_editor.c
             opengl_depth_and_color_renderer/src/Library/ModelLoader/model_editor.h
+            #Inverse Kinematics
+            opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/bvh_inverseKinematics.c
+            opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c
+            opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/levmar.c 
             #Textures and how to load them 
             opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.h
@@ -73,8 +77,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Library/Rendering/tiledRenderer.c
             opengl_depth_and_color_renderer/src/Library/Rendering/downloadFromRenderer.c
             opengl_depth_and_color_renderer/src/Library/Rendering/downloadFromRenderer.h
-            
- 
+            #Tools
             opengl_depth_and_color_renderer/src/Library/Tools/tools.h
             opengl_depth_and_color_renderer/src/Library/Tools/tools.c
             opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.h 
