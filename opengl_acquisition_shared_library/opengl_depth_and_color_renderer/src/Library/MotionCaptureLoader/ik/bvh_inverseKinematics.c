@@ -934,14 +934,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if (initialMAEInPixels!=0)
         {
             *initialMAEInPixels = meanBVH2DDistance(
-                                      mc,
-                                      renderer,
-                                      1,
-                                      0,
-                                      &bvhCurrentTransform,
-                                      bvhTargetTransform,
-                                      ikConfig->verbose
-                                  );
+                                                                                                    mc,
+                                                                                                    renderer,
+                                                                                                    1,
+                                                                                                    0,
+                                                                                                    &bvhCurrentTransform,
+                                                                                                    bvhTargetTransform,
+                                                                                                    ikConfig->verbose
+                                                                                                  );
         }
         //----------------------------------------------------
 
@@ -949,15 +949,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if ( (initialMAEInMM!=0) && (groundTruth!=0) )
         {
             *initialMAEInMM = meanBVH3DDistance(
-                                  mc,
-                                  renderer,
-                                  1,
-                                  0,
-                                  problem->initialSolution->motion,
-                                  &bvhCurrentTransform,
-                                  groundTruth->motion,
-                                  bvhTargetTransform
-                              );
+                                                                                                mc,
+                                                                                                renderer,
+                                                                                                1,
+                                                                                                0,
+                                                                                                problem->initialSolution->motion,
+                                                                                                &bvhCurrentTransform,
+                                                                                                groundTruth->motion,
+                                                                                                bvhTargetTransform
+                                                                                              );
         }
         //----------------------------------------------------
 
@@ -1042,14 +1042,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if (finalMAEInPixels!=0)
         {
             *finalMAEInPixels  = meanBVH2DDistance(
-                                     mc,
-                                     renderer,
-                                     1,
-                                     0,
-                                     &bvhCurrentTransform,
-                                     bvhTargetTransform,
-                                     ikConfig->verbose
-                                 );
+                                                                                                   mc,
+                                                                                                   renderer,
+                                                                                                   1,
+                                                                                                   0,
+                                                                                                   &bvhCurrentTransform,
+                                                                                                   bvhTargetTransform,
+                                                                                                   ikConfig->verbose
+                                                                                                 );
             if (previousMAEInPixels<*finalMAEInPixels)
             {
                 if (ikConfig->considerPreviousSolution)
@@ -1063,15 +1063,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if ( (finalMAEInMM!=0) && (groundTruth!=0) )
         {
             *finalMAEInMM = meanBVH3DDistance(
-                                mc,
-                                renderer,
-                                1,
-                                0,
-                                solution->motion,
-                                &bvhCurrentTransform,
-                                groundTruth->motion,
-                                bvhTargetTransform
-                            );
+                                                                                              mc,
+                                                                                              renderer,
+                                                                                              1,
+                                                                                              0,
+                                                                                              solution->motion,
+                                                                                              &bvhCurrentTransform,
+                                                                                              groundTruth->motion,
+                                                                                              bvhTargetTransform
+                                                                                            );
         }
         //----------------------------------------------------
     }
@@ -1145,13 +1145,10 @@ int bvh_MirrorJointsThroughIK(
         return 0;
     }
 
-
     struct BVH_Transform bvhTransform= {0};
     struct simpleRenderer renderer= {0};
-    simpleRendererDefaults(
-        &renderer,
-        1920, 1080, 582.18394,   582.52915 // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-    );
+    // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+    simpleRendererDefaults(&renderer,1920,1080, 582.18394,582.52915);
     simpleRendererInitialize(&renderer);
 
     BVHFrameID fID=0;
@@ -1166,7 +1163,6 @@ int bvh_MirrorJointsThroughIK(
             jIDB
         );
     }
-
 
     return 1;
 }
