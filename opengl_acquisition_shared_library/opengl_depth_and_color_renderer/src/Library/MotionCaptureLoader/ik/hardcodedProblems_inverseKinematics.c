@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int prepareProblem(
+int prepareDefaultBodyProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
     struct simpleRenderer *renderer,
@@ -47,10 +47,7 @@ int prepareProblem(
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
-
-#if DISCARD_POSITIONAL_COMPONENT
-    fprintf(stderr,"Ignoring positional component..\n");
-#else
+ 
     if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
@@ -62,8 +59,7 @@ int prepareProblem(
         problem->chain[chainID].part[partID].bigChanges=1;
         problem->chain[chainID].part[partID].jointImportance=2.0;
         ++partID;
-    }
-#endif // DISCARD_POSITIONAL_COMPONENT
+    } 
 
 
     if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
@@ -735,14 +731,7 @@ int bvhTestIK(
             if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform,0) )
             {
                 if  (bvh_projectTo2D(mc,&bvhTargetTransform,&renderer,0,0))
-                {
-#if DISCARD_POSITIONAL_COMPONENT
-                    bvh_removeTranslationFromTransform(
-                        mc,
-                        &bvhTargetTransform
-                    );
-#endif // DISCARD_POSITIONAL_COMPONENT
-
+                { 
                     unsigned int springIgnoresIterativeChanges=0;
 
                     struct ikConfiguration ikConfig= {0};

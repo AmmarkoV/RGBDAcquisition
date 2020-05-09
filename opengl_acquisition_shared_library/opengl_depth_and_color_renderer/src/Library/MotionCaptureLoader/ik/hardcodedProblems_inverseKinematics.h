@@ -9,7 +9,7 @@ extern "C"
 #endif
 
 
-int prepareProblem(
+int prepareDefaultBodyProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
     struct simpleRenderer *renderer,

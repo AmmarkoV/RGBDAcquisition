@@ -33,8 +33,7 @@
  
 //Switch to remember previos solutions and not rely only on initial solution
 #define REMEMBER_PREVIOUS_SOLUTION 1
-
-#define DISCARD_POSITIONAL_COMPONENT 0
+ 
 
 unsigned long tickBaseIK = 0;
 
@@ -145,11 +144,8 @@ float meanBVH2DDistance(
                 float tX=bvhTargetTransform->joint[jID].pos2D[0];
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
-                if (  
-                         //(!bvhSourceTransform->joint[jID].isBehindCamera) &&
-                         //(!bvhTargetTransform->joint[jID].isBehindCamera) && 
-                         (  (sX!=0.0) || (sY!=0.0) ) && 
-                         (  (tX!=0.0) || (tY!=0.0) ) 
+                if (   
+                         (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) ) 
                     )
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
@@ -162,13 +158,7 @@ float meanBVH2DDistance(
 
                     numberOfSamples+=1;
                     sumOf2DDistances+=this2DDistance;
-                } 
-                /*
-                else if (verbose)
-                {
-                     fprintf(stderr,YELLOW "avoided src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",sX,sY,tX,tY);
-                        fprintf(stderr,"2D %s distance = avoided\n" NORMAL,mc->jointHierarchy[jID].jointName);
-                }*/
+                }  
             }
         }
         if (verbose)
@@ -285,24 +275,12 @@ float meanBVH3DDistance(
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
-    if (updatedSolution==0)
-    {
-        return 0;
-    }
-    if (problem->currentSolution==0)
-    {
-        return 0;
-    }
-    if (problem->initialSolution==0)
-    {
-        return 0;
-    }
-
-
-    if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )
-    {
-        return 0;
-    }
+    if (updatedSolution==0)                     { return 0; }
+    if (problem->currentSolution==0)  { return 0; }
+    if (problem->initialSolution==0)     { return 0; }
+    
+    //Actual copy
+    if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  { return 0; }
     //if (!copyMotionBuffer(problem->initialSolution,updatedSolution) ) { return 0; }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
@@ -344,21 +322,16 @@ int viewProblem(struct ikProblem * problem)
 
             if (problem->chain[chainID].part[partID].endEffector)
             {
-                fprintf(
-                    stderr,"jID(%s/%u)->EndEffector ",
-                    problem->mc->jointHierarchy[jID].jointName,
-                    jID
-                );
+                fprintf(stderr,"jID(%s/%u)->EndEffector ",problem->mc->jointHierarchy[jID].jointName,jID);
             }
             else
             {
-                fprintf(
-                    stderr,"jID(%s/%u)->mID(%u to %u) ",
-                    problem->mc->jointHierarchy[jID].jointName,
-                    jID,
-                    problem->chain[chainID].part[partID].mIDStart,
-                    problem->chain[chainID].part[partID].mIDEnd
-                );
+                fprintf(stderr,"jID(%s/%u)->mID(%u to %u) ",
+                              problem->mc->jointHierarchy[jID].jointName,
+                              jID,
+                             problem->chain[chainID].part[partID].mIDStart,
+                             problem->chain[chainID].part[partID].mIDEnd
+                            );
             }
         }
         fprintf(stderr,"\n");
@@ -381,26 +354,19 @@ float calculateChainLoss(
     if (chainID<problem->numberOfChains)
     {
         //fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
-
         if (
-            bvh_loadTransformForMotionBuffer(
-                problem->mc,
-                problem->chain[chainID].currentSolution->motion,
-                &problem->chain[chainID].current2DProjectionTransform,
-                0//Dont populate extra structures we dont need them they just take time
+              bvh_loadTransformForMotionBuffer(
+                                                                                          problem->mc,
+                                                                                          problem->chain[chainID].currentSolution->motion,
+                                                                                          &problem->chain[chainID].current2DProjectionTransform,
+                                                                                          0//Dont populate extra structures we dont need them they just take time
+                                                                                        )
             )
-        )
-        {
-#if DISCARD_POSITIONAL_COMPONENT
-            bvh_removeTranslationFromTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
-#endif // DISCARD_POSITIONAL_COMPONENT
-
+        { 
             if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
             {
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
-                    //if ( (partID==partIDStart) || (problem->chain[chainID].part[partID].partParent==partIDStart) )
-                    {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
                          
                         ///Warning: When you change this please change meanBVH2DDistance as well!
@@ -408,21 +374,15 @@ float calculateChainLoss(
                         float sY=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1];
                         float tX =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
                         float tY =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
-
-                        if (
-                               ((sX!=0.0) || (sY!=0.0)) &&
-                               ((tX!=0.0) || (tY!=0.0)) 
-                            )
-                        {
-                            //Ignore empty joints ..!
-                            float thisSquared2DDistance=getSquared2DPointDistance(sX,sY,tX,tY); 
-                                                        
-                            loss+=thisSquared2DDistance * problem->chain[chainID].part[partID].jointImportance;
+                        
+                        //Only use source/target joints  that exist and are not occluded.. 
+                        if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
+                        { 
+                            loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
                         }
-                    }
-                }
-            }
+                } //We add ever part of this chain
+            } // We successfully projected the BVH file to 2D points..
 
         } //Have a valid 2D transform
     } //Have a valid chain
@@ -459,7 +419,8 @@ float iteratePartLoss(
     };
 
 
-    float originalValues[3] = {
+    float originalValues[3] = 
+    {
          problem->chain[chainID].currentSolution->motion[mIDS[0]],
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
@@ -475,7 +436,7 @@ float iteratePartLoss(
     const char * jointName = problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName;
 
 
-//This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
+    //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
     float initialLoss = calculateChainLoss(problem,chainID,partID);
 
     if (initialLoss==0.0)
@@ -587,8 +548,8 @@ if (iterationID==0)
 ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
     {
-//Are we at a global optimum? ---------------------------------------------------------------------------------
-//Do we care ? ----------------------------------------------------------------------------------
+       //Are we at a global optimum? ---------------------------------------------------------------------------------
+       //Do we care ? ----------------------------------------------------------------------------------
         unsigned int badLosses=0;
         for (unsigned int i=0; i<3; i++)
         {
@@ -601,28 +562,25 @@ if (iterationID==0)
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
-                if (verbose) 
-                      { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
+                if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
                 delta[i] = d;
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
             {
-                if (verbose) 
-                     { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
+                if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
                 delta[i] = d;
             }
             else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
             {
-                if (verbose)
-                    { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
+                if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
                 delta[i] = -d;
             }
             else
             {
                 if (verbose)
                 {
-                    fprintf(stderr,"Dont know what to do with #%u value ..\n",i);
+                    fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
                     fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
                     delta[i] = d;
                     ++badLosses;
@@ -635,8 +593,7 @@ if (iterationID==0)
             //We are at a local optima and  since tryMaintainingLocalOptima is enabled
             //we will try to maintain it..!
 
-            if (verbose)
-                 { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
+            if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
             return initialLoss;
         }
 
@@ -646,10 +603,6 @@ if (iterationID==0)
 ///--------------------------------------------------------------------------------------------------------------
 ///--------------------------------------------------------------------------------------------------------------
 ///--------------------------------------------------------------------------------------------------------------
-
-
-
-
 
 
     if (verbose)
@@ -797,7 +750,6 @@ if (iterationID==0)
         fprintf(stderr,"correction rate of %0.2f,%0.2f,%0.2f deg\n",(bestValues[0]-originalValues[0])/executedEpochs,(bestValues[1]-originalValues[1])/executedEpochs,(bestValues[2]-originalValues[2])/executedEpochs);
     }
 
-
     //After finishing with the optimization procedure we store the best result we achieved..!
     problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
     problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
@@ -814,20 +766,17 @@ if (iterationID==0)
 
 
 
-
-
-
 int iterateChainLoss(
-    struct ikProblem * problem,
-    unsigned int iterationID,
-    unsigned int chainID,
-    float lr,
-    float maximumAcceptableStartingLoss,
-    unsigned int epochs,
-    unsigned int tryMaintainingLocalOptima,
-    unsigned int springIgnoresIterativeChanges,
-    unsigned int verbose
-)
+                                         struct ikProblem * problem,
+                                         unsigned int iterationID,
+                                         unsigned int chainID,
+                                         float lr,
+                                         float maximumAcceptableStartingLoss,
+                                         unsigned int epochs,
+                                         unsigned int tryMaintainingLocalOptima,
+                                         unsigned int springIgnoresIterativeChanges,
+                                         unsigned int verbose
+                                       )
 {
     //Before we start we will make a copy of the problem->currentSolution to work on improving it..
     copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
@@ -860,10 +809,10 @@ int iterateChainLoss(
 
 
 int ensureInitialPositionIsInFrustrum(
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * solution,
-    struct MotionBuffer * previousSolution
-    )
+                                                                            struct simpleRenderer *renderer,
+                                                                            struct MotionBuffer * solution,
+                                                                            struct MotionBuffer * previousSolution
+                                                                         )
 {
    float closestDistanceToCameraInCM=30; 
     
@@ -895,29 +844,29 @@ int ensureInitialPositionIsInFrustrum(
 
 
 int approximateBodyFromMotionBufferUsingInverseKinematics(
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct ikConfiguration * ikConfig,
-    //---------------------------------
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct MotionBuffer * groundTruth,
-    //---------------------------------
-    struct BVH_Transform * bvhTargetTransform,
-    //---------------------------------
-    float * initialMAEInPixels,
-    float * finalMAEInPixels,
-    float * initialMAEInMM,
-    float * finalMAEInMM
-)
+                                                                                                                                  struct BVH_MotionCapture * mc,
+                                                                                                                                  struct simpleRenderer *renderer,
+                                                                                                                                  struct ikConfiguration * ikConfig,
+                                                                                                                                  //---------------------------------
+                                                                                                                                  struct MotionBuffer * previousSolution,
+                                                                                                                                  struct MotionBuffer * solution,
+                                                                                                                                  struct MotionBuffer * groundTruth,
+                                                                                                                                  //---------------------------------
+                                                                                                                                  struct BVH_Transform * bvhTargetTransform,
+                                                                                                                                  //---------------------------------
+                                                                                                                                  float * initialMAEInPixels,
+                                                                                                                                  float * finalMAEInPixels,
+                                                                                                                                  float * initialMAEInMM,
+                                                                                                                                  float * finalMAEInMM
+                                                                                                                                )
 {
-    if  ( (solution == 0) || (solution->motion == 0) )
+    if  ( (solution==0) || (solution->motion==0) )
     {
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
         return 0;
     }
 
-    if (ikConfig == 0)
+    if (ikConfig==0)
     {
         fprintf(stderr,RED "No configuration provided for IK..\n" NORMAL);
         return 0;
@@ -945,7 +894,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
 
-    if (!prepareProblem(
+    if (!prepareDefaultBodyProblem(
                 problem,
                 mc,
                 renderer,
@@ -980,15 +929,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             0// We don't need extra structures
         )
     )
-    {
-#if DISCARD_POSITIONAL_COMPONENT
-        bvh_removeTranslationFromTransform(
-            mc,
-            &bvhCurrentTransform
-        );
-#endif // DISCARD_POSITIONAL_COMPONENT
-
-
+    {  
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
         {
@@ -1024,13 +965,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     if (ikConfig->dumpScreenshots)
     {
-        dumpBVHToSVGFrame(
-            "initial.svg",
-            mc,
-            &bvhCurrentTransform,
-            0,
-            renderer
-        );
+        dumpBVHToSVGFrame("initial.svg",mc,&bvhCurrentTransform,0,renderer);
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1039,21 +974,21 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
 
-    for (int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
+    for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
-        for (int chainID=0; chainID<problem->numberOfChains; chainID++)
+        for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
             iterateChainLoss(
-                problem,
-                iterationID,
-                chainID,
-                ikConfig->learningRate,
-                ikConfig->maximumAcceptableStartingLoss,
-                ikConfig->epochs,
-                ikConfig->tryMaintainingLocalOptima,
-                ikConfig->springIgnoresIterativeChanges,
-                ikConfig->verbose
-            );
+                                               problem,
+                                               iterationID,
+                                               chainID,
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->epochs,
+                                               ikConfig->tryMaintainingLocalOptima,
+                                               ikConfig->springIgnoresIterativeChanges,
+                                               ikConfig->verbose
+                                             );
         }
     }
 
@@ -1095,22 +1030,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
 
     if (
-        bvh_loadTransformForMotionBuffer(
-            mc,
-            solution->motion,
-            &bvhCurrentTransform,
-            0// dont use extra structures
-        )
-    )
+          bvh_loadTransformForMotionBuffer(
+                                                                                      mc,
+                                                                                      solution->motion,
+                                                                                      &bvhCurrentTransform,
+                                                                                      0// dont use extra structures
+                                                                                     )
+      )
     {
-#if DISCARD_POSITIONAL_COMPONENT
-        bvh_removeTranslationFromTransform(
-            mc,
-            &bvhCurrentTransform
-        );
-#endif // DISCARD_POSITIONAL_COMPONENT
-
-
         //----------------------------------------------------
         if (finalMAEInPixels!=0)
         {
@@ -1147,8 +1074,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                             );
         }
         //----------------------------------------------------
-
-
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1156,76 +1081,16 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     if (ikConfig->dumpScreenshots)
     {
-        dumpBVHToSVGFrame(
-            "target.svg",
-            mc,
-            bvhTargetTransform,
-            1,
-            renderer
-        );
-
-        dumpBVHToSVGFrame(
-            "solution.svg",
-            mc,
-            &bvhCurrentTransform,
-            0,
-            renderer
-        );
-
+        dumpBVHToSVGFrame("target.svg",mc,bvhTargetTransform,1,renderer);
+        dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
 
 
-//Cleanup allocations needed for the problem..
+    //Cleanup allocations needed for the problem..
     cleanProblem(problem);
     free(problem);
     return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
