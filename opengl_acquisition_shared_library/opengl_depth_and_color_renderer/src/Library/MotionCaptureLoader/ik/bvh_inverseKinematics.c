@@ -786,18 +786,18 @@ int iterateChainLoss(
         if (!problem->chain[chainID].part[partID].endEffector)
         {
             iteratePartLoss(
-                problem,
-                iterationID,
-                chainID,
-                partID,
-                lr,
-                maximumAcceptableStartingLoss,
-                epochs,
-                tryMaintainingLocalOptima,
-                springIgnoresIterativeChanges,
-                verbose
-            );
-        }
+                                            problem,
+                                            iterationID,
+                                            chainID,
+                                            partID,
+                                            lr,
+                                            maximumAcceptableStartingLoss,
+                                            epochs,
+                                            tryMaintainingLocalOptima,
+                                            springIgnoresIterativeChanges,
+                                            verbose
+                                        );
+         }
     }
 
     //After we finish we update the problem->currentSolution with what our chain came up with..
