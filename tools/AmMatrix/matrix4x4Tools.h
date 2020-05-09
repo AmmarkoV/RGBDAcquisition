@@ -308,6 +308,16 @@ int multiplyFour4x4DMatrices(double * result , double * matrixA , double * matri
 int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
 
 
+/**
+* @brief Multiply 2x 4x4 Float matrices ( A * B ) using SSE instrcutions,  matrices should be 16bit algined i.e.  float m[16] __attribute__((aligned(16))) )
+* @ingroup AmMatrix
+* @param  Output 4x4 Float Matrix ( should be already allocated )
+* @param  Input 4x4 Float Matrix A
+* @param  Input 4x4 Float Matrix B
+* @retval 0=failure,1=success
+*/
+int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matrixB);
+
 int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * matrixB);
 
 int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC);
