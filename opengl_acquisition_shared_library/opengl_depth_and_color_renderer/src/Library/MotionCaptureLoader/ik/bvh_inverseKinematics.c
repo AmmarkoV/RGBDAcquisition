@@ -497,7 +497,8 @@ if (iterationID==0)
             if (previousLoss<initialLoss)
             {
                 //Congratulations! better solution for free!
-                fprintf(stderr,GREEN "Previous solution for joint %s loss (%0.2f) is better than current (%0.2f) \n" NORMAL,jointName,previousLoss,initialLoss);
+                 if (verbose)
+                  { fprintf(stderr,GREEN "Previous solution for joint %s loss (%0.2f) is better than current (%0.2f) \n" NORMAL,jointName,previousLoss,initialLoss); }
                 originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
                 originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
                 originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
@@ -999,6 +1000,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
      float * m = problem->initialSolution->motion;
+     fprintf(stderr,"IK lr = %0.2f ,  max start loss =%0.2f , Iterations = %u , epochs = %u , spring = %0.2f \n", 
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->iterations,
+                                               ikConfig->epochs, 
+                                               ikConfig->spring
+                    );
      fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
 
         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
