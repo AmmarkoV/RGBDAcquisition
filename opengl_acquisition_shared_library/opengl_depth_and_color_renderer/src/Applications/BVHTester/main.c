@@ -28,6 +28,7 @@
 #include "../../Library/MotionCaptureLoader/edit/bvh_interpolate.h"
 
 #include "../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h"
+#include "../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.h"
 
 #include "../../Library/MotionCaptureLoader/tests/test.h"
 
