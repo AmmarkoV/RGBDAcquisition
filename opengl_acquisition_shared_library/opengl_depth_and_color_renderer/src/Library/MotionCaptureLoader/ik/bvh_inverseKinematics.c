@@ -875,7 +875,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     if (ikConfig->ikVersion != (float) IK_VERSION)
     {
-        fprintf(stderr,RED "IK Version mismatch for configuration structure (%0.2f vs %0.2f ) ..\n" NORMAL,ikConfig->ikVersion,IK_VERSION);
+        fprintf(stderr,RED "Fatal: IK Version mismatch for configuration structure (%0.2f vs %0.2f ) ..\n" NORMAL,ikConfig->ikVersion,IK_VERSION);
         exit(0);
     }
 
@@ -995,36 +995,17 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
 
-
-     fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
-                        problem->initialSolution->motion[0],
-                        problem->initialSolution->motion[1],
-                        problem->initialSolution->motion[2],
-                        problem->initialSolution->motion[3],
-                        problem->initialSolution->motion[4],
-                        problem->initialSolution->motion[5]
-                       );
+     float * m = problem->initialSolution->motion;
+     fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
 
         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
         { 
-            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
-                        problem->previousSolution->motion[0],
-                        problem->previousSolution->motion[1],
-                        problem->previousSolution->motion[2],
-                        problem->previousSolution->motion[3],
-                        problem->previousSolution->motion[4],
-                        problem->previousSolution->motion[5]
-                       ); 
+            m = problem->previousSolution->motion;
+            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
         }
-
-    fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",
-                        solution->motion[0],
-                        solution->motion[1],
-                        solution->motion[2],
-                        solution->motion[3],
-                        solution->motion[4],
-                        solution->motion[5]
-                       );
+    
+    m = solution->motion;
+    fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1050,6 +1031,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                                                    bvhTargetTransform,
                                                                                                    ikConfig->verbose
                                                                                                  );
+                                                                                                 
             if (previousMAEInPixels<*finalMAEInPixels)
             {
                 if (ikConfig->considerPreviousSolution)
