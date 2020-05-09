@@ -1,11 +1,7 @@
 #include "hardcodedProblems_inverseKinematics.h"
 
-#include "bvh_inverseKinematics.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-
-
 
 int prepareProblem(
     struct ikProblem * problem,
