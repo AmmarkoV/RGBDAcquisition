@@ -359,7 +359,11 @@ float calculateChainLoss(
     float loss=0;
     if (chainID<problem->numberOfChains)
     {
-        //fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
+        if (partIDStart >= problem->chain[chainID].numberOfParts)
+        {
+           fprintf(stderr,"Chain %u has  too few parts ( %u ) \n",chainID,problem->chain[chainID].numberOfParts);
+        }
+        else          
         if (
               bvh_loadTransformForMotionBuffer(
                                                                                           problem->mc,
@@ -438,32 +442,37 @@ float iteratePartLoss(
 
 
     //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
-    
+
     //WHY?
     float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
-   
+
     ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
+    unsigned int lastPartIDOfChain = problem->chain[chainID].numberOfParts;
+    if (lastPartIDOfChain>0) { --lastPartIDOfChain; }
+    unsigned int lastPartOfChainJointID = lastPartIDOfChain  = problem->chain[chainID].part[lastPartIDOfChain].jID;
+    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   
+
    //WHY?  is this not the same ?
    float initialLoss = calculateChainLoss(problem,chainID,partID);
    //float shouldBeSameAsInitialLoss = initialLoss;
-   
-   
+
+
    if (initialLoss!=initialLoss)
    {
-       fprintf(stderr,RED "Started with a NaN loss \n" NORMAL);
+       fprintf(stderr,RED "Started with a NaN loss whill processing chain %u for joint %s \n" NORMAL,chainID,jointName);
+       bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
        return initialLoss;
    }
-   
-   
+
+
    if (shouldBeSameAsInitialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Bug in optimizations loss after joint %s marking is %0.2f , previous was %0.2f \n" NORMAL,jointName,shouldBeSameAsInitialLoss,initialLoss);
        exit(0);
    }
-   
+
 
     if (initialLoss==0.0)
     {
@@ -548,13 +557,13 @@ if (iterationID==0)
 //-------------------------------------------
 
     float previousValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ;
-    float currentValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ;
-    float bestValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ;
+    float currentValues[3]    = {  originalValues[0],originalValues[1],originalValues[2] } ;
+    float bestValues[3]          = {  originalValues[0],originalValues[1],originalValues[2] } ;
 
-    float previousLoss[3] = { initialLoss, initialLoss, initialLoss };
-    float currentLoss[3]  = { initialLoss, initialLoss, initialLoss };
-    float previousDelta[3] = {0.0,0.0,0.0};
-    float gradient[3]={0.0,0.0,0.0};
+    float previousLoss[3]      = { initialLoss, initialLoss, initialLoss };
+    float currentLoss[3]         = { initialLoss, initialLoss, initialLoss };
+    float previousDelta[3]    = {0.0,0.0,0.0};
+    float gradient[3]               = {0.0,0.0,0.0};
 
     float bestLoss = initialLoss;
     //float loss=initialLoss;

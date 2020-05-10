@@ -364,17 +364,27 @@ int bvh_shouldJoinBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhT
  //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
  if (jID>=MAX_BVH_JOINT_HIERARCHY_SIZE) { return 0; }
  
- if (!bvhTransform->useOptimizations)
- { //If we are not using optimizations then transform this joint 
-     return 1;
- }  else  
-  if ( (bvhTransform->useOptimizations) && (!bvhTransform->joint[jID].skipCalculations) )
-  {
-      //If we are using optimizations and this joint is not skipped then transform this joint
-      return 1;
-  }
+//If we are not using optimizations then transform this joint 
+if (!bvhTransform->useOptimizations) {   return 1; }  else  
+//If we are using optimizations and this joint is not skipped then transform this joint
+if ( (bvhTransform->useOptimizations) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
+
 
  return 0;
+}
+
+
+
+int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
+{ 
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+     if (!bvhTransform->joint[jID].skipCalculations)
+     {
+         fprintf(stderr,"Joint %u ( %s ) is selected \n" ,jID , bvhMotion->jointHierarchy[jID].jointName);
+     }
+   }
+
 }
 
 
@@ -407,7 +417,8 @@ int bvh_markJointAndParentsAsUsefulInTransform(
   if (bvhTransform==0) { return 0; }
  if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
-
+ 
+  //We want to make sure all parent joints until root ( jID->0 ) are set to not skip calculations..
   while (jID!=0)
       {
            bvhTransform->joint[jID].skipCalculations=0;
