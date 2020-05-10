@@ -742,7 +742,6 @@ int bvhTestIK(
                     ikConfig.iterations = iterations;
                     ikConfig.epochs = epochs;
                     ikConfig.spring = spring;
-                    ikConfig.springIgnoresIterativeChanges = springIgnoresIterativeChanges;
                     ikConfig.dumpScreenshots = 1;
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
                     ikConfig.verbose = 1;

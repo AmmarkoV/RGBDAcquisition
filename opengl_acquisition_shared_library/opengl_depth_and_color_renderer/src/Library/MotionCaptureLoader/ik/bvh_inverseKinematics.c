@@ -30,10 +30,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
- 
-//Switch to remember previos solutions and not rely only on initial solution
-#define REMEMBER_PREVIOUS_SOLUTION 1
- 
+  
 
 unsigned long tickBaseIK = 0;
 
@@ -405,8 +402,7 @@ float iteratePartLoss(
                                            float maximumAcceptableStartingLoss,
                                            unsigned int epochs,
                                            unsigned int tryMaintainingLocalOptima,
-                                           float spring,
-                                           unsigned int springIgnoresIterativeChanges,
+                                           float spring, 
                                            unsigned int verbose
                                           )
 {
@@ -425,14 +421,7 @@ float iteratePartLoss(
          problem->chain[chainID].currentSolution->motion[mIDS[0]],
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
-    };
- 
-    if (springIgnoresIterativeChanges)
-    {
-        originalValues[0] = problem->initialSolution->motion[mIDS[0]];
-        originalValues[1] = problem->initialSolution->motion[mIDS[1]];
-        originalValues[2] = problem->initialSolution->motion[mIDS[2]];
-    } 
+    }; 
 
     const char * jointName = problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName;
 
@@ -473,7 +462,6 @@ float iteratePartLoss(
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
-#if REMEMBER_PREVIOUS_SOLUTION
 //We only need to do this on the first iteration
 //We dont want to constantly overwrite values with previous solutions and sabotage next iterations
 if (iterationID==0)
@@ -512,8 +500,7 @@ if (iterationID==0)
                problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2]; 
             } 
     }
-}
-#endif // REMEMBER_PREVIOUS_SOLUTION
+} 
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
@@ -530,6 +517,9 @@ if (iterationID==0)
 
     float bestLoss = initialLoss;
     float loss=initialLoss;
+
+    //Gradual fine tuning.. On a first glance it works worse..
+    //lr = lr / iterationID;
 
     unsigned int consecutiveBadSteps=0;
     unsigned int maximumConsecutiveBadEpochs=4;
@@ -654,7 +644,7 @@ if (iterationID==0)
                 (fabs(delta[2]>300))
              )
         {
-            fprintf(stderr,RED "EXPLODING GRADIENT!\n" NORMAL);
+            fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,i,epochs);
             fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
             fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
             fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
@@ -775,8 +765,7 @@ int iterateChainLoss(
                                          float maximumAcceptableStartingLoss,
                                          unsigned int epochs,
                                          unsigned int tryMaintainingLocalOptima,
-                                         float spring,
-                                         unsigned int springIgnoresIterativeChanges,
+                                         float spring, 
                                          unsigned int verbose
                                        )
 {
@@ -786,7 +775,7 @@ int iterateChainLoss(
     for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
     {
         if (!problem->chain[chainID].part[partID].endEffector)
-        {
+        { //If the part is  not an end effector it has parameters to change and improve
             iteratePartLoss(
                                             problem,
                                             iterationID,
@@ -796,8 +785,7 @@ int iterateChainLoss(
                                             maximumAcceptableStartingLoss,
                                             epochs,
                                             tryMaintainingLocalOptima,
-                                            spring,
-                                            springIgnoresIterativeChanges,
+                                            spring, 
                                             verbose
                                         );
          }
@@ -944,8 +932,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->epochs,
                                                ikConfig->tryMaintainingLocalOptima,
-                                               ikConfig->spring,
-                                               ikConfig->springIgnoresIterativeChanges,
+                                               ikConfig->spring, 
                                                ikConfig->verbose
                                              );
         }
