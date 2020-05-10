@@ -281,7 +281,7 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
     
     //Actual copy
     if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  { return 0; }
-    //if (!copyMotionBuffer(problem->initialSolution,updatedSolution) ) { return 0; }
+    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )      { return 0; }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
@@ -849,6 +849,7 @@ int ensureInitialPositionIsInFrustrum(
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                                                                                   struct BVH_MotionCapture * mc,
                                                                                                                                   struct simpleRenderer *renderer,
+                                                                                                                                   struct ikProblem * problem,
                                                                                                                                   struct ikConfiguration * ikConfig,
                                                                                                                                   //---------------------------------
                                                                                                                                   struct MotionBuffer * previousSolution,
@@ -882,41 +883,18 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         exit(0);
     }
 
-    struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
-    if (problem!=0)
-    {
-         memset(problem,0,sizeof(struct ikProblem));
-    } else
-    {
-        fprintf(stderr,"Failed to allocate memory for our IK problem..\n");
-        return 0;
-    }
-   
 
     ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
-
-
-
-    if (!prepareDefaultBodyProblem(
-                problem,
-                mc,
-                renderer,
-                previousSolution,
-                solution,
-                bvhTargetTransform
-            )
-       )
-    {
-        fprintf(stderr,"Could not prepare the problem for IK solution\n");
-        free(problem);
-        return 0;
-    }
-
+    
+    //Make sure our problem has the correct details ..
+    updateProblemSolutionToAllChains(problem,solution);
+    problem->bvhTarget2DProjectionTransform =  bvhTargetTransform;  
+    if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }
+    
+    
     //Don't spam console..
     //viewProblem(problem);
-     
-
-
+    
     float previousMAEInPixels=1000000; //Big invalid number
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -924,43 +902,20 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     struct BVH_Transform bvhCurrentTransform= {0};
 
 
-    if (
-        bvh_loadTransformForMotionBuffer(
-            mc,
-            problem->initialSolution->motion,
-            &bvhCurrentTransform,
-            0// We don't need extra structures
-        )
+    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,0)// We don't need extra structures
     )
     {  
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
         {
-            *initialMAEInPixels = meanBVH2DDistance(
-                                                                                                    mc,
-                                                                                                    renderer,
-                                                                                                    1,
-                                                                                                    0,
-                                                                                                    &bvhCurrentTransform,
-                                                                                                    bvhTargetTransform,
-                                                                                                    ikConfig->verbose
-                                                                                                  );
+            *initialMAEInPixels = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
         }
         //----------------------------------------------------
 
 
         if ( (initialMAEInMM!=0) && (groundTruth!=0) )
         {
-            *initialMAEInMM = meanBVH3DDistance(
-                                                                                                mc,
-                                                                                                renderer,
-                                                                                                1,
-                                                                                                0,
-                                                                                                problem->initialSolution->motion,
-                                                                                                &bvhCurrentTransform,
-                                                                                                groundTruth->motion,
-                                                                                                bvhTargetTransform
-                                                                                              );
+            *initialMAEInMM = meanBVH3DDistance(mc,renderer,1,0,problem->initialSolution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
 
@@ -1079,9 +1034,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
 
 
-    //Cleanup allocations needed for the problem..
-    cleanProblem(problem);
-    free(problem);
+
     return 1;
 }
 

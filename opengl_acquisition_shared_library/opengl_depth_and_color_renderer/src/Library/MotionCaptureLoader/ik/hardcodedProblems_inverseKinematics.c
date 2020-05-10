@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int prepareDefaultBodyProblem(
     struct ikProblem * problem,
@@ -667,7 +668,7 @@ int writeHTML(
 
 
 
-// ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100
+// ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 15
 
 int bvhTestIK(
     struct BVH_MotionCapture * mc,
@@ -749,10 +750,35 @@ int bvhTestIK(
                     ikConfig.ikVersion = IK_VERSION;
                     //------------------------------------
 
+
+    
+                       struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+                      if (problem!=0)
+                                     { memset(problem,0,sizeof(struct ikProblem)); } else
+                                     { fprintf(stderr,"Failed to allocate memory for our IK problem..\n");  return 0; }
+
+                        if (!prepareDefaultBodyProblem(
+                                                                                            problem,
+                                                                                            mc,
+                                                                                            &renderer,
+                                                                                            previousSolution,
+                                                                                            solution,
+                                                                                            &bvhTargetTransform
+                                                                                        )
+                         )
+                        {
+                               fprintf(stderr,"Could not prepare the problem for IK solution\n");
+                               free(problem);
+                               return 0;
+                         }
+
+
+
                     if (
                         approximateBodyFromMotionBufferUsingInverseKinematics(
                             mc,
                             &renderer,
+                            problem,
                             &ikConfig,
                             //---------------
                             previousSolution,
@@ -795,6 +821,10 @@ int bvhTestIK(
                             ikConfig.dumpScreenshots
                         );
                         //-------------------------------------------------------------------------------------------------
+                        
+                       //Cleanup allocations needed for the problem..
+                       cleanProblem(problem);
+                       free(problem); 
                     }
                     else
                     {

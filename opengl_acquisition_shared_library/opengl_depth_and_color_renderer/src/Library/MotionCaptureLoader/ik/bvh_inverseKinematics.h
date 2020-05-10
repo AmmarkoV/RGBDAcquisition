@@ -102,6 +102,7 @@ int cleanProblem(struct ikProblem * problem);
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
+                                         struct ikProblem * problem,
                                          struct ikConfiguration * ikConfig,
                                          //---------------------------------
                                          struct MotionBuffer * previousSolution,
