@@ -172,14 +172,12 @@ int bvh_projectTo2D(
 {
       bvhTransform->jointsOccludedIn2DProjection=0;
       unsigned int pointsDumped=0;
-      float position2DX=0.0;
-      float position2DY=0.0;
-      float position2DW=0.0;
+      
+      float position2D[3]={0.0,0.0,0.0}; 
 
 
       //Then project 3D positions on 2D frame and save results..
-      unsigned int jID=0;
-      for (jID=0; jID<mc->jointHierarchySize; jID++)
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
       {
         if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
         {
@@ -200,9 +198,9 @@ int bvh_projectTo2D(
            simpleRendererRenderUsingPrecalculatedMatrices(
                                                           renderer,
                                                           pos3DFloat,
-                                                          &position2DX,
-                                                          &position2DY,
-                                                          &position2DW
+                                                          &position2D[0],
+                                                          &position2D[1],
+                                                          &position2D[2]
                                                          );
           }
     //-------------------------------------------------------------------------------------------
@@ -223,9 +221,9 @@ int bvh_projectTo2D(
                                  pos3DCenterFloat,
                                  0,
                                  0,
-                                 &position2DX,
-                                 &position2DY,
-                                 &position2DW
+                                 &position2D[0],
+                                 &position2D[1],
+                                 &position2D[2]
                                );
 
             //Should this only happen when position2DW>=0.0
@@ -235,15 +233,15 @@ int bvh_projectTo2D(
            }
     //-------------------------------------------------------------------------------------------
 
-           if (position2DW<0.0)
+           if (position2D[2]<0.0)
            {
               bvhTransform->joint[jID].pos2D[0] = 0.0;
               bvhTransform->joint[jID].pos2D[1] = 0.0;
               bvhTransform->joint[jID].isBehindCamera=1;
            } else
            {
-              bvhTransform->joint[jID].pos2D[0] = (double) position2DX;
-              bvhTransform->joint[jID].pos2D[1] = (double) position2DY;
+              bvhTransform->joint[jID].pos2D[0] = (double) position2D[0];
+              bvhTransform->joint[jID].pos2D[1] = (double) position2D[1];
               bvhTransform->joint[jID].pos2DCalculated=1;
            }
 
@@ -255,18 +253,8 @@ int bvh_projectTo2D(
     if (occlusions)
      {
       //Also project our Torso coordinates..
-      bvh_populateRectangle2DFromProjections(
-                                             mc,
-                                             bvhTransform,
-                                             &bvhTransform->torso
-                                            );
-
-
-
-       bvh_projectTo2DHandleOcclusions(
-                                       mc,
-                                       bvhTransform
-                                      );
+       bvh_populateRectangle2DFromProjections(mc,bvhTransform,&bvhTransform->torso); 
+       bvh_projectTo2DHandleOcclusions(mc,bvhTransform);
      //------------------------------------------------------------------------------------------
      }//End of occlusion code
 

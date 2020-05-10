@@ -356,7 +356,7 @@ float calculateChainLoss(
                                                  )
 {
     unsigned int numberOfSamples=0;
-    float loss=0.0;
+    float loss=0;
     if (chainID<problem->numberOfChains)
     {
         //fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
@@ -437,15 +437,23 @@ float iteratePartLoss(
 
 
     //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
+    
+    //WHY?
     float initialLoss = calculateChainLoss(problem,chainID,partID);
    
     ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    
-   //Why is this not the same ?
-   // float initialLoss = calculateChainLoss(problem,chainID,partID);
-
+   //WHY?  is this not the same ?
+   float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
+   
+   if (shouldBeSameAsInitialLoss!=initialLoss)
+   {
+       fprintf(stderr,RED "Bug in optimizations loss after joint marking is %0.2f , previous was %0.2f \n" NORMAL,shouldBeSameAsInitialLoss,initialLoss);
+       exit(0);
+   }
+   
 
     if (initialLoss==0.0)
     {
