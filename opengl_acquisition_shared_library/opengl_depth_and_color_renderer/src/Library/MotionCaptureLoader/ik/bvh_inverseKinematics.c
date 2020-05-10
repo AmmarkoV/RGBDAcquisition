@@ -522,8 +522,8 @@ if (iterationID==0)
     //lr = lr / iterationID;
 
     unsigned int consecutiveBadSteps=0;
-    unsigned int maximumConsecutiveBadEpochs=4;
-    float e=0.0001;
+    unsigned int maximumConsecutiveBadEpochs=3;
+    float e=0.00001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
     float distanceFromInitial; 
@@ -639,9 +639,9 @@ if (iterationID==0)
 
 
         if  ( 
-                (fabs(delta[0]>300)) ||
-                (fabs(delta[1]>300)) ||
-                (fabs(delta[2]>300))
+                (fabs(delta[0]>250)) ||
+                (fabs(delta[1]>250)) ||
+                (fabs(delta[2]>250))
              )
         {
             fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,i,epochs);
@@ -655,6 +655,11 @@ if (iterationID==0)
              delta[0]=lr; 
              delta[1]=lr; 
              delta[2]=lr; 
+             //Also throw eroneous loss out of the window
+             //This is *NOT* the correct loss but it is sure much better than exploding
+             currentLoss[0]=previousLoss[0];
+             currentLoss[1]=previousLoss[1];
+             currentLoss[2]=previousLoss[2];
         }
 
         //Safeguard against division with zero..
@@ -693,7 +698,7 @@ if (iterationID==0)
 
 
 
-        // If loss is not a number
+        // If loss is NaN
         if (loss!=loss)
         {
             //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
