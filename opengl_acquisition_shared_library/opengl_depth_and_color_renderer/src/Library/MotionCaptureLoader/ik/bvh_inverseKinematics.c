@@ -1,3 +1,12 @@
+/*
+ * bvh_inverseKinematics.c
+ *
+ * This file contains an implementation of my inverse kinematics algorithm
+ *
+ * Ammar Qammaz, May 2020
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -359,7 +368,7 @@ float calculateChainLoss(
                                                                                           0//Dont populate extra structures we dont need them they just take time
                                                                                         )
             )
-        { 
+        {
             if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
             {
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -422,18 +431,31 @@ float iteratePartLoss(
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
     }; 
-
-    const char * jointName = problem->mc->jointHierarchy[problem->chain[chainID].part[partID].jID].jointName;
+     
+    unsigned int jointID = problem->chain[chainID].part[partID].jID;
+    const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
 
 
     //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
     float initialLoss = calculateChainLoss(problem,chainID,partID);
+   
+    ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
+    bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
+   //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   
+   //Why is this not the same ?
+   // float initialLoss = calculateChainLoss(problem,chainID,partID);
+
 
     if (initialLoss==0.0)
     {
-        //If our loss is perfect we can't ( and wont ) improve it..
+        //If our loss is perfect we obviously can't improve it..
         if (verbose)
                { fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,jointName); }
+
+       ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
+       bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
+       ///-------------------------------------------------------------------------------------------------------------------------------         
         return initialLoss;
     }
 
@@ -448,13 +470,15 @@ float iteratePartLoss(
         {
             if (verbose)
                     { fprintf( stderr, RED"\nWon't optimize %s,  exceeded maximum acceptable starting loss by %0.2f%%\n" NORMAL,jointName, ((float) 100*initialLoss/maximumAcceptableStartingLoss) ); }
+
+             ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
+             bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
+             ///-------------------------------------------------------------------------------------------------------------------------------                     
             return initialLoss;
         }
     }
 
-    ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
-    bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->chain[chainID].part[partID].jID);
-   //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
     if (verbose)
           { fprintf(stderr,"\nOptimizing %s (initial loss %0.2f, iteration %u , chain %u, part %u)\n",jointName,initialLoss,iterationID,chainID,partID); }
@@ -523,7 +547,7 @@ if (iterationID==0)
     unsigned int consecutiveBadSteps=0;
     float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     unsigned int maximumConsecutiveBadEpochs=3;
-    float e=0.00001;
+    float e=0.000001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
     float distanceFromInitial; 
@@ -585,6 +609,10 @@ if (iterationID==0)
             //we will try to maintain it..!
 
             if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
+             
+             ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
+             bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
+             ///------------------------------------------------------------------------------------------------------------------------------- 
             return initialLoss;
         }
 
@@ -604,69 +632,62 @@ if (iterationID==0)
 
 
     unsigned int executedEpochs=epochs;
-    for (unsigned int i=0; i<epochs; i++)
+    for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
-//-------------------
+        //Calculate losses
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
         currentLoss[0]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
-//-------------------
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
         currentLoss[1]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
-//-------------------
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
         currentLoss[2]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
-//-------------------
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
         
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         previousDelta[0]=delta[0]; 
         gradient[0] =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
         delta[0] =  beta * delta[0] + (float) lr * gradient[0];
-
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         previousDelta[1]=delta[1]; 
         gradient[1] =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
         delta[1] =  beta * delta[1] + (float) lr * gradient[1];
-
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         previousDelta[2]=delta[2]; 
         gradient[2] =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
         delta[2] =  beta * delta[2] + (float) lr * gradient[2];
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
 
         if  ( 
-                //Large gradient
-                ( (fabs(delta[0]>250)) || (fabs(delta[1]>250)) || (fabs(delta[2]>250)) ) ||
-                //NaN gradient
-                 ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) )
+                //Safeguard agains gradient explosions which we detect when we see large gradients or NaNs
+                 (fabs(delta[0]>250)) || (fabs(delta[1]>250)) || (fabs(delta[2]>250))  ||  (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) 
              )
         {
-            fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,i,epochs);
+            fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,currentEpoch,epochs);
             fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
             fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
             fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
             fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
             fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
             fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
-            /*
-            //Trying to save the day...
-             delta[0]=lr; 
-             delta[1]=lr; 
-             delta[2]=lr; 
-             //Also throw eroneous loss out of the window
-             //This is *NOT* the correct loss but it is sure much better than exploding
-             currentLoss[0]=previousLoss[0];
-             currentLoss[1]=previousLoss[1];
-             currentLoss[2]=previousLoss[2];*/
-             //Just stop after explosion..
-            executedEpochs=i;
+            
+             //Just stop after an explosion..
+            executedEpochs=currentEpoch;
              break;
         }
- 
+         
+        //Remember previous loss/values 
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
         previousLoss[2]=currentLoss[2];
@@ -696,8 +717,8 @@ if (iterationID==0)
         {
             //Immediately terminate when encountering NaN, it will be a waste of resources otherwise
             if (verbose)
-                    { fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,currentValues[0],currentValues[1],currentValues[2]); }
-            executedEpochs=i;
+                    { fprintf(stderr,RED "%07u |NaN| %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,currentEpoch,currentValues[0],currentValues[1],currentValues[2]); }
+            executedEpochs=currentEpoch;
             break;
         } else
         if (loss + minimumLossDeltaFromBestToBeAcceptable < bestLoss)  
@@ -709,13 +730,13 @@ if (iterationID==0)
             bestValues[2]=currentValues[2];
             consecutiveBadSteps=0;
             if (verbose)
-                  { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
+                  { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",currentEpoch,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
         }
         else
         { //Loss has not been improved..!
             ++consecutiveBadSteps;
             if (verbose)
-                 { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]); }
+                  { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n" NORMAL,currentEpoch,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
         }
 
 
@@ -724,7 +745,7 @@ if (iterationID==0)
         {
             if (verbose)
                  { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); }
-            executedEpochs=i;
+            executedEpochs=currentEpoch;
             break;
         }
     }
@@ -745,7 +766,7 @@ if (iterationID==0)
     problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
 
    ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->chain[chainID].part[partID].jID);
+    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
     ///-------------------------------------------------------------------------------------------------------------------------------
 
     return bestLoss;
@@ -808,7 +829,7 @@ int ensureInitialPositionIsInFrustrum(
   //TODO : 
    //Ensure that  pose is not out of the bounds of camera ?
    //If it is inverse kinematics wont know what to do..
-    if (solution->motion[2]>-1 * closestDistanceToCameraInCM)
+    if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
     {
         fprintf(stderr,RED "Warning: Detected pose behind camera! ..\n" NORMAL);
         if ( (previousSolution!=0) && (previousSolution->motion!=0) )
@@ -816,11 +837,18 @@ int ensureInitialPositionIsInFrustrum(
             if (previousSolution->motion[2] < -1 * closestDistanceToCameraInCM)
                     {
                         fprintf(stderr,GREEN "Fixed using previous frame ! ..\n" NORMAL);
+                        solution->motion[0]=previousSolution->motion[0]; 
+                        solution->motion[1]=previousSolution->motion[1]; 
+                        /// This is the most important  --------------------------------
                         solution->motion[2]=previousSolution->motion[2]; 
+                        ///-------------------------------------------------------------------------
+                        solution->motion[3]=previousSolution->motion[3]; 
+                        solution->motion[4]=previousSolution->motion[4]; 
+                        solution->motion[5]=previousSolution->motion[5]; 
                     } 
         }
 
-        if (solution->motion[2]>-1 * closestDistanceToCameraInCM)
+        if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
         {  
                  fprintf(stderr,RED "Warning: Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
                  solution->motion[2]=-140;
