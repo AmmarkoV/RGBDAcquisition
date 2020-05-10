@@ -440,7 +440,7 @@ float iteratePartLoss(
     if (maximumAcceptableStartingLoss>0.0)
     {
         //The positional subproblem gets a pass to help the other joints..
-        int isItThePositionalSubproblem = ( (partID==0) &&  (chainID==0) ); 
+        int isItThePositionalSubproblem = ( (partID==0) && ( (chainID==0) || chainID==1) ); 
         
         //If we are really.. really.. far from the solution we might not want to try and do IK
         //as it will improve loss but may lead to a weird incorrect pose 
@@ -513,7 +513,6 @@ if (iterationID==0)
     float currentLoss[3]  = { initialLoss, initialLoss, initialLoss };
     float previousDelta[3] = {0.0,0.0,0.0};
     float gradient[3]={0.0,0.0,0.0};
-    float currentCorrection[3] = {0.0,0.0,0.0};
 
     float bestLoss = initialLoss;
     float loss=initialLoss;
@@ -522,6 +521,7 @@ if (iterationID==0)
     //lr = lr / iterationID;
 
     unsigned int consecutiveBadSteps=0;
+    float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     unsigned int maximumConsecutiveBadEpochs=3;
     float e=0.00001;
     float d=lr; //0.0005;
@@ -639,9 +639,10 @@ if (iterationID==0)
 
 
         if  ( 
-                (fabs(delta[0]>250)) ||
-                (fabs(delta[1]>250)) ||
-                (fabs(delta[2]>250))
+                //Large gradient
+                ( (fabs(delta[0]>250)) || (fabs(delta[1]>250)) || (fabs(delta[2]>250)) ) ||
+                //NaN gradient
+                 ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) )
              )
         {
             fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,i,epochs);
@@ -660,18 +661,11 @@ if (iterationID==0)
              currentLoss[0]=previousLoss[0];
              currentLoss[1]=previousLoss[1];
              currentLoss[2]=previousLoss[2];
+             //Just stop after explosion so previous changes are not really used..
+            executedEpochs=i;
+             break;
         }
-
-        //Safeguard against division with zero..
-        if (delta[0]!=delta[0]) { delta[0]=lr; }
-        if (delta[1]!=delta[1]) { delta[1]=lr; }
-        if (delta[2]!=delta[2]) { delta[2]=lr; }
-
-        //We remember our new "previous" state
-        currentCorrection[0] = previousValues[0] - currentValues[0];
-        currentCorrection[1] = previousValues[1] - currentValues[1];
-        currentCorrection[2] = previousValues[2] - currentValues[2];
-        //----------------------------------------------
+ 
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
         previousLoss[2]=currentLoss[2];
@@ -686,6 +680,7 @@ if (iterationID==0)
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
         //----------------------------------------------
+         
         
         //We store our new values and calculate our new loss
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
@@ -694,9 +689,6 @@ if (iterationID==0)
         //----------------------------------------------
         loss=calculateChainLoss(problem,chainID,partID);
         //----------------------------------------------
-        
-
-
 
         // If loss is NaN
         if (loss!=loss)
@@ -707,7 +699,7 @@ if (iterationID==0)
             executedEpochs=i;
             break;
         } else
-        if (loss<bestLoss)  
+        if (loss + minimumLossDeltaFromBestToBeAcceptable < bestLoss)  
         {
             //Loss has been improved..!
             bestLoss=loss;
@@ -716,7 +708,7 @@ if (iterationID==0)
             bestValues[2]=currentValues[2];
             consecutiveBadSteps=0;
             if (verbose)
-                  { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],currentCorrection[0],currentValues[1],currentCorrection[1],currentValues[2],currentCorrection[2]); }
+                  { fprintf(stderr,"%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n",i,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
         }
         else
         { //Loss has not been improved..!
