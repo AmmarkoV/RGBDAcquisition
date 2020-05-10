@@ -94,6 +94,7 @@ int bvh_populateRectangle2DFromProjections(
                                           );
 
 
+int bvh_shouldJoinBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID);
 
 int bvh_markAllJointsAsUselessInTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform);
 

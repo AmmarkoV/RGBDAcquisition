@@ -358,7 +358,24 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 #endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
+int bvh_shouldJoinBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
+{ 
+  if (bvhTransform==0) { return 0; }
+ //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
+ if (jID>=MAX_BVH_JOINT_HIERARCHY_SIZE) { return 0; }
+ 
+ if (!bvhTransform->useOptimizations)
+ { //If we are not using optimizations then transform this joint 
+     return 1;
+ }  else  
+  if ( (bvhTransform->useOptimizations) && (!bvhTransform->joint[jID].skipCalculations) )
+  {
+      //If we are using optimizations and this joint is not skipped then transform this joint
+      return 1;
+  }
 
+ return 0;
+}
 
 
 int bvh_markAllJointsAsUselessInTransform(
@@ -388,6 +405,7 @@ int bvh_markJointAndParentsAsUsefulInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
+ if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
 
   while (jID!=0)
@@ -410,6 +428,7 @@ int bvh_markJointAndParentsAsUselessInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
+ if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
 
   while (jID!=0)
@@ -432,13 +451,10 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
+ if (jID>=bvhMotion->jointHierarchySize) { return 0; }
 
-  bvh_markJointAndParentsAsUselessInTransform(
-                                              bvhMotion ,
-                                              bvhTransform,
-                                              jID
-                                             );
-
+  bvhTransform->useOptimizations=1;
+  bvh_markJointAndParentsAsUselessInTransform(bvhMotion,bvhTransform,jID);
   bvhTransform->joint[jID].skipCalculations=0;
 
   return 1;
@@ -493,7 +509,7 @@ int bvh_loadTransformForMotionBuffer(
   //----------------------------------------------------------------------------------------
   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
+     if (bvh_shouldJoinBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
       //To Setup the dynamic transformation we must first get values from our bvhMotion structure
       if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
@@ -553,7 +569,7 @@ int bvh_loadTransformForMotionBuffer(
   //-----------------------------------------------------------------------
   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-    if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
+    if (bvh_shouldJoinBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
      //This will get populated either way..
      //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);

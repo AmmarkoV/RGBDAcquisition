@@ -450,6 +450,14 @@ float iteratePartLoss(
    float initialLoss = calculateChainLoss(problem,chainID,partID);
    //float shouldBeSameAsInitialLoss = initialLoss;
    
+   
+   if (initialLoss!=initialLoss)
+   {
+       fprintf(stderr,RED "Started with a NaN loss \n" NORMAL);
+       return initialLoss;
+   }
+   
+   
    if (shouldBeSameAsInitialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Bug in optimizations loss after joint %s marking is %0.2f , previous was %0.2f \n" NORMAL,jointName,shouldBeSameAsInitialLoss,initialLoss);
