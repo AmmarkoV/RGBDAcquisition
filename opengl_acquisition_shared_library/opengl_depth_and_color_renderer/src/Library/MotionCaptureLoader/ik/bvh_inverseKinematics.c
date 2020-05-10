@@ -388,11 +388,12 @@ float calculateChainLoss(
                             ++numberOfSamples;
                         }
                 } //We add ever part of this chain
-            } // We successfully projected the BVH file to 2D points..
-
-        } //Have a valid 2D transform
-    } //Have a valid chain
-
+            } else  // We successfully projected the BVH file to 2D points..
+           { fprintf(stderr,RED "Could not calculate transform projections to 2D for chain %u \n"NORMAL,chainID); }
+        } else //Have a valid 2D transform
+       { fprintf(stderr,RED "Could not calculate transform for chain %u is invalid\n"NORMAL,chainID); }
+    } else //Have a valid chain
+    { fprintf(stderr,RED "Chain %u is invalid\n"NORMAL,chainID); }
     //I have left 0/0 on purpose to cause NaNs when projection errors occur
     //----------------------------------------------------------------------------------------------------------
     if (numberOfSamples!=0) { loss = (float) loss/numberOfSamples; }  else
@@ -439,18 +440,19 @@ float iteratePartLoss(
     //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
     
     //WHY?
-    float initialLoss = calculateChainLoss(problem,chainID,partID);
+    float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
    
     ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    
    //WHY?  is this not the same ?
-   float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
+   float initialLoss = calculateChainLoss(problem,chainID,partID);
+   //float shouldBeSameAsInitialLoss = initialLoss;
    
    if (shouldBeSameAsInitialLoss!=initialLoss)
    {
-       fprintf(stderr,RED "Bug in optimizations loss after joint marking is %0.2f , previous was %0.2f \n" NORMAL,shouldBeSameAsInitialLoss,initialLoss);
+       fprintf(stderr,RED "Bug in optimizations loss after joint %s marking is %0.2f , previous was %0.2f \n" NORMAL,jointName,shouldBeSameAsInitialLoss,initialLoss);
        exit(0);
    }
    
