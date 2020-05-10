@@ -440,23 +440,21 @@ float iteratePartLoss(
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
 
-
-    //This has to happen before the transform economy call (bvh_markJointAsUsefulAndParentsAsUselessInTransform) or all hell will break loose..
-
-    //WHY?
-    float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
-
-    ///This is an important call to make sure that we only update this joint and its children but not its parents ( for performance reasons.. )
-    unsigned int lastPartIDOfChain = problem->chain[chainID].numberOfParts;
+  unsigned int lastPartIDOfChain = problem->chain[chainID].numberOfParts;
     if (lastPartIDOfChain>0) { --lastPartIDOfChain; }
     unsigned int lastPartOfChainJointID = lastPartIDOfChain  = problem->chain[chainID].part[lastPartIDOfChain].jID;
+  
+    //In order to proeprly initialize all the transforms up to our joint we first have to mark our joint and its parents as usefull!
+    //If problem->chain[chainID].current2DProjectionTransform is not properly initialized than transformations will fail leading to a NaN 
+    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
+    float initialLoss = calculateChainLoss(problem,chainID,partID);
+
+    ///From here on we only need to update this joint and its children ( and we dont care about their parents since they dont change  for performance reasons.. )
     bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-   //WHY?  is this not the same ?
-   float initialLoss = calculateChainLoss(problem,chainID,partID);
-   //float shouldBeSameAsInitialLoss = initialLoss;
+
 
 
    if (initialLoss!=initialLoss)
@@ -466,13 +464,14 @@ float iteratePartLoss(
        return initialLoss;
    }
 
-
+/* Debug optimizations..
+   float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
    if (shouldBeSameAsInitialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Bug in optimizations loss after joint %s marking is %0.2f , previous was %0.2f \n" NORMAL,jointName,shouldBeSameAsInitialLoss,initialLoss);
        exit(0);
    }
-
+*/
 
     if (initialLoss==0.0)
     {
