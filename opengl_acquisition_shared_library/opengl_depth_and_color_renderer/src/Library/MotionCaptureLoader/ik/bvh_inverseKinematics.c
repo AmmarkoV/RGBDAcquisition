@@ -988,15 +988,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if (finalMAEInPixels!=0)
         {
-            *finalMAEInPixels  = meanBVH2DDistance(
-                                                                                                   mc,
-                                                                                                   renderer,
-                                                                                                   1,
-                                                                                                   0,
-                                                                                                   &bvhCurrentTransform,
-                                                                                                   bvhTargetTransform,
-                                                                                                   ikConfig->verbose
-                                                                                                 );
+            *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
                                                                                                  
             if (previousMAEInPixels<*finalMAEInPixels)
             {
@@ -1010,16 +1002,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if ( (finalMAEInMM!=0) && (groundTruth!=0) )
         {
-            *finalMAEInMM = meanBVH3DDistance(
-                                                                                              mc,
-                                                                                              renderer,
-                                                                                              1,
-                                                                                              0,
-                                                                                              solution->motion,
-                                                                                              &bvhCurrentTransform,
-                                                                                              groundTruth->motion,
-                                                                                              bvhTargetTransform
-                                                                                            );
+            *finalMAEInMM = meanBVH3DDistance(mc,renderer,1,0,solution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
     }
