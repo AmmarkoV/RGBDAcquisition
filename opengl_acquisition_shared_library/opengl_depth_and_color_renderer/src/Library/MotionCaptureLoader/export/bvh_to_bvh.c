@@ -106,24 +106,23 @@ int dumpBVHToBVH(
    {
      fprintf(fp,"HIERARCHY\n");
      //--------------------------------------------------------------------------------------
-     unsigned int nextHierarchyLevel = 0;
+     unsigned int nextHierarchyLevel; // This gets always overwritten.. = 0;
      unsigned int hasNext=0;
-
-     BVHJointID jID;
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+ 
+     for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
         {
           unsigned int currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
 
           if (jID+1<mc->jointHierarchySize) { hasNext=1; }
 
           if (hasNext) { nextHierarchyLevel=mc->jointHierarchy[jID+1].hierarchyLevel; } else
-                       { nextHierarchyLevel=0; }
+                                  { nextHierarchyLevel=0; }
 
           writeBVHHierarchyOpenningSection(fp,mc,jID);
 
           if (nextHierarchyLevel < currentHierarchyLevel)
           {
-           writeBVHHierarchyClosingSection(
+              writeBVHHierarchyClosingSection(
                                             fp ,
                                             mc,
                                             nextHierarchyLevel,
@@ -136,12 +135,10 @@ int dumpBVHToBVH(
       //--------------------------------------------------------------------------------------
       fprintf(fp,"Frames: %u\n",mc->numberOfFrames);
       fprintf(fp,"Frame Time: %0.8f\n",mc->frameTime);
-
-      unsigned int fID=0;
-      unsigned int mID=0;
-      for (fID=0; fID<mc->numberOfFrames; fID++)
+ 
+      for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
       {
-        for ( mID=fID*mc->numberOfValuesPerFrame; mID<(fID+1)*mc->numberOfValuesPerFrame; mID++)
+        for (unsigned int mID=fID*mc->numberOfValuesPerFrame; mID<(fID+1)*mc->numberOfValuesPerFrame; mID++)
          {
            if (valueIsZero(mc->motionValues[mID]))
            {

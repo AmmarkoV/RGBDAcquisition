@@ -225,20 +225,21 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                if (debug) fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
                //Store new Joint Hierarchy Level
                //Rest of the information will be filled in when we reach an {
-               bvhMotion->rootJointID=jNum;
-               bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
-               bvhMotion->jointHierarchy[jNum].isRoot=1;
-               //Update lookup table to remember ordering
-               bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
-
-               currentJoint=jNum;
-
-               if (currentJoint>=MAX_BVH_JOINT_HIERARCHY_SIZE)
+                   
+               
+               if (jNum<MAX_BVH_JOINT_HIERARCHY_SIZE)
+               { 
+                 bvhMotion->rootJointID=jNum;
+                 bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+                 bvhMotion->jointHierarchy[jNum].isRoot=1;
+                 //Update lookup table to remember ordering
+                 bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame; 
+                 currentJoint=jNum; 
+                 ++jNum; 
+               } else
                {
                  fprintf(stderr,"We have run out of space for our joint hierarchy..\n");
                }
-
-               ++jNum;
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))
               {

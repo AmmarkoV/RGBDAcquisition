@@ -39,13 +39,12 @@ int bvh_mergeWith(
      }
 
      struct BVH_MergeAssociations rules={0};
-
-     unsigned int sourceJID=0,targetJID=0;
+ 
      if ( (sourceMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) && (targetMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) )
      {
-      for (sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
+      for (unsigned int sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
       {
-      for (targetJID=0; targetJID<targetMC->jointHierarchySize; targetJID++)
+      for (unsigned int targetJID=0; targetJID<targetMC->jointHierarchySize; targetJID++)
       {
        if (!sourceMC->jointHierarchy[sourceJID].isEndSite)
        {
@@ -73,18 +72,17 @@ int bvh_mergeWith(
 
      fprintf(stderr,"Will copy %u frames from source to target",targetMC->numberOfFrames);
 
-     unsigned int frameID=0,sourceMID=0,targetMID=0,channel=0;
-     for (frameID=0; frameID<targetMC->numberOfFrames; frameID++)
+     for (unsigned int frameID=0; frameID<targetMC->numberOfFrames; frameID++)
      {
-       for (sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
+       for (unsigned int sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
        {
-         sourceJID=sourceMC->motionToJointLookup[sourceMID].jointID;// channelIDMotionOffset
-         channel=sourceMC->motionToJointLookup[sourceMID].channelID;
+         unsigned int sourceJID=sourceMC->motionToJointLookup[sourceMID].jointID;// channelIDMotionOffset
+         unsigned int channel=sourceMC->motionToJointLookup[sourceMID].channelID;
          if (rules.jointAssociationSourceToTargetExists[sourceJID])
          {
-             targetJID=rules.jointAssociationSourceToTarget[sourceJID];
+             unsigned int targetJID=rules.jointAssociationSourceToTarget[sourceJID];
              //targetMID=targetMC->jointToMotionLookup[targetJID].jointMotionOffset+channel;
-             targetMID=targetMC->jointToMotionLookup[targetJID].channelIDMotionOffset[channel];
+             unsigned int targetMID=targetMC->jointToMotionLookup[targetJID].channelIDMotionOffset[channel];
              targetMC->motionValues[(frameID)*targetMC->numberOfValuesPerFrame + targetMID] = sourceMC->motionValues[(frameID)*sourceMC->numberOfValuesPerFrame + sourceMID];
          }
        }

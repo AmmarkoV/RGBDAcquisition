@@ -53,8 +53,7 @@ int bvh_PerturbJointAnglesRange(
     int success=1;
 
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0;
-    unsigned int mID=0;
+    BVHJointID jID=0; 
     fprintf(stderr,"Randomizing : ");
     unsigned int i=0;
     for (i=iplus2+1; i<=iplus2+numberOfValues; i++)
@@ -69,7 +68,7 @@ int bvh_PerturbJointAnglesRange(
          )
          {
            unsigned int channelsEncountered=0;
-           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
            {
                if ( mc->motionToJointLookup[mID].jointID == jID )
                {
@@ -102,7 +101,7 @@ int bvh_PerturbJointAnglesRange(
        unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
        unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
 
-       for (mID=mIDStart; mID<mIDEnd; mID++)
+       for (unsigned int mID=mIDStart; mID<mIDEnd; mID++)
          {
            if (selectedJoints[mID-mIDStart])
            {
@@ -171,8 +170,7 @@ int bvh_eraseJoints(
   {
     unsigned int success=1;
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0;
-    unsigned int mID=0;
+    BVHJointID jID=0; 
     fprintf(stderr,"Erasing : ");
     unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
@@ -188,7 +186,7 @@ int bvh_eraseJoints(
            fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
            mc->jointHierarchy[jID].erase2DCoordinates=1;
 
-           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
            {
                if (mc->motionToJointLookup[mID].jointID == jID)
                {
@@ -206,7 +204,7 @@ int bvh_eraseJoints(
                  mc->jointHierarchy[jIDES].erase2DCoordinates=1;
                  fprintf(stderr,GREEN "%s_EndSite " NORMAL,argv[i]);
 
-                 for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+                 for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
                    {
                       if (mc->motionToJointLookup[mID].jointID == jIDES)
                          {
@@ -225,12 +223,11 @@ int bvh_eraseJoints(
      }
     fprintf(stderr,"\n");
 
-     unsigned int fID=0;
-     for (fID=0; fID<mc->numberOfFrames; fID++)
+     for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
       {
        unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
        unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
-       for (mID=mIDStart; mID<mIDEnd; mID++)
+       for (unsigned int mID=mIDStart; mID<mIDEnd; mID++)
          {
            if (selectedJoints[mID-mIDStart])
            {

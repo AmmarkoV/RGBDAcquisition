@@ -162,16 +162,13 @@ int main(int argc,const char **argv)
 {
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
-    const char * fromBVHFile="Motions/example.bvh";
-    const char * toBVHFile="Motions/bvh.bvh";
-    const char * toSceneFile="Scenes/bvh.conf";
+    const char * fromBVHFile="Motions/example.bvh"; 
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
-    unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
-    unsigned int maxFrames = 0;
+    unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1; 
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
     //unsigned int flipOrientation = 0;
@@ -422,7 +419,7 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--maxFrames")==0)
         {
           if (i+1>=argc)  { incorrectArguments();}
-          maxFrames=atoi(argv[i+1]);
+          unsigned int maxFrames=atoi(argv[i+1]);
           //We can limit the number of frames
           if (maxFrames!=0)
             {
@@ -913,7 +910,7 @@ int main(int argc,const char **argv)
           //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
           if (i+2>=argc)  { incorrectArguments(); }
           const char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
-          toSceneFile=argv[i+2];
+          const char * toSceneFile=argv[i+2];
           //toSceneFileTRI
 
            struct bvhToTRI bvhtri={0};
@@ -925,7 +922,7 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--bvh")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
-          toBVHFile=argv[i+1];
+          const char * toBVHFile=argv[i+1];
           if (
                !dumpBVHToBVH(
                              toBVHFile,

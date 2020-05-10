@@ -515,7 +515,7 @@ if (iterationID==0)
     float gradient[3]={0.0,0.0,0.0};
 
     float bestLoss = initialLoss;
-    float loss=initialLoss;
+    //float loss=initialLoss;
 
     //Gradual fine tuning.. On a first glance it works worse..
     //lr = lr / iterationID;
@@ -652,6 +652,7 @@ if (iterationID==0)
             fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
             fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
             fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
+            /*
             //Trying to save the day...
              delta[0]=lr; 
              delta[1]=lr; 
@@ -660,8 +661,8 @@ if (iterationID==0)
              //This is *NOT* the correct loss but it is sure much better than exploding
              currentLoss[0]=previousLoss[0];
              currentLoss[1]=previousLoss[1];
-             currentLoss[2]=previousLoss[2];
-             //Just stop after explosion so previous changes are not really used..
+             currentLoss[2]=previousLoss[2];*/
+             //Just stop after explosion..
             executedEpochs=i;
              break;
         }
@@ -687,7 +688,7 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //----------------------------------------------
-        loss=calculateChainLoss(problem,chainID,partID);
+        float loss=calculateChainLoss(problem,chainID,partID);
         //----------------------------------------------
 
         // If loss is NaN
@@ -872,10 +873,19 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
     
     //Make sure our problem has the correct details ..
-    updateProblemSolutionToAllChains(problem,solution);
     problem->bvhTarget2DProjectionTransform =  bvhTargetTransform;  
-    if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }
+      
+    #define RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION 0
     
+    #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
+      updateProblemSolutionToAllChains(problem,previousSolution); 
+      if (!copyMotionBuffer(problem->previousSolution,solution) )      { return 0; }        
+    #else
+      updateProblemSolutionToAllChains(problem,solution);
+      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }         
+    #endif
+    
+     
     
     //Don't spam console..
     //viewProblem(problem);

@@ -1356,7 +1356,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"static const char * BVHOutputArrayNames[] =\n");
   fprintf(stdout,"{\n");
   char comma=',';
-  char coord='X';
+  char coord;//='X'; This is overwritten so dont need to be assigned..
   unsigned int countOfChannels=0;
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
@@ -1393,7 +1393,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 
   char label[513]={0};
   comma=',';
-  coord='X';
+  //coord='X'; It is always reassigned before use..
   countOfChannels=0;
 
   fprintf(stdout,"/**\n");

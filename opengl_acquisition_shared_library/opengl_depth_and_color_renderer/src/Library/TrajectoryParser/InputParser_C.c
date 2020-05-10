@@ -710,7 +710,7 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   if  ( inpt == 0 ) return 0; /* NULL INPUT -> NULL OUTPUT*/
 
   unsigned int STRING_END = strlen(inpt) ;
-  unsigned int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1 , FOUND_DELIMETER=0; /* Ignores starting ,,,,,string,etc*/
+  unsigned int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1; /* Ignores starting ,,,,,string,etc*/ 
 
   if ( STRING_END == 0 ) { return 0; } /* NULL INPUT -> NULL OUTPUT pt 2*/
 
@@ -741,7 +741,7 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   ipc->tokens_count = 0 , ipc->tokenlist[0].token_start=0;
   for (i=0; i<STRING_END; i++)
   {
-    FOUND_DELIMETER = 0;
+    unsigned int FOUND_DELIMETER = 0;
     for (z=0; z<ipc->cur_delimeter_count; z++)
     {
 

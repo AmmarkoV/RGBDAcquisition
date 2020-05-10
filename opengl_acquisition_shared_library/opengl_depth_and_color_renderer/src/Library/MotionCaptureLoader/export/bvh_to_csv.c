@@ -56,13 +56,11 @@ int csvSkeletonFilter(
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons
                      )
-{
-   unsigned int jID=0;
-
+{ 
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
    {
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (bvhTransform->joint[jID].isBehindCamera)
          {
@@ -79,7 +77,7 @@ int csvSkeletonFilter(
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsOutOfImage)
    {
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
         float x = bvhTransform->joint[jID].pos2D[0];
         float y = bvhTransform->joint[jID].pos2D[1];
@@ -104,7 +102,7 @@ int csvSkeletonFilter(
    { //If all x,y 0 filter out
        unsigned int jointCount=0;
        unsigned int jointsInWeirdPositionCount=0;
-       for (jID=0; jID<mc->jointHierarchySize; jID++)
+       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
         float x = bvhTransform->joint[jID].pos2D[0];
         float y = bvhTransform->joint[jID].pos2D[1];
@@ -175,8 +173,7 @@ int dumpBVHToCSVHeader(
                        const char * filename3D,
                        const char * filenameBVH
                       )
-{
-   unsigned int jID=0;
+{ 
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
@@ -188,7 +185,7 @@ int dumpBVHToCSVHeader(
     {
      char comma=' ';
      //2D Positions -------------------------------------------------------------------------------------------------------------
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
@@ -240,7 +237,7 @@ int dumpBVHToCSVHeader(
      {
       char comma=' ';
 
-      for (jID=0; jID<mc->jointHierarchySize; jID++)
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
@@ -295,7 +292,7 @@ int dumpBVHToCSVHeader(
 
       char comma=' ';
       //Model Configuration
-      for (jID=0; jID<mc->jointHierarchySize; jID++)
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
@@ -352,8 +349,7 @@ int dumpBVHToCSVBody(
                        unsigned int filterWeirdSkeletons,
                        unsigned int encodeRotationsAsRadians
                       )
-{
-   unsigned int jID=0;
+{ 
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
@@ -398,7 +394,7 @@ int dumpBVHToCSVBody(
      if (fp2D!=0)
      {
       char comma=' ';
-      for (jID=0; jID<mc->jointHierarchySize; jID++)
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
           //----------------------------------
@@ -452,7 +448,7 @@ int dumpBVHToCSVBody(
    if (fp3D!=0)
    {
      char comma=' ';
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
@@ -487,7 +483,7 @@ int dumpBVHToCSVBody(
    if (fpBVH!=0)
    {
      char comma=' ';
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 

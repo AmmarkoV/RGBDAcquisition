@@ -598,6 +598,7 @@ int prepareDefaultBodyProblem(
 
     problem->numberOfChains = chainID;
     problem->numberOfGroups = groupID;
+    problem->numberOfJobs = jobID;
 
     return 1;
 }
@@ -733,9 +734,7 @@ int bvhTestIK(
             if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform,0) )
             {
                 if  (bvh_projectTo2D(mc,&bvhTargetTransform,&renderer,0,0))
-                { 
-                    unsigned int springIgnoresIterativeChanges=0;
-
+                {
                     struct ikConfiguration ikConfig= {0};
                     //------------------------------------
                     ikConfig.learningRate = lr;
