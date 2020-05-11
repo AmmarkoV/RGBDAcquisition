@@ -440,17 +440,11 @@ float iteratePartLoss(
     //Shorthand to access joint ID and joint Name witout having to traverse the problem 
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
-     //We also want the last part of our chain to make sure when we evaluate loss we are transforming all joints
-    unsigned int lastPartIDOfThisChain = problem->chain[chainID].numberOfParts;
-    if (lastPartIDOfThisChain>0) { --lastPartIDOfThisChain; }
-    unsigned int lastPartOfChainJointID = problem->chain[chainID].part[lastPartIDOfThisChain].jID;
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------
   
     //Our armature has 500 d.o.f, if we do a calculateChainLoss this will calculate each and every one of them!!
     //Obviously we want to be really fast so we can't afford this, in order to speed up computations we will need to transform all parent joints
-    //until the end joint of our chain... 
-    //bvh_markAllJointsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform); <- why doesn't this work?
-    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
+    //until the end joint of our chain...  iterateChainLoss
     float initialLoss = calculateChainLoss(problem,chainID,partID);
 
     ///Having calculated all these joints from here on we only need to update this joint and its children ( and we dont care about their parents since they dont change .. )
@@ -472,9 +466,6 @@ float iteratePartLoss(
         if (verbose)
                { fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,jointName); }
 
-       ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-       bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
-       ///-------------------------------------------------------------------------------------------------------------------------------         
         return initialLoss;
     }
        else
@@ -490,9 +481,6 @@ float iteratePartLoss(
             if (verbose)
                     { fprintf( stderr, RED"\nWon't optimize %s,  exceeded maximum acceptable starting loss by %0.2f%%\n" NORMAL,jointName, ((float) 100*initialLoss/maximumAcceptableStartingLoss) ); }
 
-             ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-             bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
-             ///-------------------------------------------------------------------------------------------------------------------------------                     
             return initialLoss;
         }
     } //Careful dont add another else here..
@@ -626,12 +614,8 @@ if (iterationID==0)
             //We tried nudging all parameters both ways and couldn't improve anything
             //We are at a local optima and  since tryMaintainingLocalOptima is enabled
             //we will try to maintain it..!
-
             if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
-             
-             ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-             bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
-             ///------------------------------------------------------------------------------------------------------------------------------- 
+              
             return initialLoss;
         }
 
@@ -784,10 +768,6 @@ if (iterationID==0)
     problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
     problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
 
-   ///This is an important call to make sure that we leave everything as we left it for the next joint ( for performance reasons.. )
-    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform, jointID);
-    ///-------------------------------------------------------------------------------------------------------------------------------
-
     return bestLoss;
 }
 
@@ -809,7 +789,15 @@ int iterateChainLoss(
 {
     //Before we start we will make a copy of the problem->currentSolution to work on improving it..
     copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
-
+   
+     //Make sure chain has been fully extended to root joint..
+    bvh_markAllJointsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
+    for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+    {
+      unsigned int jointID = problem->chain[chainID].part[partID].jID;
+      bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
+    }
+    
     for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
     {
         if (!problem->chain[chainID].part[partID].endEffector)
