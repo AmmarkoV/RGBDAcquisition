@@ -436,43 +436,36 @@ float iteratePartLoss(
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
     }; 
-     
+    
+    //Shorthand to access joint ID and joint Name witout having to traverse the problem 
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
-
-  unsigned int lastPartIDOfChain = problem->chain[chainID].numberOfParts;
-    if (lastPartIDOfChain>0) { --lastPartIDOfChain; }
-    unsigned int lastPartOfChainJointID = lastPartIDOfChain  = problem->chain[chainID].part[lastPartIDOfChain].jID;
+     //We also want the last part of our chain to make sure when we evaluate loss we are transforming all joints
+    unsigned int lastPartIDOfThisChain = problem->chain[chainID].numberOfParts;
+    if (lastPartIDOfThisChain>0) { --lastPartIDOfThisChain; }
+    unsigned int lastPartOfChainJointID = problem->chain[chainID].part[lastPartIDOfThisChain].jID;
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
   
-    //In order to proeprly initialize all the transforms up to our joint we first have to mark our joint and its parents as usefull!
-    //If problem->chain[chainID].current2DProjectionTransform is not properly initialized than transformations will fail leading to a NaN 
+    //Our armature has 500 d.o.f, if we do a calculateChainLoss this will calculate each and every one of them!!
+    //Obviously we want to be really fast so we can't afford this, in order to speed up computations we will need to transform all parent joints
+    //until the end joint of our chain... 
+    //bvh_markAllJointsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform); <- why doesn't this work?
     bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
     float initialLoss = calculateChainLoss(problem,chainID,partID);
 
-    ///From here on we only need to update this joint and its children ( and we dont care about their parents since they dont change  for performance reasons.. )
-    bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,lastPartOfChainJointID);
+    ///Having calculated all these joints from here on we only need to update this joint and its children ( and we dont care about their parents since they dont change .. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
+ 
+ //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high  loss
    if (initialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Started with a NaN loss whill processing chain %u for joint %s \n" NORMAL,chainID,jointName);
        bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
        return initialLoss;
    }
-
-/* Debug optimizations..
-   float shouldBeSameAsInitialLoss = calculateChainLoss(problem,chainID,partID);
-   if (shouldBeSameAsInitialLoss!=initialLoss)
-   {
-       fprintf(stderr,RED "Bug in optimizations loss after joint %s marking is %0.2f , previous was %0.2f \n" NORMAL,jointName,shouldBeSameAsInitialLoss,initialLoss);
-       exit(0);
-   }
-*/
-
+      else
     if (initialLoss==0.0)
     {
         //If our loss is perfect we obviously can't improve it..
@@ -484,7 +477,7 @@ float iteratePartLoss(
        ///-------------------------------------------------------------------------------------------------------------------------------         
         return initialLoss;
     }
-
+       else
     if (maximumAcceptableStartingLoss>0.0)
     {
         //The positional subproblem gets a pass to help the other joints..
@@ -502,8 +495,8 @@ float iteratePartLoss(
              ///-------------------------------------------------------------------------------------------------------------------------------                     
             return initialLoss;
         }
-    }
-
+    } //Careful dont add another else here..
+ //------------------------
 
 
     if (verbose)
