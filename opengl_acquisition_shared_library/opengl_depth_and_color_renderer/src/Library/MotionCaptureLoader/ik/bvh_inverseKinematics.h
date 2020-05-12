@@ -10,10 +10,23 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.21
+#define IK_VERSION 0.22
 
 #define MAXIMUM_CHAINS 15
 #define MAXIMUM_PARTS_OF_CHAIN 15
+
+
+
+enum bvhIKSolutionStatus
+{
+  BVH_IK_NOTSTARTED=0,
+  BVH_IK_STARTED,
+  BVH_IK_FINISHED_ITERATION,
+  BVH_IK_FINISHED_EVERYTHING, 
+  //--------------------
+  BVH_IK_STATES
+};
+
 
 struct ikChainParts
 {
@@ -34,6 +47,8 @@ struct ikChain
 {
   unsigned int jobID;
   unsigned int groupID;
+  
+  unsigned int status; // enum bvhIKSolutionStatus
 
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
@@ -110,6 +125,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct MotionBuffer * groundTruth,
                                          //---------------------------------
                                          struct BVH_Transform * bvhTargetTransform,
+                                         //---------------------------------
+                                         unsigned int useMultipleThreads,
                                          //---------------------------------
                                          float * initialMAEInPixels,
                                          float * finalMAEInPixels,

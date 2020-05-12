@@ -28,6 +28,10 @@
 #include "../edit/bvh_cut_paste.h"
 
 
+// --------------------------------------------
+#include <pthread.h>
+#include <errno.h>
+// --------------------------------------------
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -787,6 +791,7 @@ int iterateChainLoss(
                                          unsigned int verbose
                                        )
 {
+    problem->chain[chainID].status = BVH_IK_STARTED;
     //Before we start we will make a copy of the problem->currentSolution to work on improving it..
     copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
    
@@ -819,9 +824,124 @@ int iterateChainLoss(
 
     //After we finish we update the problem->currentSolution with what our chain came up with..
     copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
+    problem->chain[chainID].status = BVH_IK_FINISHED_ITERATION;
 
     return 1;
 }
+
+ 
+
+//This is the regular and easy to follow serial implementation where for each iteration we go through
+//each one of the chains in order.. We still mark the chain status to ensure 1:1 operation with the multithreaded
+//version of the code.. 
+int singleThreadedSolver(
+                                         struct ikProblem * problem,
+                                         struct ikConfiguration * ikConfig
+                                       )
+{
+  for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
+    {
+        for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+        {
+            iterateChainLoss(
+                                               problem,
+                                               iterationID,
+                                               chainID,
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->epochs,
+                                               ikConfig->tryMaintainingLocalOptima,
+                                               ikConfig->spring, 
+                                               ikConfig->verbose
+                                             );
+        }
+    }
+
+   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+        {
+           problem->chain[chainID].status = BVH_IK_FINISHED_EVERYTHING;
+        }
+   return 1;
+}
+
+
+struct passContextToThread
+{
+    struct ikProblem * problem;
+    struct ikConfiguration * ikConfig;
+    unsigned int iterationID;
+    unsigned int chainID;
+    unsigned int i_adapt;
+};
+
+
+
+void * iterateChainLossThread(void * ptr)
+{
+  //We are a thread so lets retrieve our variables..
+  struct passContextToThread * incoming_context = (struct passContextToThread *) ptr;
+ 
+  unsigned int i = incoming_context->i_adapt;
+  incoming_context->i_adapt += 1; // <-- This signals we got the i value..
+
+/*
+iterateChainLoss(
+                                               problem,
+                                               iterationID,
+                                               chainID,
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->epochs,
+                                               ikConfig->tryMaintainingLocalOptima,
+                                               ikConfig->spring, 
+                                               ikConfig->verbose
+                                             );
+*/
+ 
+  return 0;
+}
+
+
+//This is the multi threaded version of the code..!
+//This is more complex than just spawning one thread per problem because we have to ensure that certain chains get processed in certain order
+int multiThreadedSolver(
+                                         struct ikProblem * problem,
+                                         struct ikConfiguration * ikConfig
+                                       )
+{
+  pthread_t workerPool[16];
+    
+ // int retres = pthread_create(&instance->threads_pool[threadID],0/*&instance->attr*/,ServeClientAfterUnpackingThreadMessage,(void*) &context);
+    
+  for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
+    {
+        for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+        {
+            iterateChainLoss(
+                                               problem,
+                                               iterationID,
+                                               chainID,
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->epochs,
+                                               ikConfig->tryMaintainingLocalOptima,
+                                               ikConfig->spring, 
+                                               ikConfig->verbose
+                                             );
+        }
+    }                 
+    
+  //This should make the thread release all of its resources (?)
+  //pthread_detach(pthread_self());
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -879,6 +999,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                                                                                   //---------------------------------
                                                                                                                                   struct BVH_Transform * bvhTargetTransform,
                                                                                                                                   //---------------------------------
+                                                                                                                                  unsigned int useMultipleThreads,
+                                                                                                                                  //--------------------------------- 
                                                                                                                                   float * initialMAEInPixels,
                                                                                                                                   float * finalMAEInPixels,
                                                                                                                                   float * initialMAEInMM,
@@ -959,26 +1081,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
 
-
-
-
-    for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
-    {
-        for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-        {
-            iterateChainLoss(
-                                               problem,
-                                               iterationID,
-                                               chainID,
-                                               ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
-                                               ikConfig->epochs,
-                                               ikConfig->tryMaintainingLocalOptima,
-                                               ikConfig->spring, 
-                                               ikConfig->verbose
-                                             );
-        }
-    }
+     
+     //Solve the problem using a single thread..!
+      singleThreadedSolver(problem,ikConfig);
+ 
+     //Solve the problem using multiple threads..!
+     // multiThreadedSolver(problem,ikConfig);
 
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);

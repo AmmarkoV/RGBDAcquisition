@@ -46,6 +46,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
  
@@ -88,6 +89,7 @@ int prepareDefaultBodyProblem(
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
         problem->chain[chainID].part[partID].jointImportance=1.0;
+            
         ++partID;
     }
     else
@@ -179,6 +181,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
 
@@ -272,6 +275,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
 
@@ -346,6 +350,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
 
@@ -419,6 +424,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
 
@@ -513,6 +519,7 @@ int prepareDefaultBodyProblem(
     problem->chain[chainID].groupID=groupID;
     problem->chain[chainID].jobID=jobID;
     problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
 
@@ -785,6 +792,8 @@ int bvhTestIK(
                             //-------------------
                             &bvhTargetTransform,
                             //-------------------
+                            0, //Use a single thread ( For Now )!
+                            //------------------- 
                             &initialMAEInPixels,
                             &finalMAEInPixels,
                             &initialMAEInMM,
