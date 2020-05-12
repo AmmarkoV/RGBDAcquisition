@@ -879,24 +879,22 @@ struct passContextToThread
 void * iterateChainLossThread(void * ptr)
 {
   //We are a thread so lets retrieve our variables..
-  struct passContextToThread * incoming_context = (struct passContextToThread *) ptr;
+  struct passContextToThread * ctx = (struct passContextToThread *) ptr;
  
-  unsigned int i = incoming_context->i_adapt;
-  incoming_context->i_adapt += 1; // <-- This signals we got the i value..
+  unsigned int i = ctx->i_adapt;
+  ctx->i_adapt += 1; // <-- This signals we got the i value..
 
-/*
-iterateChainLoss(
-                                               problem,
-                                               iterationID,
-                                               chainID,
-                                               ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
-                                               ikConfig->epochs,
-                                               ikConfig->tryMaintainingLocalOptima,
-                                               ikConfig->spring, 
-                                               ikConfig->verbose
-                                             );
-*/
+  iterateChainLoss(
+                                    ctx->problem,
+                                    ctx->iterationID,
+                                    ctx->chainID,
+                                    ctx->ikConfig->learningRate,
+                                    ctx->ikConfig->maximumAcceptableStartingLoss,
+                                    ctx->ikConfig->epochs,
+                                    ctx->ikConfig->tryMaintainingLocalOptima,
+                                    ctx->ikConfig->spring, 
+                                    ctx->ikConfig->verbose
+                                  );
  
   return 0;
 }
