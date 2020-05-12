@@ -115,6 +115,8 @@ struct ikConfiguration
 int cleanProblem(struct ikProblem * problem);
 
 
+unsigned long GetTickCountMicrosecondsIK();
+
 //Temporary call that allows outside control..
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                          struct BVH_MotionCapture * mc,

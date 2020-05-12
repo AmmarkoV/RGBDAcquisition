@@ -687,6 +687,15 @@ int writeHTML(
 
 
 
+float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsigned long endTime)
+{
+    float timeInMilliseconds =  (float) (endTime-startTime)/1000;
+    if (timeInMilliseconds ==0.0)
+        {
+            timeInMilliseconds=0.00001;    //Take care of division by null..
+        }
+    return (float) 1000/timeInMilliseconds;
+}
 
 // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 15
 
@@ -790,6 +799,7 @@ int bvhTestIK(
                          }
 
 
+                   unsigned long startTime = GetTickCountMicrosecondsIK();
 
                     if (
                         approximateBodyFromMotionBufferUsingInverseKinematics(
@@ -817,6 +827,8 @@ int bvhTestIK(
                         //=======
                         result=1;
                         //=======
+                        unsigned long endTime = GetTickCountMicrosecondsIK();
+
 
                         //-------------------------------------------------------------------------------------------------------------
                         //compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
@@ -826,6 +838,7 @@ int bvhTestIK(
 
                         fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
                         fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
+                        fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
                         
 
 
