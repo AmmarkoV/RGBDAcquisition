@@ -468,7 +468,7 @@ int prepareDefaultBodyProblem(
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
         problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
+        problem->chain[chainID].part[partID].jointImportance=1.5;
         ++partID;
     }
     else
@@ -543,7 +543,7 @@ int prepareDefaultBodyProblem(
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
         problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
+        problem->chain[chainID].part[partID].jointImportance=1.5;
         ++partID;
     }
     else

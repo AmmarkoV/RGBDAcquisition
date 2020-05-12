@@ -128,7 +128,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Library/Interfaces/webInterface.c 
             opengl_depth_and_color_renderer/src/Library/Interfaces/webInterface.h
            ) 
-target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 Codecs ${PNG_Libs} ${JPG_Libs}) 
+target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 Codecs pthread ${PNG_Libs} ${JPG_Libs}) 
  
  
 

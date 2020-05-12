@@ -158,7 +158,7 @@ add_library(OGLRendererSandbox SHARED
             Interfaces/webInterface.c 
             Interfaces/webInterface.h
            ) 
-target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ${HTTP_Libs} ) 
+target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs pthread ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ${HTTP_Libs} ) 
  
  
 
