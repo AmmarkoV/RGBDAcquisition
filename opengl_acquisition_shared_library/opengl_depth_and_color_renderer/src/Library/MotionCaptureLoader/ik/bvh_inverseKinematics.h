@@ -48,7 +48,9 @@ struct ikChain
   unsigned int jobID;
   unsigned int groupID;
   
+  unsigned int parallel;  
   unsigned int status; // enum bvhIKSolutionStatus
+  unsigned int permissionToStart;  
 
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];

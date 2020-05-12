@@ -64,7 +64,7 @@ add_executable(
               ../../../../../tools/AmMatrix/simpleRenderer.c
               )
  
-target_link_libraries(BVHTester rt m  ) 
+target_link_libraries(BVHTester rt m pthread ) 
 add_dependencies(BVHTester OGLRendererSandbox)  
        
  

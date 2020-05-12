@@ -910,8 +910,19 @@ int multiThreadedSolver(
                                        )
 {
   pthread_t workerPool[16];
-    
- // int retres = pthread_create(&instance->threads_pool[threadID],0/*&instance->attr*/,ServeClientAfterUnpackingThreadMessage,(void*) &context);
+  struct passContextToThread workerContext[16];
+  unsigned int workerID = 0;
+  
+      
+  for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+        {
+              if ( problem->chain[chainID].parallel )
+              { 
+                  int result = pthread_create(&workerPool[workerID],0,iterateChainLossThread,(void*) &workerContext[workerID]);
+                  ++workerID;
+              } 
+        }
+
     
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
@@ -1081,12 +1092,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
 
-     
+     if (useMultipleThreads)
+     {
+      //Solve the problem using multiple threads..!
+      multiThreadedSolver(problem,ikConfig);          
+     } else
+     {
      //Solve the problem using a single thread..!
       singleThreadedSolver(problem,ikConfig);
- 
-     //Solve the problem using multiple threads..!
-     // multiThreadedSolver(problem,ikConfig);
+     }
 
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
