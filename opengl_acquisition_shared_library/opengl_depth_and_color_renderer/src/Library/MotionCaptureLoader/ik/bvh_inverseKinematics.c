@@ -897,7 +897,7 @@ void * iterateChainLossThread(void * ptr)
                                     ctx->ikConfig->verbose
                                   );      
     }
-    usleep(1000);
+    usleep(100);
   }
  
   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
@@ -976,6 +976,7 @@ int multiThreadedSolver(
         //All parallel threads have been started and now we must wait until they are done and gather their output 
         unsigned int allThreadsAreDone=0;
         unsigned int threadsComplete=0;
+        unsigned int waitTime=0;
         fprintf(stderr,"\nWaiting for threads to complete : ");
         while (!allThreadsAreDone)
         {
@@ -1019,11 +1020,11 @@ int multiThreadedSolver(
                 allThreadsAreDone=1;
             } else
             {
-                usleep(1000);
+                usleep(100);
             }
             
-            fprintf(stderr,".");
-            
+            ++waitTime;
+            if (waitTime%3==0) { fprintf(stderr,"."); }
          }
     }
     
