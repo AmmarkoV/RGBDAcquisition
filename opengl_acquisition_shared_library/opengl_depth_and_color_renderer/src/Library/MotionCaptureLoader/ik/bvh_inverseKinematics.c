@@ -311,8 +311,11 @@ int cleanProblem(struct ikProblem * problem)
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
         freeMotionBuffer(problem->chain[chainID].currentSolution);
+        //Terminate all threads..  
+        problem->chain[chainID].terminate=1;
+        problem->chain[chainID].threadIsSpawned=0;
     }
-
+   
     return 1;
 }
 
@@ -897,6 +900,7 @@ void * iterateChainLossThread(void * ptr)
     usleep(1000);
   }
  
+  ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
   return 0;
 }
 
@@ -917,10 +921,15 @@ int multiThreadedSolver(
               {
                   if (!problem->chain[chainID].threadIsSpawned)
                   {
+                      //Make sure the thread will not terminate just as it starts
+                      problem->chain[chainID].terminate=0;
+                      
+                      //Populate context passed to the thread 
                       problem->workerContext[numberOfWorkerThreads].problem=problem;
                       problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
                       problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
                       
+                      //Create the actual thread..
                      int result = pthread_create(&problem->workerPool[numberOfWorkerThreads],0,iterateChainLossThread,(void*) &problem->workerContext[numberOfWorkerThreads]);
                      problem->chain[chainID].threadIsSpawned = (result==0);
                   }
@@ -967,6 +976,7 @@ int multiThreadedSolver(
         //All parallel threads have been started and now we must wait until they are done and gather their output 
         unsigned int allThreadsAreDone=0;
         unsigned int threadsComplete=0;
+        fprintf(stderr,"\nWaiting for threads to complete : ");
         while (!allThreadsAreDone)
         {
           //Lets check if all our chains are done and copy back their results..!  
@@ -998,6 +1008,8 @@ int multiThreadedSolver(
                                        problem->currentSolution->motion[mIDS[2]]=problem->chain[chainID].currentSolution->motion[mIDS[2]];
                                     } //If a part is an end effector it has no parameters to copy
                            }  //Copy every part of this chain
+                           
+                        problem->chain[chainID].status=BVH_IK_NOTSTARTED;
                      } // If thread has finished its iteration  
                  }// If this chain has a thread serving it
             }//Check all chains..
@@ -1010,6 +1022,7 @@ int multiThreadedSolver(
                 usleep(1000);
             }
             
+            fprintf(stderr,".");
             
          }
     }
