@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.22
+#define IK_VERSION 0.23
 
 #define MAXIMUM_CHAINS 15
 #define MAXIMUM_PARTS_OF_CHAIN 15
@@ -45,12 +45,18 @@ struct ikChainParts
 
 struct ikChain
 {
-  unsigned int jobID;
-  unsigned int groupID;
-  
+  //Thread information  
+  // --------------------------------------------------------------------------
   unsigned int parallel;  
+  unsigned int currentIteration;
   unsigned int status; // enum bvhIKSolutionStatus
   unsigned int permissionToStart;  
+  unsigned int threadIsSpawned;  
+  // --------------------------------------------------------------------------
+    
+    
+  unsigned int jobID;
+  unsigned int groupID;  
 
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];

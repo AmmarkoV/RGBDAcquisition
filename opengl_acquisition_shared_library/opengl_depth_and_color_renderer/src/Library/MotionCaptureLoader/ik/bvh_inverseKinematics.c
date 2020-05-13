@@ -843,6 +843,7 @@ int singleThreadedSolver(
     {
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
+            problem->chain[chainID].currentIteration=iterationID;
             iterateChainLoss(
                                                problem,
                                                iterationID,
@@ -868,10 +869,8 @@ int singleThreadedSolver(
 struct passContextToThread
 {
     struct ikProblem * problem;
-    struct ikConfiguration * ikConfig;
-    unsigned int iterationID;
+    struct ikConfiguration * ikConfig; 
     unsigned int chainID;
-    unsigned int i_adapt;
 };
 
 
@@ -881,12 +880,9 @@ void * iterateChainLossThread(void * ptr)
   //We are a thread so lets retrieve our variables..
   struct passContextToThread * ctx = (struct passContextToThread *) ptr;
  
-  unsigned int i = ctx->i_adapt;
-  ctx->i_adapt += 1; // <-- This signals we got the i value..
-
   iterateChainLoss(
                                     ctx->problem,
-                                    ctx->iterationID,
+                                    ctx->problem->chain[ctx->chainID].currentIteration,
                                     ctx->chainID,
                                     ctx->ikConfig->learningRate,
                                     ctx->ikConfig->maximumAcceptableStartingLoss,
@@ -916,27 +912,42 @@ int multiThreadedSolver(
         {
               if ( problem->chain[chainID].parallel )
               { 
-                  int result = pthread_create(&workerPool[workerID],0,iterateChainLossThread,(void*) &workerContext[workerID]);
+                  if (!problem->chain[chainID].threadIsSpawned)
+                  {
+                      workerContext[workerID].problem=problem;
+                      workerContext[workerID].ikConfig=ikConfig;
+                      workerContext[workerID].chainID=chainID; 
+                      
+                     int result = pthread_create(&workerPool[workerID],0,iterateChainLossThread,(void*) &workerContext[workerID]);
+                     problem->chain[chainID].threadIsSpawned = (result==0);
+                  }
                   ++workerID;
-              } 
+              }
         }
 
     
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-        {
-            iterateChainLoss(
-                                               problem,
-                                               iterationID,
-                                               chainID,
-                                               ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
-                                               ikConfig->epochs,
-                                               ikConfig->tryMaintainingLocalOptima,
-                                               ikConfig->spring, 
-                                               ikConfig->verbose
-                                             );
+        { 
+              problem->chain[chainID].currentIteration=iterationID;
+              if (!problem->chain[chainID].parallel )
+              {  //Normal chains run normally..
+                iterateChainLoss(
+                                                   problem,
+                                                   iterationID,
+                                                   chainID,
+                                                   ikConfig->learningRate,
+                                                   ikConfig->maximumAcceptableStartingLoss,
+                                                   ikConfig->epochs,
+                                                   ikConfig->tryMaintainingLocalOptima,
+                                                   ikConfig->spring, 
+                                                   ikConfig->verbose
+                                                 );
+              } else
+              {
+                  
+              }
         }
     }                 
     
