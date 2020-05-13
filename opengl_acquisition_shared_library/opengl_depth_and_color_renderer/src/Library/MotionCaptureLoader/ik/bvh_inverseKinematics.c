@@ -29,7 +29,6 @@
 
 
 // --------------------------------------------
-#include <pthread.h>
 #include <errno.h>
 // --------------------------------------------
 
@@ -792,8 +791,6 @@ int iterateChainLoss(
                                        )
 {
     problem->chain[chainID].status = BVH_IK_STARTED;
-    //Before we start we will make a copy of the problem->currentSolution to work on improving it..
-    copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
    
      //Make sure chain has been fully extended to root joint..
     bvh_markAllJointsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
@@ -822,8 +819,6 @@ int iterateChainLoss(
          }
     }
 
-    //After we finish we update the problem->currentSolution with what our chain came up with..
-    copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
     problem->chain[chainID].status = BVH_IK_FINISHED_ITERATION;
 
     return 1;
@@ -843,6 +838,9 @@ int singleThreadedSolver(
     {
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
+            //Before we start we will make a copy of the problem->currentSolution to work on improving it..
+            copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
+    
             problem->chain[chainID].currentIteration=iterationID;
             iterateChainLoss(
                                                problem,
@@ -855,6 +853,9 @@ int singleThreadedSolver(
                                                ikConfig->spring, 
                                                ikConfig->verbose
                                              );
+             
+             //After we finish we update the problem->currentSolution with what our chain came up with..
+            copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
         }
     }
 
@@ -866,21 +867,22 @@ int singleThreadedSolver(
 }
 
 
-struct passContextToThread
-{
-    struct ikProblem * problem;
-    struct ikConfiguration * ikConfig; 
-    unsigned int chainID;
-};
-
 
 
 void * iterateChainLossThread(void * ptr)
 {
   //We are a thread so lets retrieve our variables..
-  struct passContextToThread * ctx = (struct passContextToThread *) ptr;
- 
-  iterateChainLoss(
+  struct passIKContextToThread * ctx = (struct passIKContextToThread *) ptr;
+   
+   //Instead of doing this here we believe what pthread_create tells us..
+  /// ctx->problem->chain[ctx->chainID].threadIsSpawned = 1;
+  
+  while (!ctx->problem->chain[ctx->chainID].terminate)
+  {
+     if (ctx->problem->chain[ctx->chainID].permissionToStart)
+     {
+         ctx->problem->chain[ctx->chainID].permissionToStart = 0; // We need a new permission to start again...
+         iterateChainLoss(
                                     ctx->problem,
                                     ctx->problem->chain[ctx->chainID].currentIteration,
                                     ctx->chainID,
@@ -890,7 +892,10 @@ void * iterateChainLossThread(void * ptr)
                                     ctx->ikConfig->tryMaintainingLocalOptima,
                                     ctx->ikConfig->spring, 
                                     ctx->ikConfig->verbose
-                                  );
+                                  );      
+    }
+    usleep(1000);
+  }
  
   return 0;
 }
@@ -903,33 +908,37 @@ int multiThreadedSolver(
                                          struct ikConfiguration * ikConfig
                                        )
 {
-  pthread_t workerPool[16];
-  struct passContextToThread workerContext[16];
-  unsigned int workerID = 0;
+  unsigned int numberOfWorkerThreads = 0;
   
-      
+  //Make sure all threads needed are created but only paying the cost of creating a thread once..!
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-        {
+        { 
               if ( problem->chain[chainID].parallel )
-              { 
+              {
                   if (!problem->chain[chainID].threadIsSpawned)
                   {
-                      workerContext[workerID].problem=problem;
-                      workerContext[workerID].ikConfig=ikConfig;
-                      workerContext[workerID].chainID=chainID; 
+                      problem->workerContext[numberOfWorkerThreads].problem=problem;
+                      problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
+                      problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
                       
-                     int result = pthread_create(&workerPool[workerID],0,iterateChainLossThread,(void*) &workerContext[workerID]);
+                     int result = pthread_create(&problem->workerPool[numberOfWorkerThreads],0,iterateChainLossThread,(void*) &problem->workerContext[numberOfWorkerThreads]);
                      problem->chain[chainID].threadIsSpawned = (result==0);
                   }
-                  ++workerID;
+                  ++numberOfWorkerThreads;
               }
         }
 
-    
+  
+  //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
+        //We go through each chain, if the chain is single threaded we do the same as the singleThreadedSolver
+        //if the thread is parallel then we just ask it to start processing the current data and we then need to stop and wait to gather results..
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-        { 
+        {
+              //Before we start we will make a copy of the problem->currentSolution to work on improving it..
+              copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
+              
               problem->chain[chainID].currentIteration=iterationID;
               if (!problem->chain[chainID].parallel )
               {  //Normal chains run normally..
@@ -944,12 +953,71 @@ int multiThreadedSolver(
                                                    ikConfig->spring, 
                                                    ikConfig->verbose
                                                  );
+                                                 
+                  //After we finish we update the problem->currentSolution with what our chain came up with..
+                 copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
               } else
               {
-                  
+                  //We just give the thread permission to start and we will process its output asynchronously later..
+                  problem->chain[chainID].permissionToStart = 1;
               }
         }
-    }                 
+        
+        //At this point of the code for the particular iteration all single threaded chains have been executed
+        //All parallel threads have been started and now we must wait until they are done and gather their output 
+        unsigned int allThreadsAreDone=0;
+        unsigned int threadsComplete=0;
+        while (!allThreadsAreDone)
+        {
+          //Lets check if all our chains are done and copy back their results..!  
+          for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+            {
+                 if (problem->chain[chainID].parallel )
+                 {
+                     if (problem->chain[chainID].status == BVH_IK_FINISHED_ITERATION)
+                     {
+                         ++threadsComplete;                      
+                        //Yey..! This thread has finished its iteration, normally we would gather the result by using the copyMotionBuffer call
+                        //however this will overwrite the solution of other stuff so we are really only interested in copyint the motion values
+                        //from partIDs that do not correspond to endEffectors..
+                        
+                        for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+                           {
+                                if (!problem->chain[chainID].part[partID].endEffector)
+                                   {  
+                                       //Shorthand to address the correct motion values
+                                       unsigned int mIDS[3] ={
+                                                                                       problem->chain[chainID].part[partID].mIDStart,
+                                                                                       problem->chain[chainID].part[partID].mIDStart+1,
+                                                                                       problem->chain[chainID].part[partID].mIDStart+2
+                                                                                      };
+
+                                       //Copy back the solution of the chain to the "official" solution for the  whole  problem
+                                       problem->currentSolution->motion[mIDS[0]]=problem->chain[chainID].currentSolution->motion[mIDS[0]];
+                                       problem->currentSolution->motion[mIDS[1]]=problem->chain[chainID].currentSolution->motion[mIDS[1]];
+                                       problem->currentSolution->motion[mIDS[2]]=problem->chain[chainID].currentSolution->motion[mIDS[2]];
+                                    } //If a part is an end effector it has no parameters to copy
+                           }  //Copy every part of this chain
+                     } // If thread has finished its iteration  
+                 }// If this chain has a thread serving it
+            }//Check all chains..
+            
+            if (numberOfWorkerThreads==threadsComplete)
+            {
+                allThreadsAreDone=1;
+            } else
+            {
+                usleep(1000);
+            }
+            
+            
+         }
+    }
+    
+    
+    
+    
+    
     
   //This should make the thread release all of its resources (?)
   //pthread_detach(pthread_self());

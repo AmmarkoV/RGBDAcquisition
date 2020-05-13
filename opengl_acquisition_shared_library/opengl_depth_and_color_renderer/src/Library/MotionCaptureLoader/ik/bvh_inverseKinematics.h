@@ -5,6 +5,8 @@
 #include "../bvh_loader.h"
 #include "../export/bvh_export.h"
 
+#include <pthread.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -47,11 +49,12 @@ struct ikChain
 {
   //Thread information  
   // --------------------------------------------------------------------------
-  unsigned int parallel;  
-  unsigned int currentIteration;
-  unsigned int status; // enum bvhIKSolutionStatus
-  unsigned int permissionToStart;  
-  unsigned int threadIsSpawned;  
+  unsigned char parallel;  
+  unsigned char currentIteration;
+  unsigned char status; // enum bvhIKSolutionStatus
+  unsigned char permissionToStart;  
+  unsigned char terminate;  
+  unsigned char threadIsSpawned;  
   // --------------------------------------------------------------------------
     
     
@@ -71,6 +74,16 @@ struct ikChain
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
+
+
+
+struct passIKContextToThread
+{
+    struct ikProblem * problem;
+    struct ikConfiguration * ikConfig; 
+    unsigned int chainID;
+};
+
 
 struct ikProblem
 {
@@ -96,6 +109,10 @@ struct ikProblem
  unsigned int numberOfJobs;
 
  struct ikChain chain[MAXIMUM_CHAINS];
+
+ //Thread storage..
+  pthread_t workerPool[MAXIMUM_CHAINS];
+  struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
