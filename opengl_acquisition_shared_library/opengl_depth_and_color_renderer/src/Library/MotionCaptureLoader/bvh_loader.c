@@ -169,6 +169,7 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 //----------------------------------------------------------------------------------------------------
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
 {
+ //fprintf(stderr,"Loading BVH %s \n",filename);
  bvhMotion->scaleWorld=scaleWorld;
   int successfullRead=0;
   FILE *fd=0;

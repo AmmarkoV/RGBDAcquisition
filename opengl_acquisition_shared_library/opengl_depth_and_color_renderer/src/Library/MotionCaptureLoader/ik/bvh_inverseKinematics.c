@@ -422,7 +422,8 @@ float iteratePartLoss(
                                            float maximumAcceptableStartingLoss,
                                            unsigned int epochs,
                                            unsigned int tryMaintainingLocalOptima,
-                                           float spring, 
+                                           float spring,
+                                           float gradientExplosionThreshold,
                                            unsigned int verbose
                                           )
 {
@@ -680,17 +681,24 @@ if (iterationID==0)
 
         if  ( 
                 //Safeguard agains gradient explosions which we detect when we see large gradients or NaNs
-                 (fabs(delta[0]>250)) || (fabs(delta[1]>250)) || (fabs(delta[2]>250))  ||  (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) 
+                 (fabs(delta[0]>gradientExplosionThreshold)) || 
+                 (fabs(delta[1]>gradientExplosionThreshold)) || 
+                 (fabs(delta[2]>gradientExplosionThreshold)) ||  
+                 (delta[0]!=delta[0]) || 
+                 (delta[1]!=delta[1]) || 
+                 (delta[2]!=delta[2]) 
              )
         {
             fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,currentEpoch,epochs);
-            fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
-            fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
-            fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
-            fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
-            fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
-            fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
-            
+            if (verbose)
+            {
+             fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
+             fprintf(stderr,RED "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
+             fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
+             fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
+             fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
+             fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
+            }
              //Just stop after an explosion..
             executedEpochs=currentEpoch;
              break;
@@ -790,6 +798,7 @@ int iterateChainLoss(
                                          unsigned int epochs,
                                          unsigned int tryMaintainingLocalOptima,
                                          float spring, 
+                                         float gradientExplosionThreshold,
                                          unsigned int verbose
                                        )
 {
@@ -817,6 +826,7 @@ int iterateChainLoss(
                                             epochs,
                                             tryMaintainingLocalOptima,
                                             spring, 
+                                            gradientExplosionThreshold,
                                             verbose
                                         );
          }
@@ -854,6 +864,7 @@ int singleThreadedSolver(
                                                ikConfig->epochs,
                                                ikConfig->tryMaintainingLocalOptima,
                                                ikConfig->spring, 
+                                               ikConfig->gradientExplosionThreshold,
                                                ikConfig->verbose
                                              );
              
@@ -871,7 +882,14 @@ int singleThreadedSolver(
 
 
 
-
+///=====================================================================================
+///=====================================================================================
+///=====================================================================================
+///                                                                             Start of Multi Threaded Code
+///=====================================================================================
+///=====================================================================================
+///=====================================================================================
+ 
 void * iterateChainLossThread(void * ptr)
 {
   //We are a thread so lets retrieve our variables..
@@ -884,7 +902,8 @@ void * iterateChainLossThread(void * ptr)
   {
      if (ctx->problem->chain[ctx->chainID].permissionToStart)
      {
-         ctx->problem->chain[ctx->chainID].permissionToStart = 0; // We need a new permission to start again...
+         // We need a new permission to start again...
+         ctx->problem->chain[ctx->chainID].permissionToStart = 0; 
          iterateChainLoss(
                                     ctx->problem,
                                     ctx->problem->chain[ctx->chainID].currentIteration,
@@ -894,6 +913,7 @@ void * iterateChainLossThread(void * ptr)
                                     ctx->ikConfig->epochs,
                                     ctx->ikConfig->tryMaintainingLocalOptima,
                                     ctx->ikConfig->spring, 
+                                    ctx->ikConfig->gradientExplosionThreshold,
                                     ctx->ikConfig->verbose
                                   );      
     }
@@ -960,6 +980,7 @@ int multiThreadedSolver(
                                                    ikConfig->epochs,
                                                    ikConfig->tryMaintainingLocalOptima,
                                                    ikConfig->spring, 
+                                                   ikConfig->gradientExplosionThreshold,
                                                    ikConfig->verbose
                                                  );
                                                  
@@ -1028,16 +1049,17 @@ int multiThreadedSolver(
          }
     }
     
-    
-    
-    
-    
-    
   //This should make the thread release all of its resources (?)
   //pthread_detach(pthread_self());
 }
 
-
+///=====================================================================================
+///=====================================================================================
+///=====================================================================================
+///                                                                             End of Multi Threaded Code
+///=====================================================================================
+///=====================================================================================
+///=====================================================================================
 
 
 

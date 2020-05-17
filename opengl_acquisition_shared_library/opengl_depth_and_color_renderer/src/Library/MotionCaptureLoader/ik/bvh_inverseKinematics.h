@@ -129,6 +129,7 @@ struct ikConfiguration
   unsigned int considerPreviousSolution;
   unsigned int tryMaintainingLocalOptima;
   float spring; 
+  float gradientExplosionThreshold;
   unsigned int dumpScreenshots;
   unsigned int verbose;
   float ikVersion;
