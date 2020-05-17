@@ -680,10 +680,11 @@ if (iterationID==0)
 
 
         if  ( 
-                //Safeguard agains gradient explosions which we detect when we see large gradients or NaNs
+                //Safeguard agains gradient explosions which we detect when we see large gradients  
                  (fabs(delta[0]>gradientExplosionThreshold)) || 
                  (fabs(delta[1]>gradientExplosionThreshold)) || 
                  (fabs(delta[2]>gradientExplosionThreshold)) ||  
+                 //Safeguard against NaNs
                  (delta[0]!=delta[0]) || 
                  (delta[1]!=delta[1]) || 
                  (delta[2]!=delta[2]) 
