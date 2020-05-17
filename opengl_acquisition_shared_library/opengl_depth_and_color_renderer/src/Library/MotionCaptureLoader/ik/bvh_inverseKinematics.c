@@ -679,6 +679,9 @@ if (iterationID==0)
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
 
+
+
+        
         if  ( 
                 //Safeguard agains gradient explosions which we detect when we see large gradients  
                  (fabs(delta[0]>gradientExplosionThreshold)) || 
@@ -704,7 +707,22 @@ if (iterationID==0)
             executedEpochs=currentEpoch;
              break;
         }
-         
+/* 
+        else 
+        { 
+        if  ( 
+                //Safeguard agains gradient explosions which we detect when we see large gradients  
+                 (fabs(delta[0]>50)) || 
+                 (fabs(delta[1]>50)) || 
+                 (fabs(delta[2]>50))  
+             )
+        {
+             fprintf(stderr,YELLOW "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
+             fprintf(stderr,YELLOW "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
+             exit(0);
+        }
+        }
+*/
         //Remember previous loss/values 
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];

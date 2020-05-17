@@ -769,7 +769,7 @@ int bvhTestIK(
                     ikConfig.iterations = iterations;
                     ikConfig.epochs = epochs;
                     ikConfig.spring = spring;
-                    ikConfig.gradientExplosionThreshold = 250;
+                    ikConfig.gradientExplosionThreshold = 50;
                     ikConfig.dumpScreenshots = 1;
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
                     ikConfig.verbose = 1;
