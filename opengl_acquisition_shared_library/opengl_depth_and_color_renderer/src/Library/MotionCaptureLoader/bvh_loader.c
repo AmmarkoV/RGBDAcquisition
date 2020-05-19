@@ -1482,4 +1482,25 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 
 
 
+
+
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief An array with BVH string labels\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"static const char * BVH3DPositionalOutputArrayNames[] =\n");
+  fprintf(stdout,"{\n");
+  comma=',';
+  countOfChannels=0;
+  for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
+  { 
+           coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels);
+           ++countOfChannels;
+           coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels);
+           ++countOfChannels;
+           coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels); 
+           ++countOfChannels; 
+  }
+  fprintf(stdout,"};\n\n\n\n");
+
+
 }
