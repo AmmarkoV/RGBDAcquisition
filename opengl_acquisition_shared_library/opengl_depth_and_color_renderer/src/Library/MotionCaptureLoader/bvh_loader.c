@@ -1462,7 +1462,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief This is a programmer friendly enumerator to access 3D output  extracted from the BVH file.\n");
   fprintf(stdout," */\n");
-  fprintf(stdout,"enum 3D_Output_Joints\n");
+  fprintf(stdout,"enum BVH_3D_Output_Joints\n");
   fprintf(stdout,"{\n");
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
