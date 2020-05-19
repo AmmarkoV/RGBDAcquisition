@@ -1453,4 +1453,33 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   }
   fprintf(stdout,"};\n\n\n");
 
+
+
+  comma=',';
+  //coord='X'; It is always reassigned before use..
+  countOfChannels=0;
+
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief This is a programmer friendly enumerator to access 3D output  extracted from the BVH file.\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"enum 3D_Output_Joints\n");
+  fprintf(stdout,"{\n");
+  for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+     snprintf(label,512,"%s",bvhMotion->jointHierarchy[i].jointName);
+     uppercase(label);
+     coord='X'; 
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     ++countOfChannels;
+     coord='Y'; 
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     ++countOfChannels;
+     coord='Z'; 
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     ++countOfChannels;
+  } 
+  fprintf(stdout,"};\n\n\n");
+
+
+
 }

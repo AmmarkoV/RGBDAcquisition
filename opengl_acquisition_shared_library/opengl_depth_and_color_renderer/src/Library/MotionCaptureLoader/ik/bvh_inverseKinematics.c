@@ -707,8 +707,7 @@ if (iterationID==0)
             executedEpochs=currentEpoch;
              break;
         }
-/* 
-        else 
+/*     else 
         { 
         if  ( 
                 //Safeguard agains gradient explosions which we detect when we see large gradients  
