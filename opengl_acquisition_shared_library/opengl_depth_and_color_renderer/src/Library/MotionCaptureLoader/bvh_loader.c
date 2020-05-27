@@ -1280,7 +1280,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
     fprintf(stdout,"___________________________________\n");
-    fprintf(stdout,GREEN "Joint %u - %s " NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
+    fprintf(stdout,GREEN "Joint %u - %s/%s " NORMAL ,i,bvhMotion->jointHierarchy[i].jointName,bvhMotion->jointHierarchy[i].jointNameLowercase);
     unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
     fprintf(stdout," | Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
     //===============================================================

@@ -183,41 +183,54 @@ int controlScene(const char * name,const char * variable,int control,float value
   OPENGL_ACQUISITION_ROTATION_XYZ,         //2
   OPENGL_ACQUISITION_JOINT_ROTATION_XYZ,   //3
   OPENGL_ACQUISITION_JOINT_ROTATION_ZXY,   //4
-  OPENGL_ACQUISITION_JOINT_ROTATION_TEST,  //5
-  OPENGL_ACQUISITION_COLOR_RGB,            //6
+  OPENGL_ACQUISITION_JOINT_ROTATION_ZYX,   //5
+  OPENGL_ACQUISITION_JOINT_ROTATION_TEST,  //6
+  OPENGL_ACQUISITION_COLOR_RGB,            //7
 */
  float coords[4]={0};
 
-
- if (control==1)
- {
-    coords[0]=valueA;
-    coords[1]=valueB;
-    coords[2]=valueC;
-    return moveAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,0,coords,3);
- }
-
- if (control==3)
+  switch(control)
   {
-    coords[0]=valueA;
-    coords[1]=valueB;
-    coords[2]=valueC;
-  } else
- if (control==4)
-  {
-    coords[0]=valueC;
-    coords[1]=valueA;
-    coords[2]=valueB;
-  } else
- if (control==5)
-  {
-    coords[0]=-1*valueA;
-    coords[1]=-1*valueB;
-    coords[2]=-1*valueC;
-  } else
-  {
-    fprintf(stderr,"Unhandled control for controlScene\n");
-  }
+     case 0: //OPENGL_ACQUISITION_NOCONTROL
+       return 0;
+     break;
+     case 1: //OPENGL_ACQUISITION_POSITION_XYZ
+       coords[0]=valueA;
+       coords[1]=valueB;
+       coords[2]=valueC;
+       return moveAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,0,coords,3);
+     break;
+     case 2: //OPENGL_ACQUISITION_ROTATION_XYZ
+       fprintf(stderr,"OPENGL_ACQUISITION_ROTATION_XYZ not implemented..!\n");
+       return 0;
+     break;
+     case 3: //OPENGL_ACQUISITION_JOINT_ROTATION_XYZ
+       coords[0]=valueA;
+       coords[1]=valueB;
+       coords[2]=valueC;
+     break;
+     case 4: //OPENGL_ACQUISITION_JOINT_ROTATION_ZXY
+       coords[0]=valueC;
+       coords[1]=valueA;
+       coords[2]=valueB;
+     break;
+     case 5: //OPENGL_ACQUISITION_JOINT_ROTATION_ZYX
+       coords[0]=valueC;
+       coords[1]=valueA;
+       coords[2]=valueB;
+     break;
+     case 6: //OPENGL_ACQUISITION_JOINT_ROTATION_TEST
+       coords[0]=-1*valueA;
+       coords[1]=-1*valueB;
+       coords[2]=-1*valueC;
+     break;
+     case 7: //OPENGL_ACQUISITION_COLOR_RGB
+       fprintf(stderr,"OPENGL_ACQUISITION_COLOR_RGB not implemented..!\n");
+     break;
+     default :
+       fprintf(stderr,"Unhandled control (%u) for controlScene call\n",control);
+       return 0;
+  };
 
  return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
 }
