@@ -188,7 +188,7 @@ int controlScene(const char * name,const char * variable,int control,float value
   OPENGL_ACQUISITION_COLOR_RGB,            //7
 */
  float coords[4]={0};
-
+ char doRotationControl=0;
   switch(control)
   {
      case 0: //OPENGL_ACQUISITION_NOCONTROL
@@ -208,21 +208,25 @@ int controlScene(const char * name,const char * variable,int control,float value
        coords[0]=valueA;
        coords[1]=valueB;
        coords[2]=valueC;
+       doRotationControl=1;
      break;
      case 4: //OPENGL_ACQUISITION_JOINT_ROTATION_ZXY
        coords[0]=valueC;
        coords[1]=valueA;
        coords[2]=valueB;
+       doRotationControl=1;
      break;
      case 5: //OPENGL_ACQUISITION_JOINT_ROTATION_ZYX
        coords[0]=valueC;
-       coords[1]=valueA;
-       coords[2]=valueB;
+       coords[1]=valueB;
+       coords[2]=valueA;
+       doRotationControl=1;
      break;
      case 6: //OPENGL_ACQUISITION_JOINT_ROTATION_TEST
        coords[0]=-1*valueA;
        coords[1]=-1*valueB;
        coords[2]=-1*valueC;
+       doRotationControl=1;
      break;
      case 7: //OPENGL_ACQUISITION_COLOR_RGB
        fprintf(stderr,"OPENGL_ACQUISITION_COLOR_RGB not implemented..!\n");
@@ -232,7 +236,9 @@ int controlScene(const char * name,const char * variable,int control,float value
        return 0;
   };
 
- return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+  if (doRotationControl)
+      { return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3); }
+  return 0;
 }
 
 int passUserCommand(const char * command,const char * value)
