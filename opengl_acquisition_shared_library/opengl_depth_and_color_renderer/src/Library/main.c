@@ -222,7 +222,7 @@ int controlScene(const char * name,const char * variable,int control,float value
        coords[2]=valueA;
        doRotationControl=1;
      break;
-     case 6: //OPENGL_ACQUISITION_JOINT_ROTATION_TEST
+     case 6: //OPENGL_ACQUISITION_JOINT_ROTATION_NEGATIVE_XYZ
        coords[0]=-1*valueA;
        coords[1]=-1*valueB;
        coords[2]=-1*valueC;
