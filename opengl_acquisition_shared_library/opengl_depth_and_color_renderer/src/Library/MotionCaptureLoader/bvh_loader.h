@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.4";
+static const char BVH_LOADER_VERSION_STRING [] = "0.41";
 
 
 /**
@@ -150,6 +150,7 @@ struct BVH_Joint
   char hasEndSite;
   //--------------------
   char jointName[MAX_BVH_JOINT_NAME+1];
+  char jointNameLowercase[MAX_BVH_JOINT_NAME+1];
   unsigned int jointNameHash;
   //--------------------
   unsigned int parentJoint;

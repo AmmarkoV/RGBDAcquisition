@@ -246,11 +246,13 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //We encountered something like |JOINT Chest|
                if (debug) fprintf(stderr,"-J-");
                //Store new Joint Name
-               InputParser_GetWord(
-                                    ipcB,1,
-                                    bvhMotion->jointHierarchy[jNum].jointName ,
-                                    MAX_BVH_JOINT_NAME
-                                  );
+               InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
+               
+                //Also store lowercase version of joint name for internal use   
+                snprintf(bvhMotion->jointHierarchy[jNum].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jNum].jointName);
+                lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
+                bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);              
+                                  
                if (debug) fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
                //Store new Joint Hierarchy Level
                //Rest of the information will be filled in when we reach an {

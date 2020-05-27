@@ -7,8 +7,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODUL
 add_library(assimpLoader SHARED  
             assimp_loader.cpp
             assimp_loader.h   
-               ../../src/ModelLoader/model_loader_tri.c
-               ../../src/ModelLoader/model_loader_tri.h
+               ../../src/Library/ModelLoader/model_loader_tri.c
+               ../../src/Library/ModelLoader/model_loader_tri.h
            ) 
 target_link_libraries(assimpLoader m assimp) 
  
@@ -20,8 +20,8 @@ add_executable(assimpTester
                assimp_loader.h  
                assimp_bvh.cpp
                assimp_bvh.h
-               ../../src/ModelLoader/model_loader_tri.c
-               ../../src/ModelLoader/model_loader_tri.h 
+               ../../src/Library/ModelLoader/model_loader_tri.c
+               ../../src/Library/ModelLoader/model_loader_tri.h 
                ) 
 target_link_libraries(assimpTester rt m assimp ) 
 #add_dependencies(assimpTester OGLRendererSandbox)  

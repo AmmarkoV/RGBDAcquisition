@@ -373,11 +373,16 @@ int bvh_getJointIDFromJointNameNocase(
    snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
    lowercase(jointNameLowercase);
 
-   return bvh_getJointIDFromJointName(
-                                      bvhMotion ,
-                                      jointNameLowercase,
-                                      jID
-                                     );
+  unsigned int i=0;
+   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   {
+     if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
+     {
+         *jID=i;
+         return 1;
+     }
+   }
+ return 0;
 }
 
 
