@@ -14,6 +14,8 @@ void lowercase(char *a);
 void uppercase(char *a);
 
 
+unsigned long hashFunctionJoints(const char *str);
+
 void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion);
 
 /**

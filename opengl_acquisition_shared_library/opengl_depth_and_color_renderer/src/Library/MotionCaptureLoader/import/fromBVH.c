@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include "../../TrajectoryParser/InputParser_C.h"
+#include "../edit/bvh_rename.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -225,7 +226,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName ,MAX_BVH_JOINT_NAME);
                 
                 //Also store lowercase version of joint name for internal use   
-                snprintf(bvhMotion->jointHierarchy[jNum].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jNum].jointName);
+                strncpy(bvhMotion->jointHierarchy[jNum].jointNameLowercase,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
+                //snprintf(bvhMotion->jointHierarchy[jNum].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jNum].jointName);
                 lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
                 bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);        
                
@@ -266,7 +268,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
                
                 //Also store lowercase version of joint name for internal use   
-                snprintf(bvhMotion->jointHierarchy[jNum].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jNum].jointName);
+                strncpy(bvhMotion->jointHierarchy[jNum].jointNameLowercase,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
+                //snprintf(bvhMotion->jointHierarchy[jNum].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jNum].jointName);
                 lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
                 bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);              
                                   

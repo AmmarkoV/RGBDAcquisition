@@ -181,7 +181,8 @@ void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
 
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
-            snprintf(bvhMotion->jointHierarchy[jID].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jID].jointName);
+            strncpy(bvhMotion->jointHierarchy[jID].jointNameLowercase,bvhMotion->jointHierarchy[jID].jointName,MAX_BVH_JOINT_NAME);
+            //snprintf(bvhMotion->jointHierarchy[jID].jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jID].jointName);
             lowercase(bvhMotion->jointHierarchy[jID].jointNameLowercase);
             bvhMotion->jointHierarchy[jID].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jID].jointNameLowercase);
         }
@@ -377,7 +378,8 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     if (changedSomething)
                         {
                             //Since jN is pointing to the lower case buffer and we have corrected the lowercase buffer lets copy this back to the regular joint name!
-                            snprintf(bvhMotion->jointHierarchy[jID].jointName,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jID].jointNameLowercase);
+                            //snprintf(bvhMotion->jointHierarchy[jID].jointName,MAX_BVH_JOINT_NAME,"%s",bvhMotion->jointHierarchy[jID].jointNameLowercase);
+                            strncpy(bvhMotion->jointHierarchy[jID].jointNameLowercase,bvhMotion->jointHierarchy[jID].jointName,MAX_BVH_JOINT_NAME);
                         }
 
                 }
