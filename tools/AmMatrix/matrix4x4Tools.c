@@ -7,6 +7,7 @@
 #include "matrix4x4Tools.h"
 
 #define OPTIMIZED 1
+#define INTEL_OPTIMIZATIONS 0
 
 #define PRINT_MATRIX_DEBUGGING 0
 
@@ -1059,10 +1060,15 @@ int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
   return 1;
 }
 
+
+#if INTEL_OPTIMIZATIONS
 #include <xmmintrin.h>
+#endif
+
 //__attribute__((aligned(16)))
 int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matrixB)
 { 
+#if INTEL_OPTIMIZATIONS
     float *A = matrixA;
     float *B = matrixB;
     float *C  = result;
@@ -1085,6 +1091,10 @@ int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matri
                         _mm_mul_ps(brod4, row4)));
         _mm_store_ps(&C[4*i], row);
     }
+#else 
+   multiplyTwo4x4FMatrices(result ,matrixA,matrixB); 
+#endif
+
 }
 
 
