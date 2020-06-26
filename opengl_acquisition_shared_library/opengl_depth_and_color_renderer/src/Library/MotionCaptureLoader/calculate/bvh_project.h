@@ -26,7 +26,7 @@ struct BVH_RendererConfiguration
   float k1,k2,k3,p1,p2;
   //----------
   //float R[9];
-  float T[3];
+  float T[4];
   float projection[16];
   float viewMatrix[16];
   int viewport[4];

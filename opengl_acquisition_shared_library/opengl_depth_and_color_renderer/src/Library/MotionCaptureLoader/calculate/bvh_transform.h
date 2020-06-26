@@ -1,3 +1,11 @@
+/** @file bvh_transform.h
+ *  @brief  BVH 3D Transormation code.  
+ *          This part of the code does not deal with loading or changing the BVH file but just performing 3D transformations.
+ *          In order to keep things clean all transforms take place in the BVH_Transform structure. The 3D calculation code is 
+ *          also seperated using the AmMatrix sublibrary https://github.com/AmmarkoV/RGBDAcquisition/tree/master/tools/AmMatrix  
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+ 
 #ifndef BVH_TRANSFORM_H_INCLUDED
 #define BVH_TRANSFORM_H_INCLUDED
 
