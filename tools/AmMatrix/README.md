@@ -2,7 +2,7 @@
 
 This is a small library that can facilitate basic 3D geometry linear algebra.!
 
-This code base has 
+This code base has :
 
 - Code that can handle simple 3x3 matrix math -> [Source](https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/matrix3x3Tools.c) / [Header](https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/matrix3x3Tools.h)
 - Code that can handle simple 4x4 matrix math -> [Source](https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/matrix4x4Tools.c) / [Header](https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/matrix4x4Tools.h)
@@ -13,7 +13,7 @@ This code base has
 
 
 
-The repository also contains some stub code that contains SSE implementation of some heavy 4x4 matrix math, as well as some other incomplete math functions for solving linear systems, handling simple collisions
+The repository also contains some stub code that contains SSE implementation of some heavy 4x4 matrix math, as well as some other incomplete math functions for solving linear systems, handling simple collisions etc.
 
 
 
