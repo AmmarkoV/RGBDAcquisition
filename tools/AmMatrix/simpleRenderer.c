@@ -3,6 +3,92 @@
 #include "matrixOpenGL.h"
 #include <stdio.h>
 
+
+int simpleRendererDefaults(
+                            struct simpleRenderer * sr,
+                            unsigned int width,
+                            unsigned int height,
+                            float fX,
+                            float fY
+                            )
+{
+  sr->width=width;
+  sr->height=height;
+  sr->fx = fX;
+  sr->fy = fY;
+  sr->skew = 0.0;
+  sr->cx = (float) width/2;
+  sr->cy = (float) height/2;
+  sr->near = 1.0;
+  sr->far = 10000.0;
+
+  //-----------------------------------
+  sr->cameraOffsetPosition[0]=0.0;
+  sr->cameraOffsetPosition[1]=0.0;
+  sr->cameraOffsetPosition[2]=0.0;
+  sr->cameraOffsetPosition[3]=0.0;
+  //-----------------------------------
+  sr->cameraOffsetRotation[0]=0.0;
+  sr->cameraOffsetRotation[1]=0.0;
+  sr->cameraOffsetRotation[2]=0.0;
+  sr->cameraOffsetRotation[3]=0.0;
+  //-----------------------------------
+  return 1;
+}
+
+
+
+int simpleRendererInitialize(struct simpleRenderer * sr)
+{
+  sr->viewport[0]=0;
+  sr->viewport[1]=0;
+  sr->viewport[2]=sr->width;
+  sr->viewport[3]=sr->height;
+
+  buildOpenGLProjectionForIntrinsics(
+                                      sr->projectionMatrix ,
+                                      sr->viewport ,
+                                      sr->fx,
+                                      sr->fy,
+                                      sr->skew,
+                                      sr->cx,
+                                      sr->cy,
+                                      sr->width,
+                                      sr->height,
+                                      sr->near,
+                                      sr->far
+                                     );
+
+   double viewMatrixD[16];
+   create4x4DIdentityMatrix(viewMatrixD);
+
+   create4x4DScalingMatrix(viewMatrixD,0.01,0.01,-0.01);
+   copy4x4DMatrixTo4x4F(sr->viewMatrix,viewMatrixD);
+
+   //Initialization of matrices not yet used
+   create4x4FIdentityMatrix(sr->modelMatrix);
+   create4x4FIdentityMatrix(sr->modelViewMatrix);
+
+ return 1;
+}
+
+
+
+
+
+
+
+
+int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
+{
+  //We basically have to do nothing to initialize this way since we have an explicit configuration populating our struct
+  //This call is made to basically track when we try to use an explicit configuration
+  return 1;
+}
+
+
+
+
 int simpleRendererRender(
                          struct simpleRenderer * sr ,
                          float * position3D,
@@ -181,90 +267,22 @@ int simpleRendererRenderUsingPrecalculatedMatrices(
 }
 
 
-int simpleRendererDefaults(
-                            struct simpleRenderer * sr,
-                            unsigned int width,
-                            unsigned int height,
-                            float fX,
-                            float fY
-                            )
-{
-  sr->width=width;
-  sr->height=height;
-  sr->fx = fX;
-  sr->fy = fY;
-  sr->skew = 0.0;
-  sr->cx = (float) width/2;
-  sr->cy = (float) height/2;
-  sr->near = 1.0;
-  sr->far = 10000.0;
 
-  //-----------------------------------
-  sr->cameraOffsetPosition[0]=0.0;
-  sr->cameraOffsetPosition[1]=0.0;
-  sr->cameraOffsetPosition[2]=0.0;
-  sr->cameraOffsetPosition[3]=0.0;
-  //-----------------------------------
-  sr->cameraOffsetRotation[0]=0.0;
-  sr->cameraOffsetRotation[1]=0.0;
-  sr->cameraOffsetRotation[2]=0.0;
-  sr->cameraOffsetRotation[3]=0.0;
-  //-----------------------------------
-  return 1;
+
+//TODO : I should add simpleRendererRenderUsingPrecalculatedMatrices from vectors to cut down on extensive function calling and make the code more efficient
+int simpleRendererMultiRenderUsingPrecalculatedMatrices(
+                                                          struct simpleRenderer * sr ,
+                                                          float * position3DVector,
+                                                          unsigned int numberOf3DPoints,
+                                                          ///---------------
+                                                          float * output2DX,
+                                                          float * output2DY,
+                                                          float * output2DW
+                                                        )
+{ 
+  
+  return 0;
 }
-
-
-int simpleRendererInitialize(struct simpleRenderer * sr)
-{
-  sr->viewport[0]=0;
-  sr->viewport[1]=0;
-  sr->viewport[2]=sr->width;
-  sr->viewport[3]=sr->height;
-
-  buildOpenGLProjectionForIntrinsics(
-                                      sr->projectionMatrix ,
-                                      sr->viewport ,
-                                      sr->fx,
-                                      sr->fy,
-                                      sr->skew,
-                                      sr->cx,
-                                      sr->cy,
-                                      sr->width,
-                                      sr->height,
-                                      sr->near,
-                                      sr->far
-                                     );
-
-   double viewMatrixD[16];
-   create4x4DIdentityMatrix(viewMatrixD);
-
-   create4x4DScalingMatrix(viewMatrixD,0.01,0.01,-0.01);
-   copy4x4DMatrixTo4x4F(sr->viewMatrix,viewMatrixD);
-
-   //Initialization of matrices not yet used
-   create4x4FIdentityMatrix(sr->modelMatrix);
-   create4x4FIdentityMatrix(sr->modelViewMatrix);
-
- return 1;
-}
-
-
-
-
-
-
-
-
-int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
-{
-  //We basically have to do nothing to initialize this way since we have an explicit configuration populating our struct
-  //This call is made to basically track when we try to use an explicit configuration
-  return 1;
-}
-
-
-
-
 
 
 
