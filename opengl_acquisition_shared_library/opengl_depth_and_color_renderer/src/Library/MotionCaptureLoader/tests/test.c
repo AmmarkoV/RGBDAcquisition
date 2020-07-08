@@ -7,7 +7,8 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
     //Test getting rotations for a joint..
     BVHJointID jID=0;
-    if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+    //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+    if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
     {
       fprintf(stderr,"\nJoint %s (#%u) \n",bvhMotion->jointHierarchy[jID].jointName,jID);
 

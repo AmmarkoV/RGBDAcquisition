@@ -154,7 +154,8 @@ int getAssociatedPositionsAndRotationsForJointAssociation(
   if (
       (bvhtri->jointAssociation[jAssociationID].useJoint) &&
         (
-         bvh_getJointIDFromJointName(
+         //bvh_getJointIDFromJointName(
+         bvh_getJointIDFromJointNameNocase(
                                       mc,
                                       bvhtri->jointAssociation[jAssociationID].bvhJointName,
                                       &jID
@@ -353,7 +354,8 @@ int dumpBVHToTrajectoryParserTRI(
     for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
        {
          if (
-              bvh_getJointIDFromJointName(
+              //bvh_getJointIDFromJointName(
+              bvh_getJointIDFromJointNameNocase(
                                            mc,
                                            bvhtri->jointAssociation[jAssociationID].bvhJointName,
                                            &jID

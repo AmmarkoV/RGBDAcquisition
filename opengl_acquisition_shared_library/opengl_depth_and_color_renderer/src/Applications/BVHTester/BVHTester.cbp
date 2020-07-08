@@ -19,6 +19,9 @@
 					<Add option="-pedantic" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-lpthread" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="../../../BVHTester" prefix_auto="1" extension_auto="1" />
@@ -125,6 +128,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/ik/levmar.c">
 			<Option compilerVar="CC" />
 		</Unit>

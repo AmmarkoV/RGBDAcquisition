@@ -53,14 +53,15 @@ int bvh_PerturbJointAnglesRange(
     int success=1;
 
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0; 
+    BVHJointID jID=0;
     fprintf(stderr,"Randomizing : ");
     unsigned int i=0;
     for (i=iplus2+1; i<=iplus2+numberOfValues; i++)
      {
       fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
       if (
-           bvh_getJointIDFromJointName(
+           //bvh_getJointIDFromJointName(
+           bvh_getJointIDFromJointNameNocase(
                                        mc,
                                        argv[i],
                                        &jID
@@ -170,13 +171,14 @@ int bvh_eraseJoints(
   {
     unsigned int success=1;
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0; 
+    BVHJointID jID=0;
     fprintf(stderr,"Erasing : ");
     unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (
-           bvh_getJointIDFromJointName(
+           //bvh_getJointIDFromJointName(
+           bvh_getJointIDFromJointNameNocase(
                                        mc,
                                        argv[i],
                                        &jID

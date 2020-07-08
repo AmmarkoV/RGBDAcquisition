@@ -480,13 +480,13 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
          }
     }
 
- 
+
       unsigned int mID_Initial,mID_Target;
       for (int frameID=0; frameID<bvhMotion->numberOfFramesEncountered; frameID++)
        {
          //fprintf(stderr,"FrameNumber %u\n",frameID);
          for (int mID=0; mID<bvhMotion->numberOfValuesPerFrame; mID++)
-         { 
+         {
              unsigned int  jointID = bvhMotion->motionToJointLookup[mID].jointID;
              int isMIDProtected=0;
 
@@ -562,8 +562,8 @@ int bvh_changeJointDimensions(
     //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
 
     BVHJointID jID=0;
-   //if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
-   if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+   if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
+   //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
    {
        unsigned int angleX = 0;
        unsigned int angleY = 1;
@@ -914,8 +914,9 @@ int bvh_selectJoints(
     unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
-      if (
-              bvh_getJointIDFromJointName(mc,argv[i],&jID)
+        if (
+              //bvh_getJointIDFromJointName(mc,argv[i],&jID)
+              bvh_getJointIDFromJointNameNocase(mc,argv[i],&jID)
            )
          {
            fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
@@ -973,7 +974,8 @@ int bvh_selectJointsToHide2D(
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (
-              bvh_getJointIDFromJointName(mc,argv[i],&jID)
+              bvh_getJointIDFromJointNameNocase(mc,argv[i],&jID)
+              //bvh_getJointIDFromJointName(mc,argv[i],&jID)
            )
          {
            fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
@@ -1276,7 +1278,7 @@ void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,stru
 void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
 {
   fprintf(stdout,"\n\n\nPrinting BVH file..\n");
-  
+
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
     fprintf(stdout,"___________________________________\n");
@@ -1327,7 +1329,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
 void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
 {
   fprintf(stdout,"\n\n\nPrinting BVH JointToMotion lookup table..\n");
-  fprintf(stdout,"_______________________________________________\n"); 
+  fprintf(stdout,"_______________________________________________\n");
   for (unsigned int fID=0; fID<bvhMotion->numberOfFrames; fID++)
   {
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -1473,16 +1475,16 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   {
      snprintf(label,512,"%s",bvhMotion->jointHierarchy[i].jointName);
      uppercase(label);
-     coord='X'; 
-     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     coord='X';
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels);
      ++countOfChannels;
-     coord='Y'; 
-     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     coord='Y';
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels);
      ++countOfChannels;
-     coord='Z'; 
-     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels); 
+     coord='Z';
+     fprintf(stdout,"BVH_3DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels);
      ++countOfChannels;
-  } 
+  }
   fprintf(stdout,"};\n\n\n");
 
 
@@ -1497,13 +1499,13 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   comma=',';
   countOfChannels=0;
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
-  { 
+  {
            coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels);
            ++countOfChannels;
            coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels);
            ++countOfChannels;
-           coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels); 
-           ++countOfChannels; 
+           coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // %u\n",bvhMotion->jointHierarchy[i].jointName,coord,comma,countOfChannels);
+           ++countOfChannels;
   }
   fprintf(stdout,"};\n\n\n\n");
 
