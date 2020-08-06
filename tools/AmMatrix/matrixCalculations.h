@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-
+#include "matrix4x4Tools.h"
 
 /**
 * @author Greg James - gjames@NVIDIA.com , Lisc: Free code - no warranty & no money back.  Use it all you want
@@ -64,7 +64,7 @@ float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float rad
 * @param  Input Translation 3x1
 * @retval 0=Failure,1=Success
 */
-int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);
+int projectPointsFrom3Dto2D(float * x2D,float * y2D ,float * x3D,float *y3D ,float * z3D ,float * intrinsics ,float * rotation3x3 ,float * translation);
 
 
 
@@ -89,7 +89,7 @@ int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  d
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  );
+int move3DPoint(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D);
 
 
 /**
@@ -283,7 +283,7 @@ static inline float sqrt_fast_approximation(const float x)
 * @param  Point B
 * @retval Distance between the two points
 */
-double distanceBetween3DPoints(double * p1, double * p2);
+float distanceBetween3DPoints(float * p1, float * p2);
 
 /**
 * @brief Find an approximation of the distance between 2 points

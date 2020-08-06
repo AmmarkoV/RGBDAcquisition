@@ -824,14 +824,14 @@ int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4
 }
 
 
-int transform3FNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D)
+int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D)
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
 
 
   if (point3D[3]!=0.0)
   {
-    fprintf(stderr,"Error with W coordinate transform3DNormalVectorUsing3x3PartOf4x4Matrix , should be zero  \n");
+    fprintf(stderr,"Error with W coordinate transform3DNormalVectorUsing3x3FPartOf4x4FMatrix , should be zero  \n");
     return 0;
   }
 

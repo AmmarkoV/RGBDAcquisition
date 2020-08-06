@@ -160,8 +160,6 @@ static const char * ROTATION_ORDER_NAMESA[] =
   "INVALID_ROTATION_ORDER"
 };
 
-
-
 enum ROTATION_ORDER
 {
   ROTATION_ORDER_NONE=0,
@@ -175,7 +173,6 @@ enum ROTATION_ORDER
   //--------------------
   ROTATION_ORDER_NUMBER_OF_NAMES
 };
-
 
 /**
 * @brief Convert euler angles in degrees to a 4x4 rotation matrix using any rotation order wanted
@@ -308,8 +305,8 @@ int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D, float * transf
 * @param  Input 4x4 Matrix A
 * @param  Input Vector 4x1 V where W coordinate should be 0
 * @retval 0=failure,1=success
-*/
-int transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D);
+*/ 
+int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D);
 
 
 

@@ -10,7 +10,6 @@
 #define BVH_TRANSFORM_H_INCLUDED
 
 #include "../bvh_loader.h"
-#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #ifdef __cplusplus
 extern "C"

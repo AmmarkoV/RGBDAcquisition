@@ -15,8 +15,9 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.41";
+static const char BVH_LOADER_VERSION_STRING [] = "0.43";
 
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 /**
 * @brief MAX_BVH_JOINT_NAME is the maximum label size for Joint names
@@ -158,7 +159,7 @@ struct BVH_Joint
   unsigned int hierarchyLevel;
   //--------------------
   float offset[3];
-  float staticTransformation[16];
+  struct Matrix4x4OfFloats staticTransformation;
   //--------------------
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;

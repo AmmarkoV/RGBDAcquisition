@@ -582,7 +582,7 @@ int bvh_changeJointDimensions(
        bvhMotion->jointHierarchy[jID].offset[angleZ] *= zScale;
        //fprintf(stderr,"offset is now %0.2f %0.2f %0.2f\n",bvhMotion->jointHierarchy[jID].offset[0],bvhMotion->jointHierarchy[jID].offset[1],bvhMotion->jointHierarchy[jID].offset[2]);
 
-       float * m = bvhMotion->jointHierarchy[jID].staticTransformation;
+       float * m = bvhMotion->jointHierarchy[jID].staticTransformation.m;
        m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (float) bvhMotion->jointHierarchy[jID].offset[0];
        m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (float) bvhMotion->jointHierarchy[jID].offset[1];
        m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (float) bvhMotion->jointHierarchy[jID].offset[2];
@@ -618,7 +618,7 @@ int bvh_scaleAllOffsets(
       bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
       bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
 
-       float * m = bvhMotion->jointHierarchy[jID].staticTransformation;
+       float * m = bvhMotion->jointHierarchy[jID].staticTransformation.m;
        m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (float) bvhMotion->jointHierarchy[jID].offset[0];
        m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (float) bvhMotion->jointHierarchy[jID].offset[1];
        m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (float) bvhMotion->jointHierarchy[jID].offset[2];
