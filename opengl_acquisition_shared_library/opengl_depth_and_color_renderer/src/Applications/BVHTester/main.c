@@ -48,33 +48,35 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-void prepare4x4Human36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
+void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,float rX,float rY,float rZ)
 {
-    float rXM[16],rYM[16],rZM[16];
+    struct Matrix4x4OfFloats rXM={0};
+    struct Matrix4x4OfFloats rYM={0};
+    struct Matrix4x4OfFloats rZM={0};
 
     //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
-    rXM[0]=1.0;  rXM[1]=0.0;     rXM[2]=0.0;        rXM[3]=0.0;
-    rXM[4]=0.0;  rXM[5]=cos(rX); rXM[6]=-sin(rX);   rXM[7]=0.0;
-    rXM[8]=0.0;  rXM[9]=sin(rX); rXM[10]=cos(rX);   rXM[11]=0.0;
-    rXM[12]=0.0; rXM[13]=0.0;    rXM[14]=0.0;       rXM[15]=1.0;
+    rXM.m[0]=1.0;  rXM.m[1]=0.0;     rXM.m[2]=0.0;        rXM.m[3]=0.0;
+    rXM.m[4]=0.0;  rXM.m[5]=cos(rX); rXM.m[6]=-sin(rX);   rXM.m[7]=0.0;
+    rXM.m[8]=0.0;  rXM.m[9]=sin(rX); rXM.m[10]=cos(rX);   rXM.m[11]=0.0;
+    rXM.m[12]=0.0; rXM.m[13]=0.0;    rXM.m[14]=0.0;       rXM.m[15]=1.0;
 
     //R1y=np.matrix([[np.cos(Ry),0,np.sin(Ry)], [0,1,0], [-np.sin(Ry),0,np.cos(Ry)]])     #[cos(obj.Params(2)) 0 sin(obj.Params(2)); 0 1 0; -sin(obj.Params(2)) 0 cos(obj.Params(2))]
-    rYM[0]=cos(rY);  rYM[1]=0.0;  rYM[2]=sin(rY);   rYM[3]=0.0;
-    rYM[4]=0.0;      rYM[5]=1.0;  rYM[6]=0.0;       rYM[7]=0.0;
-    rYM[8]=-sin(rY); rYM[9]=0.0;  rYM[10]=cos(rY);  rYM[11]=0.0;
-    rYM[12]=0.0;     rYM[13]=0.0; rYM[14]=0.0;      rYM[15]=1.0;
+    rYM.m[0]=cos(rY);  rYM.m[1]=0.0;  rYM.m[2]=sin(rY);   rYM.m[3]=0.0;
+    rYM.m[4]=0.0;      rYM.m[5]=1.0;  rYM.m[6]=0.0;       rYM.m[7]=0.0;
+    rYM.m[8]=-sin(rY); rYM.m[9]=0.0;  rYM.m[10]=cos(rY);  rYM.m[11]=0.0;
+    rYM.m[12]=0.0;     rYM.m[13]=0.0; rYM.m[14]=0.0;      rYM.m[15]=1.0;
 
     //R1z=np.matrix([[np.cos(Rz),-np.sin(Rz),0], [np.sin(Rz),np.cos(Rz),0], [0,0,1]])     #[cos(obj.Params(3)) -sin(obj.Params(3)) 0; sin(obj.Params(3)) cos(obj.Params(3)) 0; 0 0 1]
-    rZM[0]=cos(rZ); rZM[1]=-sin(rZ); rZM[2]=0.0;    rZM[3]=0.0;
-    rZM[4]=sin(rZ); rZM[5]=cos(rZ);  rZM[6]=0.0;    rZM[7]=0.0;
-    rZM[8]=0.0;     rZM[9]=0.0;      rZM[10]=1.0;   rZM[11]=0.0;
-    rYM[12]=0.0;    rZM[13]=0.0;     rZM[14]=0.0;   rZM[15]=1.0;
+    rZM.m[0]=cos(rZ); rZM.m[1]=-sin(rZ); rZM.m[2]=0.0;    rZM.m[3]=0.0;
+    rZM.m[4]=sin(rZ); rZM.m[5]=cos(rZ);  rZM.m[6]=0.0;    rZM.m[7]=0.0;
+    rZM.m[8]=0.0;     rZM.m[9]=0.0;      rZM.m[10]=1.0;   rZM.m[11]=0.0;
+    rYM.m[12]=0.0;    rZM.m[13]=0.0;     rZM.m[14]=0.0;   rZM.m[15]=1.0;
 
     multiplyThree4x4FMatrices(
                               rotationMatrix ,
-                              rXM ,
-                              rYM,
-                              rZM
+                              &rXM ,
+                              &rYM,
+                              &rZM
                             );
 
 }
@@ -331,7 +333,7 @@ int main(int argc,const char **argv)
           unsigned int width=atoi(argv[i+16]);
           unsigned int height=atoi(argv[i+17]);
           //-------------------------------------------------------------------------------
-          prepare4x4Human36MRotationMatrix(renderingConfiguration.viewMatrix,rX,rY,rZ);
+          prepare4x4Human36MRotationMatrix(&renderingConfiguration.viewMatrix,rX,rY,rZ);
           //copy3x3FMatrixTo4x4F(renderingConfiguration.viewMatrix,renderingConfiguration.R);
 
           // 0  1  2  3
@@ -339,9 +341,9 @@ int main(int argc,const char **argv)
           // 8  9  10 11
           // 12 13 14 15
           //----------------------------------------------------------------
-          renderingConfiguration.viewMatrix[3] =renderingConfiguration.T[0];
-          renderingConfiguration.viewMatrix[7] =renderingConfiguration.T[1];
-          renderingConfiguration.viewMatrix[11]=renderingConfiguration.T[2];
+          renderingConfiguration.viewMatrix.m[3] =renderingConfiguration.T[0];
+          renderingConfiguration.viewMatrix.m[7] =renderingConfiguration.T[1];
+          renderingConfiguration.viewMatrix.m[11]=renderingConfiguration.T[2];
           //----------------------------------------
           renderingConfiguration.viewport[0]=0;
           renderingConfiguration.viewport[1]=0;
@@ -351,7 +353,7 @@ int main(int argc,const char **argv)
           renderingConfiguration.height=height;
           //----------------------------------------
           buildOpenGLProjectionForIntrinsics(
-                                             renderingConfiguration.projection ,
+                                             renderingConfiguration.projection.m ,
                                              renderingConfiguration.viewport ,
                                              renderingConfiguration.fX,
                                              renderingConfiguration.fY,

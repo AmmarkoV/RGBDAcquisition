@@ -8,6 +8,7 @@ extern "C"
 {
 #endif
 
+#include "matrix4x4Tools.h"
 
 
 /**
@@ -160,7 +161,8 @@ void gldPerspective(
   void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
 
 
-  void getModelViewProjectionMatrixFromMatrices(float * output,float * projectionMatrix,float * viewMatrix,float * modelMatrix);
+
+void getModelViewProjectionMatrixFromMatrices(struct Matrix4x4OfFloats * output,struct Matrix4x4OfFloats * projectionMatrix,struct Matrix4x4OfFloats * viewMatrix,struct Matrix4x4OfFloats * modelMatrix);
 
 
   void prepareRenderingMatrices(

@@ -205,16 +205,17 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
-   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
-   float identMat[16];
-   float finalFrustrum[16];
-   create4x4FIdentityMatrix(identMat);
-   identMat[10]=-1;
-   multiplyTwo4x4FMatrices_Naive(finalFrustrum,identMat,frustum);
-   copy4x4FMatrix(frustum,finalFrustrum);
+   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15 
+   struct Matrix4x4OfFloats identMat={0};
+   struct Matrix4x4OfFloats finalFrustrum={0};
+   
+   create4x4FIdentityMatrix(&identMat);
+   identMat.m[10]=-1;
+   multiplyTwo4x4FMatrices_Naive(finalFrustrum.m,identMat.m,frustum);
+   copy4x4FMatrix(frustum,finalFrustrum.m);
 
    //This should produce our own Row Major Format
-   transpose4x4FMatrix(finalFrustrum);
+   transpose4x4FMatrix(finalFrustrum.m);
 }
 
 
@@ -437,18 +438,18 @@ void lookAt(
       y[2] /= mag;
     }
 
-   float initial[16];
-   initial[0] = x[0]; initial[1] = x[1]; initial[2] = x[2]; initial[3] = 0.0;
-   initial[4] = y[0]; initial[5] = y[1]; initial[6] = y[2]; initial[7] = 0.0;
-   initial[8] = z[0]; initial[9] = z[1]; initial[10]= z[2]; initial[11]= 0.0;
-   initial[12]= 0.0;  initial[13]= 0.0;  initial[14]= 0.0;  initial[15]= 1.0;
+   struct Matrix4x4OfFloats initial={0};
+   initial.m[0] = x[0]; initial.m[1] = x[1]; initial.m[2] = x[2]; initial.m[3] = 0.0;
+   initial.m[4] = y[0]; initial.m[5] = y[1]; initial.m[6] = y[2]; initial.m[7] = 0.0;
+   initial.m[8] = z[0]; initial.m[9] = z[1]; initial.m[10]= z[2]; initial.m[11]= 0.0;
+   initial.m[12]= 0.0;  initial.m[13]= 0.0;  initial.m[14]= 0.0;  initial.m[15]= 1.0;
 
 
    /* Translate Eye to Origin */
    //glTranslatef(-eyex, -eyey, -eyez);
-   float translation[16];
-   create4x4FTranslationMatrix(translation , -eyex, -eyey, -eyez );
-   multiplyTwo4x4FMatrices_Naive(matrix,initial,translation);
+   struct Matrix4x4OfFloats translation={0};
+   create4x4FTranslationMatrix(&translation , -eyex, -eyey, -eyez );
+   multiplyTwo4x4FMatrices_Naive(matrix,initial.m,translation.m);
 
 }
 
@@ -828,7 +829,7 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 
 
 
-void getModelViewProjectionMatrixFromMatrices(float * output,float * projectionMatrix,float * viewMatrix,float * modelMatrix)
+void getModelViewProjectionMatrixFromMatrices(struct Matrix4x4OfFloats * output,struct Matrix4x4OfFloats * projectionMatrix,struct Matrix4x4OfFloats * viewMatrix,struct Matrix4x4OfFloats * modelMatrix)
 {
     //fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
 
