@@ -570,19 +570,17 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
 
 
 
-
-
 /*
-    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
-    We also have an absolute position of a 3D point , and we want to calculate the relative position
-    of the 3D point in relation to the object ( unrotated relative position )
-*/
-int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
+//BROKEN WHILE TRANSITION FROM DOUBLES TO FLOATS
+// We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
+// We also have an absolute position of a 3D point , and we want to calculate the relative position
+// of the 3D point in relation to the object ( unrotated relative position )
+int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation ,float * absoluteInPoint3DRotated )
 {
-    double objectRotation3x3[9];
+    float objectRotation3x3[9];
     create3x3EulerRotationXYZOrthonormalMatrix(objectRotation3x3,objectRotation);
 
-     pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
+    pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointDVector(relativeOutPoint3DUnrotated);
@@ -593,14 +591,13 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOut
 
 
 
-/*
-    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
-    We also have an absolute position of a 3D point , and we want to calculate the relative position
-    of the 3D point in relation to the object ( unrotated relative position )
-*/
-int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
+//BROKEN WHILE TRANSITION FROM DOUBLES TO FLOATS
+//We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
+//We also have an absolute position of a 3D point , and we want to calculate the relative position
+//of the 3D point in relation to the object ( unrotated relative position )
+int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectQuaternion ,float * absoluteInPoint3DRotated )
 {
-    double objectRotation3x3[9];
+    float objectRotation3x3[9];
 
     //printf("Object Position is %f,%f,%f  \n", objectPosition[0], objectPosition[1], objectPosition[2] );
     //printf("Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
@@ -621,12 +618,11 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
 }
 
 
-/*
-    We have an object with a relative Position X,Y,Z to an Object (objectPosition[])
-*/
-int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated)
+//BROKEN WHILE TRANSITION FROM DOUBLES TO FLOATS
+//We have an object with a relative Position X,Y,Z to an Object (objectPosition[])
+int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(float * absoluteOutPoint3DRotated ,float * objectPosition ,float * objectRotation ,float * relativeInPoint3DUnrotated)
 {
-    double objectRotation3x3[9]={0};
+    float objectRotation3x3[9]={0};
     create3x3EulerRotationXYZOrthonormalMatrix(objectRotation3x3,objectRotation);
     pointFromRelationWithObjectToAbsolute(absoluteOutPoint3DRotated,objectPosition,objectRotation3x3,relativeInPoint3DUnrotated);
 
@@ -638,12 +634,11 @@ int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOut
 
 
 
-/*
-    We have an object with a relative Position X,Y,Z to an Object (objectPosition[])
-*/
-int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeInPoint3DUnrotated)
+//BROKEN WHILE TRANSITION FROM DOUBLES TO FLOATS
+//We have an object with a relative Position X,Y,Z to an Object (objectPosition[])
+int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(float * absoluteOutPoint3DRotated , float * objectPosition ,float * objectQuaternion ,float * relativeInPoint3DUnrotated)
 {
-    double objectRotation3x3[9];
+    float objectRotation3x3[9];
 
     //printf("Object Position is %f,%f,%f  \n", objectPosition[0], objectPosition[1], objectPosition[2] );
     //printf("Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
@@ -662,6 +657,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
     return 1;
 }
+*/
 
 
 void testMatrices()
@@ -670,3 +666,5 @@ void testMatrices()
    testGJSolver();
   return ; 
 }
+
+

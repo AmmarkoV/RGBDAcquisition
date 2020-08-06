@@ -296,7 +296,7 @@ int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matri
 
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
 
-int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * matrixB);
+int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
 
 int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC);
 

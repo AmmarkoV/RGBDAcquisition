@@ -122,7 +122,7 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
 * @param  Input Array of Euler Angles
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated );
+//int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation ,float * absoluteInPoint3DRotated );
 
 /**
 * @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a Quaternion Rotation
@@ -132,7 +132,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOut
 * @param  Input Array Quaternion qX qY qZ qW order
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated );
+//int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectQuaternion ,float * absoluteInPoint3DRotated );
 
 
 /**
@@ -143,7 +143,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
 * @param  Input Array of Euler Angles
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated);
+//int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(float * absoluteOutPoint3DRotated ,float * objectPosition ,float * objectRotation ,float * relativeInPoint3DUnrotated);
 
 
 
@@ -155,7 +155,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOut
 * @param  Input Array Quaternion qX qY qZ qW order
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeInPoint3DUnrotated);
+//int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(float * absoluteOutPoint3DRotated ,float * objectPosition ,float * objectQuaternion ,float * relativeInPoint3DUnrotated);
 
 
 
