@@ -204,7 +204,7 @@ int bvh_eraseJoints(
              if (bhv_jointGetEndSiteChild(mc,jID,&jIDES))
                {
                  mc->jointHierarchy[jIDES].erase2DCoordinates=1;
-                 fprintf(stderr,GREEN "%s_EndSite " NORMAL,argv[i]);
+                 fprintf(stderr,GREEN "EndSite_%s " NORMAL,argv[i]);
 
                  for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
                    {
