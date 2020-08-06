@@ -507,6 +507,7 @@ int prepareDefaultBodyProblem(
     else
     {
         fprintf(stderr,"No R toe in armature..\n");
+        bvh_printBVH(mc);
         return 0;
     }
 
@@ -602,6 +603,7 @@ int prepareDefaultBodyProblem(
     else
     {
         fprintf(stderr,"No L toe in armature..\n");
+        bvh_printBVH(mc);
         return 0;
     }
 
