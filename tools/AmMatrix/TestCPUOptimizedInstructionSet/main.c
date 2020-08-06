@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define INTEL_OPTIMIZATIONS 1
 #include "../matrix4x4Tools.h"
 
 unsigned long tickBaseMN=0;
