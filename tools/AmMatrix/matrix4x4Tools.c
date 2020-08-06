@@ -18,9 +18,7 @@ enum mat4x4Item
     I31     , I32 , I33 , I34 ,
     I41     , I42 , I43 , I44
 };
-
-
-
+ 
 enum mat4x4RTItem
 {
     r0 = 0 , r1, r2 , t0 ,
@@ -28,11 +26,7 @@ enum mat4x4RTItem
     r6     , r7 ,r8 , t2 ,
     zero0  , zero1 , zero2 , one0
 };
-
-
-
-
-
+ 
 enum mat4x4EItem
 {
     e0 = 0 , e1  , e2  , e3 ,
@@ -481,8 +475,7 @@ void create4x4DRotationZ(double * m,double degrees)
 
 
 
-
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder)
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder)
 {
    //Initialize rotation matrix..
    create4x4FIdentityMatrix(m);
@@ -496,47 +489,47 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, flo
     float degreesX = eulX;
     float degreesY = eulY;
     float degreesZ = eulZ;
-    float rX[16]={0};
-    float rY[16]={0};
-    float rZ[16]={0};
+    struct Matrix4x4OfFloats rX={0};
+    struct Matrix4x4OfFloats rY={0};
+    struct Matrix4x4OfFloats rZ={0};
 
   //Assuming the rotation axis are correct
   //rX,rY,rZ should hold our rotation matrices
-   create4x4FRotationX(rX,degreesX);
-   create4x4FRotationY(rY,degreesY);
-   create4x4FRotationZ(rZ,degreesZ);
+   create4x4FRotationX(rX.m,degreesX);
+   create4x4FRotationY(rY.m,degreesY);
+   create4x4FRotationZ(rZ.m,degreesZ);
 
   switch (rotationOrder)
   {
     case ROTATION_ORDER_XYZ :
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
     break;
     case ROTATION_ORDER_XZY :
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
     break;
     case ROTATION_ORDER_YXZ :
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
     break;
     case ROTATION_ORDER_YZX :
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
     break;
     case ROTATION_ORDER_ZXY :
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
     break;
     case ROTATION_ORDER_ZYX :
-      multiplyTwo4x4FMatricesBuffered(m,m,rZ);
-      multiplyTwo4x4FMatricesBuffered(m,m,rY);
-      multiplyTwo4x4FMatricesBuffered(m,m,rX);
+      multiplyTwo4x4FMatricesBuffered(m,m,rZ.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rY.m);
+      multiplyTwo4x4FMatricesBuffered(m,m,rX.m);
     break;
     case ROTATION_ORDER_RPY:
       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY\n");
@@ -1019,7 +1012,7 @@ int multiplyFour4x4DMatrices(double * result , double * matrixA , double * matri
 }
 
 
-int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
+int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB)
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
@@ -1102,11 +1095,22 @@ int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matri
     }
   return 1;
 #else
-  return multiplyTwo4x4FMatrices(result ,matrixA,matrixB);
+  return multiplyTwo4x4FMatrices_Naive(result ,matrixA,matrixB);
 #endif
 
 }
 
+
+
+
+int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
+{
+#if INTEL_OPTIMIZATIONS
+   return multiplyTwo4x4FMatrices_SSE(result->m,matrixA->m,matrixB->m);
+#else 
+   return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
+#endif
+}
 
 
 
@@ -1121,14 +1125,14 @@ int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * m
 }
 
 
-int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC)
+int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
 {
   if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
 
   int i=0;
-  float tmp[16];
-  i+=multiplyTwo4x4FMatrices(tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4FMatrices(result , matrixA , tmp);
+  struct Matrix4x4OfFloats tmp;
+  i+=multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4FMatricesS(result,matrixA,&tmp);
 
   return (i==2);
 }
@@ -1315,68 +1319,41 @@ int normalize3DPointDVector(double * vec)
 
 
 void doRPYTransformationF(
-                         float *m,
+                         struct Matrix4x4OfFloats * m,
                          float  rollInDegrees,
                          float  pitchInDegrees,
                          float  yawInDegrees
                         )
 {
-    float intermediateMatrixPitch[16];
-    float intermediateMatrixHeading[16];
-    float intermediateMatrixRoll[16];
-    create4x4FRotationMatrix(  intermediateMatrixRoll   , rollInDegrees,      0.0,   0.0,   1.0);
-    create4x4FRotationMatrix(  intermediateMatrixHeading, yawInDegrees,       0.0,   1.0,   0.0);
-    create4x4FRotationMatrix(  intermediateMatrixPitch  , pitchInDegrees,     1.0,   0.0,   0.0);
+    struct Matrix4x4OfFloats intermediateMatrixPitch;
+    struct Matrix4x4OfFloats intermediateMatrixHeading;
+    struct Matrix4x4OfFloats intermediateMatrixRoll;
+    create4x4FRotationMatrix(intermediateMatrixRoll.m   , rollInDegrees,      0.0,   0.0,   1.0);
+    create4x4FRotationMatrix(intermediateMatrixHeading.m, yawInDegrees,       0.0,   1.0,   0.0);
+    create4x4FRotationMatrix(intermediateMatrixPitch.m  , pitchInDegrees,     1.0,   0.0,   0.0);
 
     multiplyThree4x4FMatrices(
                               m ,
-                              intermediateMatrixRoll ,
-                              intermediateMatrixHeading ,
-                              intermediateMatrixPitch
+                              &intermediateMatrixRoll ,
+                              &intermediateMatrixHeading ,
+                              &intermediateMatrixPitch
                             );
 }
 
-
-
-
-void doRPYTransformationD(
-                         double *m,
-                         double rollInDegrees,
-                         double pitchInDegrees,
-                         double yawInDegrees
-                        )
-{
-    double intermediateMatrixPitch[16];
-    double intermediateMatrixHeading[16];
-    double intermediateMatrixRoll[16];
-    create4x4DRotationMatrix(intermediateMatrixRoll   , rollInDegrees,      0.0,   0.0,   1.0);
-    create4x4DRotationMatrix(intermediateMatrixHeading, yawInDegrees,       0.0,   1.0,   0.0);
-    create4x4DRotationMatrix(intermediateMatrixPitch  , pitchInDegrees,     1.0,   0.0,   0.0);
-
-    multiplyThree4x4DMatrices(
-                              m ,
-                              intermediateMatrixRoll ,
-                              intermediateMatrixHeading ,
-                              intermediateMatrixPitch
-                            );
-}
-
-
-
-
+ 
 
 
 void create4x4FModelTransformation(
-                                   float * m ,
-                                  //Rotation Component
-                                  float rotationX,//heading
-                                  float rotationY,//pitch
-                                  float rotationZ,//roll
-                                  unsigned int rotationOrder,
-                                  //Translation Component
-                                  float x, float y, float z ,
-                                  float scaleX, float scaleY, float scaleZ
-                                 )
+                                   struct Matrix4x4OfFloats * m ,
+                                   //Rotation Component
+                                   float rotationX,//heading
+                                   float rotationY,//pitch
+                                   float rotationZ,//roll
+                                   unsigned int rotationOrder,
+                                   //Translation Component
+                                   float x, float y, float z ,
+                                   float scaleX, float scaleY, float scaleZ
+                                  )
 {
    if (m==0) {return;}
 
@@ -1385,21 +1362,21 @@ void create4x4FModelTransformation(
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
 
-    float intermediateMatrixTranslation[16]={0};
+    struct Matrix4x4OfFloats intermediateMatrixTranslation={0};
     create4x4FTranslationMatrix(
-                                intermediateMatrixTranslation,
+                                intermediateMatrixTranslation.m,
                                 x,
                                 y,
                                 z
                                );
 
 
-    float intermediateMatrixRotation[16];
+    struct Matrix4x4OfFloats intermediateMatrixRotation;
 
 
     if ( (x==0) && (y==0) && (z==0) )
     {
-      create4x4FIdentityMatrix(intermediateMatrixRotation);
+      create4x4FIdentityMatrix(intermediateMatrixRotation.m);
     } else
     if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
@@ -1409,7 +1386,7 @@ void create4x4FModelTransformation(
     {
      //This is the old way to do this rotation
      doRPYTransformationF(
-                          intermediateMatrixRotation,
+                          &intermediateMatrixRotation,
                           rotationZ,//roll,
                           rotationY,//pitch
                           rotationX//heading
@@ -1418,7 +1395,7 @@ void create4x4FModelTransformation(
     {
      //fprintf(stderr,"Using new model transform code\n");
      create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                      intermediateMatrixRotation ,
+                                                      &intermediateMatrixRotation ,
                                                       rotationX,
                                                       rotationY,
                                                       rotationZ,
@@ -1431,17 +1408,17 @@ void create4x4FModelTransformation(
       {
         float intermediateScalingMatrix[16];
         create4x4FScalingMatrix(intermediateScalingMatrix,scaleX,scaleY,scaleZ);
-        multiplyThree4x4FMatrices(m,intermediateMatrixTranslation,intermediateMatrixRotation,intermediateScalingMatrix);
+        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
       } else
       {
-         multiplyTwo4x4FMatrices(m,intermediateMatrixTranslation,intermediateMatrixRotation);
+         multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation);
       }
 }
 
 
 
 
-
+/*
 
 void create4x4DModelTransformation(
                                   double * m ,
@@ -1513,7 +1490,7 @@ void create4x4DModelTransformation(
       {
          multiplyTwo4x4DMatrices(m,intermediateMatrixTranslation,intermediateMatrixRotation);
       }
-}
+}*/
 
 
 void create4x4DCameraModelViewMatrixForRendering(

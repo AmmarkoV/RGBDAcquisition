@@ -526,7 +526,7 @@ int bvh_loadTransformForMotionBuffer(
       if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
        create4x4FTranslationMatrix(
-                                    bvhTransform->joint[jID].dynamicTranslation,
+                                    &bvhTransform->joint[jID].dynamicTranslation,
                                     data[MOTIONBUFFER_DATA_FIELDS_POSX],
                                     data[MOTIONBUFFER_DATA_FIELDS_POSY],
                                     data[MOTIONBUFFER_DATA_FIELDS_POSZ]

@@ -11,6 +11,13 @@ OPTION (ENABLE_SHADERS ON)
 OPTION (ENABLE_ASSIMP OFF)
 OPTION (ENABLE_AMMARSERVER OFF)
 
+OPTION(INTEL_OPTIMIZATIONS OFF)
+
+if (INTEL_OPTIMIZATIONS)
+add_definitions(-DINTEL_OPTIMIZATIONS)
+endif(INTEL_OPTIMIZATIONS)
+
+
 IF( ENABLE_HIGH_PERFORMANCE_BUILD )
  set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
  set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 

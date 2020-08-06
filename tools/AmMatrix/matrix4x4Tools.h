@@ -12,6 +12,26 @@ extern "C"
 {
 #endif
 
+struct Matrix4x4OfFloats
+{
+  /*A Matrix 4x4 aligned to allow for SSE optimized calculations.
+   * 
+   * Items are stored on the m array using this ordering 
+     0   1   2   3
+     4   5   6   7
+     8   9   10  11
+     12  13  14  15
+     
+     IRC => Item Row/Column => 
+     I11     , I12 , I13 , I14 ,
+     I21     , I22 , I23 , I24 ,
+     I31     , I32 , I33 , I34 ,
+     I41     , I42 , I43 , I44
+    */
+  float __attribute__((aligned(16))) m[16];
+};
+
+
 /**
 * @brief Allocate a new 4x4 Matrix
 * @ingroup AmMatrix
@@ -212,7 +232,7 @@ enum ROTATION_ORDER
 void create4x4DMatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
 
 
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(float * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
 
 
 /**
@@ -305,7 +325,7 @@ int multiplyFour4x4DMatrices(double * result , double * matrixA , double * matri
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
+int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB);
 
 
 int codeHasSSE();
@@ -320,9 +340,12 @@ int codeHasSSE();
 */
 int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matrixB);
 
+
+int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
+
 int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * matrixB);
 
-int multiplyThree4x4FMatrices(float * result , float * matrixA , float * matrixB , float * matrixC);
+int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC);
 
 /**
 * @brief Multiply a 4x4 matrix of doubles with a double precision Vector (3D Point)  A*V
@@ -368,23 +391,20 @@ int normalize3DPointFVector(float * vec);
 */
 int normalize3DPointDVector(double * vec);
 
+
 void doRPYTransformationF(
-                         float *m,
+                         struct Matrix4x4OfFloats * m,
                          float  rollInDegrees,
                          float  pitchInDegrees,
                          float  yawInDegrees
                         );
 
-void doRPYTransformationD(
-                         double *m,
-                         double rollInDegrees,
-                         double pitchInDegrees,
-                         double yawInDegrees
-                        );
+
 /*
 */
 
 
+ 
 
 /**
 * @brief Produce a rotation and translation that will bring the scene to the coordinate frame of the camera in order to properly
@@ -405,31 +425,16 @@ void doRPYTransformationD(
 * @param  Input/Output Vector
 * @retval 0=failure,1=success
 */
-void create4x4DModelTransformation(
-                                  double * m ,
-                                  //Rotation Component
-                                  double rotationX,//heading
-                                  double rotationY,//pitch
-                                  double rotationZ,//roll
-                                  unsigned int rotationOrder,
-                                  //Translation Component
-                                  double x, double y, double z ,
-                                  double scaleX, double scaleY, double scaleZ
-                                 );
-
-
-
-
 void create4x4FModelTransformation(
-                                   float * m ,
-                                  //Rotation Component
-                                  float rotationX,//heading
-                                  float rotationY,//pitch
-                                  float rotationZ,//roll
-                                  unsigned int rotationOrder,
-                                  //Translation Component
-                                  float x, float y, float z ,
-                                  float scaleX, float scaleY, float scaleZ
+                                   struct Matrix4x4OfFloats * m ,
+                                   //Rotation Component
+                                   float rotationX,//heading
+                                   float rotationY,//pitch
+                                   float rotationZ,//roll
+                                   unsigned int rotationOrder,
+                                   //Translation Component
+                                   float x, float y, float z ,
+                                   float scaleX, float scaleY, float scaleZ
                                  );
 
 
