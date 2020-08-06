@@ -388,37 +388,63 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    create4x4FRotationY(&rY,degreesY);
    create4x4FRotationZ(&rZ,degreesZ);
 
+   #define SPEEDUP_ROTATION_CALCULATIONS 1
+
   switch (rotationOrder)
   {
     case ROTATION_ORDER_XYZ :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rX,&rY,&rZ);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+      #endif
     break;
     case ROTATION_ORDER_XZY :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rX,&rZ,&rY);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+      #endif
     break;
     case ROTATION_ORDER_YXZ :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rY,&rX,&rZ);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+      #endif
     break;
     case ROTATION_ORDER_YZX :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rY,&rZ,&rX);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+      #endif
     break;
     case ROTATION_ORDER_ZXY :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rZ,&rX,&rY);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+      #endif
     break;
     case ROTATION_ORDER_ZYX :
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+      #if SPEEDUP_ROTATION_CALCULATIONS 
+       multiplyThree4x4FMatrices(m,&rZ,&rY,&rX);
+      #else 
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
+       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
+      #endif
     break;
     case ROTATION_ORDER_RPY:
       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY\n");
