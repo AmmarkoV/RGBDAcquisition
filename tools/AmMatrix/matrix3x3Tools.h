@@ -126,7 +126,7 @@ int transpose3x3MatrixDFromSource(double * dest,double * source);
 * @param  Input 3x3 Matrix
 * @retval 0=Failure,1=Success
 */
-int upscale3x3to4x4(double * mat4x4,double * mat3x3);
+int upscale3x3Fto4x4F(float * mat4x4,float * mat3x3);
 
 
 /**

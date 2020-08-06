@@ -105,11 +105,7 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 * @param  Y Axis Parameter
 * @param  Z Axis Parameter
 */
-void create4x4DRotationMatrix(double * m,double angle, double x, double y, double z) ;
-
 void create4x4FRotationMatrix(struct Matrix4x4OfFloats * m , float angle, float x, float y, float z);
-
-void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y, float z);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Translation
@@ -119,7 +115,8 @@ void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y
 * @param  Y Translation
 * @param  Z Translation
 */
-void create4x4DTranslationMatrix(double * matrix,double x, double y, double z);
+void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y, float z);
+
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Scaling
@@ -240,7 +237,7 @@ float det4x4FMatrix(float * mat) ;
 * @param  Output ( should be already allocated ) 3x3 Matrix
 * @retval 0=failure,1=success
 */
-int invert4x4FMatrix(float * result,float * mat) ;
+int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * mat) ;
 
 
 /**
@@ -251,6 +248,27 @@ int invert4x4FMatrix(float * result,float * mat) ;
 */
 int transpose4x4FMatrix(float * mat);
   
+
+
+/**
+* @brief Transpose an allocated 4x4 matrix to Identity using doubles ( diagonal 1 , all else 0 )
+* @ingroup AmMatrix
+* @param  Input/Output Matrix
+* @retval 0=Failure,1=Success
+*/
+int transpose4x4DMatrix(double * mat);
+
+
+
+/**
+* @brief Multiply 2x 4x4 Double matrices ( A * B )
+* @ingroup AmMatrix
+* @param  Output 4x4 Float Matrix ( should be already allocated )
+* @param  Input 4x4 Float Matrix A
+* @param  Input 4x4 Float Matrix B
+* @retval 0=failure,1=success
+*/
+int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB);
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )
@@ -295,7 +313,7 @@ int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D, float * transformation4x4, float * point3D);
+int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4, float * point3D);
 
 /**
 * @brief Multiply a the 3x3 rotational part of a 4x4 matrix with a Normal Vector (3D Point)  A*V
@@ -384,16 +402,16 @@ void create4x4FModelTransformation(
 * @param  Input/Output Vector
 * @retval 0=failure,1=success
 */
-void create4x4DCameraModelViewMatrixForRendering(
-                                                double * m ,
+void create4x4FCameraModelViewMatrixForRendering(
+                                                struct Matrix4x4OfFloats * m ,
                                                 //Rotation Component
-                                                double rotationX_angleDegrees,
-                                                double rotationY_angleDegrees,
-                                                double rotationZ_angleDegrees ,
+                                                float rotationX_angleDegrees,
+                                                float rotationY_angleDegrees,
+                                                float rotationZ_angleDegrees ,
                                                 //Translation Component
-                                                double translationX_angleDegrees,
-                                                double translationY_angleDegrees,
-                                                double translationZ_angleDegrees
+                                                float translationX_angleDegrees,
+                                                float translationY_angleDegrees,
+                                                float translationZ_angleDegrees
                                                );
 
 

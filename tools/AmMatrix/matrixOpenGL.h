@@ -159,7 +159,8 @@ void gldPerspective(
 
   void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
 
-  void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix);
+
+  void getModelViewProjectionMatrixFromMatrices(float * output,float * projectionMatrix,float * viewMatrix,float * modelMatrix);
 
 
   void prepareRenderingMatrices(

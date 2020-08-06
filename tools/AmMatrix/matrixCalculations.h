@@ -100,7 +100,7 @@ int move3DPoint(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4
 * @param  Input Array 3x3 of a Rotation Matrix
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated);
+int pointFromRelationWithObjectToAbsolute(float * absoluteOutPoint3DRotated,float * objectPosition ,float * objectRotation3x3 ,float * relativeInPoint3DUnrotated);
 
 /**
 * @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a 3x3 Matrix
@@ -110,7 +110,7 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
 * @param  Input Array 3x3 of a Rotation Matrix
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
+int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation3x3 ,float * absoluteInPoint3DRotated );
 
 
 

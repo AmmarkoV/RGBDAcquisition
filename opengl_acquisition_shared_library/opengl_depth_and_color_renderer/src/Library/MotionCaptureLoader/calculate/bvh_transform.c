@@ -433,13 +433,13 @@ int bvh_loadTransformForMotionBuffer(
         }
 
 
-        multiplyTwo4x4FMatrices(
+        multiplyTwo4x4FMatricesS(
                                 //Output AxB
-                                bvhTransform->joint[jID].localToWorldTransformation ,
+                                &bvhTransform->joint[jID].localToWorldTransformation ,
                                 //Parent Output A
-                                bvhTransform->joint[parentID].chainTransformation,
+                                &bvhTransform->joint[parentID].chainTransformation,
                                 //This Transform B
-                                bvhMotion->jointHierarchy[jID].staticTransformation
+                                &bvhMotion->jointHierarchy[jID].staticTransformation
                               );
       } else
       if ( bvhMotion->jointHierarchy[jID].isRoot)
@@ -474,13 +474,13 @@ int bvh_loadTransformForMotionBuffer(
       }
 
     bvhTransform->joint[jID].isChainTrasformationComputed=1;
-    multiplyTwo4x4FMatrices(
+    multiplyTwo4x4FMatricesS(
                            //Output AxB
-                           bvhTransform->joint[jID].chainTransformation ,
+                           &bvhTransform->joint[jID].chainTransformation ,
                            //A
-                           bvhTransform->joint[jID].localToWorldTransformation,
+                           &bvhTransform->joint[jID].localToWorldTransformation,
                            //B
-                           bvhTransform->joint[jID].dynamicRotation
+                           &bvhTransform->joint[jID].dynamicRotation
                           );
 
   #if FIND_FAST_CENTER

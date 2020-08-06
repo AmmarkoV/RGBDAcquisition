@@ -515,7 +515,7 @@ void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, floa
 
 
 
-int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated)
+int pointFromRelationWithObjectToAbsolute(float * absoluteOutPoint3DRotated,float * objectPosition ,float * objectRotation3x3 ,float * relativeInPoint3DUnrotated)
 {
   //  What we want to do ( in mathematica )
   // (  { {r0,r1,r2,0} , {r3,r4,r5,0} , {r6,r7,r8,0} , {0,0,0,1} } * { { X }  , { Y }  , { Z } , { 1.0 } } ) + { {ObjX} , {ObjY} , {ObjZ} , { 0 }  }
@@ -523,19 +523,19 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
   //We have a coordinate space in Relation to our object so we want to first rotate our point and then translate it
   //back to absolute coordinate space
 
-  double objectRotation4x4[4*4]={0};
+  struct Matrix4x4OfFloats objectRotation4x4={0};
   //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
-  upscale3x3to4x4(objectRotation4x4,objectRotation3x3);
+  upscale3x3Fto4x4F(objectRotation4x4.m,objectRotation3x3);
 
-  objectRotation4x4[e3]=objectPosition[0];
-  objectRotation4x4[e7]=objectPosition[1];
-  objectRotation4x4[e11]=objectPosition[2];
-  objectRotation4x4[e15]=1.0;
+  objectRotation4x4.m[e3]=objectPosition[0];
+  objectRotation4x4.m[e7]=objectPosition[1];
+  objectRotation4x4.m[e11]=objectPosition[2];
+  objectRotation4x4.m[e15]=1.0;
 
-  transform3DPointDVectorUsing4x4DMatrix(absoluteOutPoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
+  transform3DPointFVectorUsing4x4FMatrix(absoluteOutPoint3DRotated,&objectRotation4x4,relativeInPoint3DUnrotated);
 
   //Normalization is done automatically
-  normalize3DPointDVector(absoluteOutPoint3DRotated);
+  normalize3DPointFVector(absoluteOutPoint3DRotated);
 
   return 1;
 }
@@ -546,23 +546,23 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
 */
-int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
+int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation3x3 ,float * absoluteInPoint3DRotated )
 {
   //printf("pointFromAbsoluteToInRelationWithObject Using Inversion Code\n");
-  double objectRotation4x4[4*4]={0};
+  struct Matrix4x4OfFloats objectRotation4x4={0};
   //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
-  upscale3x3to4x4(objectRotation4x4,objectRotation3x3);
+  upscale3x3Fto4x4F(objectRotation4x4.m,objectRotation3x3);
 
-  objectRotation4x4[e3]=objectPosition[0];
-  objectRotation4x4[e7]=objectPosition[1];
-  objectRotation4x4[e11]=objectPosition[2];
-  objectRotation4x4[e15]=1.0;
+  objectRotation4x4.m[e3]=objectPosition[0];
+  objectRotation4x4.m[e7]=objectPosition[1];
+  objectRotation4x4.m[e11]=objectPosition[2];
+  objectRotation4x4.m[e15]=1.0;
 
 
-  double objectInvRotation4x4[4*4]={0};
-  invert4x4DMatrix(objectInvRotation4x4,objectRotation4x4);
+  struct Matrix4x4OfFloats objectInvRotation4x4={0};
+  invert4x4FMatrix(&objectInvRotation4x4,&objectRotation4x4);
 
-  transform3DPointDVectorUsing4x4DMatrix(relativeOutPoint3DUnrotated,objectInvRotation4x4,absoluteInPoint3DRotated);
+  transform3DPointFVectorUsing4x4FMatrix(relativeOutPoint3DUnrotated,&objectInvRotation4x4,absoluteInPoint3DRotated);
   return 1;
 }
 

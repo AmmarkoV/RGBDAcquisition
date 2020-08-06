@@ -46,25 +46,24 @@ int convertRodriguezTo3x3(double * result,double * matrix)
 }
 
 
-void changeYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
+void changeYandZAxisOpenGL4x4Matrix(float * result,float * matrix)
 {
   #if PRINT_MATRIX_DEBUGGING
    fprintf(stderr,"Invert Y and Z axis\n");
   #endif // PRINT_MATRIX_DEBUGGING
-
-  double * invertOp = (double * ) malloc ( sizeof(double) * 16 );
-  if (invertOp==0) { return; }
-
-  create4x4DIdentityMatrix(invertOp);
-  invertOp[5]=-1;   invertOp[10]=-1;
-  multiplyTwo4x4DMatrices(result, matrix, invertOp);
-  free(invertOp);
+   
+  struct Matrix4x4OfFloats invertOp = {0};
+ 
+  create4x4FIdentityMatrix(&invertOp);
+  invertOp.m[5]=-1;   invertOp.m[10]=-1;
+  
+  multiplyTwo4x4FMatrices_Naive(result,matrix,invertOp.m);  
 }
 
 int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
 {
-  double * matrix3x3Rotation = malloc4x4DMatrix();    if (matrix3x3Rotation==0) { return 0; }
-
+  double matrix3x3Rotation[16] = {0}; 
+  
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
@@ -105,16 +104,15 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
 
 
-  print4x4DMatrix("ModelView", result4x4,0);
-  free4x4DMatrix(&matrix3x3Rotation);
+  print4x4DMatrix("ModelView", result4x4,0); 
   return 1;
 }
 
 
 int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
 {
-  double * matrix3x3Rotation = malloc4x4DMatrix();    if (matrix3x3Rotation==0) { return 0; }
-
+  double matrix3x3Rotation[16] = {0};     
+  
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
@@ -138,21 +136,20 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
   /*
       Here what we want to do is generate a 4x4 matrix that does the normal transformation that our
       rodriguez and translation vector define
+       * 
+       * //Transposed in one step
   */
-   m[0]=  rm[0];        m[1]= rm[1];        m[2]=  rm[2];       m[3]= -Tx;
-   m[4]=  rm[3];        m[5]= rm[4];        m[6]=  rm[5];       m[7]= -Ty;
-   m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]=-Tz;
-   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
+   m[0]=  rm[0];        m[4]= rm[1];        m[8]=  rm[2];       m[12]= -Tx;
+   m[1]=  rm[3];        m[5]= rm[4];        m[9]=  rm[5];       m[13]= -Ty;
+   m[2]=  rm[6];        m[6]= rm[7];        m[10]= rm[8];       m[14]=-Tz;
+   m[3]=  0.0;          m[7]= 0.0;          m[11]=0.0;          m[15]=1.0;
 
 
   #if PRINT_MATRIX_DEBUGGING
    print4x4DMatrix("ModelView", result4x4);
    fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   #endif // PRINT_MATRIX_DEBUGGING
-
-  transpose4x4DMatrix(result4x4);
-
-  free4x4DMatrix(&matrix3x3Rotation);
+  
   return 1;
 }
 
@@ -213,7 +210,7 @@ void buildOpenGLProjectionForIntrinsics   (
    float finalFrustrum[16];
    create4x4FIdentityMatrix(identMat);
    identMat[10]=-1;
-   multiplyTwo4x4FMatrices(finalFrustrum,identMat,frustum);
+   multiplyTwo4x4FMatrices_Naive(finalFrustrum,identMat,frustum);
    copy4x4FMatrix(frustum,finalFrustrum);
 
    //This should produce our own Row Major Format
@@ -223,7 +220,7 @@ void buildOpenGLProjectionForIntrinsics   (
 
 void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD
                                            (
-                                             double * frustum,
+                                             double * frustumOutput,
                                              int * viewport ,
                                              double fx,
                                              double fy,
@@ -263,23 +260,23 @@ void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD
    // set the viewport parameters
    viewport[0] = L; viewport[1] = B; viewport[2] = R_sub_L; viewport[3] = T_sub_B;
 
+   struct Matrix4x4OfFloats frustum={0};
    //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
-   frustum[0] = -2.0f*fx/R_sub_L;     frustum[1] = 0.0f;                 frustum[2] = 0.0f;                              frustum[3] = 0.0f;
-   frustum[4] = 0.0f;                 frustum[5] = 2.0f*fy/T_sub_B;      frustum[6] = 0.0f;                              frustum[7] = 0.0f;
-   frustum[8] = 2.0f*cx/R_sub_L-1.0f; frustum[9] = 2.0f*cy/T_sub_B-1.0f; frustum[10]=-1.0*(F_plus_N/F_sub_N);            frustum[11] = -1.0f;
-   frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]=-2.0f*F_mul_N/(F_sub_N);            frustum[15] = 0.0f;
+   frustum.m[0] = -2.0f*fx/R_sub_L;     frustum.m[1] = 0.0f;                 frustum.m[2] = 0.0f;                              frustum.m[3]  = 0.0f;
+   frustum.m[4] = 0.0f;                 frustum.m[5] = 2.0f*fy/T_sub_B;      frustum.m[6] = 0.0f;                              frustum.m[7]  = 0.0f;
+   frustum.m[8] = 2.0f*cx/R_sub_L-1.0f; frustum.m[9] = 2.0f*cy/T_sub_B-1.0f; frustum.m[10]=-1.0*(F_plus_N/F_sub_N);            frustum.m[11] =-1.0f;
+   frustum.m[12]= 0.0f;                 frustum.m[13]= 0.0f;                 frustum.m[14]=-2.0f*F_mul_N/(F_sub_N);            frustum.m[15] = 0.0f;
    //Matrix already in OpenGL column major format
 
 
 
    //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
-   double identMat[16];
-   double finalFrustrum[16];
-   create4x4DIdentityMatrix(identMat);
-   identMat[10]=-1;
-   multiplyTwo4x4DMatrices(finalFrustrum,identMat,frustum);
-   copy4x4DMatrix(frustum,finalFrustrum);
-
+   struct Matrix4x4OfFloats identMat;
+   struct Matrix4x4OfFloats finalFrustrum;
+   create4x4FIdentityMatrix(&identMat);
+   identMat.m[10]=-1;
+   multiplyTwo4x4FMatricesS(&finalFrustrum,&identMat,&frustum);
+   copy4x4FMatrixTo4x4D(frustumOutput,finalFrustrum.m); 
 }
 
 //matrix will receive the calculated perspective matrix.
@@ -451,7 +448,7 @@ void lookAt(
    //glTranslatef(-eyex, -eyey, -eyez);
    float translation[16];
    create4x4FTranslationMatrix(translation , -eyex, -eyey, -eyez );
-   multiplyTwo4x4FMatrices(matrix , initial , translation);
+   multiplyTwo4x4FMatrices_Naive(matrix,initial,translation);
 
 }
 
@@ -831,19 +828,19 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 
 
 
-  void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
-  {
+void getModelViewProjectionMatrixFromMatrices(float * output,float * projectionMatrix,float * viewMatrix,float * modelMatrix)
+{
     //fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
 
     //print4x4DMatrix("projectionMatrix",projectionMatrix,1);
     //print4x4DMatrix("viewMatrix",viewMatrix,1);
     //print4x4DMatrix("modelMatrix",modelMatrix,1);
 
-	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
+     //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
      ///THIS IS THE CORRECT WAY TO PERFORM THE MULTIPLICATION WITH OUR ROW MAJOR MATRICES
-     multiplyThree4x4DMatrices(output, projectionMatrix , viewMatrix , modelMatrix );
+     multiplyThree4x4FMatrices(output,projectionMatrix,viewMatrix,modelMatrix);
      //print4x4DMatrix("MVP=",output,1);
-  }
+}
 
 
 
@@ -880,9 +877,11 @@ void prepareRenderingMatrices(
      transpose4x4DMatrix(projectionMatrixD); //We want our own Row Major format..
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
-
-
-     create4x4DScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
+     
+     
+     struct Matrix4x4OfFloats viewMatrix={0};
+     create4x4FScalingMatrix(&viewMatrix,-1.0,1.0,1.0);
+     copy4x4FMatrixTo4x4D(viewMatrixD,viewMatrix.m);
 
      glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
