@@ -55,7 +55,7 @@ int main()
         matrixB.m[1] = tmp;
         
         unsigned long startUnoptimized = GetTickCountMicrosecondsMN();
-        multiplyTwo4x4FMatrices(testResultUnoptimized.m,matrixA.m,matrixB.m);
+        multiplyTwo4x4FMatrices_Naive(testResultUnoptimized.m,matrixA.m,matrixB.m);
         unsigned long endUnoptimized = GetTickCountMicrosecondsMN();
         unoptimizedTime+=endUnoptimized - startUnoptimized;
 

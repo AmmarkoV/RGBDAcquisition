@@ -543,7 +543,7 @@ int bvh_loadTransformForMotionBuffer(
                         bvhMotion->jointHierarchy[jID].jointName
                        );
               }
-          create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
+          create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
        } else
       {
        #if USE_BVH_SPECIFIC_ROTATIONS

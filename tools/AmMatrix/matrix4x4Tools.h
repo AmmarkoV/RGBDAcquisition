@@ -31,23 +31,6 @@ struct Matrix4x4OfFloats
   float __attribute__((aligned(16))) m[16];
 };
 
-
-/**
-* @brief Allocate a new 4x4 Matrix
-* @ingroup AmMatrix
-* @retval 0=Failure or a pointer to an allocated 3x3 Matrix
-*/
-double * malloc4x4DMatrix();
-
-/**
-* @brief Deallocate an existing 3x3 Matrix
-* @ingroup AmMatrix
-* @param  Pointer to a Pointer of an allocated matrix
-*/
-void free4x4DMatrix(double ** mat);
-
-
-
 /**
 * @brief Printout an 4x4 Matrix that consists of floats
 * @ingroup AmMatrix
@@ -64,8 +47,6 @@ void print4x4FMatrix(const char * str , float * matrix4x4,int forcePrint);
 */
 void print4x4DMatrix(const char * str , double * matrix4x4,int forcePrint);
 
-
-
 /**
 * @brief Copy a 4x4 Matrix of doubles to another
 * @ingroup AmMatrix
@@ -74,8 +55,6 @@ void print4x4DMatrix(const char * str , double * matrix4x4,int forcePrint);
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
 void copy4x4DMatrix(double * out,double * in);
-
-
 
 
 void copy3x3FMatrixTo4x4F(float * out,float * in);
@@ -97,7 +76,6 @@ void copy4x4FMatrix(float * out,float * in);
 */
 void copy4x4FMatrixTo4x4D(double * out,float * in);
 
-
 /**
 * @brief Convert a 4x4 Matrix from Double To Float
 * @ingroup AmMatrix
@@ -110,24 +88,13 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m );
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
 * @ingroup AmMatrix
 * @param  Input/Output Matrix
-*/
-void create4x4DIdentityMatrix(double * m) ;
+*/  
+void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
 
-void create4x4FIdentityMatrix(float * m);
+int is4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
+int is4x4FIdentityMatrixPercisionCompensating(struct Matrix4x4OfFloats * m);
 
-int is4x4DZeroMatrix(double  * m);
-
-int is4x4DIdentityMatrix(double * m);
-
-
-int is4x4FIdentityMatrix(float  * m);
-int is4x4FIdentityMatrixPercisionCompensating(float  * m);
-
-
-void convert4x4DMatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
-
-
-
+void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pitch,float *yaw);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous Translation rotation
@@ -140,12 +107,9 @@ void convert4x4DMatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 */
 void create4x4DRotationMatrix(double * m,double angle, double x, double y, double z) ;
 
+void create4x4FRotationMatrix(struct Matrix4x4OfFloats * m , float angle, float x, float y, float z);
 
-void create4x4FRotationMatrix(float * m , float angle, float x, float y, float z);
-
-
-void create4x4FTranslationMatrix(float * matrix , float x, float y, float z);
-
+void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y, float z);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Translation
@@ -157,7 +121,6 @@ void create4x4FTranslationMatrix(float * matrix , float x, float y, float z);
 */
 void create4x4DTranslationMatrix(double * matrix,double x, double y, double z);
 
-
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Scaling
 * @ingroup AmMatrix
@@ -166,11 +129,8 @@ void create4x4DTranslationMatrix(double * matrix,double x, double y, double z);
 * @param  Scaling on the Y
 * @param  Scaling on the Z
 * @retval 0=Failure,1=Success
-*/
-void create4x4DScalingMatrix(double * matrix,double scaleX, double scaleY, double scaleZ);
-
-void create4x4FScalingMatrix(float * matrix , float scaleX, float scaleY, float scaleZ);
-
+*/ 
+void create4x4FScalingMatrix(struct Matrix4x4OfFloats * matrix , float scaleX, float scaleY, float scaleZ);
 
 /**
 * @brief Convert a quaternion to 4x4 matrix
@@ -182,10 +142,7 @@ void create4x4FScalingMatrix(float * matrix , float scaleX, float scaleY, float 
 * @param  Quaternion on the W
 * @param  Degrees of rotation
 */
-void create4x4DQuaternionMatrix(double * m , double qX,double qY,double qZ,double qW);
-
-
-
+void create4x4FQuaternionMatrix(struct Matrix4x4OfFloats * m ,float qX,float qY,float qZ,float qW);
 
 //This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
 //Since this used to be a variable in some points of the code..
@@ -229,11 +186,11 @@ enum ROTATION_ORDER
 * @param  Rotation Z in euler angles (0-360)
 * @param  Rotation order given by enum ROTATION_ORDER, typically ROTATION_ORDER_ZYX or ROTATION_ORDER_XYZ
 */
-void create4x4DMatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
-
-
 void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
 
+
+
+void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ);
 
 /**
 * @brief Convert a quaternion to 4x4 matrix ZYX convention ( standard )
@@ -243,7 +200,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
 * @param  Rotation Y in euler angles (0-360)
 * @param  Rotation Z in euler angles (0-360)
 */
-void create4x4DMatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, double eulZ);
+void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ);
 
 
 /**
@@ -252,7 +209,7 @@ void create4x4DMatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, do
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4DRotationX(double * matrix,double degrees) ;
+void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Rotation on the Y axis
@@ -260,7 +217,7 @@ void create4x4DRotationX(double * matrix,double degrees) ;
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4DRotationY(double * matrix,double degrees) ;
+void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Rotation on the Z axis
@@ -268,7 +225,7 @@ void create4x4DRotationY(double * matrix,double degrees) ;
 * @param  Output already allocated 4x4 Matrix
 * @param  Degrees of rotation
 */
-void create4x4DRotationZ(double * matrix,double degrees);
+void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees);
 
 
 /**
@@ -277,7 +234,7 @@ void create4x4DRotationZ(double * matrix,double degrees);
 * @param  Input 4x4 Matrix
 * @retval Det(mat)
 */
-double det4x4DMatrix(double * mat) ;
+float det4x4FMatrix(float * mat) ;
 
 /**
 * @brief Invert a 4x4 matrix
@@ -286,10 +243,8 @@ double det4x4DMatrix(double * mat) ;
 * @param  Output ( should be already allocated ) 3x3 Matrix
 * @retval 0=failure,1=success
 */
-int invert4x4DMatrix(double * result,double * mat) ;
+int invert4x4FMatrix(float * result,float * mat) ;
 
-
-int transpose4x4FMatrix(float * mat);
 
 /**
 * @brief Transpose an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
@@ -297,25 +252,8 @@ int transpose4x4FMatrix(float * mat);
 * @param  Input/Output Matrix
 * @retval 0=Failure,1=Success
 */
-int transpose4x4DMatrix(double * mat) ;
-
-
-/**
-* @brief Multiply 2x 4x4 matrices ( A * B )
-* @ingroup AmMatrix
-* @param  Output 4x4 Matrix ( should be already allocated )
-* @param  Input 4x4 Matrix A
-* @param  Input 4x4 Matrix B
-* @retval 0=failure,1=success
-*/
-int multiplyTwo4x4DMatrices(double * result , double * matrixA , double * matrixB);
-
-
-int multiplyTwo4x4DMatricesBuffered(double * result , double * matrixA , double * matrixB);
-
-int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
-
-int multiplyFour4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC , double * matrixD);
+int transpose4x4FMatrix(float * mat);
+  
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )
@@ -347,15 +285,9 @@ int multiplyTwo4x4FMatricesBuffered(float * result , float * matrixA , float * m
 
 int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC);
 
-/**
-* @brief Multiply a 4x4 matrix of doubles with a double precision Vector (3D Point)  A*V
-* @ingroup AmMatrix
-* @param  Output Vector ( should be already allocated )
-* @param  Input 4x4 Matrix A
-* @param  Input Vector 4x1 V
-* @retval 0=failure,1=success
-*/
-int transform3DPointDVectorUsing4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D);
+
+int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
+ 
 
 
 /**

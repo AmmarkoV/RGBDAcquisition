@@ -46,7 +46,7 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
   sr->viewport[3]=sr->height;
 
   buildOpenGLProjectionForIntrinsics(
-                                      sr->projectionMatrix ,
+                                      sr->projectionMatrix.m ,
                                       sr->viewport ,
                                       sr->fx,
                                       sr->fy,
@@ -58,16 +58,13 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
                                       sr->near,
                                       sr->far
                                      );
-
-   double viewMatrixD[16];
-   create4x4DIdentityMatrix(viewMatrixD);
-
-   create4x4DScalingMatrix(viewMatrixD,0.01,0.01,-0.01);
-   copy4x4DMatrixTo4x4F(sr->viewMatrix,viewMatrixD);
+ 
+   create4x4FIdentityMatrix(&sr->viewMatrix);
+   create4x4FScalingMatrix(&sr->viewMatrix,0.01,0.01,-0.01); 
 
    //Initialization of matrices not yet used
-   create4x4FIdentityMatrix(sr->modelMatrix);
-   create4x4FIdentityMatrix(sr->modelViewMatrix);
+   create4x4FIdentityMatrix(&sr->modelMatrix);
+   create4x4FIdentityMatrix(&sr->modelViewMatrix);
 
  return 1;
 }
@@ -101,12 +98,12 @@ int simpleRendererRender(
                          float * output2DW
                         )
 {
- float  modelTransformationF[16];
+ struct Matrix4x4OfFloats modelTransformationF;
  ///--------------------------------------------------------------------
  ///                       CAMERA MATRICES ETC
  ///--------------------------------------------------------------------
  create4x4FModelTransformation(
-                              modelTransformationF,
+                              &modelTransformationF,
                               //Rotation Component
                               (float) sr->cameraOffsetRotation[0],//heading,
                               (float) sr->cameraOffsetRotation[1],//pitch,
@@ -122,7 +119,7 @@ int simpleRendererRender(
                               (float) 1.0
                              );
  ///--------------------------------------------------------------------
- multiplyTwo4x4FMatrices(sr->modelViewMatrix,sr->viewMatrix,modelTransformationF);
+ multiplyTwo4x4FMatricesS(&sr->modelViewMatrix,&sr->viewMatrix,&modelTransformationF);
  ///--------------------------------------------------------------------
 
 
@@ -132,21 +129,21 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
  ///                       OBJECT MATRICES ETC
  ///--------------------------------------------------------------------
-  float objectMatrixRotation[16];
+  struct Matrix4x4OfFloats objectMatrixRotation;
 
   if (objectRotation==0)
     {
-      create4x4FIdentityMatrix(objectMatrixRotation);
+      create4x4FIdentityMatrix(&objectMatrixRotation);
     } else
   if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
     {
-      create4x4FIdentityMatrix(objectMatrixRotation);
+      create4x4FIdentityMatrix(&objectMatrixRotation);
     } else
   if (rotationOrder==ROTATION_ORDER_RPY)
     {
      //This is the old way to do this rotation
      doRPYTransformationF(
-                          objectMatrixRotation,
+                          &objectMatrixRotation,
                           (float) objectRotation[0],
                           (float) objectRotation[1],
                           (float) objectRotation[2]
@@ -155,7 +152,7 @@ int simpleRendererRender(
     {
      //fprintf(stderr,"Using new model transform code\n");
      create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                      objectMatrixRotation ,
+                                                      &objectMatrixRotation ,
                                                       (float) objectRotation[0],
                                                       (float) objectRotation[1],
                                                       (float) objectRotation[2],
@@ -175,7 +172,7 @@ int simpleRendererRender(
 
    transform3DPointFVectorUsing4x4FMatrix(
                                           resultPoint3D,
-                                          objectMatrixRotation,
+                                          &objectMatrixRotation,
                                           point3D
                                          );
 
@@ -207,8 +204,8 @@ int simpleRendererRender(
   if (
        !_glhProjectf(
                      final3DPosition,
-                     sr->modelViewMatrix,
-                     sr->projectionMatrix,
+                     sr->modelViewMatrix.m,
+                     sr->projectionMatrix.m,
                      sr->viewport,
                      windowCoordinates
                     )
@@ -245,13 +242,13 @@ int simpleRendererRenderUsingPrecalculatedMatrices(
  ///--------------------------------------------------------------------
   float windowCoordinates[3]={0};
 
-  create4x4FIdentityMatrix(sr->modelViewMatrix);
+  create4x4FIdentityMatrix(&sr->modelViewMatrix);
 
   if (
        !_glhProjectf(
                      position3D,
-                     sr->modelViewMatrix,
-                     sr->projectionMatrix,
+                     sr->modelViewMatrix.m,
+                     sr->projectionMatrix.m,
                      sr->viewport,
                      windowCoordinates
                     )
