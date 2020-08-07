@@ -52,7 +52,7 @@ void aiMakeQuaternion(aiMatrix4x4 * am , aiQuaternion * qu)
 }
 
 
-void doubleMatMakeIdentity(double * am)
+void floatMatMakeIdentity(float * am)
 {
  am[0] = 1.0; am[1] = 0.0;  am[2] = 0.0;  am[3] = 0.0;
  am[4] = 0.0; am[5] = 1.0;  am[6] = 0.0;  am[7] = 0.0;
@@ -154,7 +154,7 @@ unsigned int countNumberOfNodes(struct aiScene *scene  , struct aiMesh * mesh )
   return numberOfNodes;
 }
 
-void convertMatrixAIToAmMatrix(double * rm ,  aiMatrix4x4 * am)
+void convertMatrixAIToAmMatrix(float * rm ,  aiMatrix4x4 * am)
 {
  rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
  rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
@@ -177,7 +177,7 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
 
 
   //Make sure that the finalVertexTransformation is identity , so it will always make sense..
-  double * d = triModel->bones[nodeNum].info->finalVertexTransformation;
+  float * d = triModel->bones[nodeNum].info->finalVertexTransformation;
   d[0]=1.0;  d[1]=0.0;  d[2]=0.0;  d[3]=0.0;
   d[4]=0.0;  d[5]=1.0;  d[6]=0.0;  d[7]=0.0;
   d[8]=0.0;  d[9]=0.0;  d[10]=1.0; d[11]=0.0;
@@ -226,8 +226,8 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
 
 
    convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->localTransformation,  &node->mTransformation);
-   doubleMatMakeIdentity(triModel->bones[nodeNum].info->finalVertexTransformation);
-   doubleMatMakeIdentity(triModel->bones[nodeNum].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
+   floatMatMakeIdentity(triModel->bones[nodeNum].info->finalVertexTransformation);
+   floatMatMakeIdentity(triModel->bones[nodeNum].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
 
 
   if (findBoneNumFromAINode( node ,  mesh , &boneNum ))
@@ -340,7 +340,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     triModel->header.numberOfIndices       = mesh->mNumFaces*3;       indexSize        =triModel->header.numberOfIndices       * sizeof(unsigned int);
     triModel->header.numberOfBones         = 0;                       //bonesSize        =0; //Initially no bones allocated this will be done later..!
 
-    double * gm = triModel->header.boneGlobalInverseTransform;
+    float * gm = triModel->header.boneGlobalInverseTransform;
     gm[0]=m_GlobalInverseTransform.a1;  gm[1]=m_GlobalInverseTransform.a2;  gm[2]=m_GlobalInverseTransform.a3;  gm[3]=m_GlobalInverseTransform.a4;
     gm[4]=m_GlobalInverseTransform.b1;  gm[5]=m_GlobalInverseTransform.b2;  gm[6]=m_GlobalInverseTransform.b3;  gm[7]=m_GlobalInverseTransform.b4;
     gm[8]=m_GlobalInverseTransform.c1;  gm[9]=m_GlobalInverseTransform.c2;  gm[10]=m_GlobalInverseTransform.c3; gm[11]=m_GlobalInverseTransform.c4;
