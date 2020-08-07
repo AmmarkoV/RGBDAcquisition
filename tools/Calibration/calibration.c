@@ -479,9 +479,14 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
 {
  if (calib==0) { fprintf(stderr,"No calibration file provided , returning null 4x4 transformation matrix \n"); return 0;  }
 
- double * m = malloc4x4DMatrix();
+ double * m = (double*) malloc ( sizeof(double) * 16 );
+ 
  if (m==0) {fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");  return 0; }
- create4x4DIdentityMatrix(m);
+  
+ m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+ m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+ m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+ m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0; 
 
  if (! calib->extrinsicParametersSet )
      { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return m; } else
@@ -493,15 +498,22 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
 int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , float * z)
 {
   int result = 0;
-  double raw3D[4]={0};
-  double world3D[4]={0};
+  float raw3D[4]={0};
+  float world3D[4]={0};
 
-  raw3D[0] = (double) *x;
-  raw3D[1] = (double) *y;
-  raw3D[2] = (double) *z;
-  raw3D[3] = (double) 1.0;
-
-  result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
+  raw3D[0] = (float) *x;
+  raw3D[1] = (float) *y;
+  raw3D[2] = (float) *z;
+  raw3D[3] = (float) 1.0;
+  
+  
+  //Doing double -> float -> double casts
+  struct Matrix4x4OfFloats mF;
+  copy4x4DMatrixTo4x4F(mF.m,m);
+  result = transform3DPointFVectorUsing4x4FMatrix(world3D,&mF,raw3D);
+  copy4x4FMatrixTo4x4D(m,mF.m);
+  
+  //result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
   *x= (float) world3D[0];
   *y= (float) world3D[1];
@@ -514,10 +526,11 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
 {
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
+  
  if (likely(m!=0))
  {
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
-  free4x4DMatrix(&m); // This is the same as free(m); m=0;
+  free(m); m=0;
   return 1;
  } //End of M allocated!
 

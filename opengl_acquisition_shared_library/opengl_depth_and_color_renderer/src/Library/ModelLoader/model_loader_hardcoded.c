@@ -173,7 +173,7 @@ void drawSphere(unsigned int quality)
     #warning "drawSphere should create a call list , otherwise it is a very slow call.."
   #endif
 
-//    double r=1.0;
+  //double r=1.0;
     int lats=quality;
     int longs=quality;
   //---------------
