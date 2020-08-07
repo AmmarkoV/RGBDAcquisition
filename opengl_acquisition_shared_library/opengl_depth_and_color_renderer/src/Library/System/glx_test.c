@@ -334,22 +334,22 @@ pushObjectToBufferData(
 
 
 void prepareMatrices(
-                    double * projectionMatrixD,
-                    double * viewMatrixD,
-                    double * viewportMatrixD
+                    struct Matrix4x4OfFloats * projectionMatrix,
+                    struct Matrix4x4OfFloats * viewMatrix,
+                    struct Matrix4x4OfFloats * viewportMatrix
                     )
 {
 
      int viewport[4]={0};
-     double fx = 535.423889;
-     double fy = 533.48468;
-     double skew = 0.0;
-     double cx = (double) WIDTH/2;
-     double cy = (double) HEIGHT/2;
-     double near = 1.0;
-     double far = 255.0;
-     buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
-                                         projectionMatrixD ,
+     float fx = 535.423889;
+     float fy = 533.48468;
+     float skew = 0.0;
+     float cx = (float) WIDTH/2;
+     float cy = (float) HEIGHT/2;
+     float near = 1.0;
+     float far = 255.0;
+     buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(
+                                         projectionMatrix->m ,
                                          viewport ,
                                          fx, fy,
                                          skew,
@@ -358,13 +358,13 @@ void prepareMatrices(
                                          near,
                                          far
                                          );
-     transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
+     transpose4x4FMatrix(projectionMatrix->m); //We want our own Row Major format..
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
 
-     create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
+     create4x4FScalingMatrix(viewMatrix,-1.0,1.0,1.0);
 
-     glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
+     glGetViewportMatrix(viewportMatrix->m,viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
 
 
@@ -375,16 +375,16 @@ int drawObjectAT(GLuint programID,
                  unsigned int triangleCount,
 
 
-                 double x,
-                 double y,
-                 double z,
-                 double roll,
-                 double pitch,
-                 double yaw,
+                 float x,
+                 float y,
+                 float z,
+                 float roll,
+                 float pitch,
+                 float yaw,
 
-                 double * projectionMatrixD,
-                 double * viewportMatrixD,
-                 double * viewMatrixD
+                 struct Matrix4x4OfFloats * projectionMatrix,
+                 struct Matrix4x4OfFloats * viewportMatrix,
+                 struct Matrix4x4OfFloats * viewMatrix
                  )
 {
        //Select Shader to render with
@@ -396,37 +396,34 @@ int drawObjectAT(GLuint programID,
        //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
 
-       double modelMatrixD[16];
-       create4x4ModelTransformation(
-                                    modelMatrixD,
-                                    //Rotation Component
-                                    roll,//roll
-                                    pitch ,//pitch
-                                    yaw ,//yaw
-                                    ROTATION_ORDER_RPY,
+       struct Matrix4x4OfFloats modelMatrix;
+       create4x4FModelTransformation(
+                                      &modelMatrix,
+                                      //Rotation Component
+                                      roll,//roll
+                                      pitch ,//pitch
+                                      yaw ,//yaw
+                                      ROTATION_ORDER_RPY,
+                                      //Translation Component (XYZ)
+                                      (float) x/100,
+                                      (float) y/100,
+                                      (float) z/100,
 
-                                    //Translation Component (XYZ)
-                                    (double) x/100,
-                                    (double) y/100,
-                                    (double) z/100,
-
-                                    10.0,//scaleX,
-                                    10.0,//scaleY,
-                                    10.0//scaleZ
+                                      10.0,//scaleX,
+                                      10.0,//scaleY,
+                                      10.0//scaleZ
                                    );
 
       //-------------------------------------------------------------------
-       double MVPD[16];
-       float MVP[16];
-       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-       copy4x4DMatrixToF(MVP , MVPD );
-       transpose4x4Matrix(MVP);
+       struct Matrix4x4OfFloats MVP;
+       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,&modelMatrix);
+       transpose4x4FMatrix(MVP.m);
       //-------------------------------------------------------------------
 
 
 
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+      // Send our transformation to the currently bound shader, in the "MVP" uniform
+      glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
 
 
 
@@ -434,9 +431,6 @@ int drawObjectAT(GLuint programID,
          //Our flipped view needs front culling..
          glCullFace(GL_FRONT);
          glEnable(GL_CULL_FACE);
-
-
-
 
          //-------------------------------------------------
          //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
@@ -620,9 +614,17 @@ int doDrawing()
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
-  if (!start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv)) { fprintf(stderr,"Could not initialize"); return 1;}
+  if (!start_glx3_stuff(
+                        WIDTH,
+                        HEIGHT,
+                        1, //Force viewing window
+                        argc,
+                        argv
+                        )
+     ) 
+      { fprintf(stderr,"Could not initialize"); return 1;}
 
 
   if (glewInit() != GLEW_OK)

@@ -66,16 +66,16 @@ void buildOpenGLProjectionForIntrinsics   (
 * @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
 * @retval 0=Failure,1=Success
 */
-void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
-                                             double * frustum,
+void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(
+                                             float * frustum,
                                              int * viewport ,
-                                             double fx,
-                                             double fy,
-                                             double skew,
-                                             double cx, double cy,
+                                             float fx,
+                                             float fy,
+                                             float skew,
+                                             float cx,float cy,
                                              unsigned int imageWidth, unsigned int imageHeight,
-                                             double nearPlane,
-                                             double farPlane
+                                             float nearPlane,
+                                             float farPlane
                                            );
 
 
@@ -158,34 +158,34 @@ void gldPerspective(
 
 
 
-  void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
+  void glGetViewportMatrix(float * m, float startX, float startY, float width, float height, float near, float far);
 
 
 
-void getModelViewProjectionMatrixFromMatrices(struct Matrix4x4OfFloats * output,struct Matrix4x4OfFloats * projectionMatrix,struct Matrix4x4OfFloats * viewMatrix,struct Matrix4x4OfFloats * modelMatrix);
+  void getModelViewProjectionMatrixFromMatrices(struct Matrix4x4OfFloats * output,struct Matrix4x4OfFloats * projectionMatrix,struct Matrix4x4OfFloats * viewMatrix,struct Matrix4x4OfFloats * modelMatrix);
 
 
   void prepareRenderingMatrices(
-                              double fx ,
-                              double fy ,
-                              double skew ,
-                              double cx,
-                              double cy,
-                              double windowWidth,
-                              double windowHeight,
-                              double near,
-                              double far,
-                              double * projectionMatrixD,
-                              double * viewMatrixD,
-                              double * viewportMatrixD
+                              float fx ,
+                              float fy ,
+                              float skew ,
+                              float cx,
+                              float cy,
+                              float windowWidth,
+                              float windowHeight,
+                              float near,
+                              float far,
+                              struct Matrix4x4OfFloats * projectionMatrix,
+                              struct Matrix4x4OfFloats * viewMatrix,
+                              struct Matrix4x4OfFloats * viewportMatrix
                              );
 
 
 void correctProjectionMatrixForDifferentViewport(
-                                                  double * out,
-                                                  double * projectionMatrix,
-                                                  double * originalViewport,
-                                                  double * newViewport
+                                                  float * out,
+                                                  float * projectionMatrix,
+                                                  float * originalViewport,
+                                                  float * newViewport
                                                 );
 
 #ifdef __cplusplus
