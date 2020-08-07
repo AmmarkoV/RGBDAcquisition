@@ -12,6 +12,38 @@ extern "C"
 {
 #endif
 
+
+//This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
+//Since this used to be a variable in some points of the code..
+static const char * ROTATION_ORDER_NAMESA[] =
+{
+  "ROTATION_ORDER_NONE", //0
+  "ROTATION_ORDER_XYZ",//1
+  "ROTATION_ORDER_XZY",//2
+  "ROTATION_ORDER_YXZ",//3
+  "ROTATION_ORDER_YZX",//4
+  "ROTATION_ORDER_ZXY",//5
+  "ROTATION_ORDER_ZYX",//6
+  "ROTATION_ORDER_RPY",//7
+  //--------------------
+  "INVALID_ROTATION_ORDER"
+};
+
+enum ROTATION_ORDER
+{
+  ROTATION_ORDER_NONE=0,
+  ROTATION_ORDER_XYZ,//1
+  ROTATION_ORDER_XZY,//2
+  ROTATION_ORDER_YXZ,//3
+  ROTATION_ORDER_YZX,//4
+  ROTATION_ORDER_ZXY,//5
+  ROTATION_ORDER_ZYX,//6
+  ROTATION_ORDER_RPY,//7
+  //--------------------
+  ROTATION_ORDER_NUMBER_OF_NAMES
+};
+
+
 struct Matrix4x4OfFloats
 {
   /*A Matrix 4x4 aligned to allow for SSE optimized calculations.
@@ -30,6 +62,8 @@ struct Matrix4x4OfFloats
     */
   float __attribute__((aligned(16))) m[16];
 };
+
+
 
 /**
 * @brief Printout an 4x4 Matrix that consists of floats
@@ -93,6 +127,8 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
 
 
 int is4x4FIdentityMatrix(float * m);
+
+int is4x4FZeroMatrix(float  * m);
 int is4x4FIdentityMatrixS(struct Matrix4x4OfFloats * m);
 
 int is4x4FIdentityMatrixPercisionCompensating(struct Matrix4x4OfFloats * m);
@@ -143,36 +179,6 @@ void create4x4FScalingMatrix(struct Matrix4x4OfFloats * matrix , float scaleX, f
 * @param  Degrees of rotation
 */
 void create4x4FQuaternionMatrix(struct Matrix4x4OfFloats * m ,float qX,float qY,float qZ,float qW);
-
-//This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
-//Since this used to be a variable in some points of the code..
-static const char * ROTATION_ORDER_NAMESA[] =
-{
-  "ROTATION_ORDER_NONE", //0
-  "ROTATION_ORDER_XYZ",//1
-  "ROTATION_ORDER_XZY",//2
-  "ROTATION_ORDER_YXZ",//3
-  "ROTATION_ORDER_YZX",//4
-  "ROTATION_ORDER_ZXY",//5
-  "ROTATION_ORDER_ZYX",//6
-  "ROTATION_ORDER_RPY",//7
-  //--------------------
-  "INVALID_ROTATION_ORDER"
-};
-
-enum ROTATION_ORDER
-{
-  ROTATION_ORDER_NONE=0,
-  ROTATION_ORDER_XYZ,//1
-  ROTATION_ORDER_XZY,//2
-  ROTATION_ORDER_YXZ,//3
-  ROTATION_ORDER_YZX,//4
-  ROTATION_ORDER_ZXY,//5
-  ROTATION_ORDER_ZYX,//6
-  ROTATION_ORDER_RPY,//7
-  //--------------------
-  ROTATION_ORDER_NUMBER_OF_NAMES
-};
 
 /**
 * @brief Convert euler angles in degrees to a 4x4 rotation matrix using any rotation order wanted
@@ -313,8 +319,9 @@ int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4
 
 int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
 
-int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC);
+int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB,struct Matrix4x4OfFloats * matrixC);
 
+int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
  

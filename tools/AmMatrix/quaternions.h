@@ -1,5 +1,5 @@
 /** @file quaternions.h
- *  @brief This is a small math library that deals with quaternions , doubles are used for maximum precision
+ *  @brief This is a small math library that deals with quaternions , floats are used 
  *
  *  @author Ammar Qammaz (AmmarkoV)
  */
@@ -42,7 +42,7 @@ enum quatOrderXYZW
  * @param The convention used for quaternions ( see enum quatOrder )
  * @retval Nothing , no return value
  */
-void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention);
+void euler2Quaternions(float * quaternions,float * euler,int quaternionConvention);
 
 
 /**
@@ -52,7 +52,7 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
  * @param Quaternions , The input quaternions in the order declared by enum quatOrder
  * @param The convention used for quaternions ( see enum quatOrder )
  */
-void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention);
+void quaternions2Euler(float * euler,float * quaternions,int quaternionConvention);
 
 
 /**
@@ -63,7 +63,7 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
  * @param Input Quaternion B
  * @param Factor , typically should be 0.5 for half and half
  */
-void quaternionSlerp(double * qOut, double * q0,double * q1,double t);
+void quaternionSlerp(float * qOut, float * q0,float * q1,float t);
 
 /**
  * @brief Normalize Quaternion
@@ -75,32 +75,32 @@ void quaternionSlerp(double * qOut, double * q0,double * q1,double t);
  * @param Input/Output , qW
  * @retval 1=Success/0=Failure
  */
-int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
+int normalizeQuaternions(float *qX,float *qY,float *qZ,float *qW);
 
 /**
  * @brief Convert Quaternion to a 3x3 Matrix
  * @ingroup quaternions
  * @param
- * @param Output 3x3 double matrix
+ * @param Output 3x3 float matrix
  * @param Input quaternion
  * @param Input quaternion convention used
  */
-void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
+void quaternion2Matrix3x3(float * matrix3x3,float * quaternions,int quaternionConvention);
 
 /**
  * @brief Convert Quaternion to a 4x4 Matrix
  * @ingroup quaternions
  * @param
- * @param Output 4x4 double matrix
+ * @param Output 4x4 float matrix
  * @param Input quaternion
  * @param Input quaternion convention used
  */
-void quaternion2Matrix4x4(double * matrix4x4,double * quaternions,int quaternionConvention);
+void quaternion2Matrix4x4(float * matrix4x4,float * quaternions,int quaternionConvention);
 
 
 
-void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4);
-void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double * m3);
+void matrix4x42Quaternion(float * quaternions,int quaternionConvention,float * matrix4x4);
+void matrix3x32Quaternion(float * quaternions,int quaternionConvention,float * m3);
 
 /**
  * @brief Calculate the Inner Product of Two Quaternions
@@ -117,8 +117,8 @@ void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double *
  * @param Quaternion B qW
  * @retval Inner Product
  */
-double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
-                               double qBX,double qBY,double qBZ,double qBW);
+float innerProductQuaternions(float qAX,float qAY,float qAZ,float qAW ,
+                               float qBX,float qBY,float qBZ,float qBW);
 
 
 
@@ -137,15 +137,15 @@ double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
  * @param Quaternion B qW
  * @retval Angle Between the Two
  */
-double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
-                                double qBX,double qBY,double qBZ,double qBW);
+float anglesBetweenQuaternions(float qAX,float qAY,float qAZ,float qAW ,
+                                float qBX,float qBY,float qBZ,float qBW);
 
 
 
-void quaternionRotate(double * quaternion , double rotX , double rotY, double rotZ , double angleDegrees , int quaternionConvention);
+void quaternionRotate(float * quaternion , float rotX , float rotY, float rotZ , float angleDegrees , int quaternionConvention);
 
 
-void quaternionFromTwoVectors(double * quaternionOutput , double * vA , double * vB);
+void quaternionFromTwoVectors(float * quaternionOutput , float * vA , float * vB);
 
 #ifdef __cplusplus
 }

@@ -35,7 +35,7 @@
 
 
 
-void print4x4DMatrixTRI(const char * str , double * matrix4x4)
+void print4x4FMatrixTRI(const char * str , float * matrix4x4)
 {
   fprintf( stderr, "  %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
@@ -82,9 +82,9 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
 
      if (alsoPrintMatrices)
         {
-         print4x4DMatrixTRI("matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose", triModel->bones[i].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose );
-         print4x4DMatrixTRI("finalVertexTransformation", triModel->bones[i].info->finalVertexTransformation );
-         print4x4DMatrixTRI("localTransformation", triModel->bones[i].info->localTransformation );
+         print4x4FMatrixTRI("matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose", triModel->bones[i].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose );
+         print4x4FMatrixTRI("finalVertexTransformation", triModel->bones[i].info->finalVertexTransformation );
+         print4x4FMatrixTRI("localTransformation", triModel->bones[i].info->localTransformation );
         }
      }
    }
