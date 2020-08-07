@@ -33,7 +33,7 @@
 
 
 
-#define NORMAL   "\033[0m"
+#define NORMAL  "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 
@@ -173,10 +173,10 @@ int doTiledDrawing(
                      535.423889, //fx
                      533.48468,  //fy
                      0.0,        //skew
-                     (double) originalWIDTH/2,    //cx
-                     (double) originalHEIGHT/2,   //cy
-                     (double) originalWIDTH,      //Window Width
-                     (double) originalHEIGHT,     //Window Height
+                     (float) originalWIDTH/2,    //cx
+                     (float) originalHEIGHT/2,   //cy
+                     (float) originalWIDTH,      //Window Width
+                     (float) originalHEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
                      &projectionMatrix,
@@ -185,13 +185,13 @@ int doTiledDrawing(
                     );
 
      //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
+        float roll=0.0;//(float)  (rand()%90);
+        float pitch=0.0;//(float) (rand()%90);
+        float yaw=0.0;//(float)   (rand()%90);
 
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
+        float x=-259.231f;//(float)  (1000-rand()%2000);
+        float y=-54.976f;//(float) (100-rand()%200);
+        float z=2699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
@@ -290,13 +290,13 @@ int doSingleDrawing(
 
 
      //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
+        float roll=0.0;//(float)  (rand()%90);
+        float pitch=0.0;//(float) (rand()%90);
+        float yaw=0.0;//(float)   (rand()%90);
 
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
+        float x=-259.231f;//(float)  (1000-rand()%2000);
+        float y=-54.976f;//(float) (100-rand()%200);
+        float z=2699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
