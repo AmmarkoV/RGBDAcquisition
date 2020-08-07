@@ -926,8 +926,8 @@ int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * m
 
   int i=0;
   float tmp[16];
-  i+=multiplyTwo4x4FMatrices(tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4FMatrices(result , matrixA , tmp);
+  i+=multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4FMatrices_Naive(result , matrixA , tmp);
 
   return (i==2);
 }

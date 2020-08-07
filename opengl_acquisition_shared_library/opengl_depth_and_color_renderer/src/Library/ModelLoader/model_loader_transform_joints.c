@@ -878,6 +878,8 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
 
+  struct  Matrix4x4OfFloats alignedMatrixHolder;
+
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
      if ( is4x4FZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
@@ -894,6 +896,8 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
+       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[k].info->finalVertexTransformation);
+         
        //V is the vertice we will be working in this loop
        unsigned int v = triModelIn->bones[k].weightIndex[i];
        //W is the weight that we have for the specific bone
@@ -908,7 +912,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        position[3] = 1.0;
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
-       transform3DPointFVectorUsing4x4FMatrix(transformedPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
+       transform3DPointFVectorUsing4x4FMatrix(transformedPosition,&alignedMatrixHolder,position);
        triModelOut->vertices[v*3+0] += (float) transformedPosition[0] * w;
        triModelOut->vertices[v*3+1] += (float) transformedPosition[1] * w;
        triModelOut->vertices[v*3+2] += (float) transformedPosition[2] * w;
@@ -922,7 +926,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        normal[3]   = 0.0;
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
-       transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
+       transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal,&alignedMatrixHolder,normal);
        triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
        triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
        triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
