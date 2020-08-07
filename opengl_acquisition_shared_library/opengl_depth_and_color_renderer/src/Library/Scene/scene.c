@@ -745,9 +745,10 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   if (scene!=0)
   {
     /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n", camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
-
-    create4x4DCameraModelViewMatrixForRendering(
-                                                scene->activeModelViewMatrix ,
+    
+    struct Matrix4x4OfFloats aMVM={0};
+    create4x4FCameraModelViewMatrixForRendering(
+                                                &aMVM,
                                                 //Rotation Component
                                                 scene->cameraPose.angleX,
                                                 scene->cameraPose.angleY,
@@ -757,6 +758,8 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
                                                 scene->cameraPose.posY,
                                                 scene->cameraPose.posZ
                                                );
+                                               
+    copy4x4FMatrixTo4x4D(scene->activeModelViewMatrix,aMVM.m); 
     transpose4x4DMatrix(scene->activeModelViewMatrix);
     glLoadMatrixd(scene->activeModelViewMatrix);
 

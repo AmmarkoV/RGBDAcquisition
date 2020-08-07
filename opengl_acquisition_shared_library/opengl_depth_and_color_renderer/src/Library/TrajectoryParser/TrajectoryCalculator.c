@@ -287,6 +287,9 @@ int parseAbsoluteRotation(struct VirtualStream * stream,double * planetRotAbsolu
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
+    fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength disabled after float transition\n");
+    return 0;
+    /*
   fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength(sat=%u,planet=%u) from frame %u to frame %u \n",satteliteObj,planetObj,frameNumber,frameNumber+duration);
   if ( satteliteObj >= stream->numberOfObjects ) { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,satteliteObj); return 0; }
   if ( planetObj >= stream->numberOfObjects )    { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,planetObj);    return 0; }
@@ -392,7 +395,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     stream->object[satteliteObj].MAX_timeOfFrames = stream->object[planetObj].MAX_timeOfFrames;
     stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;
  return 1;
-
+*/
 }
 
 
@@ -634,12 +637,13 @@ int fillPosWithFrame(
        */
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
+       struct Matrix4x4OfFloats mF={0};
+         
        double rotCur[4]={0};
        unsigned int i=0,z=0;
        for (i=0; i<numberOfJoints; i++)
        {
-        float * f=&joints[16*i];
-        double m[16]={0};
+        float * f=&joints[16*i]; 
 
         //Euler Rotation
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -654,16 +658,18 @@ int fillPosWithFrame(
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = 0.0;
+         
+         struct Matrix4x4OfFloats mF={0};
 
-         create4x4DMatrixFromEulerAnglesWithRotationOrder(
-                                                          m,
+         create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                          &mF,
                                                           rotCur[0],
                                                           rotCur[1],
                                                           rotCur[2],
                                                           (unsigned int) stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].eulerRotationOrder
                                                         );
 
-         copy4x4DMatrixTo4x4F(f,m);
+         copy4x4FMatrix(f,mF.m);
         } else
         //Quaternion Rotation
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -673,9 +679,10 @@ int fillPosWithFrame(
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
-
-         quaternion2Matrix4x4(m,rotCur,0);
-         copy4x4DMatrixTo4x4F(f,m);
+          
+         create4x4FQuaternionMatrix(&mF,rotCur[0],rotCur[1],rotCur[2],rotCur[3]); 
+         //quaternion2Matrix4x4(m,rotCur,0);
+         copy4x4FMatrix(f,mF.m);
         } else
         //Matrix 4x4 Matrix
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -697,7 +704,8 @@ int fillPosWithFrame(
         //---------------------------------------------------------------------------------------------------------------------------------
         {
          //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
-         create4x4FIdentityMatrix(f);
+         create4x4FIdentityMatrix(&mF);
+         copy4x4FMatrix(f,mF.m);
         }
         //---------------------------------------------------------------------------------------------------------------------------------
        }
@@ -740,13 +748,7 @@ int fillJointsWithInterpolatedFrame(
        for (i=0; i<numberOfJoints; i++)
        {
 
-        float * f=&joints[16*i];
-        double m[16]={
-                       1.0 , 0.0 , 0.0 ,0.0 ,
-                       0.0 , 1.0 , 0.0 ,0.0 ,
-                       0.0 , 0.0 , 1.0 ,0.0 ,
-                       0.0 , 0.0 , 0.0 ,1.0
-                     };
+        float * f=&joints[16*i]; 
 
         if (
             (stream->object[ObjID].frame[PrevFrame].jointList==0) ||
@@ -792,15 +794,18 @@ int fillJointsWithInterpolatedFrame(
          //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
          //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
          //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
-         create4x4DMatrixFromEulerAnglesWithRotationOrder(
-                                                          m,
+         
+         struct Matrix4x4OfFloats mF={0};
+         
+         create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                          &mF,
                                                           (double) rotTot[0],
                                                           (double) rotTot[1],
                                                           (double) rotTot[2],
                                                           (unsigned int) stream->object[ObjID].frame[NextFrame].jointList->joint[i].eulerRotationOrder
                                                         );
          //create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
-         copy4x4DMatrixTo4x4F(f,m);
+         copy4x4FMatrix(f,mF.m);
         } else
        if (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)

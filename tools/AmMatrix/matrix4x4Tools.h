@@ -91,7 +91,10 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m );
 */  
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
 
-int is4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
+
+int is4x4FIdentityMatrix(float  * m);
+int is4x4FIdentityMatrixS(struct Matrix4x4OfFloats * m);
+
 int is4x4FIdentityMatrixPercisionCompensating(struct Matrix4x4OfFloats * m);
 
 void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pitch,float *yaw);
@@ -269,6 +272,18 @@ int transpose4x4DMatrix(double * mat);
 * @retval 0=failure,1=success
 */
 int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB);
+
+/**
+* @brief Multiply 3x 4x4 Double matrices ( A * B * C )
+* @ingroup AmMatrix
+* @param  Output 4x4 Float Matrix ( should be already allocated )
+* @param  Input 4x4 Float Matrix A
+* @param  Input 4x4 Float Matrix B
+* @param  Input 4x4 Float Matrix C
+* @retval 0=failure,1=success
+*/
+int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
+
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )

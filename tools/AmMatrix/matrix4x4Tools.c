@@ -163,6 +163,9 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     m->m[12]= 0.0;  m->m[13]= 0.0;  m->m[14] = 0.0;  m->m[15] = 1.0;
   #endif // OPTIMIZED
 }
+
+ 
+ 
  
 
 int floatPEq(float * element , float value )
@@ -175,14 +178,20 @@ int floatPEq(float * element , float value )
 }
 
 
-int is4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
+int is4x4FIdentityMatrix(float  * m)
 {
    return (
-    (floatPEq(&m->m[0],1.0)) &&(floatPEq(&m->m[1],0.0)) &&(floatPEq(&m->m[2],0.0)) &&(floatPEq(&m->m[3],0.0)) &&
-    (floatPEq(&m->m[4],0.0)) &&(floatPEq(&m->m[5],1.0)) &&(floatPEq(&m->m[6],0.0)) &&(floatPEq(&m->m[7],0.0)) &&
-    (floatPEq(&m->m[8],0.0)) &&(floatPEq(&m->m[9],0.0)) &&(floatPEq(&m->m[10],1.0))&&(floatPEq(&m->m[11],0.0))&&
-    (floatPEq(&m->m[12],0.0))&&(floatPEq(&m->m[13],0.0))&&(floatPEq(&m->m[14],0.0))&&(floatPEq(&m->m[15],1.0))
-           );
+           (floatPEq(&m[0],1.0)) &&(floatPEq(&m[1],0.0)) &&(floatPEq(&m[2],0.0)) &&(floatPEq(&m[3],0.0)) &&
+           (floatPEq(&m[4],0.0)) &&(floatPEq(&m[5],1.0)) &&(floatPEq(&m[6],0.0)) &&(floatPEq(&m[7],0.0)) &&
+           (floatPEq(&m[8],0.0)) &&(floatPEq(&m[9],0.0)) &&(floatPEq(&m[10],1.0))&&(floatPEq(&m[11],0.0))&&
+           (floatPEq(&m[12],0.0))&&(floatPEq(&m[13],0.0))&&(floatPEq(&m[14],0.0))&&(floatPEq(&m[15],1.0))
+          );
+}
+
+
+int is4x4FIdentityMatrixS(struct Matrix4x4OfFloats * m)
+{
+   return is4x4FIdentityMatrix(m->m);
 }
 
 
@@ -364,7 +373,7 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 
 
 
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder)
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float eulX, float eulY, float eulZ,unsigned int rotationOrder)
 {
    //Initialize rotation matrix..
    create4x4FIdentityMatrix(m);
@@ -729,7 +738,7 @@ int transpose4x4DMatrix(double * mat)
 
 
  
-int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
+int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB) 
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
@@ -770,6 +779,20 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 
   return 1;
 }
+
+
+int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
+{
+  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+
+  int i=0;
+  double tmp[16];
+  i+=multiplyTwo4x4DMatrices(tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4DMatrices(result , matrixA , tmp);
+
+  return (i==2);
+}
+
 
 
 int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB)

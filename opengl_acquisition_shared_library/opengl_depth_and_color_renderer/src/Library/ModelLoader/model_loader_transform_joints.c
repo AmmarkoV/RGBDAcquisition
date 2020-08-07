@@ -662,8 +662,12 @@ float * mallocModelTransformJoints(
      unsigned int i=0;
      for (i=0; i<(*jointDataSizeOutput); i++)
      {
-       float * mat = &returnMat[16*i];
-       create4x4FIdentityMatrix(mat);
+       float * m = &returnMat[16*i];
+       //create4x4FIdentityMatrix(mat);
+       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
      }
   }
   return returnMat;
@@ -804,10 +808,12 @@ void recursiveJointHeirarchyTransformer(
     if (in->bones[curBone].info->altered)
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
-      double translation[16] , rotation[16] , scaling[16];
-      create4x4DIdentityMatrix(translation);
-      create4x4DIdentityMatrix(rotation);
-      create4x4DIdentityMatrix(scaling);
+      //Set all matrices to identity..
+      double translation[16]={0} , rotation[16]={0} , scaling[16]={0}; 
+      translation[0] = 1.0; translation[5] = 1.0; translation[10] = 1.0; translation[15] = 1.0;
+      rotation[0] = 1.0;    rotation[5] = 1.0;    rotation[10] = 1.0;    rotation[15] = 1.0;
+      scaling[0] = 1.0;     scaling[5] = 1.0;     scaling[10] = 1.0;     scaling[15] = 1.0;
+      //------------------------------------------------------------------------------------------
 
       copy4x4FMatrixTo4x4D(rotation,&jointData[curBone*16]);
 
@@ -860,6 +866,127 @@ void recursiveJointHeirarchyTransformer(
 }
 
 
+
+enum mat4x4EItem
+{
+    e0 = 0 , e1  , e2  , e3 ,
+    e4     , e5  , e6  , e7 ,
+    e8     , e9  , e10 , e11 ,
+    e12    , e13 , e14 , e15
+};
+
+int transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(double * resultPoint3D,double * transformation4x4,double * point3D)
+{
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
+
+
+  if (point3D[3]!=0.0)
+  {
+    fprintf(stderr,"Error with W coordinate transform3DNormalVectorUsing3x3FPartOf4x4FMatrix , should be zero  \n");
+    return 0;
+  }
+
+  double * m = transformation4x4;
+  register double X=point3D[0],Y=point3D[1],W=point3D[2];
+  /*
+  What we want to do ( in mathematica )
+   { {me0,me1,me2} , {me3,me4,me5} , {me6,me7,me8} } * { { X } , { Y } , { W } }
+
+   This gives us
+
+  {
+    {me2 W + me0 X + me1 Y},
+    {me5 W + me3 X + me4 Y},
+    {me8 W + me6 X + me7 Y}
+  }
+*/
+
+  double * me0=&m[e0] , * me1=&m[e1] , * me2=&m[e2]  ;  //m[e3]  ignored
+  double * me3=&m[e4] , * me4=&m[e5] , * me5=&m[e6]  ;  //m[e7]  ignored
+  double * me6=&m[e8] , * me7=&m[e9] , * me8=&m[e10] ;  //m[e11] ignored
+  //       last line ignored since we only want 3x3
+
+
+  resultPoint3D[0] =  (*me2) * W + (*me0) * X + (*me1) * Y;
+  resultPoint3D[1] =  (*me5) * W + (*me3) * X + (*me4) * Y;
+  resultPoint3D[2] =  (*me8) * W + (*me6) * X + (*me7) * Y;
+  resultPoint3D[3] =  0;
+
+ // Ok we have our results but now to normalize our vector
+  if(resultPoint3D[2]!=0.0)
+  {
+   resultPoint3D[0]/=resultPoint3D[2];
+   resultPoint3D[1]/=resultPoint3D[2];
+   resultPoint3D[2]=1.0; //resultPoint3D[2]/=resultPoint3D[2];
+  }
+
+  return 1;
+}
+
+
+int doublePEq(double * element , double value )
+{
+ const double machineFloatPercision= 0.0001;
+ if ( *element == value ) { return 1; }
+
+ if ( ( value-machineFloatPercision<*element ) && (( *element<value+machineFloatPercision )) ) { return 1; }
+ return 0;
+}
+ 
+int is4x4DZeroMatrix(double  * m)
+{
+   return (
+            (doublePEq(&m[0],0.0)) &&(doublePEq(&m[1],0.0)) &&(doublePEq(&m[2],0.0)) &&(doublePEq(&m[3],0.0)) &&
+            (doublePEq(&m[4],0.0)) &&(doublePEq(&m[5],0.0)) &&(doublePEq(&m[6],0.0)) &&(doublePEq(&m[7],0.0)) &&
+            (doublePEq(&m[8],0.0)) &&(doublePEq(&m[9],0.0)) &&(doublePEq(&m[10],0.0))&&(doublePEq(&m[11],0.0))&&
+            (doublePEq(&m[12],0.0))&&(doublePEq(&m[13],0.0))&&(doublePEq(&m[14],0.0))&&(doublePEq(&m[15],0.0))
+           );
+}
+
+
+int transform3DPointDVectorUsing4x4DMatrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+{
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
+
+/*
+   What we want to do ( in mathematica )
+   { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
+   This gives us
+  {
+    {e3 W + e0 X + e1 Y + e2 Z},
+    {e7 W + e4 X + e5 Y + e6 Z},
+    {e11 W + e8 X + e9 Y + e10 Z},
+    {e15 W + e12 X + e13 Y + e14 Z}
+  }
+*/
+  double * m = transformation4x4;
+  register double X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
+
+  resultPoint3D[0] =  m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
+  resultPoint3D[1] =  m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
+  resultPoint3D[2] =  m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
+  resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
+
+  // Ok we have our results but now to normalize our vector
+  if (resultPoint3D[3]!=0.0)
+  {
+   resultPoint3D[0]/=resultPoint3D[3];
+   resultPoint3D[1]/=resultPoint3D[3];
+   resultPoint3D[2]/=resultPoint3D[3];
+   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
+   return 1;
+  } else
+  {
+     fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
+     print4x4DMatrix("Matrix was",transformation4x4,1);
+     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
+     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
+     return 0;
+  }
+
+ return 1;
+}
+
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
   //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
@@ -875,7 +1002,12 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
      if ( is4x4DZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
      {
        fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
-       create4x4DIdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
+       //create4x4DIdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
+       double * m = triModelIn->bones[k].info->finalVertexTransformation;
+       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
      }
 
 
@@ -910,10 +1042,10 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
        transform3DNormalVectorUsing3x3DPartOf4x4DMatrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
-	   triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
-	   triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
-	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
-	   //----------------------------------------------------------------------
+       triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
+       triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
+       triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
+       //----------------------------------------------------------------------
 
      }
    }
@@ -992,7 +1124,13 @@ int doModelTransform(
    }
 
   double initialParentTransform[16]={0};
-  create4x4DIdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
+  //create4x4DIdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
+  double * m = initialParentTransform;
+  m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+  m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+  m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+  m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+  
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
