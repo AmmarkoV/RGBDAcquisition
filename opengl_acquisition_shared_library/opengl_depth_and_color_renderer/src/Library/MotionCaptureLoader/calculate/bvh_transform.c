@@ -14,12 +14,7 @@
 #define FAST_OFFSET_TRANSLATION 1
 
 
-
-double fToD(float in)
-{
-  return (double) in;
-}
-
+ 
 
 float max(float a,float b)
 {

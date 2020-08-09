@@ -6,7 +6,7 @@
 
 /*
 //THIS IS NOT USED ANYWHERE
-double bvh_constrainAngleCentered180(double angle)
+float bvh_constrainAngleCentered180(float angle)
 {
    angle = fmod(angle,360.0);
    if (angle<0.0)

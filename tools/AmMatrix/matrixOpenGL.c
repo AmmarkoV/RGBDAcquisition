@@ -12,14 +12,14 @@
 #define RED     "\033[31m"      /* Red */
 
 
-int convertRodriguezTo3x3(double * result,double * matrix)
+int convertRodriguezTo3x3(float * result,float * matrix)
 {
   if ( (matrix==0) ||  (result==0) ) { return 0; }
 
 
-  double x = matrix[0] , y = matrix[1] , z = matrix[2];
-  double th = sqrt( x*x + y*y + z*z );
-  double cosTh = cos(th);
+  float x = matrix[0] , y = matrix[1] , z = matrix[2];
+  float th = sqrt( x*x + y*y + z*z );
+  float cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
   if ( th < 0.00001 )
@@ -39,7 +39,7 @@ int convertRodriguezTo3x3(double * result,double * matrix)
 
   #if PRINT_MATRIX_DEBUGGING
    fprintf(stderr,"rodriguez %f %f %f\n ",matrix[0],matrix[1],matrix[2]);
-   print3x3DMatrix("Rodriguez Initial", result);
+   print3x3FMatrix("Rodriguez Initial", result);
   #endif // PRINT_MATRIX_DEBUGGING
 
   return 1;
@@ -60,9 +60,9 @@ void changeYandZAxisOpenGL4x4Matrix(float * result,float * matrix)
   multiplyTwo4x4FMatrices_Naive(result,matrix,invertOp.m);  
 }
 
-int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
+int convertRodriguezAndTranslationTo4x4UnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit)
 {
-  double matrix3x3Rotation[16] = {0}; 
+  float matrix3x3Rotation[16] = {0}; 
   
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
@@ -70,18 +70,18 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
   #endif // PRINT_MATRIX_DEBUGGING
 
   //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
-  convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
+  convertRodriguezTo3x3((float*) matrix3x3Rotation , rodriguez);
 
   //Shorthand variables for readable code :P
-  double * m  = result4x4;
-  double * rm = matrix3x3Rotation;
-  double * tm = translation;
+  float * m  = result4x4;
+  float * rm = matrix3x3Rotation;
+  float * tm = translation;
 
 
-  //double scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
-  double Tx = tm[0]*scaleToDepthUnit;
-  double Ty = tm[1]*scaleToDepthUnit;
-  double Tz = tm[2]*scaleToDepthUnit;
+  //float scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
+  float Tx = tm[0]*scaleToDepthUnit;
+  float Ty = tm[1]*scaleToDepthUnit;
+  float Tz = tm[2]*scaleToDepthUnit;
 
 
   /*
@@ -104,14 +104,14 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
 
 
-  print4x4DMatrix("ModelView", result4x4,0); 
+  print4x4FMatrix("ModelView", result4x4,0); 
   return 1;
 }
 
 
-int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
+int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit )
 {
-  double matrix3x3Rotation[16] = {0};     
+  float matrix3x3Rotation[16] = {0};     
   
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
@@ -120,18 +120,18 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 
 
   //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
-  convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
+  convertRodriguezTo3x3((float*) matrix3x3Rotation , rodriguez);
 
   //Shorthand variables for readable code :P
-  double * m  = result4x4;
-  double * rm = matrix3x3Rotation;
-  double * tm = translation;
+  float * m  = result4x4;
+  float * rm = matrix3x3Rotation;
+  float * tm = translation;
 
 
-  //double scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
-  double Tx = tm[0]*scaleToDepthUnit;
-  double Ty = tm[1]*scaleToDepthUnit;
-  double Tz = tm[2]*scaleToDepthUnit;
+  //float scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
+  float Tx = tm[0]*scaleToDepthUnit;
+  float Ty = tm[1]*scaleToDepthUnit;
+  float Tz = tm[2]*scaleToDepthUnit;
 
   /*
       Here what we want to do is generate a 4x4 matrix that does the normal transformation that our
@@ -146,7 +146,7 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 
 
   #if PRINT_MATRIX_DEBUGGING
-   print4x4DMatrix("ModelView", result4x4);
+   print4x4FMatrix("ModelView", result4x4);
    fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   #endif // PRINT_MATRIX_DEBUGGING
   

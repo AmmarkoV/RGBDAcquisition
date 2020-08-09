@@ -262,15 +262,15 @@ int bvh_ConstrainRotations(
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
-   double buffer = (double) mc->motionValues[mID+3];
+   float buffer = (float) mc->motionValues[mID+3];
    buffer = bvh_RemapAngleCentered0(buffer,0);
    mc->motionValues[mID+3] = (float) buffer;
 
-   buffer = (double) mc->motionValues[mID+4];
+   buffer = (float) mc->motionValues[mID+4];
    buffer = bvh_RemapAngleCentered0(buffer,constrainOrientation);
    mc->motionValues[mID+4] = (float) buffer;
 
-   buffer = (double) mc->motionValues[mID+5];
+   buffer = (float) mc->motionValues[mID+5];
    buffer = bvh_RemapAngleCentered0(buffer,0);
    mc->motionValues[mID+5] = (float) buffer;
   }

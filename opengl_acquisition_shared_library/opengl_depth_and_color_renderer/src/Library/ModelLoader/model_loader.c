@@ -529,18 +529,18 @@ int drawModelAt(
    create4x4FModelTransformation(
                                   &modelTransformation,
                                   //Rotation Component
-                                  (double) rotationX,//heading,
-                                  (double) rotationY,//pitch,
-                                  (double) rotationZ,//roll,
+                                  (float) rotationX,//heading,
+                                  (float) rotationY,//pitch,
+                                  (float) rotationZ,//roll,
                                            rotationOrder,
                                   //Translation Component
-                                  (double) positionX,
-                                  (double) positionY,
-                                  (double) positionZ ,
+                                  (float) positionX,
+                                  (float) positionY,
+                                  (float) positionZ ,
                                   //Scale Component
-                                  (double) mod->scaleX,
-                                  (double) mod->scaleY,
-                                  (double) mod->scaleZ
+                                  (float) mod->scaleX,
+                                  (float) mod->scaleY,
+                                  (float) mod->scaleZ
                                  );
   transpose4x4FMatrix(modelTransformation.m); //Because we want to use this in OpenGL
   glMultMatrixf(modelTransformation.m);

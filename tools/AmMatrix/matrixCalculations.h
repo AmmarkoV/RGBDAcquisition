@@ -77,7 +77,7 @@ int projectPointsFrom3Dto2D(float * x2D,float * y2D ,float * x3D,float *y3D ,flo
 * @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
 * @retval 0=Failure,1=Success
 */
-int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  double * absoluteInPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeOutPoint3DUnrotated);
+int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,float * absoluteInPoint3DRotated ,float * objectPosition,float * objectQuaternion ,float * relativeOutPoint3DUnrotated);
 
 
 
@@ -163,27 +163,17 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
 
 
 /**
- * @brief Perform Slerp function between 2 4x4 matrices ( of doubles ) representing rigid transformations
- * @ingroup AmMatrix
- * @param Output Matrix4x4  ( of doubles )
- * @param Input Matrix4x4 A ( of doubles )
- * @param Input Matrix4x4 B ( of doubles )
- * @param Factor , typically should be 0.5 for half and half
- */
-int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step );
-
-
-
-
-/**
  * @brief Perform Slerp function between 2 4x4 matrices ( of floats ) representing rigid transformations
  * @ingroup AmMatrix
- * @param Output Matrix4x4   ( of floats )
- * @param Input Matrix4x4 A  ( of floats )
- * @param Input Matrix4x4 B  ( of floats )
+ * @param Output Matrix4x4  ( of floats )
+ * @param Input Matrix4x4 A ( of floats )
+ * @param Input Matrix4x4 B ( of floats )
  * @param Factor , typically should be 0.5 for half and half
  */
-int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float step );
+int slerp2RotTransMatrices4x4(float * result4, float * a4, float * b4 , float step );
+
+
+
 
 /**
 * @brief Return the Inner Product of 2 3D points

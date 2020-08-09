@@ -117,7 +117,7 @@ float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float rad
 
 
 
-int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step )
+int slerp2RotTransMatrices4x4(float * result4, float * a4, float * b4 , float step )
 {
   if ( (result4==0) || (a4==0) || (b4==0) ) { return 0; }
 
@@ -127,13 +127,13 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
 
   int conventionToUseInternally = 0;
 
-  double qA[4];
+  float qA[4];
   matrix4x42Quaternion(qA, conventionToUseInternally , a4);
 
-  double qB[4];
+  float qB[4];
   matrix4x42Quaternion(qB, conventionToUseInternally , b4);
 
-  double qOut[4];
+  float qOut[4];
   quaternionSlerp( qOut, qA , qB, step);
   quaternion2Matrix4x4(result4 , qOut , conventionToUseInternally );
 
@@ -143,23 +143,7 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
  return 1;
 }
 
-
-
-
-int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float step )
-{
- double a4D[16],b4D[16],rD[16];
-
-
- copy4x4FMatrixTo4x4D(a4D,a4);
- copy4x4FMatrixTo4x4D(b4D,b4);
-
-   slerp2RotTransMatrices4x4( rD, a4D, b4D , step );
-
- copy4x4DMatrixTo4x4F(result4, rD);
- return 1;
-}
-
+ 
 
 
 

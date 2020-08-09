@@ -814,7 +814,7 @@ int fillJointsWithInterpolatedFrame(
           )
         {
         //fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
-        slerp2RotTransMatrices4x4F(
+        slerp2RotTransMatrices4x4(
                                    f , //write straight to the output
                                    stream->object[ObjID].frame[PrevFrame].jointList->joint[i].m,
                                    stream->object[ObjID].frame[NextFrame].jointList->joint[i].m ,

@@ -113,7 +113,7 @@ int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene,float * rodr
   if (scene==0) { fprintf(stderr,"Cannot access virtual stream to sceneSetOpenGLExtrinsicCalibration\n"); return 0; }
 
   scene->useCustomModelViewMatrix=1;
-  convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(scene->customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
+  convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(scene->customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
 
   scene->controls.scaleDepthTo=(float) scaleToDepthUnit;
 
@@ -180,7 +180,7 @@ int updateProjectionMatrix()
     if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport"); }
     glViewport(0,0,WIDTH,HEIGHT);
 
-    print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
+    print4x4FMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
 
   } else
   if (scene->useIntrinsicMatrix)
@@ -202,10 +202,9 @@ int updateProjectionMatrix()
                                              scene->controls.farPlane
                                            );
 
-   print4x4DMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix , 0 );
-
+   print4x4FMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix , 0 ); 
    glMatrixMode(GL_PROJECTION);
-   glLoadMatrixd(scene->customProjectionMatrix); // we load a matrix of Doubles
+   glLoadMatrixf(scene->customProjectionMatrix); // we load a matrix of Doubles
    glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
   }
     else
@@ -214,16 +213,15 @@ int updateProjectionMatrix()
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
 
-   double matrix[16]={0};
-
+   float matrix[16]={0}; 
    gldPerspective(
                   matrix,
-                  (double) scene->controls.fieldOfView,
-                  (double) WIDTH/HEIGHT,
-                  (double) scene->controls.nearPlane,
-                  (double) scene->controls.farPlane
+                  (float) scene->controls.fieldOfView,
+                  (float) WIDTH/HEIGHT,
+                  (float) scene->controls.nearPlane,
+                  (float) scene->controls.farPlane
                  );
-   glMultMatrixd(matrix);
+   glMultMatrixf(matrix);
 
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
    glViewport(0, 0, WIDTH, HEIGHT);
@@ -720,7 +718,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
       if (scene->useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
-           print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix , 0);
+           print4x4FMatrix("Scene declared modelview matrix", scene->modelViewMatrix , 0);
          }
 
    checkOpenGLError(__FILE__, __LINE__);

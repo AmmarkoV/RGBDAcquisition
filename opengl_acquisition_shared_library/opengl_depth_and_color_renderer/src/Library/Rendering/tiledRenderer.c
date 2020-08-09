@@ -205,7 +205,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                     gldPerspective(
                                    matrixF,
                                    85.0,
-                                   (double) tileWidth/tileHeight,
+                                   (float) tileWidth/tileHeight,
                                    0.1,
                                    13500.0
                                   );
