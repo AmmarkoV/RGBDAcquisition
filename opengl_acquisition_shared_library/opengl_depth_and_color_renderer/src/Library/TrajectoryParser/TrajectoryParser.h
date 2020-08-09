@@ -161,8 +161,7 @@ struct VirtualConnector
 
    float R , G , B , Transparency;
 
-   double scale;
-
+   float scale; 
 };
 
 
@@ -196,7 +195,7 @@ struct VirtualObject
    unsigned int lastFrameTime;
    unsigned int nextFrameTime;
 
-   double scaleX,scaleY,scaleZ;
+   float scaleX,scaleY,scaleZ;
    unsigned int particleNumber;
 
    unsigned int bbox2D[4];
@@ -209,7 +208,7 @@ struct VirtualObject
    // 0-6  low bounds          X Y Z    A B C D
    // 7-13 high bounds         X Y Z    A B C D
    // 14-20 resample variances X Y Z    A B C D
-   double limits[ 7 * 3];
+   float limits[ 7 * 3];
 
    unsigned int generations;
    unsigned int particles;*/
@@ -247,7 +246,6 @@ struct VirtualStreamControls
   //float depthUnit = 1.0;
 
   unsigned int userKeyFOVEnabled;
-
 };
 
 
@@ -261,10 +259,10 @@ struct VirtualStream
     // These are the matrices actively used by OpenGL
     // to render the scene
     //--------------------------------------------------------
-     double activeProjectionMatrix[16];
-     double activeModelViewMatrix[16];
-     double activeModelViewProjectionMatrix[16];
-     double activeNormalTransformation[16];
+     float activeProjectionMatrix[16];
+     float activeModelViewMatrix[16];
+     float activeModelViewProjectionMatrix[16];
+     float activeNormalTransformation[16];
     //--------------------------------------------------------
     //--------------------------------------------------------
 
@@ -273,27 +271,27 @@ struct VirtualStream
     // control the view of the camera for our scene
     //--------------------------------------------------------
     int projectionMatrixDeclared;
-    double projectionMatrix[16];
+    float projectionMatrix[16];
 
     int modelViewMatrixDeclared;
-    double modelViewMatrix[16];
+    float modelViewMatrix[16];
 
 
     int useCustomProjectionMatrix;
-    double customProjectionMatrix[16];
+    float customProjectionMatrix[16];
 
     int useCustomModelViewMatrix;
-    double customModelViewMatrix[16];
+    float customModelViewMatrix[16];
 
     int emulateProjectionMatrixDeclared;
-    double emulateProjectionMatrix[9];
+    float emulateProjectionMatrix[9];
 
     int extrinsicsDeclared;
-    double extrinsicTranslation[3];
-    double extrinsicRodriguezRotation[3];
+    float extrinsicTranslation[3];
+    float extrinsicRodriguezRotation[3];
 
     int useIntrinsicMatrix;
-    double cameraMatrix[9];
+    float cameraMatrix[9];
     //--------------------------------------------------------
     //--------------------------------------------------------
     //--------------------------------------------------------
@@ -346,7 +344,7 @@ struct VirtualStream
     struct ModelList * associatedModelList;
     void * modelStorage;
 
-    double scaleWorld[6];
+    float scaleWorld[6];
     int rotationsOverride;
     int rotationsXYZ[3];
     float rotationsOffset[3];

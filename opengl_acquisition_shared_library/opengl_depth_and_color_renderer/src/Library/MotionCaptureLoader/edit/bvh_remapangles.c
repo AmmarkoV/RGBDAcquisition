@@ -37,10 +37,10 @@ double bvh_constrainAngleCentered180(double angle)
 //
 //
 //We want to add 180 degrees to the model so 0 is oriented towards us..!
-double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
+float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation)
 {
-    double angleFrom_minus360_to_plus360;
-    double angleRotated = angle+180;
+    float angleFrom_minus360_to_plus360;
+    float angleRotated = angle+180;
 
      if (angleRotated<0.0)
      {
@@ -64,9 +64,9 @@ double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
 
 
 
-double bvh_RemapAngleCentered0(double angle, unsigned int constrainOrientation)
+float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 {
-   double angleShifted = angle;
+   float angleShifted = angle;
    //We want to add 180 degrees to the model so 0 is oriented towards us..!
    switch (constrainOrientation)
    {

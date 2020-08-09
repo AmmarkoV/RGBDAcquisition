@@ -228,9 +228,9 @@ int bvh_projectTo2D(
                                );
 
             //Should this only happen when position2DW>=0.0
-            //bvhTransform->joint[jID].pos3D[0] = (double) pos3DCenterFloat[0];
-            //bvhTransform->joint[jID].pos3D[1] = (double) pos3DCenterFloat[1];
-            //bvhTransform->joint[jID].pos3D[2] = (double) pos3DCenterFloat[2];               );
+            //bvhTransform->joint[jID].pos3D[0] = (float) pos3DCenterFloat[0];
+            //bvhTransform->joint[jID].pos3D[1] = (float) pos3DCenterFloat[1];
+            //bvhTransform->joint[jID].pos3D[2] = (float) pos3DCenterFloat[2];               );
            }
     //-------------------------------------------------------------------------------------------
 
@@ -241,8 +241,8 @@ int bvh_projectTo2D(
               bvhTransform->joint[jID].isBehindCamera=1;
            } else
            {
-              bvhTransform->joint[jID].pos2D[0] = (double) position2D[0];
-              bvhTransform->joint[jID].pos2D[1] = (double) position2D[1];
+              bvhTransform->joint[jID].pos2D[0] = (float) position2D[0];
+              bvhTransform->joint[jID].pos2D[1] = (float) position2D[1];
               bvhTransform->joint[jID].pos2DCalculated=1;
            }
 

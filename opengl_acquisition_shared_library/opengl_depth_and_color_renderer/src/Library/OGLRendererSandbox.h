@@ -26,7 +26,7 @@ void internalTest();
 * @param Far plane
 * @retval 0=Failure,1=Success
 */
-int setOpenGLNearFarPlanes(double near , double far);
+int setOpenGLNearFarPlanes(float near ,float far);
 
 
 /**
@@ -36,7 +36,7 @@ int setOpenGLNearFarPlanes(double near , double far);
 * @bug Careful about providing Column/Row Major matrices
 * @retval 0=Failure,1=Success
 */
-int setOpenGLIntrinsicCalibration(double * camera);
+int setOpenGLIntrinsicCalibration(float * camera);
 
 
 /**
@@ -47,7 +47,7 @@ int setOpenGLIntrinsicCalibration(double * camera);
 * @param Scale of translation
 * @retval 0=Failure,1=Success
 */
-int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit);
+int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation , float scaleToDepthUnit);
 
 
 unsigned int getOpenGLTimestamp();
@@ -96,14 +96,14 @@ int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilena
 * @ingroup OGLRendererSandbox
 * @retval Focal Length
 */
-double getOpenGLFocalLength();
+float getOpenGLFocalLength();
 
 /**
 * @brief Get Virtual Pixel Size
 * @ingroup OGLRendererSandbox
 * @retval Pixel Size
 */
-double getOpenGLPixelSize();
+float getOpenGLPixelSize();
 
 
 /**

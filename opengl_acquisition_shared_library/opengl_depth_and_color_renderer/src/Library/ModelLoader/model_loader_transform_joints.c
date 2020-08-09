@@ -178,13 +178,10 @@ void HsvToRgb(float h,float S,float V, float * r, float * g, float * b)
 
 
 void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *oG,float *oB)
-{
-
+{ 
   unsigned int sCoef=10;
   unsigned int vCoef=40;
-
-
-
+ 
   unsigned int hStep = (unsigned int) 360/maxID;
   unsigned int sStep = (unsigned int) sCoef/maxID;
   unsigned int vStep = (unsigned int) vCoef/maxID;
@@ -575,10 +572,10 @@ void colorCodeBones(struct TRI_Model * in)
 
 
 int setTRIJointRotationOrder(
-                                 struct TRI_Model * in ,
-                                 unsigned int jointToChange ,
-                                 unsigned int rotationOrder
-                               )
+                             struct TRI_Model * in ,
+                             unsigned int jointToChange ,
+                             unsigned int rotationOrder
+                           )
 {
   if (in==0)        { return 0; }
   if (in->bones==0) { return 0; }

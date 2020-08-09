@@ -130,7 +130,7 @@ SaveDIBitmap(const char *filename, /* I - File to load */
     switch (info->bmiHeader.biCompression)
 	{
 	case BI_BITFIELDS :
-            infosize += 12; /* Add 3 RGB doubleword masks */
+            infosize += 12; /* Add 3 RGB dou ble word masks */
             if (info->bmiHeader.biClrUsed == 0)
 	      break;
 	case BI_RGB :
@@ -341,7 +341,7 @@ SaveDIBitmap(const char *filename, /* I - File to load */
     switch (info->bmiHeader.biCompression)
 	{
 	case BI_BITFIELDS :
-            infosize += 12; /* Add 3 RGB doubleword masks */
+            infosize += 12; /* Add 3 RGB dou ble word masks */
             if (info->bmiHeader.biClrUsed == 0)
 	      break;
 	case BI_RGB :

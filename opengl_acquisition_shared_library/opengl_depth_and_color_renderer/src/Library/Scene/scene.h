@@ -26,9 +26,9 @@ int sceneSeekTime(unsigned int seekTime);
 int sceneIgnoreTime(unsigned int newSettingMode);
 
 
-int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit);
+int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene,float * rodriguez,float * translation ,float scaleToDepthUnit);
 
-int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera);
+int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,float * camera);
 
 
 

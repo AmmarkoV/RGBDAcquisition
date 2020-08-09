@@ -137,11 +137,11 @@ void glhPerspectivef2(
 * @param Z Far
 */
 void gldPerspective(
-                     double * matrix,
-                     double fovxInDegrees,
-                     double aspect,
-                     double zNear,
-                     double zFar
+                     float *matrix,
+                     float fovxInDegrees,
+                     float aspect,
+                     float zNear,
+                     float zFar
                    );
 
 

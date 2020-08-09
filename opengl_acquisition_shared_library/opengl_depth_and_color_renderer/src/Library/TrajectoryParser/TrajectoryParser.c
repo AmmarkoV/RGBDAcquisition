@@ -145,8 +145,8 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
   char model[MAX_PATH]={0};
   char typeStr[MAX_PATH]={0};
   char includeFile[MAX_PATH]={0};
-  double euler[3];
-  double quaternions[4];
+  float euler[3];
+  float quaternions[4];
   float pos[16]={0};
   unsigned int i,satteliteObj,planetObj,item,frame,duration,time,coordLength,eventType=0,foundA=0,foundB=0,objIDA=0,objIDB=0;
 
@@ -252,21 +252,21 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
            case TRAJECTORYPRIMITIVES_PROJECTION_MATRIX :
                  newstream->projectionMatrixDeclared=1;
-                 for (i=1; i<=16; i++) { newstream->projectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+                 for (i=1; i<=16; i++) { newstream->projectionMatrix[i-1] = (float)  InputParser_GetWordFloat(ipc,i); }
                  fprintf(stderr,"Projection Matrix given to TrajectoryParser\n");
            break;
 
 
            case TRAJECTORYPRIMITIVES_EMULATE_PROJECTION_MATRIX :
                  newstream->emulateProjectionMatrixDeclared=1;
-                 for (i=1; i<=9; i++) { newstream->emulateProjectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+                 for (i=1; i<=9; i++) { newstream->emulateProjectionMatrix[i-1] = (float)  InputParser_GetWordFloat(ipc,i); }
                  fprintf(stderr,"Emulating Projection Matrix given to TrajectoryParser\n");
            break;
 
 
            case TRAJECTORYPRIMITIVES_MODELVIEW_MATRIX :
                  newstream->modelViewMatrixDeclared=1;
-                 for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (double) InputParser_GetWordFloat(ipc,i); }
+                 for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (float) InputParser_GetWordFloat(ipc,i); }
                  fprintf(stderr,"ModelView Matrix given to TrajectoryParser\n");
            break;
 
@@ -622,8 +622,8 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
                int coordLength=7;
 
-               double euler[3];
-               double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+               float euler[3];
+               float quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
                normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
@@ -706,8 +706,8 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                pos[5] = InputParser_GetWordFloat(ipc,6);
                pos[6] = InputParser_GetWordFloat(ipc,7);
 
-               double euler[3];
-               double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+               float euler[3];
+               float quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
                normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1

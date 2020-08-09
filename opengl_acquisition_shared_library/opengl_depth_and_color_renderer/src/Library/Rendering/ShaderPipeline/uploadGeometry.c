@@ -82,11 +82,11 @@ pushObjectToBufferData(
     //Pass vNormal to shader
     if ((normals!=0) && (sizeOfNormals!=0) )
     {
-     GLuint vNormal = glGetAttribLocation( programID, "vNormal" );                             checkOpenGLError(__FILE__, __LINE__);
+     GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vNormal)
      {
-      glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(sizeOfVertices) ); checkOpenGLError(__FILE__, __LINE__);
+      glEnableVertexAttribArray(vNormal );                                                    checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vNormal, 3,GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(sizeOfVertices));  checkOpenGLError(__FILE__, __LINE__);
      }
     }
 

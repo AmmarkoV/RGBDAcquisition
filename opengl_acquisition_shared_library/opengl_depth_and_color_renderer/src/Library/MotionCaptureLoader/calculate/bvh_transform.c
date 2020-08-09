@@ -490,7 +490,7 @@ int bvh_loadTransformForMotionBuffer(
    bvhTransform->joint[jID].pos3D[3]= bvhTransform->joint[jID].localToWorldTransformation.m[15];
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #else
-   double centerPoint[4]={0.0,0.0,0.0,1.0};
+   float centerPoint[4]={0.0,0.0,0.0,1.0};
    transform3DPointFVectorUsing4x4FMatrix(
                                           bvhTransform->joint[jID].pos3D,
                                           bvhTransform->joint[jID].localToWorldTransformation,

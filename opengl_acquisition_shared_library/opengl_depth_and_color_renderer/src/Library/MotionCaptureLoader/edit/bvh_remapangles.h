@@ -8,9 +8,9 @@ extern "C"
 {
 #endif
 
-double bvh_RemapAngleCentered0(double angle, unsigned int constrainOrientation);
+float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation);
 
-double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation);
+float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation);
 
 
 #ifdef __cplusplus

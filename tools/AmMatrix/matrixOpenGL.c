@@ -337,16 +337,16 @@ void glhPerspectivef2(
 
 
 void gldPerspective(
-                     double *matrix,
-                     double fovxInDegrees,
-                     double aspect,
-                     double zNear,
-                     double zFar
+                     float *matrix,
+                     float fovxInDegrees,
+                     float aspect,
+                     float zNear,
+                     float zFar
                    )
 {
    // This code is based off the MESA source for gluPerspective
    // *NOTE* This assumes GL_PROJECTION is the current matrix
-   double xmin, xmax, ymin, ymax;
+   float xmin, xmax, ymin, ymax;
 
    xmax = zNear * tan(fovxInDegrees * M_PI / 360.0);
    xmin = -xmax;
@@ -373,7 +373,7 @@ void gldPerspective(
    matrix[15] = 0.0;
 
    // Add to current matrix
-   //glMultMatrixd(matrix);
+   //glMultMatrixf(matrix);
 }
 
 
