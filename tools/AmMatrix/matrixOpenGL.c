@@ -880,9 +880,9 @@ void prepareRenderingMatrices(
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
      
      
-     create4x4FScalingMatrix(&viewMatrix,-1.0,1.0,1.0);
+     create4x4FScalingMatrix(viewMatrix,-1.0,1.0,1.0);
 
-     glGetViewportMatrix(viewportMatrix,viewport[0],viewport[1],viewport[2],viewport[3],near,far);
+     glGetViewportMatrix(viewportMatrix->m,viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
 
 
