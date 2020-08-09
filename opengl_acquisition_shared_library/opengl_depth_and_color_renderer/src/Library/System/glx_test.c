@@ -477,13 +477,13 @@ int doDrawing()
 
 
 
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
+     struct Matrix4x4OfFloats projectionMatrix;
+     struct Matrix4x4OfFloats viewportMatrix;
+     struct Matrix4x4OfFloats viewMatrix;
      prepareMatrices(
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
+                     &projectionMatrix,
+                     &viewMatrix,
+                     &viewportMatrix
                     );
 
 
@@ -564,9 +564,9 @@ int doDrawing()
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
 
@@ -582,9 +582,9 @@ int doDrawing()
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
 		// Swap buffers
