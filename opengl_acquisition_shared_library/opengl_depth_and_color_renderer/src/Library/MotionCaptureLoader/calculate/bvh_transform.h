@@ -84,7 +84,7 @@ struct BVH_TransformedJoint
 struct BVH_Transform
 {
   char useOptimizations;
-  char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+  unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   
   struct rectangleArea torso;
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
@@ -105,7 +105,7 @@ int bvh_populateRectangle2DFromProjections(
 
 int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform);
 
-unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID);
+unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH_Transform * bvhTransform,const BVHJointID jID);
 
 int bvh_markAllJointsAsUselessInTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform);
 

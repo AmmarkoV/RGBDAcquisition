@@ -197,12 +197,12 @@ int bvh_populateRectangle2DFromProjections(
  
 
 
-unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
+unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH_Transform * bvhTransform,const BVHJointID jID)
 { 
   if (bvhTransform==0) { return 0; }
  
   if (bvhTransform->useOptimizations) 
-  {    
+  {
      //If we are using optimizations and this joint is not skipped then transform this joint
      if (jID<MAX_BVH_JOINT_HIERARCHY_SIZE)  
           { 
