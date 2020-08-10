@@ -180,7 +180,7 @@ int bvh_projectTo2D(
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
       { 
         //if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
-        if (bvh_shouldJoinBeTransformedGivenOurOptimizations(bvhTransform,jID))
+        if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
         {
           if (bvhTransform->joint[jID].pos3D[3]!=1.0)
              { fprintf(stderr,"bvh_projectTo2D: W coord (%0.2f) of joint %u not normalized..\n",bvhTransform->joint[jID].pos3D[3],jID); }

@@ -197,7 +197,7 @@ int bvh_populateRectangle2DFromProjections(
  
 
 
-int bvh_shouldJoinBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
+int bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
 { 
   if (bvhTransform==0) { return 0; }
  //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
@@ -359,7 +359,7 @@ int bvh_loadTransformForMotionBuffer(
   //----------------------------------------------------------------------------------------
   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-     if (bvh_shouldJoinBeTransformedGivenOurOptimizations(bvhTransform,jID))
+     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
       //To Setup the dynamic transformation we must first get values from our bvhMotion structure
       if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
@@ -409,7 +409,7 @@ int bvh_loadTransformForMotionBuffer(
   //-----------------------------------------------------------------------
   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-    if (bvh_shouldJoinBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
      //This will get populated either way..
      //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
