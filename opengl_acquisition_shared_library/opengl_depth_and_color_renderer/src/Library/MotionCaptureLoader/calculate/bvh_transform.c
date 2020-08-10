@@ -197,7 +197,7 @@ int bvh_populateRectangle2DFromProjections(
  
 
 
-int bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
+unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
 { 
   if (bvhTransform==0) { return 0; }
  
@@ -206,7 +206,10 @@ int bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvh
   //If we are using optimizations and this joint is not skipped then transform this joint
   {    
      //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
-     if ( (jID<MAX_BVH_JOINT_HIERARCHY_SIZE) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
+     //if ( (jID<MAX_BVH_JOINT_HIERARCHY_SIZE) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
+     
+     if (jID<MAX_BVH_JOINT_HIERARCHY_SIZE)  
+          { return  (!bvhTransform->skipCalculationsForJoint[jID]); }
   }
 
 
@@ -219,7 +222,7 @@ int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_T
 { 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-     if (!bvhTransform->joint[jID].skipCalculations)
+     if (!bvhTransform->skipCalculationsForJoint[jID])
      {
          fprintf(stderr,"Joint %u ( %s ) is selected \n" ,jID , bvhMotion->jointHierarchy[jID].jointName);
      }
@@ -239,7 +242,7 @@ int bvh_markAllJointsAsUselessInTransform(
 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-     bvhTransform->joint[jID].skipCalculations=1;
+     bvhTransform->skipCalculationsForJoint[jID]=1;
    }
 
   return 1;
@@ -261,11 +264,11 @@ int bvh_markJointAndParentsAsUsefulInTransform(
   //We want to make sure all parent joints until root ( jID->0 ) are set to not skip calculations..
   while (jID!=0)
       {
-           bvhTransform->joint[jID].skipCalculations=0;
+           bvhTransform->skipCalculationsForJoint[jID]=0;
            jID = bvhMotion->jointHierarchy[jID].parentJoint;
       }
 
-  bvhTransform->joint[0].skipCalculations=0;
+  bvhTransform->skipCalculationsForJoint[0]=0;
 
   return 1;
 }
@@ -284,11 +287,11 @@ int bvh_markJointAndParentsAsUselessInTransform(
 
   while (jID!=0)
       {
-           bvhTransform->joint[jID].skipCalculations=1;
+           bvhTransform->skipCalculationsForJoint[jID]=1;
            jID = bvhMotion->jointHierarchy[jID].parentJoint;
       }
 
-  bvhTransform->joint[0].skipCalculations=1;
+  bvhTransform->skipCalculationsForJoint[0]=1;
 
   return 1;
 }
@@ -306,7 +309,7 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 
   bvhTransform->useOptimizations=1;
   bvh_markJointAndParentsAsUselessInTransform(bvhMotion,bvhTransform,jID);
-  bvhTransform->joint[jID].skipCalculations=0;
+  bvhTransform->skipCalculationsForJoint[jID]=0;
 
   return 1;
 }
