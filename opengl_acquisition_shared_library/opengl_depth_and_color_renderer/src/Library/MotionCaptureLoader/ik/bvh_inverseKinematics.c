@@ -1237,6 +1237,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
      float * m = problem->initialSolution->motion;
+     
      fprintf(stderr,"IK lr = %f ,  max start loss =%0.1f , Iterations = %u , epochs = %u , spring = %0.1f \n", 
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
@@ -1244,16 +1245,18 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->epochs, 
                                                ikConfig->spring
                     );
-     fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+                    
+     //fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
 
         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
         { 
             m = problem->previousSolution->motion;
-            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
+            //fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
         }
     
     m = solution->motion;
-    fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+    //fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+    
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------

@@ -26,4 +26,6 @@ cd "$DIR"
 ln -s AmmarH.tri Ammar.tri
 ln -s ElinaH.tri Elina.tri
 
+./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --paint 123 123 123
+
 exit 0
