@@ -200,13 +200,14 @@ int bvh_populateRectangle2DFromProjections(
 int bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
 { 
   if (bvhTransform==0) { return 0; }
- //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
- if (jID>=MAX_BVH_JOINT_HIERARCHY_SIZE) { return 0; }
  
-//If we are not using optimizations then transform this joint 
-if (!bvhTransform->useOptimizations) {   return 1; }  else  
-//If we are using optimizations and this joint is not skipped then transform this joint
-if ( (bvhTransform->useOptimizations) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
+  //If we are not using optimizations then transform this joint 
+  if (!bvhTransform->useOptimizations) { return 1; }  else  
+  //If we are using optimizations and this joint is not skipped then transform this joint
+  {    
+     //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
+     if ( (jID<MAX_BVH_JOINT_HIERARCHY_SIZE) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
+  }
 
 
  return 0;
