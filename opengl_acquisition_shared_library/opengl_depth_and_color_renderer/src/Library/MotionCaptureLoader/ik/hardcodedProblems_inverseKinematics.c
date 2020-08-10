@@ -494,7 +494,7 @@ int prepareDefaultBodyProblem(
     }
 
 
-    if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.r",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.r",&thisJID)) )
+    if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.r",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.r",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
         problem->chain[chainID].part[partID].partParent=2;
@@ -506,6 +506,7 @@ int prepareDefaultBodyProblem(
     }
     else
     {
+        bvh_printBVH(mc);
         fprintf(stderr,"No R toe in armature..\n");
         return 0;
     }
@@ -589,7 +590,7 @@ int prepareDefaultBodyProblem(
         return 0;
     }
 
-    if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.l",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"endsite_toe1-2.l",&thisJID)) )
+    if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.l",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.l",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
         problem->chain[chainID].part[partID].partParent=2;
@@ -601,6 +602,7 @@ int prepareDefaultBodyProblem(
     }
     else
     {
+        bvh_printBVH(mc);
         fprintf(stderr,"No L toe in armature..\n");
         return 0;
     }

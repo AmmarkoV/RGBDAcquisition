@@ -59,8 +59,8 @@ int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsig
     if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
 
     fprintf(stderr,"printObjectTrajectory quaternions are qXqYqZqW\n");
-    double euler[3];
-    double quaternions[4];
+    float euler[3];
+    float quaternions[4];
 
     fprintf(stderr,"POS=\"%0.2f %0.2f %0.2f\"\n",
             stream->object[ObjID].frame[FrameIDToReturn].x,
@@ -111,7 +111,7 @@ int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int 
    if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
    {
        fprintf(stderr,"rotatePositionOfObjectTrajectory doing a quaternion rotation %0.2f %0.2f %0.2f , angle %0.2f..\n",*x,*y,*z,*angleDegrees);
-       double quaternion[4]={0};
+       float quaternion[4]={0};
        quaternion[0]=stream->object[ObjID].frame[FrameIDToReturn].rot1;
        quaternion[1]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
        quaternion[2]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
@@ -194,14 +194,14 @@ float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,flo
 
 }
 
-void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternionConvention)
+void euler2QuaternionsInternal(float * quaternions,float * euler,int quaternionConvention)
 {
   #warning "TODO : make this use euler2Quaternions declared at AmMatrix/quaternions.h"
   //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
   //Our input is degrees so we convert it to radians for the sin/cos functions
-  double eX = (double) (euler[0] * PI) / 180;
-  double eY = (double) (euler[1] * PI) / 180;
-  double eZ = (double) (euler[2] * PI) / 180;
+  float eX = (float) (euler[0] * PI) / 180;
+  float eY = (float) (euler[1] * PI) / 180;
+  float eZ = (float) (euler[2] * PI) / 180;
 
   //fprintf(stderr,"eX %f eY %f eZ %f\n",eX,eY,eZ);
 
@@ -210,12 +210,12 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
   //eY Pitch θ - rotation about the Y-axis
   //eZ Yaw   ψ - rotation about the Z-axis
 
-  double cosX2 = cos((double) eX/2); //cos(φ/2);
-  double sinX2 = sin((double) eX/2); //sin(φ/2);
-  double cosY2 = cos((double) eY/2); //cos(θ/2);
-  double sinY2 = sin((double) eY/2); //sin(θ/2);
-  double cosZ2 = cos((double) eZ/2); //cos(ψ/2);
-  double sinZ2 = sin((double) eZ/2); //sin(ψ/2);
+  float cosX2 = cos((float) eX/2); //cos(φ/2);
+  float sinX2 = sin((float) eX/2); //sin(φ/2);
+  float cosY2 = cos((float) eY/2); //cos(θ/2);
+  float sinY2 = sin((float) eY/2); //sin(θ/2);
+  float cosZ2 = cos((float) eZ/2); //cos(ψ/2);
+  float sinZ2 = sin((float) eZ/2); //sin(ψ/2);
 
   switch (quaternionConvention )
   {
@@ -240,10 +240,10 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 }
 
-int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler,double *quaternion)
+int convertQuaternionsToEulerAngles(struct VirtualStream * stream,float * euler,float *quaternion)
 {
  normalizeQuaternions(&quaternion[0],&quaternion[1],&quaternion[2],&quaternion[3]);
- double eulerTMP[3];
+ float eulerTMP[3];
  quaternions2Euler(eulerTMP,quaternion,1); //1
  euler[0] = stream->rotationsOffset[0] + (stream->scaleWorld[3] * eulerTMP[0]);
  euler[1] = stream->rotationsOffset[1] + (stream->scaleWorld[4] * eulerTMP[1]);
@@ -261,12 +261,12 @@ int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler
  return 1;
 }
 
-int parseAbsoluteRotation(struct VirtualStream * stream,double * planetRotAbsolute,unsigned int planetObj,unsigned int frameNumber)
+int parseAbsoluteRotation(struct VirtualStream * stream,float * planetRotAbsolute,unsigned int planetObj,unsigned int frameNumber)
 {
    if (stream->object[planetObj].frame[frameNumber].isQuaternion)
       {
-        double euler[3];
-        double quaternions[4];
+        float euler[3];
+        float quaternions[4];
         quaternions[0]=stream->object[planetObj].frame[frameNumber].rot1;
         quaternions[1]=stream->object[planetObj].frame[frameNumber].rot2;
         quaternions[2]=stream->object[planetObj].frame[frameNumber].rot3;
@@ -277,9 +277,9 @@ int parseAbsoluteRotation(struct VirtualStream * stream,double * planetRotAbsolu
         planetRotAbsolute[2] = euler[2];
       } else
       {
-       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
-       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
-       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+       planetRotAbsolute[0] = (float) stream->object[planetObj].frame[frameNumber].rot1;
+       planetRotAbsolute[1] = (float) stream->object[planetObj].frame[frameNumber].rot2;
+       planetRotAbsolute[2] = (float) stream->object[planetObj].frame[frameNumber].rot3;
       }
   return 1;
 }
@@ -287,6 +287,9 @@ int parseAbsoluteRotation(struct VirtualStream * stream,double * planetRotAbsolu
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
+    fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength disabled after float transition\n");
+    return 0;
+    /*
   fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength(sat=%u,planet=%u) from frame %u to frame %u \n",satteliteObj,planetObj,frameNumber,frameNumber+duration);
   if ( satteliteObj >= stream->numberOfObjects ) { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,satteliteObj); return 0; }
   if ( planetObj >= stream->numberOfObjects )    { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,planetObj);    return 0; }
@@ -336,38 +339,38 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
 
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
-    double satPosAbsolute[4]={0};
-    satPosAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].x;
-    satPosAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].y;
-    satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
+    float satPosAbsolute[4]={0};
+    satPosAbsolute[0] = (float) stream->object[satteliteObj].frame[frameNumber].x;
+    satPosAbsolute[1] = (float) stream->object[satteliteObj].frame[frameNumber].y;
+    satPosAbsolute[2] = (float) stream->object[satteliteObj].frame[frameNumber].z;
     satPosAbsolute[3] = 1.0;
     //==================================================================================
-    double planetPosAbsolute[4]={0};
-    planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
-    planetPosAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].y;
-    planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
+    float planetPosAbsolute[4]={0};
+    planetPosAbsolute[0] = (float) stream->object[planetObj].frame[frameNumber].x;
+    planetPosAbsolute[1] = (float) stream->object[planetObj].frame[frameNumber].y;
+    planetPosAbsolute[2] = (float) stream->object[planetObj].frame[frameNumber].z;
     planetPosAbsolute[3] = 1.0;
 
-    double planetRotAbsolute[4]={0};
-    planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
-    planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
-    planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+    float planetRotAbsolute[4]={0};
+    planetRotAbsolute[0] = (float) stream->object[planetObj].frame[frameNumber].rot1;
+    planetRotAbsolute[1] = (float) stream->object[planetObj].frame[frameNumber].rot2;
+    planetRotAbsolute[2] = (float) stream->object[planetObj].frame[frameNumber].rot3;
 
 
     parseAbsoluteRotation(stream,planetRotAbsolute,planetObj,frameNumber);
     //==================================================================================
 
 
-    double satPosRelative[4]={0};
+    float satPosRelative[4]={0};
     pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     unsigned int pos=0;
     fprintf(stderr,YELLOW " Will align satelite to planet from frame %u to %u\n" NORMAL ,frameNumber+1 , frameNumber+duration );
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
     {
-       planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
-       planetPosAbsolute[1] = (double) stream->object[planetObj].frame[pos].y;
-       planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
+       planetPosAbsolute[0] = (float) stream->object[planetObj].frame[pos].x;
+       planetPosAbsolute[1] = (float) stream->object[planetObj].frame[pos].y;
+       planetPosAbsolute[2] = (float) stream->object[planetObj].frame[pos].z;
        planetPosAbsolute[3] = 1.0;
 
        parseAbsoluteRotation(stream,planetRotAbsolute,planetObj,frameNumber);
@@ -392,7 +395,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     stream->object[satteliteObj].MAX_timeOfFrames = stream->object[planetObj].MAX_timeOfFrames;
     stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;
  return 1;
-
+*/
 }
 
 
@@ -411,16 +414,16 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
   return 1;
 }
 
-int flipRotationAxisD(double * rotX, double * rotY , double * rotZ , int where2SendX , int where2SendY , int where2SendZ)
+int flipRotationAxisD(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
 {
   #if PRINT_LOAD_INFO
    fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
    fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
   #endif
 
-  double tmpX = *rotX;
-  double tmpY = *rotY;
-  double tmpZ = *rotZ;
+  float tmpX = *rotX;
+  float tmpY = *rotY;
+  float tmpZ = *rotZ;
   //-----------------------------------------
   if (where2SendX==0) { *rotX=tmpX; } else
   if (where2SendX==1) { *rotY=tmpX; } else
@@ -634,12 +637,13 @@ int fillPosWithFrame(
        */
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
-       double rotCur[4]={0};
+       struct Matrix4x4OfFloats mF={0};
+         
+       float rotCur[4]={0};
        unsigned int i=0,z=0;
        for (i=0; i<numberOfJoints; i++)
        {
-        float * f=&joints[16*i];
-        double m[16]={0};
+        float * f=&joints[16*i]; 
 
         //Euler Rotation
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -654,16 +658,18 @@ int fillPosWithFrame(
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = 0.0;
+         
+         struct Matrix4x4OfFloats mF={0};
 
-         create4x4DMatrixFromEulerAnglesWithRotationOrder(
-                                                          m,
+         create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                          &mF,
                                                           rotCur[0],
                                                           rotCur[1],
                                                           rotCur[2],
                                                           (unsigned int) stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].eulerRotationOrder
                                                         );
 
-         copy4x4DMatrixTo4x4F(f,m);
+         copy4x4FMatrix(f,mF.m);
         } else
         //Quaternion Rotation
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -673,9 +679,10 @@ int fillPosWithFrame(
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
-
-         quaternion2Matrix4x4(m,rotCur,0);
-         copy4x4DMatrixTo4x4F(f,m);
+          
+         create4x4FQuaternionMatrix(&mF,rotCur[0],rotCur[1],rotCur[2],rotCur[3]); 
+         //quaternion2Matrix4x4(m,rotCur,0);
+         copy4x4FMatrix(f,mF.m);
         } else
         //Matrix 4x4 Matrix
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -697,7 +704,8 @@ int fillPosWithFrame(
         //---------------------------------------------------------------------------------------------------------------------------------
         {
          //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
-         create4x4FIdentityMatrix(f);
+         create4x4FIdentityMatrix(&mF);
+         copy4x4FMatrix(f,mF.m);
         }
         //---------------------------------------------------------------------------------------------------------------------------------
        }
@@ -740,13 +748,7 @@ int fillJointsWithInterpolatedFrame(
        for (i=0; i<numberOfJoints; i++)
        {
 
-        float * f=&joints[16*i];
-        double m[16]={
-                       1.0 , 0.0 , 0.0 ,0.0 ,
-                       0.0 , 1.0 , 0.0 ,0.0 ,
-                       0.0 , 0.0 , 1.0 ,0.0 ,
-                       0.0 , 0.0 , 0.0 ,1.0
-                     };
+        float * f=&joints[16*i]; 
 
         if (
             (stream->object[ObjID].frame[PrevFrame].jointList==0) ||
@@ -792,15 +794,18 @@ int fillJointsWithInterpolatedFrame(
          //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
          //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
          //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
-         create4x4DMatrixFromEulerAnglesWithRotationOrder(
-                                                          m,
-                                                          (double) rotTot[0],
-                                                          (double) rotTot[1],
-                                                          (double) rotTot[2],
+         
+         struct Matrix4x4OfFloats mF={0};
+         
+         create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                          &mF,
+                                                          (float) rotTot[0],
+                                                          (float) rotTot[1],
+                                                          (float) rotTot[2],
                                                           (unsigned int) stream->object[ObjID].frame[NextFrame].jointList->joint[i].eulerRotationOrder
                                                         );
          //create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
-         copy4x4DMatrixTo4x4F(f,m);
+         copy4x4FMatrix(f,mF.m);
         } else
        if (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)
@@ -809,7 +814,7 @@ int fillJointsWithInterpolatedFrame(
           )
         {
         //fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
-        slerp2RotTransMatrices4x4F(
+        slerp2RotTransMatrices4x4(
                                    f , //write straight to the output
                                    stream->object[ObjID].frame[PrevFrame].jointList->joint[i].m,
                                    stream->object[ObjID].frame[NextFrame].jointList->joint[i].m ,

@@ -22,10 +22,10 @@ void * prepareCameraControlCallback(struct AmmServer_DynamicRequest  * rqst)
 {
   char buf[32];
 
-  double translation[4]={0};
+  float translation[4]={0};
   translation[3]=1.0;
 
-  double rotation[4]={0};
+  float rotation[4]={0};
 
   AmmServer_Warning("New Camera State");
   //==============================================================

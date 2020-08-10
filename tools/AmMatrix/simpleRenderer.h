@@ -15,6 +15,9 @@ extern "C"
 {
 #endif
 
+#include "matrix4x4Tools.h"
+
+
 /**
  * @brief This structure holds the 3D renderer configuration, if you want to initialize this structure please use simpleRendererDefaults
  * @ingroup simpleRenderer
@@ -36,10 +39,10 @@ struct simpleRenderer
   int removeObjectPosition;
 
 
-  float projectionMatrix[16];
-  float viewMatrix[16];
-  float modelMatrix[16];
-  float modelViewMatrix[16];
+  struct Matrix4x4OfFloats projectionMatrix;
+  struct Matrix4x4OfFloats viewMatrix;
+  struct Matrix4x4OfFloats modelMatrix;
+  struct Matrix4x4OfFloats modelViewMatrix;
   int   viewport[4];
 };
 

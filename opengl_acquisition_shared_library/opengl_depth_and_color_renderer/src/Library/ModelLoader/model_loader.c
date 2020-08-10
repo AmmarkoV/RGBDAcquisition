@@ -525,25 +525,25 @@ int drawModelAt(
 
 
    //fprintf(stderr,"drawModelAt: %s -> %u \n", mod->pathOfModel , rotationOrder);
-   double modelTransformation[16];
-   create4x4DModelTransformation(
-                                  modelTransformation,
+   struct Matrix4x4OfFloats modelTransformation={0};
+   create4x4FModelTransformation(
+                                  &modelTransformation,
                                   //Rotation Component
-                                  (double) rotationX,//heading,
-                                  (double) rotationY,//pitch,
-                                  (double) rotationZ,//roll,
+                                  (float) rotationX,//heading,
+                                  (float) rotationY,//pitch,
+                                  (float) rotationZ,//roll,
                                            rotationOrder,
                                   //Translation Component
-                                  (double) positionX,
-                                  (double) positionY,
-                                  (double) positionZ ,
+                                  (float) positionX,
+                                  (float) positionY,
+                                  (float) positionZ ,
                                   //Scale Component
-                                  (double) mod->scaleX,
-                                  (double) mod->scaleY,
-                                  (double) mod->scaleZ
+                                  (float) mod->scaleX,
+                                  (float) mod->scaleY,
+                                  (float) mod->scaleZ
                                  );
-  transpose4x4DMatrix(modelTransformation); //Because we want to use this in OpenGL
-  glMultMatrixd(modelTransformation);
+  transpose4x4FMatrix(modelTransformation.m); //Because we want to use this in OpenGL
+  glMultMatrixf(modelTransformation.m);
 
 
 /*
@@ -556,7 +556,7 @@ int drawModelAt(
   glGetIntegerv( GL_VIEWPORT, viewport );
   print4x4FMatrix("Projection",projection,0);
   print4x4FMatrix("ModelView",modelview,0);
-  print4x4DMatrix("ModelTransform",modelTransformation,0);
+  print4x4FMatrix("ModelTransform",modelTransformation.m,0);
  // exit (0);
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }

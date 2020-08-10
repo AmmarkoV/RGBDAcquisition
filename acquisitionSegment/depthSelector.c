@@ -245,7 +245,7 @@ if (segConf->enableBBox)
   selectedPtrStart   = selectedDepth + ( (posX) + posY * sourceWidthStep );
   selectedPtr   = selectedPtrStart;
 
-  double raw3D[4] ,  world3D[4];
+  float raw3D[4] ,  world3D[4];
   float x3D , y3D , z3D;
   x=posX; y=posY; depth=0;
   while (sourcePixels<sourcePixelsEnd)
@@ -258,13 +258,19 @@ if (segConf->enableBBox)
      {
        transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
 
-       raw3D[0] = (double) x3D;
-       raw3D[1] = (double) y3D;
-       raw3D[2] = (double) z3D;
-       raw3D[3] = (double) 1.0;
+       raw3D[0] = (float) x3D;
+       raw3D[1] = (float) y3D;
+       raw3D[2] = (float) z3D;
+       raw3D[3] = (float) 1.0;
 
-       transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
-
+       //Doing double -> float -> double casts
+       struct Matrix4x4OfFloats mF;
+       copy4x4DMatrixTo4x4F(mF.m,m);
+       transform3DPointFVectorUsing4x4FMatrix(world3D,&mF,raw3D);
+       copy4x4FMatrixTo4x4D(m,mF.m);
+  
+       //result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
+  
        selected=(
                    (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
                    (segConf->bboxY1<world3D[1])&& (segConf->bboxY2>world3D[1]) &&
@@ -284,7 +290,7 @@ if (segConf->enableBBox)
    selectedPtrStart+=sourceWidthStep;
    selectedPtr=selectedPtrStart;
  } //End of Master While loop
-  free4x4DMatrix(&m); // This is the same as free(m); m=0;
+  free(m); m=0;
  } //End of M allocated!
 } // End of Bounding Box Segmentation
 // -------------------------------------------------------------------------------------------------
@@ -298,8 +304,8 @@ if ( segConf->enablePlaneSegmentation )
   double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
   if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform plane segmentation\n"); } else
   {
-    double raw3D[4]={0};  raw3D[3] = (double) 1.0;
-    double world3D[4]={0};
+    float raw3D[4]={0};  raw3D[3] = (float) 1.0;
+    float world3D[4]={0};
 
     float p1[3]; p1[0]=(float) segConf->p1[0]; p1[1]=(float) segConf->p1[1]; p1[2]=(float) segConf->p1[2];
     float p2[3]; p2[0]=(float) segConf->p2[0]; p2[1]=(float) segConf->p2[1]; p2[2]=(float) segConf->p2[2];
@@ -342,9 +348,15 @@ if ( segConf->enablePlaneSegmentation )
      if (*selectedPtr!=0)
      {
       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
-      raw3D[0] = (double) x3D; raw3D[1] = (double) y3D; raw3D[2] = (double) z3D; raw3D[3] = (double) 1.0;
+      raw3D[0] = (float) x3D; raw3D[1] = (float) y3D; raw3D[2] = (float) z3D; raw3D[3] = (float) 1.0;
 
-      transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
+      //Doing double -> float -> double casts
+      struct Matrix4x4OfFloats mF;
+      copy4x4DMatrixTo4x4F(mF.m,m);
+      transform3DPointFVectorUsing4x4FMatrix(world3D,&mF,raw3D);
+      copy4x4FMatrixTo4x4D(m,mF.m);
+  
+      //transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];
@@ -371,7 +383,7 @@ if ( segConf->enablePlaneSegmentation )
    selectedPtrStart+=sourceWidthStep;
    selectedPtr=selectedPtrStart;
  } //End of Master While loop
-  free4x4DMatrix(&m); // This is the same as free(m); m=0;
+  free(m); m=0;
  } //End of M allocated!
 
  }

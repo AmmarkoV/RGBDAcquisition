@@ -284,7 +284,7 @@ int downloadOpenGLColorFromTexture(const char * filename , unsigned int tex, uns
     char * pixelsC = (char * ) malloc(sizeof(char) * 3 * width * height);
     if (pixelsC!=0)
     {
-     float * pixels3CPTR = pixels3C;
+     float * pixels3CPTR = (float*) pixels3C;
      char  * pixelPTR = pixelsC;
      char  * pixelLimit = pixelsC+(3 * width * height);
 

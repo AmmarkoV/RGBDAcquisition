@@ -186,7 +186,7 @@ void  create3x3EulerRotationXYZOrthonormalMatrix(double * matrix3x3,double * rot
 
 
 
-int upscale3x3to4x4(double * mat4x4,double * mat3x3)
+int upscale3x3Fto4x4F(float * mat4x4,float * mat3x3)
 {
   if  ( (mat3x3==0)||(mat4x4==0) )   { return 0; }
 

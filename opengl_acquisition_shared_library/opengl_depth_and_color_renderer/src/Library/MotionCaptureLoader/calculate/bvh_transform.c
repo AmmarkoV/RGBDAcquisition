@@ -3,8 +3,7 @@
 #include "bvh_transform.h"
 
 #include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
-
-#define USE_BVH_SPECIFIC_ROTATIONS 0
+ 
 
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..
@@ -15,12 +14,7 @@
 #define FAST_OFFSET_TRANSLATION 1
 
 
-
-double fToD(float in)
-{
-  return (double) in;
-}
-
+ 
 
 float max(float a,float b)
 {
@@ -200,162 +194,7 @@ int bvh_populateRectangle2DFromProjections(
  return 0;
 }
 
-
-
-
-#if USE_BVH_SPECIFIC_ROTATIONS
-
-///This code here is provided for the random guy that will wonder how the BVH transformations happen..
-//instead of shifting through thousands of lines of code I have compacted the calls needed here so that
-//you can easily understand how the transformations happen..
-/*
-   0  1  2  3
-   4  5  6  7
-   8  9 10 11
-  12 13 14 15
-*/
-
-/*
-   [0,0]  [1,0]  [2,0]  [3,0]
-   [0,1]  [1,1]  [2,1]  [3,1]
-   [0,2]  [1,2]  [2,2]  [3,2]
-   [0,3]  [1,3]  [2,3]  [3,3]
-*/
-//---------------------------------------------------------
-double degrees_to_radBVH(double degrees)
-{
-    return (double) degrees * ( (double)  M_PI /180.0);
-}
-//---------------------------------------------------------
-void create4x4RotationBVH_X(double * m,double degrees)
-{
-    double radians = degrees_to_radBVH(degrees);
-
-    create4x4DIdentityMatrix(m);
-
-    double cosV = (double) cosf((float)radians);
-    double sinV = (double) sinf((float)radians);
-
-    // Rotate X formula.
-    m[5] =    cosV; // [1,1]
-    m[9] = -1*sinV; // [1,2]
-    m[6] =    sinV; // [2,1]
-    m[10] =   cosV; // [2,2]
-}
-//---------------------------------------------------------
-void create4x4RotationBVH_Y(double * m,double degrees)
-{
-    double radians = degrees_to_radBVH(degrees);
-
-    create4x4DIdentityMatrix(m);
-
-    double cosV = (double) cosf((float)radians);
-    double sinV = (double) sinf((float)radians);
-
-    // Rotate Y formula.
-    m[0] =    cosV; // [0,0]
-    m[2] = -1*sinV; // [2,0]
-    m[8] =    sinV; // [0,2]
-    m[10] =   cosV; // [2,2]
-}
-//---------------------------------------------------------
-void create4x4RotationBVH_Z(double * m,double degrees)
-{
-    double radians = degrees_to_radBVH(degrees);
-
-    create4x4DIdentityMatrix(m);
-
-    double cosV = (double) cosf((float)radians);
-    double sinV = (double) sinf((float)radians);
-
-    // Rotate Z formula.
-    m[0] =    cosV;  // [0,0]
-    m[1] =    sinV;  // [1,0]
-    m[4] = -1*sinV;  // [0,1]
-    m[5] =    cosV;  // [1,1]
-}
-//---------------------------------------------------------
-
-
-
-//As http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0Hq96gIhAq-6mvi8OAfMJid2qkv7ZIGNxNMna4vBNngILoceulshvxMfc states
-//To calculate the position of a segment you first create a transformation matrix from the local translation and rotation information for that segment. For any joint segment the translation information will simply be the offset as defined in the hierarchy section. The rotation data comes from the motion section. For the root object, the translation data will be the sum of the offset data and the translation data from the motion section. The BVH format doesn't account for scales so it isn't necessary to worry about including a scale factor calculation.
-//A straightforward way to create the rotation matrix is to create 3 separate rotation matrices, one for each axis of rotation. Then concatenate the matrices from left to right Y, X and Z.
-//
-//vR = vYXZ
-void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ)
-{
-  double rX[16]={0};
-  double rY[16]={0};
-  double rZ[16]={0};
-
-  //Initialize rotation matrix..
-  create4x4DIdentityMatrix(matrix);
-
-  if (rotationType==0)
-  {
-    //No rotation type, get's you back an Identity Matrix..
-    return;
-  }
-
-//Assuming the rotation axis are correct
-//rX,rY,rZ should hold our rotation matrices
-   create4x4RotationBVH_X(rX,degreesX);
-   create4x4RotationBVH_Y(rY,degreesY);
-   create4x4RotationBVH_Z(rZ,degreesZ);
-
-
-//TODO : Fix correct order..
-//http://www.dcs.shef.ac.uk/intranet/research/public/resmes/CS0111.pdf
-//https://github.com/duststorm/BVwHacker <- this is a good guide for the transform order..
-
-  switch (rotationType)
-  {
-    case BVH_ROTATION_ORDER_XYZ :
-      //This is what happens with poser exported bvh files..
-      //multiplyThree4x4Matrices( matrix, rX, rY, rZ );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-    break;
-    case BVH_ROTATION_ORDER_XZY :
-      //multiplyThree4x4Matrices( matrix, rX, rZ, rY );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-    break;
-    case BVH_ROTATION_ORDER_YXZ :
-      //multiplyThree4x4Matrices( matrix, rY, rX, rZ );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-    break;
-    case BVH_ROTATION_ORDER_YZX :
-      //multiplyThree4x4Matrices( matrix, rY, rZ, rX );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-    break;
-    case BVH_ROTATION_ORDER_ZXY :
-      //This is what happens most of the time with bvh files..
-      //multiplyThree4x4Matrices( matrix, rZ, rX, rY );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-    break;
-    case BVH_ROTATION_ORDER_ZYX :
-      //multiplyThree4x4Matrices( matrix, rZ, rY, rX );
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rZ);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rY);
-      multiplyTwo4x4DMatricesBuffered(matrix,matrix,rX);
-    break;
-    default :
-      fprintf(stderr,"Error, Incorrect rotation type %u\n",rotationType);
-    break;
-  };
-
-}
-#endif // USE_BVH_SPECIFIC_ROTATIONS
+ 
 
 
 int bvh_shouldJoinBeTransformedGivenOurOptimizations(struct BVH_Transform * bvhTransform,BVHJointID jID)
@@ -526,7 +365,7 @@ int bvh_loadTransformForMotionBuffer(
       if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
        create4x4FTranslationMatrix(
-                                    bvhTransform->joint[jID].dynamicTranslation,
+                                    &bvhTransform->joint[jID].dynamicTranslation,
                                     data[MOTIONBUFFER_DATA_FIELDS_POSX],
                                     data[MOTIONBUFFER_DATA_FIELDS_POSY],
                                     data[MOTIONBUFFER_DATA_FIELDS_POSZ]
@@ -543,32 +382,22 @@ int bvh_loadTransformForMotionBuffer(
                         bvhMotion->jointHierarchy[jID].jointName
                        );
               }
-          create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
+          create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
        } else
-      {
-       #if USE_BVH_SPECIFIC_ROTATIONS
-       create4x4RotationBVH(
-                            bvhTransform->joint[jID].dynamicRotation,
-                            bvhMotion->jointHierarchy[jID].channelRotationOrder,
-                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
-                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
-                            -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ]
-                           );
-       #else
+      { 
        create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                       bvhTransform->joint[jID].dynamicRotation,
-                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
-                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
-                                                       -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
-                                                       (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
-                                                      );
-       #endif // USE_BVH_SPECIFIC_ROTATIONS
+                                                        &bvhTransform->joint[jID].dynamicRotation,
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
+                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                       ); 
       }
      } else
      {
       fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
-      create4x4FIdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
+      create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicTranslation);
+      create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
      }
     }
   }
@@ -595,17 +424,17 @@ int bvh_loadTransformForMotionBuffer(
         {
          //This is needed because we access the chain transform of our parent so at some point this will get used..
          bvhTransform->joint[parentID].isChainTrasformationComputed=1;
-         create4x4FIdentityMatrix(bvhTransform->joint[parentID].chainTransformation);
+         create4x4FIdentityMatrix(&bvhTransform->joint[parentID].chainTransformation);
         }
 
 
-        multiplyTwo4x4FMatrices(
+        multiplyTwo4x4FMatricesS(
                                 //Output AxB
-                                bvhTransform->joint[jID].localToWorldTransformation ,
+                                &bvhTransform->joint[jID].localToWorldTransformation ,
                                 //Parent Output A
-                                bvhTransform->joint[parentID].chainTransformation,
+                                &bvhTransform->joint[parentID].chainTransformation,
                                 //This Transform B
-                                bvhMotion->jointHierarchy[jID].staticTransformation
+                                &bvhMotion->jointHierarchy[jID].staticTransformation
                               );
       } else
       if ( bvhMotion->jointHierarchy[jID].isRoot)
@@ -615,12 +444,13 @@ int bvh_loadTransformForMotionBuffer(
         #if FAST_OFFSET_TRANSLATION
          //Skip the matrix multiplication..
          create4x4FTranslationMatrix(
-                                     bvhTransform->joint[jID].localToWorldTransformation,
-                                     bvhMotion->jointHierarchy[jID].staticTransformation[3]  + bvhTransform->joint[jID].dynamicTranslation[3],
-                                     bvhMotion->jointHierarchy[jID].staticTransformation[7]  + bvhTransform->joint[jID].dynamicTranslation[7],
-                                     bvhMotion->jointHierarchy[jID].staticTransformation[11] + bvhTransform->joint[jID].dynamicTranslation[11]
+                                     &bvhTransform->joint[jID].localToWorldTransformation,
+                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[3]  + bvhTransform->joint[jID].dynamicTranslation.m[3],
+                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[7]  + bvhTransform->joint[jID].dynamicTranslation.m[7],
+                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[11] + bvhTransform->joint[jID].dynamicTranslation.m[11]
                                     );
         #else
+        /*
          multiplyTwo4x4FMatrices(
                                 //Output AxB
                                 bvhTransform->joint[jID].localToWorldTransformation ,
@@ -629,31 +459,33 @@ int bvh_loadTransformForMotionBuffer(
                                 //B
                                 bvhTransform->joint[jID].dynamicTranslation
                               );
+                               * 
+        */
         #endif // FAST_OFFSET_TRANSLATION
       } else
       {
         //Weird case where joint is not root and doesnt have parents(?)
-        create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
+        create4x4FIdentityMatrix(&bvhTransform->joint[jID].localToWorldTransformation);
       }
 
     bvhTransform->joint[jID].isChainTrasformationComputed=1;
-    multiplyTwo4x4FMatrices(
+    multiplyTwo4x4FMatricesS(
                            //Output AxB
-                           bvhTransform->joint[jID].chainTransformation ,
+                           &bvhTransform->joint[jID].chainTransformation ,
                            //A
-                           bvhTransform->joint[jID].localToWorldTransformation,
+                           &bvhTransform->joint[jID].localToWorldTransformation,
                            //B
-                           bvhTransform->joint[jID].dynamicRotation
+                           &bvhTransform->joint[jID].dynamicRotation
                           );
 
   #if FIND_FAST_CENTER
-   bvhTransform->joint[jID].pos3D[0]= bvhTransform->joint[jID].localToWorldTransformation[3];
-   bvhTransform->joint[jID].pos3D[1]= bvhTransform->joint[jID].localToWorldTransformation[7];
-   bvhTransform->joint[jID].pos3D[2]= bvhTransform->joint[jID].localToWorldTransformation[11];
-   bvhTransform->joint[jID].pos3D[3]= bvhTransform->joint[jID].localToWorldTransformation[15];
+   bvhTransform->joint[jID].pos3D[0]= bvhTransform->joint[jID].localToWorldTransformation.m[3];
+   bvhTransform->joint[jID].pos3D[1]= bvhTransform->joint[jID].localToWorldTransformation.m[7];
+   bvhTransform->joint[jID].pos3D[2]= bvhTransform->joint[jID].localToWorldTransformation.m[11];
+   bvhTransform->joint[jID].pos3D[3]= bvhTransform->joint[jID].localToWorldTransformation.m[15];
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #else
-   double centerPoint[4]={0.0,0.0,0.0,1.0};
+   float centerPoint[4]={0.0,0.0,0.0,1.0};
    transform3DPointFVectorUsing4x4FMatrix(
                                           bvhTransform->joint[jID].pos3D,
                                           bvhTransform->joint[jID].localToWorldTransformation,

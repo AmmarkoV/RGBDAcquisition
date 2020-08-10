@@ -145,31 +145,31 @@ void redraw(void)
 }
 
 
-int setOpenGLNearFarPlanes(double near , double far)
+int setOpenGLNearFarPlanes(float near ,float far)
 {
  return sceneSetNearFarPlanes((float) near, (float) far);
 }
 
-int setOpenGLIntrinsicCalibration(double * camera)
+int setOpenGLIntrinsicCalibration(float * camera)
 {
   return sceneSetOpenGLIntrinsicCalibration(getLoadedScene(),camera);
 }
 
 
-int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit)
+int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation , float scaleToDepthUnit)
 {
   return sceneSetOpenGLExtrinsicCalibration(getLoadedScene(),rodriguez,translation,scaleToDepthUnit);
 }
 
 
-double getOpenGLFocalLength()
+float getOpenGLFocalLength()
 {
  return sceneGetNearPlane();
 }
 
-double getOpenGLPixelSize()
+float getOpenGLPixelSize()
 {
- return 2/WIDTH;
+ return (float) 2/WIDTH;
 }
 
 int controlScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)

@@ -26,7 +26,7 @@ int dumpBVHToSVGFrame(
               renderer->cameraOffsetPosition[0]*10,renderer->cameraOffsetPosition[1]*10,renderer->cameraOffsetPosition[2]*10);
 
       unsigned int x=10;
-      float * m = renderer->projectionMatrix;
+      float * m = renderer->projectionMatrix.m;
       fprintf(fp,"<text x=\"%u\" y=\"45\">Projection Matrix</text>\n",x);
       fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
       fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
@@ -35,7 +35,7 @@ int dumpBVHToSVGFrame(
 
 
       x=150;
-      m = renderer->modelViewMatrix;
+      m = renderer->modelViewMatrix.m;
       fprintf(fp,"<text x=\"%u\" y=\"45\">ModelView Matrix</text>\n",x);
       fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
       fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
@@ -43,7 +43,7 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
 
       x=300;
-      m = renderer->viewMatrix;
+      m = renderer->viewMatrix.m;
       fprintf(fp,"<text x=\"%u\" y=\"45\">View Matrix</text>\n",x);
       fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
       fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
@@ -51,7 +51,7 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
 
       x=450;
-      m = renderer->modelMatrix;
+      m = renderer->modelMatrix.m;
       fprintf(fp,"<text x=\"%u\" y=\"45\">Model Matrix</text>\n",x);
       fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
       fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);

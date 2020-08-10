@@ -83,10 +83,10 @@ int reallyFastCheckForLinuxGPUWithoutPBuffer()
 int main(int argc,const char **argv)
 {
 
-    double * rodriguez = (double*) malloc(sizeof(double) * 3 );
-    double * translation = (double*) malloc(sizeof(double) * 3 );
-    double * camera = (double*) malloc(sizeof(double) * 9 );
-    double scaleToDepthUnit = 1.0;
+    float * rodriguez = (float*) malloc(sizeof(float) * 3 );
+    float * translation = (float*) malloc(sizeof(float) * 3 );
+    float * camera = (float*) malloc(sizeof(float) * 9 );
+    float scaleToDepthUnit = 1.0;
 
 
 
@@ -140,7 +140,7 @@ int main(int argc,const char **argv)
                 {
                     camera[z]=atof(argv[z+i+1]);
                 }
-                setOpenGLIntrinsicCalibration( (double*) camera);
+                setOpenGLIntrinsicCalibration( (float*) camera);
             }
         }
         else if (strcmp(argv[i],"--extrinsics")==0)
@@ -154,7 +154,7 @@ int main(int argc,const char **argv)
                 rodriguez[1]=atof(argv[i+5]);
                 rodriguez[2]=atof(argv[i+6]);
                 scaleToDepthUnit = atof(argv[i+7]);
-                setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation , scaleToDepthUnit);
+                setOpenGLExtrinsicCalibration( (float*) rodriguez, (float*) translation , scaleToDepthUnit);
             }
         }
         else if ( (strcmp(argv[i],"--resolution")==0) ||

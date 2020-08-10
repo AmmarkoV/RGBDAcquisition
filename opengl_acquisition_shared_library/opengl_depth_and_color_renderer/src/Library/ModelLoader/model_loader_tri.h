@@ -29,7 +29,7 @@ extern "C"
          to keep the spec as clean as possible
 * @ingroup TRI
 */
-#define TRI_LOADER_VERSION 9
+#define TRI_LOADER_VERSION 10
 ///IF I EVER CHANGE THE VERSION AGAIN I SHOULD ALWAYS UPDATE LAST STABLE COMMIT INSIDE MODEL_LOADER_TRI..!
 
 
@@ -51,22 +51,22 @@ struct TRI_Bones_Header
   unsigned int boneWeightsNumber;
   unsigned int boneNameSize;
 //-------------------------------------------
-  double matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose[16]; //selfdescriptive
-  double finalVertexTransformation[16]; //What we will use in the end
-  double localTransformation[16]; // or node->mTransformation
+  float matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose[16]; //selfdescriptive
+  float finalVertexTransformation[16]; //What we will use in the end
+  float localTransformation[16]; // or node->mTransformation
   unsigned char altered;
 
   //Bone center location and dimension
-  double x , dimX;
-  double y , dimY;
-  double z , dimZ;
+  float x , dimX;
+  float y , dimY;
+  float z , dimZ;
   unsigned char bonePositionSet;
 
   //Bone rotation setting
-  double minXRotation , rotX , maxXRotation;
-  double minYRotation , rotY , maxYRotation;
-  double minZRotation , rotZ , maxZRotation;
-  double minWRotation , rotW , maxWRotation;
+  float minXRotation , rotX , maxXRotation;
+  float minYRotation , rotY , maxYRotation;
+  float minZRotation , rotZ , maxZRotation;
+  float minWRotation , rotW , maxWRotation;
 
   unsigned char rotationSet , rotationLimitsSet;
   unsigned char isEulerRotation;
@@ -120,7 +120,7 @@ struct TRI_Header
      unsigned int numberOfIndices;
      unsigned int numberOfBones;
      unsigned int rootBone;
-     double boneGlobalInverseTransform[16];
+     float boneGlobalInverseTransform[16];
 
      //In order not to break this file format ever again
      unsigned int notUsed1;
@@ -188,12 +188,12 @@ struct TRI_Container
 
 
 /**
-* @brief Printout the values of an array of 16 values ( double val[16]; ) that contains a 4x4 Matrix
+* @brief Printout the values of an array of 16 values ( float val[16]; ) that contains a 4x4 Matrix
 * @ingroup TRI
 * @param  string label to include in the printout
-* @param  pointer to the 4x4 double matrix
+* @param  pointer to the 4x4 float matrix
 */
-void print4x4DMatrixTRI(const char * str , double * matrix4x4);
+void print4x4FMatrixTRI(const char * str , float * matrix4x4);
 
 /**
 * @brief Printout the bone structure of a TRI model

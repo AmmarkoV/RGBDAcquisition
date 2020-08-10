@@ -1138,7 +1138,7 @@ static inline int findIntersectionInternal(struct OBJ_Model * obj,Face triangle,
 	Vector e1, e2, p, s, q;
 	Vector bcoords;
 	float t,u,v, tmp, e=0.000001;
-	double l, new_normal_length;
+	float l, new_normal_length;
 	Vector v0,v1,v2,dir;
 	Vector origin, end;
 	origin.n1 = p1.x;
@@ -1207,9 +1207,9 @@ static inline int findIntersectionInternal(struct OBJ_Model * obj,Face triangle,
 
     Vector tmpVec = *new_normal;
 	new_normal_length = VectorLength(tmpVec);
-	new_normal->n1 /=new_normal_length;
-	new_normal->n2 /=new_normal_length;
-	new_normal->n3 /=new_normal_length;
+	new_normal->n1 /= new_normal_length;
+	new_normal->n2 /= new_normal_length;
+	new_normal->n3 /= new_normal_length;
 
 	intersection_point->n1 = dir.n1 * t + origin.n1;
 	intersection_point->n2 = dir.n2 * t + origin.n2;

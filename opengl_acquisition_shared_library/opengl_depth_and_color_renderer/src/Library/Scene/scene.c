@@ -108,12 +108,12 @@ int sceneSwitchKeyboardControl(int newVal)
  return 1;
 }
 
-int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit)
+int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene,float * rodriguez,float * translation ,float scaleToDepthUnit)
 {
   if (scene==0) { fprintf(stderr,"Cannot access virtual stream to sceneSetOpenGLExtrinsicCalibration\n"); return 0; }
 
   scene->useCustomModelViewMatrix=1;
-  convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(scene->customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
+  convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(scene->customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
 
   scene->controls.scaleDepthTo=(float) scaleToDepthUnit;
 
@@ -130,7 +130,7 @@ int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * ro
   return 1;
 }
 
-int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera)
+int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,float * camera)
 {
   if (scene==0) { fprintf(stderr,"Cannot sceneSetOpenGLIntrinsicCalibration without an initialized VirtualStream\n"); return 0;}
 
@@ -161,12 +161,12 @@ int updateProjectionMatrix()
      }
      fprintf(stderr,"Emulating Projection Matrix from Trajectory Parser");
      int viewport[4]={0};
-     double fx = scene->emulateProjectionMatrix[0];
-     double fy = scene->emulateProjectionMatrix[4];
-     double skew = 0.0;
-     double cx = scene->emulateProjectionMatrix[2];
-     double cy = scene->emulateProjectionMatrix[5];
-     buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, scene->controls.nearPlane, scene->controls.farPlane);
+     float fx = scene->emulateProjectionMatrix[0];
+     float fy = scene->emulateProjectionMatrix[4];
+     float skew = 0.0;
+     float cx = scene->emulateProjectionMatrix[2];
+     float cy = scene->emulateProjectionMatrix[5];
+     buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(scene->projectionMatrix,viewport,fx,fy,skew,cx,cy,WIDTH,HEIGHT,scene->controls.nearPlane,scene->controls.farPlane);
      scene->projectionMatrixDeclared =1;
      fprintf(stderr,"Updated projection matrix using 3x3 matrix");
   }
@@ -175,12 +175,12 @@ int updateProjectionMatrix()
   { //Scene configuration overwrites local configuration
     fprintf(stderr,"Custom projection matrix is declared\n");
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixd( scene->projectionMatrix ); // we load a matrix of Doubles
+    glLoadMatrixf( scene->projectionMatrix ); // we load a matrix of Doubles
 
     if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport"); }
     glViewport(0,0,WIDTH,HEIGHT);
 
-    print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
+    print4x4FMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
 
   } else
   if (scene->useIntrinsicMatrix)
@@ -188,7 +188,7 @@ int updateProjectionMatrix()
    int viewport[4]={0};
 
    fprintf(stderr,"Using intrinsics to build projection matrix\n");
-   buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD   (
+   buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(
                                              scene->customProjectionMatrix  ,
                                              viewport ,
                                              scene->cameraMatrix[0],
@@ -202,10 +202,9 @@ int updateProjectionMatrix()
                                              scene->controls.farPlane
                                            );
 
-   print4x4DMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix , 0 );
-
+   print4x4FMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix , 0 ); 
    glMatrixMode(GL_PROJECTION);
-   glLoadMatrixd(scene->customProjectionMatrix); // we load a matrix of Doubles
+   glLoadMatrixf(scene->customProjectionMatrix); // we load a matrix of Doubles
    glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
   }
     else
@@ -214,16 +213,15 @@ int updateProjectionMatrix()
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
 
-   double matrix[16]={0};
-
+   float matrix[16]={0}; 
    gldPerspective(
                   matrix,
-                  (double) scene->controls.fieldOfView,
-                  (double) WIDTH/HEIGHT,
-                  (double) scene->controls.nearPlane,
-                  (double) scene->controls.farPlane
+                  (float) scene->controls.fieldOfView,
+                  (float) WIDTH/HEIGHT,
+                  (float) scene->controls.nearPlane,
+                  (float) scene->controls.farPlane
                  );
-   glMultMatrixd(matrix);
+   glMultMatrixf(matrix);
 
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
    glViewport(0, 0, WIDTH, HEIGHT);
@@ -714,13 +712,13 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
   {
      //Scene configuration overwrites local configuration
-     glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
+     glLoadMatrixf( scene->modelViewMatrix ); // we load a matrix of Doubles
 
-     copy4x4DMatrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
+     copy4x4FMatrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
       if (scene->useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
-           print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix , 0);
+           print4x4FMatrix("Scene declared modelview matrix", scene->modelViewMatrix , 0);
          }
 
    checkOpenGLError(__FILE__, __LINE__);
@@ -731,8 +729,8 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   if ( (scene!=0) && (scene->useCustomModelViewMatrix) )
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
-    copy4x4DMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
-    glLoadMatrixd((const GLdouble*) scene->customModelViewMatrix);
+    copy4x4FMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
+    glLoadMatrixf((const GLfloat*) scene->customModelViewMatrix);
 
     /* We flip our coordinate system so it comes straight
        glRotatef(90,-1.0,0,0); //TODO FIX THESE
@@ -745,9 +743,10 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   if (scene!=0)
   {
     /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n", camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
-
-    create4x4DCameraModelViewMatrixForRendering(
-                                                scene->activeModelViewMatrix ,
+    
+    struct Matrix4x4OfFloats aMVM={0};
+    create4x4FCameraModelViewMatrixForRendering(
+                                                &aMVM,
                                                 //Rotation Component
                                                 scene->cameraPose.angleX,
                                                 scene->cameraPose.angleY,
@@ -757,8 +756,10 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
                                                 scene->cameraPose.posY,
                                                 scene->cameraPose.posZ
                                                );
-    transpose4x4DMatrix(scene->activeModelViewMatrix);
-    glLoadMatrixd(scene->activeModelViewMatrix);
+                                               
+    copy4x4FMatrix(scene->activeModelViewMatrix,aMVM.m); 
+    transpose4x4FMatrix(scene->activeModelViewMatrix);
+    glLoadMatrixf(scene->activeModelViewMatrix);
 
     /*
     glLoadIdentity();

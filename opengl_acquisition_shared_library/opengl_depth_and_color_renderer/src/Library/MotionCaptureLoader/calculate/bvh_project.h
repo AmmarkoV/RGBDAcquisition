@@ -6,6 +6,7 @@
 
 
 #include "../../../../../../tools/AmMatrix/simpleRenderer.h"
+#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 
 #ifdef __cplusplus
@@ -27,11 +28,9 @@ struct BVH_RendererConfiguration
   //----------
   //float R[9];
   float T[4];
-  float projection[16];
-  float viewMatrix[16];
-  int viewport[4];
-
-
+  struct Matrix4x4OfFloats projection;
+  struct Matrix4x4OfFloats viewMatrix;
+  int viewport[4]; 
 };
 
 

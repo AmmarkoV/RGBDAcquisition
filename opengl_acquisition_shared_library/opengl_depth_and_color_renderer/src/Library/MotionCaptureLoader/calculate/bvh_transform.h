@@ -11,7 +11,6 @@
 
 #include "../bvh_loader.h"
 
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -67,10 +66,10 @@ struct BVH_TransformedJoint
 
   //Transforms
   //-----------------
-  float localToWorldTransformation[16];
-  float chainTransformation[16];
-  float dynamicTranslation[16];
-  float dynamicRotation[16];
+  struct Matrix4x4OfFloats localToWorldTransformation;
+  struct Matrix4x4OfFloats chainTransformation;
+  struct Matrix4x4OfFloats dynamicTranslation;
+  struct Matrix4x4OfFloats dynamicRotation;
 
   //Position as X,Y,Z
   //-----------------

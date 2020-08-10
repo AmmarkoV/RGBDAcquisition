@@ -17,18 +17,18 @@ int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int 
 int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID);
 int smoothTrajectories(struct VirtualStream * stream);
 float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z);
-void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternionConvention);
+void euler2QuaternionsInternal(float * quaternions,float * euler,int quaternionConvention);
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration);
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB);
 
-int flipRotationAxisD(double * rotX, double * rotY , double * rotZ , int where2SendX , int where2SendY , int where2SendZ);
+int flipRotationAxisD(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ);
 int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ);
 int unflipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ);
 
 
 
 
-int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler,double *quaternion);
+int convertQuaternionsToEulerAngles(struct VirtualStream * stream,float * euler,float *quaternion);
 
 
 
@@ -37,7 +37,7 @@ int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler
 int fillPosWithNull(float * pos,float * scaleX ,float * scaleY,float * scaleZ);
 int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * joints,float * scaleX,float * scaleY,float * scaleZ );
 /*
-int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos,double * scale )
+int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale )
 */
 
 

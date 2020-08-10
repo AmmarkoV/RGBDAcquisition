@@ -173,27 +173,27 @@ void drawSphere(unsigned int quality)
     #warning "drawSphere should create a call list , otherwise it is a very slow call.."
   #endif
 
-//    double r=1.0;
+  //float r=1.0;
     int lats=quality;
     int longs=quality;
   //---------------
     int i, j;
     for(i = 0; i <= lats; i++)
     {
-       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-       double z0  = sin(lat0);
-       double zr0 =  cos(lat0);
+       float lat0 = M_PI * (-0.5 + (float) (i - 1) / lats);
+       float z0  = sin(lat0);
+       float zr0 =  cos(lat0);
 
-       double lat1 = M_PI * (-0.5 + (double) i / lats);
-       double z1 = sin(lat1);
-       double zr1 = cos(lat1);
+       float lat1 = M_PI * (-0.5 + (float) i / lats);
+       float z1 = sin(lat1);
+       float zr1 = cos(lat1);
 
        glBegin(GL_QUAD_STRIP);
        for(j = 0; j <= longs; j++)
         {
-           double lng = 2 * M_PI * (double) (j - 1) / longs;
-           double x = cos(lng);
-           double y = sin(lng);
+           float lng = 2 * M_PI * (float) (j - 1) / longs;
+           float x = cos(lng);
+           float y = sin(lng);
 
            glNormal3f(x * zr0, y * zr0, z0);
            glVertex3f(x * zr0, y * zr0, z0);
@@ -210,27 +210,27 @@ void initializeSphere()
 {
   fprintf(stderr,"TODO : initializeSphere not implemented because it has quads instead of triangles..\n");
   return;
-//    double r=1.0;
+//    float r=1.0;
     int lats=SPHERE_QUALITY;
     int longs=SPHERE_QUALITY;
   //---------------
     int i, j;
     for(i = 0; i <= lats; i++)
     {
-       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-       double z0  = sin(lat0);
-       double zr0 =  cos(lat0);
+       float lat0 = M_PI * (-0.5 + (float) (i - 1) / lats);
+       float z0  = sin(lat0);
+       float zr0 =  cos(lat0);
 
-       double lat1 = M_PI * (-0.5 + (double) i / lats);
-       double z1 = sin(lat1);
-       double zr1 = cos(lat1);
+       float lat1 = M_PI * (-0.5 + (float) i / lats);
+       float z1 = sin(lat1);
+       float zr1 = cos(lat1);
 
        glBegin(GL_QUAD_STRIP);
        for(j = 0; j <= longs; j++)
         {
-           double lng = 2 * M_PI * (double) (j - 1) / longs;
-           double x = cos(lng);
-           double y = sin(lng);
+           float lng = 2 * M_PI * (float) (j - 1) / longs;
+           float x = cos(lng);
+           float y = sin(lng);
 
            glNormal3f(x * zr0, y * zr0, z0);
            glVertex3f(x * zr0, y * zr0, z0);

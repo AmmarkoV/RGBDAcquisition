@@ -14,6 +14,7 @@
 
 
 #include <time.h>
+#include <string.h>
 
 #include "../Tools/save_to_file.h"
 #include "../Tools/tools.h"
@@ -32,7 +33,7 @@
 
 
 
-#define NORMAL   "\033[0m"
+#define NORMAL  "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 
@@ -78,16 +79,16 @@ int drawObjectAT(GLuint programID,
                  unsigned int triangleCount,
 
 
-                 double x,
-                 double y,
-                 double z,
-                 double roll,
-                 double pitch,
-                 double yaw,
+                 float x,
+                 float y,
+                 float z,
+                 float roll,
+                 float pitch,
+                 float yaw,
 
-                 double * projectionMatrixD,
-                 double * viewportMatrixD,
-                 double * viewMatrixD
+                 struct Matrix4x4OfFloats * projectionMatrix,
+                 struct Matrix4x4OfFloats * viewportMatrix,
+                 struct Matrix4x4OfFloats * viewMatrix
                  )
 {
        //Select Shader to render with
@@ -99,9 +100,9 @@ int drawObjectAT(GLuint programID,
        //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
 
-       double modelMatrixD[16];
-       create4x4ModelTransformation(
-                                    modelMatrixD,
+       struct Matrix4x4OfFloats modelMatrix;
+       create4x4FModelTransformation(
+                                    &modelMatrix,
                                     //Rotation Component
                                     roll,//roll
                                     pitch ,//pitch
@@ -109,27 +110,25 @@ int drawObjectAT(GLuint programID,
                                     ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
-                                    (double) x/100,
-                                    (double) y/100,
-                                    (double) z/100,
+                                    (float) x/100,
+                                    (float) y/100,
+                                    (float) z/100,
 
                                     10.0,//scaleX,
                                     10.0,//scaleY,
                                     10.0//scaleZ
                                    );
 
-      //-------------------------------------------------------------------
-       double MVPD[16];
-       float MVP[16];
-       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-       copy4x4DMatrixToF(MVP , MVPD );
-       transpose4x4Matrix(MVP);
+      //------------------------------------------------------------------- 
+       struct Matrix4x4OfFloats MVP;
+       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,&modelMatrix);
+       transpose4x4FMatrix(MVP.m);
       //-------------------------------------------------------------------
 
 
 
 		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
 
 
 
@@ -166,34 +165,33 @@ int doTiledDrawing(
                    unsigned int tilesY
                    )
 {
-
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
+     struct Matrix4x4OfFloats projectionMatrix;
+     struct Matrix4x4OfFloats viewportMatrix;
+     struct Matrix4x4OfFloats viewMatrix;
 
      prepareRenderingMatrices(
                      535.423889, //fx
                      533.48468,  //fy
                      0.0,        //skew
-                     (double) originalWIDTH/2,    //cx
-                     (double) originalHEIGHT/2,   //cy
-                     (double) originalWIDTH,      //Window Width
-                     (double) originalHEIGHT,     //Window Height
+                     (float) originalWIDTH/2,    //cx
+                     (float) originalHEIGHT/2,   //cy
+                     (float) originalWIDTH,      //Window Width
+                     (float) originalHEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
+                     &projectionMatrix,
+                     &viewMatrix,
+                     &viewportMatrix
                     );
 
      //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
+        float roll=0.0;//(float)  (rand()%90);
+        float pitch=0.0;//(float) (rand()%90);
+        float yaw=0.0;//(float)   (rand()%90);
 
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
+        float x=-259.231f;//(float)  (1000-rand()%2000);
+        float y=-54.976f;//(float) (100-rand()%200);
+        float z=2699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
@@ -210,12 +208,12 @@ int doTiledDrawing(
      glViewport(viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight );
 
 
-     double newViewport[4]={viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight};
-     double projectionMatrixViewportCorrected[16];
+     float newViewport[4]={viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight};
+     float projectionMatrixViewportCorrected[16];
      correctProjectionMatrixForDifferentViewport(
                                                   projectionMatrixViewportCorrected,
-                                                  projectionMatrixD,
-                                                  viewportMatrixD,
+                                                  projectionMatrix.m,
+                                                  viewportMatrix.m,
                                                   newViewport
                                                 );
 
@@ -230,11 +228,10 @@ int doTiledDrawing(
                   z,
                   roll,
                   pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  yaw, 
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
      drawObjectAT(
@@ -249,9 +246,9 @@ int doTiledDrawing(
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
 
@@ -272,9 +269,9 @@ int doSingleDrawing(
                    unsigned int tilesY)
 {
 
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
+     struct Matrix4x4OfFloats projectionMatrix;
+     struct Matrix4x4OfFloats viewportMatrix;
+     struct Matrix4x4OfFloats viewMatrix;
 
      prepareRenderingMatrices(
                      535.423889, //fx
@@ -286,20 +283,20 @@ int doSingleDrawing(
                      HEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
+                     &projectionMatrix,
+                     &viewMatrix,
+                     &viewportMatrix
                     );
 
 
      //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
+        float roll=0.0;//(float)  (rand()%90);
+        float pitch=0.0;//(float) (rand()%90);
+        float yaw=0.0;//(float)   (rand()%90);
 
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
+        float x=-259.231f;//(float)  (1000-rand()%2000);
+        float y=-54.976f;//(float) (100-rand()%200);
+        float z=2699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
@@ -314,9 +311,9 @@ int doSingleDrawing(
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
      drawObjectAT(
@@ -331,9 +328,9 @@ int doSingleDrawing(
                   pitch,
                   yaw+180,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
  return 1;
 }
@@ -517,7 +514,7 @@ int doDrawing()
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 

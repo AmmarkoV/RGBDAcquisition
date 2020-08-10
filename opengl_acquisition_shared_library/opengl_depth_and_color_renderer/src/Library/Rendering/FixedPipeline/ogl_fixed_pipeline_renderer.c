@@ -117,11 +117,10 @@ int stopOGLFixedRendering(struct rendererConfiguration * config)
 
 
 
-void doOGLFixedBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+void doOGLFixedBoneDrawCalllist(float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {
   unsigned int bone=0;
-
-
+ 
   glLineWidth(6.0);
   for (bone=0; bone<boneSizes; bone++)
   {
@@ -156,32 +155,32 @@ void doOGLFixedBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsi
 
 
      int quality=20;
-//    double r=1.0;
-    int lats=quality;
-    int longs=quality;
+  // float r=1.0;
+     int lats=quality;
+     int longs=quality;
   //---------------
     int i, j;
     for(i = 0; i <= lats; i++)
     {
-       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-       double z0  = sin(lat0);
-       double zr0 =  cos(lat0);
+       float lat0 = M_PI * (-0.5 + (float) (i - 1) / lats);
+       float z0  = sin(lat0);
+       float zr0 =  cos(lat0);
 
-       double lat1 = M_PI * (-0.5 + (double) i / lats);
-       double z1 = sin(lat1);
-       double zr1 = cos(lat1);
+       float lat1 = M_PI * (-0.5 + (float) i / lats);
+       float z1 = sin(lat1);
+       float zr1 = cos(lat1);
 
   //---------------
    glPushMatrix();
     glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
-       glScalef( boneSphere , boneSphere , boneSphere );
+       glScalef(boneSphere,boneSphere,boneSphere);
        glBegin(GL_QUAD_STRIP);
        glColor3f(0.74,0.01,1.0);
        for(j = 0; j <= longs; j++)
         {
-           double lng = 2 * M_PI * (double) (j - 1) / longs;
-           double x = cos(lng);
-           double y = sin(lng);
+           float lng = 2 * M_PI * (float) (j - 1) / longs;
+           float x = cos(lng);
+           float y = sin(lng);
 
            glNormal3f(x * zr0, y * zr0, z0);
            glVertex3f(x * zr0, y * zr0, z0);

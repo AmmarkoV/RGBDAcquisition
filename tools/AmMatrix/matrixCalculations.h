@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-
+#include "matrix4x4Tools.h"
 
 /**
 * @author Greg James - gjames@NVIDIA.com , Lisc: Free code - no warranty & no money back.  Use it all you want
@@ -64,7 +64,7 @@ float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float rad
 * @param  Input Translation 3x1
 * @retval 0=Failure,1=Success
 */
-int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);
+int projectPointsFrom3Dto2D(float * x2D,float * y2D ,float * x3D,float *y3D ,float * z3D ,float * intrinsics ,float * rotation3x3 ,float * translation);
 
 
 
@@ -77,7 +77,7 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 * @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
 * @retval 0=Failure,1=Success
 */
-int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  double * absoluteInPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeOutPoint3DUnrotated);
+int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,float * absoluteInPoint3DRotated ,float * objectPosition,float * objectQuaternion ,float * relativeOutPoint3DUnrotated);
 
 
 
@@ -89,7 +89,7 @@ int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  d
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  );
+int move3DPoint(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D);
 
 
 /**
@@ -100,7 +100,7 @@ int move3DPoint(double * resultPoint3D, double * transformation4x4, double * poi
 * @param  Input Array 3x3 of a Rotation Matrix
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated);
+int pointFromRelationWithObjectToAbsolute(float * absoluteOutPoint3DRotated,float * objectPosition ,float * objectRotation3x3 ,float * relativeInPoint3DUnrotated);
 
 /**
 * @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a 3x3 Matrix
@@ -110,7 +110,7 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
 * @param  Input Array 3x3 of a Rotation Matrix
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
+int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation3x3 ,float * absoluteInPoint3DRotated );
 
 
 
@@ -122,7 +122,7 @@ int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated
 * @param  Input Array of Euler Angles
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated );
+//int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectRotation ,float * absoluteInPoint3DRotated );
 
 /**
 * @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a Quaternion Rotation
@@ -132,7 +132,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOut
 * @param  Input Array Quaternion qX qY qZ qW order
 * @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated );
+//int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(float * relativeOutPoint3DUnrotated,float * objectPosition ,float * objectQuaternion ,float * absoluteInPoint3DRotated );
 
 
 /**
@@ -143,7 +143,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
 * @param  Input Array of Euler Angles
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated);
+//int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(float * absoluteOutPoint3DRotated ,float * objectPosition ,float * objectRotation ,float * relativeInPoint3DUnrotated);
 
 
 
@@ -155,22 +155,9 @@ int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOut
 * @param  Input Array Quaternion qX qY qZ qW order
 * @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
 * @retval 0=Failure,1=Success */
-int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeInPoint3DUnrotated);
+//int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(float * absoluteOutPoint3DRotated ,float * objectPosition ,float * objectQuaternion ,float * relativeInPoint3DUnrotated);
 
 
-
-
-
-
-/**
- * @brief Perform Slerp function between 2 4x4 matrices ( of doubles ) representing rigid transformations
- * @ingroup AmMatrix
- * @param Output Matrix4x4  ( of doubles )
- * @param Input Matrix4x4 A ( of doubles )
- * @param Input Matrix4x4 B ( of doubles )
- * @param Factor , typically should be 0.5 for half and half
- */
-int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step );
 
 
 
@@ -178,12 +165,15 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
 /**
  * @brief Perform Slerp function between 2 4x4 matrices ( of floats ) representing rigid transformations
  * @ingroup AmMatrix
- * @param Output Matrix4x4   ( of floats )
- * @param Input Matrix4x4 A  ( of floats )
- * @param Input Matrix4x4 B  ( of floats )
+ * @param Output Matrix4x4  ( of floats )
+ * @param Input Matrix4x4 A ( of floats )
+ * @param Input Matrix4x4 B ( of floats )
  * @param Factor , typically should be 0.5 for half and half
  */
-int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float step );
+int slerp2RotTransMatrices4x4(float * result4, float * a4, float * b4 , float step );
+
+
+
 
 /**
 * @brief Return the Inner Product of 2 3D points
@@ -283,7 +273,7 @@ static inline float sqrt_fast_approximation(const float x)
 * @param  Point B
 * @retval Distance between the two points
 */
-double distanceBetween3DPoints(double * p1, double * p2);
+float distanceBetween3DPoints(float * p1, float * p2);
 
 /**
 * @brief Find an approximation of the distance between 2 points

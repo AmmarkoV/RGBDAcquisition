@@ -201,15 +201,15 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                    #define USE_OUR_OWN 1
 
                    #if USE_OUR_OWN
-                    double matrixD[16];
+                    float matrixF[16];
                     gldPerspective(
-                                   matrixD,
+                                   matrixF,
                                    85.0,
-                                   (double) tileWidth/tileHeight,
+                                   (float) tileWidth/tileHeight,
                                    0.1,
                                    13500.0
                                   );
-                    glMultMatrixd(matrixD);
+                    glMultMatrixf(matrixF);
                    #else
                     gluPerspective( 85.0, (GLfloat)(tileWidth)/(GLfloat)(tileHeight), 0.1f, 13500.0 );
                    #endif // USE_OUR_OWN

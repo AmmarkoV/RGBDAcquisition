@@ -8,6 +8,7 @@ extern "C"
 {
 #endif
 
+#include "matrix4x4Tools.h"
 
 
 /**
@@ -19,7 +20,7 @@ extern "C"
 * @param  Input Unit Scale
 * @retval 0=Failure,1=Success
 */
-int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
+int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit);
 
 /**
 * @brief build OpenGL Projection Matrix using Rodriguez Rotation and a translation ( typically coming from OpenCV )
@@ -30,7 +31,7 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
 * @param  Input Unit Scale
 * @retval 0=Failure,1=Success
 */
-int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
+int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit);
 
 
 
@@ -65,16 +66,16 @@ void buildOpenGLProjectionForIntrinsics   (
 * @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
 * @retval 0=Failure,1=Success
 */
-void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
-                                             double * frustum,
+void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(
+                                             float * frustum,
                                              int * viewport ,
-                                             double fx,
-                                             double fy,
-                                             double skew,
-                                             double cx, double cy,
+                                             float fx,
+                                             float fy,
+                                             float skew,
+                                             float cx,float cy,
                                              unsigned int imageWidth, unsigned int imageHeight,
-                                             double nearPlane,
-                                             double farPlane
+                                             float nearPlane,
+                                             float farPlane
                                            );
 
 
@@ -136,11 +137,11 @@ void glhPerspectivef2(
 * @param Z Far
 */
 void gldPerspective(
-                     double * matrix,
-                     double fovxInDegrees,
-                     double aspect,
-                     double zNear,
-                     double zFar
+                     float *matrix,
+                     float fovxInDegrees,
+                     float aspect,
+                     float zNear,
+                     float zFar
                    );
 
 
@@ -157,32 +158,34 @@ void gldPerspective(
 
 
 
-  void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
+  void glGetViewportMatrix(float * m, float startX, float startY, float width, float height, float near, float far);
 
-  void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix);
+
+
+  void getModelViewProjectionMatrixFromMatrices(struct Matrix4x4OfFloats * output,struct Matrix4x4OfFloats * projectionMatrix,struct Matrix4x4OfFloats * viewMatrix,struct Matrix4x4OfFloats * modelMatrix);
 
 
   void prepareRenderingMatrices(
-                              double fx ,
-                              double fy ,
-                              double skew ,
-                              double cx,
-                              double cy,
-                              double windowWidth,
-                              double windowHeight,
-                              double near,
-                              double far,
-                              double * projectionMatrixD,
-                              double * viewMatrixD,
-                              double * viewportMatrixD
+                              float fx ,
+                              float fy ,
+                              float skew ,
+                              float cx,
+                              float cy,
+                              float windowWidth,
+                              float windowHeight,
+                              float near,
+                              float far,
+                              struct Matrix4x4OfFloats * projectionMatrix,
+                              struct Matrix4x4OfFloats * viewMatrix,
+                              struct Matrix4x4OfFloats * viewportMatrix
                              );
 
 
 void correctProjectionMatrixForDifferentViewport(
-                                                  double * out,
-                                                  double * projectionMatrix,
-                                                  double * originalViewport,
-                                                  double * newViewport
+                                                  float * out,
+                                                  float * projectionMatrix,
+                                                  float * originalViewport,
+                                                  float * newViewport
                                                 );
 
 #ifdef __cplusplus

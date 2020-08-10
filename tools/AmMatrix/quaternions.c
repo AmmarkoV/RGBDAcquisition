@@ -43,7 +43,7 @@ enum matrix3x3EnumTranspose
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void handleQuaternionPackConvention(double qX,double qY,double qZ,double qW , double * packedQuaternionOutput,int quaternionConvention)
+void handleQuaternionPackConvention(float qX,float qY,float qZ,float qW , float * packedQuaternionOutput,int quaternionConvention)
 {
     switch (quaternionConvention)
     {
@@ -66,7 +66,7 @@ void handleQuaternionPackConvention(double qX,double qY,double qZ,double qW , do
     }
 }
 
-void handleQuaternionUnpackConvention(double * packedQuaternionInput,double *qXOut,double *qYOut,double *qZOut,double *qWOut ,int quaternionConvention)
+void handleQuaternionUnpackConvention(float * packedQuaternionInput,float *qXOut,float *qYOut,float *qZOut,float *qWOut ,int quaternionConvention)
 {
     switch (quaternionConvention)
     {
@@ -93,18 +93,18 @@ void handleQuaternionUnpackConvention(double * packedQuaternionInput,double *qXO
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
+int normalizeQuaternions(float *qX,float *qY,float *qZ,float *qW)
 {
 #if USE_FAST_NORMALIZATION
     // Works best when quat is already almost-normalized
-    double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
+    float f = (float) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
     *qX *= f;
     *qY *= f;
     *qZ *= f;
     *qW *= f;
 #else
-    double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
-    double f = (double) 1 / sqrtDown;
+    float sqrtDown = (float) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
+    float f = (float) 1 / sqrtDown;
     *qX *= f;
     *qY *= f;
     *qZ *= f;
@@ -114,25 +114,25 @@ int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
 }
 
 
-double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
-                               double qBX,double qBY,double qBZ,double qBW)
+float innerProductQuaternions(float qAX,float qAY,float qAZ,float qAW ,
+                               float qBX,float qBY,float qBZ,float qBW)
 {
-    return (double) ((qAX * qBX) + (qAY * qBY)+ (qAZ * qBZ) + (qAW * qBW));
+    return (float) ((qAX * qBX) + (qAY * qBY)+ (qAZ * qBZ) + (qAW * qBW));
 }
 
 
-double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
-                                double qBX,double qBY,double qBZ,double qBW)
+float anglesBetweenQuaternions(float qAX,float qAY,float qAZ,float qAW ,
+                                float qBX,float qBY,float qBZ,float qBW)
 {
-    double rads= acos(innerProductQuaternions(qAX,qAY,qAZ,qAW,qBX,qBY,qBZ,qBW));
+    float rads= acos(innerProductQuaternions(qAX,qAY,qAZ,qAW,qBX,qBY,qBZ,qBW));
 
-    return (double)  /*Why is the *2 needed ? */ 2* /*Why?*/ (rads * 180) / PI;
+    return (float)  /*Why is the *2 needed ? */ 2* /*Why?*/ (rads * 180) / PI;
 }
 
 
-void multiplyQuaternions(double * qXOut,double * qYOut,double * qZOut,double * qWOut,
-                         double qAX,double qAY,double qAZ,double qAW ,
-                         double qBX,double qBY,double qBZ,double qBW)
+void multiplyQuaternions(float * qXOut,float * qYOut,float * qZOut,float * qWOut,
+                         float qAX,float qAY,float qAZ,float qAW ,
+                         float qBX,float qBY,float qBZ,float qBW)
 {
     *qXOut = (qBX*qAW)+(qBW*qAX)+(qBZ*qAY)-(qBY*qAZ);
     *qYOut = (qBY*qAW)-(qBZ*qAX)+(qBW*qAY)+(qBX*qAZ);
@@ -143,13 +143,13 @@ void multiplyQuaternions(double * qXOut,double * qYOut,double * qZOut,double * q
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
+void euler2Quaternions(float * quaternions,float * euler,int quaternionConvention)
 {
     //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
     //Our input is degrees so we convert it to radians for the sin/cos functions
-    double eX = (double) (euler[0] * PI) / 180;
-    double eY = (double) (euler[1] * PI) / 180;
-    double eZ = (double) (euler[2] * PI) / 180;
+    float eX = (float) (euler[0] * PI) / 180;
+    float eY = (float) (euler[1] * PI) / 180;
+    float eZ = (float) (euler[2] * PI) / 180;
 
     //fprintf(stderr,"eX %f eY %f eZ %f\n",eX,eY,eZ);
 
@@ -158,29 +158,29 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
     //eY Pitch θ - rotation about the Y-axis
     //eZ Yaw   ψ - rotation about the Z-axis
 
-    double cosX2 = cos((double) eX/2); //cos(φ/2);
-    double sinX2 = sin((double) eX/2); //sin(φ/2);
-    double cosY2 = cos((double) eY/2); //cos(θ/2);
-    double sinY2 = sin((double) eY/2); //sin(θ/2);
-    double cosZ2 = cos((double) eZ/2); //cos(ψ/2);
-    double sinZ2 = sin((double) eZ/2); //sin(ψ/2);
+    float cosX2 = cos((float) eX/2); //cos(φ/2);
+    float sinX2 = sin((float) eX/2); //sin(φ/2);
+    float cosY2 = cos((float) eY/2); //cos(θ/2);
+    float sinY2 = sin((float) eY/2); //sin(θ/2);
+    float cosZ2 = cos((float) eZ/2); //cos(ψ/2);
+    float sinZ2 = sin((float) eZ/2); //sin(ψ/2);
 
 
 
 
-    double qX = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
-    double qY = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
-    double qZ = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
-    double qW = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
+    float qX = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
+    float qY = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
+    float qZ = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
+    float qW = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
 
     handleQuaternionPackConvention(qX,qY,qZ,qW,quaternions,quaternionConvention);
 }
 
 
 
-void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
+void quaternions2Euler(float * euler,float * quaternions,int quaternionConvention)
 {
-    double qX,qY,qZ,qW;
+    float qX,qY,qZ,qW;
 
     handleQuaternionUnpackConvention(quaternions,&qX,&qY,&qZ,&qW,quaternionConvention);
 
@@ -190,19 +190,19 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
     //e3 Yaw   - rZ: rotation about the Z-axis
 
     //Shorthand to go according to http://graphics.wikia.com/wiki/Conversion_between_quaternions_and_Euler_angles
-    double q0=qW , q1 = qX , q2 = qY , q3 = qZ;
-    double q0q1 = (double) q0*q1 , q2q3 = (double) q2*q3;
-    double q0q2 = (double) q0*q2 , q3q1 = (double) q3*q1;
-    double q0q3 = (double) q0*q3 , q1q2 = (double) q1*q2;
+    float q0=qW , q1 = qX , q2 = qY , q3 = qZ;
+    float q0q1 = (float) q0*q1 , q2q3 = (float) q2*q3;
+    float q0q2 = (float) q0*q2 , q3q1 = (float) q3*q1;
+    float q0q3 = (float) q0*q3 , q1q2 = (float) q1*q2;
 
 
-    double eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
+    float eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
     if (eXDenominator == 0.0 )
     {
         fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n");
         return;
     }
-    double eYDenominator = ( 1.0 - 2.0 * ( q2*q2 + q3*q3) );
+    float eYDenominator = ( 1.0 - 2.0 * ( q2*q2 + q3*q3) );
     if (eYDenominator == 0.0 )
     {
         fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n");
@@ -238,9 +238,9 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void quaternionSlerp(double * qOut, double * q0,double * q1,double t)
+void quaternionSlerp(float * qOut, float * q0,float * q1,float t)
 {
-    double product = (q0[0]*q1[0]) + (q0[1]*q1[1]) + (q0[2]*q1[2]) + (q0[3]*q1[3]); // -1,1)
+    float product = (q0[0]*q1[0]) + (q0[1]*q1[1]) + (q0[2]*q1[2]) + (q0[3]*q1[3]); // -1,1)
     if (product<-1.0)
     {
         product=-1.0;
@@ -250,8 +250,8 @@ void quaternionSlerp(double * qOut, double * q0,double * q1,double t)
         product= 1.0;
     }
 
-    double omega = acos(product);
-    double absOmega = omega;
+    float omega = acos(product);
+    float absOmega = omega;
     if (absOmega<0.0)
     {
         absOmega=-1*absOmega;
@@ -269,9 +269,9 @@ void quaternionSlerp(double * qOut, double * q0,double * q1,double t)
     }
 
 
-    double som = sin(omega);
-    double st0 = sin((1-t) * omega) / som;
-    double st1 = sin(t * omega) / som;
+    float som = sin(omega);
+    float st0 = sin((1-t) * omega) / som;
+    float st1 = sin(t * omega) / som;
 
     qOut[0] = q0[0]*st0 + q1[0]*st1;
     qOut[1] = q0[1]*st0 + q1[1]*st1;
@@ -281,13 +281,13 @@ void quaternionSlerp(double * qOut, double * q0,double * q1,double t)
     return;
 }
 
-void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention)
+void quaternion2Matrix3x3(float * matrix3x3,float * quaternions,int quaternionConvention)
 {
     //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
-    double qX,qY,qZ,qW;
+    float qX,qY,qZ,qW;
     handleQuaternionUnpackConvention(quaternions,&qX,&qY,&qZ,&qW,quaternionConvention);
 
-    double * m = matrix3x3;
+    float * m = matrix3x3;
 
     m[m0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[m1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[m2]=(2*qX*qZ) + (2*qY*qW);
     m[m3]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[m4]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[m5]=(2*qY*qZ) - (2*qX*qW);
@@ -298,13 +298,13 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 
 
 
-void quaternion2Matrix4x4(double * matrix4x4,double * quaternions,int quaternionConvention)
+void quaternion2Matrix4x4(float * matrix4x4,float * quaternions,int quaternionConvention)
 {
     //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
-    double qX,qY,qZ,qW;
+    float qX,qY,qZ,qW;
     handleQuaternionUnpackConvention(quaternions,&qX,&qY,&qZ,&qW,quaternionConvention);
 
-    double * m = matrix4x4;
+    float * m = matrix4x4;
 
     m[0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[2]=(2*qX*qZ) + (2*qY*qW);          m[3]=0.0;
     m[4]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[5]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[6]=(2*qY*qZ) - (2*qX*qW);          m[7]=0.0;
@@ -315,11 +315,11 @@ void quaternion2Matrix4x4(double * matrix4x4,double * quaternions,int quaternion
 }
 
 
-void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4)
+void matrix4x42Quaternion(float * quaternions,int quaternionConvention,float * matrix4x4)
 {
 //http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php
-    double qX,qY,qZ,qW;
-    double m[4][4];
+    float qX,qY,qZ,qW;
+    float m[4][4];
     m[0][0] = matrix4x4[m0_0];    m[0][1] = matrix4x4[m0_1];    m[0][2] = matrix4x4[m0_2];    m[0][3] = matrix4x4[m0_3];
     m[1][0] = matrix4x4[m1_0];    m[1][1] = matrix4x4[m1_1];    m[1][2] = matrix4x4[m1_2];    m[1][3] = matrix4x4[m1_3];
     m[2][0] = matrix4x4[m2_0];    m[0][1] = matrix4x4[m2_1];    m[0][2] = matrix4x4[m2_2];    m[0][3] = matrix4x4[m2_3];
@@ -365,9 +365,9 @@ void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double *
 
 
 
-void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double * m3)
+void matrix3x32Quaternion(float * quaternions,int quaternionConvention,float * m3)
 {
-  double m4[16];
+  float m4[16];
 
   m4[0]=m3[0];  m4[1]=m3[1];  m4[2]=m3[2];  m4[3]=0.0;
   m4[4]=m3[3];  m4[5]=m3[4];  m4[6]=m3[5];  m4[7]=0.0;
@@ -378,17 +378,17 @@ void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double *
 }
 
 
-void axisAngle2Quaternion(double * quaternionOutput,double xx,double yy,double zz,double a, int quaternionConvention)
+void axisAngle2Quaternion(float * quaternionOutput,float xx,float yy,float zz,float a, int quaternionConvention)
 {
     // Here we calculate the sin( theta / 2) once for optimization
-    double aDeg= a*PI_DIV_180;
-    double sin_aDegDiv2 = sin( aDeg / 2.0 );
+    float aDeg= a*PI_DIV_180;
+    float sin_aDegDiv2 = sin( aDeg / 2.0 );
 
     // Calculate the x, y and z of the quaternion
-    double x = xx * sin_aDegDiv2;
-    double y = yy * sin_aDegDiv2;
-    double z = zz * sin_aDegDiv2;
-    double w = cos( aDeg / 2.0 );
+    float x = xx * sin_aDegDiv2;
+    float y = yy * sin_aDegDiv2;
+    float z = zz * sin_aDegDiv2;
+    float w = cos( aDeg / 2.0 );
 
     // Calcualte the w value by cos( theta / 2 )
     normalizeQuaternions(&x,&y,&z,&w);
@@ -397,14 +397,14 @@ void axisAngle2Quaternion(double * quaternionOutput,double xx,double yy,double z
 }
 
 
-void quaternionRotate(double * quaternion , double rotX , double rotY, double rotZ , double angleDegrees , int quaternionConvention)
+void quaternionRotate(float * quaternion , float rotX , float rotY, float rotZ , float angleDegrees , int quaternionConvention)
 {
-    double rotationQuaternion[4]={0};
+    float rotationQuaternion[4]={0};
     axisAngle2Quaternion(rotationQuaternion,rotX,rotY,rotZ,angleDegrees,quaternionConvention);
 
 
     normalizeQuaternions(&quaternion[pQX],&quaternion[pQY],&quaternion[pQZ],&quaternion[pQW]);
-    double result[4]={0};
+    float result[4]={0};
     multiplyQuaternions(&result[pQX],&result[pQY],&result[pQZ],&result[pQW],
                         rotationQuaternion[pQX],rotationQuaternion[pQY],rotationQuaternion[pQZ],rotationQuaternion[pQW],
                         quaternion[pQX],quaternion[pQY],quaternion[pQZ],quaternion[pQW] );
@@ -415,9 +415,9 @@ void quaternionRotate(double * quaternion , double rotX , double rotY, double ro
 
 
 //http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
-void quaternionFromTwoVectors(double * quaternionOutput , double * vA , double * vB)
+void quaternionFromTwoVectors(float * quaternionOutput , float * vA , float * vB)
 {
-    double dotProductOfVectors = vA[0]*vB[0] + vA[1]*vB[1] + vA[2]*vB[2];
+    float dotProductOfVectors = vA[0]*vB[0] + vA[1]*vB[1] + vA[2]*vB[2];
     float m = sqrt(2.f + 2.f * dotProductOfVectors);
     float wD = (1.f / m);
 
