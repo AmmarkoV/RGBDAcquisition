@@ -37,21 +37,21 @@
 			<Add option="-lGLU" />
 			<Add option="-lX11" />
 			<Add option="-lGLEW" />
-			<Add library="../../../../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="../../../../acquisition/libRGBDAcquisition.so" />
+			<Add library="../../../../../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../../../../../acquisition/libRGBDAcquisition.so" />
 		</Linker>
-		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.c">
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.h" />
-		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.c">
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
-		<Unit filename="../../../../tools/AmMatrix/quaternions.c">
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../tools/AmMatrix/quaternions.h" />
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.h" />
 		<Unit filename="../ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -68,6 +68,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.h" />
 		<Unit filename="../Rendering/downloadFromRenderer.c">
 			<Option compilerVar="CC" />
 		</Unit>

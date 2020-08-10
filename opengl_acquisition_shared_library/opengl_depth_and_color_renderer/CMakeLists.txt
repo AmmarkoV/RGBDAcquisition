@@ -44,6 +44,7 @@ add_subdirectory (src/Applications/Renderer/)
 add_subdirectory (src/Applications/Comparer/)
 add_subdirectory (src/Applications/ModelDump/)
 add_subdirectory (src/Applications/ModelMotionAnalysis/)
+add_subdirectory (src/Applications/BVHTester/)
  
  
 

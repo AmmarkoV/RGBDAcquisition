@@ -23,8 +23,8 @@
 
 #include "glx3.h"
 
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
 
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
@@ -106,6 +106,7 @@ int drawObjectAT(GLuint programID,
                                     roll,//roll
                                     pitch ,//pitch
                                     yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
                                     (double) x/100,
@@ -341,11 +342,11 @@ int doDrawing()
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
-	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
+	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebuffer.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebuffer.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
     GLuint programID = sho->ProgramObject;
@@ -473,7 +474,7 @@ int doDrawing()
       #endif // DO_MULTI
 
         //We have accumulated all data on the framebuffer and will now draw it back..
-        drawFramebuffer(
+        drawFramebufferToScreen(
                         programFrameBufferID,
                         quad_vertexbuffer,
                         //renderedDepth,
@@ -526,8 +527,22 @@ int main(int argc, char **argv)
 	 	return 1;
    }
 
-   #define modelToLoad "../../Models/Ammar.tri"
-   //#define modelToLoad "../../submodules/Assimp/Ammar_1k.tri"
+   #define defaultModelToLoad "../../../Models/Ammar.tri" 
+   const char * modelToLoad = defaultModelToLoad;
+   
+
+    for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--from")==0)
+                    {
+                        if (argc>i+1)
+                            {
+                                modelToLoad = argv[i+1];
+                            }
+                    }
+
+        }  
+   
 
 
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )

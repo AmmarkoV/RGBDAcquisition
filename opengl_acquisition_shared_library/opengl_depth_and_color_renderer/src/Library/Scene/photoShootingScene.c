@@ -50,23 +50,25 @@ void * createPhotoshoot(
   struct tiledRendererConfiguration * configuration = 0;
 
   configuration = (struct tiledRendererConfiguration * ) malloc(sizeof(struct tiledRendererConfiguration));
-  memset(configuration,0,sizeof(struct tiledRendererConfiguration));
-  if (configuration == 0) { fprintf(stderr,"Could not allocate a configuration structure\n"); return 0; }
+  if (configuration!=0)
+  {
+   memset(configuration,0,sizeof(struct tiledRendererConfiguration));
 
+   configuration->columns=columns;
+   configuration->rows=rows;
+   configuration->objID=objID;
+   configuration->distance=distance;
+   configuration->angleX=angleX;
+   configuration->angleY=angleY;
+   configuration->angleZ=angleZ;
+   configuration->angXVariance=angXVariance;
+   configuration->angYVariance=angYVariance;
+   configuration->angZVariance=angZVariance;
 
-  configuration->columns=columns;
-  configuration->rows=rows;
-  configuration->objID=objID;
-  configuration->distance=distance;
-  configuration->angleX=angleX;
-  configuration->angleY=angleY;
-  configuration->angleZ=angleZ;
-  configuration->angXVariance=angXVariance;
-  configuration->angYVariance=angYVariance;
-  configuration->angZVariance=angZVariance;
-
-  configuration->scenePTR = (void *) scene;
-  configuration->modelStoragePTR = (void*) modelStorage;
+   configuration->scenePTR = (void *) scene;
+   configuration->modelStoragePTR = (void*) modelStorage;
+  } else
+  { fprintf(stderr,"Could not allocate a configuration structure\n"); return 0; }
 
 
   return (void*) configuration;

@@ -27,9 +27,12 @@
 #include "TrajectoryCalculator.h"
 #include "TrajectoryPrimitives.h"
 
+#include "../OGLRendererSandbox.h"
 #include "../ModelLoader/model_loader.h"
 #include "../../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../../tools/AmMatrix/quaternions.h"
+#include "../Tools/tools.h"
+
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,6 +160,9 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
      }
 
 
+  //Initialize this so renderer does not explode..!
+  newstream->controls.lastTickMillisecond = GetTickCountMilliseconds();
+
   switch (label)
   {
              case TRAJECTORYPRIMITIVES_COMMENT : /*Comment , don't spam console etc*/ break;
@@ -172,6 +178,8 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                break;
 
 
+             case TRAJECTORYPRIMITIVES_NEAR_CLIP                         :  newstream->controls.nearPlane=InputParser_GetWordFloat(ipc,1); break;
+             case TRAJECTORYPRIMITIVES_FAR_CLIP                          :  newstream->controls.farPlane=InputParser_GetWordFloat(ipc,1); break;
              case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;
@@ -179,7 +187,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
-             case TRAJECTORYPRIMITIVES_RATE                              :   newstream->rate=InputParser_GetWordFloat(ipc,1);  break;
+             case TRAJECTORYPRIMITIVES_RATE                              :   newstream->rate=InputParser_GetWordFloat(ipc,1);  newstream->forceRateRegardlessOfGPUSpeed=1; break;
              case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_SMOOTH                            :   smoothTrajectories(newstream); break;
              case TRAJECTORYPRIMITIVES_OBJ_OFFSET                        :   newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);   break;
@@ -378,7 +386,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
           case TRAJECTORYPRIMITIVES_POSEQ :
-              InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
                time = InputParser_GetWordInt(ipc,2);
                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
@@ -400,6 +408,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                pos[0] = InputParser_GetWordFloat(ipc,4);
                pos[1] = InputParser_GetWordFloat(ipc,5);
                pos[2] = InputParser_GetWordFloat(ipc,6);
+               pos[3] = 0.0;
                coordLength=3;
 
                //if (newstream->rotationsOverride)
@@ -408,7 +417,36 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
           break;
 
 
+          case TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER :
+               //fprintf(stderr,"TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER recvd\n");
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,nameB,MAX_PATH);
+               InputParser_GetLowercaseWord(ipc,3,typeStr,MAX_PATH);
 
+               changeModelJointRotationOrder(
+                                             newstream ,
+                                             modelStorage,
+                                             name  ,
+                                             nameB,
+                                             typeStr
+                                            );
+                //fprintf(stderr,"survived\n");
+          break;
+
+
+          case TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER:
+               //fprintf(stderr,"TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER recvd\n");
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetLowercaseWord(ipc,2,typeStr,MAX_PATH);
+
+               changeObjectRotationOrder(
+                                         newstream ,
+                                         modelStorage,
+                                         name  ,
+                                         typeStr
+                                        );
+                 //fprintf(stderr,"survived\n");
+          break;
 
           case TRAJECTORYPRIMITIVES_MOVE :
           case TRAJECTORYPRIMITIVES_POS :
@@ -434,16 +472,41 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 */
+               unsigned int numberOfArguments = InputParser_GetNumberOfArguments(ipc);
 
-               coordLength=6;
-               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
-               convertQuaternionsToEulerAngles(newstream,euler,quaternions);
-               pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+
+               //fprintf(stderr,"TODO : TRAJECTORYPRIMITIVES_MOVE should ultimately just supply a 4x4 matrix to the levels below or offer an orientation order..");
+
+               if (numberOfArguments==9)
+               {
+                 //We have received an euler angle rotation..
+                 if (newstream->debug) { fprintf(stderr,"Rotation for object `%s` @ time %u is euler angles\n",name,time);}
+                 coordLength=6;
+               } else
+               if (numberOfArguments==10)
+               {
+                 //We have received a quaternion rotation..
+                 if (newstream->debug) { fprintf(stderr,"Rotation for object `%s` @ time %u is quaternion but converted to euler angles\n",name,time);}
+                 coordLength=6;
+                 quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+                 convertQuaternionsToEulerAngles(newstream,euler,quaternions);
+                 pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+               } else
+               {
+                fprintf(stderr,"Movement command for object `%s` has %u arguments and don't know its rotation order\n",name,InputParser_GetNumberOfArguments(ipc));
+               }
 
                 //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
                 addStateToObjectMini( newstream , name  , time , (float*) pos , coordLength );
-          break;
+          break; 
 
+         case TRAJECTORYPRIMITIVES_LIGHT :
+           fprintf(stderr,"Enabling light..\n");
+           newstream->useLightingSystem=1;
+           newstream->lightPosition[0]=InputParser_GetWordFloat(ipc,1);
+           newstream->lightPosition[1]=InputParser_GetWordFloat(ipc,2);
+           newstream->lightPosition[2]=InputParser_GetWordFloat(ipc,3);
+         break;
 
           case TRAJECTORYPRIMITIVES_EVENT :
               if (InputParser_WordCompareNoCase(ipc,1,(char*)"INTERSECTS",10)==1)

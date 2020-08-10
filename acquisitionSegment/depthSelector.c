@@ -263,7 +263,7 @@ if (segConf->enableBBox)
        raw3D[2] = (double) z3D;
        raw3D[3] = (double) 1.0;
 
-       transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
+       transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
        selected=(
                    (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
@@ -284,7 +284,7 @@ if (segConf->enableBBox)
    selectedPtrStart+=sourceWidthStep;
    selectedPtr=selectedPtrStart;
  } //End of Master While loop
-  free4x4Matrix(&m); // This is the same as free(m); m=0;
+  free4x4DMatrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
 } // End of Bounding Box Segmentation
 // -------------------------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ if ( segConf->enablePlaneSegmentation )
       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
       raw3D[0] = (double) x3D; raw3D[1] = (double) y3D; raw3D[2] = (double) z3D; raw3D[3] = (double) 1.0;
 
-      transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
+      transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];
@@ -371,7 +371,7 @@ if ( segConf->enablePlaneSegmentation )
    selectedPtrStart+=sourceWidthStep;
    selectedPtr=selectedPtrStart;
  } //End of Master While loop
-  free4x4Matrix(&m); // This is the same as free(m); m=0;
+  free4x4DMatrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
 
  }

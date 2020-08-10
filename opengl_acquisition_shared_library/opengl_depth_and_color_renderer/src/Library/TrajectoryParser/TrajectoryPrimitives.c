@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 31-05-2018 19:47:50 using StringRecognizer                  
+This file was automatically generated @ 30-10-2019 12:52:41 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -82,6 +82,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
  break; 
  case 'F' : 
      switch (toupper(str[1])) { 
+     case 'A' : 
+         if (strLength<8) { return 0; } 
+         if ( strncasecmp(str,"FAR_CLIP",8) == 0 ) { return TRAJECTORYPRIMITIVES_FAR_CLIP; } 
+     break; 
      case 'O' : 
          if (strLength<3) { return 0; } 
          if ( strncasecmp(str,"FOG",3) == 0 ) { return TRAJECTORYPRIMITIVES_FOG; } 
@@ -118,6 +122,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      break; 
     }; 
  break; 
+ case 'L' : 
+     if (strLength<5) { return 0; } 
+     if ( strncasecmp(str,"LIGHT",5) == 0 ) { return TRAJECTORYPRIMITIVES_LIGHT; } 
+ break; 
  case 'M' : 
      switch (toupper(str[1])) { 
      case 'A' : 
@@ -137,12 +145,17 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      break; 
     }; 
  break; 
+ case 'N' : 
+     if (strLength<9) { return 0; } 
+     if ( strncasecmp(str,"NEAR_CLIP",9) == 0 ) { return TRAJECTORYPRIMITIVES_NEAR_CLIP; } 
+ break; 
  case 'O' : 
      switch (toupper(str[1])) { 
      case 'B' : 
          switch (toupper(str[2])) { 
          case 'J' : 
-             if ( (strLength >= 11 )&& ( strncasecmp(str,"OBJECT_TYPE",11) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_TYPE; } 
+             if ( (strLength >= 21 )&& ( strncasecmp(str,"OBJECT_ROTATION_ORDER",21) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER; } 
+             else  if ( (strLength >= 11 )&& ( strncasecmp(str,"OBJECT_TYPE",11) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_TYPE; } 
              else  if ( (strLength >= 10 )&& ( strncasecmp(str,"OBJECTTYPE",10) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECTTYPE; } 
              else  if ( (strLength >= 6 )&& ( strncasecmp(str,"OBJECT",6) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT; } 
              else  if ( (strLength >= 10 )&& ( strncasecmp(str,"OBJ_OFFSET",10) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJ_OFFSET; } 
@@ -161,7 +174,8 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      case 'O' : 
          switch (toupper(str[2])) { 
          case 'S' : 
-             if ( (strLength >= 7 )&& ( strncasecmp(str,"POSERAW",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSERAW; } 
+             if ( (strLength >= 19 )&& ( strncasecmp(str,"POSE_ROTATION_ORDER",19) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER; } 
+             else  if ( (strLength >= 7 )&& ( strncasecmp(str,"POSERAW",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSERAW; } 
              else  if ( (strLength >= 7 )&& ( strncasecmp(str,"POSE4x4",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE4X4; } 
              else  if ( (strLength >= 5 )&& ( strncasecmp(str,"POSEQ",5) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSEQ; } 
              else  if ( (strLength >= 4 )&& ( strncasecmp(str,"POSE",4) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE; } 

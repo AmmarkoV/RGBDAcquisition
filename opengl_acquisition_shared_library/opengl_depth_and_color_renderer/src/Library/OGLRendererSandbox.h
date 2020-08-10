@@ -50,6 +50,7 @@ int setOpenGLIntrinsicCalibration(double * camera);
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit);
 
 
+unsigned int getOpenGLTimestamp();
 
 /**
 * @brief Get 2D Width Of OpenGL Rendering Surface
@@ -66,6 +67,7 @@ unsigned int getOpenGLWidth();
 unsigned int getOpenGLHeight();
 
 
+int controlScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC);
 
 int passUserCommand(const char * command,const char * value);
 int passUserInput(char key,int state,unsigned int x, unsigned int y);
@@ -86,7 +88,7 @@ int setKeyboardControl(int val);
 * @param Fragment Shader Filename
 * @retval 0=Failure,1=Success
 */
-int enableShaders(char * vertShaderFilename , char * fragShaderFilename );
+int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilename );
 
 
 /**
@@ -178,7 +180,7 @@ void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 * @param Filename of the scene file that describes the scene to be played out
 * @retval 0=Failure,1=Success
 */
-int startOGLRendererSandbox(int argc, char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile);
+int startOGLRendererSandbox(int argc,const char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile);
 
 
 

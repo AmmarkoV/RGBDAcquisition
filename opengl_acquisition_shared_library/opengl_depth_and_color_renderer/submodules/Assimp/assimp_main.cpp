@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../src/ModelLoader/model_loader_tri.h"
+#include "../../src/Library/ModelLoader/model_loader_tri.h"
 
 #include "assimp_loader.h"
 #include "assimp_bvh.h"
@@ -36,8 +36,27 @@ int main (int argc, char *argv[])
 
 
  convertAssimpToTRI(argv[2],flatModel,originalModel,selectMesh);
- saveModelTri(argv[3], originalModel);
 
+
+    for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--paint")==0)
+            {
+               int r = atoi(argv[i+1]);
+               int g = atoi(argv[i+2]);
+               int b = atoi(argv[i+3]);
+
+               fprintf(stderr,"Will paint mesh (RGB) (%u/%u/%u) \n",r,g,b);
+               paintTRI(
+                        originalModel,
+                        r,
+                        g,
+                        b
+                       );
+            }
+        }
+
+ saveModelTri(argv[3], originalModel);
 
 
    if (strcmp(argv[1],"--test")==0)

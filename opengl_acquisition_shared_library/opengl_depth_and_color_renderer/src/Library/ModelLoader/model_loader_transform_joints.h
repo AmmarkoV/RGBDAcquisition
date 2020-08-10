@@ -86,6 +86,17 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
 
 
 
+int setTRIJointRotationOrder(
+                              struct TRI_Model * in ,
+                              unsigned int jointToChange ,
+                              unsigned int rotationOrder
+                             );
+
+int getTRIJointRotationOrder(
+                             struct TRI_Model * in ,
+                             unsigned int jointToChange ,
+                             unsigned int rotationOrder
+                            );
 
 
 
@@ -108,7 +119,7 @@ int setTRIModelBoneInitialPosition(struct TRI_Model * in);
 void colorCodeBones(struct TRI_Model * in);
 
 /**
-* @brief Transform a TRI Joint using just 3 Euler Angles..!
+* @brief Transform a TRI Joint using just 3 Euler Angles using ZYX order..!
 * @ingroup TRI
 * @param  input TRI structure with the loaded model
 * @param  allocated matrix array that will be altered

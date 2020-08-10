@@ -3,6 +3,7 @@
 
 #include "FixedPipeline/ogl_fixed_pipeline_renderer.h"
 #include "ShaderPipeline/ogl_shader_pipeline_renderer.h"
+#include "ShaderPipeline/shader_loader.h"
 
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
@@ -27,7 +28,7 @@ int resetRendererOptions()
 }
 
 
-int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
+int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilename)
 {
   strncpy(
            rendererOptions.fragmentShaderFile ,
@@ -72,6 +73,26 @@ int startOGLRendering()
 
 
 
+int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+{
+  rendererOptions.useLighting=1; //if we want light we need to use lighting..
+  rendererOptions.lightPos[0]=pos[0];
+  rendererOptions.lightPos[1]=pos[1];
+  rendererOptions.lightPos[2]=pos[2];
+
+  switch (rendererOptions.useShaders)
+  {
+    case 0 :
+          fixedOGLLighting(&rendererOptions);
+    break;
+
+    case 1 :
+         fprintf(stderr,"No Shader lighting support yet..!\n");
+    break;
+  };
+  return 1;
+}
+
 
 int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {
@@ -90,16 +111,16 @@ int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int bone
 
 
 int renderOGL(
-               float * projectionMatrix ,
-               float * viewMatrix ,
-               float * modelMatrix ,
-               float * mvpMatrix ,
+               const float * projectionMatrix ,
+               const float * viewMatrix ,
+               const float * modelMatrix ,
+               const float * mvpMatrix ,
                //-------------------------------------------------------
-               float * vertices ,       unsigned int numberOfVertices ,
-               float * normal ,         unsigned int numberOfNormals ,
-               float * textureCoords ,  unsigned int numberOfTextureCoords ,
-               float * colors ,         unsigned int numberOfColors ,
-               unsigned int * indices , unsigned int numberOfIndices
+               const float * vertices ,       unsigned int numberOfVertices ,
+               const float * normal ,         unsigned int numberOfNormals ,
+               const float * textureCoords ,  unsigned int numberOfTextureCoords ,
+               const float * colors ,         unsigned int numberOfColors ,
+               const unsigned int * indices , unsigned int numberOfIndices
              )
 {
 
@@ -122,7 +143,7 @@ int renderOGL(
 
     case 1 :
       fprintf(stderr,"shader draw is under construction please deactivate shaders from CMake..\n");
-      fprintf(stderr,"renderOGL => rendererOptions.useShaders=%u\n",rendererOptions.useShaders);
+      fprintf(stderr,"renderOGL => rendererOptions.useShaders=%d\n",rendererOptions.useShaders);
       useShader(rendererOptions.loadedShader);
       doOGLShaderDrawCalllist(
                               projectionMatrix ,

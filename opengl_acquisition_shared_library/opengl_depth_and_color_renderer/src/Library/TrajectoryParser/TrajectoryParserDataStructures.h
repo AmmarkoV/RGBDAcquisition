@@ -18,7 +18,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-int dummy_strcasecmp_internal(char * input1, char * input2);
+int dummy_strcasecmp_internal(const char * input1,const char * input2);
 
 void listAllObjectTypeID(struct VirtualStream * stream);
 
@@ -82,16 +82,50 @@ int addStateToObjectMini(
                        );
 
 
+int changeObjectRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * rotationOrderStr
+                                );
+
+int changeModelJointRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * jointName,
+                                  char * modelOrder
+                                 );
+
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
+                              const char * name  ,
+                              const char * jointName,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
                        );
 
+
+int changeAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name  ,
+                                const char * jointName,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               );
+
+int moveAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               );
 
 int addConnectorToVirtualStream(
                                  struct VirtualStream * stream ,

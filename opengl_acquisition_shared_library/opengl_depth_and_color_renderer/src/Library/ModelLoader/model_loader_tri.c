@@ -441,11 +441,33 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
               fprintf(stderr,YELLOW"  Incompatible triloader file , cannot load \n");
               if (triModel->header.triType>TRI_LOADER_VERSION )
                 {
-                  fprintf(stderr,"  You need to upgrade your TRI Loader code to be able to read it \n");
+                  fprintf(stderr,"  You need to upgrade your TRI Loader code to be able to read this file \n");
+                  fprintf(stderr,"  If you have included this reader in a tool, you need to \n");
+                  fprintf(stderr,"  Copy && Paste the current version of model_loader_tri.c,model_loader_tri.h,model_loader_transform_joints.c and model_loader_transform_joints.h \n");
+                  fprintf(stderr,"  https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader\n");
                 } else
               if (triModel->header.triType<TRI_LOADER_VERSION )
                 {
-                  fprintf(stderr,"  This is an old file-version that was dropped! \n ");
+                  fprintf(stderr,"  This is an old .TRI file-version that was dropped! \n");
+                  fprintf(stderr,"  In order to keep the spec clean there is no backwards compatibility\n");
+                  fprintf(stderr,"  I am sorry about this but there is no other way to keep things manageable\n");
+                  fprintf(stderr,"  Hopefully the file format will stabilize to a version and will stop changing\n");
+                  fprintf(stderr,"  If you really wish to open this file please revert to an older state of the repository\n");
+
+
+                  //IF I EVER CHANGE THE VERSION AGAIN I SHOULD ALWAYS UPDATE LAST STABLE COMMIT HERE..
+                  if (triModel->header.triType==8)
+                  {
+                      fprintf(stderr,"  The last stable commit that opens the file you want is 8efe78de3a6ee7f6c1a40c2bdccf91b1eee8d883\n");
+                      fprintf(stderr,"  or https://github.com/AmmarkoV/RGBDAcquisition/commit/8efe78de3a6ee7f6c1a40c2bdccf91b1eee8d883\n\n\n");
+
+                      fprintf(stderr,"  mkdir oldVersion && cd oldVersion\n");
+                      fprintf(stderr,"  git clone https://github.com/AmmarkoV/RGBDAcquisition/ \n");
+                      fprintf(stderr,"  cd RGBDAcquisition\n");
+                      fprintf(stderr,"  git checkout 8efe78de3a6ee7f6c1a40c2bdccf91b1eee8d883\n\n\n\n");
+                  }
+
+                  fprintf(stderr,"  Thank you for your understanding\n");
                 }
               fprintf(stderr,"   " NORMAL);
              fprintf(stderr,RED " ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
@@ -605,7 +627,36 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
  return 0;
 }
 
+int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
+{
+  if (triModel!=0)
+  {
+    if (triModel->header.numberOfColors>0 )
+    {
+       if (triModel->colors!=0)
+       {
+         float rP = (float) r/255;
+         float gP = (float) g/255;
+         float bP = (float) b/255;
+         float * clr = triModel->colors;
+         float * clrLimit = triModel->colors + triModel->header.numberOfColors;
 
+         while (clr<clrLimit)
+         {
+           *clr = rP; ++clr;
+           *clr = gP; ++clr;
+           *clr = bP; ++clr;
+         }
+
+         return 1;
+       }
+    }
+  }
+
+
+  fprintf(stderr,"Failed to paint TRI file..\n");
+  return 0;
+}
 
 int saveModelTri(const char * filename , struct TRI_Model * triModel)
 {

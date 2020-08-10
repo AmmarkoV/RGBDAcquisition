@@ -20,9 +20,15 @@ short * openGLDepthFrame = 0;
 struct calibration calibRGB;
 struct calibration calibDepth;
 
+int tryStartingWithoutWindow=1;
+
 
 int startOpenGLModule(unsigned int max_devs,const char * settings)
 {
+    if (strstr(settings,"safe")!=0)
+    {
+        tryStartingWithoutWindow=0;
+    }
   return 1;
 }
 
@@ -53,7 +59,16 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
 
-   if (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName) )
+    if (!tryStartingWithoutWindow)
+    {
+       if (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,1 /*View Window*/,devName) )
+      {
+        return 0;
+        //return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
+      }
+    }
+    else
+   if  (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName) )
    {
      fprintf(stderr,"Could not start openGL context with a p-buffer..");
      fprintf(stderr,"Will now try to start it with a visible window..");
@@ -70,6 +85,13 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
    //changeOGLRendererGrabMode(1);
 
   return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
+}
+
+
+int controlOpenGLScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
+{
+ fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
+ return controlScene(name,variable,control,valueA,valueB,valueC);
 }
 
 
@@ -100,6 +122,7 @@ int seekOpenGLFrame(int devID,unsigned int seekFrame) {  return seekOGLRendererS
 int snapOpenGLFrames(int devID) { return snapOGLRendererSandbox(openGL_Framerate); }
 
 //Color Frame getters
+unsigned long getLastOpenGLColorTimestamp(int devID) { return getOpenGLTimestamp(); }
 int getOpenGLColorWidth(int devID) { return openGL_WIDTH; }
 int getOpenGLColorHeight(int devID) { return openGL_HEIGHT; }
 int getOpenGLColorDataSize(int devID) { return openGL_HEIGHT*openGL_WIDTH * 3; }
@@ -189,6 +212,7 @@ int setOpenGLDepthCalibration(int devID,struct calibration * calib)
 
 
    //Depth Frame getters
+unsigned long getLastOpenGLDepthTimestamp(int devID) { return getOpenGLTimestamp(); }
 int getOpenGLDepthWidth(int devID)    {  return openGL_WIDTH; }
 int getOpenGLDepthHeight(int devID)   { return openGL_HEIGHT; }
 int getOpenGLDepthDataSize(int devID) { return openGL_WIDTH*openGL_HEIGHT; }

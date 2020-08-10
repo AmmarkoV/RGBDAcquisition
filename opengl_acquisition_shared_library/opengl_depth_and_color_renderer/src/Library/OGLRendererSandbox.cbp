@@ -50,74 +50,74 @@
 			<Add library="GLU" />
 			<Add library="GLEW" />
 			<Add library="X11" />
-			<Add library="../../../tools/Codecs/libCodecs.a" />
+			<Add library="../../../../tools/Codecs/libCodecs.a" />
 			<Add library="jpeg" />
 			<Add library="png" />
 		</Linker>
-		<Unit filename="../../../tools/AmMatrix/collisions.c">
+		<Unit filename="../../../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/collisions.h" />
-		<Unit filename="../../../tools/AmMatrix/matrix3x3Tools.c">
+		<Unit filename="../../../../tools/AmMatrix/collisions.h" />
+		<Unit filename="../../../../tools/AmMatrix/matrix3x3Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/matrix3x3Tools.h" />
-		<Unit filename="../../../tools/AmMatrix/matrix4x4Tools.c">
+		<Unit filename="../../../../tools/AmMatrix/matrix3x3Tools.h" />
+		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/matrix4x4Tools.h" />
-		<Unit filename="../../../tools/AmMatrix/matrixCalculations.c">
+		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../tools/AmMatrix/matrixCalculations.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/matrixCalculations.h" />
-		<Unit filename="../../../tools/AmMatrix/matrixOpenGL.c">
+		<Unit filename="../../../../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/matrixOpenGL.h" />
-		<Unit filename="../../../tools/AmMatrix/ocvStaging.c">
+		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/ocvStaging.h" />
-		<Unit filename="../../../tools/AmMatrix/quaternions.c">
+		<Unit filename="../../../../tools/AmMatrix/ocvStaging.h" />
+		<Unit filename="../../../../tools/AmMatrix/quaternions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/quaternions.h" />
-		<Unit filename="../../../tools/AmMatrix/solveHomography.c">
+		<Unit filename="../../../../tools/AmMatrix/quaternions.h" />
+		<Unit filename="../../../../tools/AmMatrix/solveHomography.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/solveHomography.h" />
-		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.c">
+		<Unit filename="../../../../tools/AmMatrix/solveHomography.h" />
+		<Unit filename="../../../../tools/AmMatrix/solveLinearSystemGJ.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.h" />
-		<Unit filename="../../../tools/ImageOperations/convolutionFilter.c">
+		<Unit filename="../../../../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../../../../tools/ImageOperations/convolutionFilter.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/convolutionFilter.h" />
-		<Unit filename="../../../tools/ImageOperations/depthClassifier.c">
+		<Unit filename="../../../../tools/ImageOperations/convolutionFilter.h" />
+		<Unit filename="../../../../tools/ImageOperations/depthClassifier.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/depthClassifier.h" />
-		<Unit filename="../../../tools/ImageOperations/findSubImage.c">
+		<Unit filename="../../../../tools/ImageOperations/depthClassifier.h" />
+		<Unit filename="../../../../tools/ImageOperations/findSubImage.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/findSubImage.h" />
-		<Unit filename="../../../tools/ImageOperations/imageFilters.c">
+		<Unit filename="../../../../tools/ImageOperations/findSubImage.h" />
+		<Unit filename="../../../../tools/ImageOperations/imageFilters.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/imageFilters.h" />
-		<Unit filename="../../../tools/ImageOperations/imageOps.c">
+		<Unit filename="../../../../tools/ImageOperations/imageFilters.h" />
+		<Unit filename="../../../../tools/ImageOperations/imageOps.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/imageOps.h" />
-		<Unit filename="../../../tools/ImageOperations/patchComparison.c">
+		<Unit filename="../../../../tools/ImageOperations/imageOps.h" />
+		<Unit filename="../../../../tools/ImageOperations/patchComparison.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/patchComparison.h" />
-		<Unit filename="../../../tools/ImageOperations/resize.c">
+		<Unit filename="../../../../tools/ImageOperations/patchComparison.h" />
+		<Unit filename="../../../../tools/ImageOperations/resize.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../tools/ImageOperations/resize.h" />
+		<Unit filename="../../../../tools/ImageOperations/resize.h" />
 		<Unit filename="Interfaces/webInterface.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -156,6 +156,42 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_processor.h" />
+		<Unit filename="MotionCaptureLoader/bvh_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="MotionCaptureLoader/bvh_project.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/bvh_project.h" />
+		<Unit filename="MotionCaptureLoader/bvh_to_tri_pose.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/bvh_to_tri_pose.h" />
+		<Unit filename="MotionCaptureLoader/bvh_transform.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/bvh_transform.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_export.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_export.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_csv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_csv.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_svg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_svg.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c">
 			<Option compilerVar="CC" />

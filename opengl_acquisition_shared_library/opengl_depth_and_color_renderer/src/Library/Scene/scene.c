@@ -37,11 +37,10 @@
 struct VirtualStream * scene = 0;
 struct ModelList * modelStorage;
 
-int WIDTH=640;
-int HEIGHT=480;
+unsigned int WIDTH=640;
+unsigned int HEIGHT=480;
 
 
-#define USE_LIGHTS 1
 const GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -152,7 +151,7 @@ int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * cam
 
 int updateProjectionMatrix()
 {
-  fprintf(stderr,"updateProjectionMatrix called ( %u x %u )  \n",WIDTH,HEIGHT);
+  fprintf(stderr,"updateProjectionMatrix called ( %d x %d )  \n",WIDTH,HEIGHT);
   if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
@@ -243,7 +242,7 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    return 1;
 }
 
-int initScene(int argc, char *argv[],char * confFile)
+int initScene(int argc,const char *argv[],const char * confFile)
 {
   fprintf(stderr,"Initializing Scene\n");
 
@@ -311,6 +310,7 @@ int tickScene(unsigned int framerate)
        return 0;
    }
 
+
    //ALL positions should be calculated here!
    //i dont like the way this is working now
    float posStack[7]={0};
@@ -318,12 +318,67 @@ int tickScene(unsigned int framerate)
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-
-   unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
-   calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
+  unsigned int timestampToUse = 0;
 
 
+   if (scene->ignoreTime)
+   {
+     timestampToUse = scene->ticks;
+     ++scene->ticks;
+     scene->ticksF = (float) scene->ticks;
+     scene->controls.lastTickMillisecond =   scene->ticks;
+   } else
+  //There are two ways to render, the first is regardless of GPU we try to enforce a specific framerate..
+  //The rate is controled using the RATE(x) script command. If we get a rate of 100 it means that we will
+  //try to playback a stream captured at 100 frames per second..!
+    if(scene->forceRateRegardlessOfGPUSpeed)
+    {
+        unsigned int thisTickMillisecond = GetTickCountMilliseconds();
+        unsigned int millisecondDiff=thisTickMillisecond - scene->controls.lastTickMillisecond;
+        float ticksPerMillisecond = (float) scene->rate / 1000;
 
+        //Even if we have incredibly slow or very fast animations we want to be able to progress..
+        scene->ticksF += ticksPerMillisecond * millisecondDiff;
+
+        scene->ticks = (unsigned int) scene->ticksF;
+        scene->controls.lastTickMillisecond = thisTickMillisecond ;
+
+        timestampToUse = scene->ticks;
+
+        //We have managed to use the correct timestamp regardless of framerate,
+        //But if our framerate is larger than the target rate let's sleep a little to
+        //conserve our GPU resources..
+
+        //Our Framerate is  scene->controls.lastFramerate
+        //Our desired framerate is scene->rate
+        if (scene->controls.lastFramerate>scene->rate)
+        {
+          float framesToSkip = scene->controls.lastFramerate - scene->rate;
+          float sleepTime = (float) 1000*1000/framesToSkip;
+
+          //Sleep less time to ensure rendering without intermissions
+          sleepTime/=3;
+
+          //fprintf(stderr,"sleepTime:%0.2f\n",sleepTime );
+          usleep((unsigned int) sleepTime);
+        }
+    } else
+    //The second way to render is as fast as possible..!
+    //We can manually adjust tickUSleepTime using keyboard if we want..
+    {
+        timestampToUse = scene->ticks;//*((unsigned int) 100/scene->rate);
+        if (framerate>0)
+         {
+          if (scene->controls.tickUSleepTime>0)
+              { usleep(scene->controls.tickUSleepTime); }
+         }
+        ++scene->ticks;
+    }
+
+   scene->timestampToUse = timestampToUse;
+
+
+   calculateVirtualStreamPos(scene,0,scene->timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
    scene->cameraPose.posX = scene->cameraUserDelta.posX + pos[0];
    scene->cameraPose.posY = scene->cameraUserDelta.posY + pos[1];
    scene->cameraPose.posZ = scene->cameraUserDelta.posZ + pos[2];
@@ -332,16 +387,6 @@ int tickScene(unsigned int framerate)
    scene->cameraPose.angleY = scene->cameraUserDelta.angleY + pos[4];
    scene->cameraPose.angleZ = scene->cameraUserDelta.angleZ + pos[5];
 
-   if (framerate>0)
-   {
-    //if (lastFramerate>)
-    //TODO: sleep enough time for framerate to succeed
-    if (scene->controls.tickUSleepTime>0)
-              { usleep(scene->controls.tickUSleepTime); }
-   }
-
-
-   ++scene->ticks;
    return 1;
 }
 
@@ -357,7 +402,11 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       float modelview[16];
       float projection[16];
 
-      float posX = x3D , posY = y3D , posZ = z3D;
+      float pos3DF[3];
+      pos3DF[0]=x3D;
+      pos3DF[1]=y3D;
+      pos3DF[2]=z3D;
+
       float win[3]={0};
 
       glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
@@ -365,7 +414,7 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       glGetIntegerv( GL_VIEWPORT, viewport );
 
       #warning "All the functions that use gluProject / unproject should be moved in a seperate compartment"
-      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win );
+      _glhProjectf( pos3DF , modelview, projection, viewport, win );
 
       if  (
             (win[0] < 0) || (win[0] >= WIDTH) ||
@@ -440,12 +489,13 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
   float * pos1 = (float*) &posStackA;
   float * pos2 = (float*) &posStackB;
 
+
   unsigned int i=0;
   for (i=0; i<scene->numberOfConnectors; i++)
   {
     if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
+         ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
+         ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
         )
        {
         /*
@@ -454,13 +504,15 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
                        scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
         float scale = (float) scene->connector[i].scale;
 
-        drawConnector(pos1,
+        drawConnector(
+                      pos1,
                       pos2,
                       &scale ,
                       &scene->connector[i].R ,
                       &scene->connector[i].G ,
                       &scene->connector[i].B ,
-                      &scene->connector[i].Transparency );
+                      &scene->connector[i].Transparency
+                     );
        } else
        {
          fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);
@@ -477,8 +529,8 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
 
 
 
- unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
-
+ //unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
+ unsigned int timestampToUse = scene->timestampToUse;
 
 
   unsigned int i;
@@ -503,7 +555,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
   //This is actually the only visible console output..
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
+    fprintf(stderr,"\r%0.2f FPS - @ %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
             scene->controls.lastFramerate,
             (float) timestampToUse/1000,
             scene->ticks,
@@ -599,12 +651,22 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
             struct TRI_Model *triModelIn=(struct TRI_Model*) mod->modelInternalData;
 
 
-            doModelTransform( &triModelOut , triModelIn , joints , numberOfBones , 1/*Autodetect*/ , 1/*Regular mode*/, 1/*Do Transforms*/ , 0 /*Default joint convention*/);
+            doModelTransform(
+                              &triModelOut ,
+                              triModelIn ,
+                              joints ,
+                              numberOfBones ,
+                              1/*Autodetect default matrices for speedup*/ ,
+                              1/*Direct setting of matrices*/,
+                              1/*Do Transforms, don't just calculate the matrices*/ ,
+                              0 /*Default joint convention*/
+                            );
             //fprintf(stderr,"TriOUT Indices %u , TriIN Indices %u \n",triModelOut.header.numberOfIndices,triModelIn->header.numberOfIndices);
 
             mod->modelInternalData = (void*) &triModelOut;
             // - - - -
-            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+            //                       pX     pY     pZ      rX     rY    rZ
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],mod->rotationOrder) )
               { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
             // - - - -
 
@@ -614,7 +676,8 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
            } else
            {
             //Regular <fast> drawing of model
-            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+            //                       pX     pY     pZ      rX     rY    rZ
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],mod->rotationOrder) )
                { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
            }
 
@@ -665,7 +728,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
    return 1;
   }
 
-  if (scene->useCustomModelViewMatrix)
+  if ( (scene!=0) && (scene->useCustomModelViewMatrix) )
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
     copy4x4DMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
@@ -679,10 +742,11 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
      result = 1;
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
+  if (scene!=0)
   {
     /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n", camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
 
-    create4x4CameraModelViewMatrixForRendering(
+    create4x4DCameraModelViewMatrixForRendering(
                                                 scene->activeModelViewMatrix ,
                                                 //Rotation Component
                                                 scene->cameraPose.angleX,
@@ -693,7 +757,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
                                                 scene->cameraPose.posY,
                                                 scene->cameraPose.posZ
                                                );
-    transpose4x4MatrixD(scene->activeModelViewMatrix);
+    transpose4x4DMatrix(scene->activeModelViewMatrix);
     glLoadMatrixd(scene->activeModelViewMatrix);
 
     /*
@@ -718,6 +782,16 @@ int renderScene()
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
+
+  //Lighting
+  if (scene->useLightingSystem)
+  {
+     renderOGLLight(
+                                          scene->lightPosition,
+                                          0,
+                                          0
+                                        );
+  }
 
   setupSceneCameraBeforeRendering(scene);
 

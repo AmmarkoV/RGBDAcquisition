@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_workspace_file>
-	<Workspace title="Workspace">
-		<Project filename="src/OGLRendererSandbox.cbp" />
-		<Project filename="src/Renderer/Renderer.cbp" />
-		<Project filename="src/Comparer/Comparer.cbp" />
-		<Project filename="src/ModelDump/ModelDump.cbp" />
-		<Project filename="src/GameEngine/GameEngine.cbp" />
-	</Workspace>
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_workspace_file Version="10.0.0">
+  <Workspace title="Workspace">
+    <Project filename="src/Library/OGLRendererSandbox.cbp"/>
+    <Project filename="src/Applications/Renderer/Renderer.cbp"/>
+    <Project filename="src/Applications/Comparer/Comparer.cbp"/>
+    <Project filename="src/Applications/ModelDump/ModelDump.cbp"/>
+    <Project filename="src/Applications/GameEngine/GameEngine.cbp"/>
+    <Project filename="src/Applications/BVHTester/BVHTester.cbp"/>
+  </Workspace>
 </CodeBlocks_workspace_file>

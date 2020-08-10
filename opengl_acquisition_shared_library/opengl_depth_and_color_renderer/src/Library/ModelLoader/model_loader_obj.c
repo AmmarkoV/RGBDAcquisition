@@ -10,6 +10,8 @@
 
 #define reallocationStep 500
 
+#warning "The .OBJ Wavefront loader code is ancient, triggers various CPPCheck warnings and needs maintenance"
+
 #define CALCULATE_3D_BOUNDING_BOX 1
 #ifndef CALCULATE_3D_BOUNDING_BOX
   #warning "3D bounding boxes not getting calculated"
@@ -424,7 +426,7 @@ int countChar(char  * str , unsigned int strLength , char seek , char terminatio
 
 
 
-int saveOBJ(struct OBJ_Model * obj , char * filename)
+int saveOBJ(struct OBJ_Model * obj ,const char * filename)
 {
   //sed -i 's/,/./g' filename
   FILE * fp=fopen(filename,"w");
@@ -459,9 +461,11 @@ int saveOBJ(struct OBJ_Model * obj , char * filename)
 	         );
     }
 
-
     fclose(fp);
+    return 1;
   }
+
+ return 0;
 }
 
 
@@ -480,14 +484,14 @@ int readOBJ(struct OBJ_Model * obj)
   long unsigned int    numnormals;                 /* number of normals in model */
   long unsigned int    numcolors;
   long unsigned int    numtexs;                 /* number of normals in texture coordintaes */
-  long unsigned int    numfaces;			/* number of faces in model */
+  //long unsigned int    numfaces;			/* number of faces in model */
   long unsigned int    numgroups;			/* number of groups in model */
   GLuint cur_group,material, mat;
   long unsigned int v,n,t,i;
   int grp;
 
   fprintf(stderr,"TODO : proper string allocation here for filename %s \n",obj->filename);
-  char fname[2*MAX_MODEL_PATHS+1]={0};
+  char fname[2*MAX_MODEL_PATHS+100]={0};
   snprintf(fname,2*MAX_MODEL_PATHS,"%s/%s.obj",obj->directory , obj->filename);
 
   fprintf(stderr,"Opening File %s ..\n",fname);
@@ -517,7 +521,7 @@ int readOBJ(struct OBJ_Model * obj)
   numvertices = 0;
   numnormals = 0;
   numcolors = 0;
-  numfaces = 0;
+  //numfaces = 0;
   cur_group = AddGroup(obj,"default");
   obj->groups[0].material=0;
   while(fscanf(file, "%s", buf) != EOF)

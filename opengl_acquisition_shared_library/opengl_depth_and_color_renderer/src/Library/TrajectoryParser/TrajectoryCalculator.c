@@ -625,13 +625,13 @@ int fillPosWithFrame(
 
     if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
     {
-        /*
+      /*
        fprintf(stderr,
                "Populating non interpolated joints for frame %u  ( %u joints ) \n",
                FrameIDToReturn ,
                stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints
               );
-*/
+       */
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
        double rotCur[4]={0};
@@ -640,16 +640,33 @@ int fillPosWithFrame(
        {
         float * f=&joints[16*i];
         double m[16]={0};
+
+        //Euler Rotation
+        //---------------------------------------------------------------------------------------------------------------------------------
         if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useEulerRotation)
         {
+          if (!stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].eulerRotationOrder)
+          {
+              fprintf(stderr,RED "fillPosWithFrame: Empty eulerRotationOrder %u #%u/%u \n" NORMAL,FrameIDToReturn,i,numberOfJoints);
+          }
+
          rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = 0.0;
 
-         create4x4MatrixFromEulerAnglesXYZ(m,rotCur[0],rotCur[1],rotCur[2]);
-         copy4x4DMatrixToF(f,m);
+         create4x4DMatrixFromEulerAnglesWithRotationOrder(
+                                                          m,
+                                                          rotCur[0],
+                                                          rotCur[1],
+                                                          rotCur[2],
+                                                          (unsigned int) stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].eulerRotationOrder
+                                                        );
+
+         copy4x4DMatrixTo4x4F(f,m);
         } else
+        //Quaternion Rotation
+        //---------------------------------------------------------------------------------------------------------------------------------
         if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useQuaternion)
         {
          rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
@@ -658,23 +675,32 @@ int fillPosWithFrame(
          rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
 
          quaternion2Matrix4x4(m,rotCur,0);
-         copy4x4DMatrixToF(f,m);
+         copy4x4DMatrixTo4x4F(f,m);
         } else
+        //Matrix 4x4 Matrix
+        //---------------------------------------------------------------------------------------------------------------------------------
         if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useMatrix4x4)
-        { //If we want to use a 4x4 matrix then just copy it..
+        {
+          //If we want to use a 4x4 matrix then just copy it..
+          copy4x4FMatrix(
+                          f,
+                          stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].m
+                        );
+          /*
           float *s = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].m;
           for (z=0; z<16; z++)
             {
               f[z]=s[z];
-            }
+            }*/
         } else
+        //Not used so identity 4x4 Matrix
+        //---------------------------------------------------------------------------------------------------------------------------------
         {
          //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
-         create4x4IdentityMatrixF(f);
+         create4x4FIdentityMatrix(f);
         }
-
+        //---------------------------------------------------------------------------------------------------------------------------------
        }
-
     }
 
     return 1;
@@ -766,9 +792,15 @@ int fillJointsWithInterpolatedFrame(
          //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
          //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
          //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
-         create4x4MatrixFromEulerAnglesZYX(m,rotTot[0],rotTot[1],rotTot[2]);
+         create4x4DMatrixFromEulerAnglesWithRotationOrder(
+                                                          m,
+                                                          (double) rotTot[0],
+                                                          (double) rotTot[1],
+                                                          (double) rotTot[2],
+                                                          (unsigned int) stream->object[ObjID].frame[NextFrame].jointList->joint[i].eulerRotationOrder
+                                                        );
          //create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
-         copy4x4DMatrixToF(f,m);
+         copy4x4DMatrixTo4x4F(f,m);
         } else
        if (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)
@@ -987,6 +1019,9 @@ int calculateVirtualStreamPos(
                                float * scaleZ
                              )
 {
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
+   //First job, check if everything is ok..!
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
    if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
@@ -999,7 +1034,7 @@ int calculateVirtualStreamPos(
    if ( (ObjID==0) && (stream->object[ObjID].numberOfFrames == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
     else
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
-
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
 
    if (
         (stream->autoRefresh != 0 ) ||
@@ -1039,14 +1074,16 @@ int calculateVirtualStreamPos(
    } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) || ((stream->alwaysShowLastFrame)) )
    {
-
     //We might want to ignore time and just return frame after frame on each call!
     //Also if we only got one frame for the object there is no point in trying to interpolate time etc.. so just handle things here..
-
-
     if ( stream->object[ObjID].lastFrame +1 >= stream->object[ObjID].MAX_numberOfFrames ) { stream->object[ObjID].lastFrame  = 0; }
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;
+
+
+    //OK new rules.. ------------------------------------------------------
+    // If we ignore time we suppose that the time given is the frame number so we use this ..!
+    FrameIDToReturn = timeAbsMilliseconds;
 
 
     if (stream->alwaysShowLastFrame)

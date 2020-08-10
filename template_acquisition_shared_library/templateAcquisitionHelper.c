@@ -10,9 +10,14 @@
   #define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
 #endif // ENABLE_PNG
 
+#if ENABLE_JPG
+  #define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
+#endif // ENABLE_PNG
 
  #if USE_CODEC_LIBRARY
   #include "../tools/Codecs/codecs.h"
+ #else
+  //#error "No codec library, will not compile.."
  #endif // USE_CODEC_LIBRARY
 
 
@@ -346,10 +351,10 @@ unsigned int findExtensionOfDataset(
   unsigned int i=0,tryStyle=0;
   while (i<4)
   {
-   if (i==0) { strncpy(colorExtension,"pnm",MAX_EXTENSION_PATH); } else
-   if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH); } else
-   if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); } else
-   if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); } else
+   if (i==0) { strncpy(colorExtension,"pnm",MAX_EXTENSION_PATH);  } else
+   if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH);  } else
+   if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH);  } else
+   if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH);  } else
    if (i==4) { strncpy(colorExtension,"cpnm",MAX_EXTENSION_PATH); }
 
    tryStyle=0;
@@ -366,10 +371,10 @@ unsigned int findExtensionOfDataset(
   i=0;
   while (i<4)
   {
-   if (i==0) { strncpy(depthExtension,"pnm",MAX_EXTENSION_PATH); } else
-   if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH); } else
-   if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); } else
-   if (i==3) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }else
+   if (i==0) { strncpy(depthExtension,"pnm",MAX_EXTENSION_PATH);  } else
+   if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH);  } else
+   if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH);  } else
+   if (i==3) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH);  } else
    if (i==4) { strncpy(colorExtension,"cpnm",MAX_EXTENSION_PATH); }
 
    tryStyle=0;

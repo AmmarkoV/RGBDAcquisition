@@ -104,63 +104,63 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="OpenGLAcquisition.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_obj.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/ppm.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_obj.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TextureLoader/ppm.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/ppm.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TextureLoader/ppm.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/InputParser_C.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryCalculator.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryCalculator.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParser.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParser.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryPrimitives.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/glx.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryPrimitives.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/System/glx.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/glx.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/main.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/System/glx.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/save_to_file.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/save_to_file.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/scene.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Scene/scene.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/scene.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/shader_loader.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/tools.c">
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Scene/scene.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/shader_loader.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Tools/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/tools.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/Library/Tools/tools.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

@@ -9,7 +9,7 @@
 #include <GL/gl.h>
 
 #include "../Scene/scene.h"
-#include "glx.h"
+#include "glx2.h"
 
 
 #define NORMAL   "\033[0m"
@@ -37,8 +37,9 @@ static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg )
 }
 
 
-int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
+int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **argv)
 {
+  fprintf(stderr,"start_glx2_stuff\n");
   XVisualInfo         *vi;
   Colormap             cmap;
   XSetWindowAttributes swa;

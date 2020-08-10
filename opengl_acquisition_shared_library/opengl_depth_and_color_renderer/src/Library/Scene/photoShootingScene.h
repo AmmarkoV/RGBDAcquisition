@@ -21,6 +21,7 @@ void * createPhotoshoot(
                         float angleX,float angleY,float angleZ ,
                         float angXVariance ,float angYVariance , float angZVariance
                        );
+
 int renderPhotoshoot( void * context  );
 int sceneSwitchKeyboardControl(int newVal);
 

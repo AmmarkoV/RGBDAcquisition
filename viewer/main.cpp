@@ -191,7 +191,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
     if (!noinput)
     {
     float msWaitTime = ((float) 1000/framerate) ;
-    int key = cvWaitKey(msWaitTime/3);
+    int key = waitKey(msWaitTime/3);
     if (key != -1)
 			{
 				key = 0x000000FF & key;
@@ -222,7 +222,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
     } else
     {
-     cvWaitKey(1);
+     waitKey(1);
     }
 
 
@@ -243,11 +243,11 @@ if (drawColor)
        #define ZERO_COPY 0
        
        #if ZERO_COPY 
-        cv::cvtColor(rgbImage, rgbImage, CV_RGB2BGR );
+        cv::cvtColor(rgbImage, rgbImage, COLOR_RGB2BGR );
         imshow( "RGB Feed", rgbImage);
        #else 
         Mat bgrImage;
-        cv::cvtColor(rgbImage,bgrImage,  CV_RGB2BGR );
+        cv::cvtColor(rgbImage,bgrImage,  COLOR_RGB2BGR );
         imshow( "RGB Feed", bgrImage);
        #endif
       }

@@ -73,15 +73,59 @@ GLuint      vao=0;
 GLuint      bufferVao=0;
 GLuint      bufferSkyboxVao=0;
 
- GLuint vPosition , vNormal , vColor , vTexture , lightPositionLocation  , materialColorLocation;
- GLuint fogLocation  , modelViewMatrixLocation  , modelViewProjectionMatrixLocation  , normalTransformationLocation;
- GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1Location , normalTextureLocation , skyboxLocation , textureStrengthLocation ;
+GLuint vPosition , vNormal , vColor , vTexture , lightPositionLocation  , materialColorLocation;
+GLuint fogLocation  , modelViewMatrixLocation  , modelViewProjectionMatrixLocation  , normalTransformationLocation;
+GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1Location , normalTextureLocation , skyboxLocation , textureStrengthLocation;
 
 
 
 //Just to make codeblocks display the function without the grayout
 //#define USE_GLEW 1
 
+int  shaderOGLLighting(struct rendererConfiguration * config)
+{ 
+  #warning "GL_COLOR does not even exist"
+  //glEnable(GL_COLOR);
+  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
+  glEnable(GL_COLOR_MATERIAL);
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
+
+  #if USE_LIGHTS
+   if (config->useLighting)
+   {
+      GLfloat light_position[] = { config->lightPos[0], config->lightPos[1], config->lightPos[2] , 1.0 };
+      GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0 };
+  
+      GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_shininess[] = { 50.0 };
+  
+  
+      glEnable(GL_LIGHT0);
+      glEnable(GL_LIGHTING);
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
+      glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+      glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+      glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+      glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
+
+      GLenum faces=GL_FRONT; //GL_FRONT_AND_BACK;//
+      glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
+      glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
+      glMaterialfv(faces, GL_SPECULAR,   mat_specular);
+      glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }  
+      return 1;
+   }
+  #else
+   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
+   return 0; 
+  #endif // USE_LIGHTS
+}
 
 
 int startOGLShaderPipeline(struct rendererConfiguration * config)
@@ -153,33 +197,7 @@ int startOGLShaderPipeline(struct rendererConfiguration * config)
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
 
-
-  #warning "GL_COLOR does not even exist"
-  //glEnable(GL_COLOR);
-  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
-  glEnable(GL_COLOR_MATERIAL);
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
-
-  #if USE_LIGHTS
-   glEnable(GL_LIGHT0);
-   glEnable(GL_LIGHTING);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
-   glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-   glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
-
-   GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
-   glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
-   glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
-   glMaterialfv(faces, GL_SPECULAR,   mat_specular);
-   glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }
-  #else
-   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
-  #endif // USE_LIGHTS
-
+ shaderOGLLighting(&config);
 
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
   //Enable Culling
@@ -232,21 +250,17 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 
 
 
-
-
-
-
 void doOGLShaderDrawCalllist(
-                              float * projectionMatrix ,
-                              float * viewMatrix ,
-                              float * modelMatrix ,
-                              float * mvpMatrix ,
+                              const float * projectionMatrix ,
+                              const float * viewMatrix ,
+                              const float * modelMatrix ,
+                              const float * mvpMatrix ,
                               //-----------------------------------------------------
-                              float * vertices ,       unsigned int numberOfVertices ,
-                              float * normals ,        unsigned int numberOfNormals ,
-                              float * textureCoords ,  unsigned int numberOfTextureCoords ,
-                              float * colors ,         unsigned int numberOfColors ,
-                              unsigned int * indices , unsigned int numberOfIndices
+                              const float * vertices ,       unsigned int numberOfVertices ,
+                              const float * normals ,        unsigned int numberOfNormals ,
+                              const float * textureCoords ,  unsigned int numberOfTextureCoords ,
+                              const float * colors ,         unsigned int numberOfColors ,
+                              const unsigned int * indices , unsigned int numberOfIndices
                              )
 {
   fprintf(stderr,"doOGLShaderDrawCalllist\n");
@@ -260,7 +274,7 @@ void doOGLShaderDrawCalllist(
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
-    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
+    fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
 
 
   int generateNewBuffer=1;

@@ -66,6 +66,30 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_converter.h
             ModelLoader/model_editor.c
             ModelLoader/model_editor.h
+            #Motion Capture and how to load it
+            MotionCaptureLoader/bvh_loader.c
+            MotionCaptureLoader/calculate/bvh_transform.c
+            MotionCaptureLoader/calculate/bvh_project.c
+            MotionCaptureLoader/calculate/bvh_to_tri_pose.c
+            MotionCaptureLoader/import/fromBVH.c
+            MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
+            MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
+            MotionCaptureLoader/export/bvh_to_svg.c
+            MotionCaptureLoader/export/bvh_to_csv.c
+            MotionCaptureLoader/export/bvh_to_bvh.c
+            MotionCaptureLoader/export/bvh_export.c 
+            MotionCaptureLoader/edit/bvh_randomize.c 
+            MotionCaptureLoader/edit/bvh_rename.c 
+            MotionCaptureLoader/edit/bvh_remapangles.c 
+            MotionCaptureLoader/edit/bvh_interpolate.c 
+            MotionCaptureLoader/edit/bvh_filter.c 
+            MotionCaptureLoader/edit/bvh_merge.c 
+            MotionCaptureLoader/edit/bvh_cut_paste.c 
+            #Inverse Kinematics
+            MotionCaptureLoader/ik/bvh_inverseKinematics.c
+            MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c
+            MotionCaptureLoader/ik/levmar.c
+            MotionCaptureLoader/tests/test.c
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
@@ -99,20 +123,16 @@ add_library(OGLRendererSandbox SHARED
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
             #AmMatrix dependencies 
-            ../../../../tools/AmMatrix/matrix3x3Tools.c
-            ../../../../tools/AmMatrix/matrix3x3Tools.h
-            ../../../../tools/AmMatrix/matrix4x4Tools.c
-            ../../../../tools/AmMatrix/matrix4x4Tools.h
-            ../../../../tools/AmMatrix/quaternions.c
-            ../../../../tools/AmMatrix/quaternions.h
+            ../../../../tools/AmMatrix/matrix3x3Tools.c 
+            ../../../../tools/AmMatrix/matrix4x4Tools.c 
+            ../../../../tools/AmMatrix/matrixMultiplicationOptimization.c
+            ../../../../tools/AmMatrix/quaternions.c 
             #../../../../tools/AmMatrix/matrixProject.c
             #../../../../tools/AmMatrix/matrixProject.c
-            ../../../../tools/AmMatrix/matrixCalculations.c
-            ../../../../tools/AmMatrix/matrixCalculations.h
-            ../../../../tools/AmMatrix/matrixOpenGL.c
-            ../../../../tools/AmMatrix/matrixOpenGL.h
-            ../../../../tools/AmMatrix/solveLinearSystemGJ.c
-            ../../../../tools/AmMatrix/solveLinearSystemGJ.h
+            ../../../../tools/AmMatrix/matrixCalculations.c 
+            ../../../../tools/AmMatrix/matrixOpenGL.c 
+            ../../../../tools/AmMatrix/solveLinearSystemGJ.c 
+            ../../../../tools/AmMatrix/simpleRenderer.c 
             #ImageOperations dependencies
             ../../../../tools/ImageOperations/depthClassifier.c
             ../../../../tools/ImageOperations/convolutionFilter.c
@@ -138,7 +158,7 @@ add_library(OGLRendererSandbox SHARED
             Interfaces/webInterface.c 
             Interfaces/webInterface.h
            ) 
-target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ${HTTP_Libs} ) 
+target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs pthread ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ${HTTP_Libs} ) 
  
  
 

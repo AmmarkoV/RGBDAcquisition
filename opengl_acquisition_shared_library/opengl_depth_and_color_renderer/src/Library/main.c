@@ -19,7 +19,9 @@
 #include "ModelLoader/model_loader_obj.h"
 #include "ModelLoader/model_loader_tri.h"
 #include "ModelLoader/model_converter.h"
+
 #include "Scene/scene.h"
+#include "Scene/photoShootingScene.h"
 
 #include "Rendering/downloadFromRenderer.h"
 
@@ -80,7 +82,7 @@ void checkFrameGettersForError(char * from)
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
-   return downloadOpenGLDepth(depth,x,y,width,height,sceneGetDepthScalingPrameter());
+   return downloadOpenGLDepth((unsigned short*)depth,x,y,width,height,sceneGetDepthScalingPrameter());
 }
 
 unsigned int getOpenGLWidth()
@@ -93,11 +95,15 @@ unsigned int getOpenGLHeight()
     return HEIGHT;
 }
 
-int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+unsigned int getOpenGLTimestamp()
 {
-   return downloadOpenGLColor(color,x,y,width,height);
+    return getLoadedScene()->timestampToUse;
 }
 
+int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+{
+   return downloadOpenGLColor((unsigned char*) color,x,y,width,height);
+}
 
 void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
@@ -111,8 +117,6 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
     if (rgb!=0) { free(rgb); rgb=0; }
     return ;
 }
-
-
 
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
@@ -168,7 +172,74 @@ double getOpenGLPixelSize()
  return 2/WIDTH;
 }
 
+int controlScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
+{
+ if (name==0) { return 0; }
+ if (variable==0) { return 0; }
+ //TODO:
+ /* THIS SHOULD BE THE SAME AS OpenGLAcquisition.h
+  OPENGL_ACQUISITION_NOCONTROL=0,          //0
+  OPENGL_ACQUISITION_POSITION_XYZ,         //1
+  OPENGL_ACQUISITION_ROTATION_XYZ,         //2
+  OPENGL_ACQUISITION_JOINT_ROTATION_XYZ,   //3
+  OPENGL_ACQUISITION_JOINT_ROTATION_ZXY,   //4
+  OPENGL_ACQUISITION_JOINT_ROTATION_ZYX,   //5
+  OPENGL_ACQUISITION_JOINT_ROTATION_TEST,  //6
+  OPENGL_ACQUISITION_COLOR_RGB,            //7
+*/
+ float coords[4]={0};
+ char doRotationControl=0;
+  switch(control)
+  {
+     case 0: //OPENGL_ACQUISITION_NOCONTROL
+       return 0;
+     break;
+     case 1: //OPENGL_ACQUISITION_POSITION_XYZ
+       coords[0]=valueA;
+       coords[1]=valueB;
+       coords[2]=valueC;
+       return moveAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,0,coords,3);
+     break;
+     case 2: //OPENGL_ACQUISITION_ROTATION_XYZ
+       fprintf(stderr,"OPENGL_ACQUISITION_ROTATION_XYZ not implemented..!\n");
+       return 0;
+     break;
+     case 3: //OPENGL_ACQUISITION_JOINT_ROTATION_XYZ
+       coords[0]=valueA;
+       coords[1]=valueB;
+       coords[2]=valueC;
+       doRotationControl=1;
+     break;
+     case 4: //OPENGL_ACQUISITION_JOINT_ROTATION_ZXY
+       coords[0]=valueC;
+       coords[1]=valueA;
+       coords[2]=valueB;
+       doRotationControl=1;
+     break;
+     case 5: //OPENGL_ACQUISITION_JOINT_ROTATION_ZYX
+       coords[0]=valueC;
+       coords[1]=valueB;
+       coords[2]=valueA;
+       doRotationControl=1;
+     break;
+     case 6: //OPENGL_ACQUISITION_JOINT_ROTATION_NEGATIVE_XYZ
+       coords[0]=-1*valueA;
+       coords[1]=-1*valueB;
+       coords[2]=-1*valueC;
+       doRotationControl=1;
+     break;
+     case 7: //OPENGL_ACQUISITION_COLOR_RGB
+       fprintf(stderr,"OPENGL_ACQUISITION_COLOR_RGB not implemented..!\n");
+     break;
+     default :
+       fprintf(stderr,"Unhandled control (%u) for controlScene call\n",control);
+       return 0;
+  };
 
+  if (doRotationControl)
+      { return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3); }
+  return 0;
+}
 
 int passUserCommand(const char * command,const char * value)
 {
@@ -192,14 +263,14 @@ int setKeyboardControl(int val)
 
 
 
-int startOGLRendererSandbox(int argc, char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
+int startOGLRendererSandbox(int argc,const char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
 {
-  fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
+  //fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   snapsPerformed=0;
 
-  char ** testP=0;
-  fprintf(stderr,"trying to start glx code with a window request ( %ux%u , viewWindow=%u ).. ",width,height,viewWindow);
-   if ( !start_glx_stuff(width,height,openGLVersion,viewWindow,0,testP) )
+  //char ** testP=0;
+  fprintf(stderr,"trying to start glx code with configuration ( %ux%u , viewWindow=%u )..\n",width,height,viewWindow);
+   if ( !start_glx_stuff(width,height,openGLVersion,viewWindow,argc,argv/*0,testP*/) )
    {
      return 0;
    }
@@ -304,8 +375,8 @@ int saveSnapshotOfObjects()
              (pHeight<HEIGHT)
            )
         {
-         saveTileRGBToFile(0,i,rgb, minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
-         saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+         saveTileRGBToFile(0,i,(unsigned char*) rgb,minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+         saveTileDepthToFile(0,i,(unsigned short*) zshortbuffer,minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
         }
       }
 
@@ -507,7 +578,7 @@ int dumpModelFileH(const char * inputfile,const char * outputfile)
     {
 
 
-      fprintf(stderr,"Writing %u vertices .. \n",obj->numVertices);
+      fprintf(stderr,"Writing %lu vertices .. \n",obj->numVertices);
       fprintf(fd,"const float %sVertices[] = { ",outputfile);
        unsigned int i=0,j=0;
        for(i=0; i<obj->numGroups; i++)
@@ -538,7 +609,7 @@ int dumpModelFileH(const char * inputfile,const char * outputfile)
 
 
 
-        fprintf(stderr,"Writing %u normals .. \n",obj->numNormals);
+        fprintf(stderr,"Writing %lu normals .. \n",obj->numNormals);
         fprintf(fd,"const float %sNormals[] = { ",outputfile);
 
        for(i=0; i<obj->numGroups; i++)

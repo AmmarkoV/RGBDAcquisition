@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "../../Library/OGLRendererSandbox.h"
+#include "../../Library/Scene/scene.h"
 
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
@@ -39,8 +40,8 @@ static int myMkdir(const char * prefix,const char * dirname)
 {
     char filename[FILENAME_MAX]= {0};
     // - - - - - - - - - - - - - - - -
-    if ( (prefix==0)||(dirname==0) ) { return 0; }
-    if ( (prefix==0)&&(dirname!=0) ) { snprintf(filename,FILENAME_MAX,"mkdir -p %s",dirname); }
+    if ( (prefix==0)||(dirname==0) ) { return 0; } else
+    if ( (prefix==0)&&(dirname!=0) ) { snprintf(filename,FILENAME_MAX,"mkdir -p %s",dirname); } else
     if ( (prefix!=0)&&(dirname==0) ) { snprintf(filename,FILENAME_MAX,"mkdir -p %s",prefix); } else
                                      { snprintf(filename,FILENAME_MAX,"mkdir -p %s/%s",prefix,dirname); }
 
@@ -79,7 +80,7 @@ int reallyFastCheckForLinuxGPUWithoutPBuffer()
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
 
     double * rodriguez = (double*) malloc(sizeof(double) * 3 );

@@ -16,7 +16,7 @@ unsigned int defaultWidth=640;
 unsigned int defaultHeight=480;
 unsigned int defaultFramerate=30;
 unsigned int transparency=0;
-unsigned char transR=0,transG=0,transB=0;
+unsigned char transR=0,transG=0,transB=0,transThreshold=0;
 signed int shiftX=0;
 signed int shiftY=0;
 signed int shiftTime=0;
@@ -146,6 +146,14 @@ int main(int argc, char *argv[])
                                            //Transparency 0 = no transparency , transparency 100 = full transparency
                                            fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
+    if  (
+          (strcmp(argv[i],"-transparencyThreshold")==0)
+        )
+                                         {
+                                           transThreshold=atoi(argv[i+1]);
+                                           //Transparency 0 = no transparency , transparency 100 = full transparency
+                                           fprintf(stderr,"Setting transparency threshold to %u \n",transThreshold);
+                                         } else
     if (
         (strcmp(argv[i],"-module")==0) ||
         (strcmp(argv[i],"-module1")==0) ||
@@ -237,6 +245,15 @@ int main(int argc, char *argv[])
                                            makepath(outputfoldername);
                                            fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
                                          }
+  else
+    if (
+        (strcmp(argv[i],"-resolution")==0)
+       )
+                                         {
+                                           defaultWidth=atoi(argv[i+1]);
+                                           defaultHeight=atoi(argv[i+2]);
+                                           fprintf(stderr,"Resolution, set to %u x %u  \n",defaultWidth,defaultHeight);
+                                         }
   }
 
   if (moduleID_1==SCRIPTED_ACQUISITION_MODULE)
@@ -306,9 +323,11 @@ int main(int argc, char *argv[])
   if (strlen(inputname2)<1) { devName2=0; }
 
     //Initialize Every OpenNI Device
+    fprintf(stderr,"Initializing device 1 @ %ux%u:%u\n",defaultWidth,defaultHeight,defaultFramerate);
     acquisitionOpenDevice(moduleID_1,devID_1,devName1,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
+    fprintf(stderr,"Initializing device 2 @ %ux%u:%u\n",defaultWidth,defaultHeight,defaultFramerate);
     acquisitionOpenDevice(moduleID_2,devID_2,devName2,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
@@ -396,7 +415,7 @@ int main(int argc, char *argv[])
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,
            depthOut ,
-           transR,transG,transB,
+           transR,transG,transB,transThreshold,
            shiftX,shiftY,
            widthRGB , heightRGB ,
            transparency , 0 );

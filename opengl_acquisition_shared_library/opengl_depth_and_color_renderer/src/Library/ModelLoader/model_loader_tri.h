@@ -21,12 +21,23 @@ extern "C"
 #include "model_loader_setup.h"
 
 
+
+
+
 /**
 * @brief TRI_LOADER_VERSION is a compatibility switch , every time this changes it invalidates all older files in order
          to keep the spec as clean as possible
 * @ingroup TRI
 */
-#define TRI_LOADER_VERSION 8
+#define TRI_LOADER_VERSION 9
+///IF I EVER CHANGE THE VERSION AGAIN I SHOULD ALWAYS UPDATE LAST STABLE COMMIT INSIDE MODEL_LOADER_TRI..!
+
+
+
+
+
+
+
 
 /**
 * @brief Each bone has a parent ( if the parent has the same ID as the node it is the root )  , some transforms , weights and limits
@@ -55,12 +66,23 @@ struct TRI_Bones_Header
   double minXRotation , rotX , maxXRotation;
   double minYRotation , rotY , maxYRotation;
   double minZRotation , rotZ , maxZRotation;
-  unsigned char rotationSet , rotationLimitsSet;
+  double minWRotation , rotW , maxWRotation;
 
+  unsigned char rotationSet , rotationLimitsSet;
+  unsigned char isEulerRotation;
+  unsigned char eulerRotationOrder;
+  unsigned char isQuaternionRotation;
 //-------------------------------------------
   unsigned int  allocatedNumberOfBoneChildren; //This is used when doing recursions , should be the same with numberOfBoneChildren
   unsigned int  numberOfBoneChildren;
 //-------------------------------------------
+
+
+ //In order not to break this file format ever again
+ unsigned char notUsed1;
+ unsigned char notUsed2;
+ unsigned int notUsed3;
+ unsigned int notUsed4;
 };
 
 /**
@@ -224,6 +246,19 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 */
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 
+
+
+
+/**
+* @brief  Force a specific color on all vertices of TRI file
+* @ingroup TRI
+* @param  input TRI structure with mesh we want to color
+* @param  R channel value ( 0-255 )
+* @param  G channel value ( 0-255 )
+* @param  B channel value ( 0-255 )
+* @retval 0=Failure,1=Success
+*/
+int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
 
 /**
 * @brief  Save TRI model to a file

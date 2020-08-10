@@ -44,9 +44,12 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       float x3D , y3D , z3D , angleX , angleY , angleZ;
       tiledRenderer_get3DCenterForTile(trConf , column, row ,&x3D , &y3D , &z3D , &angleX , &angleY , &angleZ);
-      float posX = x3D , posY = y3D , posZ = z3D;
+      float pos3DF[3];
+      pos3DF[0]=x3D;
+      pos3DF[1]=y3D;
+      pos3DF[2]=z3D;
 
-      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win);
+      _glhProjectf(pos3DF, modelview, projection, viewport, win);
 
       fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column,row , x3D , y3D , z3D , win[0] , win[1] , win[2]);
 
@@ -123,19 +126,16 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
   struct ModelList * modelstorage = ( struct ModelList* ) trConf->modelStoragePTR;
   if (modelstorage->models==0) { fprintf(stderr,"ModelList not properly allocated..\n"); return 0; }
 
-
-  fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
-  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
-  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
-
-
-  if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
-                { setupTiledRendererOGL(0.0,0.0,0.0); }
-
-
-  fprintf(stderr,"setupTiledRendererOGL done \n");
-  if (scene!=0)
+  if (scene!=0) 
     {
+       if (scene->object==0) { fprintf(stderr,"Object List not properly allocated..\n"); return 0; }
+
+       fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
+       fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
+       fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
+ 
+        
+       setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB);
        unsigned char noColor=0;
        float posStack[POS_COORD_LENGTH]={0};
        float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
@@ -226,7 +226,8 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                    drawModelAt(
                                 mod,
                                 pos[POS_X],pos[POS_Y],pos[POS_Z],
-                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ],
+                                mod->rotationOrder
                               );
                 }
             }
@@ -243,6 +244,10 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                     pos[POS_ANGLEY],
                     pos[POS_ANGLEZ]
               );
+    } else
+    {
+      fprintf(stderr,"Scene not declared..\n");
+      return 0;
     }
 
    glPopMatrix();

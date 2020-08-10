@@ -63,6 +63,7 @@ struct Joint
   char altered;
   float x , y , z , scaleX ,scaleY, scaleZ;
   char useEulerRotation;
+  char eulerRotationOrder;
   char useQuaternion;
   float rot1 , rot2 , rot3 , rot4;
   char useMatrix4x4;
@@ -85,6 +86,9 @@ struct KeyFrame
    float x , y , z , scaleX ,scaleY, scaleZ;
    float rot1 , rot2 , rot3 , rot4;
    unsigned char isQuaternion;
+   unsigned char isEulerRotation;
+   //Rotation order is set for each model not for each keyframe..
+   //unsigned char eulerRotationOrder;
 
    float R , G , B , Alpha ;
    unsigned char hasColor;
@@ -227,6 +231,9 @@ struct VirtualStreamControls
 
   unsigned int tickUSleepTime;
   unsigned int pauseTicking;
+  unsigned int lastTickMillisecond;
+
+
   float farPlane; //<--be aware that this has an effect on the depth maps generated
   float nearPlane; //<--this also
   float fieldOfView;
@@ -250,7 +257,6 @@ struct VirtualStreamControls
 */
 struct VirtualStream
 {
-
     //--------------------------------------------------------
     // These are the matrices actively used by OpenGL
     // to render the scene
@@ -261,7 +267,6 @@ struct VirtualStream
      double activeNormalTransformation[16];
     //--------------------------------------------------------
     //--------------------------------------------------------
-
 
     //--------------------------------------------------------
     // These are matrices declared on the scene file that
@@ -348,7 +353,9 @@ struct VirtualStream
 
     unsigned int userCanMoveCameraOnHisOwn;
     unsigned int playback;
+
     float rate;
+    unsigned int forceRateRegardlessOfGPUSpeed;
 
     unsigned int autoRefresh;
     unsigned int autoRefreshForce;
@@ -365,9 +372,20 @@ struct VirtualStream
 
     char renderWireframe;
 
+    char useLightingSystem;
+    float lightPosition[3];
+
     unsigned int objDeclarationsOffset;
+
+    //TicksF is only used when we have set a specific rate
+    //to ensure that we can progress frames even on incredibly fast
+    //framerates or very slow rendering speeds..
+    float ticksF;
+    //Timestamp is the timestamp of our Rendering
     unsigned int timestamp;
+    //Ticks is internal renderer clock..
     unsigned int ticks;
+    unsigned int timestampToUse;
 
     char filename[MAX_PATH+1];
 };

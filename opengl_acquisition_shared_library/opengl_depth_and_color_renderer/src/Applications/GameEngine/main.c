@@ -44,6 +44,10 @@ int main(int argc, char **argv)
         }
     }
 
+    if (argc==1)
+    {
+         fprintf(stderr,"You have not given any arguments to the Renderer , please consider giving --from Scenes/test.conf for example.. \n");
+    }
 
 
     int started = 0;
@@ -78,7 +82,6 @@ int main(int argc, char **argv)
 
 
 
-    char aString[512]={0};
     float coords[7]={0,0,4,0,0,0};
     for (i=0; i<100; i++)
     {

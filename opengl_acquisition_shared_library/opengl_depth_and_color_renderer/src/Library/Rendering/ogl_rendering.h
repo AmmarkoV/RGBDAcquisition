@@ -6,6 +6,10 @@
 #define OGL_RENDERING_H_INCLUDED
 
 
+//Master Switch for lighting..
+#define USE_LIGHTS 1
+
+
 #define MAX_SHADER_FILENAMES 512
 
 struct rendererConfiguration
@@ -17,6 +21,8 @@ char vertexShaderFile[MAX_SHADER_FILENAMES];
 char * selectedVertexShader;
 struct shaderObject * loadedShader;
 int useShaders;
+int useLighting;
+float lightPos[3];
 //--------------------------------------
 
 int doCulling;
@@ -34,7 +40,7 @@ int resetRendererOptions();
 */
 int startOGLRendering();
 
-
+int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int boneSizes);
 
 int renderOGLBones(
                  float * pos ,
@@ -43,16 +49,16 @@ int renderOGLBones(
                 );
 
 int renderOGL(
-               float * projectionMatrix ,
-               float * viewMatrix ,
-               float * modelMatrix ,
-               float * mvpMatrix ,
+               const float * projectionMatrix ,
+               const float * viewMatrix ,
+               const float * modelMatrix ,
+               const float * mvpMatrix ,
                //-------------------------------------------------------
-               float * vertices ,       unsigned int numberOfVertices ,
-               float * normal ,         unsigned int numberOfNormals ,
-               float * textureCoords ,  unsigned int numberOfTextureCoords ,
-               float * colors ,         unsigned int numberOfColors ,
-               unsigned int * indices , unsigned int numberOfIndices
+               const float * vertices ,       unsigned int numberOfVertices ,
+               const float * normal ,         unsigned int numberOfNormals ,
+               const float * textureCoords ,  unsigned int numberOfTextureCoords ,
+               const float * colors ,         unsigned int numberOfColors ,
+               const unsigned int * indices , unsigned int numberOfIndices
              );
 
 /**

@@ -205,6 +205,17 @@ void InputParser_Destroy(struct InputParserC * ipc);
 unsigned char InputParser_SelfCheck(struct InputParserC * ipc);
 
 
+
+
+/**
+ * @brief Retrieve the number of arguments seperated from the last InputParser_SeperateWords call
+ * @ingroup InputParser
+ * @param InputParser Context to be used ( needs to be created using InputParser_Create )
+ * @retval Number of arguments tokenized , 0=No arguments/Error
+ */
+unsigned int InputParser_GetNumberOfArguments(struct InputParserC * ipc);
+
+
 /**
  * @brief Check if a word ( InputParser_GetWord ) is empty after issuing a InputParser_SeperateWords call
  * @ingroup InputParser

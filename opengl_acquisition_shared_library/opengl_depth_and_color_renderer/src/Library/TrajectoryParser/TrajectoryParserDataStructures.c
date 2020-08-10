@@ -7,6 +7,10 @@
 #include "TrajectoryCalculator.h"
 
 #include "../ModelLoader/model_loader_hardcoded.h"
+#include "../ModelLoader/model_loader_tri.h"
+#include "../ModelLoader/model_loader_transform_joints.h"
+
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -143,7 +147,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-int dummy_strcasecmp_internal(char * input1, char * input2)
+int dummy_strcasecmp_internal(const char * input1,const char * input2)
 {
   #if CASE_SENSITIVE_OBJECT_NAMES
     return strcmp(input1,input2);
@@ -337,30 +341,28 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
 
 
 int addStateToObjectID(
-                               struct VirtualStream * stream ,
-                               unsigned int ObjID  ,
-                               unsigned int timeMilliseconds ,
-                               float * coord ,
-                               unsigned int coordLength ,
-                               float scaleX , float scaleY ,float scaleZ ,
-                               float R , float G , float B , float Alpha
+                        struct VirtualStream * stream ,
+                        unsigned int ObjID  ,
+                        unsigned int timeMilliseconds ,
+                        float * coord ,
+                        unsigned int coordLength ,
+                        float scaleX , float scaleY ,float scaleZ ,
+                        float R , float G , float B , float Alpha
                        )
 {
   //Todo check timeMilliseconds is our new state actually a replacement for an old one ?
-
-
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
   //Now we should definately have enough space for our new frame
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { fprintf(stderr,"Cannot add new POS instruction to Object %u \n",ObjID); return 0; }
 
   //We have the space so lets fill our new frame spot ..!
-
   unsigned int pos = stream->object[ObjID].numberOfFrames;
   ++stream->object[ObjID].numberOfFrames;
 
   // 1 is object name
   stream->object[ObjID].frame[pos].time = timeMilliseconds;
   stream->object[ObjID].frame[pos].isQuaternion = 0;
+  stream->object[ObjID].frame[pos].isEulerRotation = 0;
 
   stream->object[ObjID].frame[pos].scaleX = scaleX;
   stream->object[ObjID].frame[pos].scaleY = scaleY;
@@ -377,11 +379,14 @@ int addStateToObjectID(
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
   if (coordLength > 2 ) {  stream->object[ObjID].frame[pos].z = coord[2]; }
 
-  if (coordLength > 3 ) {stream->object[ObjID].frame[pos].rot1 = coord[3]; }
-  if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
-  if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
-  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
-  if (coordLength==7) { stream->object[ObjID].frame[pos].isQuaternion = 1; }
+  if (coordLength > 3 ) {  stream->object[ObjID].frame[pos].rot1 = coord[3];     }
+  if (coordLength > 4 ) {  stream->object[ObjID].frame[pos].rot2 = coord[4];     }
+  if (coordLength > 5 ) {  stream->object[ObjID].frame[pos].rot3 = coord[5];     }
+  if (coordLength > 6 ) {  stream->object[ObjID].frame[pos].rot4 = coord[6];     }
+
+  if (coordLength==6)   {  stream->object[ObjID].frame[pos].isEulerRotation = 1; } else
+  if (coordLength==7)   {  stream->object[ObjID].frame[pos].isQuaternion = 1;    } else
+                        {  fprintf(stderr,"addStateToObjectID: ObjID=%u frame[%u] incorrect rotation component..\n",ObjID,pos); }
 
   if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
     {
@@ -399,7 +404,7 @@ int addStateToObjectID(
    stream->object[ObjID].frame[pos].rot1 , stream->object[ObjID].frame[pos].rot2 , stream->object[ObjID].frame[pos].rot3 , stream->object[ObjID].frame[pos].rot4 );
   #endif
 
-  return 1;
+ return 1;
 }
 
 
@@ -438,33 +443,334 @@ int addStateToObjectMini(
  //fprintf(stderr,"addStateToObjectMini(%s,id=%u,found=%u)\n",name,ObjID,ObjFound);
  if (ObjFound)
   {
-     return addStateToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,
-                                    stream->object[ObjID].scaleX,
-                                    stream->object[ObjID].scaleY,
-                                    stream->object[ObjID].scaleZ,
-                                    stream->object[ObjID].R,
-                                    stream->object[ObjID].G,
-                                    stream->object[ObjID].B,
-                                    stream->object[ObjID].Transparency );
+     return addStateToObjectID(
+                               stream,ObjID,timeMilliseconds,
+                               coord,coordLength,
+                               stream->object[ObjID].scaleX,
+                               stream->object[ObjID].scaleY,
+                               stream->object[ObjID].scaleZ,
+                               stream->object[ObjID].R,
+                               stream->object[ObjID].G,
+                               stream->object[ObjID].B,
+                               stream->object[ObjID].Transparency
+                              );
   }
-  fprintf(stderr,"Could not Find object %s \n",name);
+  fprintf(stderr,"addStateToObjectMini: Could not Find object `%s`\n",name);
   return 0;
 }
+
+
+
+
+int getRotationOrderFromString(const char * rotationOrderStr)
+{
+ unsigned int rotationOrder=0;
+
+ if (strcmp(rotationOrderStr,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
+ if (strcmp(rotationOrderStr,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
+ if (strcmp(rotationOrderStr,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
+ if (strcmp(rotationOrderStr,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
+ if (strcmp(rotationOrderStr,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
+ if (strcmp(rotationOrderStr,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; } else
+ if (strcmp(rotationOrderStr,"rpy")==0) { rotationOrder=ROTATION_ORDER_RPY; }
+
+ return rotationOrder;
+}
+
+
+int changeObjectRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * rotationOrderStr
+                                )
+{
+ unsigned int objFound = 0;
+ unsigned int objTypeFound = 0;
+ unsigned int objID = getObjectID(stream,name,&objFound);
+
+
+ if(modelStorage!=0)
+ {
+ if (objFound)
+ {
+  unsigned int objTypeID = getObjectTypeID(stream,stream->object[objID].typeStr,&objTypeFound );
+  if (objTypeFound)
+  {
+    unsigned int modelID = stream->objectTypes[objTypeID].modelListArrayNumber;
+    struct Model *mod = &modelStorage->models[modelID];
+    mod->rotationOrder=getRotationOrderFromString(rotationOrderStr);
+    fprintf(stderr,"Setting rotation order %u for model %s \n",mod->rotationOrder,mod->pathOfModel);
+    return 1;
+  } else  { fprintf(stderr,"changeModelRotationOrder: Could not find object type..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: Could not find object..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: No model storage allocated\n"); }
+
+
+ return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int changeModelJointRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * jointName,
+                                  char * modelOrder
+                                )
+{
+ unsigned int boneIDResult;
+ unsigned int objFound = 0;
+ unsigned int objTypeFound = 0;
+ unsigned int objID = getObjectID(stream,name,&objFound);
+
+
+ if(modelStorage!=0)
+ {
+ if (objFound)
+ {
+  unsigned int objTypeID = getObjectTypeID(stream,stream->object[objID].typeStr,&objTypeFound );
+  if (objTypeFound)
+  {
+   unsigned int modelID = stream->objectTypes[objTypeID].modelListArrayNumber;
+   struct Model *mod = &modelStorage->models[modelID];
+   if (mod->type==TRI_MODEL)
+   {
+    struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
+
+    if ( findTRIBoneWithName(triM,jointName,&boneIDResult) )
+    {
+     unsigned int rotationOrder=getRotationOrderFromString(modelOrder);
+
+     if (
+         setTRIJointRotationOrder(
+                                  triM,
+                                  boneIDResult,
+                                  rotationOrder
+                                 )
+        )
+     {
+
+        return 1;
+
+     } else { fprintf(stderr,"changeModelRotationOrder: could not find a correct joint ..\n"); }
+    } else { fprintf(stderr,"changeModelRotationOrder: could not find joint..\n"); }
+   } else { fprintf(stderr,"changeModelRotationOrder: cannot change model rotation order on non TRI models, (objid=%u / objtype=%u / mod->type=%u) ..\n",objID,objTypeID,mod->type); }
+  } else  { fprintf(stderr,"changeModelRotationOrder: Could not find object type..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: Could not find object..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: No model storage allocated\n"); }
+
+
+ return 0;
+}
+
+
+int changeAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name  ,
+                                const char * jointName,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               )
+{
+ if (stream==0)                                     {   fprintf(stderr,"changeAllPosesInObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"changeAllPosesInObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"changeAllPosesInObjectState: Invalid values to add as a pose \n"); return 0; }
+
+ int foundExactTimestamp=0;
+ unsigned int ObjFound = 0;
+ //fprintf(stderr,"Adding pose to object %s \n",name);
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+ //fprintf(stderr,"Object Found = %u , Object ID = %u \n",ObjFound,ObjID);
+ if (ObjFound)
+  {
+    unsigned int pos=0;
+    if ( stream->object[ObjID].frame[pos].jointList !=0 )
+    {
+       //pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
+       if(stream->object[ObjID].numberOfFrames>0)
+       {
+        for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
+        {
+
+
+        unsigned int objectTypeID = stream->object[ObjID].type;
+
+        unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
+        //fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
+        if (modelID<modelStorage->currentNumberOfModels)
+        {
+        struct Model * mod = (struct Model *) &modelStorage->models[modelID];
+        if (mod!=0)
+        {
+        int boneFound=0;
+
+        //fprintf(stderr,"Set mod->initialized=%u\n", mod->initialized);
+
+        unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
+
+        if (boneFound)
+        {
+           stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
+           stream->object[ObjID].frame[pos].jointList->numberOfJoints = mod->numberOfBones;
+
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=0;
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=0;
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=0;
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=0;
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=0;
+
+           if (coordLength==3)
+           {
+            if (stream->debug)
+                { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]); }
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=1;
+
+            //By default the euler rotation order will be ZYX but this can be changed using the POSE_ROTATION_ORDER command
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=getModelBoneRotationOrderFromBoneName(mod,boneID);
+
+            if (stream->debug)
+                { fprintf(stderr,"bone %u => rotation order %u \n",boneID,stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder); }
+
+            if (stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder==0)
+            {
+              stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=ROTATION_ORDER_ZYX;
+            }
+
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
+           } else
+           if (coordLength==4)
+           {
+            if (stream->debug)
+                { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms quaternion(%0.2f %0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2],coord[3]); }
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=1;
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
+           } else
+           if (coordLength==16)
+           {
+            if (stream->debug)
+                 { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds); }
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=1;
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
+            unsigned int z=0;
+            for (z=0; z<16; z++)
+              { stream->object[ObjID].frame[pos].jointList->joint[boneID].m[z]=coord[z]; }
+           } else
+           {
+             fprintf(stderr,RED "Unknown coordinate length ( %u )  obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n" NORMAL,coordLength,ObjID,pos,boneID,timeMilliseconds);
+           }
+
+
+        } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); return 0; }
+        } else { fprintf(stderr,"Could not find data of model %u for %s \n",modelID,name); return 0; }
+        } else { fprintf(stderr,"Could not find exact model %u for %s \n",modelID,name); return 0; }
+        }
+        return 1;
+       } else  { fprintf(stderr,"Could not find any timestamp for %s \n", name); }
+    } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
+  } else       { fprintf(stderr,"Could not Find object %s \n",name); }
+
+  return 0;
+}
+
+
+
+
+
+int moveAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name  ,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               )
+{
+ if (stream==0)                     {   fprintf(stderr,"moveAllPosesInObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)               {   fprintf(stderr,"moveAllPosesInObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(coord==0) )       {   fprintf(stderr,"moveAllPosesInObjectState: Invalid values to add as a pose \n"); return 0; }
+
+ int foundExactTimestamp=0;
+ unsigned int ObjFound = 0;
+ //fprintf(stderr,"Adding pose to object %s \n",name);
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+ //fprintf(stderr,"Object Found = %u , Object ID = %u \n",ObjFound,ObjID);
+ if (ObjFound)
+  {
+    unsigned int pos=0;
+    if ( stream->object[ObjID].frame[pos].jointList !=0 )
+    {
+       //pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
+       if(stream->object[ObjID].numberOfFrames>0)
+       {
+        for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
+        {
+
+
+        unsigned int objectTypeID = stream->object[ObjID].type;
+
+        unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
+        //fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
+        if (modelID<modelStorage->currentNumberOfModels)
+        {
+        struct Model * mod = (struct Model *) &modelStorage->models[modelID];
+        if (mod!=0)
+        {
+           stream->object[ObjID].frame[pos].x=coord[0];
+           stream->object[ObjID].frame[pos].y=coord[1];
+           stream->object[ObjID].frame[pos].z=coord[2];
+        } else { fprintf(stderr,"Could not find data of model %u for %s \n",modelID,name); return 0; }
+        } else { fprintf(stderr,"Could not find exact model %u for %s \n",modelID,name); return 0; }
+        }
+        return 1;
+       } else  { fprintf(stderr,"Could not find any timestamp for %s \n", name); }
+    } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
+  } else       { fprintf(stderr,"Could not Find object %s \n",name); }
+
+  return 0;
+}
+
+
+
 
 
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
+                              const char * name  ,
+                              const char * jointName,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
                         )
 {
- if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
- if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
- if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+ if (stream==0)                                     {   fprintf(stderr,"addPoseToObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"addPoseToObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"addPoseToObjectState: Invalid values to add as a pose \n"); return 0; }
 
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
@@ -501,22 +807,42 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
            stream->object[ObjID].frame[pos].jointList->numberOfJoints = mod->numberOfBones;
 
-
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=0;
 
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---
            if (coordLength==3)
            {
             if (stream->debug)
                 { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=1;
+
+            //By default the euler rotation order will be ZYX but this can be changed using the POSE_ROTATION_ORDER command
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=getModelBoneRotationOrderFromBoneName(mod,boneID);
+
+            if (stream->debug)
+                {
+                    fprintf(stderr,"bone %u => rotation order %u %s \n",
+                                     boneID,
+                                     stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder,
+                                     ROTATION_ORDER_NAMESA[stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder]
+                                    );
+                }
+
+            if (stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder==0)
+            {
+              stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=ROTATION_ORDER_ZYX;
+            }
+
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---
            if (coordLength==4)
            {
             if (stream->debug)
@@ -528,7 +854,8 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
-           if (coordLength=16)
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---
+           if (coordLength==16)
            {
             if (stream->debug)
                  { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds); }
@@ -538,6 +865,7 @@ int addPoseToObjectState(
             for (z=0; z<16; z++)
               { stream->object[ObjID].frame[pos].jointList->joint[boneID].m[z]=coord[z]; }
            } else
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---
            {
              fprintf(stderr,RED "Unknown coordinate length ( %u )  obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n" NORMAL,coordLength,ObjID,pos,boneID,timeMilliseconds);
            }
@@ -552,6 +880,10 @@ int addPoseToObjectState(
 
   return 0;
 }
+
+
+
+
 
 
 int addConnectorToVirtualStream(
@@ -700,7 +1032,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    strcpy(filename,inputFilename); //strcpy also copies null terminator
    extension[0]=0;
    unsigned int inputFilenameLength=strlen(inputFilename);
-   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
+   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0,  directorySpan = 0; //directoryStart = inputFilenameLength ,
 
 
    if (inputFilenameLength==0) { return 0; }
@@ -760,7 +1092,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
 
   //If we reached this place we have a directory(!)
 
-   directoryStart  = i;
+   //directoryStart  = i;
    const char * startOfDirectory = &inputFilename[0]; // do not include . ( dot )
    directorySpan = filenameStart;
    strncpy(directory,startOfDirectory,directorySpan);
@@ -845,6 +1177,7 @@ int addObjectToVirtualStream(
    hashMap_AddULong(stream->objectHash,name,pos);
    #endif // USE_HASHMAPS
 
+   fprintf(stderr,GREEN "ObjectID %u has name %s and type %s \n" NORMAL,pos,name,type);
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
    stream->object[pos].R = (float) R/255;
@@ -1012,7 +1345,6 @@ int addObjectTypeToVirtualStream(
 
      if (downloadModel(model,webLink))
       {
-
        #if USE_HASHMAPS
          hashMap_AddULong(stream->objectTypesHash,type,pos);
        #endif // USE_HASHMAPS
@@ -1021,13 +1353,17 @@ int addObjectTypeToVirtualStream(
        strcpy(stream->objectTypes[pos].model,model);
 
        fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
-       if (loadObjectTypeModelForVirtualStream(
-                                              stream ,
-                                              model ,
-                                              pos
-                                             ) )
-       { ++stream->numberOfObjectTypes;
-         return 1; }
+       if (
+           loadObjectTypeModelForVirtualStream(
+                                               stream ,
+                                               model ,
+                                               pos
+                                             )
+          )
+          {
+            ++stream->numberOfObjectTypes;
+            return 1;
+          }
       } else
       { fprintf(stderr,"Could not find model\n"); }
 

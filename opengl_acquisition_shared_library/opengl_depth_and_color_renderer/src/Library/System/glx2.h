@@ -17,7 +17,7 @@
 * @param argv, Pointer to an array of strings from main
 * @retval 1=Success , 0=Failure
 */
-int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv);
+int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const  char **argv);
 
 
 /**

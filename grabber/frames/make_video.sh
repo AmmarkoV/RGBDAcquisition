@@ -16,11 +16,14 @@ else
  DATASET=$1
  EXTENSION=$2
 fi
+
+echo "Dataset is $DATASET and extension is $EXTENSION"
  
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"` 
 
-cd $DATASET
-avconv -i colorFrame_0_%05d.$EXTENSION -y -r 20 -threads 8 -b 30000k -s 640x480  ../outHD_$THEDATETAG.mp4 
+cd $DATASET 
+#-crf 0 is lossless -crf 51 is terrible quality
+ffmpeg -framerate 30 -i colorFrame_0_%05d.$EXTENSION -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p  ../outHD-$DATASET-$THEDATETAG.webm  # -b:v 30000k  -s 640x480 
 cd ..
 
 cd $STARTDIR 

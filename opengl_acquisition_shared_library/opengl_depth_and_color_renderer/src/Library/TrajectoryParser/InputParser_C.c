@@ -24,7 +24,7 @@
 int warningsAboutIncorrectlyAllocatedStackIssued = 0;
 
 
-char _ipc_ver[]=" 0.359\0";  //26/4/2017
+char _ipc_ver[]=" 0.361\0";  //2/10/2018
 
 
 /*
@@ -293,7 +293,7 @@ void InputParser_Destroy(struct InputParserC * ipc)
     if ( ipc->delimeters != 0 )
     {
      free(ipc->delimeters);
-     /*ipc->delimeters=0;*/
+     ipc->delimeters=0;
     }
     ipc->cur_delimeter_count=0;
     ipc->max_delimeter_count=0;
@@ -317,7 +317,7 @@ void InputParser_Destroy(struct InputParserC * ipc)
     if ( ipc->tokenlist != 0 )
      {
       free(ipc->tokenlist);
-      /*ipc->tokenlist=0;*/
+      ipc->tokenlist=0;
      }
     ipc->tokens_max=0;
     ipc->tokens_count=0;
@@ -404,6 +404,12 @@ unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
   return 1;
 }
 
+
+unsigned int InputParser_GetNumberOfArguments(struct InputParserC * ipc)
+{
+  if ( CheckIPCOk(ipc)==0) { return 0; }
+  return ipc->tokens_count;
+}
 
 /*
    InputParser_GetWord..
@@ -602,6 +608,7 @@ float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
    if (!isLocallyAllocated)
     {
      string_segment = (char*) malloc( (tokenLength+1) * sizeof(char) );
+     //memset(string_segment,0,(tokenLength+1) * sizeof(char));
      if (string_segment==0)
       {
         fprintf(stderr,"InputParser_GetWordFloat could not allocate memory to return float value , returning NaN \n");
@@ -638,8 +645,9 @@ float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
     */
     sscanf(string_segment,"%f",&return_value);
    #else
-    //fprintf(stderr,"Using atof to parse %s \n",string_segment);
+    //fprintf(stderr,"Using atof to parse `%s` \n",string_segment);
     return_value=atof(string_segment);
+    //fprintf(stderr,"Returns `%0.6f` \n",return_value);
    #endif // USE_SCANF
 
 
@@ -681,6 +689,8 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
       #if WARN_ABOUT_INCORRECTLY_ALLOCATED_STACK_STRINGS
        if (warningsAboutIncorrectlyAllocatedStackIssued==0)
         {
+         fprintf(stderr,"InputParser %s \n\n\n",InputParserC_Version());   
+            
          fprintf(stderr,"Please note that feeding input parser with strings allocated on the stack it is generally a good idea to enable keepcopy\n");
          fprintf(stderr,"For example passing here a string allocated as  char* hello = \"hello!\"; might lead to a segFault ( i.e. when calling InputParser_GetWordFloat ) \n");
          fprintf(stderr,"The correct way for allocating a string with in place processing is char hello[] = \"hello!\"; \n");
@@ -699,8 +709,8 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   if (CheckIPCOk(ipc)==0) { return 0; }
   if  ( inpt == 0 ) return 0; /* NULL INPUT -> NULL OUTPUT*/
 
-  unsigned int   STRING_END = strlen(inpt) ;
-  int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1 , FOUND_DELIMETER ; /* Ignores starting ,,,,,string,etc*/
+  unsigned int STRING_END = strlen(inpt) ;
+  unsigned int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1; /* Ignores starting ,,,,,string,etc*/ 
 
   if ( STRING_END == 0 ) { return 0; } /* NULL INPUT -> NULL OUTPUT pt 2*/
 
@@ -716,6 +726,7 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
                             }
                           }
                           ipc->str = (char * ) malloc( sizeof(char) * (STRING_END+1) );
+                          memset(ipc->str,0,sizeof(char) * (STRING_END+1));
                           ipc->local_allocation = 1;
                           strncpy( ipc->str , inpt , STRING_END ) ;
                        } else
@@ -730,7 +741,7 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   ipc->tokens_count = 0 , ipc->tokenlist[0].token_start=0;
   for (i=0; i<STRING_END; i++)
   {
-    FOUND_DELIMETER = 0;
+    unsigned int FOUND_DELIMETER = 0;
     for (z=0; z<ipc->cur_delimeter_count; z++)
     {
 

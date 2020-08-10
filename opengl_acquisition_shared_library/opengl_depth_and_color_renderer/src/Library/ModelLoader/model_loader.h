@@ -27,8 +27,14 @@ struct Model
 
     float bbox2D[4]; //The 2D rendering output bounding box of the specific model
 
-    float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
+    float x, y, z,  scaleX, scaleY, scaleZ;
+    unsigned int rotationOrder;
+
     float minX,minY,minZ,maxX,maxY,maxZ;
+
+    float rotationX;//heading,
+    float rotationY;//pitch,
+    float rotationZ;//roll,
 
     //Color
     float colorR , colorG , colorB , transparency;
@@ -118,7 +124,16 @@ void unloadModel(struct Model * mod);
 * @param roll of model
 * @retval 0=Error , 1=Success
 */
-int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+int drawModelAt(
+                 struct Model * mod,
+                 float positionX,
+                 float positionY,
+                 float positionZ,
+                 float rotationX,//heading,
+                 float rotationY,//pitch,
+                 float rotationZ,//roll,
+                 unsigned int rotationOrder
+                );
 
 /**
 * @brief Draw a Model at current position
@@ -141,7 +156,15 @@ int drawModel(struct Model * mod);
 * @param roll of model
 * @retval 0=Error , 1=Success
 */
-int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+int addToModelCoordinates(
+                            struct Model * mod,
+                            float x,
+                            float y,
+                            float z,
+                            float rotationX, //heading,
+                            float rotationY, //pitch,
+                            float rotationZ  //roll
+                         );
 
 /**
 * @brief Add to current coordinates of model by passing pointers and not the values
@@ -156,7 +179,15 @@ int addToModelCoordinates(struct Model * mod,float x,float y,float z,float headi
 * @param roll of model
 * @retval 0=Error , 1=Success
 */
-int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,float *heading,float *pitch,float *roll);
+int addToModelCoordinatesNoSTACK(
+                                  struct Model * mod,
+                                  float *x,
+                                  float *y,
+                                  float *z,
+                                  float *rotationX, //heading,
+                                  float *rotationY, //pitch,
+                                  float *rotationZ  //roll
+                                );
 
 /**
 * @brief Set current coordinates of model
@@ -186,7 +217,15 @@ int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading
 * @param roll of model
 * @retval 0=Error , 1=Success
 */
-int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll);
+int setModelCoordinatesNoSTACK(
+                                  struct Model * mod,
+                                  float *x,
+                                  float *y,
+                                  float *z,
+                                  float *rotationX,
+                                  float *rotationY,
+                                  float *rotationZ
+                              );
 
 
 /**
@@ -240,6 +279,9 @@ int drawCube();
 int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber);
 
 //TODO Add explanation here
-int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found);
+int getModelBoneIDFromBoneName(struct Model *mod,const char * boneName,int * found);
+
+
+int getModelBoneRotationOrderFromBoneName(struct Model *mod,unsigned int boneID);
 
 #endif // MODEL_LOADER_H_INCLUDED
