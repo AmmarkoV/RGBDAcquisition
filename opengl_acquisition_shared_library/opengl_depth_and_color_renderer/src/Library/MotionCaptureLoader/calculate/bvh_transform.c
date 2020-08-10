@@ -201,15 +201,17 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(struct BVH_Trans
 { 
   if (bvhTransform==0) { return 0; }
  
-  //If we are not using optimizations then transform this joint 
-  if (!bvhTransform->useOptimizations) { return 1; }  else  
-  //If we are using optimizations and this joint is not skipped then transform this joint
+  if (bvhTransform->useOptimizations) 
   {    
-     //if (jID>=bvhMotion->jointHierarchySize) { return 0; }
-     //if ( (jID<MAX_BVH_JOINT_HIERARCHY_SIZE) && (!bvhTransform->joint[jID].skipCalculations) ) { return 1; }
-     
+     //If we are using optimizations and this joint is not skipped then transform this joint
      if (jID<MAX_BVH_JOINT_HIERARCHY_SIZE)  
-          { return  (!bvhTransform->skipCalculationsForJoint[jID]); }
+          { 
+            return  (!bvhTransform->skipCalculationsForJoint[jID]); 
+          }
+  } else
+  {
+     //If we are not using optimizations then transform every joint 
+     return 1;
   }
 
 
@@ -305,7 +307,7 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
- if (jID>=bvhMotion->jointHierarchySize) { return 0; }
+  if (jID>=bvhMotion->jointHierarchySize) { return 0; }
 
   bvhTransform->useOptimizations=1;
   bvh_markJointAndParentsAsUselessInTransform(bvhMotion,bvhTransform,jID);
