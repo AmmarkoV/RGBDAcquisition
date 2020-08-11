@@ -385,95 +385,62 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 
 
 
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float eulX, float eulY, float eulZ,unsigned int rotationOrder)
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
 {
-   //Initialize rotation matrix..
-   create4x4FIdentityMatrix(m);
 
   if (rotationOrder==0)
   {
     //No rotation type, get's you back an Identity Matrix..
     fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: No rotation order given, returning identity..\n");
+    create4x4FIdentityMatrix(m);
     return;
-  }
-    float degreesX = eulX;
-    float degreesY = eulY;
-    float degreesZ = eulZ;
-    struct Matrix4x4OfFloats rX={0};
-    struct Matrix4x4OfFloats rY={0};
-    struct Matrix4x4OfFloats rZ={0};
+  } 
+    struct Matrix4x4OfFloats rX;
+    struct Matrix4x4OfFloats rY;
+    struct Matrix4x4OfFloats rZ;
 
-  //Assuming the rotation axis are correct
-  //rX,rY,rZ should hold our rotation matrices
-   create4x4FRotationX(&rX,degreesX);
-   create4x4FRotationY(&rY,degreesY);
-   create4x4FRotationZ(&rZ,degreesZ);
-
-   #define SPEEDUP_ROTATION_CALCULATIONS 1
+   //Assuming the rotation axis are correct
+   //rX,rY,rZ should hold our 4x4 rotation matrices
+   create4x4FRotationX(&rX,degreesEulerX);
+   create4x4FRotationY(&rY,degreesEulerY);
+   create4x4FRotationZ(&rZ,degreesEulerZ);
+ 
 
   switch (rotationOrder)
   {
-    case ROTATION_ORDER_XYZ :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rX,&rY,&rZ);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      #endif
+    case ROTATION_ORDER_XYZ : 
+       multiplyThree4x4FMatrices(m,&rX,&rY,&rZ); 
     break;
-    case ROTATION_ORDER_XZY :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rX,&rZ,&rY);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      #endif
+    case ROTATION_ORDER_XZY : 
+       multiplyThree4x4FMatrices(m,&rX,&rZ,&rY); 
     break;
-    case ROTATION_ORDER_YXZ :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rY,&rX,&rZ);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-      #endif
+    case ROTATION_ORDER_YXZ : 
+       multiplyThree4x4FMatrices(m,&rY,&rX,&rZ); 
     break;
-    case ROTATION_ORDER_YZX :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rY,&rZ,&rX);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      #endif
+    case ROTATION_ORDER_YZX : 
+       multiplyThree4x4FMatrices(m,&rY,&rZ,&rX); 
     break;
-    case ROTATION_ORDER_ZXY :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rZ,&rX,&rY);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-      #endif
+    case ROTATION_ORDER_ZXY : 
+       multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
     break;
-    case ROTATION_ORDER_ZYX :
-      #if SPEEDUP_ROTATION_CALCULATIONS 
-       multiplyThree4x4FMatrices(m,&rZ,&rY,&rX);
-      #else 
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rZ.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rY.m);
-       multiplyTwo4x4FMatricesBuffered(m,m->m,rX.m);
-      #endif
+    case ROTATION_ORDER_ZYX : 
+       multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
     break;
     case ROTATION_ORDER_RPY:
-      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY\n");
+       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY, returning Identity\n"); 
+       doRPYTransformationF(
+                            m,
+                            degreesEulerZ,//roll,
+                            degreesEulerY,//pitch
+                            degreesEulerX //heading
+                           );
     break;
     default :
-      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u\n",rotationOrder);
+      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
+      create4x4FIdentityMatrix(m);
     break;
   };
+  
 }
 
 
@@ -1131,14 +1098,14 @@ void create4x4FModelTransformation(
                                    float scaleX, float scaleY, float scaleZ
                                   )
 {
-   if (m==0) {return;}
+    if (m==0) {return;}
 
     //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
     //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
 
-    struct Matrix4x4OfFloats intermediateMatrixTranslation={0};
+    struct Matrix4x4OfFloats intermediateMatrixTranslation;
     create4x4FTranslationMatrix(
                                 &intermediateMatrixTranslation,
                                 x,
@@ -1148,15 +1115,15 @@ void create4x4FModelTransformation(
 
 
     struct Matrix4x4OfFloats intermediateMatrixRotation;
-
-
-    if ( (x==0) && (y==0) && (z==0) )
+    if ( (rotationX==0.0) && (rotationY==0) &&  (rotationZ==0) )
     {
-      create4x4FIdentityMatrix(&intermediateMatrixRotation);
-    } else
+      //Fast path since a lot of the time the rotation component is not active
+      create4x4FIdentityMatrix(&intermediateMatrixRotation); 
+    } else 
     if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
       fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
+      create4x4FIdentityMatrix(&intermediateMatrixRotation);
     } else
     if (rotationOrder==ROTATION_ORDER_RPY)
     {

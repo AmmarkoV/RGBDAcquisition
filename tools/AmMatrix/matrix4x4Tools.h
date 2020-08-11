@@ -189,7 +189,7 @@ void create4x4FQuaternionMatrix(struct Matrix4x4OfFloats * m ,float qX,float qY,
 * @param  Rotation Z in euler angles (0-360)
 * @param  Rotation order given by enum ROTATION_ORDER, typically ROTATION_ORDER_ZYX or ROTATION_ORDER_XYZ
 */
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m ,float eulX, float eulY, float eulZ,unsigned int rotationOrder);
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder);
 
 
 
