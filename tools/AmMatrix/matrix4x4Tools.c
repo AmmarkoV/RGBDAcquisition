@@ -1103,27 +1103,48 @@ void create4x4FModelTransformation(
     //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
     //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
-
-
+     
+    char operationsNeeded = 0; 
+    char numberOfOperationsNeeded=0;
+     
+     
+    //Translation matrix 
+    //----------------------------------------------------------
+    char translationSpecified;
     struct Matrix4x4OfFloats intermediateMatrixTranslation;
-    create4x4FTranslationMatrix(
-                                &intermediateMatrixTranslation,
-                                x,
-                                y,
-                                z
+    if ( (x==0.0) && (y==0.0) && (z==0.0) )
+    {
+        translationSpecified=0;
+    } else
+    {
+     create4x4FTranslationMatrix(
+                                 &intermediateMatrixTranslation,
+                                 x,
+                                 y,
+                                 z
                                );
+      translationSpecified=1; 
+      operationsNeeded+=1;
+      ++numberOfOperationsNeeded;
+    }
+    //----------------------------------------------------------
 
 
+    //Rotation matrix 
+    //---------------------------------------------------------- 
+    char rotationSpecified;
     struct Matrix4x4OfFloats intermediateMatrixRotation;
-    if ( (rotationX==0.0) && (rotationY==0) &&  (rotationZ==0) )
+    if ( (rotationX==0.0) && (rotationY==0.0) && (rotationZ==0.0) )
     {
       //Fast path since a lot of the time the rotation component is not active
       create4x4FIdentityMatrix(&intermediateMatrixRotation); 
+      rotationSpecified=0;
     } else 
     if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
       fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
       create4x4FIdentityMatrix(&intermediateMatrixRotation);
+      rotationSpecified=0;
     } else
     if (rotationOrder==ROTATION_ORDER_RPY)
     {
@@ -1133,7 +1154,10 @@ void create4x4FModelTransformation(
                           rotationZ,//roll,
                           rotationY,//pitch
                           rotationX//heading
-                         );
+                         ); 
+     rotationSpecified=1;
+     operationsNeeded+=2;
+     ++numberOfOperationsNeeded; 
     } else
     {
      //fprintf(stderr,"Using new model transform code\n");
@@ -1144,18 +1168,52 @@ void create4x4FModelTransformation(
                                                       rotationZ,
                                                       rotationOrder
                                                      );
+     rotationSpecified=1; 
+     operationsNeeded+=2;    
+     ++numberOfOperationsNeeded;                                                  
     }
+    //----------------------------------------------------------
+    
 
 
-  if ( (scaleX!=1.0) || (scaleY!=1.0) || (scaleZ!=1.0) )
+    //Scale matrix 
+    //----------------------------------------------------------
+    char scaleSpecified;
+    struct Matrix4x4OfFloats intermediateScalingMatrix;
+    if ( (scaleX==1.0) && (scaleY==1.0) && (scaleZ==1.0) ) 
       {
-        struct Matrix4x4OfFloats intermediateScalingMatrix;
-        create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
-        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
+          scaleSpecified=0;
       } else
-      {
-         multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation);
+      { 
+        create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
+        scaleSpecified=1;
+        operationsNeeded+=4;   
+        ++numberOfOperationsNeeded; 
       }
+      
+      
+    //Do the absolutely minimum number of operations required
+    //----------------------------------------------------------
+    if (numberOfOperationsNeeded==3)
+    {
+        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix); 
+    } else
+    if (numberOfOperationsNeeded==2)
+    {
+        if (scaleSpecified!=0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
+        if (translationSpecified!=0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
+        if (rotationSpecified!=0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }  
+    } else
+    if (numberOfOperationsNeeded==1)
+    {
+        if (translationSpecified!=0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
+        if (rotationSpecified!=0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
+        if (scaleSpecified!=0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }  
+    } else
+    {
+      create4x4FIdentityMatrix(m); 
+    }
+    //----------------------------------------------------------
 }
 
 
