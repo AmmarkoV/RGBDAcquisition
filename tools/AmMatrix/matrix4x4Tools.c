@@ -1095,6 +1095,7 @@ void create4x4FModelTransformation(
                                    unsigned int rotationOrder,
                                    //Translation Component
                                    float x, float y, float z ,
+                                   //Scaling Component
                                    float scaleX, float scaleY, float scaleZ
                                   )
 {
