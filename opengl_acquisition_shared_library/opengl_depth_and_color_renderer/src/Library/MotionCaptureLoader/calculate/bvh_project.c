@@ -171,44 +171,31 @@ int bvh_projectTo2D(
                    )
 {
       bvhTransform->jointsOccludedIn2DProjection=0;
-      unsigned int pointsDumped=0;
       
       float position2D[3]={0.0,0.0,0.0}; 
+      float pos3DFloat[4];
 
 
       //Then project 3D positions on 2D frame and save results..
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-      { 
+      {
         //if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
         if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-        {
-          if (bvhTransform->joint[jID].pos3D[3]!=1.0)
-             { fprintf(stderr,"bvh_projectTo2D: W coord (%0.2f) of joint %u not normalized..\n",bvhTransform->joint[jID].pos3D[3],jID); }
-
-           float pos3DFloat[4];
+        { 
            pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
            pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
            pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];
-           pos3DFloat[3]=1.0;
+           pos3DFloat[3]= (float) bvhTransform->joint[jID].pos3D[3];
+           
+           //Remind the client that the 2D positions extracted came from a not-normalized 3D points
+           //pos3DFloat[3]=1.0; 
+           //if (bvhTransform->joint[jID].pos3D[3]!=1.0)
+           //   { fprintf(stderr,"bvh_projectTo2D: W coord (%0.2f) of joint %u not normalized..\n",bvhTransform->joint[jID].pos3D[3],jID); }
 
-    //Two cases here , we either want to directly render using the matrices in our simplerenderer
-    //-------------------------------------------------------------------------------------------
-    if (directRendering)
-          {
-           fprintf(stderr, "DIRECT RENDER ");
-           simpleRendererRenderUsingPrecalculatedMatrices(
-                                                          renderer,
-                                                          pos3DFloat,
-                                                          &position2D[0],
-                                                          &position2D[1],
-                                                          &position2D[2]
-                                                         );
-          }
-    //-------------------------------------------------------------------------------------------
-    //Or we want to render using our camera position where we have to do some extra matrix operations
-    //to recenter our mesh and transform it accordingly
-    //-------------------------------------------------------------------------------------------
-        else
+          //Two cases here , we either want to want to render using our camera position where we have to do some extra matrix operations
+          //to recenter our mesh and transform it accordingly
+          //-------------------------------------------------------------------------------------------
+          if (!directRendering)
           {
            float pos3DCenterFloat[4];
            pos3DCenterFloat[0]= (float) bvhTransform->centerPosition[0];
@@ -231,23 +218,36 @@ int bvh_projectTo2D(
             //bvhTransform->joint[jID].pos3D[0] = (float) pos3DCenterFloat[0];
             //bvhTransform->joint[jID].pos3D[1] = (float) pos3DCenterFloat[1];
             //bvhTransform->joint[jID].pos3D[2] = (float) pos3DCenterFloat[2];               );
-           }
-    //-------------------------------------------------------------------------------------------
+         }
+           else
+         {
+         //-------------------------------------------------------------------------------------------
+         //Or we directly render using the matrices in our simplerenderer
+         //-------------------------------------------------------------------------------------------
+           fprintf(stderr, "DIRECT RENDER ");
+           simpleRendererRenderUsingPrecalculatedMatrices(
+                                                          renderer,
+                                                          pos3DFloat,
+                                                          &position2D[0],
+                                                          &position2D[1],
+                                                          &position2D[2]
+                                                         );
+          } 
+         //-------------------------------------------------------------------------------------------
 
-           if (position2D[2]<0.0)
-           {
-              bvhTransform->joint[jID].pos2D[0] = 0.0;
-              bvhTransform->joint[jID].pos2D[1] = 0.0;
-              bvhTransform->joint[jID].isBehindCamera=1;
-           } else
+           if (position2D[2]>=0.0) 
            {
               bvhTransform->joint[jID].pos2D[0] = (float) position2D[0];
               bvhTransform->joint[jID].pos2D[1] = (float) position2D[1];
               bvhTransform->joint[jID].pos2DCalculated=1;
-           }
-
+           } else
+           {
+              bvhTransform->joint[jID].pos2D[0] = 0.0;
+              bvhTransform->joint[jID].pos2D[1] = 0.0;
+              bvhTransform->joint[jID].isBehindCamera=1;
+           }   
         }
-        ++pointsDumped;
+         
       } //Joint Loop , render all joint points..
 
     //------------------------------------------------------------------------------------------
@@ -259,5 +259,5 @@ int bvh_projectTo2D(
      //------------------------------------------------------------------------------------------
      }//End of occlusion code
 
- return (pointsDumped==mc->jointHierarchySize);
+ return (mc->jointHierarchySize>0);
 }

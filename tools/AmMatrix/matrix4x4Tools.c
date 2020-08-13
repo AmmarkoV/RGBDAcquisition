@@ -166,6 +166,13 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 }
 
  
+
+//static inline
+float degrees_to_radF(float degrees)
+{
+    return (float) degrees * ( (float) M_PI / 180.0 );
+}
+ 
  
  
 
@@ -244,18 +251,11 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 
 
 
-
-float degrees_to_radF(float degrees)
-{
-    return (float) degrees * ( (float) M_PI / 180.0 );
-}
- 
-
 void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
 {
-    float x = degrees_to_radF(eulX);
-    float y = degrees_to_radF(eulY);
-    float z = degrees_to_radF(eulZ);
+    float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
+    float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
+    float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
 
     float cr = cos( x );
     float sr = sin( x );
@@ -294,9 +294,9 @@ void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,fl
 void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
 {
     //roll = X , pitch = Y , yaw = Z
-    float x = degrees_to_radF(eulX);
-    float y = degrees_to_radF(eulY);
-    float z = degrees_to_radF(eulZ);
+    float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
+    float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
+    float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
 
 
     float cr = cos(z);
@@ -335,7 +335,7 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
 //---------------------------------------------------------
 void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 {
-    float radians = degrees_to_radF(degrees);
+    float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
 
     create4x4FIdentityMatrix(m);
 
@@ -351,7 +351,7 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 //---------------------------------------------------------
 void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
 {
-    float radians = degrees_to_radF(degrees);
+    float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
 
     create4x4FIdentityMatrix(m);
 
@@ -367,7 +367,7 @@ void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
 //---------------------------------------------------------
 void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 {
-    float radians = degrees_to_radF(degrees);
+    float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
 
     create4x4FIdentityMatrix(m);
 
