@@ -321,6 +321,16 @@ int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * m
 
 int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB,struct Matrix4x4OfFloats * matrixC);
 
+int multiplyThree4x4FMatricesWithIdentityHints(
+                                                struct Matrix4x4OfFloats * result,
+                                                struct Matrix4x4OfFloats * matrixA,
+                                                int matrixAIsIdentity,
+                                                struct Matrix4x4OfFloats * matrixB,
+                                                int matrixBIsIdentity,
+                                                struct Matrix4x4OfFloats * matrixC,
+                                                int matrixCIsIdentity
+                                              );
+
 int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);

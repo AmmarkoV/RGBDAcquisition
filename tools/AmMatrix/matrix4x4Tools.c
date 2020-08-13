@@ -402,29 +402,40 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    //Assuming the rotation axis are correct
    //rX,rY,rZ should hold our 4x4 rotation matrices
    create4x4FRotationX(&rX,degreesEulerX);
+   char rXisIdentity=(degreesEulerX==0);
+   
    create4x4FRotationY(&rY,degreesEulerY);
+   char rYisIdentity=(degreesEulerY==0);
+   
    create4x4FRotationZ(&rZ,degreesEulerZ);
- 
+   char rZisIdentity=(degreesEulerZ==0);
+   
 
   switch (rotationOrder)
   {
     case ROTATION_ORDER_XYZ : 
-       multiplyThree4x4FMatrices(m,&rX,&rY,&rZ); 
+       //multiplyThree4x4FMatrices(m,&rX,&rY,&rZ); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity); 
     break;
     case ROTATION_ORDER_XZY : 
-       multiplyThree4x4FMatrices(m,&rX,&rZ,&rY); 
+       //multiplyThree4x4FMatrices(m,&rX,&rZ,&rY); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity); 
     break;
     case ROTATION_ORDER_YXZ : 
-       multiplyThree4x4FMatrices(m,&rY,&rX,&rZ); 
+       //multiplyThree4x4FMatrices(m,&rY,&rX,&rZ); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity); 
     break;
     case ROTATION_ORDER_YZX : 
-       multiplyThree4x4FMatrices(m,&rY,&rZ,&rX); 
+       //multiplyThree4x4FMatrices(m,&rY,&rZ,&rX); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity); 
     break;
     case ROTATION_ORDER_ZXY : 
-       multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
+       //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity); 
     break;
     case ROTATION_ORDER_ZYX : 
-       multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
+       //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity); 
     break;
     case ROTATION_ORDER_RPY:
        fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY, returning Identity\n"); 
@@ -912,6 +923,46 @@ int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4
 }
 
 
+int multiplyThree4x4FMatricesWithIdentityHints(
+                                                struct Matrix4x4OfFloats * result,
+                                                struct Matrix4x4OfFloats * matrixA,
+                                                int matrixAIsIdentity,
+                                                struct Matrix4x4OfFloats * matrixB,
+                                                int matrixBIsIdentity,
+                                                struct Matrix4x4OfFloats * matrixC,
+                                                int matrixCIsIdentity
+                                              )
+{
+  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+
+  unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
+  
+    //Do the absolutely minimum number of operations required
+    //----------------------------------------------------------
+    switch (numberOfOperationsNeeded)
+    {
+      case 3:   
+        return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); 
+      case 2:   
+        if (matrixAIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);  } else
+        if (matrixBIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);  } else
+        if (matrixCIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);  }
+      case 1:   
+        if (!matrixAIsIdentity)    { copy4x4FMatrix(result->m,matrixA->m); } else
+        if (!matrixBIsIdentity)    { copy4x4FMatrix(result->m,matrixB->m); } else
+        if (!matrixCIsIdentity)    { copy4x4FMatrix(result->m,matrixC->m); }   
+        return 1;
+      case 0:
+      default:   
+        create4x4FIdentityMatrix(result);
+        return 1; 
+    }; 
+    //----------------------------------------------------------
+ 
+  return 1;
+}
+
+
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
 {
   if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (matrixD==0) || (result==0) ) { return 0; }
@@ -1195,25 +1246,25 @@ void create4x4FModelTransformation(
       
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
-    if (numberOfOperationsNeeded==3)
+    switch (numberOfOperationsNeeded)
     {
-        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix); 
-    } else
-    if (numberOfOperationsNeeded==2)
-    {
+      case 3:   
+        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
+       return; 
+      case 2:   
         if (scaleSpecified!=0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
         if (translationSpecified!=0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
-        if (rotationSpecified!=0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }  
-    } else
-    if (numberOfOperationsNeeded==1)
-    {
+        if (rotationSpecified!=0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  } 
+        return;
+      case 1:   
         if (translationSpecified!=0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
         if (rotationSpecified!=0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
         if (scaleSpecified!=0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }  
-    } else
-    {
+        return;
+      case 0:   
       create4x4FIdentityMatrix(m); 
-    }
+      return;
+    };
     //----------------------------------------------------------
 }
 
