@@ -150,6 +150,7 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
 
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 {
+    
   #if OPTIMIZED
    memset(m->m,0,16*sizeof(float));
    m->m[0] = 1.0;

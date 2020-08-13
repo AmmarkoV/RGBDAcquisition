@@ -135,6 +135,7 @@ int simpleRendererRender(
     {
       create4x4FIdentityMatrix(&objectMatrixRotation);
     } else
+        /*
   if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
     {
       create4x4FIdentityMatrix(&objectMatrixRotation);
@@ -148,7 +149,7 @@ int simpleRendererRender(
                           (float) objectRotation[1],
                           (float) objectRotation[2]
                          );
-    } else
+    } else*/
     {
      //fprintf(stderr,"Using new model transform code\n");
      create4x4FMatrixFromEulerAnglesWithRotationOrder(
