@@ -208,17 +208,15 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
      //If we are using optimizations and this joint is not skipped then transform this joint
      //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
      //if (jID<MAX_BVH_JOINT_HIERARCHY_SIZE)  
-          { 
+     //     { 
             return  (!bvhTransform->skipCalculationsForJoint[jID]); 
-          }
+     //     }
   } else
   {
      //If we are not using optimizations then transform every joint 
      return 1;
   }
-
-
- return 0;
+  
 }
 
 
@@ -347,12 +345,10 @@ int bvh_loadTransformForMotionBuffer(
                                      unsigned int populateTorso
                                    )
 {
-   //Don't do transforms
-   //---------------------------------
-   if (bvhMotion==0)    { return 0; }
-   if (motionBuffer==0) { return 0; }
-   if (bvhTransform==0) { return 0; }
-   //---------------------------------
+  //ONly do transforms on allocated context 
+  if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
+  {
+    
 
 
   //First of all we need to clean the BVH_Transform structure
@@ -368,7 +364,7 @@ int bvh_loadTransformForMotionBuffer(
   //----------------------------------------------------------------------------------------
   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
       //To Setup the dynamic transformation we must first get values from our bvhMotion structure
       if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
@@ -381,8 +377,22 @@ int bvh_loadTransformForMotionBuffer(
                                   );
 
 
-       if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder==0)  )
+       if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
+       { 
+        create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                        &bvhTransform->joint[jID].dynamicRotation,
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
+                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
+                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                       ); 
+       } else
        {
+         //No rotation order will get you an Identity rotation   
+         create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
+         
+         //This is normal in an end-site but we should 
+         //display a debug message in case this doesn't happen on an end site
          if (!bvhMotion->jointHierarchy[jID].isEndSite)
               {
                 fprintf(stderr,
@@ -391,17 +401,9 @@ int bvh_loadTransformForMotionBuffer(
                         bvhMotion->jointHierarchy[jID].jointName
                        );
               }
-          create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
-       } else
-      { 
-       create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                        &bvhTransform->joint[jID].dynamicRotation,
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
-                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
-                                                       ); 
-      }
+       } 
+       
+       
      } else
      {
       fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
@@ -529,7 +531,10 @@ int bvh_loadTransformForMotionBuffer(
   }
 
 
-  return 1;
+  return 1;   
+ }
+   
+ return 0;
 }
 
 

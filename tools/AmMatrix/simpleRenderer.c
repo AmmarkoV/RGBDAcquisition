@@ -131,27 +131,11 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
   struct Matrix4x4OfFloats objectMatrixRotation;
 
-  if (objectRotation==0)
+  if (objectRotation==0) 
     {
       create4x4FIdentityMatrix(&objectMatrixRotation);
-    } else
-        /*
-  if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
+    }   else
     {
-      create4x4FIdentityMatrix(&objectMatrixRotation);
-    } else
-  if (rotationOrder==ROTATION_ORDER_RPY)
-    {
-     //This is the old way to do this rotation
-     doRPYTransformationF(
-                          &objectMatrixRotation,
-                          (float) objectRotation[0],
-                          (float) objectRotation[1],
-                          (float) objectRotation[2]
-                         );
-    } else*/
-    {
-     //fprintf(stderr,"Using new model transform code\n");
      create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                       &objectMatrixRotation ,
                                                       (float) objectRotation[0],
@@ -159,7 +143,8 @@ int simpleRendererRender(
                                                       (float) objectRotation[2],
                                                       rotationOrder
                                                      );
-    }
+    }  
+    
  ///--------------------------------------------------------------------
 
 
@@ -179,19 +164,23 @@ int simpleRendererRender(
 
 
   float final3DPosition[4];
+  float windowCoordinates[3]={0};
 
-  if (sr->removeObjectPosition)
+
+  if (!sr->removeObjectPosition) 
+   { //This is more probable to happen
+    final3DPosition[0]=(float) resultPoint3D[0]+center3D[0]+sr->cameraOffsetPosition[0];
+    final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
+    final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
+    final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
+   } else
    {
     final3DPosition[0]=(float) resultPoint3D[0]+sr->cameraOffsetPosition[0];
     final3DPosition[1]=(float) resultPoint3D[1]+sr->cameraOffsetPosition[1];
     final3DPosition[2]=(float) resultPoint3D[2]+sr->cameraOffsetPosition[2];
-   } else
-   {
-    final3DPosition[0]=(float) resultPoint3D[0]+center3D[0]+sr->cameraOffsetPosition[0];
-    final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
-    final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
-   }
-  final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
+    final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
+   } 
+   
  ///--------------------------------------------------------------------
 
 
@@ -200,8 +189,6 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
  ///                         FINAL PROJECTION
  ///--------------------------------------------------------------------
-  float windowCoordinates[3]={0};
-
   if (
        !_glhProjectf(
                      final3DPosition,
