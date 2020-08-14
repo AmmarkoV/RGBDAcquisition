@@ -522,16 +522,20 @@ int bvh_loadTransformForMotionBuffer(
   bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
 
 
-  if (populateTorso)
+  if (!populateTorso)
+  {
+    //Fast path out of here
+    return 1;      
+  } else
   {
    if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
      {
      //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
      }
+    return 1;   
   }
 
 
-  return 1;   
  }
    
  return 0;
