@@ -509,10 +509,10 @@ if (iterationID==0)
     { 
            //We need to remember the initial solution we where given 
             float rememberInitialSolution[3]={
-                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[0]],
-                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[1]],
-                                                                                  problem->chain[chainID].currentSolution->motion[mIDS[2]] 
-                                                                                }; 
+                                              problem->chain[chainID].currentSolution->motion[mIDS[0]],
+                                              problem->chain[chainID].currentSolution->motion[mIDS[1]],
+                                              problem->chain[chainID].currentSolution->motion[mIDS[2]] 
+                                             }; 
             
             //Maybe previous solution is closer to current?
             problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
@@ -543,14 +543,14 @@ if (iterationID==0)
 //-------------------------------------------
 //-------------------------------------------
 
-    float previousValues[3] = {  originalValues[0],originalValues[1],originalValues[2] } ;
-    float currentValues[3]    = {  originalValues[0],originalValues[1],originalValues[2] } ;
-    float bestValues[3]          = {  originalValues[0],originalValues[1],originalValues[2] } ;
+    float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
+    float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
+    float bestValues[3]     = { originalValues[0],originalValues[1],originalValues[2] };
 
-    float previousLoss[3]      = { initialLoss, initialLoss, initialLoss };
-    float currentLoss[3]         = { initialLoss, initialLoss, initialLoss };
-    float previousDelta[3]    = {0.0,0.0,0.0};
-    float gradient[3]               = {0.0,0.0,0.0};
+    float previousLoss[3]   = { initialLoss, initialLoss, initialLoss };
+    float currentLoss[3]    = { initialLoss, initialLoss, initialLoss };
+    float previousDelta[3]  = { 0.0,0.0,0.0 };
+    float gradient[3]       = { 0.0,0.0,0.0 };
 
     float bestLoss = initialLoss;
     //float loss=initialLoss;
@@ -1166,6 +1166,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     {
         fprintf(stderr,RED "Fatal: IK Version mismatch for configuration structure (%0.2f vs %0.2f ) ..\n" NORMAL,ikConfig->ikVersion,IK_VERSION);
         exit(0);
+    }
+    
+    if (ikConfig->dumpScreenshots)
+    {
+        fprintf(stderr,RED "Dumping screenshots is disabled for performance reasons..\n" NORMAL);
+        ikConfig->dumpScreenshots=0;
+         
     }
 
 

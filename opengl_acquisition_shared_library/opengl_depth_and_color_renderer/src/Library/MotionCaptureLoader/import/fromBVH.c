@@ -108,14 +108,13 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
      return 0;
    }
 
-   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,5);
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,4);
    if (ipc==0) { return 0; }
 
    InputParser_SetDelimeter(ipc,0,' ');
    InputParser_SetDelimeter(ipc,1,'\t');
-   InputParser_SetDelimeter(ipc,2,' ');
-   InputParser_SetDelimeter(ipc,3,10);
-   InputParser_SetDelimeter(ipc,4,13);
+   InputParser_SetDelimeter(ipc,2,10);
+   InputParser_SetDelimeter(ipc,3,13); 
 
    //unsigned int i=0;
    unsigned int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);

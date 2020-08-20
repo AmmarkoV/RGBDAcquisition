@@ -24,7 +24,7 @@
 int warningsAboutIncorrectlyAllocatedStackIssued = 0;
 
 
-char _ipc_ver[]=" 0.361\0";  //2/10/2018
+char _ipc_ver[]=" 0.362\0";  //13/8/2020
 
 
 /*
@@ -741,11 +741,10 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   ipc->tokens_count = 0 , ipc->tokenlist[0].token_start=0;
   for (i=0; i<STRING_END; i++)
   {
-    unsigned int FOUND_DELIMETER = 0;
+    unsigned char FOUND_DELIMETER = 0;
     for (z=0; z<ipc->cur_delimeter_count; z++)
     {
-
-    if ( inpt[i] == ipc->delimeters[z] )
+     if ( inpt[i] == ipc->delimeters[z] )
       {
         FOUND_DELIMETER = 1;
         if (NEXT_SHOULD_NOT_BE_A_DELIMITER==0)

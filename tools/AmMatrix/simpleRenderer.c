@@ -190,7 +190,7 @@ int simpleRendererRender(
  ///                         FINAL PROJECTION
  ///--------------------------------------------------------------------
   if (
-       !_glhProjectf(
+       _glhProjectf(
                      final3DPosition,
                      sr->modelViewMatrix.m,
                      sr->projectionMatrix.m,
@@ -199,18 +199,23 @@ int simpleRendererRender(
                     )
      )
      {
+      *output2DX = windowCoordinates[0];//windowCoordinates[2];
+      *output2DY = windowCoordinates[1];//windowCoordinates[2];
+      *output2DW = windowCoordinates[2];
+      return 1;
+     }
+     // else
+     //{
         //If you reach here make sure you have called simpleRendererInitialize
         /*
         print4x4FMatrix("modelViewMatrix",sr->modelMatrix,1);
         print4x4FMatrix("projectionMatrix",sr->projectionMatrix,1);
         fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]);
         */
-     }
+    // }
  ///--------------------------------------------------------------------
-  *output2DX = windowCoordinates[0];//windowCoordinates[2];
-  *output2DY = windowCoordinates[1];//windowCoordinates[2];
-  *output2DW = windowCoordinates[2];
-  return 1;
+
+ return 0;
 }
 
 
