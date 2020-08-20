@@ -731,7 +731,7 @@ int transpose4x4DMatrix(double * mat)
 int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB) 
 {
  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
-  {  
+ {  
 
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
@@ -782,7 +782,7 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 
   return (
              (multiplyTwo4x4DMatrices(tmp,matrixB,matrixC)) &&
-             (multiplyTwo4x4DMatrices(result , matrixA , tmp)) 
+             (multiplyTwo4x4DMatrices(result,matrixA,tmp )) 
          );
   }
   return 0;
@@ -944,7 +944,7 @@ int multiplyThree4x4FMatricesWithIdentityHints(
                                               )
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
-  {  
+  {
     unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
   
     //Do the absolutely minimum number of operations required
@@ -966,9 +966,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
       default:   
         create4x4FIdentityMatrix(result);
         return 1; 
-    }; 
+    };
     //----------------------------------------------------------
- 
+
    return 1;
   }
  return 0;
@@ -977,24 +977,24 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
 {
-  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (matrixD==0) || (result==0) ) { return 0; }
-
-  int i=0;
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (matrixD!=0) && (result!=0) ) 
+  {      
   struct Matrix4x4OfFloats tmpA;
-  struct Matrix4x4OfFloats tmpB;
-  i+=multiplyTwo4x4FMatricesS(&tmpA,matrixC,matrixD);
-  i+=multiplyTwo4x4FMatricesS(&tmpB,matrixB,&tmpA);
-  i+=multiplyTwo4x4FMatricesS(result,matrixA,&tmpB);
-
-  return (i==3);
+  struct Matrix4x4OfFloats tmpB; 
+  return (
+            (multiplyTwo4x4FMatricesS(&tmpA,matrixC,matrixD)) &&
+            (multiplyTwo4x4FMatricesS(&tmpB,matrixB,&tmpA)) &&
+            (multiplyTwo4x4FMatricesS(result,matrixA,&tmpB)) 
+         );
+  }
+  return 0;
 }
 
 
 int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D)
 {
-  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
-
-
+ if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
+ {
   if (point3D[3]!=0.0)
   {
     fprintf(stderr,"Error with W coordinate transform3DNormalVectorUsing3x3FPartOf4x4FMatrix , should be zero  \n");
@@ -1036,6 +1036,8 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
   }
 
   return 1;
+ }
+ return 0;
 }
 
 
@@ -1045,8 +1047,8 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
 
 int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4, float * point3D)
 {
-  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
-
+if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
+ {      
 /*
    What we want to do ( in mathematica )
    { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
@@ -1085,6 +1087,8 @@ int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D,struct Matrix4x
   }
 
  return 1;
+ }
+return 0;
 }
 
 int normalize3DPointFVector(float * vec)
