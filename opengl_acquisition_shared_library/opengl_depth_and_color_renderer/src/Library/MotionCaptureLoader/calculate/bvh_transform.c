@@ -378,7 +378,7 @@ int bvh_loadTransformForMotionBuffer(
 
 
        if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
-       { 
+       {
         create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                         &bvhTransform->joint[jID].dynamicRotation,
                                                         -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],

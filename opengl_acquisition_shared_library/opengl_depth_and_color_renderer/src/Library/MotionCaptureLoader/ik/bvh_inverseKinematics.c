@@ -1168,12 +1168,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         exit(0);
     }
     
+    /*
     if (ikConfig->dumpScreenshots)
     {
         fprintf(stderr,RED "Dumping screenshots is disabled for performance reasons..\n" NORMAL);
         ikConfig->dumpScreenshots=0;
          
-    }
+    }*/
 
 
     ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);

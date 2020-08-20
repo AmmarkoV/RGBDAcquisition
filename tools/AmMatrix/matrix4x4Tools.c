@@ -439,7 +439,6 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity); 
     break;
     case ROTATION_ORDER_RPY:
-       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF can't handle RPY, returning Identity\n"); 
        doRPYTransformationF(
                             m,
                             degreesEulerZ,//roll,
@@ -731,7 +730,8 @@ int transpose4x4DMatrix(double * mat)
  
 int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB) 
 {
-  if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
+ if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
+  {  
 
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
@@ -769,27 +769,31 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
   #endif // PRINT_MATRIX_DEBUGGING
 
   return 1;
+  }
+  return 0;
 }
 
 
 int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
 {
-  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+ if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
+  {   
+  double tmp[16]; 
 
-  int i=0;
-  double tmp[16];
-  i+=multiplyTwo4x4DMatrices(tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4DMatrices(result , matrixA , tmp);
-
-  return (i==2);
+  return (
+             (multiplyTwo4x4DMatrices(tmp,matrixB,matrixC)) &&
+             (multiplyTwo4x4DMatrices(result , matrixA , tmp)) 
+         );
+  }
+  return 0;
 }
 
 
 
 int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB)
 {
-  if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
-
+  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
+  {  
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
   print4x4FMatrix("A", matrixA);
@@ -826,6 +830,8 @@ int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * mat
   #endif // PRINT_MATRIX_DEBUGGING
 
   return 1;
+  }
+ return 0;
 }
 
 
@@ -901,26 +907,29 @@ int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * 
 
 int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC)
 {
-  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
+  {  
+  float tmp[16]; 
 
-  int i=0;
-  float tmp[16];
-  i+=multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4FMatrices_Naive(result , matrixA , tmp);
-
-  return (i==2);
+  return (
+           (multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC)) &&
+           (multiplyTwo4x4FMatrices_Naive(result , matrixA , tmp))
+         );
+  }
+  return 0;
 }
 
 int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
 {
-  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
-
-  int i=0;
-  struct Matrix4x4OfFloats tmp;
-  i+=multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4FMatricesS(result,matrixA,&tmp);
-
-  return (i==2);
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
+  { 
+   struct Matrix4x4OfFloats tmp; 
+   return (
+           ( multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC)  ) &&
+           ( multiplyTwo4x4FMatricesS(result,matrixA,&tmp) )
+          );
+  }
+  return 0;
 }
 
 
@@ -934,9 +943,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
                                                 int matrixCIsIdentity
                                               )
 {
-  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
-
-  unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
+  {  
+    unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
   
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
@@ -960,7 +969,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
     }; 
     //----------------------------------------------------------
  
-  return 1;
+   return 1;
+  }
+ return 0;
 }
 
 
