@@ -356,10 +356,10 @@ int viewProblem(struct ikProblem * problem)
 
 
 float calculateChainLoss(
-                                                   struct ikProblem * problem,
-                                                   unsigned int chainID,
-                                                   unsigned int partIDStart
-                                                 )
+                          struct ikProblem * problem,
+                          unsigned int chainID,
+                          unsigned int partIDStart
+                        )
 {
     unsigned int numberOfSamples=0;
     float loss=0;
@@ -372,11 +372,11 @@ float calculateChainLoss(
         else          
         if (
               bvh_loadTransformForMotionBuffer(
-                                                                                          problem->mc,
-                                                                                          problem->chain[chainID].currentSolution->motion,
-                                                                                          &problem->chain[chainID].current2DProjectionTransform,
-                                                                                          0//Dont populate extra structures we dont need them they just take time
-                                                                                        )
+                                               problem->mc,
+                                               problem->chain[chainID].currentSolution->motion,
+                                               &problem->chain[chainID].current2DProjectionTransform,
+                                               0//Dont populate extra structures we dont need them they just take time
+                                              )
             )
         {
             if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
@@ -407,7 +407,7 @@ float calculateChainLoss(
     //I have left 0/0 on purpose to cause NaNs when projection errors occur
     //----------------------------------------------------------------------------------------------------------
     if (numberOfSamples!=0) { loss = (float) loss/numberOfSamples; }  else
-                                                       { loss = NAN; }
+                            { loss = NAN; }
     //----------------------------------------------------------------------------------------------------------
     return loss;
 }
@@ -429,6 +429,7 @@ float iteratePartLoss(
 {
     unsigned long startTime = GetTickCountMicrosecondsIK();
 
+    //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
     {
         problem->chain[chainID].part[partID].mIDStart,
@@ -436,7 +437,7 @@ float iteratePartLoss(
         problem->chain[chainID].part[partID].mIDStart+2
     };
 
-
+    //The original values we want to improve
     float originalValues[3] = 
     {
          problem->chain[chainID].currentSolution->motion[mIDS[0]],
@@ -454,12 +455,12 @@ float iteratePartLoss(
     //until the end joint of our chain...  iterateChainLoss
     float initialLoss = calculateChainLoss(problem,chainID,partID);
 
-    ///Having calculated all these joints from here on we only need to update this joint and its children ( and we dont care about their parents since they dont change .. )
+    ///Having calculated all these joints from here on we only need to update this joint and its children ( we dont care about their parents since they dont change .. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
  
- //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high  loss
+ //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
    if (initialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Started with a NaN loss whill processing chain %u for joint %s \n" NORMAL,chainID,jointName);
@@ -467,22 +468,22 @@ float iteratePartLoss(
        return initialLoss;
    }
       else
-    if (initialLoss==0.0)
-    {
+   if (initialLoss==0.0)
+   {
         //If our loss is perfect we obviously can't improve it..
         if (verbose)
                { fprintf(stderr, GREEN"\nWon't optimize %s,  already perfect\n" NORMAL,jointName); }
 
         return initialLoss;
-    }
+   }
        else
-    if (maximumAcceptableStartingLoss>0.0)
-    {
+   if (maximumAcceptableStartingLoss>0.0)
+   {
         //The positional subproblem gets a pass to help the other joints..
         int isItThePositionalSubproblem = ( (partID==0) && ( (chainID==0) || chainID==1) ); 
         
-        //If we are really.. really.. far from the solution we might not want to try and do IK
-        //as it will improve loss but may lead to a weird incorrect pose 
+        //If we are really.. really.. far from the solution we don't want to try and do IK
+        //as it will improve loss but may lead to a weird and incorrect pose 
         if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) ) //Dont do that chain
         {
             if (verbose)
@@ -490,7 +491,7 @@ float iteratePartLoss(
 
             return initialLoss;
         }
-    } //Careful dont add another else here..
+   } //Careful dont add another else here..
  //------------------------
 
 
@@ -514,7 +515,7 @@ if (iterationID==0)
                                               problem->chain[chainID].currentSolution->motion[mIDS[2]] 
                                              }; 
             
-            //Maybe previous solution is closer to current?
+            //Maybe previous solution is closer to current observation?
             problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
             problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) problem->previousSolution->motion[mIDS[1]];
             problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) problem->previousSolution->motion[mIDS[2]];
@@ -592,7 +593,7 @@ if (iterationID==0)
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
                 if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
-                delta[i] = d;
+                delta[i] = d; // Why d ? and not 0
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
@@ -619,7 +620,7 @@ if (iterationID==0)
         if (badLosses==3)
         {
             //We tried nudging all parameters both ways and couldn't improve anything
-            //We are at a local optima and  since tryMaintainingLocalOptima is enabled
+            //We are at a local optima and since tryMaintainingLocalOptima is enabled
             //we will try to maintain it..!
             if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
               
@@ -705,23 +706,12 @@ if (iterationID==0)
             }
              //Just stop after an explosion..
             executedEpochs=currentEpoch;
-             break;
+            break;
         }
-/*     else 
-        { 
-        if  ( 
-                //Safeguard agains gradient explosions which we detect when we see large gradients  
-                 (fabs(delta[0]>50)) || 
-                 (fabs(delta[1]>50)) || 
-                 (fabs(delta[2]>50))  
-             )
-        {
-             fprintf(stderr,YELLOW "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
-             fprintf(stderr,YELLOW "currentDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,delta[0],delta[1],delta[2]);
-             exit(0);
-        }
-        }
-*/
+
+
+
+
         //Remember previous loss/values 
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
@@ -808,17 +798,17 @@ if (iterationID==0)
 
 
 int iterateChainLoss(
-                                         struct ikProblem * problem,
-                                         unsigned int iterationID,
-                                         unsigned int chainID,
-                                         float lr,
-                                         float maximumAcceptableStartingLoss,
-                                         unsigned int epochs,
-                                         unsigned int tryMaintainingLocalOptima,
-                                         float spring, 
-                                         float gradientExplosionThreshold,
-                                         unsigned int verbose
-                                       )
+                     struct ikProblem * problem,
+                     unsigned int iterationID,
+                     unsigned int chainID,
+                     float lr,
+                     float maximumAcceptableStartingLoss,
+                     unsigned int epochs,
+                     unsigned int tryMaintainingLocalOptima,
+                     float spring, 
+                     float gradientExplosionThreshold,
+                     unsigned int verbose
+                    )
 {
     problem->chain[chainID].status = BVH_IK_STARTED;
    
@@ -835,18 +825,18 @@ int iterateChainLoss(
         if (!problem->chain[chainID].part[partID].endEffector)
         { //If the part is  not an end effector it has parameters to change and improve
             iteratePartLoss(
-                                            problem,
-                                            iterationID,
-                                            chainID,
-                                            partID,
-                                            lr,
-                                            maximumAcceptableStartingLoss,
-                                            epochs,
-                                            tryMaintainingLocalOptima,
-                                            spring, 
-                                            gradientExplosionThreshold,
-                                            verbose
-                                        );
+                             problem,
+                             iterationID,
+                             chainID,
+                             partID,
+                             lr,
+                             maximumAcceptableStartingLoss,
+                             epochs,
+                             tryMaintainingLocalOptima,
+                             spring, 
+                             gradientExplosionThreshold,
+                             verbose
+                           );
          }
     }
 
@@ -861,9 +851,9 @@ int iterateChainLoss(
 //each one of the chains in order.. We still mark the chain status to ensure 1:1 operation with the multithreaded
 //version of the code.. 
 int singleThreadedSolver(
-                                         struct ikProblem * problem,
-                                         struct ikConfiguration * ikConfig
-                                       )
+                         struct ikProblem * problem,
+                         struct ikConfiguration * ikConfig
+                        )
 {
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
@@ -923,17 +913,17 @@ void * iterateChainLossThread(void * ptr)
          // We need a new permission to start again...
          ctx->problem->chain[ctx->chainID].permissionToStart = 0; 
          iterateChainLoss(
-                                    ctx->problem,
-                                    ctx->problem->chain[ctx->chainID].currentIteration,
-                                    ctx->chainID,
-                                    ctx->ikConfig->learningRate,
-                                    ctx->ikConfig->maximumAcceptableStartingLoss,
-                                    ctx->ikConfig->epochs,
-                                    ctx->ikConfig->tryMaintainingLocalOptima,
-                                    ctx->ikConfig->spring, 
-                                    ctx->ikConfig->gradientExplosionThreshold,
-                                    ctx->ikConfig->verbose
-                                  );      
+                           ctx->problem,
+                           ctx->problem->chain[ctx->chainID].currentIteration,
+                           ctx->chainID,
+                           ctx->ikConfig->learningRate,
+                           ctx->ikConfig->maximumAcceptableStartingLoss,
+                           ctx->ikConfig->epochs,
+                           ctx->ikConfig->tryMaintainingLocalOptima,
+                           ctx->ikConfig->spring, 
+                           ctx->ikConfig->gradientExplosionThreshold,
+                           ctx->ikConfig->verbose
+                         );      
     }
     usleep(100);
   }
@@ -946,9 +936,9 @@ void * iterateChainLossThread(void * ptr)
 //This is the multi threaded version of the code..!
 //This is more complex than just spawning one thread per problem because we have to ensure that certain chains get processed in certain order
 int multiThreadedSolver(
-                                         struct ikProblem * problem,
-                                         struct ikConfiguration * ikConfig
-                                       )
+                        struct ikProblem * problem,
+                        struct ikConfiguration * ikConfig
+                       )
 {
   unsigned int numberOfWorkerThreads = 0;
   
@@ -990,17 +980,17 @@ int multiThreadedSolver(
               if (!problem->chain[chainID].parallel )
               {  //Normal chains run normally..
                 iterateChainLoss(
-                                                   problem,
-                                                   iterationID,
-                                                   chainID,
-                                                   ikConfig->learningRate,
-                                                   ikConfig->maximumAcceptableStartingLoss,
-                                                   ikConfig->epochs,
-                                                   ikConfig->tryMaintainingLocalOptima,
-                                                   ikConfig->spring, 
-                                                   ikConfig->gradientExplosionThreshold,
-                                                   ikConfig->verbose
-                                                 );
+                                 problem,
+                                 iterationID,
+                                 chainID,
+                                 ikConfig->learningRate,
+                                 ikConfig->maximumAcceptableStartingLoss,
+                                 ikConfig->epochs,
+                                 ikConfig->tryMaintainingLocalOptima,
+                                 ikConfig->spring,
+                                 ikConfig->gradientExplosionThreshold,
+                                 ikConfig->verbose
+                                );
                                                  
                   //After we finish we update the problem->currentSolution with what our chain came up with..
                  copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
@@ -1037,10 +1027,10 @@ int multiThreadedSolver(
                                    {  
                                        //Shorthand to address the correct motion values
                                        unsigned int mIDS[3] ={
-                                                                                       problem->chain[chainID].part[partID].mIDStart,
-                                                                                       problem->chain[chainID].part[partID].mIDStart+1,
-                                                                                       problem->chain[chainID].part[partID].mIDStart+2
-                                                                                      };
+                                                               problem->chain[chainID].part[partID].mIDStart,
+                                                               problem->chain[chainID].part[partID].mIDStart+1,
+                                                               problem->chain[chainID].part[partID].mIDStart+2
+                                                             };
 
                                        //Copy back the solution of the chain to the "official" solution for the  whole  problem
                                        problem->currentSolution->motion[mIDS[0]]=problem->chain[chainID].currentSolution->motion[mIDS[0]];
@@ -1088,10 +1078,10 @@ int multiThreadedSolver(
 
 
 int ensureInitialPositionIsInFrustrum(
-                                                                            struct simpleRenderer *renderer,
-                                                                            struct MotionBuffer * solution,
-                                                                            struct MotionBuffer * previousSolution
-                                                                         )
+                                      struct simpleRenderer *renderer,
+                                      struct MotionBuffer * solution,
+                                      struct MotionBuffer * previousSolution
+                                     )
 {
    float closestDistanceToCameraInCM=30; 
     
@@ -1130,24 +1120,24 @@ int ensureInitialPositionIsInFrustrum(
 
 
 int approximateBodyFromMotionBufferUsingInverseKinematics(
-                                                                                                                                  struct BVH_MotionCapture * mc,
-                                                                                                                                  struct simpleRenderer *renderer,
-                                                                                                                                   struct ikProblem * problem,
-                                                                                                                                  struct ikConfiguration * ikConfig,
-                                                                                                                                  //---------------------------------
-                                                                                                                                  struct MotionBuffer * previousSolution,
-                                                                                                                                  struct MotionBuffer * solution,
-                                                                                                                                  struct MotionBuffer * groundTruth,
-                                                                                                                                  //---------------------------------
-                                                                                                                                  struct BVH_Transform * bvhTargetTransform,
-                                                                                                                                  //---------------------------------
-                                                                                                                                  unsigned int useMultipleThreads,
-                                                                                                                                  //--------------------------------- 
-                                                                                                                                  float * initialMAEInPixels,
-                                                                                                                                  float * finalMAEInPixels,
-                                                                                                                                  float * initialMAEInMM,
-                                                                                                                                  float * finalMAEInMM
-                                                                                                                                )
+                                                          struct BVH_MotionCapture * mc,
+                                                          struct simpleRenderer *renderer,
+                                                          struct ikProblem * problem,
+                                                          struct ikConfiguration * ikConfig,
+                                                          //---------------------------------
+                                                          struct MotionBuffer * previousSolution,
+                                                          struct MotionBuffer * solution,
+                                                          struct MotionBuffer * groundTruth,
+                                                          //---------------------------------
+                                                          struct BVH_Transform * bvhTargetTransform,
+                                                          //---------------------------------
+                                                          unsigned int useMultipleThreads,
+                                                          //--------------------------------- 
+                                                          float * initialMAEInPixels,
+                                                          float * finalMAEInPixels,
+                                                          float * initialMAEInMM,
+                                                          float * finalMAEInMM
+                                                         )
 {
     if  ( (solution==0) || (solution->motion==0) )
     {
@@ -1161,21 +1151,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         return 0;
     }
 
-
     if (ikConfig->ikVersion != (float) IK_VERSION)
     {
         fprintf(stderr,RED "Fatal: IK Version mismatch for configuration structure (%0.2f vs %0.2f ) ..\n" NORMAL,ikConfig->ikVersion,IK_VERSION);
+        fprintf(stderr,RED "There is something wrong with your setup, halting execution..\n" NORMAL);
         exit(0);
     }
-    
-    /*
-    if (ikConfig->dumpScreenshots)
-    {
-        fprintf(stderr,RED "Dumping screenshots is disabled for performance reasons..\n" NORMAL);
-        ikConfig->dumpScreenshots=0;
-         
-    }*/
-
 
     ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
     
@@ -1204,8 +1185,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     struct BVH_Transform bvhCurrentTransform= {0};
 
 
-    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,0)// We don't need extra structures
-    )
+    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
     {  
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
@@ -1271,11 +1251,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     if (
           bvh_loadTransformForMotionBuffer(
-                                                                                      mc,
-                                                                                      solution->motion,
-                                                                                      &bvhCurrentTransform,
-                                                                                      0// dont use extra structures
-                                                                                     )
+                                           mc,
+                                           solution->motion,
+                                           &bvhCurrentTransform,
+                                           0// dont use extra structures
+                                          )
       )
     {
         //----------------------------------------------------
@@ -1315,76 +1295,3 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 }
 
 
-
-
-
-
-
-
-
-
-
-//https://www.gamasutra.com/blogs/LuisBermudez/20170804/303066/3_Simple_Steps_to_Implement_Inverse_Kinematics.php
-//https://groups.csail.mit.edu/drl/journal_club/papers/033005/buss-2004.pdf
-//https://simtk-confluence.stanford.edu/display/OpenSim/How+Inverse+Kinematics+Works
-int mirrorBVHThroughIK(
-    struct BVH_MotionCapture * mc,
-    struct BVH_Transform * bvhTransform,
-    unsigned int fID,
-    struct simpleRenderer * renderer,
-    BVHJointID jIDA,
-    BVHJointID jIDB
-)
-{
-    fprintf(stderr,"NOT IMPLEMENTED YET..");
-    //Todo mirror 2D points in 2D and then perform IK..
-    return 0;
-}
-
-
-
-
-int bvh_MirrorJointsThroughIK(
-    struct BVH_MotionCapture * mc,
-    const char * jointNameA,
-    const char * jointNameB
-)
-{
-    BVHJointID jIDA,jIDB;
-
-    if (
-        (!bvh_getJointIDFromJointNameNocase(mc,jointNameA,&jIDA)) ||
-        (!bvh_getJointIDFromJointNameNocase(mc,jointNameB,&jIDB))
-    )
-    {
-        fprintf(stderr,"bvh_MirrorJointsThroughIK error resolving joints (%s,%s) \n",jointNameA,jointNameB);
-        fprintf(stderr,"Full list of joints is : \n");
-        unsigned int jID=0;
-        for (jID=0; jID<mc->jointHierarchySize; jID++)
-        {
-            fprintf(stderr,"   joint %u = %s\n",jID,mc->jointHierarchy[jID].jointName);
-        }
-        return 0;
-    }
-
-    struct BVH_Transform bvhTransform= {0};
-    struct simpleRenderer renderer= {0};
-    // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-    simpleRendererDefaults(&renderer,1920,1080, 582.18394,582.52915);
-    simpleRendererInitialize(&renderer);
-
-    BVHFrameID fID=0;
-    for (fID=0; fID<mc->numberOfFrames; fID++)
-    {
-        mirrorBVHThroughIK(
-            mc,
-            &bvhTransform,
-            fID,
-            &renderer,
-            jIDA,
-            jIDB
-        );
-    }
-
-    return 1;
-}
