@@ -240,15 +240,16 @@ void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
    //Since we do several million accesses an additional optimization is to keep a list of interesting joints
    //-----------------------------------------------------------------------------------------------
    bvhTransform->jointIDTransformHashPopulated=1;
-   bvhTransform->lengthOfListOfJointIDsToTransform=0; //Start from the .. start.. 
+   unsigned int hashedElementsCounter=0;
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
        if (!bvhTransform->skipCalculationsForJoint[jID])
        {
-         bvhTransform->listOfJointIDsToTransform[bvhTransform->lengthOfListOfJointIDsToTransform]=jID;
-         bvhTransform->lengthOfListOfJointIDsToTransform+=1;
+         bvhTransform->listOfJointIDsToTransform[hashedElementsCounter]=jID;
+         hashedElementsCounter+=1;
        }
-   } 
+   }
+   bvhTransform->lengthOfListOfJointIDsToTransform=hashedElementsCounter; //Start from the .. start.. 
    //-----------------------------------------------------------------------------------------------
 }
 
@@ -392,8 +393,8 @@ int bvh_loadTransformForMotionBuffer(
   //----------------------------------------------------------------------------------------
   #if USE_TRANSFORM_HASHING
    for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
-   {  
-     unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
+   {
+    unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
   #else 
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
