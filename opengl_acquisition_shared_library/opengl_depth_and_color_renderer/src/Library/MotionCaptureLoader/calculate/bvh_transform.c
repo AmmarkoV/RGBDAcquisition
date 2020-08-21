@@ -237,6 +237,7 @@ int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_T
 
 void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
 {
+    #if USE_TRANSFORM_HASHING  
    //Since we do several million accesses an additional optimization is to keep a list of interesting joints
    //-----------------------------------------------------------------------------------------------
    bvhTransform->jointIDTransformHashPopulated=1;
@@ -251,6 +252,8 @@ void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
    }
    bvhTransform->lengthOfListOfJointIDsToTransform=hashedElementsCounter; //Start from the .. start.. 
    //-----------------------------------------------------------------------------------------------
+   #endif
+   return;
 }
 
 
@@ -267,9 +270,11 @@ int bvh_markAllJointsAsUselessInTransform(
    {
      bvhTransform->skipCalculationsForJoint[jID]=1;
    }
-  
-  bvhTransform->lengthOfListOfJointIDsToTransform=0; //No joints are interesting
-  
+   
+  #if USE_TRANSFORM_HASHING
+   bvhTransform->lengthOfListOfJointIDsToTransform=0; //No joints are interesting
+  #endif
+ 
   return 1;
 }
 
@@ -294,9 +299,11 @@ int bvh_markJointAndParentsAsUsefulInTransform(
  
   bvhTransform->skipCalculationsForJoint[0]=0;
 
+  #if USE_TRANSFORM_HASHING
   //As an extra speed up we hash the interesting joints
-  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
-  
+   bvh_HashUsefulJoints(bvhMotion,bvhTransform);
+  #endif
+ 
   return 1;
 }
 
@@ -321,9 +328,11 @@ int bvh_markJointAndParentsAsUselessInTransform(
 
   bvhTransform->skipCalculationsForJoint[0]=1;
 
-  //As an extra speed up we hash the interesting joints
-  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
-
+  #if USE_TRANSFORM_HASHING
+   //As an extra speed up we hash the interesting joints
+   bvh_HashUsefulJoints(bvhMotion,bvhTransform);
+  #endif
+  
   return 1;
 }
 
@@ -342,10 +351,11 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
   bvh_markJointAndParentsAsUselessInTransform(bvhMotion,bvhTransform,jID);
   bvhTransform->skipCalculationsForJoint[jID]=0;
 
-
-  //As an extra speed up we hash the interesting joints
-  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
-
+  #if USE_TRANSFORM_HASHING
+   //As an extra speed up we hash the interesting joints
+   bvh_HashUsefulJoints(bvhMotion,bvhTransform);
+  #endif
+  
   return 1;
 }
 
