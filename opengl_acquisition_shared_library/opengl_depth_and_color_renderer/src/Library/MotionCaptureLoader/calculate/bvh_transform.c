@@ -234,6 +234,25 @@ int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_T
 }
 
 
+
+void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
+{
+   //Since we do several million accesses an additional optimization is to keep a list of interesting joints
+   //-----------------------------------------------------------------------------------------------
+   bvhTransform->jointIDTransformHashPopulated=1;
+   bvhTransform->lengthOfListOfJointIDsToTransform=0; //Start from the .. start.. 
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+       if (!bvhTransform->skipCalculationsForJoint[jID])
+       {
+         bvhTransform->listOfJointIDsToTransform[bvhTransform->lengthOfListOfJointIDsToTransform]=jID;
+         bvhTransform->lengthOfListOfJointIDsToTransform+=1;
+       }
+   } 
+   //-----------------------------------------------------------------------------------------------
+}
+
+
 int bvh_markAllJointsAsUselessInTransform(
                                           struct BVH_MotionCapture * bvhMotion ,
                                           struct BVH_Transform * bvhTransform
@@ -247,10 +266,11 @@ int bvh_markAllJointsAsUselessInTransform(
    {
      bvhTransform->skipCalculationsForJoint[jID]=1;
    }
-
+  
+  bvhTransform->lengthOfListOfJointIDsToTransform=0; //No joints are interesting
+  
   return 1;
 }
-
 
 
 int bvh_markJointAndParentsAsUsefulInTransform(
@@ -261,7 +281,7 @@ int bvh_markJointAndParentsAsUsefulInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
- if (jID>=bvhMotion->jointHierarchySize) { return 0; }
+  if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
  
   //We want to make sure all parent joints until root ( jID->0 ) are set to not skip calculations..
@@ -270,9 +290,12 @@ int bvh_markJointAndParentsAsUsefulInTransform(
            bvhTransform->skipCalculationsForJoint[jID]=0;
            jID = bvhMotion->jointHierarchy[jID].parentJoint;
       }
-
+ 
   bvhTransform->skipCalculationsForJoint[0]=0;
 
+  //As an extra speed up we hash the interesting joints
+  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
+  
   return 1;
 }
 
@@ -285,8 +308,9 @@ int bvh_markJointAndParentsAsUselessInTransform(
 {
   if (bvhMotion==0) { return 0; }
   if (bvhTransform==0) { return 0; }
- if (jID>=bvhMotion->jointHierarchySize) { return 0; }
+  if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
+   
 
   while (jID!=0)
       {
@@ -295,6 +319,9 @@ int bvh_markJointAndParentsAsUselessInTransform(
       }
 
   bvhTransform->skipCalculationsForJoint[0]=1;
+
+  //As an extra speed up we hash the interesting joints
+  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
 
   return 1;
 }
@@ -313,6 +340,10 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
   bvhTransform->useOptimizations=1;
   bvh_markJointAndParentsAsUselessInTransform(bvhMotion,bvhTransform,jID);
   bvhTransform->skipCalculationsForJoint[jID]=0;
+
+
+  //As an extra speed up we hash the interesting joints
+  bvh_HashUsefulJoints(bvhMotion,bvhTransform);
 
   return 1;
 }
@@ -337,7 +368,6 @@ enum MOTIONBUFFER_DATA_FIELDS
 };
 
 
-
 int bvh_loadTransformForMotionBuffer(
                                      struct BVH_MotionCapture * bvhMotion,
                                      float * motionBuffer,
@@ -349,8 +379,6 @@ int bvh_loadTransformForMotionBuffer(
   if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
   {
     
-
-
   //First of all we need to clean the BVH_Transform structure
   bvhTransform->jointsOccludedIn2DProjection=0;
 
@@ -362,8 +390,14 @@ int bvh_loadTransformForMotionBuffer(
   //First of all we need to populate all local dynamic transformation of our chain
   //These only have to do with our Motion Buffer and don't involve any chain transformations
   //----------------------------------------------------------------------------------------
-  for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-  {
+  #if USE_TRANSFORM_HASHING
+   for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
+   {  
+     unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
+  #else 
+   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+  #endif     
     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
       //To Setup the dynamic transformation we must first get values from our bvhMotion structure
@@ -418,8 +452,14 @@ int bvh_loadTransformForMotionBuffer(
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
-  for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-  {
+  #if USE_TRANSFORM_HASHING
+   for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
+   {  
+     unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
+  #else 
+   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+  #endif     
     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
      //This will get populated either way..

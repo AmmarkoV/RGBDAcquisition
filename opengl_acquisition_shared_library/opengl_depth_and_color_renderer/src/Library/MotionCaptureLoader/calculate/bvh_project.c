@@ -177,8 +177,16 @@ int bvh_projectTo2D(
 
 
       //Then project 3D positions on 2D frame and save results..
+      #if USE_TRANSFORM_HASHING
+      for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
+         {  
+           unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
+      #else 
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-      {
+         {
+      #endif     
+      //for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+      //{
         //if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
         if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
         { 

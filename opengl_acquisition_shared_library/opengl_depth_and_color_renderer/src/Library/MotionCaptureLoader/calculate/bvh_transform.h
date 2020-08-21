@@ -81,10 +81,16 @@ struct BVH_TransformedJoint
 };
 
 
+#define USE_TRANSFORM_HASHING 0
+
 struct BVH_Transform
 {
   char useOptimizations;
   unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+
+  unsigned int jointIDTransformHashPopulated;
+  unsigned int lengthOfListOfJointIDsToTransform;
+  BVHJointID listOfJointIDsToTransform[MAX_BVH_JOINT_HIERARCHY_SIZE];
   
   struct rectangleArea torso;
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
