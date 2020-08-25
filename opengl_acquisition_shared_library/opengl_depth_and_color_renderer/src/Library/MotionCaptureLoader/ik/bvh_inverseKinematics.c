@@ -139,10 +139,8 @@ float meanBVH2DDistance(
 
             if (mc->selectedJoints!=0)
             {
-                if (!mc->selectedJoints[jID])
-                {
-                    isSelected=0;
-                }
+              //Selected joints table is declared so we can access it
+              isSelected=mc->selectedJoints[jID];
             }
 
             if ( (useAllJoints) || ( (isSelected) && (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
@@ -154,8 +152,8 @@ float meanBVH2DDistance(
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
                 if (   
-                         (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) ) 
-                    )
+                     (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) ) 
+                   )
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
                     
@@ -235,10 +233,8 @@ float meanBVH3DDistance(
 
             if (mc->selectedJoints!=0)
             {
-                if (!mc->selectedJoints[jID])
-                {
-                    isSelected=0;
-                }
+              //Selected joints table is declared so we can access it
+              isSelected=mc->selectedJoints[jID]; 
             }
 
             if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
@@ -284,13 +280,13 @@ float meanBVH3DDistance(
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
-    if (updatedSolution==0)                     { return 0; }
+    if (updatedSolution==0)           { return 0; }
     if (problem->currentSolution==0)  { return 0; }
-    if (problem->initialSolution==0)     { return 0; }
+    if (problem->initialSolution==0)  { return 0; }
     
-    //Actual copy
+    //Actual copy ------------------------------------------------------------------
     if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  { return 0; }
-    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )      { return 0; }
+    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  { return 0; }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
@@ -365,11 +361,8 @@ float calculateChainLoss(
     float loss=0;
     if (chainID<problem->numberOfChains)
     {
-        if (partIDStart >= problem->chain[chainID].numberOfParts)
-        {
-           fprintf(stderr,"Chain %u has  too few parts ( %u ) \n",chainID,problem->chain[chainID].numberOfParts);
-        }
-        else          
+      if (partIDStart < problem->chain[chainID].numberOfParts)
+      {
         if (
               bvh_loadTransformForMotionBuffer(
                                                problem->mc,
@@ -379,7 +372,7 @@ float calculateChainLoss(
                                               )
             )
         {
-            if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
+           if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
             {
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
@@ -388,8 +381,8 @@ float calculateChainLoss(
                         ///Warning: When you change this please change meanBVH2DDistance as well!
                         float sX=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0];
                         float sY=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1];
-                        float tX =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
-                        float tY =(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
+                        float tX=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
+                        float tY=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
                         
                         //Only use source/target joints  that exist and are not occluded.. 
                         if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
@@ -402,14 +395,16 @@ float calculateChainLoss(
            { fprintf(stderr,RED "Could not calculate transform projections to 2D for chain %u \n"NORMAL,chainID); }
         } else //Have a valid 2D transform
        { fprintf(stderr,RED "Could not calculate transform for chain %u is invalid\n"NORMAL,chainID); }
+       
+     } else
+     { fprintf(stderr,RED "Chain %u has  too few parts ( %u ) \n" NORMAL,chainID,problem->chain[chainID].numberOfParts); }    
     } else //Have a valid chain
     { fprintf(stderr,RED "Chain %u is invalid\n"NORMAL,chainID); }
     //I have left 0/0 on purpose to cause NaNs when projection errors occur
     //----------------------------------------------------------------------------------------------------------
-    if (numberOfSamples!=0) { loss = (float) loss/numberOfSamples; }  else
-                            { loss = NAN; }
+    if (numberOfSamples!=0) { return (float) loss/numberOfSamples; }  else
+                            { return NAN; }
     //----------------------------------------------------------------------------------------------------------
-    return loss;
 }
 
 
