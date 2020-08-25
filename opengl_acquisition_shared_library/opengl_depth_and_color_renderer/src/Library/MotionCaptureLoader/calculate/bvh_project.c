@@ -178,27 +178,21 @@ int bvh_projectTo2D(
 
       //Then project 3D positions on 2D frame and save results..
       #if USE_TRANSFORM_HASHING
+      fprintf(stderr,"bvh_projectTo2D called with %u items in hash\n",bvhTransform->lengthOfListOfJointIDsToTransform);
       for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
-         {  
+         {
+           //USING_HASH
            unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
       #else 
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
          {
       #endif     
-      //for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-      //{
-        //if ( (!bvhTransform->useOptimizations) || (!bvhTransform->joint[jID].skipCalculations) )
         if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
         { 
            pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
            pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
            pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];
            pos3DFloat[3]= (float) bvhTransform->joint[jID].pos3D[3];
-           
-           //Remind the client that the 2D positions extracted came from a not-normalized 3D points
-           //pos3DFloat[3]=1.0; 
-           //if (bvhTransform->joint[jID].pos3D[3]!=1.0)
-           //   { fprintf(stderr,"bvh_projectTo2D: W coord (%0.2f) of joint %u not normalized..\n",bvhTransform->joint[jID].pos3D[3],jID); }
 
           //Two cases here , we either want to want to render using our camera position where we have to do some extra matrix operations
           //to recenter our mesh and transform it accordingly

@@ -81,7 +81,16 @@ struct BVH_TransformedJoint
 };
 
 
+
+//Hashing means to generate a new table that only contains
+//The needed fields for transforms in order to try skipping 
+//checks we know that will fail
 #define USE_TRANSFORM_HASHING 0
+
+#if USE_TRANSFORM_HASHING
+ #warning "Transform hashing is under construction and not yet working.."
+#endif
+
 
 struct BVH_Transform
 {
@@ -114,6 +123,11 @@ int bvh_populateRectangle2DFromProjections(
 int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform);
 
 unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH_Transform * bvhTransform,const BVHJointID jID);
+
+int bvh_markAllJointsAsUsefullInTransform(
+                                          struct BVH_MotionCapture * bvhMotion ,
+                                          struct BVH_Transform * bvhTransform
+                                         );
 
 int bvh_markAllJointsAsUselessInTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform);
 

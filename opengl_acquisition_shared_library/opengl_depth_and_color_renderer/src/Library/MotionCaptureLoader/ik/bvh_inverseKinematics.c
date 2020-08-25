@@ -414,18 +414,18 @@ float calculateChainLoss(
 
 
 float iteratePartLoss(
-                                           struct ikProblem * problem,
-                                           unsigned int iterationID,
-                                           unsigned int chainID,
-                                           unsigned int partID,
-                                           float lr,
-                                           float maximumAcceptableStartingLoss,
-                                           unsigned int epochs,
-                                           unsigned int tryMaintainingLocalOptima,
-                                           float spring,
-                                           float gradientExplosionThreshold,
-                                           unsigned int verbose
-                                          )
+                      struct ikProblem * problem,
+                      unsigned int iterationID,
+                      unsigned int chainID,
+                      unsigned int partID,
+                      float lr,
+                      float maximumAcceptableStartingLoss,
+                      unsigned int epochs,
+                      unsigned int tryMaintainingLocalOptima,
+                      float spring,
+                      float gradientExplosionThreshold,
+                      unsigned int verbose
+                     )
 {
     unsigned long startTime = GetTickCountMicrosecondsIK();
 

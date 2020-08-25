@@ -237,23 +237,49 @@ int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_T
 
 void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
 {
-    #if USE_TRANSFORM_HASHING  
+   #if USE_TRANSFORM_HASHING  
    //Since we do several million accesses an additional optimization is to keep a list of interesting joints
+   //and only access them
    //-----------------------------------------------------------------------------------------------
-   bvhTransform->jointIDTransformHashPopulated=1;
    unsigned int hashedElementsCounter=0;
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-       if (!bvhTransform->skipCalculationsForJoint[jID])
+       if ( (!bvhTransform->useOptimizations) || (!bvhTransform->skipCalculationsForJoint[jID]) )
        {
          bvhTransform->listOfJointIDsToTransform[hashedElementsCounter]=jID;
-         hashedElementsCounter+=1;
+         ++hashedElementsCounter;
        }
    }
    bvhTransform->lengthOfListOfJointIDsToTransform=hashedElementsCounter; //Start from the .. start.. 
+   bvhTransform->jointIDTransformHashPopulated=1; //(hashedElementsCounter>0); //Mark the hash as populated
    //-----------------------------------------------------------------------------------------------
    #endif
    return;
+}
+
+
+
+int bvh_markAllJointsAsUsefullInTransform(
+                                          struct BVH_MotionCapture * bvhMotion ,
+                                          struct BVH_Transform * bvhTransform
+                                         )
+{
+  if (bvhMotion==0) { return 0; }
+  if (bvhTransform==0) { return 0; }
+  bvhTransform->useOptimizations=1;
+
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+     bvhTransform->skipCalculationsForJoint[jID]=0;
+   }
+   
+  #if USE_TRANSFORM_HASHING
+   //Marking all joints as useless is the same as setting the length of the joint 
+   //list to zero
+   bvh_HashUsefulJoints(bvhMotion,bvhTransform);
+  #endif
+ 
+  return 1;
 }
 
 
@@ -272,6 +298,8 @@ int bvh_markAllJointsAsUselessInTransform(
    }
    
   #if USE_TRANSFORM_HASHING
+   //Marking all joints as useless is the same as setting the length of the joint 
+   //list to zero
    bvhTransform->lengthOfListOfJointIDsToTransform=0; //No joints are interesting
   #endif
  
@@ -343,7 +371,7 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
                                                         BVHJointID jID
                                                        )
 {
-  if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
   if (jID>=bvhMotion->jointHierarchySize) { return 0; }
 
@@ -401,9 +429,10 @@ int bvh_loadTransformForMotionBuffer(
   //First of all we need to populate all local dynamic transformation of our chain
   //These only have to do with our Motion Buffer and don't involve any chain transformations
   //----------------------------------------------------------------------------------------
-  #if USE_TRANSFORM_HASHING
+  #if 0 //USE_TRANSFORM_HASHING
    for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
    {
+    //USING_HASH   
     unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
   #else 
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -463,9 +492,10 @@ int bvh_loadTransformForMotionBuffer(
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
-  #if USE_TRANSFORM_HASHING
+  #if 0 //USE_TRANSFORM_HASHING
    for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
    {  
+     //USING_HASH
      unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
   #else 
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
