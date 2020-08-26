@@ -199,13 +199,34 @@ static inline signed int Str2Int_internal(char * inpt,unsigned int start_from,un
 
 static inline unsigned char CheckIPCOk(struct InputParserC * ipc)
 {
+    /*
     if ( ipc->guardbyte1.checksum != ipc->guardbyte2.checksum ) { fprintf(stderr,"Input Parser - Wrong GuardChecksums #1\n"); return 0; }
     if ( ipc->guardbyte3.checksum != ipc->guardbyte4.checksum ) { fprintf(stderr,"Input Parser - Wrong GuardChecksums #2\n"); return 0; }
     if ( ipc->guardbyte1.checksum != ipc->guardbyte4.checksum ) { fprintf(stderr,"Input Parser - Wrong GuardChecksums #3\n"); return 0; }
     if ( (ipc->tokenlist==0) ||  (ipc->tokens_max<ipc->tokens_count) ) { fprintf(stderr,"Input Parser - Tokenlist error\n"); return 0; }
     if ( (ipc->delimeters==0) || (ipc->max_delimeter_count<ipc->cur_delimeter_count) ) { fprintf(stderr,"Input Parser - Delimeter error\n"); return 0; }
-
-    return 1;
+    */
+    if ( 
+         (ipc->guardbyte1.checksum==ipc->guardbyte2.checksum) &&
+         (ipc->guardbyte3.checksum==ipc->guardbyte4.checksum) &&
+         (ipc->guardbyte1.checksum==ipc->guardbyte4.checksum) 
+       )
+       {
+          if ( (ipc->tokenlist!=0) && (ipc->tokens_max>=ipc->tokens_count) )
+          {
+            if ( (ipc->delimeters!=0) && (ipc->max_delimeter_count>=ipc->cur_delimeter_count) ) 
+            {
+               return 1; 
+            }  else 
+            { fprintf(stderr,"Input Parser - Delimeter error\n"); return 0; }
+              
+          } else
+          { fprintf(stderr,"Input Parser - Tokenlist error\n"); }
+           
+           
+       } else
+       { fprintf(stderr,"Input Parser - Wrong GuardChecksums\n"); }
+    return 0;
 }
 
 

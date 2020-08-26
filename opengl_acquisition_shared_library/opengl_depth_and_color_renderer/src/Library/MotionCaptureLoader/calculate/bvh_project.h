@@ -40,6 +40,16 @@ void bvh_cleanTransform(
                        struct BVH_Transform     * bvhTransform
                       );
 
+
+int bvh_projectJIDTo2D(
+                     struct BVH_MotionCapture * mc,
+                     struct BVH_Transform     * bvhTransform,
+                     struct simpleRenderer    * renderer,
+                     BVHJointID jID,
+                     unsigned int               occlusions,
+                     unsigned int               directRendering
+                   );
+
 int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,

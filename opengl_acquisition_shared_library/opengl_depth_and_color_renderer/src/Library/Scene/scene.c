@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <time.h>
 #include <math.h>
 
 #include "../Tools/tools.h"
@@ -300,6 +301,20 @@ int closeScene()
   return 1;
 }
 
+
+
+int nanoTickSleep(long nanoseconds)
+{
+   struct timespec req, rem;
+
+   req.tv_sec = 0;              
+   req.tv_nsec = nanoseconds; 
+
+   return nanosleep(&req , &rem);
+}
+
+
+
 int tickScene(unsigned int framerate)
 {
    if (scene->controls.pauseTicking)
@@ -358,7 +373,7 @@ int tickScene(unsigned int framerate)
           sleepTime/=3;
 
           //fprintf(stderr,"sleepTime:%0.2f\n",sleepTime );
-          usleep((unsigned int) sleepTime);
+          nanoTickSleep((long) sleepTime);
         }
     } else
     //The second way to render is as fast as possible..!
@@ -368,7 +383,7 @@ int tickScene(unsigned int framerate)
         if (framerate>0)
          {
           if (scene->controls.tickUSleepTime>0)
-              { usleep(scene->controls.tickUSleepTime); }
+              { nanoTickSleep(scene->controls.tickUSleepTime); }
          }
         ++scene->ticks;
     }

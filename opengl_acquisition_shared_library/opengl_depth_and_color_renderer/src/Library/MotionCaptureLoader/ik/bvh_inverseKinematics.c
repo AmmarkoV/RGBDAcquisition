@@ -372,8 +372,26 @@ float calculateChainLoss(
                                               )
             )
         {
+            
+           #define ONLY_PROJECT_PARTS 1
+           
+           #if ONLY_PROJECT_PARTS
+           //To perform better we can skip projections that are not part of our kinematic chain..
+           //We thus perform fewer matrix multiplications 
+           unsigned int failedProjections=0;
+           for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                {
+                  unsigned int jID=problem->chain[chainID].part[partID].jID;
+                  failedProjections += ( bvh_projectJIDTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,jID,0,0) == 0 );
+                } 
+                
+           if (failedProjections==0)     
+            {
+           #else             
+           //We project all Joints to their 2D locations..
            if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
             {
+           #endif 
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
@@ -858,17 +876,17 @@ int singleThreadedSolver(
     
             problem->chain[chainID].currentIteration=iterationID;
             iterateChainLoss(
-                                               problem,
-                                               iterationID,
-                                               chainID,
-                                               ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
-                                               ikConfig->epochs,
-                                               ikConfig->tryMaintainingLocalOptima,
-                                               ikConfig->spring, 
-                                               ikConfig->gradientExplosionThreshold,
-                                               ikConfig->verbose
-                                             );
+                              problem,
+                              iterationID,
+                              chainID,
+                              ikConfig->learningRate,
+                              ikConfig->maximumAcceptableStartingLoss,
+                              ikConfig->epochs,
+                              ikConfig->tryMaintainingLocalOptima,
+                              ikConfig->spring, 
+                              ikConfig->gradientExplosionThreshold,
+                              ikConfig->verbose
+                           );
              
              //After we finish we update the problem->currentSolution with what our chain came up with..
             copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
