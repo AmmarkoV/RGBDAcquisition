@@ -53,9 +53,7 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z1=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[0]=jID;
        }
-
        //---
-
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) ) { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"rShldr",&jID) )    { found=1; }
@@ -68,9 +66,7 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z2=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[1]=jID;
        }
-
        //---
-
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )      { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"rThigh",&jID) )    { found=1; }
@@ -83,9 +79,7 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
        }
-
        //---
-
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )      { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"lThigh",&jID) )    { found=1; }
@@ -98,6 +92,7 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z4=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[3]=jID;
        }
+       //---
 
        if (
             (bvhTransform->torso.point1Exists) &&
@@ -215,13 +210,12 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
   {
      //If we are not using optimizations then transform every joint 
      return 1;
-  }
-  
+  } 
 }
 
 
 
-int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
+void bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
 { 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
@@ -230,14 +224,31 @@ int bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_T
          fprintf(stderr,"Joint %u ( %s ) is selected \n" ,jID , bvhMotion->jointHierarchy[jID].jointName);
      }
    }
-
 }
 
 
 
 void bvh_HashUsefulJoints(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
 {
-   #if USE_TRANSFORM_HASHING  
+   #if USE_TRANSFORM_HASHING
+   /*
+   //This is a little stupid.. if we are not using optimizations then we go through
+   //all elements..
+   if (!bvhTransform->useOptimizations)
+   {    
+      unsigned int hashedElementsCounter=0;
+      for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+       {
+         bvhTransform->listOfJointIDsToTransform[hashedElementsCounter]=jID;
+         ++hashedElementsCounter;
+       }
+       
+     bvhTransform->lengthOfListOfJointIDsToTransform=hashedElementsCounter; //Start from the .. start.. 
+     bvhTransform->jointIDTransformHashPopulated=1; //(hashedElementsCounter>0); //Mark the hash as populated
+     return ;
+   }
+   */
+    
    //Since we do several million accesses an additional optimization is to keep a list of interesting joints
    //and only access them
    //-----------------------------------------------------------------------------------------------
@@ -264,7 +275,7 @@ int bvh_markAllJointsAsUsefullInTransform(
                                           struct BVH_Transform * bvhTransform
                                          )
 {
-  if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
   bvhTransform->useOptimizations=1;
 
@@ -288,7 +299,7 @@ int bvh_markAllJointsAsUselessInTransform(
                                           struct BVH_Transform * bvhTransform
                                          )
 {
-  if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
   bvhTransform->useOptimizations=1;
 
@@ -313,7 +324,7 @@ int bvh_markJointAndParentsAsUsefulInTransform(
                                                 BVHJointID jID
                                               )
 {
-  if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
   if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
@@ -342,7 +353,7 @@ int bvh_markJointAndParentsAsUselessInTransform(
                                                 BVHJointID jID
                                               )
 {
-  if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
   if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
@@ -429,7 +440,7 @@ int bvh_loadTransformForMotionBuffer(
   //First of all we need to populate all local dynamic transformation of our chain
   //These only have to do with our Motion Buffer and don't involve any chain transformations
   //----------------------------------------------------------------------------------------
-  #if 0 //USE_TRANSFORM_HASHING
+  #if USE_TRANSFORM_HASHING
    for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
    {
     //USING_HASH   
@@ -492,7 +503,7 @@ int bvh_loadTransformForMotionBuffer(
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
-  #if 0 //USE_TRANSFORM_HASHING
+  #if USE_TRANSFORM_HASHING
    for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
    {  
      //USING_HASH
@@ -500,7 +511,7 @@ int bvh_loadTransformForMotionBuffer(
   #else 
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-  #endif     
+  #endif
     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
      //This will get populated either way..
@@ -542,7 +553,7 @@ int bvh_loadTransformForMotionBuffer(
                                      bvhMotion->jointHierarchy[jID].staticTransformation.m[11] + bvhTransform->joint[jID].dynamicTranslation.m[11]
                                     );
         #else
-        /*
+         //We can do the matrix multipliaction to calculate the offset..
          multiplyTwo4x4FMatrices(
                                 //Output AxB
                                 bvhTransform->joint[jID].localToWorldTransformation ,
@@ -551,8 +562,6 @@ int bvh_loadTransformForMotionBuffer(
                                 //B
                                 bvhTransform->joint[jID].dynamicTranslation
                               );
-                               * 
-        */
         #endif // FAST_OFFSET_TRANSLATION
       } else
       {
@@ -586,14 +595,6 @@ int bvh_loadTransformForMotionBuffer(
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #endif // FIND_FAST_CENTER
 
-
-      /*
-   if ( bvhMotion->jointHierarchy[jID].isRoot)
-      {
-       bvhTransform->centerPosition[0]=bvhTransform->joint[jID].pos3D[0];
-       bvhTransform->centerPosition[1]=bvhTransform->joint[jID].pos3D[1];
-       bvhTransform->centerPosition[2]=bvhTransform->joint[jID].pos3D[2];
-      }*/
     }
   }
 
@@ -665,14 +666,21 @@ int bvh_removeTranslationFromTransform(
 
   if ( bvh_getRootJointID(bvhMotion,&rootJID) )
   {
+   float rX = bvhTransform->joint[rootJID].pos3D[0];
+   float rY = bvhTransform->joint[rootJID].pos3D[1];
+   float rZ = bvhTransform->joint[rootJID].pos3D[2];
+      
+   float r2DX = bvhTransform->joint[rootJID].pos2D[0];
+   float r2DY = bvhTransform->joint[rootJID].pos2D[1];
+     
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
     {
-     bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].pos3D[0]-bvhTransform->joint[rootJID].pos3D[0];
-     bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].pos3D[1]-bvhTransform->joint[rootJID].pos3D[1];
-     bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].pos3D[2]-bvhTransform->joint[rootJID].pos3D[2];
+     bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].pos3D[0]-rX;
+     bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].pos3D[1]-rY;
+     bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].pos3D[2]-rZ;
 
-     bvhTransform->joint[jID].pos2D[0]=bvhTransform->joint[jID].pos2D[0]-bvhTransform->joint[rootJID].pos2D[0];
-     bvhTransform->joint[jID].pos2D[1]=bvhTransform->joint[jID].pos2D[1]-bvhTransform->joint[rootJID].pos2D[1];
+     bvhTransform->joint[jID].pos2D[0]=bvhTransform->joint[jID].pos2D[0]-r2DX;
+     bvhTransform->joint[jID].pos2D[1]=bvhTransform->joint[jID].pos2D[1]-r2DY;
     }
   }
 

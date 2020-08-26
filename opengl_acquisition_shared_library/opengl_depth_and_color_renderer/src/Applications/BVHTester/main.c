@@ -110,15 +110,15 @@ int testMultipleLoad(const char * filename)
 {
  struct BVH_MotionCapture bvhMotion={0};
 
- unsigned int done=0;
- unsigned int fileNumber=0;
- ssize_t read;
  FILE * fp = fopen(filename,"r");
     if (fp!=0)
         {
             char * line = NULL;
             size_t len = 0;
-
+            ssize_t read;
+ 
+            unsigned int fileNumber=0;
+            unsigned int done=0;
             while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
                 {
                   if (line!=0)

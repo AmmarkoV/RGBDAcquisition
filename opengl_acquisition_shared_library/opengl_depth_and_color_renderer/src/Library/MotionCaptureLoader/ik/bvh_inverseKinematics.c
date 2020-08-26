@@ -560,7 +560,6 @@ if (iterationID==0)
     float e=0.000001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
-    float distanceFromInitial; 
 
 
 //Give an initial direction..
@@ -643,7 +642,7 @@ if (iterationID==0)
         //Calculate losses
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-        distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
+        float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
         currentLoss[0]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
@@ -892,6 +891,18 @@ int singleThreadedSolver(
 ///=====================================================================================
 ///=====================================================================================
 ///=====================================================================================
+
+
+int nsleep(long nanoseconds)
+{
+   struct timespec req, rem;
+
+   req.tv_sec = 0;              
+   req.tv_nsec = nanoseconds; 
+
+   return nanosleep(&req , &rem);
+}
+
  
 void * iterateChainLossThread(void * ptr)
 {
@@ -920,7 +931,7 @@ void * iterateChainLossThread(void * ptr)
                            ctx->ikConfig->verbose
                          );      
     }
-    usleep(100);
+    nsleep(100);
   }
  
   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
@@ -1044,7 +1055,7 @@ int multiThreadedSolver(
                 allThreadsAreDone=1;
             } else
             {
-                usleep(100);
+                nsleep(100);
             }
             
             ++waitTime;
@@ -1219,7 +1230,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
 
-     float * m = problem->initialSolution->motion;
      
      fprintf(stderr,"IK lr = %f ,  max start loss =%0.1f , Iterations = %u , epochs = %u , spring = %0.1f \n", 
                                                ikConfig->learningRate,
@@ -1228,18 +1238,23 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->epochs, 
                                                ikConfig->spring
                     );
-                    
-     //fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+               
+     
+     if (ikConfig->verbose)
+     {
+      float * m = problem->initialSolution->motion;      
+      fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
 
         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
         { 
             m = problem->previousSolution->motion;
-            //fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
+            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
         }
     
-    m = solution->motion;
-    //fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
-    
+      m = solution->motion;
+      fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);     
+     }
+     
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------

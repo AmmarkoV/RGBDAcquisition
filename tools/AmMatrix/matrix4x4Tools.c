@@ -1172,7 +1172,6 @@ void create4x4FModelTransformation(
     //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
      
-    char operationsNeeded = 0; 
     char numberOfOperationsNeeded=0;
      
      
@@ -1191,8 +1190,7 @@ void create4x4FModelTransformation(
                                  y,
                                  z
                                );
-      translationSpecified=1; 
-      operationsNeeded+=1;
+      translationSpecified=1;
       ++numberOfOperationsNeeded;
     }
     //----------------------------------------------------------
@@ -1224,7 +1222,6 @@ void create4x4FModelTransformation(
                           rotationX//heading
                          ); 
      rotationSpecified=1;
-     operationsNeeded+=2;
      ++numberOfOperationsNeeded; 
     } else
     {
@@ -1236,8 +1233,7 @@ void create4x4FModelTransformation(
                                                       rotationZ,
                                                       rotationOrder
                                                      );
-     rotationSpecified=1; 
-     operationsNeeded+=2;    
+     rotationSpecified=1;
      ++numberOfOperationsNeeded;                                                  
     }
     //----------------------------------------------------------
@@ -1254,8 +1250,7 @@ void create4x4FModelTransformation(
       } else
       { 
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
-        scaleSpecified=1;
-        operationsNeeded+=4;   
+        scaleSpecified=1; 
         ++numberOfOperationsNeeded; 
       }
       
