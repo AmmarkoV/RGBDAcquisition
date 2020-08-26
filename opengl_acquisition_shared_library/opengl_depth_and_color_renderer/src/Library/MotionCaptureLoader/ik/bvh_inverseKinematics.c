@@ -372,7 +372,6 @@ float calculateChainLoss(
                                               )
             )
         {
-            
            #define ONLY_PROJECT_PARTS 1
            
            #if ONLY_PROJECT_PARTS

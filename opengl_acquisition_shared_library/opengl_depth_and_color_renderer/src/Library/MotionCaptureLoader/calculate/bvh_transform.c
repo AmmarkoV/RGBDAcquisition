@@ -400,8 +400,6 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 
 
 
-
-
 /**
  * @brief This is a MocapNET orientation.
  */
@@ -425,7 +423,7 @@ int bvh_loadTransformForMotionBuffer(
                                      unsigned int populateTorso
                                    )
 {
-  //ONly do transforms on allocated context 
+  //Only do transforms on allocated context 
   if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
   {
     
@@ -448,7 +446,7 @@ int bvh_loadTransformForMotionBuffer(
   #else 
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-  #endif     
+  #endif
     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
     {
       //To Setup the dynamic transformation we must first get values from our bvhMotion structure
@@ -480,11 +478,7 @@ int bvh_loadTransformForMotionBuffer(
          //display a debug message in case this doesn't happen on an end site
          if (!bvhMotion->jointHierarchy[jID].isEndSite)
               {
-                fprintf(stderr,
-                        "No channel rotation order for joint jID=%u jointName=%s, using identity matrix\n",
-                        jID,
-                        bvhMotion->jointHierarchy[jID].jointName
-                       );
+                fprintf(stderr,"No channel rotation order for joint jID=%u jointName=%s, using identity matrix\n",jID,bvhMotion->jointHierarchy[jID].jointName);
               }
        } 
        
@@ -580,10 +574,10 @@ int bvh_loadTransformForMotionBuffer(
                           );
 
   #if FIND_FAST_CENTER
-   bvhTransform->joint[jID].pos3D[0]= bvhTransform->joint[jID].localToWorldTransformation.m[3];
-   bvhTransform->joint[jID].pos3D[1]= bvhTransform->joint[jID].localToWorldTransformation.m[7];
-   bvhTransform->joint[jID].pos3D[2]= bvhTransform->joint[jID].localToWorldTransformation.m[11];
-   bvhTransform->joint[jID].pos3D[3]= bvhTransform->joint[jID].localToWorldTransformation.m[15];
+   bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].localToWorldTransformation.m[3];
+   bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].localToWorldTransformation.m[7];
+   bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].localToWorldTransformation.m[11];
+   bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].localToWorldTransformation.m[15]; 
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #else
    float centerPoint[4]={0.0,0.0,0.0,1.0};
