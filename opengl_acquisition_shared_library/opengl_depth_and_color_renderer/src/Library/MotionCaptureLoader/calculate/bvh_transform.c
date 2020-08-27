@@ -660,7 +660,7 @@ int bvh_loadTransformForMotionBuffer(
   //First of all we need to populate all local dynamic transformation of our chain
   //These only have to do with our Motion Buffer and don't involve any chain transformations
   //----------------------------------------------------------------------------------------
-  //Cleanup before accumulating  
+  //Cleanup before accumulating ..
   bvhTransform->lengthOfListOfJointIDsToTransform=0;
   
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -683,8 +683,8 @@ int bvh_loadTransformForMotionBuffer(
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
-   //for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-   //{
+   //We used our buffer to cache only the joints that need processing during the first path
+   //so we will only process those..
    for (unsigned int hID=0; hID<bvhTransform->lengthOfListOfJointIDsToTransform; hID++)
     { 
       unsigned int jID = bvhTransform->listOfJointIDsToTransform[hID];

@@ -354,7 +354,8 @@ int viewProblem(struct ikProblem * problem)
 float calculateChainLoss(
                           struct ikProblem * problem,
                           unsigned int chainID,
-                          unsigned int partIDStart
+                          unsigned int partIDStart,
+                          unsigned int economicTransformCalculation
                         )
 {
     unsigned int numberOfSamples=0;
@@ -363,14 +364,35 @@ float calculateChainLoss(
     {
       if (partIDStart < problem->chain[chainID].numberOfParts)
       {
-        if (
-              bvh_loadTransformForMotionBuffer(
-                                               problem->mc,
-                                               problem->chain[chainID].currentSolution->motion,
-                                               &problem->chain[chainID].current2DProjectionTransform,
-                                               0//Dont populate extra structures we dont need them they just take time
-                                              )
-            )
+        unsigned int transformIsLoaded=0;
+
+        if (economicTransformCalculation)
+        {
+            //IMPORTANT: Please note that this call relies on the internal accumulation of jIDs that happens on a regular 
+            //bvh_loadTransformForMotionBuffer call however calling it once before is not guaranteed.. 
+            //So be very very careful..
+            transformIsLoaded = bvh_loadTransformForMotionBufferFollowingAListOfJointIDs
+                                                                (
+                                                                  problem->mc,
+                                                                  problem->chain[chainID].currentSolution->motion,
+                                                                  &problem->chain[chainID].current2DProjectionTransform,
+                                                                  0,//Dont populate extra structures we dont need them they just take time
+                                                                  problem->chain[chainID].current2DProjectionTransform.listOfJointIDsToTransform,
+                                                                  problem->chain[chainID].current2DProjectionTransform.lengthOfListOfJointIDsToTransform
+                                                                );          
+        }  else
+        {
+            transformIsLoaded = bvh_loadTransformForMotionBuffer(
+                                                                  problem->mc,
+                                                                  problem->chain[chainID].currentSolution->motion,
+                                                                  &problem->chain[chainID].current2DProjectionTransform,
+                                                                  0//Dont populate extra structures we dont need them they just take time
+                                                                );
+        }
+   
+                
+                
+        if (transformIsLoaded)
         {
            #define ONLY_PROJECT_PARTS 1
            
@@ -388,8 +410,8 @@ float calculateChainLoss(
             {
            #else             
            //We project all Joints to their 2D locations..
-           if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
-            {
+           //if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
+           // {
            #endif 
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
@@ -465,7 +487,12 @@ float iteratePartLoss(
     //Our armature has 500 d.o.f, if we do a calculateChainLoss this will calculate each and every one of them!!
     //Obviously we want to be really fast so we can't afford this, in order to speed up computations we will need to transform all parent joints
     //until the end joint of our chain...  iterateChainLoss
-    float initialLoss = calculateChainLoss(problem,chainID,partID);
+    float initialLoss = calculateChainLoss(
+                                            problem,
+                                            chainID,
+                                            partID,
+                                            0//VERY IMPORTANT FOR THE FIRST CHAIN CALCULATION TO BE Non Economic otherwise subsequent calls will fail..
+                                          );
 
     ///Having calculated all these joints from here on we only need to update this joint and its children ( we dont care about their parents since they dont change .. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
@@ -531,7 +558,7 @@ if (iterationID==0)
             problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
             problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) problem->previousSolution->motion[mIDS[1]];
             problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) problem->previousSolution->motion[mIDS[2]];
-            float previousLoss = calculateChainLoss(problem,chainID,partID);
+            float previousLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
             
             if (previousLoss<initialLoss)
             {
@@ -596,9 +623,9 @@ if (iterationID==0)
         {
             float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
-            float lossPlusD=calculateChainLoss(problem,chainID,partID);
+            float lossPlusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
-            float lossMinusD=calculateChainLoss(problem,chainID,partID);
+            float lossMinusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
@@ -660,17 +687,17 @@ if (iterationID==0)
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
-        currentLoss[0]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
+        currentLoss[0]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
-        currentLoss[1]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
+        currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
-        currentLoss[2]=calculateChainLoss(problem,chainID,partID) + spring * distanceFromInitial * distanceFromInitial;
+        currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
@@ -745,7 +772,7 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //----------------------------------------------
-        float loss=calculateChainLoss(problem,chainID,partID);
+        float loss=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
         //----------------------------------------------
 
         // If loss is NaN
