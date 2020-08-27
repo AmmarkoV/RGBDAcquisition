@@ -97,11 +97,11 @@ struct BVH_Transform
   char useOptimizations;
   unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   
-  #if USE_TRANSFORM_HASHING
+  //#if USE_TRANSFORM_HASHING
   unsigned int jointIDTransformHashPopulated;
   unsigned int lengthOfListOfJointIDsToTransform;
   BVHJointID listOfJointIDsToTransform[MAX_BVH_JOINT_HIERARCHY_SIZE];
-  #endif
+  //#endif
   
   struct rectangleArea torso;
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
@@ -143,6 +143,16 @@ int bvh_markJointAndParentsAsUselessInTransform(
                                                 struct BVH_Transform * bvhTransform,
                                                 BVHJointID jID
                                               );
+
+int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
+                                                             struct BVH_MotionCapture * bvhMotion,
+                                                             float * motionBuffer,
+                                                             struct BVH_Transform * bvhTransform,
+                                                             unsigned int populateTorso,
+                                                             BVHJointID * listOfJointIDsToTransform,
+                                                             unsigned int lengthOfJointIDList 
+                                                            );
+
 
 int bvh_loadTransformForMotionBuffer(
                                      struct BVH_MotionCapture * bvhMotion,

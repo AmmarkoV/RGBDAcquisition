@@ -416,41 +416,21 @@ enum MOTIONBUFFER_DATA_FIELDS
 };
 
 
-int bvh_loadTransformForMotionBuffer(
-                                     struct BVH_MotionCapture * bvhMotion,
-                                     float * motionBuffer,
-                                     struct BVH_Transform * bvhTransform,
-                                     unsigned int populateTorso
-                                   )
+
+static inline void bvh_prepareMatricesForTransform(
+                                                   struct BVH_MotionCapture * bvhMotion,
+                                                   float * motionBuffer,
+                                                   struct BVH_Transform * bvhTransform,
+                                                   unsigned int jID
+                                                  )
 {
-  //Only do transforms on allocated context 
-  if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
-  {
-    
-  //First of all we need to clean the BVH_Transform structure
-  bvhTransform->jointsOccludedIn2DProjection=0;
-
-
+  
   //data is the buffer where we will retrieve the values
   float data[MOTIONBUFFER_DATA_FIELDS_NUMBER]={0};
   //----------------------------------------------------
-
-  //First of all we need to populate all local dynamic transformation of our chain
-  //These only have to do with our Motion Buffer and don't involve any chain transformations
-  //----------------------------------------------------------------------------------------
-  #if USE_TRANSFORM_HASHING
-   for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
-   {
-    //USING_HASH   
-    unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
-  #else 
-   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-   {
-  #endif
-    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-    {
-      //To Setup the dynamic transformation we must first get values from our bvhMotion structure
-      if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
+  
+  //To Setup the dynamic transformation we must first get values from our bvhMotion structure
+  if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
        create4x4FTranslationMatrix(
                                     &bvhTransform->joint[jID].dynamicTranslation,
@@ -460,7 +440,7 @@ int bvh_loadTransformForMotionBuffer(
                                   );
 
 
-       if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
+  if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
        {
         create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                         &bvhTransform->joint[jID].dynamicRotation,
@@ -488,26 +468,19 @@ int bvh_loadTransformForMotionBuffer(
       fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
       create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicTranslation);
       create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
-     }
-    }
-  }
+     } 
+}
 
 
 
 
-  //We will now apply all dynamic transformations across the BVH chains
-  //-----------------------------------------------------------------------
-  #if USE_TRANSFORM_HASHING
-   for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
-   {  
-     //USING_HASH
-     unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
-  #else 
-   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-   {
-  #endif
-    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-    {
+static inline void bvh_performActualTransform(
+                                              struct BVH_MotionCapture * bvhMotion,
+                                              float * motionBuffer,
+                                              struct BVH_Transform * bvhTransform,
+                                              unsigned int jID
+                                             )
+{
      //This will get populated either way..
      //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
 
@@ -561,6 +534,7 @@ int bvh_loadTransformForMotionBuffer(
       {
         //Weird case where joint is not root and doesnt have parents(?)
         create4x4FIdentityMatrix(&bvhTransform->joint[jID].localToWorldTransformation);
+        fprintf(stderr,"Joint is not root, but also doesn't have parents?\n");
       }
 
     bvhTransform->joint[jID].isChainTrasformationComputed=1;
@@ -588,8 +562,141 @@ int bvh_loadTransformForMotionBuffer(
                                          );
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #endif // FIND_FAST_CENTER
+    
+}
 
+
+
+
+int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
+                                                             struct BVH_MotionCapture * bvhMotion,
+                                                             float * motionBuffer,
+                                                             struct BVH_Transform * bvhTransform,
+                                                             unsigned int populateTorso,
+                                                             BVHJointID * listOfJointIDsToTransform,
+                                                             unsigned int lengthOfJointIDList 
+                                                            )
+{
+  //Only do transforms on allocated context 
+  if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
+  { 
+  //First of all we need to clean the BVH_Transform structure
+  bvhTransform->jointsOccludedIn2DProjection=0;
+ 
+
+  //First of all we need to populate all local dynamic transformation of our chain
+  //These only have to do with our Motion Buffer and don't involve any chain transformations
+  //----------------------------------------------------------------------------------------
+   for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
+   {
+    unsigned int jID=listOfJointIDsToTransform[hID];
+    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    {
+      bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
     }
+  }
+
+
+
+
+  //We will now apply all dynamic transformations across the BVH chains
+  //-----------------------------------------------------------------------
+   for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
+   {
+    unsigned int jID=listOfJointIDsToTransform[hID];
+    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    {
+      bvh_performActualTransform(
+                                 bvhMotion,
+                                 motionBuffer,
+                                 bvhTransform,
+                                 jID
+                                );
+    }
+   }
+
+
+  bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
+  bvhTransform->centerPosition[1]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[1];
+  bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
+
+
+  if (!populateTorso)
+  {
+    //Fast path out of here
+    return 1;      
+  } else
+  {
+   if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
+     {
+     //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
+     }
+    return 1;   
+  }
+
+
+ }
+   
+ return 0;
+}
+
+
+
+
+int bvh_loadTransformForMotionBuffer(
+                                     struct BVH_MotionCapture * bvhMotion,
+                                     float * motionBuffer,
+                                     struct BVH_Transform * bvhTransform,
+                                     unsigned int populateTorso
+                                   )
+{
+  //Only do transforms on allocated context 
+  if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
+  { 
+  //First of all we need to clean the BVH_Transform structure
+  bvhTransform->jointsOccludedIn2DProjection=0;
+ 
+
+  //First of all we need to populate all local dynamic transformation of our chain
+  //These only have to do with our Motion Buffer and don't involve any chain transformations
+  //----------------------------------------------------------------------------------------
+  //Cleanup before accumulating  
+  bvhTransform->lengthOfListOfJointIDsToTransform=0;
+  
+   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    {
+      //Since we are passing through make sure we avoid a second
+      //"expensive" call to the bvh_shouldJointBeTransformedGivenOurOptimizations
+      //------------------------------------------------------
+      bvhTransform->listOfJointIDsToTransform[bvhTransform->lengthOfListOfJointIDsToTransform]=jID;
+      ++bvhTransform->lengthOfListOfJointIDsToTransform;
+      //------------------------------------------------------  
+  
+      bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
+    }
+  }
+
+
+
+
+  //We will now apply all dynamic transformations across the BVH chains
+  //-----------------------------------------------------------------------
+   //for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   //{
+   for (unsigned int hID=0; hID<bvhTransform->lengthOfListOfJointIDsToTransform; hID++)
+    { 
+      unsigned int jID = bvhTransform->listOfJointIDsToTransform[hID];
+      if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+      {
+       bvh_performActualTransform(
+                                  bvhMotion,
+                                  motionBuffer,
+                                  bvhTransform,
+                                  jID
+                                 );
+      }
   }
 
 
