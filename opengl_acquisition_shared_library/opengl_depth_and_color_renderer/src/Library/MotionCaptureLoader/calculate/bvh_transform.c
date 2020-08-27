@@ -660,7 +660,10 @@ int bvh_loadTransformForMotionBuffer(
   //First of all we need to populate all local dynamic transformation of our chain
   //These only have to do with our Motion Buffer and don't involve any chain transformations
   //----------------------------------------------------------------------------------------
-  //Cleanup before accumulating ..
+  
+  //While doing this first step we accumulate the list of JointIDs that need a transform
+  //This saves CPU time on the second part of this call as well as enables
+  //economic subsequent calls on the IK code..
   bvhTransform->lengthOfListOfJointIDsToTransform=0;
   
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -669,9 +672,10 @@ int bvh_loadTransformForMotionBuffer(
     {
       //Since we are passing through make sure we avoid a second
       //"expensive" call to the bvh_shouldJointBeTransformedGivenOurOptimizations
+      //this is also very important for the IK code..
       //------------------------------------------------------
-      bvhTransform->listOfJointIDsToTransform[bvhTransform->lengthOfListOfJointIDsToTransform]=jID;
-      ++bvhTransform->lengthOfListOfJointIDsToTransform;
+       bvhTransform->listOfJointIDsToTransform[bvhTransform->lengthOfListOfJointIDsToTransform]=jID;
+       ++bvhTransform->lengthOfListOfJointIDsToTransform;
       //------------------------------------------------------  
   
       bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
