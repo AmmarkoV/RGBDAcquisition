@@ -164,11 +164,11 @@ int bvh_projectJIDTo2D(
                    )
 {
       float position2D[3]={0.0,0.0,0.0}; 
-      float pos3DFloat[4];
 
  
       if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
       {
+           float pos3DFloat[4];
            pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
            pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
            pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];

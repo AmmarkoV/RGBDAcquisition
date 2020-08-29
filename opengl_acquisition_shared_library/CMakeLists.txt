@@ -54,7 +54,7 @@ add_library(OpenGLAcquisition SHARED
             #Inverse Kinematics
             opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/bvh_inverseKinematics.c
             opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c
-            opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/levmar.c 
+            #opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/ik/levmar.c 
             #Textures and how to load them 
             opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.h

@@ -748,8 +748,6 @@ if (iterationID==0)
         }
 
 
-
-
         //Remember previous loss/values 
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
@@ -1228,7 +1226,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Don't spam console..
     //viewProblem(problem);
     
-    float previousMAEInPixels=1000000; //Big invalid number
+    
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1302,6 +1300,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
+    bvh_markAllJointsAsUsefullInTransform(mc,&bvhCurrentTransform);
 
     if (
           bvh_loadTransformForMotionBuffer(
@@ -1312,11 +1311,23 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                           )
       )
     {
-        //----------------------------------------------------
+        //Is the pointer there ? if not it means we don't care about final MAE
         if (finalMAEInPixels!=0)
+        { 
+        //We calculate the new 2D distance achieved..
+        *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose); 
+        
+        //Was our solution perfect? If it was we don't need to compare to previous
+        //----------------------------------------------------
+        if (*finalMAEInPixels!=0)
         {
-            *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
-                                                                                                 
+           //Perform projection on previous solution 
+           //-----------------------------------------------
+           struct BVH_Transform bvhPreviousTransform = {0}; 
+           if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
+           {  
+            float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
+                                                                                   
             if (previousMAEInPixels<*finalMAEInPixels)
             {
                 if (ikConfig->considerPreviousSolution)
@@ -1324,8 +1335,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                     fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
                     copyMotionBuffer(solution,previousSolution);
                 }
+            }           
+            
             }
+           //-----------------------------------------------
+           
         }
+       }
         //----------------------------------------------------
         if ( (finalMAEInMM!=0) && (groundTruth!=0) )
         {
@@ -1342,8 +1358,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         dumpBVHToSVGFrame("target.svg",mc,bvhTargetTransform,1,renderer);
         dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
-
-
 
     return 1;
 }

@@ -277,7 +277,7 @@ int bvh_markAllJointsAsUsefullInTransform(
 {
   if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
-  bvhTransform->useOptimizations=1;
+  bvhTransform->useOptimizations=0; //We dont use optimizations..
 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
@@ -585,7 +585,7 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
  
 
   //First of all we need to populate all local dynamic transformation of our chain
-  //These only have to do with our Motion Buffer and don't involve any chain transformations
+  //This step only has to do with our Motion Buffer and doesn't performi the final transformations
   //----------------------------------------------------------------------------------------
    for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
    {
@@ -595,9 +595,6 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
       bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
     }
   }
-
-
-
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
@@ -614,7 +611,7 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
                                 );
     }
    }
-
+  //----------------------------------------------------------------------------------------
 
   bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
   bvhTransform->centerPosition[1]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[1];
@@ -758,9 +755,6 @@ int bvh_loadTransformForFrame(
 }
 
 
-
-
-
 int bvh_removeTranslationFromTransform(
                                        struct BVH_MotionCapture * bvhMotion ,
                                        struct BVH_Transform * bvhTransform
@@ -791,5 +785,3 @@ int bvh_removeTranslationFromTransform(
 
   return 0;
 }
-
-
