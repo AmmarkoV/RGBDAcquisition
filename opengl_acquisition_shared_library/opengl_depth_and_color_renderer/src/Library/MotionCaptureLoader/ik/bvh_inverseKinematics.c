@@ -1248,7 +1248,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             *initialMAEInMM = meanBVH3DDistance(mc,renderer,1,0,problem->initialSolution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
-
     }
 
     if (ikConfig->dumpScreenshots)
