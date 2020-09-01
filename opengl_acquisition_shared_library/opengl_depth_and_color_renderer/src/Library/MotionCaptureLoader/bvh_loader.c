@@ -562,7 +562,7 @@ int bvh_changeJointDimensions(
     //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
 
     BVHJointID jID=0;
-   if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
+   if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
    //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
    {
        unsigned int angleX = 0;
@@ -596,7 +596,7 @@ int bvh_changeJointDimensions(
  for (unsigned int jIDIt=0; jIDIt<bvhMotion->jointHierarchySize; jIDIt++)
  {
    if (jIDIt!=0) { fprintf(stderr,","); }
-   fprintf(stderr,"%s",bvhMotion->jointHierarchy[jIDIt].jointName);
+   fprintf(stderr,"%s(or. %s)",bvhMotion->jointHierarchy[jIDIt].jointNameLowercase,bvhMotion->jointHierarchy[jIDIt].jointName);
  }
  fprintf(stderr,"\n");
  return 0;

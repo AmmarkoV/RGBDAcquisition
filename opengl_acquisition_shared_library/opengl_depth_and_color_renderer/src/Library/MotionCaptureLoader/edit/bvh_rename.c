@@ -207,15 +207,21 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
             fprintf(stderr,"Cannot rename joints of empty bvh hierarchy\n");
             return ;
         }
-
+    
+    unsigned int totalChangesPerformed = 0;
     unsigned int jID=0;
-
+     
+     
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
+            char * jOr = bvhMotion->jointHierarchy[jID].jointName;
             char * jN = bvhMotion->jointHierarchy[jID].jointNameLowercase;
             if (jN!=0)
                 {
-                    //This is already lowercase lowercase(jN);
+                    //This is already lowercase
+                    //lowercase(jN);
+                    
+                    
                     int changedSomething = 0;
 
                     //-------------------------------------------------------------------------------------------------
@@ -224,7 +230,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     if  ( (strcmp(jN,"hip")==0) || (strcmp(jN,"hips")==0) )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"hip");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"hip"); 
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -232,7 +240,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"abdomen");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"abdomen");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -240,7 +250,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"chest");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"chest");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
 
@@ -253,7 +265,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lhip");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lhip");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -261,7 +275,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lknee");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lknee");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -269,7 +285,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lfoot");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lfoot");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
 
@@ -282,7 +300,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rhip");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rhip");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -290,7 +310,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rknee");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rknee");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -298,7 +320,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rfoot");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rfoot");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
 
@@ -307,27 +331,33 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     //---------------------------------------LEFT HAND------------------------------------------------
                     //-------------------------------------------------------------------------------------------------
                     if  (
-                        (strcmp(jN,"leftcollar")==0) || (strcmp(jN,"lcollar")==0) || (strcmp(jN,"leftshoulder")==0)  || (strcmp(jN,"lcolr")==0)
-                    )
+                         (strcmp(jN,"leftcollar")==0) || (strcmp(jN,"lcollar")==0) || (strcmp(jN,"leftshoulder")==0)  || (strcmp(jN,"lcolr")==0)
+                        )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lcollar");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lcollar");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
-                        (strcmp(jN,"leftuparm")==0) || (strcmp(jN,"leftarm")==0) || (strcmp(jN,"lshldr")==0)  || (strcmp(jN,"leftshoulder")==0) || (strcmp(jN,"leftupperarm")==0)
-                    )
+                         (strcmp(jN,"leftuparm")==0) || (strcmp(jN,"leftarm")==0) || (strcmp(jN,"lshldr")==0)  || (strcmp(jN,"leftshoulder")==0) || (strcmp(jN,"leftupperarm")==0)
+                        )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lshoulder");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lshoulder");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
-                        (strcmp(jN,"leftelbow")==0) || (strcmp(jN,"leftlowarm")==0) || (strcmp(jN,"leftforearm")==0)  || (strcmp(jN,"lforearm")==0) || (strcmp(jN,"leftlowerarm")==0)
-                    )
+                         (strcmp(jN,"leftelbow")==0) || (strcmp(jN,"leftlowarm")==0) || (strcmp(jN,"leftforearm")==0)  || (strcmp(jN,"lforearm")==0) || (strcmp(jN,"leftlowerarm")==0)
+                        )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lelbow");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lelbow");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -335,7 +365,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"lhand");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"lhand");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
 
 
@@ -347,7 +379,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rcollar");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rcollar");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -355,7 +389,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rshoulder");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rshoulder");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -363,7 +399,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"relbow");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"relbow");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
                     if  (
@@ -371,7 +409,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"rhand");
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"rhand");
                             changedSomething=1;
+                            ++totalChangesPerformed;
                         }
                     //-------------------------------------------------------------------------------------------------
 
@@ -385,6 +425,10 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                 }
         }
 
+  if (totalChangesPerformed>0)
+  {
+    fprintf(stderr,"Renamed %u joints for easier compatibility with different armature names..\n",totalChangesPerformed); 
+  }
 
     bvh_setLimbFlags(bvhMotion);
     bvh_setTorsoImmunityForJoints(bvhMotion);
