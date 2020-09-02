@@ -225,13 +225,15 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                 }
           
           fprintf(stderr,"\n\n\n//Minima/Maxima :\n\n");
-          fprintf(stderr,"float minimumLimits[%u]={0};",numberOfValues);
-          fprintf(stderr,"float maximumLimits[%u]={0};",numberOfValues);
-           for (unsigned int mID=0; mID<numberOfValues; mID++)
+          fprintf(stderr,"float minimumLimits[%u]={0};\n",numberOfValues);
+          fprintf(stderr,"float maximumLimits[%u]={0};\n",numberOfValues);
+          fprintf(stderr,"//--------------------------\n");
+          for (unsigned int mID=7; mID<numberOfValues; mID++)
                          {
-                            fprintf(stderr,"minimumLimits[%u]=%0.2f;\n",mID,minima[mID]);  
-                            fprintf(stderr,"maximumLimits[%u]=%0.2f;\n",mID,maxima[mID]);  
+                            if (minima[mID]!=0.0) { fprintf(stderr,"minimumLimits[%u]=%0.2f;\n",mID,minima[mID]); }  
+                            if (maxima[mID]!=0.0) { fprintf(stderr,"maximumLimits[%u]=%0.2f;\n",mID,maxima[mID]); }
                          }
+          fprintf(stderr,"\n\n//--------------------------\n");
           
           if (line!=0) { free(line); }
           fclose(fp);
