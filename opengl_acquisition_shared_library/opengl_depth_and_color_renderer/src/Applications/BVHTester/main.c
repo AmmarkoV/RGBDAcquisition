@@ -160,6 +160,88 @@ int testMultipleLoad(const char * filename)
 
 
 
+
+int extractMinimaMaximaFromBVHList(const char * filename)
+{ //This will go in bvh_measure.c
+ struct BVH_MotionCapture bvhMotion={0};
+ 
+ unsigned int numberOfValues=0;
+ float minima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
+ float maxima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
+
+ FILE * fp = fopen(filename,"r");
+    if (fp!=0)
+        {
+            char * line = NULL;
+            size_t len = 0;
+            ssize_t read;
+ 
+            unsigned int fileNumber=0;
+            unsigned int done=0;
+            while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
+                {
+                  if (line!=0)
+                  {
+                    int lineLength = strlen(line);
+                    if (lineLength>=1)
+                    {
+                      if (line[lineLength-1]==10) { line[lineLength-1]=0; }
+                      if (line[lineLength-1]==13) { line[lineLength-1]=0; }
+                    }
+                    if (lineLength>=2)
+                    {
+                      if (line[lineLength-2]==10) { line[lineLength-2]=0; }
+                      if (line[lineLength-2]==13) { line[lineLength-2]=0; }
+                    }
+
+                  fprintf(stderr,"Next file is `%s`\n",line);
+                  if ( bvh_loadBVH(line, &bvhMotion, 1.0) )
+                   {
+                      fprintf(stderr,"Loaded file `%s`\n",line);
+                      //Change joint names..
+                      bvh_renameJointsForCompatibility(&bvhMotion);
+                      fprintf(stderr,"Did rename `%s`\n",line);
+                      
+                      numberOfValues = bvhMotion.numberOfValuesPerFrame;
+                      
+                      unsigned int mIDAbsolute=0;
+                      for (unsigned int fID=0; fID<bvhMotion.numberOfFrames; fID++)
+                      {
+                        for (unsigned int mID=0; mID<bvhMotion.numberOfValuesPerFrame; mID++)
+                         {
+                            if (bvhMotion.motionValues[mIDAbsolute]<minima[mID]) { minima[mID]=bvhMotion.motionValues[mIDAbsolute]; }
+                            if (bvhMotion.motionValues[mIDAbsolute]>maxima[mID]) { maxima[mID]=bvhMotion.motionValues[mIDAbsolute]; }
+                            ++mIDAbsolute; 
+                         }
+                      }
+
+                      bvh_free(&bvhMotion);
+                      fprintf(stderr,"Freed file `%s`\n",line);
+                   }
+                  }
+
+                  ++fileNumber;
+                  //if (fileNumber==10) { done=1; }
+                }
+          
+          fprintf(stderr,"\n\n\n//Minima/Maxima :\n\n");
+          fprintf(stderr,"float minimumLimits[%u]={0};",numberOfValues);
+          fprintf(stderr,"float maximumLimits[%u]={0};",numberOfValues);
+           for (unsigned int mID=0; mID<numberOfValues; mID++)
+                         {
+                            fprintf(stderr,"minimumLimits[%u]=%0.2f;\n",mID,minima[mID]);  
+                            fprintf(stderr,"maximumLimits[%u]=%0.2f;\n",mID,maxima[mID]);  
+                         }
+          
+          if (line!=0) { free(line); }
+          fclose(fp);
+          return 1;
+        }
+  return 0;
+}
+
+
+
 int main(int argc,const char **argv)
 {
     unsigned int immediatelyHaltOnError=0;
@@ -249,6 +331,14 @@ int main(int argc,const char **argv)
           bvh_testConstrainRotations();
           exit(0);
         } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--extractmotionrangeforlistoffiles")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          extractMinimaMaximaFromBVHList(argv[i+1]); 
+
+          exit(0);
+        } else            
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testmultiple")==0)
         {

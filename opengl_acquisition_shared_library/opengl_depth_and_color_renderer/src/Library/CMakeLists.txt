@@ -89,6 +89,7 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/ik/bvh_inverseKinematics.c
             MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c
             #MotionCaptureLoader/ik/levmar.c
+            MotionCaptureLoader/metrics/bvh_measure.c  
             MotionCaptureLoader/tests/test.c
             #Textures and how to load them  
             TextureLoader/texture_loader.c
