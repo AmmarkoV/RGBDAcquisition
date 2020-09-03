@@ -718,9 +718,6 @@ if (iterationID==0)
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
 
-
-
-        
         if  ( 
                 //Safeguard agains gradient explosions which we detect when we see large gradients  
                  (fabs(delta[0]>gradientExplosionThreshold)) || 
@@ -1060,9 +1057,9 @@ int multiThreadedSolver(
           //Lets check if all our chains are done and copy back their results..!  
           for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
             {
-                 if (problem->chain[chainID].parallel )
+              if (problem->chain[chainID].parallel )
                  {
-                     if (problem->chain[chainID].status == BVH_IK_FINISHED_ITERATION)
+                   if (problem->chain[chainID].status == BVH_IK_FINISHED_ITERATION)
                      {
                          ++threadsComplete;                      
                         //Yey..! This thread has finished its iteration, normally we would gather the result by using the copyMotionBuffer call
@@ -1183,6 +1180,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                //---------------------------------
                                               )
 {
+   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running \n" NORMAL);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
    struct BVH_Transform bvhPreviousTransform = {0};
@@ -1190,18 +1188,66 @@ int ensureFinalProposedSolutionIsBetterInParts(
    if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
            {  
             if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
-             {  
+             {   
                //Dont do chain 0, do only part chains..  
                for (unsigned int chainID=1; chainID<problem->numberOfChains; chainID++)
-                { 
-                    /*
-                    calculateChainLoss(
-                          struct ikProblem * problem,
-                          unsigned int chainID,
-                          unsigned int partIDStart,
-                          unsigned int economicTransformCalculation
-                        )*/
-                } 
+                {
+                  float currentSolutionChainLoss = 0.0;  
+                  float previousSolutionChainLoss = 0.0;  
+                    
+                  unsigned int partIDStart = 0;
+                  unsigned int failedProjections=0;
+                  for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                    {
+                     unsigned int jID=problem->chain[chainID].part[partID].jID;
+                     failedProjections += ( bvh_projectJIDTo2D(mc,&bvhCurrentTransform,renderer,jID,0,0) == 0 );
+                     failedProjections += ( bvh_projectJIDTo2D(mc,&bvhPreviousTransform,renderer,jID,0,0) == 0 );
+                
+                     if (failedProjections==0)     
+                     {
+                      unsigned int jID=problem->chain[chainID].part[partID].jID;
+                         
+                      ///Warning: When you change this please change meanBVH2DDistance as well!
+                      float pX=(float) bvhPreviousTransform.joint[jID].pos2D[0];
+                      float pY=(float) bvhPreviousTransform.joint[jID].pos2D[1];
+                      float sX=(float) bvhCurrentTransform.joint[jID].pos2D[0];
+                      float sY=(float) bvhCurrentTransform.joint[jID].pos2D[1];
+                      float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
+                      float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
+                        
+                      //Only use source/target joints  that exist and are not occluded.. 
+                      if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
+                        { 
+                            currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
+                        }
+
+                      if ( ((pX!=0.0) || (pY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
+                        { 
+                            previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
+                        }
+                     }
+                    }  
+                     
+                     
+                    if (currentSolutionChainLoss > previousSolutionChainLoss) 
+                    {
+                        fprintf(stderr,RED "Chain %u is worse than previous \n" NORMAL,chainID);
+                        
+                        for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                        {
+                         unsigned int mIDS[3] = { 
+                                                 problem->chain[chainID].part[partID].mIDStart,
+                                                 problem->chain[chainID].part[partID].mIDStart+1,
+                                                 problem->chain[chainID].part[partID].mIDStart+2
+                                                };
+                                                
+                         currentSolution->motion[mIDS[0]]=previousSolution->motion[mIDS[0]];
+                         currentSolution->motion[mIDS[1]]=previousSolution->motion[mIDS[1]];
+                         currentSolution->motion[mIDS[2]]=previousSolution->motion[mIDS[2]];                
+                        }
+                    }
+                     
+                }
                return 1;      
              }
            }
