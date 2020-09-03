@@ -1215,23 +1215,27 @@ int ensureFinalProposedSolutionIsBetterInParts(
                       float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
                       float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
                         
-                      //Only use source/target joints  that exist and are not occluded.. 
-                      if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
-                        { 
+                      //Only use source/target joints  that exist and are not occluded..
+
+                      if ((tX!=0.0) || (tY!=0.0))
+                      { //Don't do anything without the target point..
+                        if ((sX!=0.0) || (sY!=0.0))
+                        { //Our current solution
                             currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
                         }
 
-                      if ( ((pX!=0.0) || (pY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
-                        { 
+                        if ((pX!=0.0) || (pY!=0.0)) 
+                        {  //Our previous solution
                             previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
-                        }
+                        } 
+                       }
                      }
-                    }  
+                    }
                      
                      
                     if (currentSolutionChainLoss > previousSolutionChainLoss) 
                     {
-                        fprintf(stderr,RED "Chain %u is worse than previous \n" NORMAL,chainID);
+                        fprintf(stderr,RED "Chain %u came out worse than previous \n" NORMAL,chainID);
                         
                         for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                         {
