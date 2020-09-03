@@ -606,7 +606,7 @@ if (iterationID==0)
     float beta = 0.9; // Momentum
 
 
-//Give an initial direction..
+    //Give an initial direction..
     float delta[3]= {d,d,d};
 
 
@@ -616,7 +616,7 @@ if (iterationID==0)
 ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
     {
-       //Are we at a global optimum? ---------------------------------------------------------------------------------
+       //Are we at a global optimum? -------------------------------------------------------------------
        //Do we care ? ----------------------------------------------------------------------------------
         unsigned int badLosses=0;
         for (unsigned int i=0; i<3; i++)
@@ -1156,14 +1156,60 @@ int ensureInitialPositionIsInFrustrum(
         }
 
         if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
-        {  
+        {
                  fprintf(stderr,RED "Warning: Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
                  solution->motion[2]=-140;
-        }  
+        }
     }
      
      return 1;
 }
+
+
+
+
+
+
+int ensureFinalProposedSolutionIsBetterInParts( 
+                                               struct BVH_MotionCapture * mc,
+                                               struct simpleRenderer *renderer,
+                                               struct ikProblem * problem,
+                                               struct ikConfiguration * ikConfig,
+                                               //---------------------------------
+                                               struct MotionBuffer * currentSolution,
+                                               struct MotionBuffer * previousSolution,
+                                               //---------------------------------
+                                               struct BVH_Transform * bvhTargetTransform
+                                               //---------------------------------
+                                              )
+{
+   //------------------------------------------------ 
+   struct BVH_Transform bvhCurrentTransform  = {0}; 
+   struct BVH_Transform bvhPreviousTransform = {0};
+   //------------------------------------------------ 
+   if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
+           {  
+            if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
+             {  
+               //Dont do chain 0, do only part chains..  
+               for (unsigned int chainID=1; chainID<problem->numberOfChains; chainID++)
+                { 
+                    /*
+                    calculateChainLoss(
+                          struct ikProblem * problem,
+                          unsigned int chainID,
+                          unsigned int partIDStart,
+                          unsigned int economicTransformCalculation
+                        )*/
+                } 
+               return 1;      
+             }
+           }
+   //------------------------------------------------ 
+           
+   return 0;
+}
+
 
 
 
@@ -1215,7 +1261,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     
     #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
       updateProblemSolutionToAllChains(problem,previousSolution); 
-      if (!copyMotionBuffer(problem->previousSolution,solution) )      { return 0; }        
+      if (!copyMotionBuffer(problem->previousSolution,solution) )              { return 0; }        
     #else
       updateProblemSolutionToAllChains(problem,solution);
       if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }         
@@ -1272,13 +1318,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
      
-     fprintf(stderr,"IK lr = %f ,  max start loss =%0.1f , Iterations = %u , epochs = %u , spring = %0.1f \n", 
+    fprintf(stderr,"IK lr = %f ,  max start loss =%0.1f , Iterations = %u , epochs = %u , spring = %0.1f \n", 
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
                                                ikConfig->epochs, 
                                                ikConfig->spring
-                    );
+           );
                
      
      if (ikConfig->verbose)
@@ -1312,7 +1358,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     {
         //Is the pointer there ? if not it means we don't care about final MAE
         if (finalMAEInPixels!=0)
-        { 
+        {
         //We calculate the new 2D distance achieved..
         *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose); 
         
@@ -1347,6 +1393,25 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             *finalMAEInMM = meanBVH3DDistance(mc,renderer,1,0,solution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
+        
+        
+        
+        
+        ensureFinalProposedSolutionIsBetterInParts( 
+                                                   mc,
+                                                   renderer,
+                                                   problem,
+                                                   ikConfig,
+                                                   //---------------------------------
+                                                   solution,
+                                                   previousSolution,
+                                                   //---------------------------------
+                                                   bvhTargetTransform
+                                                   //---------------------------------
+                                                   );
+        
+        
+        
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
