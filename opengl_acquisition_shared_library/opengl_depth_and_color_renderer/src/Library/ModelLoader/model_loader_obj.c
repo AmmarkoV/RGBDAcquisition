@@ -472,7 +472,8 @@ int saveOBJ(struct OBJ_Model * obj ,const char * filename)
 
 int readOBJ(struct OBJ_Model * obj)
 {
-
+  //Ye olde OBJ reader..
+  
   if (obj->filename == 0 ) { fprintf(stderr,"readOBJ called with a null filename , cannot continue \n"); return 0; }
   /* Read the .obj model from file FILENAME */
   /* All faces are converted to be triangles */

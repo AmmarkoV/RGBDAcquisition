@@ -236,7 +236,7 @@ int main(int argc,const char **argv)
     if (photoShootOBJ)
     {
         float angXVariance=360,angYVariance=360,angZVariance=360;
-        fprintf(stderr,"Making a photoshoot of object %u with a size %ux%u image output\n",photoShootOBJ,width,height);
+        fprintf(stderr,"Making a photoshoot of object %d with a size %ux%u image output\n",photoShootOBJ,width,height);
 
         void * oglPhotoShoot = createOGLRendererPhotoshootSandbox(
                                                                    (void*) getLoadedScene(),

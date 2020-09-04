@@ -160,17 +160,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_loader.h" />
-		<Unit filename="MotionCaptureLoader/bvh_project.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_project.h" />
-		<Unit filename="MotionCaptureLoader/bvh_to_tri_pose.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_to_tri_pose.h" />
-		<Unit filename="MotionCaptureLoader/bvh_transform.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_transform.h" />
 		<Unit filename="MotionCaptureLoader/export/bvh_export.c">
 			<Option compilerVar="CC" />

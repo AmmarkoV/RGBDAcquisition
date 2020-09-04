@@ -163,22 +163,22 @@ int testMultipleLoad(const char * filename)
 
 int extractMinimaMaximaFromBVHList(const char * filename)
 { //This will go in bvh_measure.c
- struct BVH_MotionCapture bvhMotion={0};
- 
- unsigned int numberOfValues=0;
- float minima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
- float maxima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
 
  FILE * fp = fopen(filename,"r");
     if (fp!=0)
         {
+           
+            struct BVH_MotionCapture bvhMotion={0}; 
+            unsigned int numberOfValues=0; 
+            float minima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
+            float maxima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
+            
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
  
             unsigned int fileNumber=0;
-            unsigned int done=0;
-            while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
+            while  ( (read = getline(&line, &len, fp)) != -1) 
                 {
                   if (line!=0)
                   {
@@ -221,10 +221,10 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                   }
 
                   ++fileNumber;
-                  //if (fileNumber==10) { done=1; }
+                  //if (fileNumber==10) { break; }
                 }
           
-          fprintf(stderr,"\n\n\n//Minima/Maxima :\n\n");
+          fprintf(stderr,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
           fprintf(stderr,"float minimumLimits[%u]={0};\n",numberOfValues);
           fprintf(stderr,"float maximumLimits[%u]={0};\n",numberOfValues);
           fprintf(stderr,"//--------------------------\n");
