@@ -34,6 +34,7 @@ void abort_(const char * s, ...)
 
 int ReadPNG(char *filename,struct Image * pic,char read_only_header)
 {
+    //fprintf(stderr,"ReadPNG(%s)",filename);
     png_byte header[8];
 
     FILE *fp = fopen(filename, "rb");
