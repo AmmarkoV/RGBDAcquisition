@@ -1164,25 +1164,25 @@ int ensureInitialPositionIsInFrustrum(
 
 
 
-int compareChainsAndAdoptBest(
-                              struct BVH_MotionCapture * mc,
-                              struct simpleRenderer *renderer,
-                              //---------------------------------
-                              struct ikProblem * problem,
-                              unsigned int startChain,
-                              unsigned int endChain,
-                              //---------------------------------
-                              struct ikConfiguration * ikConfig,
-                              //---------------------------------
-                              struct MotionBuffer * currentSolution,
-                              struct MotionBuffer * previousSolution,
-                              //---------------------------------
-                              struct BVH_Transform * bvhCurrentTransform, 
-                              struct BVH_Transform * bvhPreviousTransform,
-                              //---------------------------------
-                              struct BVH_Transform * bvhTargetTransform
-                              //---------------------------------
-                            )
+void compareChainsAndAdoptBest(
+                               struct BVH_MotionCapture * mc,
+                               struct simpleRenderer *renderer,
+                               //---------------------------------
+                               struct ikProblem * problem,
+                               unsigned int startChain,
+                               unsigned int endChain,
+                               //---------------------------------
+                               struct ikConfiguration * ikConfig,
+                               //---------------------------------
+                               struct MotionBuffer * currentSolution,
+                               struct MotionBuffer * previousSolution,
+                               //---------------------------------
+                               struct BVH_Transform * bvhCurrentTransform, 
+                               struct BVH_Transform * bvhPreviousTransform,
+                               //---------------------------------
+                               struct BVH_Transform * bvhTargetTransform
+                               //---------------------------------
+                              )
 {
  //Dont do chain 0, do only part chains..  
  for (unsigned int chainID=startChain; chainID<endChain; chainID++)
