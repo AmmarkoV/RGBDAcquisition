@@ -1175,16 +1175,15 @@ void compareChainsAndAdoptBest(
                                struct ikConfiguration * ikConfig,
                                //---------------------------------
                                struct MotionBuffer * currentSolution,
-                               struct MotionBuffer * previousSolution,
+                               struct MotionBuffer * checkIfItIsBetterSolution,
                                //---------------------------------
                                struct BVH_Transform * bvhCurrentTransform, 
-                               struct BVH_Transform * bvhPreviousTransform,
+                               struct BVH_Transform * bvhCheckIfItIsBetterTransform,
                                //---------------------------------
                                struct BVH_Transform * bvhTargetTransform
                                //---------------------------------
                               )
 {
- //Dont do chain 0, do only part chains..  
  for (unsigned int chainID=startChain; chainID<endChain; chainID++)
                 {
                   float currentSolutionChainLoss  = 0.0;  
@@ -1196,15 +1195,15 @@ void compareChainsAndAdoptBest(
                     {
                      unsigned int jID=problem->chain[chainID].part[partID].jID;
                      failedProjections += ( bvh_projectJIDTo2D(mc,bvhCurrentTransform,renderer,jID,0,0)  == 0 );
-                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhPreviousTransform,renderer,jID,0,0) == 0 );
+                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhCheckIfItIsBetterTransform,renderer,jID,0,0) == 0 );
                 
                      if (failedProjections==0)     
                      {
                       unsigned int jID=problem->chain[chainID].part[partID].jID;
                          
                       ///Warning: When you change this please change meanBVH2DDistance as well!
-                      float pX=(float) bvhPreviousTransform->joint[jID].pos2D[0];
-                      float pY=(float) bvhPreviousTransform->joint[jID].pos2D[1];
+                      float cX=(float) bvhCheckIfItIsBetterTransform->joint[jID].pos2D[0];
+                      float cY=(float) bvhCheckIfItIsBetterTransform->joint[jID].pos2D[1];
                       float sX=(float) bvhCurrentTransform->joint[jID].pos2D[0];
                       float sY=(float) bvhCurrentTransform->joint[jID].pos2D[1];
                       float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
@@ -1221,10 +1220,10 @@ void compareChainsAndAdoptBest(
                           currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
 
-                        if ((pX!=0.0) || (pY!=0.0))
+                        if ((cX!=0.0) || (cY!=0.0))
                         { 
-                          //Our previous solution
-                          previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                          //The solution we want to check if is better
+                          previousSolutionChainLoss+= getSquared2DPointDistance(cX,cY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
                       }
                      }
@@ -1243,9 +1242,9 @@ void compareChainsAndAdoptBest(
                                                  problem->chain[chainID].part[partID].mIDStart+2
                                                 };
 
-                         currentSolution->motion[mIDS[0]]=previousSolution->motion[mIDS[0]];
-                         currentSolution->motion[mIDS[1]]=previousSolution->motion[mIDS[1]];
-                         currentSolution->motion[mIDS[2]]=previousSolution->motion[mIDS[2]];
+                         currentSolution->motion[mIDS[0]]=checkIfItIsBetterSolution->motion[mIDS[0]];
+                         currentSolution->motion[mIDS[1]]=checkIfItIsBetterSolution->motion[mIDS[1]];
+                         currentSolution->motion[mIDS[2]]=checkIfItIsBetterSolution->motion[mIDS[2]];
                         }
                     }
                 }
