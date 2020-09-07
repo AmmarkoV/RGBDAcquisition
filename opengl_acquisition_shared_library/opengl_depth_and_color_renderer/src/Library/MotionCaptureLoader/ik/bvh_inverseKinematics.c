@@ -1164,13 +1164,101 @@ int ensureInitialPositionIsInFrustrum(
 
 
 
+int compareChainsAndAdoptBest(
+                              struct BVH_MotionCapture * mc,
+                              struct simpleRenderer *renderer,
+                              //---------------------------------
+                              struct ikProblem * problem,
+                              unsigned int startChain,
+                              unsigned int endChain,
+                              //---------------------------------
+                              struct ikConfiguration * ikConfig,
+                              //---------------------------------
+                              struct MotionBuffer * currentSolution,
+                              struct MotionBuffer * previousSolution,
+                              //---------------------------------
+                              struct BVH_Transform * bvhCurrentTransform, 
+                              struct BVH_Transform * bvhPreviousTransform,
+                              //---------------------------------
+                              struct BVH_Transform * bvhTargetTransform
+                              //---------------------------------
+                            )
+{
+ //Dont do chain 0, do only part chains..  
+ for (unsigned int chainID=startChain; chainID<endChain; chainID++)
+                {
+                  float currentSolutionChainLoss  = 0.0;  
+                  float previousSolutionChainLoss = 0.0;  
+
+                  unsigned int partIDStart = 0;
+                  unsigned int failedProjections=0;
+                  for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                    {
+                     unsigned int jID=problem->chain[chainID].part[partID].jID;
+                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhCurrentTransform,renderer,jID,0,0) == 0 );
+                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhPreviousTransform,renderer,jID,0,0) == 0 );
+                
+                     if (failedProjections==0)     
+                     {
+                      unsigned int jID=problem->chain[chainID].part[partID].jID;
+                         
+                      ///Warning: When you change this please change meanBVH2DDistance as well!
+                      float pX=(float) bvhPreviousTransform->joint[jID].pos2D[0];
+                      float pY=(float) bvhPreviousTransform->joint[jID].pos2D[1];
+                      float sX=(float) bvhCurrentTransform->joint[jID].pos2D[0];
+                      float sY=(float) bvhCurrentTransform->joint[jID].pos2D[1];
+                      float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
+                      float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
+                        
+                      //Only use source/target joints  that exist and are not occluded..
+
+                      if ((tX!=0.0) || (tY!=0.0))
+                      {
+                        //Don't do anything without the target point..
+                        if ((sX!=0.0) || (sY!=0.0))
+                        { //Our current solution
+                            currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                        }
+
+                        if ((pX!=0.0) || (pY!=0.0))
+                        {  //Our previous solution
+                            previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                        }
+                      }
+                     }
+                    }
+                     
+                     
+                    if (currentSolutionChainLoss > previousSolutionChainLoss) 
+                    {
+                        fprintf(stderr,RED "Chain %u came out worse than previous \n" NORMAL,chainID);
+                        
+                        for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                        {
+                         unsigned int mIDS[3] = {
+                                                 problem->chain[chainID].part[partID].mIDStart,
+                                                 problem->chain[chainID].part[partID].mIDStart+1,
+                                                 problem->chain[chainID].part[partID].mIDStart+2
+                                                };
+
+                         currentSolution->motion[mIDS[0]]=previousSolution->motion[mIDS[0]];
+                         currentSolution->motion[mIDS[1]]=previousSolution->motion[mIDS[1]];
+                         currentSolution->motion[mIDS[2]]=previousSolution->motion[mIDS[2]];
+                        }
+                    }
+                }
+}
 
 
 
 int ensureFinalProposedSolutionIsBetterInParts( 
                                                struct BVH_MotionCapture * mc,
                                                struct simpleRenderer *renderer,
+                                               //---------------------------------
                                                struct ikProblem * problem,
+                                               unsigned int startChain,
+                                               unsigned int endChain,
+                                               //---------------------------------
                                                struct ikConfiguration * ikConfig,
                                                //---------------------------------
                                                struct MotionBuffer * currentSolution,
@@ -1186,73 +1274,23 @@ int ensureFinalProposedSolutionIsBetterInParts(
    struct BVH_Transform bvhPreviousTransform = {0};
    //------------------------------------------------ 
    if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
-           {  
+           {
             if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
-             {   
-               //Dont do chain 0, do only part chains..  
-               for (unsigned int chainID=1; chainID<problem->numberOfChains; chainID++)
-                {
-                  float currentSolutionChainLoss = 0.0;  
-                  float previousSolutionChainLoss = 0.0;  
-                    
-                  unsigned int partIDStart = 0;
-                  unsigned int failedProjections=0;
-                  for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
-                    {
-                     unsigned int jID=problem->chain[chainID].part[partID].jID;
-                     failedProjections += ( bvh_projectJIDTo2D(mc,&bvhCurrentTransform,renderer,jID,0,0) == 0 );
-                     failedProjections += ( bvh_projectJIDTo2D(mc,&bvhPreviousTransform,renderer,jID,0,0) == 0 );
-                
-                     if (failedProjections==0)     
-                     {
-                      unsigned int jID=problem->chain[chainID].part[partID].jID;
-                         
-                      ///Warning: When you change this please change meanBVH2DDistance as well!
-                      float pX=(float) bvhPreviousTransform.joint[jID].pos2D[0];
-                      float pY=(float) bvhPreviousTransform.joint[jID].pos2D[1];
-                      float sX=(float) bvhCurrentTransform.joint[jID].pos2D[0];
-                      float sY=(float) bvhCurrentTransform.joint[jID].pos2D[1];
-                      float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
-                      float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
-                        
-                      //Only use source/target joints  that exist and are not occluded..
-
-                      if ((tX!=0.0) || (tY!=0.0))
-                      { //Don't do anything without the target point..
-                        if ((sX!=0.0) || (sY!=0.0))
-                        { //Our current solution
-                            currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
-                        }
-
-                        if ((pX!=0.0) || (pY!=0.0)) 
-                        {  //Our previous solution
-                            previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance; 
-                        } 
-                       }
-                     }
-                    }
-                     
-                     
-                    if (currentSolutionChainLoss > previousSolutionChainLoss) 
-                    {
-                        fprintf(stderr,RED "Chain %u came out worse than previous \n" NORMAL,chainID);
-                        
-                        for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
-                        {
-                         unsigned int mIDS[3] = { 
-                                                 problem->chain[chainID].part[partID].mIDStart,
-                                                 problem->chain[chainID].part[partID].mIDStart+1,
-                                                 problem->chain[chainID].part[partID].mIDStart+2
-                                                };
-                                                
-                         currentSolution->motion[mIDS[0]]=previousSolution->motion[mIDS[0]];
-                         currentSolution->motion[mIDS[1]]=previousSolution->motion[mIDS[1]];
-                         currentSolution->motion[mIDS[2]]=previousSolution->motion[mIDS[2]];                
-                        }
-                    }
-                     
-                }
-               return 1;      
+             {
+               compareChainsAndAdoptBest(
+                                         mc,
+                                         renderer,
+                                         problem,
+                                         startChain,
+                                         endChain, 
+                                         ikConfig,
+                                         currentSolution,
+                                         previousSolution,
+                                         &bvhCurrentTransform,
+                                         &bvhPreviousTransform,
+                                         bvhTargetTransform
+                                        );
+               return 1;
              }
            }
    //------------------------------------------------ 
@@ -1450,7 +1488,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
                                                    renderer,
+                                                   //---------------------------------
                                                    problem,
+                                                   2, //Start Chain
+                                                   problem->numberOfChains, //End Chain
+                                                   //--------------------------------- 
                                                    ikConfig,
                                                    //---------------------------------
                                                    solution,
