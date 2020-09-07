@@ -1294,8 +1294,80 @@ int ensureFinalProposedSolutionIsBetterInParts(
                return 1;
              }
            }
+   //------------------------------------------------
+   return 0;
+}
+
+
+
+
+int springToZeroParts( 
+                                               struct BVH_MotionCapture * mc,
+                                               struct simpleRenderer *renderer,
+                                               //---------------------------------
+                                               struct ikProblem * problem,
+                                               unsigned int startChain,
+                                               unsigned int endChain,
+                                               //---------------------------------
+                                               struct ikConfiguration * ikConfig,
+                                               //---------------------------------
+                                               struct MotionBuffer * currentSolution,
+                                               //---------------------------------
+                                               struct BVH_Transform * bvhTargetTransform
+                                               //---------------------------------
+                                              )
+{
+   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running \n" NORMAL);
    //------------------------------------------------ 
-           
+   struct BVH_Transform bvhCurrentTransform  = {0}; 
+   struct BVH_Transform bvhZeroTransform = {0};
+   //------------------------------------------------ 
+    
+   struct MotionBuffer * zeroSolution = mallocNewMotionBufferAndCopy(mc,currentSolution);
+   
+   if (zeroSolution!=0)
+   {
+       
+        for (unsigned int chainID=startChain; chainID<endChain; chainID++)
+                {
+                  unsigned int partIDStart = 0;
+                  for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
+                    {
+                         unsigned int mIDS[3] = {
+                                                 problem->chain[chainID].part[partID].mIDStart,
+                                                 problem->chain[chainID].part[partID].mIDStart+1,
+                                                 problem->chain[chainID].part[partID].mIDStart+2
+                                                };
+
+                         currentSolution->motion[mIDS[0]]=0;
+                         currentSolution->motion[mIDS[1]]=0;
+                         currentSolution->motion[mIDS[2]]=0;
+                    }
+                }
+       
+     if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
+           {
+            if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,0))// We don't need extra structures
+             {
+               compareChainsAndAdoptBest(
+                                         mc,
+                                         renderer,
+                                         problem,
+                                         startChain,
+                                         endChain, 
+                                         ikConfig,
+                                         currentSolution,
+                                         zeroSolution,
+                                         &bvhCurrentTransform,
+                                         &bvhZeroTransform,
+                                         bvhTargetTransform
+                                        );
+               return 1;
+             }
+           }
+    //------------------------------------------------
+    freeMotionBuffer(zeroSolution);
+   }
    return 0;
 }
 
@@ -1483,7 +1555,24 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         }
         //----------------------------------------------------
         
-        
+        /* 
+        //This is smoother but worse..
+        springToZeroParts( 
+                           mc,
+                           renderer,
+                           //---------------------------------
+                           problem,
+                           2, //Start Chain
+                           problem->numberOfChains, //End Chain
+                           //--------------------------------- 
+                           ikConfig,
+                           //---------------------------------
+                           solution, 
+                           //---------------------------------
+                           bvhTargetTransform
+                           //---------------------------------
+                          );
+        */
         
         
         ensureFinalProposedSolutionIsBetterInParts( 
