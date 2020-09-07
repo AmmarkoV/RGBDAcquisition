@@ -1195,7 +1195,7 @@ void compareChainsAndAdoptBest(
                   for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                     {
                      unsigned int jID=problem->chain[chainID].part[partID].jID;
-                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhCurrentTransform,renderer,jID,0,0) == 0 );
+                     failedProjections += ( bvh_projectJIDTo2D(mc,bvhCurrentTransform,renderer,jID,0,0)  == 0 );
                      failedProjections += ( bvh_projectJIDTo2D(mc,bvhPreviousTransform,renderer,jID,0,0) == 0 );
                 
                      if (failedProjections==0)     
@@ -1216,13 +1216,15 @@ void compareChainsAndAdoptBest(
                       {
                         //Don't do anything without the target point..
                         if ((sX!=0.0) || (sY!=0.0))
-                        { //Our current solution
-                            currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                        { 
+                          //Our current solution
+                          currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
 
                         if ((pX!=0.0) || (pY!=0.0))
-                        {  //Our previous solution
-                            previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                        { 
+                          //Our previous solution
+                          previousSolutionChainLoss+= getSquared2DPointDistance(pX,pY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
                       }
                      }
