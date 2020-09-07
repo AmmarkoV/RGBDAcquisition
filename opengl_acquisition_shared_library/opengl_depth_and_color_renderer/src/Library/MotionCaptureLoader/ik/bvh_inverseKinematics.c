@@ -1574,7 +1574,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                           );
         */
         
-        
+        //This removes some weird noise when 
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
                                                    renderer,
