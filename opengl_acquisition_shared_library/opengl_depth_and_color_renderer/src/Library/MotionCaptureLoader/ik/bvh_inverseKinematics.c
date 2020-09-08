@@ -1380,6 +1380,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           struct ikProblem * problem,
                                                           struct ikConfiguration * ikConfig,
                                                           //---------------------------------
+                                                          struct MotionBuffer * penultimateSolution,
                                                           struct MotionBuffer * previousSolution,
                                                           struct MotionBuffer * solution,
                                                           struct MotionBuffer * groundTruth,

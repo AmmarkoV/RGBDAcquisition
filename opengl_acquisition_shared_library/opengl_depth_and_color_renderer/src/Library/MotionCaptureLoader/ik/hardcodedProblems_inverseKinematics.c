@@ -811,6 +811,7 @@ int bvhTestIK(
                             problem,
                             &ikConfig,
                             //---------------
+                            0, //This is pre-previous solution but we dont want it for our test..
                             previousSolution,
                             solution,
                             groundTruth,
