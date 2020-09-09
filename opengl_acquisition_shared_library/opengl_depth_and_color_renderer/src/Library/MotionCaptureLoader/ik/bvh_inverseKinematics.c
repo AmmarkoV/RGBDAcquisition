@@ -1594,6 +1594,24 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    );
         
         
+                
+        //This removes some weird noise when 
+        ensureFinalProposedSolutionIsBetterInParts( 
+                                                   mc,
+                                                   renderer,
+                                                   //---------------------------------
+                                                   problem,
+                                                   2, //Start Chain
+                                                   problem->numberOfChains, //End Chain
+                                                   //--------------------------------- 
+                                                   ikConfig,
+                                                   //---------------------------------
+                                                   solution,
+                                                   penultimateSolution,
+                                                   //---------------------------------
+                                                   bvhTargetTransform
+                                                   //---------------------------------
+                                                   );
         
     }
     //---------------------------------------------------------------------------------------
