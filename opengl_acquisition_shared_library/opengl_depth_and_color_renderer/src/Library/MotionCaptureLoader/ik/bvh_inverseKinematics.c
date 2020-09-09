@@ -1278,6 +1278,8 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                struct BVH_MotionCapture * mc,
                                                struct simpleRenderer *renderer,
                                                //---------------------------------
+                                               const char * label,
+                                               //---------------------------------
                                                struct ikProblem * problem,
                                                unsigned int startChain,
                                                unsigned int endChain,
@@ -1291,7 +1293,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                //---------------------------------
                                               )
 {
-   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running \n" NORMAL);
+   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
    struct BVH_Transform bvhPreviousTransform = {0};
@@ -1339,7 +1341,7 @@ int springToZeroParts(
                        //---------------------------------
                     )
 {
-   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running \n" NORMAL);
+   fprintf(stderr,GREEN "springToZeroParts running \n" NORMAL);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
    struct BVH_Transform bvhZeroTransform = {0};
@@ -1452,7 +1454,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     #endif
     
     
-    
+    //Extrapolated guess
     struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
     if (extrapolatedGuess!=0)
     {
@@ -1465,6 +1467,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
                                                    renderer,
+                                                   //---------------------------------
+                                                   "Extrapolation",
                                                    //---------------------------------
                                                    problem,
                                                    2, //Start Chain
@@ -1626,11 +1630,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                           );
         */
         
-        //This removes some weird noise when 
+        //This removes some weird noise from previous solution
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
                                                    renderer,
                                                    //---------------------------------
+                                                   "Previous",
+                                                   //--------------------------------- 
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains, //End Chain
@@ -1646,11 +1652,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         
         
                 
-        //This removes some weird noise when 
+        //This removes some weird noise from pre-previous solution 
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
                                                    renderer,
                                                    //---------------------------------
+                                                   "Penultimate",
+                                                   //--------------------------------- 
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains, //End Chain
