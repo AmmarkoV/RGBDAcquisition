@@ -1120,11 +1120,24 @@ int multiThreadedSolver(
 
 
 int extrapolateSolution(
-                        struct MotionBuffer * penultimateSolution,
-                        struct MotionBuffer * previousSolution,
-                        struct MotionBuffer * outputSolution
+                        struct MotionBuffer * a,
+                        struct MotionBuffer * b,
+                        struct MotionBuffer * extrapolated
                        )
 {
+    if ( (a!=0) && (b!=0) && (extrapolated!=0) )
+        {
+         if ( (a->motion!=0) && (b->motion!=0) && (extrapolated->motion!=0) )
+          {
+              for (unsigned int mID=0; mID<extrapolated->bufferSize; mID++)
+              {
+                  extrapolated->motion[mID] = b->motion[mID] + ( b->motion[mID] - a->motion[mID] );
+              }
+              return 1;
+          }     
+        }
+        
+    return 0;
 }
 
 
@@ -1438,7 +1451,36 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
       if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }         
     #endif
     
-     
+    
+    
+    struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
+    if (extrapolatedGuess!=0)
+    {
+        extrapolateSolution(
+                            penultimateSolution,
+                            previousSolution,
+                            extrapolatedGuess
+                           );
+                         
+        ensureFinalProposedSolutionIsBetterInParts( 
+                                                   mc,
+                                                   renderer,
+                                                   //---------------------------------
+                                                   problem,
+                                                   2, //Start Chain
+                                                   problem->numberOfChains, //End Chain
+                                                   //--------------------------------- 
+                                                   ikConfig,
+                                                   //---------------------------------
+                                                   solution,
+                                                   extrapolatedGuess,
+                                                   //---------------------------------
+                                                   bvhTargetTransform
+                                                   //---------------------------------
+                                                   );                         
+        
+        freeMotionBuffer(extrapolatedGuess);
+    }
     
     //Don't spam console..
     //viewProblem(problem);
