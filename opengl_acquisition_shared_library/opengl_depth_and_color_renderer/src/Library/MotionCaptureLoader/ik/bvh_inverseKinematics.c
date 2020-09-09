@@ -1119,6 +1119,15 @@ int multiThreadedSolver(
 
 
 
+int extrapolateSolution(
+                        struct MotionBuffer * penultimateSolution,
+                        struct MotionBuffer * previousSolution,
+                        struct MotionBuffer * outputSolution
+                       )
+{
+}
+
+
 
 
 
@@ -1302,20 +1311,20 @@ int ensureFinalProposedSolutionIsBetterInParts(
 
 
 int springToZeroParts( 
-                                               struct BVH_MotionCapture * mc,
-                                               struct simpleRenderer *renderer,
-                                               //---------------------------------
-                                               struct ikProblem * problem,
-                                               unsigned int startChain,
-                                               unsigned int endChain,
-                                               //---------------------------------
-                                               struct ikConfiguration * ikConfig,
-                                               //---------------------------------
-                                               struct MotionBuffer * currentSolution,
-                                               //---------------------------------
-                                               struct BVH_Transform * bvhTargetTransform
-                                               //---------------------------------
-                                              )
+                       struct BVH_MotionCapture * mc,
+                       struct simpleRenderer *renderer,
+                       //---------------------------------
+                       struct ikProblem * problem,
+                       unsigned int startChain,
+                       unsigned int endChain,
+                       //---------------------------------
+                       struct ikConfiguration * ikConfig,
+                       //---------------------------------
+                       struct MotionBuffer * currentSolution,
+                       //---------------------------------
+                       struct BVH_Transform * bvhTargetTransform
+                       //---------------------------------
+                    )
 {
    fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running \n" NORMAL);
    //------------------------------------------------ 
