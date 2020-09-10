@@ -1129,6 +1129,7 @@ int extrapolateSolution(
         {
          if ( (a->motion!=0) && (b->motion!=0) && (extrapolated->motion!=0) )
           {
+              //All buffers are there..
               for (unsigned int mID=0; mID<extrapolated->bufferSize; mID++)
               {
                   extrapolated->motion[mID] = b->motion[mID] + ( b->motion[mID] - a->motion[mID] );
@@ -1438,6 +1439,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         exit(0);
     }
 
+    //Don't spam console..
+    //viewProblem(problem);
+    
     ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
     
     //Make sure our problem has the correct details ..
@@ -1454,6 +1458,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     #endif
     
     
+    /*
     //Extrapolated guess
     struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
     if (extrapolatedGuess!=0)
@@ -1476,7 +1481,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //--------------------------------- 
                                                    ikConfig,
                                                    //---------------------------------
-                                                   solution,
+                                                   problem->currentSolution,
                                                    extrapolatedGuess,
                                                    //---------------------------------
                                                    bvhTargetTransform
@@ -1484,10 +1489,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    );                         
         
         freeMotionBuffer(extrapolatedGuess);
-    }
+    }*/
+
+
     
-    //Don't spam console..
-    //viewProblem(problem);
     
     
     //---------------------------------------------------------------------------------------
