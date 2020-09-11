@@ -64,6 +64,7 @@ struct Matrix4x4OfFloats
 };
 
 
+float degrees_to_radF(float degrees);
 
 /**
 * @brief Printout an 4x4 Matrix that consists of floats
