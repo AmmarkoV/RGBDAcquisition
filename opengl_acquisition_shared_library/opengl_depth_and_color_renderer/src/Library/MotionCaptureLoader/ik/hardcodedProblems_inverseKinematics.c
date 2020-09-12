@@ -4,6 +4,75 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+int prepareDefaultLeftHandProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+)
+{
+    problem->mc = mc;
+    problem->renderer = renderer;
+
+    problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
+    problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+    problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+
+    //2D Projections Targeted
+    //----------------------------------------------------------
+    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
+
+
+    //Chain #0 is Joint Right Hand-> to all its children
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    unsigned int groupID=0;
+    unsigned int jobID=0;
+    unsigned int chainID=0;
+    unsigned int partID=0;
+    BVHJointID thisJID=0;
+    //----------------------------------------------------------
+
+
+
+
+
+    //Chain 0 is the RHand and all of the rigid torso
+    //----------------------------------------------------------
+    problem->chain[chainID].groupID=groupID;
+    problem->chain[chainID].jobID=jobID;
+    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
+    problem->chain[chainID].permissionToStart = 0;
+    problem->chain[chainID].parallel=0;
+
+    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
+  
+    if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
+    {
+        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
+        problem->chain[chainID].part[partID].partParent=0; //This is the parent
+        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+        problem->chain[chainID].part[partID].jID=thisJID; 
+        problem->chain[chainID].part[partID].jointImportance=2.0;
+        ++partID;
+    }
+    else
+    {
+        fprintf(stderr,"No rHand in armature..\n");
+        return 0;
+    }
+
+}
+
+
+
 int prepareDefaultBodyProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
