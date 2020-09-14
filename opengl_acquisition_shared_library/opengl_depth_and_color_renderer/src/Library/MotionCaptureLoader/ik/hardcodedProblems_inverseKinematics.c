@@ -39,6 +39,8 @@ int addNewPartToChainProblem(
         problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID; 
+        problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+        problem->chain[*chainID].part[*partID].mIDEnd=problem->chain[*chainID].part[*partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
         problem->chain[*chainID].part[*partID].jointImportance=importance;
         problem->chain[*chainID].part[*partID].endEffector=isEndEffector;
         
@@ -52,6 +54,361 @@ int addNewPartToChainProblem(
         return 0;
     }
 }
+
+
+
+
+
+
+int prepareDefaultRightHandProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+)
+{
+    problem->mc = mc;
+    problem->renderer = renderer;
+
+    problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
+    problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+    problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+
+    //2D Projections Targeted
+    //----------------------------------------------------------
+    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
+
+
+    //Chain #0 is Joint Right Hand-> to all its children
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    unsigned int correct=0;
+    unsigned int checksum=0;
+    unsigned int groupID=0;
+    unsigned int jobID=0;
+    unsigned int chainID=0;
+    unsigned int partID=0;
+    BVHJointID thisJID=0;
+    //----------------------------------------------------------
+
+
+     //CHAIN 0 ----------------------------
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand", // Joint
+                               2.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rthumb", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }
+         
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    
+    
+    //Chain 1 is the Finger 2
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-2.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-3.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+    
+    
+    //Chain 2 is the Finger 3
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-2.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-3.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }                             
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+    
+    //Chain 3 is the Finger 4
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-2.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-3.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+
+
+    //Chain 4 is the Finger 5
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-2.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-3.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+    //Chain 5 is the Finger 1 ( Thumb )
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rthumb", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger1-2.r", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger1-3.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }                             
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+    problem->numberOfChains = chainID;
+    problem->numberOfGroups = groupID;
+    problem->numberOfJobs = jobID;
+    
+  return 1;
+}
+
+
+
+
+
+
+
+
+
+
 
 int prepareDefaultLeftHandProblem(
     struct ikProblem * problem,
@@ -79,6 +436,8 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    unsigned int correct=0;
+    unsigned int checksum=0;
     unsigned int groupID=0;
     unsigned int jobID=0;
     unsigned int chainID=0;
@@ -88,51 +447,317 @@ int prepareDefaultLeftHandProblem(
 
 
      //CHAIN 0 ----------------------------
-     addNewPartToChainProblem(
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhand", // Joint
+                              "lhand", // Joint
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-     addNewPartToChainProblem(
+     ++correct;
+     checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-1.r", // Joint
+                              "finger2-1.l", // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-  
-     addNewPartToChainProblem(
+     ++correct;
+     checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-1.r", // Joint
+                              "finger3-1.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lthumb", // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
                              
-     addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "finger4-1.r", // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
-                             );
-     addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "rthumb", // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
-                             );
+    if (correct!=checksum) 
+         { return 0; }
+         
     ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    
+    
+    //Chain 1 is the Finger 2
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-2.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-3.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+    
+    
+    //Chain 2 is the Finger 3
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-2.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-3.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }                             
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+    
+    //Chain 3 is the Finger 4
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-2.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-3.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+
+
+    //Chain 4 is the Finger 5
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-2.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-3.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    if (correct!=checksum) 
+         { return 0; }
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+    //Chain 5 is the Finger 1 ( Thumb )
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lthumb", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger1-2.l", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger1-3.l", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    if (correct!=checksum) 
+         { return 0; }                             
+                             
+    ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+    problem->numberOfChains = chainID;
+    problem->numberOfGroups = groupID;
+    problem->numberOfJobs = jobID;
+    
+  return 1;
 }
+
+
+
+
+
+
+
+
+
 
 
 
