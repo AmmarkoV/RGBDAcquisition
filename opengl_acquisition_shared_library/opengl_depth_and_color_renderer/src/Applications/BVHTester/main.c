@@ -194,6 +194,13 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                       if (line[lineLength-2]==13) { line[lineLength-2]=0; }
                     }
 
+                  if (bvhMotion.motionValues!=0)   
+                    {
+                      //Instead of regular freeing we do this weird free to avoid freeing last structure to able to access its mIDs 
+                      bvh_free(&bvhMotion);
+                      fprintf(stderr,"Freed file `%s`\n",line); 
+                    }
+                    
                   fprintf(stderr,"Next file is `%s`\n",line);
                   if ( bvh_loadBVH(line, &bvhMotion, 1.0) )
                    {
@@ -215,8 +222,8 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                          }
                       }
 
-                      bvh_free(&bvhMotion);
-                      fprintf(stderr,"Freed file `%s`\n",line);
+                      //bvh_free(&bvhMotion);
+                      //fprintf(stderr,"Freed file `%s`\n",line);
                    }
                   }
 
@@ -224,16 +231,20 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                   //if (fileNumber==10) { break; }
                 }
           
-          fprintf(stderr,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
-          fprintf(stderr,"float minimumLimits[%u]={0};\n",numberOfValues);
-          fprintf(stderr,"float maximumLimits[%u]={0};\n",numberOfValues);
-          fprintf(stderr,"//--------------------------\n");
+          fprintf(stdout,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
+          fprintf(stdout,"float minimumLimits[%u]={0};\n",numberOfValues);
+          fprintf(stdout,"float maximumLimits[%u]={0};\n",numberOfValues);
+          fprintf(stdout,"//--------------------------\n");
           for (unsigned int mID=7; mID<numberOfValues; mID++)
                          {
-                            if (minima[mID]!=0.0) { fprintf(stderr,"minimumLimits[%u]=%0.2f;\n",mID,minima[mID]); }  
-                            if (maxima[mID]!=0.0) { fprintf(stderr,"maximumLimits[%u]=%0.2f;\n",mID,maxima[mID]); }
+                            unsigned int jID = bvhMotion.motionToJointLookup[mID].jointID;
+                            if (minima[mID]!=0.0) { fprintf(stdout,"minimumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,minima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }  
+                            if (maxima[mID]!=0.0) { fprintf(stdout,"maximumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,maxima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }
                          }
-          fprintf(stderr,"\n\n//--------------------------\n");
+          fprintf(stdout,"\n\n//--------------------------\n");
+          
+          bvh_free(&bvhMotion);
+          fprintf(stderr,"Freed final file `%s`\n",line);
           
           if (line!=0) { free(line); }
           fclose(fp);
