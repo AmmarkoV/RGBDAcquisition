@@ -1279,7 +1279,8 @@ void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,stru
 //----------------------------------------------------------------------------------------------------
 void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
 {
-  fprintf(stdout,"\n\n\nPrinting BVH file..\n");
+  if (bvhMotion==0) {  fprintf(stdout,"\n\n\nCan't print empty BVH dataset..\n"); return; }
+  fprintf(stdout,"\n\n\nPrinting BVH dataset..\n");
 
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {

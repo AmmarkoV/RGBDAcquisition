@@ -33,7 +33,7 @@ int addNewPartToChainProblem(
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
     
     unsigned int thisJID=0;
-    if (bvh_getJointIDFromJointName(mc,partName,&thisJID) )
+    if (bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
         problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
@@ -46,10 +46,11 @@ int addNewPartToChainProblem(
         
         *partID+=1;                      
         problem->chain[*chainID].numberOfParts=*partID;
-
+        return 1;
     }
     else
     {
+        bvh_printBVH(mc);
         fprintf(stderr,"No %s in armature..\n",partName);
         return 0;
     }
@@ -160,7 +161,7 @@ int prepareDefaultRightHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
          
     ++chainID;
     //----------------------------------------------------------
@@ -204,7 +205,7 @@ int prepareDefaultRightHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -252,7 +253,7 @@ int prepareDefaultRightHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }                             
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                          
                              
     ++chainID;
     //----------------------------------------------------------
@@ -296,7 +297,7 @@ int prepareDefaultRightHandProblem(
                              );
 
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -343,7 +344,7 @@ int prepareDefaultRightHandProblem(
                              );
 
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -387,7 +388,7 @@ int prepareDefaultRightHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }                             
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                     
                              
     ++chainID;
     //----------------------------------------------------------
@@ -510,7 +511,7 @@ int prepareDefaultLeftHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
          
     ++chainID;
     //----------------------------------------------------------
@@ -554,7 +555,7 @@ int prepareDefaultLeftHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -602,7 +603,7 @@ int prepareDefaultLeftHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }                             
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                           
                              
     ++chainID;
     //----------------------------------------------------------
@@ -646,7 +647,7 @@ int prepareDefaultLeftHandProblem(
                              );
 
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -693,7 +694,7 @@ int prepareDefaultLeftHandProblem(
                              );
 
     if (correct!=checksum) 
-         { return 0; }
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
     ++chainID;
     //----------------------------------------------------------
@@ -737,7 +738,7 @@ int prepareDefaultLeftHandProblem(
                              );
                              
     if (correct!=checksum) 
-         { return 0; }                             
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                       
                              
     ++chainID;
     //----------------------------------------------------------
