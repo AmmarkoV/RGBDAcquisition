@@ -4,7 +4,54 @@
 #include <stdlib.h>
 #include <string.h>
 
+int addNewPartToChainProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform,
+    //-----------------------------------------
+    char * partName,
+    float importance,
+    int isEndEffector,
+    unsigned int * groupID,
+    unsigned int * jobID,
+    unsigned int * chainID,
+    unsigned int * partID
+    )
+{ 
+    //Chain 0 is the RHand and all of the rigid torso
+    //----------------------------------------------------------
+    problem->chain[*chainID].groupID=*groupID;
+    problem->chain[*chainID].jobID=*jobID;
+    problem->chain[*chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
+    problem->chain[*chainID].status = BVH_IK_NOTSTARTED;
+    problem->chain[*chainID].permissionToStart = 0;
+    problem->chain[*chainID].parallel=0;
 
+    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
+    
+    unsigned int thisJID=0;
+    if (bvh_getJointIDFromJointName(mc,partName,&thisJID) )
+    {
+        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
+        problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
+        problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
+        problem->chain[*chainID].part[*partID].jID=thisJID; 
+        problem->chain[*chainID].part[*partID].jointImportance=importance;
+        problem->chain[*chainID].part[*partID].endEffector=isEndEffector;
+        
+        *partID+=1;                      
+        problem->chain[*chainID].numberOfParts=*partID;
+
+    }
+    else
+    {
+        fprintf(stderr,"No %s in armature..\n",partName);
+        return 0;
+    }
+}
 
 int prepareDefaultLeftHandProblem(
     struct ikProblem * problem,
@@ -40,35 +87,51 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
 
 
-
-
-
-    //Chain 0 is the RHand and all of the rigid torso
-    //----------------------------------------------------------
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=0;
-
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
+     //CHAIN 0 ----------------------------
+     addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand", // Joint
+                               2.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
   
-    if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID; 
-        problem->chain[chainID].part[partID].jointImportance=2.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rHand in armature..\n");
-        return 0;
-    }
-
+     addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.r", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rthumb", // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    ++chainID;
 }
 
 
