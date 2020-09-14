@@ -9,6 +9,25 @@ extern "C"
 #endif
 
 
+int prepareDefaultRightHandProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+);
+
+
+int prepareDefaultLeftHandProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+);
+
 int prepareDefaultBodyProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
