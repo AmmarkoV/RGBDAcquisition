@@ -429,7 +429,13 @@ float calculateChainLoss(
                         { 
                             loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
-                        }
+                        }/*
+                         else
+                        {
+                           fprintf(stderr,RED "Joint %u failed to be projected (source=%u,target=%u)\n"NORMAL,jID,((sX!=0.0) || (sY!=0.0)),((tX!=0.0) || (tY!=0.0)));
+                        }*/
+                        
+                        
                 } //We add ever part of this chain
             } else  // We successfully projected the BVH file to 2D points..
            { fprintf(stderr,RED "Could not calculate transform projections to 2D for chain %u \n"NORMAL,chainID); }
@@ -1426,6 +1432,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "No problem provided for IK..\n" NORMAL);
         return 0;
     }
+    
+    if (bvhTargetTransform==0)
+    {
+        fprintf(stderr,RED "No target transform, can't do IK..\n" NORMAL);
+        return 0;
+    }
+    
     
     if  ( (solution==0) || (solution->motion==0) )
     {
