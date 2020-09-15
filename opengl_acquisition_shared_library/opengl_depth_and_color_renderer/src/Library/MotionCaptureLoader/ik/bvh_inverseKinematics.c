@@ -394,6 +394,7 @@ float calculateChainLoss(
                 
         if (transformIsLoaded)
         {
+           //Only projecting parts is a performance measure..
            #define ONLY_PROJECT_PARTS 1
            
            #if ONLY_PROJECT_PARTS
@@ -410,8 +411,8 @@ float calculateChainLoss(
             {
            #else             
            //We project all Joints to their 2D locations..
-           //if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
-           // {
+            if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
+             {
            #endif 
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
@@ -502,7 +503,7 @@ float iteratePartLoss(
  //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
    if (initialLoss!=initialLoss)
    {
-       fprintf(stderr,RED "Started with a NaN loss whill processing chain %u for joint %s \n" NORMAL,chainID,jointName);
+       fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
        bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
        return initialLoss;
    }
@@ -1420,6 +1421,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           float * finalMAEInMM
                                                          )
 {
+    if (problem==0)
+    {
+        fprintf(stderr,RED "No problem provided for IK..\n" NORMAL);
+        return 0;
+    }
+    
     if  ( (solution==0) || (solution->motion==0) )
     {
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
@@ -1441,8 +1448,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Don't spam console..
     //viewProblem(problem);
+    if (problem->chain[0].part[0].jID==0)
+    { 
+      ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution); 
+    } else
+    {
+      fprintf(stderr,RED "Not running initial position frustrum check\n" NORMAL);
+    }
     
-    ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
     
     //Make sure our problem has the correct details ..
     problem->bvhTarget2DProjectionTransform =  bvhTargetTransform;  
@@ -1451,11 +1464,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     
     #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
       updateProblemSolutionToAllChains(problem,previousSolution); 
-      if (!copyMotionBuffer(problem->previousSolution,solution) )              { return 0; }        
+      if (!copyMotionBuffer(problem->previousSolution,solution) )              { return 0; }
     #else
       updateProblemSolutionToAllChains(problem,solution);
-      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }         
+      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }
     #endif
+        
     
     
     /*
