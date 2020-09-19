@@ -20,7 +20,7 @@ extern "C"
 * @param  Input Unit Scale
 * @retval 0=Failure,1=Success
 */
-int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit);
+int convertRodriguezAndTranslationTo4x4UnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit);
 
 /**
 * @brief build OpenGL Projection Matrix using Rodriguez Rotation and a translation ( typically coming from OpenCV )

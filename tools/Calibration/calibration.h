@@ -45,27 +45,27 @@ struct calibration
 {
   /* CAMERA INTRINSIC PARAMETERS */
   char intrinsicParametersSet;
-  double intrinsic[9];
-  double k1,k2,p1,p2,k3;
+  float intrinsic[9];
+  float k1,k2,p1,p2,k3;
 
   /* CAMERA EXTRINSIC PARAMETERS */
   char extrinsicParametersSet;
-  double extrinsicRotationRodriguez[3];
-  double extrinsicTranslation[3];
-  double extrinsic[16];
+  float extrinsicRotationRodriguez[3];
+  float extrinsicTranslation[3];
+  float extrinsic[16];
 
   /*CAMERA DIMENSIONS ( WHEN RENDERING )*/
-  double nearPlane,farPlane;
+  float nearPlane,farPlane;
   unsigned int width;
   unsigned int height;
 
-  double depthUnit;
+  float depthUnit;
 
   /*CONFIGURATION*/
   int imagesUsed;
   int boardWidth;
   int boardHeight;
-  double squareSize;
+  float squareSize;
 };
 
 
@@ -157,7 +157,7 @@ int PrintCalibration(struct calibration * calib);
  * @param  Pointer , Pointer to the calibration
  * @retval Pointer to a an array of 16 doubles (4x4) , 0=Failure
  */
-double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib);
+float * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib);
 
 
 

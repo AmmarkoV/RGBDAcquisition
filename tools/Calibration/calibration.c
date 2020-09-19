@@ -475,27 +475,27 @@ int WriteCalibrationROS(const char * filename,struct calibration * calib)
 
 
 
-double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib)
+float * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib)
 {
  if (calib==0) { fprintf(stderr,"No calibration file provided , returning null 4x4 transformation matrix \n"); return 0;  }
 
- double * m = (double*) malloc ( sizeof(double) * 16 );
- 
+ float * m = (float*) malloc ( sizeof(float) * 16 );
+
  if (m==0) {fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");  return 0; }
-  
+
  m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
  m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
  m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
- m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0; 
+ m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 
  if (! calib->extrinsicParametersSet )
      { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return m; } else
-     { convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit ); }
+     { convertRodriguezAndTranslationTo4x4UnprojectionMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit ); }
 
  return m;
 }
 
-int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , float * z)
+int transform3DPointUsingExisting4x4Matrix(float * m , float * x , float * y , float * z)
 {
   int result = 0;
   float raw3D[4]={0};
@@ -505,14 +505,13 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
   raw3D[1] = (float) *y;
   raw3D[2] = (float) *z;
   raw3D[3] = (float) 1.0;
-  
-  
+
+
   //Doing double -> float -> double casts
   struct Matrix4x4OfFloats mF;
-  copy4x4DMatrixTo4x4F(mF.m,m);
+  copy4x4FMatrix(mF.m,m);
   result = transform3DPointFVectorUsing4x4FMatrix(world3D,&mF,raw3D);
-  copy4x4FMatrixTo4x4D(m,mF.m);
-  
+
   //result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
   *x= (float) world3D[0];
@@ -525,8 +524,8 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
 
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
 {
- double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
-  
+ float * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
+
  if (likely(m!=0))
  {
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
@@ -542,7 +541,7 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 
 
-int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d , float y2d  , unsigned short depthValue , float * x , float * y , float * z)
+int transform2DFProjectedPointTo3DPointInternal(struct calibration * calib , float x2d , float y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
    //PrintCalibration(calib);
 
@@ -573,7 +572,7 @@ int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d ,
     *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
     //*z = (float) depthValue;
 
-    //Debug transform2DFProjectedPointTo3DPoint
+    //Debug transform2DFProjectedPointTo3DPointInternal
     //fprintf(stderr," x3D %0.2f =  x2d(%0.2f) - cx(%0.2f) * ( depth(%u) / fx(%0.2f) )\n" , *x , x2d , calib->intrinsic[CALIB_INTR_CX] ,depthValue , calib->intrinsic[CALIB_INTR_FX] );
     //fprintf(stderr," y3D %0.2f =  y2d(%0.2f) - cy(%0.2f) * ( depth(%u) / fy(%0.2f) )\n" , *y , y2d , calib->intrinsic[CALIB_INTR_CY] ,depthValue , calib->intrinsic[CALIB_INTR_FY] );
     //fprintf(stderr," z3D %0.2f\n",*z);
@@ -589,7 +588,7 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
 {
  float x2dF=(float) x2d;
  float y2dF=(float) y2d;
- return transform2DFProjectedPointTo3DPoint(calib,x2dF,y2dF,depthValue,x,y,z);
+ return transform2DFProjectedPointTo3DPointInternal(calib,x2dF,y2dF,depthValue,x,y,z);
 }
 
 
