@@ -2,11 +2,11 @@
 
 
 
-INPUTFILE="pnm"
+INPUTFILE=""
 
 if (( $#<1 ))
 then 
- echo "Please provide arguments first argument is dataset ,  second is file format ( i.e. boxNew.mp4 ) "
+ echo "Please provide arguments first argument is the video file dataset ( i.e. boxNew.mp4 ) "
  exit 1
 else
  INPUTFILE=$1 
@@ -21,12 +21,12 @@ FRAMERATER=`ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_
 FRAMERATE=`expr $FRAMERATER`
 
 echo "File size is $FULL_WIDTH x $HEIGHT"
-echo "Each feed is $WIDTH"
+echo "Each feed is $WIDTH and has a framerate of $FRAMERATE"
 #exit 0
 
 mkdir -p $DATASET/calib
 
-echo "Left feed is 0_color and Right 1_color" > $DATASET/README
+echo "Original file was $1 with size $WIDTH x $HEIGHT @ $FRAMERATE fps. Left feed was 0_color and Right 1_color" > $DATASET/README
 
 #---------------------------------------------------------------------
 mkdir -p $DATASET/0_color

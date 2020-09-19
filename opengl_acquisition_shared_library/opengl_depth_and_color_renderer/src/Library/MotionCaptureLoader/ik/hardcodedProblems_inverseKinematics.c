@@ -459,7 +459,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "lhand", // Joint
-                               2.0,     //Importance
+                               1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
