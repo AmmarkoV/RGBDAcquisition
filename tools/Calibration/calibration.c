@@ -184,6 +184,10 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
                          && (line[4]=='T') && (line[5]==0) )                   { category=6;    } else
      if ( (line[0]=='%') && (line[1]=='R') && (line[2]=='T') && (line[3]=='4')
                          && (line[4]=='*') && (line[5]=='4') && (line[6]==0) ) { category=7;    } else
+     if ( (line[0]=='%') && (line[1]=='W') && (line[2]=='i') && (line[3]=='d')
+                         && (line[4]=='t') && (line[5]=='h') && (line[6]==0) ) { category=8;    } else
+     if ( (line[0]=='%') && (line[1]=='H') && (line[2]=='e') && (line[3]=='i') && (line[4]=='g') 
+                         && (line[5]=='h') && (line[6]=='t') && (line[7]==0))  { category=9;    } else
         {
           #if DEBUG_PRINT_EACH_CALIBRATION_LINE_READ
            fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
@@ -245,7 +249,7 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
              case 1 :  calib->nearPlane = (double) internationalAtof(line); break;
              case 2 :  calib->farPlane  = (double) internationalAtof(line); break;
            };
-          }else
+          } else
           if (category==6)
           {
            switch(linesAtCurrentCategory)
@@ -275,6 +279,20 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
              case 15:  calib->extrinsic[14] = (double) internationalAtof(line); break;
              case 16:  calib->extrinsic[15] = (double) internationalAtof(line); break;
            };
+          } else
+          if (category==8)
+          {           
+             switch(linesAtCurrentCategory)
+             {
+              case 1: calib->width = (unsigned int) atoi(line); break;
+             } 
+          } else
+          if (category==9)
+          {
+            switch(linesAtCurrentCategory)
+             {
+              case 1: calib->height = (unsigned int) atoi(line); break; 
+             }
           }
 
 
