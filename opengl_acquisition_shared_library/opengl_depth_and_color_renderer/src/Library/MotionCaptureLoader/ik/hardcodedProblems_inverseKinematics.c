@@ -466,6 +466,7 @@ int prepareDefaultLeftHandProblem(
      //---------------------------------------------------------- 
      checksum=0;
      correct=0;
+     partID=0;
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -631,6 +632,7 @@ int prepareDefaultLeftHandProblem(
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
+     
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -822,6 +824,7 @@ int prepareDefaultBodyProblemNEW(
      //---------------------------------------------------------- 
      checksum=0;
      correct=0;
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -928,6 +931,7 @@ int prepareDefaultBodyProblemNEW(
      //---------------------------------------------------------- 
      checksum=0;
      correct=0; 
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1019,6 +1023,7 @@ int prepareDefaultBodyProblemNEW(
      problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1078,6 +1083,7 @@ int prepareDefaultBodyProblemNEW(
      problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1142,6 +1148,7 @@ int prepareDefaultBodyProblemNEW(
      problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1211,6 +1218,7 @@ int prepareDefaultBodyProblemNEW(
      problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
+     partID=0;
     
      ++correct;
      checksum+=addNewPartToChainProblem(
