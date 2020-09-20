@@ -13,6 +13,7 @@ int addNewPartToChainProblem(
     struct BVH_Transform * bvhTargetTransform,
     //-----------------------------------------
     char * partName,
+    char * alternatePartName,
     float importance,
     int isEndEffector,
     unsigned int * groupID,
@@ -33,7 +34,15 @@ int addNewPartToChainProblem(
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
     
     unsigned int thisJID=0;
-    if (bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID) )
+    
+    unsigned int foundJoint = bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID);
+    if  (!foundJoint) 
+    {
+        foundJoint = bvh_getJointIDFromJointNameNocase(mc,alternatePartName,&thisJID);
+    }
+    
+    
+    if (foundJoint)
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
         //problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
@@ -52,6 +61,10 @@ int addNewPartToChainProblem(
     {
         bvh_printBVH(mc);
         fprintf(stderr,"No %s in armature..\n",partName);
+        if (alternatePartName!=0)
+        {
+         fprintf(stderr,"Also checked for the alternate %s name in armature..\n",alternatePartName);    
+        }
         return 0;
     }
 }
@@ -108,7 +121,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhand", // Joint
+                              "rhand",0, // Joint
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -118,7 +131,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-1.r", // Joint
+                              "finger2-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -127,7 +140,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-1.r", // Joint
+                              "finger3-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -136,7 +149,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-1.r", // Joint
+                              "finger4-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -145,7 +158,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-1.r", // Joint
+                              "finger5-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -154,7 +167,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rthumb", // Joint
+                              "rthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -180,7 +193,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-1.r", // Joint
+                              "finger2-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -189,7 +202,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-2.r", // Joint
+                              "finger2-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -198,7 +211,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-3.r", // Joint
+                              "finger2-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -228,7 +241,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-1.r", // Joint
+                              "finger3-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -237,7 +250,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-2.r", // Joint
+                              "finger3-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -246,7 +259,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-3.r", // Joint
+                              "finger3-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -272,7 +285,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-1.r", // Joint
+                              "finger4-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -281,7 +294,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-2.r", // Joint
+                              "finger4-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -290,7 +303,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-3.r", // Joint
+                              "finger4-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -319,7 +332,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-1.r", // Joint
+                              "finger5-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -328,7 +341,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-2.r", // Joint
+                              "finger5-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -337,7 +350,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-3.r", // Joint
+                              "finger5-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -363,7 +376,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rthumb", // Joint
+                              "rthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -372,7 +385,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger1-2.r", // Joint
+                              "finger1-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -381,7 +394,7 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger1-3.r", // Joint
+                              "finger1-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -458,7 +471,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhand", // Joint
+                              "lhand",0, // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -468,7 +481,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-1.l", // Joint
+                              "finger2-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -477,7 +490,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-1.l", // Joint
+                              "finger3-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -486,7 +499,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-1.l", // Joint
+                              "finger4-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -495,7 +508,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-1.l", // Joint
+                              "finger5-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -504,7 +517,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lthumb", // Joint
+                              "lthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -530,7 +543,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-1.l", // Joint
+                              "finger2-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -539,7 +552,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-2.l", // Joint
+                              "finger2-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -548,7 +561,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger2-3.l", // Joint
+                              "finger2-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -578,7 +591,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-1.l", // Joint
+                              "finger3-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -587,7 +600,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-2.l", // Joint
+                              "finger3-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -596,7 +609,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger3-3.l", // Joint
+                              "finger3-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -622,7 +635,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-1.l", // Joint
+                              "finger4-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -631,7 +644,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-2.l", // Joint
+                              "finger4-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -640,7 +653,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger4-3.l", // Joint
+                              "finger4-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -669,7 +682,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-1.l", // Joint
+                              "finger5-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -678,7 +691,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-2.l", // Joint
+                              "finger5-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -687,7 +700,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger5-3.l", // Joint
+                              "finger5-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -713,7 +726,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lthumb", // Joint
+                              "lthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -722,7 +735,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger1-2.l", // Joint
+                              "finger1-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -731,7 +744,7 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "finger1-3.l", // Joint
+                              "finger1-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -814,7 +827,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "hip",    // Joint
+                              "hip",0,    // Joint
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -828,7 +841,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "hip",    // Joint
+                              "hip",0,    // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -841,7 +854,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "neck",    // Joint
+                              "neck",0,    // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -852,7 +865,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder",    // Joint rShldr
+                              "rshoulder","rShldr",    // Joint rShldr
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -863,7 +876,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder",    // Joint lShldr
+                              "lshoulder","lShldr",      // Joint lShldr
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -874,7 +887,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhip",    // Joint rThigh
+                              "rhip","rThigh",     // Joint rThigh
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -885,7 +898,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhip",    // Joint lThigh
+                              "lhip","lThigh",    // Joint lThigh
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -920,7 +933,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "chest",    // Joint
+                              "chest",0,    // Joint
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -932,7 +945,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "neck",    // Joint
+                              "neck",0,    // Joint
                                0.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -944,7 +957,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "neck",    // Joint
+                              "neck",0,    // Joint
                                0.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -956,7 +969,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder",    // Joint rShldr
+                              "rshoulder","rShldr",    // Joint rShldr
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -968,7 +981,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder",    // Joint lForeArm
+                              "lshoulder","lForeArm",    // Joint lForeArm
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1011,7 +1024,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder",    // Joint rShldr
+                              "rshoulder","rShldr",    // Joint rShldr
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1023,7 +1036,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "relbow",    // Joint rForeArm
+                              "relbow","rForeArm",      // Joint rForeArm
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1035,7 +1048,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhand",    // Joint rHand
+                              "rhand",0,    // Joint rHand
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1070,7 +1083,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder",    // Joint lShldr
+                              "lshoulder","lShldr",      // Joint lShldr
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1082,7 +1095,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lelbow",    // Joint lForeArm
+                              "lelbow","lForeArm",      // Joint lForeArm
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1094,7 +1107,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhand",    // Joint lHand
+                              "lhand",0,    // Joint lHand
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1134,7 +1147,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhip",    // Joint rThigh
+                              "rhip","rThigh",    // Joint rThigh
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1145,7 +1158,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rknee",    // Joint rShin
+                              "rknee","rShin",    // Joint rShin
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1156,7 +1169,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rfoot",  // Joint rFoot
+                              "rfoot",0,  // Joint rFoot
                                1.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1167,7 +1180,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.r",  // Joint rFoot
+                              "endsite_toe1-2.r",0,  // Joint rFoot
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1203,7 +1216,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhip",    // Joint rThigh
+                              "lhip","lThigh",    // Joint lThigh
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1214,7 +1227,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lknee",    // Joint rShin
+                              "lknee","lShin",    // Joint lShin
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1225,7 +1238,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lfoot",  // Joint rFoot
+                              "lfoot",0,  // Joint lFoot
                                1.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1236,7 +1249,7 @@ int prepareDefaultBodyProblemNEW(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.l",  // Joint rFoot
+                              "endsite_toe1-2.l",0,  // Joint lFoot
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1910,10 +1923,22 @@ int prepareDefaultBodyProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 {
-    return prepareDefaultBodyProblemOLD(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
-    //return prepareDefaultBodyProblemNEW(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+    #define USE_WORKING_CODE 0
+    
+    #if USE_WORKING_CODE 
+      prepareDefaultBodyProblemOLD(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+      viewProblem(problem);
+      exit(0);
+    #else
+      if (prepareDefaultBodyProblemNEW(problem,mc,renderer,previousSolution,solution,bvhTargetTransform) )
+      {
+       viewProblem(problem);          
+      }
+      exit(0);   
+    #endif
     
     
+    return 1;
 }
 
 

@@ -136,7 +136,7 @@ struct ikConfiguration
 
 
 int cleanProblem(struct ikProblem * problem);
-
+int viewProblem(struct ikProblem * problem);
 
 unsigned long GetTickCountMicrosecondsIK();
 

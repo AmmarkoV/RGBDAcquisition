@@ -318,6 +318,7 @@ int cleanProblem(struct ikProblem * problem)
 
 int viewProblem(struct ikProblem * problem)
 {
+    fprintf(stderr,"\n\n\n\n");
     fprintf(stderr,"The IK problem we want to solve has %u groups of subproblems\n",problem->numberOfGroups);
     fprintf(stderr,"It is also ultimately divided into %u kinematic chains\n",problem->numberOfChains);
 
@@ -337,8 +338,8 @@ int viewProblem(struct ikProblem * problem)
                 fprintf(stderr,"jID(%s/%u)->mID(%u to %u) ",
                               problem->mc->jointHierarchy[jID].jointName,
                               jID,
-                             problem->chain[chainID].part[partID].mIDStart,
-                             problem->chain[chainID].part[partID].mIDEnd
+                              problem->chain[chainID].part[partID].mIDStart,
+                              problem->chain[chainID].part[partID].mIDEnd
                             );
             }
         }
