@@ -841,6 +841,7 @@ int prepareDefaultBodyProblem(
         return 0;
     }
 
+
     if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
