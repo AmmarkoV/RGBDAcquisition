@@ -36,7 +36,7 @@ int addNewPartToChainProblem(
     if (bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
-        problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
+        //problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID; 
         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
@@ -762,7 +762,7 @@ int prepareDefaultLeftHandProblem(
 
 
 
-int prepareDefaultBodyProblem(
+int prepareDefaultBodyProblemNEW(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
     struct simpleRenderer *renderer,
@@ -788,6 +788,8 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    unsigned int checksum=0;
+    unsigned int correct=0;
     unsigned int groupID=0;
     unsigned int jobID=0;
     unsigned int chainID=0;
@@ -799,224 +801,185 @@ int prepareDefaultBodyProblem(
 
 
 
-    //Chain 0 is the Hip and all of the rigid torso
-    //----------------------------------------------------------
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=0;
 
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
  
-    if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=0; //First Position
-        problem->chain[chainID].part[partID].mIDEnd=2; //First Position
-        problem->chain[chainID].part[partID].bigChanges=1;
-        problem->chain[chainID].part[partID].jointImportance=2.0;
-        ++partID;
-    } 
+     //Chain 0 is the Hip and all of the rigid torso
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "hip",    // Joint
+                               2.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
+     problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
+     problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "hip",    // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
+     problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position        
 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck",    // Joint
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );                   
 
-    if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
-        problem->chain[chainID].part[partID].jointImportance=2.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No hip in armature..\n");
-        return 0;
-    }
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rshoulder",    // Joint rShldr
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );                   
 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lshoulder",    // Joint lShldr
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );                   
+ 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhip",    // Joint rThigh
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );             
 
-    if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-            
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No neck in armature..\n");
-        return 0;
-    }
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhip",    // Joint lThigh
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );             
 
-    if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rshoulder in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No lshoulder in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.5; //Hips are more important to hips upper body can rotate via chest
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rhip in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.5; //Hips are more important to hips upper body can rotate via chest
-
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No lhip in armature..\n");
-        return 0;
-    }
-
-    problem->chain[chainID].numberOfParts=partID;
-
+                                                                            
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+         
     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
+
+
+
+ 
+
+
+
+ 
+     //Chain 1 is the Chest
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0; 
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "chest",    // Joint
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+   
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck",    // Joint
+                               0.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck",    // Joint
+                               0.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rshoulder",    // Joint rShldr
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lshoulder",    // Joint lForeArm
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
     //----------------------------------------------------------
-
-
-
-
-    //Chain 1 is the Right Arm
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    partID=0;
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=0;
-
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
-
-    if (bvh_getJointIDFromJointName(mc,"chest",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=0.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rshoulder in armature..\n");
-        return 0;
-    }
-
-    if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].jointImportance=0.5; //Less important because it can be addressed by chest
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rshoulder in armature..\n");
-        return 0;
-    }
-
-
-    if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].jointImportance=1.0; //Less important because it can be addressed by chest
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rshoulder in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].jointImportance=1.0; //Less important because it can be addressed by chest
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No relbow in armature..\n");
-        return 0;
-    }
-
-
-    problem->chain[chainID].numberOfParts=partID;
+    
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
@@ -1024,239 +987,211 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
 
 
-//These are first group..
+    //These are first group..
     ++groupID;
 
 
 
 
-    //Chain 1 is the Right Arm
+
+
+
+
+
+ 
+     //Chain 2 is the Chest
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rshoulder",    // Joint rShldr
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "relbow",    // Joint rForeArm
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand",    // Joint rHand
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                 
     //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
-    //----------------------------------------------------------
-    partID=0;
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=1;
-
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
-
-    if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=0.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rshoulder in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rForeArm",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No relbow in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rHand",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rhand in armature..\n");
-        return 0;
-    }
-
-    problem->chain[chainID].numberOfParts=partID;
+    
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
 
+ 
 
 
-
-
-    //Chain 2 is the Left Arm
+ 
+     //Chain 3 is the Chest
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lshoulder",    // Joint lShldr
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lelbow",    // Joint lForeArm
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhand",    // Joint lHand
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                 
     //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
-    //----------------------------------------------------------
-    partID=0;
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=1;
-
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
-
-    if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=0.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No lshoulder in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No lelbow in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lHand",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].endEffector=1;
-        problem->chain[chainID].part[partID].jointImportance=1.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No lhand in armature..\n");
-        return 0;
-    }
-
-    problem->chain[chainID].numberOfParts=partID;
+    
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
 
+ 
 
 
 
-    //Chain 3 is the Right Leg
+
+
+
+
+ 
+     //Chain 4 is the Chest
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhip",    // Joint rThigh
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rknee",    // Joint rShin
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rfoot",  // Joint rFoot
+                               1.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                                                         
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_toe1-2.r",  // Joint rFoot
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                                  
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-    partID=0;
-    problem->chain[chainID].groupID=groupID;
-    problem->chain[chainID].jobID=jobID;
-    problem->chain[chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
-    problem->chain[chainID].status = BVH_IK_NOTSTARTED;
-    problem->chain[chainID].permissionToStart = 0;
-    problem->chain[chainID].parallel=1;
 
-    bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[chainID].current2DProjectionTransform);
-
-    if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=0.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rhip in armature..\n");
-        return 0;
-    }
-
-    if ( (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShin",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.0;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rknee in armature..\n");
-        return 0;
-    }
-
-
-    if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
-    {
-        bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
-        problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-        problem->chain[chainID].part[partID].endEffector=0;
-        problem->chain[chainID].part[partID].jID=thisJID;
-        problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-        problem->chain[chainID].part[partID].jointImportance=1.5;
-        ++partID;
-    }
-    else
-    {
-        fprintf(stderr,"No rfoot in armature..\n");
-        return 0;
-    }
+ 
+ 
 
 
     if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.r",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.r",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=2;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1298,7 +1233,6 @@ int prepareDefaultBodyProblem(
     if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1316,7 +1250,6 @@ int prepareDefaultBodyProblem(
     if ( (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShin",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1334,7 +1267,6 @@ int prepareDefaultBodyProblem(
     if ( (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lFoot",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=0;
@@ -1352,7 +1284,6 @@ int prepareDefaultBodyProblem(
     if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.l",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.l",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=2;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1464,7 +1395,6 @@ int prepareDefaultBodyProblemOLD(
     if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].mIDStart=0; //First Position
@@ -1478,7 +1408,6 @@ int prepareDefaultBodyProblemOLD(
     if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
@@ -1495,7 +1424,6 @@ int prepareDefaultBodyProblemOLD(
     if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1512,7 +1440,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1528,7 +1455,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1544,7 +1470,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1560,7 +1485,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1601,7 +1525,6 @@ int prepareDefaultBodyProblemOLD(
     if (bvh_getJointIDFromJointName(mc,"chest",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1619,7 +1542,6 @@ int prepareDefaultBodyProblemOLD(
     if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=1;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1636,7 +1558,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=1;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1652,7 +1573,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=1;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1697,7 +1617,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShldr",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1715,7 +1634,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rForeArm",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0; //This is the parent
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1733,7 +1651,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rHand",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1774,7 +1691,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShldr",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1792,7 +1708,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lForeArm",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1810,7 +1725,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lHand",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1850,7 +1764,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rThigh",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1868,7 +1781,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"rShin",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1887,7 +1799,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )  || (bvh_getJointIDFromJointName(mc,"rFoot",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1906,7 +1817,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.r",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.r",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=2;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -1948,7 +1858,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lThigh",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1966,7 +1875,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lShin",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=0;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].endEffector=0;
         problem->chain[chainID].part[partID].jID=thisJID;
@@ -1984,7 +1892,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) ) || (bvh_getJointIDFromJointName(mc,"lFoot",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=1;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=0;
@@ -2002,7 +1909,6 @@ int prepareDefaultBodyProblemOLD(
     if ( (bvh_getJointIDFromJointName(mc,"EndSite_toe1-2.l",&thisJID) )  || (bvh_getJointIDFromJointNameNocase(mc,"endsite_toe1-2.l",&thisJID)) )
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[chainID].current2DProjectionTransform,thisJID);
-        problem->chain[chainID].part[partID].partParent=2;
         problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
         problem->chain[chainID].part[partID].jID=thisJID;
         problem->chain[chainID].part[partID].endEffector=1;
@@ -2044,6 +1950,20 @@ int prepareDefaultBodyProblemOLD(
 
 
 
+int prepareDefaultBodyProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+)
+{
+    return prepareDefaultBodyProblemOLD(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+    //return prepareDefaultBodyProblemNEW(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+    
+    
+}
 
 
 
