@@ -1931,22 +1931,24 @@ int prepareDefaultBodyProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 {
-    #define USE_WORKING_CODE 0
+    int result = 0;
+    #define USE_OLD_CODE 0
     
-    #if USE_WORKING_CODE 
-      prepareDefaultBodyProblemOLD(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+    #if USE_OLD_CODE 
+      result = prepareDefaultBodyProblemOLD(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
       viewProblem(problem);
-      exit(0);
+      //exit(0);
     #else
-      if (prepareDefaultBodyProblemNEW(problem,mc,renderer,previousSolution,solution,bvhTargetTransform) )
+      result = prepareDefaultBodyProblemNEW(problem,mc,renderer,previousSolution,solution,bvhTargetTransform);
+      if ( result )
       {
        viewProblem(problem);          
       }
-      exit(0);   
+      //exit(0);   
     #endif
     
     
-    return 1;
+    return result;
 }
 
 
