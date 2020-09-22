@@ -1171,8 +1171,7 @@ struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
       free(newBuffer);
       newBuffer=0;
     }
-  }
-
+  }  
   //----------------------
    return newBuffer;
 }
