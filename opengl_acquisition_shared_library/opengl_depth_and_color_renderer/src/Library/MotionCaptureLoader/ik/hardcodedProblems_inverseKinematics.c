@@ -868,7 +868,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder","rShldr",    // Joint rShldr
+                              "rshoulder","rShldr", // Joint 
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -879,7 +879,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder","lShldr",      // Joint lShldr
+                              "lshoulder","lShldr",      // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -890,7 +890,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhip","rThigh",     // Joint rThigh
+                              "rhip","rThigh", // Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -901,7 +901,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhip","lThigh",    // Joint lThigh
+                              "lhip","lThigh", // Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -937,7 +937,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "chest",0,    // Joint
+                              "chest",0,// Joint
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -949,7 +949,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "neck",0,    // Joint
+                              "neck",0, // Joint
                                0.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -961,7 +961,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "neck",0,    // Joint
+                              "neck",0, // Joint
                                0.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -973,7 +973,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder","rShldr",    // Joint rShldr
+                              "rshoulder","rShldr", // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -985,7 +985,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder","lForeArm",    // Joint lForeArm
+                              "lshoulder","lForeArm",    // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1029,7 +1029,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rshoulder","rShldr",    // Joint rShldr
+                              "rshoulder","rShldr",  // Joint 
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1041,7 +1041,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "relbow","rForeArm",      // Joint rForeArm
+                              "relbow","rForeArm",  // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1053,7 +1053,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhand",0,    // Joint rHand
+                              "rhand",0,// Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1089,7 +1089,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lshoulder","lShldr",      // Joint lShldr
+                              "lshoulder","lShldr",   // Joint
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1101,7 +1101,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lelbow","lForeArm",      // Joint lForeArm
+                              "lelbow","lForeArm",  // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1113,7 +1113,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhand",0,    // Joint lHand
+                              "lhand",0,  // Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1154,7 +1154,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rhip","rThigh",    // Joint rThigh
+                              "rhip","rThigh", // Joint
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1165,7 +1165,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rknee","rShin",    // Joint rShin
+                              "rknee","rShin", // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1176,7 +1176,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "rfoot",0,  // Joint rFoot
+                              "rfoot",0,  // Joint
                                1.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1187,7 +1187,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.r",0,  // Joint rFoot
+                              "endsite_toe1-2.r",0,  // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1224,7 +1224,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lhip","lThigh",    // Joint lThigh
+                              "lhip","lThigh",  // Joint
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1235,7 +1235,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lknee","lShin",    // Joint lShin
+                              "lknee","lShin",  // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1246,7 +1246,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "lfoot",0,  // Joint lFoot
+                              "lfoot",0,// Joint
                                1.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1257,7 +1257,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.l",0,  // Joint lFoot
+                              "endsite_toe1-2.l",0, // Joint
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------

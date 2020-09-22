@@ -1159,9 +1159,9 @@ int ensureInitialPositionIsInFrustrum(
                                       struct MotionBuffer * previousSolution
                                      )
 {
-   float closestDistanceToCameraInCM=30; 
+   float closestDistanceToCameraInCM=15; //30 cm 
     
-  //TODO : 
+   //TODO : 
    //Ensure that  pose is not out of the bounds of camera ?
    //If it is inverse kinematics wont know what to do..
     if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
