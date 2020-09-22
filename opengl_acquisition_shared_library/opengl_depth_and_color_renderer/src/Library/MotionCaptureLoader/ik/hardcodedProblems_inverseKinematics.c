@@ -818,7 +818,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Chain 0 is the Hip and all of the rigid torso
+     //First chain is the Hip and all of the rigid torso
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -925,7 +925,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Chain 1 is the Chest
+     //Next chain is the Chest
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -945,18 +945,6 @@ int prepareDefaultBodyProblem(
                              );
                              
    
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "neck",0, // Joint
-                               0.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
-                             
-    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1011,12 +999,79 @@ int prepareDefaultBodyProblem(
 
 
 
+     //Next chain is the Head
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck",0,  // Joint 
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "head",0,  // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "eye.l",0,// Joint
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "eye.r",0,// Joint
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+ 
 
 
 
 
  
-     //Chain 2 is the Chest
+     //Next chain is the Chest
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1076,7 +1131,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Chain 3 is the Chest
+     //Next chain  is the Chest
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1141,7 +1196,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Chain 4 is the Chest
+     //Next chain is the Chest
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1211,7 +1266,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Chain 5 is the Chest
+     //Next chain  is the Chest
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
