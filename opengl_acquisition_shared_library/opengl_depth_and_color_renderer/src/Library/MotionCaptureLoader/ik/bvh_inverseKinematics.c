@@ -1484,10 +1484,18 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     
     #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
       updateProblemSolutionToAllChains(problem,previousSolution); 
-      if (!copyMotionBuffer(problem->previousSolution,solution) )              { fprintf(stderr,RED "Failed copying previous solution \n" NORMAL); return 0; }
+      if (!copyMotionBuffer(problem->previousSolution,solution) )              
+           { 
+             fprintf(stderr,RED "Failed copying previous solution (1)\n" NORMAL); 
+             return 0; 
+           }
     #else
       updateProblemSolutionToAllChains(problem,solution);
-      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { fprintf(stderr,RED "Failed copying previous solution \n" NORMAL); return 0; }
+      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      
+           { 
+             fprintf(stderr,RED "Failed copying previous solution (2)\n" NORMAL); 
+             return 0; 
+           }
     #endif
         
     

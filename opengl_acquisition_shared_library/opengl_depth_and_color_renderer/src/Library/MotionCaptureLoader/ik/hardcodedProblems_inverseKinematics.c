@@ -802,8 +802,9 @@ int prepareDefaultBodyProblem(
 {
     problem->mc = mc;
     problem->renderer = renderer;
-
-    problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
+    
+    //problem->penultimateSolution = mallocNewMotionBufferAndCopy(mc,solution);
+    problem->previousSolution = mallocNewMotionBufferAndCopy(mc,solution); //previousSolution
     problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
     problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
 

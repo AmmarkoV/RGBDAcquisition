@@ -1153,6 +1153,9 @@ int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
 
 struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
 {
+  if (mc==0) { return 0; }
+  //----------------------
+  
   struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
   if (newBuffer!=0)
   {
@@ -1164,35 +1167,55 @@ struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
     } else
     {
       //RollBack..!  
+      newBuffer->bufferSize=0;
       free(newBuffer);
       newBuffer=0;
     }
   }
 
-  return newBuffer;
+  //----------------------
+   return newBuffer;
 }
 //---------------------------------------------------------
 
 
 struct MotionBuffer * mallocNewMotionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy)
 {
+  if (mc==0) { return 0; }
   if (whatToCopy==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty"); return 0; }
   if (whatToCopy->motion==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty"); return 0; }
+  //----------------------
 
   struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
   if (newBuffer!=0)
   {
     newBuffer->bufferSize = mc->numberOfValuesPerFrame;
+    if (mc->numberOfValuesPerFrame != whatToCopy->bufferSize)
+    {
+        fprintf(stderr,RED "mallocNewMotionBufferAndCopy: Mismatching sizes %u vs %u\n" NORMAL,mc->numberOfValuesPerFrame,whatToCopy->bufferSize); 
+    }
+      
     newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
     if (newBuffer->motion!=0)
     {
-      for (unsigned int i=0; i<newBuffer->bufferSize; i++)
+      unsigned int numberOfItems = newBuffer->bufferSize; 
+      if (mc->numberOfValuesPerFrame>whatToCopy->bufferSize)  
+           { numberOfItems = newBuffer->bufferSize; }
+        
+      for (unsigned int i=0; i<numberOfItems; i++)
       {
         newBuffer->motion[i]=whatToCopy->motion[i];
       }
+    } else
+    {
+      //RollBack..!  
+      newBuffer->bufferSize=0; 
+      free(newBuffer);
+      newBuffer=0;
     }
   }
 
+  //----------------------
   return newBuffer;
 }
 //---------------------------------------------------------
