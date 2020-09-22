@@ -344,6 +344,7 @@ int bvh_getJointIDFromJointName(
 {
    if (bvhMotion==0) { return 0; }
    if (jointName==0) { return 0; }
+   if (jID==0)       { return 0; }
    unsigned int i=0;
    for (i=0; i<bvhMotion->jointHierarchySize; i++)
    {
@@ -365,6 +366,8 @@ int bvh_getJointIDFromJointNameNocase(
 {
   if (bvhMotion==0) { return 0; }
   if (jointName==0) { return 0; }
+  if (jID==0)       { return 0; }
+  
   if (strlen(jointName)>=MAX_BVH_JOINT_NAME)
      {
        fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
@@ -398,7 +401,8 @@ int bvh_getRootJointID(
                        BVHJointID * jID
                       )
 {
-   if (bvhMotion==0) { return 0; }
+  if (bvhMotion==0) { return 0; }
+  if (jID==0)       { return 0; }
 
   *jID = bvhMotion->rootJointID;
   return 1;

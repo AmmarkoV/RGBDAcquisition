@@ -22,6 +22,19 @@ int addNewPartToChainProblem(
     unsigned int * partID
     )
 { 
+    if (*chainID >= MAXIMUM_CHAINS)
+    {
+      fprintf(stderr,"Reached limit of maximum chains.. (%u) \n",MAXIMUM_CHAINS);
+      return 0;  
+    }
+    
+    if (*partID >= MAXIMUM_PARTS_OF_CHAIN)
+    {
+      fprintf(stderr,"Reached limit of maximum parts of the chain.. (%u) \n",MAXIMUM_PARTS_OF_CHAIN);
+      return 0;  
+    }
+    
+    
     //Chain 0 is the RHand and all of the rigid torso
     //----------------------------------------------------------
     problem->chain[*chainID].groupID=*groupID;
@@ -36,7 +49,7 @@ int addNewPartToChainProblem(
     unsigned int thisJID=0;
     
     unsigned int foundJoint = bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID);
-    if  (!foundJoint) 
+    if  ( (!foundJoint) && (alternatePartName!=0) )
     {
         foundJoint = bvh_getJointIDFromJointNameNocase(mc,alternatePartName,&thisJID);
     }
@@ -45,7 +58,6 @@ int addNewPartToChainProblem(
     if (foundJoint)
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
-        //problem->chain[*chainID].part[*partID].partParent=0; //This is the parent
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID; 
         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
@@ -55,6 +67,7 @@ int addNewPartToChainProblem(
         
         *partID+=1;                      
         problem->chain[*chainID].numberOfParts=*partID;
+        //------
         return 1;
     }
     else
@@ -65,6 +78,7 @@ int addNewPartToChainProblem(
         {
          fprintf(stderr,"Also checked for the alternate %s name in armature..\n",alternatePartName);    
         }
+        //------
         return 0;
     }
 }
@@ -1196,7 +1210,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Next chain is the Chest
+     //Next chain is the Right Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1248,7 +1262,17 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-                                  
+          /*                   
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_toe5-3.r",0,  // Joint
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );*/
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1266,7 +1290,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Next chain  is the Chest
+     //Next chain  is the Left Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1318,7 +1342,17 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-                                  
+/*
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_toe5-3.l",0,  // Joint
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );              */          
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }

@@ -14,8 +14,8 @@ extern "C"
 
 #define IK_VERSION 0.23
 
-#define MAXIMUM_CHAINS 15
-#define MAXIMUM_PARTS_OF_CHAIN 15
+#define MAXIMUM_CHAINS 20
+#define MAXIMUM_PARTS_OF_CHAIN 20
 
 
 
