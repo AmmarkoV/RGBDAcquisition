@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.23
+#define IK_VERSION 0.24
 
 #define MAXIMUM_CHAINS 20
 #define MAXIMUM_PARTS_OF_CHAIN 20

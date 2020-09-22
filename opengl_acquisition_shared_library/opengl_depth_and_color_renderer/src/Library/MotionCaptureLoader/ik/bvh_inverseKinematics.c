@@ -1159,6 +1159,12 @@ int ensureInitialPositionIsInFrustrum(
                                       struct MotionBuffer * previousSolution
                                      )
 {
+   if (renderer==0) { return 0; } 
+   if (solution==0) { return 0; } 
+   if (solution->motion==0) { return 0; } 
+   if (previousSolution==0) { return 0; } 
+   if (previousSolution->motion==0) { return 0; } 
+    
    float closestDistanceToCameraInCM=15; //30 cm 
     
    //TODO : 
@@ -1185,7 +1191,7 @@ int ensureInitialPositionIsInFrustrum(
 
         if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
         {
-                 fprintf(stderr,RED "Warning: Didnt manage to solve problem, brute forcing it ! ..\n" NORMAL);
+                 fprintf(stderr,RED "Warning: Didn't manage to solve problem, brute forcing it ! ..\n" NORMAL);
                  solution->motion[2]=-140;
         }
     }
@@ -1478,12 +1484,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     
     #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
       updateProblemSolutionToAllChains(problem,previousSolution); 
-      if (!copyMotionBuffer(problem->previousSolution,solution) )              { return 0; }
+      if (!copyMotionBuffer(problem->previousSolution,solution) )              { fprintf(stderr,RED "Failed copying previous solution \n" NORMAL); return 0; }
     #else
       updateProblemSolutionToAllChains(problem,solution);
-      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { return 0; }
+      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      { fprintf(stderr,RED "Failed copying previous solution \n" NORMAL); return 0; }
     #endif
         
+    
     
     
     /*
@@ -1715,7 +1722,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         dumpBVHToSVGFrame("target.svg",mc,bvhTargetTransform,1,renderer);
         dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
-
+    
     return 1;
 }
 

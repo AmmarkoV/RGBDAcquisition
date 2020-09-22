@@ -1133,17 +1133,22 @@ void freeMotionBuffer(struct MotionBuffer * mb)
 
 int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
 {
-  if (src->bufferSize != dst->bufferSize)
+  if ( (src!=0) && (dst!=0) )
   {
-    fprintf(stderr,"Buffer Size mismatch..\n");
+   if (src->bufferSize != dst->bufferSize)
+   {
+    fprintf(stderr,RED "copyMotionBuffer: Buffer Size mismatch (Source %u/Destination %u)..\n" NORMAL,src->bufferSize,dst->bufferSize);
     return 0;
-  }
+   }
 
-  for (unsigned int i=0; i<dst->bufferSize; i++)
-  {
+   for (unsigned int i=0; i<dst->bufferSize; i++)
+   {
     dst->motion[i] = src->motion[i];
-  }
-  return 1;
+   }
+   return 1;     
+  }   
+  
+  return 0;
 }
 
 struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
@@ -1156,6 +1161,11 @@ struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
     if (newBuffer->motion!=0)
     {
       memset(newBuffer->motion,0,sizeof(float) * newBuffer->bufferSize);
+    } else
+    {
+      //RollBack..!  
+      free(newBuffer);
+      newBuffer=0;
     }
   }
 
@@ -1196,7 +1206,7 @@ void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct Mo
 
   if (guess->bufferSize != groundTruth->bufferSize)
   {
-    fprintf(stderr,"Buffer Size mismatch..\n");
+    fprintf(stderr,"compareMotionBuffers: Buffer Size mismatch..\n");
     return ;
   }
 
@@ -1236,7 +1246,7 @@ void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,stru
 
   if ( (guessA->bufferSize != groundTruth->bufferSize) || (guessB->bufferSize != groundTruth->bufferSize) )
   {
-    fprintf(stderr,"Buffer Size mismatch..\n");
+    fprintf(stderr,"compareTwoMotionBuffers: Buffer Size mismatch..\n");
     return ;
   }
 
