@@ -124,6 +124,68 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
 
 
+
+     //Next chain is the R Shoulder
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rshoulder","rShldr",  // Joint 
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "relbow","rForeArm",  // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand",0,// Joint
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                 
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+
+
      //CHAIN 0 ----------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
@@ -378,6 +440,8 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
 
 
+
+
     //Chain 5 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -472,6 +536,67 @@ int prepareDefaultLeftHandProblem(
     unsigned int partID=0;
     BVHJointID thisJID=0;
     //----------------------------------------------------------
+
+
+
+
+     //Next chain is the R Shoulder
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1;
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lshoulder","lShldr",  // Joint 
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lelbow","lForeArm",  // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhand",0,// Joint
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+                 
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
 
 
      //CHAIN 0 ----------------------------
@@ -1086,7 +1211,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Next chain is the Chest
+     //Next chain is the R Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1146,7 +1271,7 @@ int prepareDefaultBodyProblem(
 
 
  
-     //Next chain  is the Chest
+     //Next chain  is the L Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
