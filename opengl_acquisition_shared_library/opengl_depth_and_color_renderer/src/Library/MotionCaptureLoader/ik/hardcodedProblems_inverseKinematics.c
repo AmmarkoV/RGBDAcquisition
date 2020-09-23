@@ -129,7 +129,6 @@ int prepareDefaultRightHandProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
      partID=0;
@@ -157,7 +156,7 @@ int prepareDefaultRightHandProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
-                             
+   
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -192,6 +191,7 @@ int prepareDefaultRightHandProblem(
      //---------------------------------------------------------- 
      checksum=0;
      correct=0;
+     partID=0;
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -543,8 +543,7 @@ int prepareDefaultLeftHandProblem(
      //Next chain is the R Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
+     //----------------------------------------------------------
      checksum=0;
      correct=0; 
      partID=0;
