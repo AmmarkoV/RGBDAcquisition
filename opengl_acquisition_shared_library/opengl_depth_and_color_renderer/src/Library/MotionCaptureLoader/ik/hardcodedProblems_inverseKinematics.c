@@ -85,6 +85,111 @@ int addNewPartToChainProblem(
 
 
 
+int prepareDefaultFaceProblem(
+    struct ikProblem * problem,
+    struct BVH_MotionCapture * mc,
+    struct simpleRenderer *renderer,
+    struct MotionBuffer * previousSolution,
+    struct MotionBuffer * solution,
+    struct BVH_Transform * bvhTargetTransform
+)
+{
+    problem->mc = mc;
+    problem->renderer = renderer;
+
+    problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
+    problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+    problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
+
+    //2D Projections Targeted
+    //----------------------------------------------------------
+    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
+
+
+    //Chain #0 is Joint Right Hand-> to all its children
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    unsigned int correct=0;
+    unsigned int checksum=0;
+    unsigned int groupID=0;
+    unsigned int jobID=0;
+    unsigned int chainID=0;
+    unsigned int partID=0;
+    BVHJointID thisJID=0;
+    //----------------------------------------------------------
+
+
+
+     //Next chain is the R Shoulder
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis3.r",0,  // Joint 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis3.r",0,  // Joint 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis4.r",0,  // Joint 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                                  
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis4.r",0,  // Joint 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+     return 1;
+}
+
+
+
 
 
 
