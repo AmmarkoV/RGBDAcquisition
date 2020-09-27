@@ -66,9 +66,16 @@ struct ikChain
   struct MotionBuffer * currentSolution;
   struct BVH_Transform current2DProjectionTransform;
 
+  // --------------------------------------------------------------------------
   float initialError;
   float previousError;
   float currentError;
+  // --------------------------------------------------------------------------
+  
+  unsigned int encounteredAdoptedBest;
+  unsigned int encounteredNumberOfNaNsAtStart;
+  unsigned int encounteredExplodingGradients;
+  unsigned int encounteredWorseSolutionsThanPrevious;
 };
 //---------------------------------------------------------
 //---------------------------------------------------------

@@ -583,8 +583,12 @@ float iteratePartLoss(
  //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
    if (initialLoss!=initialLoss)
    {
-       fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
-       //bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
+        ++problem->chain[chainID].encounteredNumberOfNaNsAtStart;
+       if(verbose)
+         { 
+           fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
+           bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
+         }
        return initialLoss;
    }
       else
@@ -810,6 +814,7 @@ if (iterationID==0)
                  (delta[2]!=delta[2]) 
              )
         {
+            ++problem->chain[chainID].encounteredExplodingGradients;
             fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,currentEpoch,epochs);
             if (verbose)
             {
@@ -884,6 +889,7 @@ if (iterationID==0)
         {
             if (verbose)
                  { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); }
+                 
             executedEpochs=currentEpoch;
             break;
         }
@@ -917,7 +923,8 @@ if (iterationID==0)
                                             )
          ) 
          {
-            fprintf(stderr,"Optimization for joint %s rolled back\n",jointName); 
+            //fprintf(stderr,"Optimization for joint %s rolled back\n",jointName); 
+            ++problem->chain[chainID].encounteredWorseSolutionsThanPrevious;
          }
     }
 
@@ -1364,7 +1371,9 @@ void compareChainsAndAdoptBest(
                      
                     if (currentSolutionChainLoss > previousSolutionChainLoss) 
                     {
-                        fprintf(stderr,RED "Chain %u came out worse than previous \n" NORMAL,chainID);
+                        ++problem->chain[chainID].encounteredAdoptedBest;
+                        if (ikConfig->verbose)
+                             { fprintf(stderr,RED "compareChainsAndAdoptBest: Chain %u came out worse\n" NORMAL,chainID); }
                         
                         for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                         {
@@ -1567,6 +1576,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     { 
       ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution); 
     } else
+    if (ikConfig->verbose)
     {
       fprintf(stderr,RED "Not running initial position frustrum check\n" NORMAL);
     }
@@ -1678,7 +1688,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
      
-    fprintf(stderr,"IK lr = %f ,  max start loss =%0.1f , Iterations = %u , epochs = %u , spring = %0.1f \n", 
+     fprintf(stderr,"IK lr = %0.3f,  max start loss = %0.1f, Iterations = %u, epochs = %u, spring = %0.1f\n", 
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
