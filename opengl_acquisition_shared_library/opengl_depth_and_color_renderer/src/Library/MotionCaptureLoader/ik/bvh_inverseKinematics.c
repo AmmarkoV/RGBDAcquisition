@@ -455,6 +455,62 @@ float calculateChainLoss(
 }
 
 
+
+
+int examineSolutionAndKeepIfItIsBetter(
+                                      struct ikProblem * problem,
+                                      unsigned int iterationID,
+                                      unsigned int chainID,
+                                      unsigned int partID,
+                                      unsigned int * mIDS,
+                                      float * originalValues,
+                                      float * bestValues,
+                                      float * bestLoss,
+                                      float spring,
+                                      //-------------------------
+                                      float * solutionToTest
+                                    )
+{
+    
+      float previousValues[3]={
+                                problem->chain[chainID].currentSolution->motion[mIDS[0]],
+                                problem->chain[chainID].currentSolution->motion[mIDS[1]],
+                                problem->chain[chainID].currentSolution->motion[mIDS[2]]
+                              };
+        //Calculate loss of try
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
+        problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
+        problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
+        float distanceFromInitial=fabs(solutionToTest[0] - originalValues[0]);
+        float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        
+        if (currentLoss<*bestLoss)
+        {
+            *bestLoss = currentLoss;
+            bestValues[0] = solutionToTest[0];
+            bestValues[1] = solutionToTest[1];
+            bestValues[2] = solutionToTest[2];
+            return 1;
+        } else
+        { //Roll Back..!
+          problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
+          problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
+          problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
+        }
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        return 0;
+}
+
+
+
+
+
+
+
+
+
 float iteratePartLoss(
                       struct ikProblem * problem,
                       unsigned int iterationID,
@@ -487,6 +543,23 @@ float iteratePartLoss(
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
     }; 
     
+    //The original values we want to improve
+    unsigned int weHaveAPreviousSolutionHistory=0;
+    float previousSolution[3] = 
+    {
+        originalValues[0],
+        originalValues[1],
+        originalValues[2]
+    }; 
+    
+    if (problem->previousSolution!=0)
+    {    
+        weHaveAPreviousSolutionHistory=1;
+        previousSolution[0] = problem->previousSolution->motion[mIDS[0]];
+        previousSolution[1] = problem->previousSolution->motion[mIDS[1]];
+        previousSolution[2] = problem->previousSolution->motion[mIDS[2]];
+    }
+    
     //Shorthand to access joint ID and joint Name witout having to traverse the problem 
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
@@ -511,7 +584,7 @@ float iteratePartLoss(
    if (initialLoss!=initialLoss)
    {
        fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
-       bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
+       //bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
        return initialLoss;
    }
       else
@@ -824,6 +897,28 @@ if (iterationID==0)
         fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
         fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
         fprintf(stderr,"correction rate of %0.2f,%0.2f,%0.2f deg\n",(bestValues[0]-originalValues[0])/executedEpochs,(bestValues[1]-originalValues[1])/executedEpochs,(bestValues[2]-originalValues[2])/executedEpochs);
+    }
+    
+    if (weHaveAPreviousSolutionHistory)
+    {
+      if (
+           examineSolutionAndKeepIfItIsBetter(
+                                              problem,
+                                              iterationID,
+                                              chainID,
+                                              partID,
+                                              mIDS,
+                                              originalValues,
+                                              bestValues,
+                                              &bestLoss,
+                                              spring,
+                                              //-------------------------
+                                              previousSolution
+                                            )
+         ) 
+         {
+            fprintf(stderr,"Optimization for joint %s rolled back\n",jointName); 
+         }
     }
 
     //After finishing with the optimization procedure we store the best result we achieved..!
@@ -1308,7 +1403,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                //---------------------------------
                                               )
 {
-   fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
+   //fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
    struct BVH_Transform bvhPreviousTransform = {0};
