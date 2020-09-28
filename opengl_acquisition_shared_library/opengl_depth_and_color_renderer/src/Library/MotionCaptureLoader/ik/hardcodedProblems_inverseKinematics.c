@@ -1112,6 +1112,16 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
+                              "head",0,    // Joint
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );            
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
                               "rshoulder","rShldr", // Joint 
                                1.0,     //Importance
                                1,       //IsEndEffector
@@ -1251,7 +1261,19 @@ int prepareDefaultBodyProblem(
      checksum=0;
      correct=0; 
      partID=0;
-    
+     /*
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "chest",0,// Joint
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             */
+                             
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1269,7 +1291,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "head",0,  // Joint
-                               1.0,     //Importance
+                               0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -1281,7 +1303,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "eye.l",0,// Joint
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -1293,7 +1315,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "eye.r",0,// Joint
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
