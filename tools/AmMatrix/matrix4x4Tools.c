@@ -896,22 +896,95 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 }
 
 
+#if INTEL_OPTIMIZATIONS
+#define _MM_TRANSPOSE4_PS_SHUFFLE(row0, row1, row2, row3) {         \
+            __m128 tmp3, tmp2, tmp1, tmp0;                          \
+                                                                    \
+            tmp0   = _mm_shuffle_ps((row0), (row1), 0x44);          \
+            tmp2   = _mm_shuffle_ps((row0), (row1), 0xEE);          \
+            tmp1   = _mm_shuffle_ps((row2), (row3), 0x44);          \
+            tmp3   = _mm_shuffle_ps((row2), (row3), 0xEE);          \
+                                                                    \
+            (row0) = _mm_shuffle_ps(tmp0, tmp1, 0x88);              \
+            (row1) = _mm_shuffle_ps(tmp0, tmp1, 0xDD);              \
+            (row2) = _mm_shuffle_ps(tmp2, tmp3, 0x88);              \
+            (row3) = _mm_shuffle_ps(tmp2, tmp3, 0xDD);              \
+        }
+#endif
+
+
 void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
 {
     /*
      * http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
      * Here is the code for the first line of the resulting matrix m2, r0 to r3 are used to store the first matrix, 
      * r4 to r7 are used to store the second one after transposition, other registers are temporaries :
-
-r8 = _mm_mul_ps(r0, r4);
-r9 = _mm_mul_ps(r0, r5);
-r10 = _mm_mul_ps(r0, r6);
-r11 = _mm_mul_ps(r0, r7);
-
-r8 = _mm_hadd_ps(r8, r9);
-r9 = _mm_hadd_ps(r10, r11);
-r12 = _mm_hadd_ps(r8, r9);
-_mm_store_ps(&m2[0], r12);*/
+     */
+ 
+#if INTEL_OPTIMIZATIONS
+ //Load Matrix A into registers
+ __m128 r0 = _mm_load_ps(&matrixA[0]);
+ __m128 r1 = _mm_load_ps(&matrixA[4]);
+ __m128 r2 = _mm_load_ps(&matrixA[8]);
+ __m128 r3 = _mm_load_ps(&matrixA[12]);
+    
+ //Load Matrix B into registers
+ float __attribute__((aligned(16))) transposedMatrixB[16]={
+      matrixB[0],matrixB[4],matrixB[8] ,matrixB[12],
+      matrixB[1],matrixB[5],matrixB[9] ,matrixB[13],
+      matrixB[2],matrixB[6],matrixB[10],matrixB[14],
+      matrixB[3],matrixB[7],matrixB[11],matrixB[15]
+      };
+ __m128 r4 = _mm_load_ps(&transposedMatrixB[0]);
+ __m128 r5 = _mm_load_ps(&transposedMatrixB[4]);
+ __m128 r6 = _mm_load_ps(&transposedMatrixB[8]);
+ __m128 r7 = _mm_load_ps(&transposedMatrixB[12]);
+    
+ //First Line!
+ __m128 r8 = _mm_mul_ps(r0, r4);
+ __m128 r9 = _mm_mul_ps(r0, r5);
+ __m128 r10 = _mm_mul_ps(r0, r6);
+ __m128 r11 = _mm_mul_ps(r0, r7);
+ r8 = _mm_hadd_ps(r8, r9);
+ r9 = _mm_hadd_ps(r10, r11);
+ __m128 r12 = _mm_hadd_ps(r8, r9);
+ //------------
+ _mm_store_ps(&result[0], r12);
+ 
+ //Second Line!
+ r8 = _mm_mul_ps(r1, r4);
+ r9 = _mm_mul_ps(r1, r5);
+ r10 = _mm_mul_ps(r1, r6);
+ r11 = _mm_mul_ps(r1, r7);
+ r8 = _mm_hadd_ps(r8, r9);
+ r9 = _mm_hadd_ps(r10, r11);
+ r12 = _mm_hadd_ps(r8, r9);
+ //------------
+ _mm_store_ps(&result[4], r12);
+ 
+ //Third Line!
+ r8 = _mm_mul_ps(r2, r4);
+ r9 = _mm_mul_ps(r2, r5);
+ r10 = _mm_mul_ps(r2, r6);
+ r11 = _mm_mul_ps(r2, r7);
+ r8 = _mm_hadd_ps(r8, r9);
+ r9 = _mm_hadd_ps(r10, r11);
+ r12 = _mm_hadd_ps(r8, r9);
+ //------------
+ _mm_store_ps(&result[8], r12);
+ 
+ //Forth Line!
+ r8 = _mm_mul_ps(r3, r4);
+ r9 = _mm_mul_ps(r3, r5);
+ r10 = _mm_mul_ps(r3, r6);
+ r11 = _mm_mul_ps(r3, r7);
+ r8 = _mm_hadd_ps(r8, r9);
+ r9 = _mm_hadd_ps(r10, r11);
+ r12 = _mm_hadd_ps(r8, r9);
+ //------------
+ _mm_store_ps(&result[12], r12);
+ 
+ #endif
 }
 
 //__attribute__((aligned(16)))
@@ -1002,77 +1075,12 @@ void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const f
 }
 
 
-/* 
-// warning: AVX vector return without AVX enabled changes the ABI if not -march or -mavx is used..
-#if INTEL_OPTIMIZATIONS
-#include <immintrin.h>
-
-struct MATRIX {
-    union {
-        float  f[4][4];
-        __m128 m[4];
-        __m256 n[2];
-    };
-};
-void multiplyTwo4x4FMatrices_AVX(struct MATRIX * mResult,struct MATRIX M1,struct  MATRIX M2) {
-    // Perform a 4x4 matrix multiply by a 4x4 matrix 
-    // Be sure to run in 64 bit mode and set right flags
-    // Properties, C/C++, Enable Enhanced Instruction, /arch:AVX 
-    // Having MATRIX on a 32 byte bundry does help performance
-    
-    __m256 a0, a1, b0, b1;
-    __m256 c0, c1, c2, c3, c4, c5, c6, c7;
-    __m256 t0, t1, u0, u1;
-
-    t0 = M1.n[0];                                                   // t0 = a00, a01, a02, a03, a10, a11, a12, a13
-    t1 = M1.n[1];                                                   // t1 = a20, a21, a22, a23, a30, a31, a32, a33
-    u0 = M2.n[0];                                                   // u0 = b00, b01, b02, b03, b10, b11, b12, b13
-    u1 = M2.n[1];                                                   // u1 = b20, b21, b22, b23, b30, b31, b32, b33
-
-    a0 = _mm256_shuffle_ps(t0, t0, _MM_SHUFFLE(0, 0, 0, 0));        // a0 = a00, a00, a00, a00, a10, a10, a10, a10
-    a1 = _mm256_shuffle_ps(t1, t1, _MM_SHUFFLE(0, 0, 0, 0));        // a1 = a20, a20, a20, a20, a30, a30, a30, a30
-    b0 = _mm256_permute2f128_ps(u0, u0, 0x00);                      // b0 = b00, b01, b02, b03, b00, b01, b02, b03  
-    c0 = _mm256_mul_ps(a0, b0);                                     // c0 = a00*b00  a00*b01  a00*b02  a00*b03  a10*b00  a10*b01  a10*b02  a10*b03
-    c1 = _mm256_mul_ps(a1, b0);                                     // c1 = a20*b00  a20*b01  a20*b02  a20*b03  a30*b00  a30*b01  a30*b02  a30*b03
-
-    a0 = _mm256_shuffle_ps(t0, t0, _MM_SHUFFLE(1, 1, 1, 1));        // a0 = a01, a01, a01, a01, a11, a11, a11, a11
-    a1 = _mm256_shuffle_ps(t1, t1, _MM_SHUFFLE(1, 1, 1, 1));        // a1 = a21, a21, a21, a21, a31, a31, a31, a31
-    b0 = _mm256_permute2f128_ps(u0, u0, 0x11);                      // b0 = b10, b11, b12, b13, b10, b11, b12, b13
-    c2 = _mm256_mul_ps(a0, b0);                                     // c2 = a01*b10  a01*b11  a01*b12  a01*b13  a11*b10  a11*b11  a11*b12  a11*b13
-    c3 = _mm256_mul_ps(a1, b0);                                     // c3 = a21*b10  a21*b11  a21*b12  a21*b13  a31*b10  a31*b11  a31*b12  a31*b13
-
-    a0 = _mm256_shuffle_ps(t0, t0, _MM_SHUFFLE(2, 2, 2, 2));        // a0 = a02, a02, a02, a02, a12, a12, a12, a12
-    a1 = _mm256_shuffle_ps(t1, t1, _MM_SHUFFLE(2, 2, 2, 2));        // a1 = a22, a22, a22, a22, a32, a32, a32, a32
-    b1 = _mm256_permute2f128_ps(u1, u1, 0x00);                      // b0 = b20, b21, b22, b23, b20, b21, b22, b23
-    c4 = _mm256_mul_ps(a0, b1);                                     // c4 = a02*b20  a02*b21  a02*b22  a02*b23  a12*b20  a12*b21  a12*b22  a12*b23
-    c5 = _mm256_mul_ps(a1, b1);                                     // c5 = a22*b20  a22*b21  a22*b22  a22*b23  a32*b20  a32*b21  a32*b22  a32*b23
-
-    a0 = _mm256_shuffle_ps(t0, t0, _MM_SHUFFLE(3, 3, 3, 3));        // a0 = a03, a03, a03, a03, a13, a13, a13, a13
-    a1 = _mm256_shuffle_ps(t1, t1, _MM_SHUFFLE(3, 3, 3, 3));        // a1 = a23, a23, a23, a23, a33, a33, a33, a33
-    b1 = _mm256_permute2f128_ps(u1, u1, 0x11);                      // b0 = b30, b31, b32, b33, b30, b31, b32, b33
-    c6 = _mm256_mul_ps(a0, b1);                                     // c6 = a03*b30  a03*b31  a03*b32  a03*b33  a13*b30  a13*b31  a13*b32  a13*b33
-    c7 = _mm256_mul_ps(a1, b1);                                     // c7 = a23*b30  a23*b31  a23*b32  a23*b33  a33*b30  a33*b31  a33*b32  a33*b33
-
-    c0 = _mm256_add_ps(c0, c2);                                     // c0 = c0 + c2 (two terms, first two rows)
-    c4 = _mm256_add_ps(c4, c6);                                     // c4 = c4 + c6 (the other two terms, first two rows)
-    c1 = _mm256_add_ps(c1, c3);                                     // c1 = c1 + c3 (two terms, second two rows)
-    c5 = _mm256_add_ps(c5, c7);                                     // c5 = c5 + c7 (the other two terms, second two rose)
-
-                                                                    // Finally complete addition of all four terms and return the results
-    mResult->n[0] = _mm256_add_ps(c0, c4);       // n0 = a00*b00+a01*b10+a02*b20+a03*b30  a00*b01+a01*b11+a02*b21+a03*b31  a00*b02+a01*b12+a02*b22+a03*b32  a00*b03+a01*b13+a02*b23+a03*b33
-                                                 //      a10*b00+a11*b10+a12*b20+a13*b30  a10*b01+a11*b11+a12*b21+a13*b31  a10*b02+a11*b12+a12*b22+a13*b32  a10*b03+a11*b13+a12*b23+a13*b33
-    mResult->n[1] = _mm256_add_ps(c1, c5);       // n1 = a20*b00+a21*b10+a22*b20+a23*b30  a20*b01+a21*b11+a22*b21+a23*b31  a20*b02+a21*b12+a22*b22+a23*b32  a20*b03+a21*b13+a22*b23+a23*b33
-                                                 //      a30*b00+a31*b10+a32*b20+a33*b30  a30*b01+a31*b11+a32*b21+a33*b31  a30*b02+a31*b12+a32*b22+a33*b32  a30*b03+a31*b13+a32*b23+a33*b33
-    return;
-}
-#endif
-*/
-
 
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-    multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m);
+    //multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m);
+    multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m);
     return 1;
 #else 
    return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
@@ -1232,10 +1240,10 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
  
  
 
+#if INTEL_OPTIMIZATIONS 
 //__attribute__((aligned(16)))
 void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,const float * point3D)
 {
-#if INTEL_OPTIMIZATIONS 
   //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info  
  __m128 p  = _mm_load_ps(point3D);
  __m128 row1 = _mm_load_ps(&matrixA[0]);
@@ -1251,10 +1259,8 @@ void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,con
  __m128 tmp2 = _mm_hadd_ps(z, w); // = [w2+w3, w0+w1, z2+z3, z0+z1]
 
  _mm_storeu_ps(result, _mm_hadd_ps(tmp1, tmp2)); // = [w0+w1+w2+w3, z0+z1+z2+z3, y0+y1+y2+y3, x0+x1+x2+x3] 
- 
-  #endif
 }
- 
+#endif
  
 
 //struct Vector4x1OfFloats
