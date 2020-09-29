@@ -134,19 +134,12 @@ return channelOrder;
 
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
 {
-   if (channelTypeID>=BVH_VALID_CHANNEL_NAMES)
+   if ( (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) )
    {
-     fprintf(stderr,RED "bvh_resolveFrameAndJointAndChannelToMotionID: asked to resolve non-existing channel type\n" NORMAL);
-     return 0;
+     return  (fID * bvhMotion->numberOfValuesPerFrame) + bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID]; 
    }
 
-   if (jID>=bvhMotion->jointHierarchySize)
-   {
-     fprintf(stderr,RED "bvh_resolveFrameAndJointAndChannelToMotionID: asked to resolve non-existing joint\n" NORMAL);
-     return 0;
-   }
-
-   return  (fID * bvhMotion->numberOfValuesPerFrame) + bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
+  return 0; 
 }
 
 
@@ -670,18 +663,20 @@ int bvh_getMotionChannelName(struct BVH_MotionCapture * bvhMotion,BVHMotionChann
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
 {
-   if (bvhMotion==0) { return 0.0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
+   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) ) 
+    { 
+       
+      unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
-   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
-
-   if (mID>=bvhMotion->motionValuesSize)
-   {
-     fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
-     return 0.0;
-   }
-
-   return bvhMotion->motionValues[mID];
+      if (mID<bvhMotion->motionValuesSize)
+       {
+         return bvhMotion->motionValues[mID];
+       } else
+       { 
+         fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
+       } 
+}
+ return 0.0;
 }
 
 float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID) { return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_X); }
@@ -759,18 +754,17 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 float bvh_getJointChannelAtMotionBuffer(struct BVH_MotionCapture * bvhMotion, BVHJointID jID,float * motionBuffer, unsigned int channelTypeID)
 {
-   if (bvhMotion==0) { return 0.0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
+   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) ) 
+       { 
+         unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,channelTypeID);
 
-   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,channelTypeID);
-
-   if (mID>=bvhMotion->motionValuesSize)
-   {
-     fprintf(stderr,RED "bvh_getJointChannelAtMotionBuffer overflowed..\n" NORMAL);
-     return 0.0;
-   }
-
-   return motionBuffer[mID];
+         if (mID<bvhMotion->motionValuesSize)
+           {
+             return motionBuffer[mID];
+           }
+         fprintf(stderr,RED "bvh_getJointChannelAtMotionBuffer overflowed..\n" NORMAL);
+       }
+ return 0.0; 
 }
 
 float  bvh_getJointRotationXAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,float * motionBuffer) { return bvh_getJointChannelAtMotionBuffer(bvhMotion,jID,motionBuffer,BVH_ROTATION_X); }
@@ -783,17 +777,58 @@ float  bvh_getJointPositionZAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,
 
 int bhv_populatePosXYZRotXYZFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData)
 {
-  if (motionBuffer==0) { return 0; }
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 6) { return 0; }
-
-  data[0]=bvh_getJointPositionXAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  data[1]=bvh_getJointPositionYAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  data[2]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  data[3]=bvh_getJointRotationXAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  data[4]=bvh_getJointRotationYAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  data[5]=bvh_getJointRotationZAtMotionBuffer(bvhMotion,jID,motionBuffer);
-  return 1;
+  //This gets spammed a *LOT* so it needs to be improved..
+  if ( (motionBuffer!=0) && (data!=0) && (sizeOfData >= sizeof(float)* 6) ) 
+  {
+     // Old/Clean implementation..
+      if (!bvhMotion->jointHierarchy[jID].isRoot)
+      {
+       data[0]=0.0;
+       data[1]=0.0;
+       data[2]=0.0;         
+      } else
+      {//Only Root joint has a position field..
+       data[0]=bvh_getJointPositionXAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       data[1]=bvh_getJointPositionYAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       data[2]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);  
+      }
+      
+      
+      
+       //This code segment used to be just these 6 simple lines, however it run 2x slower :P
+       //data[0]=bvh_getJointPositionXAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       //data[1]=bvh_getJointPositionYAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       //data[2]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       //data[3]=bvh_getJointRotationXAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       //data[4]=bvh_getJointRotationYAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       //data[5]=bvh_getJointRotationZAtMotionBuffer(bvhMotion,jID,motionBuffer);
+       
+       unsigned int mID;
+       
+       switch (bvhMotion->jointHierarchy[jID].channelRotationOrder)
+       {
+           case BVH_ROTATION_ORDER_ZXY : 
+             //Special code to speed up cases that match the BVH specification ZXY rotation orders
+             mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,BVH_ROTATION_X);
+             data[3]=motionBuffer[mID];
+             mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,BVH_ROTATION_Y);
+             data[4]=motionBuffer[mID];
+             mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,BVH_ROTATION_Z);
+             data[5]=motionBuffer[mID];
+           break;
+           
+           default : 
+             data[3]=bvh_getJointRotationXAtMotionBuffer(bvhMotion,jID,motionBuffer);
+             data[4]=bvh_getJointRotationYAtMotionBuffer(bvhMotion,jID,motionBuffer);
+             data[5]=bvh_getJointRotationZAtMotionBuffer(bvhMotion,jID,motionBuffer);
+           break;
+       };
+       
+   
+    return 1;
+  }
+  
+  return 0;  
 }
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------

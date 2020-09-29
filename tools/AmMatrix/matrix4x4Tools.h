@@ -313,7 +313,7 @@ int codeHasSSE();
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const float * matrixB);
+void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const float * matrixB);
 
 
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);

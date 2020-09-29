@@ -871,7 +871,7 @@ return 0;
 }
 
 //__attribute__((aligned(16)))
-int multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const float * matrixB)
+void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     //return multiplyTwo4x4FMatrices_CMMA(result,matrixA,matrixB); 
@@ -896,9 +896,8 @@ int multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const flo
                                                      );
                              _mm_store_ps(&result[4*i], row);
                             }
-  return 1;
 #else
-  return multiplyTwo4x4FMatrices_Naive(result ,matrixA,matrixB);
+   multiplyTwo4x4FMatrices_Naive(result ,matrixA,matrixB);
 #endif
 
 }
@@ -974,7 +973,8 @@ void multiplyTwo4x4FMatrices_AVX(struct MATRIX * mResult,struct MATRIX M1,struct
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-   return multiplyTwo4x4FMatrices_SSE(result->m,matrixA->m,matrixB->m);
+    multiplyTwo4x4FMatrices_SSE(result->m,matrixA->m,matrixB->m);
+    return 1;
 #else 
    return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
 #endif

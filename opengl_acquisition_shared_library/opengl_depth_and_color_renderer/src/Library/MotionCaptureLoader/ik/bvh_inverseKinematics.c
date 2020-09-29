@@ -482,8 +482,8 @@ int examineSolutionAndKeepIfItIsBetter(
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
-        float distanceFromInitial=fabs(solutionToTest[0] - originalValues[0]);
-        float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
+        //float distanceFromInitial=fabs(solutionToTest[0] - originalValues[0]);
+        float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         
         if (currentLoss<*bestLoss)
@@ -771,18 +771,18 @@ if (iterationID==0)
         //Calculate losses
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-        float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
-        currentLoss[0]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
+        //float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
+        currentLoss[0]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
-        distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
-        currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
+        //distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
+        currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
-        distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
-        currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/) + spring * distanceFromInitial * distanceFromInitial;
+        //distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
+        currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
