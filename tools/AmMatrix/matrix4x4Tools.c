@@ -885,31 +885,87 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const fl
 {
 #if INTEL_OPTIMIZATIONS
     //return multiplyTwo4x4FMatrices_CMMA(result,matrixA,matrixB); 
-
+    
+    //Load all rows to registers assuming that they are allocated using the __attribute__((aligned(16)))
+    //We could load them using the _mm_loadu_ps however this performs 4x worse..!
     __m128 row1 = _mm_load_ps(&matrixB[0]);
     __m128 row2 = _mm_load_ps(&matrixB[4]);
     __m128 row3 = _mm_load_ps(&matrixB[8]);
     __m128 row4 = _mm_load_ps(&matrixB[12]);
-    for(int i=0; i<4; i++) {
-                             __m128 brod1 = _mm_set1_ps(matrixA[4*i + 0]);
-                             __m128 brod2 = _mm_set1_ps(matrixA[4*i + 1]);
-                             __m128 brod3 = _mm_set1_ps(matrixA[4*i + 2]);
-                             __m128 brod4 = _mm_set1_ps(matrixA[4*i + 3]);
-                             __m128 row = _mm_add_ps(
-                                                     _mm_add_ps(
-                                                                _mm_mul_ps(brod1, row1),
-                                                                _mm_mul_ps(brod2, row2)),
-                                                     _mm_add_ps(
-                                                                _mm_mul_ps(brod3, row3),
-                                                                _mm_mul_ps(brod4, row4)
-                                                               )
-                                                     );
-                             _mm_store_ps(&result[4*i], row);
-                            }
+    
+    //First Column ------------------------
+    __m128 brod1 = _mm_set1_ps(matrixA[4*0 + 0]);
+    __m128 brod2 = _mm_set1_ps(matrixA[4*0 + 1]);
+    __m128 brod3 = _mm_set1_ps(matrixA[4*0 + 2]);
+    __m128 brod4 = _mm_set1_ps(matrixA[4*0 + 3]);
+    __m128 row = _mm_add_ps(
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod1, row1),
+                                       _mm_mul_ps(brod2, row2)
+                                      ),
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod3, row3),
+                                       _mm_mul_ps(brod4, row4)
+                                      )
+                           );
+    _mm_store_ps(&result[4*0], row);
+
+
+    //Second Column ------------------------
+           brod1 = _mm_set1_ps(matrixA[4*1 + 0]);
+           brod2 = _mm_set1_ps(matrixA[4*1 + 1]);
+           brod3 = _mm_set1_ps(matrixA[4*1 + 2]);
+           brod4 = _mm_set1_ps(matrixA[4*1 + 3]);
+           row = _mm_add_ps(
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod1, row1),
+                                       _mm_mul_ps(brod2, row2)
+                                      ),
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod3, row3),
+                                       _mm_mul_ps(brod4, row4)
+                                      )
+                           );
+    _mm_store_ps(&result[4*1], row);
+
+
+    //Third Column ------------------------
+           brod1 = _mm_set1_ps(matrixA[4*2 + 0]);
+           brod2 = _mm_set1_ps(matrixA[4*2 + 1]);
+           brod3 = _mm_set1_ps(matrixA[4*2 + 2]);
+           brod4 = _mm_set1_ps(matrixA[4*2 + 3]);
+           row = _mm_add_ps(
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod1, row1),
+                                       _mm_mul_ps(brod2, row2)
+                                      ),
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod3, row3),
+                                       _mm_mul_ps(brod4, row4)
+                                      )
+                           );
+    _mm_store_ps(&result[4*2], row);
+
+
+    //Fourth Column ------------------------
+           brod1 = _mm_set1_ps(matrixA[4*3 + 0]);
+           brod2 = _mm_set1_ps(matrixA[4*3 + 1]);
+           brod3 = _mm_set1_ps(matrixA[4*3 + 2]);
+           brod4 = _mm_set1_ps(matrixA[4*3 + 3]);
+           row = _mm_add_ps(
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod1, row1),
+                                       _mm_mul_ps(brod2, row2)
+                                      ),
+                            _mm_add_ps(
+                                       _mm_mul_ps(brod3, row3),
+                                       _mm_mul_ps(brod4, row4)
+                                      )
+                           );
+    _mm_store_ps(&result[4*3], row);
 #else
    multiplyTwo4x4FMatrices_Naive(result ,matrixA,matrixB);
 #endif
-
 }
 
 
