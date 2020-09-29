@@ -403,16 +403,17 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
     struct Matrix4x4OfFloats rY;
     struct Matrix4x4OfFloats rZ;
 
+   char rXisIdentity=(degreesEulerX==0.0);
+   char rYisIdentity=(degreesEulerY==0.0);
+   char rZisIdentity=(degreesEulerZ==0.0);
+   
+   if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
+   { 
    //Assuming the rotation axis are correct
    //rX,rY,rZ should hold our 4x4 rotation matrices
-   create4x4FRotationX(&rX,degreesEulerX);
-   char rXisIdentity=(degreesEulerX==0.0);
-   
+   create4x4FRotationX(&rX,degreesEulerX);   
    create4x4FRotationY(&rY,degreesEulerY);
-   char rYisIdentity=(degreesEulerY==0.0);
-   
    create4x4FRotationZ(&rZ,degreesEulerZ);
-   char rZisIdentity=(degreesEulerZ==0.0);
    
 
   switch (rotationOrder)
@@ -453,7 +454,12 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
       create4x4FIdentityMatrix(m);
     break;
-  };
+  }; 
+   } else
+   {
+    //All rotations are zero skip everything..   
+    create4x4FIdentityMatrix(m);
+   }
     return ;
   } else
   {  
@@ -693,7 +699,8 @@ int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats 
 
 int transpose4x4FMatrix(float * mat)
 {
-  if (mat==0) { return 0; }
+  if (mat!=0) 
+  { 
   /*       -------  TRANSPOSE ------->
       0   1   2   3           0  4  8   12
       4   5   6   7           1  5  9   13
@@ -711,29 +718,35 @@ int transpose4x4FMatrix(float * mat)
   tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
 
   return 1;
+  }
+  
+  return 0;  
 }
 
  
 int transpose4x4DMatrix(double * mat)
 {
-  if (mat==0) { return 0; }
+  if (mat!=0) 
+  { 
   /*       -------  TRANSPOSE ------->
       0   1   2   3           0  4  8   12
       4   5   6   7           1  5  9   13
       8   9   10  11          2  6  10  14
       12  13  14  15          3  7  11  15   */
 
-  double tmp;
-  tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
-  tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
-  tmp = mat[3]; mat[3]=mat[12]; mat[12]=tmp;
+   double tmp;
+   tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
+   tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
+   tmp = mat[3]; mat[3]=mat[12]; mat[12]=tmp;
 
 
-  tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
-  tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
-  tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
-
-  return 1;
+   tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
+   tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
+   tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
+   return 1; 
+  }
+ 
+  return 0;
 }
 
 
@@ -884,7 +897,7 @@ return 0;
 void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-    //return multiplyTwo4x4FMatrices_CMMA(result,matrixA,matrixB); 
+    //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info 
     
     //Load all rows to registers assuming that they are allocated using the __attribute__((aligned(16)))
     //We could load them using the _mm_loadu_ps however this performs 4x worse..!
@@ -894,10 +907,12 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const fl
     __m128 row4 = _mm_load_ps(&matrixB[12]);
     
     //First Column ------------------------
+    //Broadcast the value in all elements 
     __m128 brod1 = _mm_set1_ps(matrixA[4*0 + 0]);
     __m128 brod2 = _mm_set1_ps(matrixA[4*0 + 1]);
     __m128 brod3 = _mm_set1_ps(matrixA[4*0 + 2]);
     __m128 brod4 = _mm_set1_ps(matrixA[4*0 + 3]);
+       //Add all required elements..
     __m128 row = _mm_add_ps(
                             _mm_add_ps(
                                        _mm_mul_ps(brod1, row1),
@@ -909,7 +924,6 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const fl
                                       )
                            );
     _mm_store_ps(&result[4*0], row);
-
 
     //Second Column ------------------------
            brod1 = _mm_set1_ps(matrixA[4*1 + 0]);
@@ -928,7 +942,6 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const fl
                            );
     _mm_store_ps(&result[4*1], row);
 
-
     //Third Column ------------------------
            brod1 = _mm_set1_ps(matrixA[4*2 + 0]);
            brod2 = _mm_set1_ps(matrixA[4*2 + 1]);
@@ -945,7 +958,6 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const fl
                                       )
                            );
     _mm_store_ps(&result[4*2], row);
-
 
     //Fourth Column ------------------------
            brod1 = _mm_set1_ps(matrixA[4*3 + 0]);
