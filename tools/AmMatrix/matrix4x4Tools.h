@@ -300,7 +300,7 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB);
+int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
 
 
 int codeHasSSE();
@@ -313,7 +313,7 @@ int codeHasSSE();
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices_SSE(float * result , float * matrixA , float * matrixB);
+int multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const float * matrixB);
 
 
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);

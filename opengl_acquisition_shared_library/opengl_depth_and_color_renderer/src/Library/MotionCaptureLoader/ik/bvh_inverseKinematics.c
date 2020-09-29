@@ -1412,6 +1412,9 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                //---------------------------------
                                               )
 {
+   if (currentSolution==0)    { return 0; }
+   if (previousSolution==0)   { return 0; }
+   if (bvhTargetTransform==0) { return 0; }
    //fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
@@ -1460,6 +1463,7 @@ int springToZeroParts(
                        //---------------------------------
                     )
 {
+   if (currentSolution==0)    { return 0; }
    fprintf(stderr,GREEN "springToZeroParts running \n" NORMAL);
    //------------------------------------------------ 
    struct BVH_Transform bvhCurrentTransform  = {0}; 
