@@ -1357,22 +1357,22 @@ void create4x4FModelTransformation(
     //----------------------------------------------------------
     switch (numberOfOperationsNeeded)
     {
-      case 3:   
-        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
-       return; 
-      case 2:   
-        if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
-        if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
-        if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  } 
-        return;
+      case 0:   
+        create4x4FIdentityMatrix(m); 
+      return;
       case 1:   
         if (translationSpecified==0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
         if (rotationSpecified==0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
         if (scaleSpecified==0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }  
         return;
-      case 0:   
-        create4x4FIdentityMatrix(m); 
-      return;
+      case 2:   
+        if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
+        if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
+        if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  } 
+        return;
+      case 3:   
+        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
+       return; 
     };
     //----------------------------------------------------------
 }

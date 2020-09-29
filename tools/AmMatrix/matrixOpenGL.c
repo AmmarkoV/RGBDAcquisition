@@ -694,7 +694,7 @@ void lookAt(
 
 
 int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate)
-  {
+{
       float objx=position3D[0];
       float objy=position3D[1];
       float objz=position3D[2];
@@ -712,21 +712,25 @@ int _glhProjectf(float * position3D, float *modelview, float *projection, int *v
       fTempo[6]=projection[2]*fTempo[0]+projection[6]*fTempo[1]+projection[10]*fTempo[2]+projection[14]*fTempo[3];
       fTempo[7]=-fTempo[2];
       //The result normalizes between -1 and 1
-      if(fTempo[7]==0.0)	//The w value
-         { return 0; }
-      fTempo[7]=1.0/fTempo[7];
-      //Perspective division
-      fTempo[4]*=fTempo[7];
-      fTempo[5]*=fTempo[7];
-      fTempo[6]*=fTempo[7];
-      //Window coordinates
-      //Map x, y to range 0-1
-      windowCoordinate[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
-      windowCoordinate[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
-      //This is only correct when glDepthRange(0.0, 1.0)
-      windowCoordinate[2]=(1.0+fTempo[6])*0.5;	//Between 0 and 1
-      return 1;
-  }
+      if(fTempo[7]!=0.0)	//The w value
+         { 
+           fTempo[7]=1.0/fTempo[7];
+           //Perspective division
+           fTempo[4]*=fTempo[7];
+           fTempo[5]*=fTempo[7];
+           fTempo[6]*=fTempo[7];
+           
+           //Window coordinates
+           //Map x, y to range 0-1
+           windowCoordinate[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
+           windowCoordinate[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
+      
+           //This is only correct when glDepthRange(0.0, 1.0)
+           windowCoordinate[2]=(1.0+fTempo[6])*0.5;	//Between 0 and 1
+          return 1;
+         }
+   return 0; 
+}
 
 int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate)
   {
