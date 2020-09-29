@@ -897,7 +897,7 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 
 
 #if INTEL_OPTIMIZATIONS
-#define _MM_TRANSPOSE4_PS_SHUFFLE(row0, row1, row2, row3) {         \
+#define _MM_TRANSPOSE4_PS_HARDCODED(row0, row1, row2, row3) {       \
             __m128 tmp3, tmp2, tmp1, tmp0;                          \
                                                                     \
             tmp0   = _mm_shuffle_ps((row0), (row1), 0x44);          \
@@ -915,21 +915,15 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 
 void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
 {
-    /*
-     * http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
-     * Here is the code for the first line of the resulting matrix m2, r0 to r3 are used to store the first matrix, 
-     * r4 to r7 are used to store the second one after transposition, other registers are temporaries :
-     */
- 
+ //http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html  
 #if INTEL_OPTIMIZATIONS
  //Load Matrix A into registers
- __m128 r0 = _mm_load_ps(&matrixA[0]);
- __m128 r1 = _mm_load_ps(&matrixA[4]);
- __m128 r2 = _mm_load_ps(&matrixA[8]);
- __m128 r3 = _mm_load_ps(&matrixA[12]);
-    
- //We need to transpose the matrixB.. but this kills us @ 0.98% time..
- /*
+ __m128 matrixA_r0 = _mm_load_ps(&matrixA[0]);
+ __m128 matrixA_r1 = _mm_load_ps(&matrixA[4]);
+ __m128 matrixA_r2 = _mm_load_ps(&matrixA[8]);
+ __m128 matrixA_r3 = _mm_load_ps(&matrixA[12]);
+
+ /* //Transpose the matrixB naively.. kills us @ 0.98% time..
  float __attribute__((aligned(16))) transposedMatrixB[16]={
       matrixB[0],matrixB[4],matrixB[8] ,matrixB[12],
       matrixB[1],matrixB[5],matrixB[9] ,matrixB[13],
@@ -938,56 +932,60 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
       };*/
       
  //Load Matrix B into registers
- __m128 r4 = _mm_load_ps(&matrixB[0]);
- __m128 r5 = _mm_load_ps(&matrixB[4]);
- __m128 r6 = _mm_load_ps(&matrixB[8]);
- __m128 r7 = _mm_load_ps(&matrixB[12]);
- _MM_TRANSPOSE4_PS(r4,r5,r6,r7);
+ __m128 matrixB_r0 = _mm_load_ps(&matrixB[0]);
+ __m128 matrixB_r1 = _mm_load_ps(&matrixB[4]);
+ __m128 matrixB_r2 = _mm_load_ps(&matrixB[8]);
+ __m128 matrixB_r3 = _mm_load_ps(&matrixB[12]);
+ //Transpose matrixB in registers
+ _MM_TRANSPOSE4_PS(matrixB_r0,matrixB_r1,matrixB_r2,matrixB_r3);
     
+ //t0 - t4 are temporary registers 
+ 
  //First Line!
- __m128 r8 = _mm_mul_ps(r0, r4);
- __m128 r9 = _mm_mul_ps(r0, r5);
- __m128 r10 = _mm_mul_ps(r0, r6);
- __m128 r11 = _mm_mul_ps(r0, r7);
- r8 = _mm_hadd_ps(r8, r9);
- r9 = _mm_hadd_ps(r10, r11);
- __m128 r12 = _mm_hadd_ps(r8, r9);
+ __m128 t0  = _mm_mul_ps(matrixA_r0,matrixB_r0);
+ __m128 t1  = _mm_mul_ps(matrixA_r0,matrixB_r1);
+ __m128 t2  = _mm_mul_ps(matrixA_r0,matrixB_r2);
+ __m128 t3  = _mm_mul_ps(matrixA_r0,matrixB_r3);
+        t0  = _mm_hadd_ps(t0,t1);
+        t1  = _mm_hadd_ps(t2,t3);
+ __m128 t4  = _mm_hadd_ps(t0,t1);
  //------------
- _mm_store_ps(&result[0], r12);
+ _mm_store_ps(&result[0], t4);
  
  //Second Line!
- r8 = _mm_mul_ps(r1, r4);
- r9 = _mm_mul_ps(r1, r5);
- r10 = _mm_mul_ps(r1, r6);
- r11 = _mm_mul_ps(r1, r7);
- r8 = _mm_hadd_ps(r8, r9);
- r9 = _mm_hadd_ps(r10, r11);
- r12 = _mm_hadd_ps(r8, r9);
+ t0  = _mm_mul_ps(matrixA_r1,matrixB_r0);
+ t1  = _mm_mul_ps(matrixA_r1,matrixB_r1);
+ t2  = _mm_mul_ps(matrixA_r1,matrixB_r2);
+ t3  = _mm_mul_ps(matrixA_r1,matrixB_r3);
+ t0  = _mm_hadd_ps(t0,t1);
+ t1  = _mm_hadd_ps(t2,t3);
+ t4  = _mm_hadd_ps(t0,t1);
  //------------
- _mm_store_ps(&result[4], r12);
+ _mm_store_ps(&result[4],t4);
  
  //Third Line!
- r8 = _mm_mul_ps(r2, r4);
- r9 = _mm_mul_ps(r2, r5);
- r10 = _mm_mul_ps(r2, r6);
- r11 = _mm_mul_ps(r2, r7);
- r8 = _mm_hadd_ps(r8, r9);
- r9 = _mm_hadd_ps(r10, r11);
- r12 = _mm_hadd_ps(r8, r9);
+ t0  = _mm_mul_ps(matrixA_r2,matrixB_r0);
+ t1  = _mm_mul_ps(matrixA_r2,matrixB_r1);
+ t2  = _mm_mul_ps(matrixA_r2,matrixB_r2);
+ t3  = _mm_mul_ps(matrixA_r2,matrixB_r3);
+ t0  = _mm_hadd_ps(t0,t1);
+ t1  = _mm_hadd_ps(t2,t3);
+ t4  = _mm_hadd_ps(t0,t1);
  //------------
- _mm_store_ps(&result[8], r12);
+ _mm_store_ps(&result[8],t4);
  
  //Forth Line!
- r8 = _mm_mul_ps(r3, r4);
- r9 = _mm_mul_ps(r3, r5);
- r10 = _mm_mul_ps(r3, r6);
- r11 = _mm_mul_ps(r3, r7);
- r8 = _mm_hadd_ps(r8, r9);
- r9 = _mm_hadd_ps(r10, r11);
- r12 = _mm_hadd_ps(r8, r9);
+ t0  = _mm_mul_ps(matrixA_r3,matrixB_r0);
+ t1  = _mm_mul_ps(matrixA_r3,matrixB_r1);
+ t2  = _mm_mul_ps(matrixA_r3,matrixB_r2);
+ t3  = _mm_mul_ps(matrixA_r3,matrixB_r3);
+ t0  = _mm_hadd_ps(t0,t1);
+ t1  = _mm_hadd_ps(t2,t3);
+ t4  = _mm_hadd_ps(t0,t1);
  //------------
- _mm_store_ps(&result[12], r12);
- 
+ _mm_store_ps(&result[12],t4);
+ #else
+   multiplyTwo4x4FMatrices_Naive(result,matrixA,matrixB);
  #endif
 }
 
