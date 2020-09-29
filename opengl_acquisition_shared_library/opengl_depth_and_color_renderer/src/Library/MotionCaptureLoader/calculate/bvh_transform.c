@@ -4,11 +4,6 @@
 
 #include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
  
-
-//Also find Center of Joint
-//We can skip the matrix multiplication by just grabbing the last column..
-#define FIND_FAST_CENTER 1
-
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..
 #define FAST_OFFSET_TRANSLATION 1
@@ -547,7 +542,7 @@ static inline void bvh_performActualTransform(
                            &bvhTransform->joint[jID].dynamicRotation
                           );
 
-  #if FIND_FAST_CENTER
+  #if FAST_OFFSET_TRANSLATION
    bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].localToWorldTransformation.m[3];
    bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].localToWorldTransformation.m[7];
    bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].localToWorldTransformation.m[11];
@@ -561,7 +556,7 @@ static inline void bvh_performActualTransform(
                                           centerPoint
                                          );
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
-  #endif // FIND_FAST_CENTER
+  #endif // FAST_OFFSET_TRANSLATION
     
 }
 

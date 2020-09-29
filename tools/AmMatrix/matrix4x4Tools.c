@@ -397,14 +397,8 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 
 void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
 {
-
-  if (rotationOrder==0)
+  if (rotationOrder!=0)
   {
-    //No rotation type, get's you back an Identity Matrix..
-    fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: No rotation order given, returning identity..\n");
-    create4x4FIdentityMatrix(m);
-    return;
-  } 
     struct Matrix4x4OfFloats rX;
     struct Matrix4x4OfFloats rY;
     struct Matrix4x4OfFloats rZ;
@@ -412,13 +406,13 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    //Assuming the rotation axis are correct
    //rX,rY,rZ should hold our 4x4 rotation matrices
    create4x4FRotationX(&rX,degreesEulerX);
-   char rXisIdentity=(degreesEulerX==0);
+   char rXisIdentity=(degreesEulerX==0.0);
    
    create4x4FRotationY(&rY,degreesEulerY);
-   char rYisIdentity=(degreesEulerY==0);
+   char rYisIdentity=(degreesEulerY==0.0);
    
    create4x4FRotationZ(&rZ,degreesEulerZ);
-   char rZisIdentity=(degreesEulerZ==0);
+   char rZisIdentity=(degreesEulerZ==0.0);
    
 
   switch (rotationOrder)
@@ -460,7 +454,14 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
       create4x4FIdentityMatrix(m);
     break;
   };
-  
+    return ;
+  } else
+  {  
+    //No rotation type, get's you back an Identity Matrix..
+    fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: No rotation order given, returning identity..\n");
+    create4x4FIdentityMatrix(m);
+    return;
+  } 
 }
 
 
