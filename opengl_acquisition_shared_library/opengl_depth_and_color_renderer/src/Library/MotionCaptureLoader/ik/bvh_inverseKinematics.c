@@ -1692,7 +1692,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     copyMotionBuffer(solution,problem->currentSolution);
 
      
-     fprintf(stderr,"IK lr = %0.3f,  max start loss = %0.1f, Iterations = %u, epochs = %u, spring = %0.1f\n", 
+     fprintf(stderr,"IK lr=%0.3f,  max start loss=%0.1f, Iterations=%u, epochs=%u, spring=%0.1f\n", 
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
