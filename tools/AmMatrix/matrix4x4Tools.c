@@ -928,17 +928,21 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  __m128 r2 = _mm_load_ps(&matrixA[8]);
  __m128 r3 = _mm_load_ps(&matrixA[12]);
     
- //Load Matrix B into registers
+ //We need to transpose the matrixB.. but this kills us @ 0.98% time..
+ /*
  float __attribute__((aligned(16))) transposedMatrixB[16]={
       matrixB[0],matrixB[4],matrixB[8] ,matrixB[12],
       matrixB[1],matrixB[5],matrixB[9] ,matrixB[13],
       matrixB[2],matrixB[6],matrixB[10],matrixB[14],
       matrixB[3],matrixB[7],matrixB[11],matrixB[15]
-      };
- __m128 r4 = _mm_load_ps(&transposedMatrixB[0]);
- __m128 r5 = _mm_load_ps(&transposedMatrixB[4]);
- __m128 r6 = _mm_load_ps(&transposedMatrixB[8]);
- __m128 r7 = _mm_load_ps(&transposedMatrixB[12]);
+      };*/
+      
+ //Load Matrix B into registers
+ __m128 r4 = _mm_load_ps(&matrixB[0]);
+ __m128 r5 = _mm_load_ps(&matrixB[4]);
+ __m128 r6 = _mm_load_ps(&matrixB[8]);
+ __m128 r7 = _mm_load_ps(&matrixB[12]);
+ _MM_TRANSPOSE4_PS(r4,r5,r6,r7);
     
  //First Line!
  __m128 r8 = _mm_mul_ps(r0, r4);
