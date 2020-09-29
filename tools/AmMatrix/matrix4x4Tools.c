@@ -336,49 +336,58 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
 void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-
-    create4x4FIdentityMatrix(m);
-
     float cosV = (float) cosf((float)radians);
     float sinV = (float) sinf((float)radians);
-
+ 
+    m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
+    m->m[4] = 0.0;  m->m[5] = cosV;    m->m[6]  = sinV;   m->m[7]  = 0.0;
+    m->m[8] = 0.0;  m->m[9] = -1*sinV; m->m[10] = cosV;   m->m[11] = 0.0;
+    m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0; 
+ 
     // Rotate X formula.
-    m->m[5] =    cosV; // [1,1]
-    m->m[9] = -1*sinV; // [1,2]
-    m->m[6] =    sinV; // [2,1]
-    m->m[10] =   cosV; // [2,2]
+    //create4x4FIdentityMatrix(m);
+    //m->m[5] =    cosV; // [1,1]
+    //m->m[9] = -1*sinV; // [1,2]
+    //m->m[6] =    sinV; // [2,1]
+    //m->m[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
 void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
 {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-
-    create4x4FIdentityMatrix(m);
-
     float cosV = (float) cosf((float)radians);
     float sinV = (float) sinf((float)radians);
 
+    m->m[0] = cosV;  m->m[1] = 0.0;  m->m[2]  = -1*sinV; m->m[3] = 0.0;
+    m->m[4] = 0.0;   m->m[5] = 1.0;  m->m[6]  = 0.0;     m->m[7] = 0.0;
+    m->m[8] = sinV;  m->m[9] = 0.0;  m->m[10] = cosV;    m->m[11] =0.0;
+    m->m[12]= 0.0;   m->m[13]= 0.0;  m->m[14] = 0.0;     m->m[15] = 1.0;
+    
     // Rotate Y formula.
-    m->m[0] =    cosV; // [0,0]
-    m->m[2] = -1*sinV; // [2,0]
-    m->m[8] =    sinV; // [0,2]
-    m->m[10] =   cosV; // [2,2]
+    //create4x4FIdentityMatrix(m);
+    //m->m[0] =    cosV; // [0,0]
+    //m->m[2] = -1*sinV; // [2,0]
+    //m->m[8] =    sinV; // [0,2]
+    //m->m[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
 void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-
-    create4x4FIdentityMatrix(m);
-
     float cosV = (float) cosf((float)radians);
     float sinV = (float) sinf((float)radians);
+    
+    m->m[0] = cosV;    m->m[1] = sinV;  m->m[2]  = 0.0; m->m[3]  = 0.0;
+    m->m[4] = -1*sinV; m->m[5] = cosV;  m->m[6]  = 0.0; m->m[7]  = 0.0;
+    m->m[8] = 0.0;     m->m[9] = 0.0;   m->m[10] = 1.0; m->m[11] = 0.0;
+    m->m[12]= 0.0;     m->m[13]= 0.0;   m->m[14] = 0.0; m->m[15] = 1.0;
 
     // Rotate Z formula.
-    m->m[0] =    cosV;  // [0,0]
-    m->m[1] =    sinV;  // [1,0]
-    m->m[4] = -1*sinV;  // [0,1]
-    m->m[5] =    cosV;  // [1,1]
+    //create4x4FIdentityMatrix(m);
+    //m->m[0] =    cosV;  // [0,0]
+    //m->m[1] =    sinV;  // [1,0]
+    //m->m[4] = -1*sinV;  // [0,1]
+    //m->m[5] =    cosV;  // [1,1]
 }
 //---------------------------------------------------------
  
