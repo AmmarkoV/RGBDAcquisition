@@ -417,7 +417,7 @@ int projectPointsFrom3Dto2D(float * x2D,float * y2D ,float * x3D,float *y3D ,flo
 
 
 
-int move3DPoint(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D)
+int move3DPoint(struct Vector4x1OfFloats  * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats  * point3D)
 {
   return transform3DPointFVectorUsing4x4FMatrix(resultPoint3D,transformation4x4,point3D);
 }
@@ -516,7 +516,19 @@ int pointFromRelationWithObjectToAbsolute(float * absoluteOutPoint3DRotated,floa
   objectRotation4x4.m[e11]=objectPosition[2];
   objectRotation4x4.m[e15]=1.0;
 
-  transform3DPointFVectorUsing4x4FMatrix(absoluteOutPoint3DRotated,&objectRotation4x4,relativeInPoint3DUnrotated);
+  struct Vector4x1OfFloats absoluteOutPoint3DRotatedVector; 
+  struct Vector4x1OfFloats relativeInPoint3DUnrotatedVector; 
+  relativeInPoint3DUnrotatedVector.m[0] = relativeInPoint3DUnrotated[0];
+  relativeInPoint3DUnrotatedVector.m[1] = relativeInPoint3DUnrotated[1];
+  relativeInPoint3DUnrotatedVector.m[2] = relativeInPoint3DUnrotated[2];
+  relativeInPoint3DUnrotatedVector.m[3] = relativeInPoint3DUnrotated[3];
+  
+  transform3DPointFVectorUsing4x4FMatrix(&absoluteOutPoint3DRotatedVector,&objectRotation4x4,&relativeInPoint3DUnrotatedVector);
+
+  absoluteOutPoint3DRotated[0] = absoluteOutPoint3DRotatedVector.m[0];
+  absoluteOutPoint3DRotated[1] = absoluteOutPoint3DRotatedVector.m[1];
+  absoluteOutPoint3DRotated[2] = absoluteOutPoint3DRotatedVector.m[2];
+  absoluteOutPoint3DRotated[3] = absoluteOutPoint3DRotatedVector.m[3];
 
   //Normalization is done automatically
   normalize3DPointFVector(absoluteOutPoint3DRotated);
@@ -537,6 +549,15 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
   //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
   upscale3x3Fto4x4F(objectRotation4x4.m,objectRotation3x3);
 
+
+  struct Vector4x1OfFloats absoluteInPoint3DRotatedVector; 
+  absoluteInPoint3DRotatedVector.m[0]=absoluteInPoint3DRotated[0];
+  absoluteInPoint3DRotatedVector.m[1]=absoluteInPoint3DRotated[1];
+  absoluteInPoint3DRotatedVector.m[2]=absoluteInPoint3DRotated[2];
+  absoluteInPoint3DRotatedVector.m[3]=absoluteInPoint3DRotated[3];
+  
+  struct Vector4x1OfFloats relativeOutPoint3DUnrotatedVector;  
+
   objectRotation4x4.m[e3]=objectPosition[0];
   objectRotation4x4.m[e7]=objectPosition[1];
   objectRotation4x4.m[e11]=objectPosition[2];
@@ -546,7 +567,14 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
   struct Matrix4x4OfFloats objectInvRotation4x4={0};
   invert4x4FMatrix(&objectInvRotation4x4,&objectRotation4x4);
 
-  transform3DPointFVectorUsing4x4FMatrix(relativeOutPoint3DUnrotated,&objectInvRotation4x4,absoluteInPoint3DRotated);
+  transform3DPointFVectorUsing4x4FMatrix(&relativeOutPoint3DUnrotatedVector,&objectInvRotation4x4,&absoluteInPoint3DRotatedVector);
+  
+  relativeOutPoint3DUnrotated[0]=relativeOutPoint3DUnrotatedVector.m[0];
+  relativeOutPoint3DUnrotated[1]=relativeOutPoint3DUnrotatedVector.m[0];
+  relativeOutPoint3DUnrotated[2]=relativeOutPoint3DUnrotatedVector.m[0];
+  relativeOutPoint3DUnrotated[3]=relativeOutPoint3DUnrotatedVector.m[0];
+  
+  
   return 1;
 }
 

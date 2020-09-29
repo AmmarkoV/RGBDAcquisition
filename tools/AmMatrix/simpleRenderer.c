@@ -149,17 +149,17 @@ int simpleRendererRender(
 
 
 
-   float point3D[4];
-   float resultPoint3D[4];
-   point3D[0]=(float) (position3D[0]-center3D[0]);
-   point3D[1]=(float) (position3D[1]-center3D[1]);
-   point3D[2]=(float) (position3D[2]-center3D[2]);
-   point3D[3]=(float) (1.0);
+   struct Vector4x1OfFloats point3D={0};  
+   struct Vector4x1OfFloats resultPoint3D={0};
+   point3D.m[0]=(float) (position3D[0]-center3D[0]);
+   point3D.m[1]=(float) (position3D[1]-center3D[1]);
+   point3D.m[2]=(float) (position3D[2]-center3D[2]);
+   point3D.m[3]=(float) (1.0);
 
    transform3DPointFVectorUsing4x4FMatrix(
-                                          resultPoint3D,
+                                          &resultPoint3D,
                                           &objectMatrixRotation,
-                                          point3D
+                                          &point3D
                                          );
 
 
@@ -169,16 +169,16 @@ int simpleRendererRender(
 
   if (!sr->removeObjectPosition) 
    { //This is more probable to happen
-    final3DPosition[0]=(float) resultPoint3D[0]+center3D[0]+sr->cameraOffsetPosition[0];
-    final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
-    final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
-    final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
+    final3DPosition[0]=(float) resultPoint3D.m[0]+center3D[0]+sr->cameraOffsetPosition[0];
+    final3DPosition[1]=(float) resultPoint3D.m[1]+center3D[1]+sr->cameraOffsetPosition[1];
+    final3DPosition[2]=(float) resultPoint3D.m[2]+center3D[2]+sr->cameraOffsetPosition[2];
+    final3DPosition[3]=(float) 1.0;//resultPoint3D.m[3];
    } else
    {
-    final3DPosition[0]=(float) resultPoint3D[0]+sr->cameraOffsetPosition[0];
-    final3DPosition[1]=(float) resultPoint3D[1]+sr->cameraOffsetPosition[1];
-    final3DPosition[2]=(float) resultPoint3D[2]+sr->cameraOffsetPosition[2];
-    final3DPosition[3]=(float) 1.0;//resultPoint3D[3];
+    final3DPosition[0]=(float) resultPoint3D.m[0]+sr->cameraOffsetPosition[0];
+    final3DPosition[1]=(float) resultPoint3D.m[1]+sr->cameraOffsetPosition[1];
+    final3DPosition[2]=(float) resultPoint3D.m[2]+sr->cameraOffsetPosition[2];
+    final3DPosition[3]=(float) 1.0;//resultPoint3D.m[3];
    } 
    
  ///--------------------------------------------------------------------

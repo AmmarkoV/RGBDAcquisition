@@ -9,6 +9,20 @@
 #define OPTIMIZED 1
 //#define INTEL_OPTIMIZATIONS 0
 
+
+#if INTEL_OPTIMIZATIONS
+#include <xmmintrin.h>
+#include <pmmintrin.h>
+#endif
+
+int codeHasSSE()
+{
+#if INTEL_OPTIMIZATIONS
+ return 1;
+#endif // INTEL_OPTIMIZATIONS
+return 0;
+}
+
 #define PRINT_MATRIX_DEBUGGING 0
 
 enum mat4x4Item
@@ -881,20 +895,27 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
  return 0;
 }
 
-#if INTEL_OPTIMIZATIONS
-#include <xmmintrin.h>
-#endif
 
-int codeHasSSE()
+void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
 {
-#if INTEL_OPTIMIZATIONS
- return 1;
-#endif // INTEL_OPTIMIZATIONS
-return 0;
+    /*
+     * http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
+     * Here is the code for the first line of the resulting matrix m2, r0 to r3 are used to store the first matrix, 
+     * r4 to r7 are used to store the second one after transposition, other registers are temporaries :
+
+r8 = _mm_mul_ps(r0, r4);
+r9 = _mm_mul_ps(r0, r5);
+r10 = _mm_mul_ps(r0, r6);
+r11 = _mm_mul_ps(r0, r7);
+
+r8 = _mm_hadd_ps(r8, r9);
+r9 = _mm_hadd_ps(r10, r11);
+r12 = _mm_hadd_ps(r8, r9);
+_mm_store_ps(&m2[0], r12);*/
 }
 
 //__attribute__((aligned(16)))
-void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA ,const float * matrixB)
+void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info 
@@ -1051,7 +1072,7 @@ void multiplyTwo4x4FMatrices_AVX(struct MATRIX * mResult,struct MATRIX M1,struct
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-    multiplyTwo4x4FMatrices_SSE(result->m,matrixA->m,matrixB->m);
+    multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m);
     return 1;
 #else 
    return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
@@ -1209,50 +1230,78 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
 
 
  
+ 
 
+//__attribute__((aligned(16)))
+void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,const float * point3D)
+{
+#if INTEL_OPTIMIZATIONS 
+  //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info  
+ __m128 p  = _mm_load_ps(point3D);
+ __m128 row1 = _mm_load_ps(&matrixA[0]);
+ __m128 row2 = _mm_load_ps(&matrixA[4]);
+ __m128 row3 = _mm_load_ps(&matrixA[8]);
+ __m128 row4 = _mm_load_ps(&matrixA[12]);  
+ 
+ __m128 x = _mm_mul_ps(row1,p);
+ __m128 y = _mm_mul_ps(row2,p);
+ __m128 z = _mm_mul_ps(row3,p);
+ __m128 w = _mm_mul_ps(row4,p);
+ __m128 tmp1 = _mm_hadd_ps(x, y); // = [y2+y3, y0+y1, x2+x3, x0+x1]
+ __m128 tmp2 = _mm_hadd_ps(z, w); // = [w2+w3, w0+w1, z2+z3, z0+z1]
 
-int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4, float * point3D)
+ _mm_storeu_ps(result, _mm_hadd_ps(tmp1, tmp2)); // = [w0+w1+w2+w3, z0+z1+z2+z3, y0+y1+y2+y3, x0+x1+x2+x3] 
+ 
+  #endif
+}
+ 
+ 
+
+//struct Vector4x1OfFloats
+int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D)
 {
 if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
- {      
-/*
-   What we want to do ( in mathematica )
-   { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
+ {
+#if INTEL_OPTIMIZATIONS
+  multiplyVectorWith4x4FMatrix_SSE(resultPoint3D->m,transformation4x4->m,point3D->m);
+#else
+  // What we want to do ( in mathematica )
+  // { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
 
-   This gives us
+  // This gives us
 
-  {
-    {e3 W + e0 X + e1 Y + e2 Z},
-    {e7 W + e4 X + e5 Y + e6 Z},
-    {e11 W + e8 X + e9 Y + e10 Z},
-    {e15 W + e12 X + e13 Y + e14 Z}
-  }
-*/
+  //{
+  //  {e3 W + e0 X + e1 Y + e2 Z},
+  //  {e7 W + e4 X + e5 Y + e6 Z},
+  //  {e11 W + e8 X + e9 Y + e10 Z},
+  //  {e15 W + e12 X + e13 Y + e14 Z}
+  //}
   float * m = transformation4x4->m;
-  register float X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
+  register float X=point3D->m[0],Y=point3D->m[1],Z=point3D->m[2],W=point3D->m[3];
 
-  resultPoint3D[0] =  m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
-  resultPoint3D[1] =  m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
-  resultPoint3D[2] =  m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
-  resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
+  resultPoint3D->m[0] = m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
+  resultPoint3D->m[1] = m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
+  resultPoint3D->m[2] = m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
+  resultPoint3D->m[3] = m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
-  if (resultPoint3D[3]!=0.0)
+  if (resultPoint3D->m[3]!=0.0)
   {
-   resultPoint3D[0]/=resultPoint3D[3];
-   resultPoint3D[1]/=resultPoint3D[3];
-   resultPoint3D[2]/=resultPoint3D[3];
-   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
+   resultPoint3D->m[0]/=resultPoint3D->m[3];
+   resultPoint3D->m[1]/=resultPoint3D->m[3];
+   resultPoint3D->m[2]/=resultPoint3D->m[3];
+   resultPoint3D->m[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
    return 1;
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
-     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
-     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
+     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D->m[0],point3D->m[1],point3D->m[2],point3D->m[3]);
+     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D->m[0],resultPoint3D->m[1],resultPoint3D->m[2],resultPoint3D->m[3]);
      return 0;
-  }
-
+  } 
  return 1;
+#endif
+ 
  }
 return 0;
 }

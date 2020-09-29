@@ -1,8 +1,8 @@
 project( OGLDepthAndColorRendererProject ) 
 cmake_minimum_required( VERSION 2.8.7 )
 
-set(CMAKE_CXX_FLAGS "-fPIC ")
-set(CMAKE_C_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-fPIC -march=native")
+set(CMAKE_C_FLAGS "-fPIC -march=native")
 
 OPTION (ENABLE_HIGH_PERFORMANCE_BUILD OFF)
 OPTION (ENABLE_JPG ON)

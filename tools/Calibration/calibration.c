@@ -516,26 +516,27 @@ float * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibra
 int transform3DPointUsingExisting4x4Matrix(float * m , float * x , float * y , float * z)
 {
   int result = 0;
-  float raw3D[4]={0};
-  float world3D[4]={0};
+  struct Vector4x1OfFloats raw3D; 
+  struct Vector4x1OfFloats world3D;  
 
-  raw3D[0] = (float) *x;
-  raw3D[1] = (float) *y;
-  raw3D[2] = (float) *z;
-  raw3D[3] = (float) 1.0;
+  raw3D.m[0] = (float) *x;
+  raw3D.m[1] = (float) *y;
+  raw3D.m[2] = (float) *z;
+  raw3D.m[3] = (float) 1.0;
 
 
   //Doing double -> float -> double casts
   struct Matrix4x4OfFloats mF;
   copy4x4FMatrix(mF.m,m);
-  result = transform3DPointFVectorUsing4x4FMatrix(world3D,&mF,raw3D);
+  result = transform3DPointFVectorUsing4x4FMatrix(&world3D,&mF,&raw3D);
 
   //result = transform3DPointDVectorUsing4x4DMatrix(world3D,m,raw3D);
 
-  *x= (float) world3D[0];
-  *y= (float) world3D[1];
-  *z= (float) world3D[2];
-
+  *x= (float) world3D.m[0];
+  *y= (float) world3D.m[1];
+  *z= (float) world3D.m[2];
+  //It is automatically divided
+  
   return result;
 }
 

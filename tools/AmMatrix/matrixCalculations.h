@@ -89,7 +89,7 @@ int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,flo
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int move3DPoint(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D);
+int move3DPoint(struct Vector4x1OfFloats  * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats  * point3D);
 
 
 /**

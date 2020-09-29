@@ -64,6 +64,20 @@ struct Matrix4x4OfFloats
 };
 
 
+struct Vector4x1OfFloats
+{
+  /*A Matrix 4x1 aligned to allow for SSE optimized calculations.
+   * 
+   * Items are stored on the m array using this ordering 
+     0   1   2   3 
+     
+     IRC => Item Row/Column => 
+     I11, I12, I13, I14
+    */
+  float __attribute__((aligned(16))) m[4];
+};
+
+
 float degrees_to_radF(float degrees);
 
 /**
@@ -346,7 +360,7 @@ int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
-int transform3DPointFVectorUsing4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4, float * point3D);
+int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D);
 
 /**
 * @brief Multiply a the 3x3 rotational part of a 4x4 matrix with a Normal Vector (3D Point)  A*V

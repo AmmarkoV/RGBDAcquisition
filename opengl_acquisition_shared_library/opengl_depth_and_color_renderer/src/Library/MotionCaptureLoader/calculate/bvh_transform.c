@@ -549,12 +549,18 @@ static inline void bvh_performActualTransform(
    bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].localToWorldTransformation.m[15]; 
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #else
-   float centerPoint[4]={0.0,0.0,0.0,1.0};
+   struct Vector4x1OfFloats resultPoint={0}; 
+   struct Vector4x1OfFloats centerPoint3D={0}; 
+   centerPoint3D.m[3]=1.0;
    transform3DPointFVectorUsing4x4FMatrix(
-                                          bvhTransform->joint[jID].pos3D,
+                                          &resultPoint,
                                           bvhTransform->joint[jID].localToWorldTransformation,
-                                          centerPoint
+                                          &centerPoint
                                          );
+   bvhTransform->joint[jID].pos3D[0] = resultPoint.m[0]; 
+   bvhTransform->joint[jID].pos3D[1] = resultPoint.m[1]; 
+   bvhTransform->joint[jID].pos3D[2] = resultPoint.m[2]; 
+   bvhTransform->joint[jID].pos3D[3] = resultPoint.m[3]; 
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #endif // FAST_OFFSET_TRANSLATION
     
