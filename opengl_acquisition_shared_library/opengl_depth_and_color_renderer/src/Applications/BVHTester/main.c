@@ -268,6 +268,7 @@ int main(int argc,const char **argv)
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1; 
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
+    unsigned int multiThreaded = 0;
     //unsigned int flipOrientation = 0;
     //unsigned int flipRandomizationOrientation = 0;
 
@@ -297,6 +298,13 @@ int main(int argc,const char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--mt")==0)
+        {
+           multiThreaded=1;
+        } else
+        
         //-----------------------------------------------------
         if (strcmp(argv[i],"--printparams")==0)
         {
@@ -382,7 +390,8 @@ int main(int argc,const char **argv)
                       epochs,
                       previousFrame,
                       sourceFrame,
-                      targetFrame
+                      targetFrame,
+                      multiThreaded
                     );
 
           exit(0);

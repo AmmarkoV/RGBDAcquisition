@@ -54,7 +54,8 @@ int bvhTestIK(
               unsigned int epochs,
               unsigned int fIDPrevious,
               unsigned int fIDSource,
-              unsigned int fIDTarget
+              unsigned int fIDTarget,
+              unsigned int multiThreaded
              );
 
 

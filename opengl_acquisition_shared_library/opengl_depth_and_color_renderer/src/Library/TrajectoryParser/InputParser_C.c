@@ -418,18 +418,17 @@ unsigned char InputParser_SelfCheck(struct InputParserC * ipc)
 */
 unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
 {
-  if ( CheckIPCOk(ipc)==0) { return 0; }
-  if ( (ipc->tokenlist==0) || ( ipc->tokens_count <= num ) ) { return 0; }
-
-
-  return 1;
+//  if ( CheckIPCOk(ipc)==0) { return 0; }
+//  if ( (ipc->tokenlist==0) || ( ipc->tokens_count <= num ) ) { return 0; }
+// return 1;
+  return ( (CheckIPCOk(ipc)!=0) && (ipc->tokenlist!=0) && ( ipc->tokens_count > num ) );
 }
 
 
 unsigned int InputParser_GetNumberOfArguments(struct InputParserC * ipc)
 {
-  if ( CheckIPCOk(ipc)==0) { return 0; }
-  return ipc->tokens_count;
+  if ( CheckIPCOk(ipc)!=0) { return ipc->tokens_count; }
+  return 0;
 }
 
 /*
@@ -610,9 +609,8 @@ signed int InputParser_GetWordInt(struct InputParserC * ipc,unsigned int num)
 */
 float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
 {
-   if ( CheckWordNumOk(ipc,num) == 0 ) { return 0.0; }
-   if (ipc->tokenlist[num].length == 0 ) { return 0.0; }
-
+   if ( ( CheckWordNumOk(ipc,num) != 0 ) && (ipc->tokenlist[num].length != 0 ) ) 
+   {
    char remember = 0;
    char * string_segment = 0;
    char * last_char_of_string_segment = 0;
@@ -685,14 +683,17 @@ float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
   return return_value;
 }
 
+ return 0.0;
+}
+
 /*
    InputParser_GetChar..
    Returns total length of token (num)..!
 */
 unsigned int InputParser_GetWordLength(struct InputParserC * ipc,unsigned int num)
 {
-    if ( CheckWordNumOk(ipc,num) == 0 ) { return 0; }
-    return ipc->tokenlist[num].length;
+    if ( CheckWordNumOk(ipc,num) != 0 ) { return ipc->tokenlist[num].length; }
+    return 0; 
 }
 
 /*

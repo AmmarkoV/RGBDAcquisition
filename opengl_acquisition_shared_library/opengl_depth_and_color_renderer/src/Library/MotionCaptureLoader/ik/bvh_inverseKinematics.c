@@ -1158,14 +1158,13 @@ int multiThreadedSolver(
         
         //At this point of the code for the particular iteration all single threaded chains have been executed
         //All parallel threads have been started and now we must wait until they are done and gather their output 
-        unsigned int allThreadsAreDone=0;
-        unsigned int threadsComplete=0;
+        unsigned int allThreadsAreDone=0; 
+        unsigned int threadsComplete=0; //Each thread that is completed counts only once since its status is intercepted and changed..
         unsigned int waitTime=0;
         
         //fprintf(stderr,"\nWaiting for threads to complete : ");
         while (!allThreadsAreDone)
         {
-          threadsComplete=0;  
           //Lets check if all our chains are done and copy back their results..!  
           for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
             {

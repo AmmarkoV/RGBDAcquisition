@@ -1729,7 +1729,8 @@ int bvhTestIK(
     unsigned int epochs,
     unsigned int fIDPrevious,
     unsigned int fIDSource,
-    unsigned int fIDTarget
+    unsigned int fIDTarget,
+    unsigned int multiThreaded
 )
 {
     int result=0;
@@ -1838,7 +1839,7 @@ int bvhTestIK(
                             //-------------------
                             &bvhTargetTransform,
                             //-------------------
-                            0, //Use a single thread ( For Now )!
+                            multiThreaded, //Use a single thread unless --mt is supplied before testik command!
                             //------------------- 
                             &initialMAEInPixels,
                             &finalMAEInPixels,
