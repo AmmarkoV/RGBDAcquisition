@@ -366,6 +366,7 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -414,6 +415,7 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //---------------------------------------------------------- 
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -458,7 +460,8 @@ int prepareDefaultRightHandProblem(
     //Chain 3 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -505,7 +508,8 @@ int prepareDefaultRightHandProblem(
     //Chain 4 is the Finger 5
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -550,7 +554,8 @@ int prepareDefaultRightHandProblem(
     //Chain 5 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------       
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -778,7 +783,8 @@ int prepareDefaultLeftHandProblem(
     //Chain 1 is the Finger 2
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -826,7 +832,8 @@ int prepareDefaultLeftHandProblem(
     //Chain 2 is the Finger 3
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -871,7 +878,8 @@ int prepareDefaultLeftHandProblem(
     //Chain 3 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -919,7 +927,8 @@ int prepareDefaultLeftHandProblem(
     //Chain 4 is the Finger 5
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -962,7 +971,8 @@ int prepareDefaultLeftHandProblem(
     //Chain 5 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
+    //----------------------------------------------------------      
+     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..

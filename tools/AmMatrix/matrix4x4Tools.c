@@ -923,7 +923,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  __m128 matrixA_r2 = _mm_load_ps(&matrixA[8]);
  __m128 matrixA_r3 = _mm_load_ps(&matrixA[12]);
 
- /* //Transpose the matrixB naively.. kills us @ 0.98% time..
+ /* //Instead of _MM_TRANSPOSE4_PS we can transpose the matrixB naively.. kills us @ 0.98% time..
  float __attribute__((aligned(16))) transposedMatrixB[16]={
       matrixB[0],matrixB[4],matrixB[8] ,matrixB[12],
       matrixB[1],matrixB[5],matrixB[9] ,matrixB[13],
@@ -1081,8 +1081,8 @@ void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const f
 int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-    //multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m);
-    multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m);
+    multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m); //109.53 fps in the sven dataset
+    ////multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m); // 107.77 fps in the sven dataset
     return 1;
 #else 
    return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);

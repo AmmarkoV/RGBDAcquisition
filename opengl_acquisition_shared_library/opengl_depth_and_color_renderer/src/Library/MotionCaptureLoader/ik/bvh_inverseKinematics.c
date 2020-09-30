@@ -1080,7 +1080,7 @@ void * iterateChainLossThread(void * ptr)
                            ctx->ikConfig->verbose
                          );      
     }
-    nsleep(100);
+    //nsleep(10);
   }
  
   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
@@ -1161,9 +1161,11 @@ int multiThreadedSolver(
         unsigned int allThreadsAreDone=0;
         unsigned int threadsComplete=0;
         unsigned int waitTime=0;
-        fprintf(stderr,"\nWaiting for threads to complete : ");
+        
+        //fprintf(stderr,"\nWaiting for threads to complete : ");
         while (!allThreadsAreDone)
         {
+          threadsComplete=0;  
           //Lets check if all our chains are done and copy back their results..!  
           for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
             {
@@ -1204,11 +1206,11 @@ int multiThreadedSolver(
                 allThreadsAreDone=1;
             } else
             {
-                nsleep(100);
+                //nsleep(10);
+                ++waitTime;
+                if (waitTime%3==0) { fprintf(stderr,"."); }
             }
             
-            ++waitTime;
-            if (waitTime%3==0) { fprintf(stderr,"."); }
          }
     }
     
@@ -1690,9 +1692,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
-
      
-     fprintf(stderr,"IK lr=%0.3f,  max start loss=%0.1f, Iterations=%u, epochs=%u, spring=%0.1f\n", 
+     if (useMultipleThreads)
+        { fprintf(stderr,"MT"); }
+      
+    fprintf(stderr,"IK lr=%0.3f,  max start loss=%0.1f, Iterations=%u, epochs=%u, spring=%0.1f\n", 
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
