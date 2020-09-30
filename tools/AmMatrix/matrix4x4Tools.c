@@ -19,8 +19,9 @@ int codeHasSSE()
 {
 #if INTEL_OPTIMIZATIONS
  return 1;
+#else
+ return 0;
 #endif // INTEL_OPTIMIZATIONS
-return 0;
 }
 
 #define PRINT_MATRIX_DEBUGGING 0

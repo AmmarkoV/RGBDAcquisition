@@ -12,6 +12,7 @@ extern "C"
 {
 #endif
 
+int codeHasSSE();
 
 //This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
 //Since this used to be a variable in some points of the code..
@@ -317,7 +318,6 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
 
 
-int codeHasSSE();
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B ) using SSE instrcutions,  matrices should be 16bit algined i.e.  float m[16] __attribute__((aligned(16))) )
