@@ -18,7 +18,7 @@
 int codeHasSSE()
 {
 #if INTEL_OPTIMIZATIONS
- return 1;
+ return 2; //2=>SSE2
 #else
  return 0;
 #endif // INTEL_OPTIMIZATIONS
