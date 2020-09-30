@@ -1170,17 +1170,21 @@ int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src)
 {
   if ( (src!=0) && (dst!=0) )
   {
-   if (src->bufferSize != dst->bufferSize)
+   if (src->bufferSize == dst->bufferSize)
+   {
+     // 0.01  
+     memcpy(dst->motion,src->motion,sizeof(float) * src->bufferSize);
+     // 0.16
+     /*for (unsigned int i=0; i<dst->bufferSize; i++)
+      { dst->motion[i] = src->motion[i]; } */
+     return 1;
+   }
+    else
    {
     fprintf(stderr,RED "copyMotionBuffer: Buffer Size mismatch (Source %u/Destination %u)..\n" NORMAL,src->bufferSize,dst->bufferSize);
     return 0;
    }
-
-   for (unsigned int i=0; i<dst->bufferSize; i++)
-   {
-    dst->motion[i] = src->motion[i];
-   }
-   return 1;     
+  
   }   
   
   return 0;

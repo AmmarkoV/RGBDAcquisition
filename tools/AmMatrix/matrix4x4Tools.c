@@ -165,8 +165,9 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
 
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 {
-   #if INTEL_OPTIMIZATIONS
-    __m128 zero = _mm_set1_ps(0); 
+   /*#if INTEL_OPTIMIZATIONS          
+    // 0.79 instruction fetch
+    __m128 zero = _mm_setzero_ps(); 
     _mm_store_ps(&m->m[0], zero);
     m->m[0] = 1.0;
     _mm_store_ps(&m->m[4], zero);
@@ -176,8 +177,9 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     _mm_store_ps(&m->m[12], zero);
     m->m[15] = 1.0; 
     return;
-   #else
+   #else*/
    #if OPTIMIZED 
+    // 0.61 instruction fetch
     memset(m->m,0,16*sizeof(float)); 
     m->m[0] = 1.0;
     m->m[5] = 1.0;
@@ -185,13 +187,14 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     m->m[15] = 1.0;
    return; 
   #else
+    //0.77 instruction fetch
     m->m[0] = 1.0;  m->m[1] = 0.0;  m->m[2] = 0.0;   m->m[3] = 0.0;
     m->m[4] = 0.0;  m->m[5] = 1.0;  m->m[6] = 0.0;   m->m[7] = 0.0;
     m->m[8] = 0.0;  m->m[9] = 0.0;  m->m[10] = 1.0;  m->m[11] =0.0;
     m->m[12]= 0.0;  m->m[13]= 0.0;  m->m[14] = 0.0;  m->m[15] = 1.0;
     return;
   #endif // OPTIMIZED
-  #endif //INTEL optimizations are more optimizing.. :P
+ // #endif //INTEL optimizations are more optimizing.. :P
 }
 
  
