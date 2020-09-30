@@ -289,8 +289,11 @@ int bvh_ConstrainRotations(
 //----------------------------------------------------------------------------------------------------
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
 {
- if (jID>bvhMotion->jointHierarchySize) { return 0; }
- return (!bvhMotion->jointHierarchy[jID].isRoot);
+ if (jID<bvhMotion->jointHierarchySize) 
+     { 
+       return (!bvhMotion->jointHierarchy[jID].isRoot);
+     }
+ return 0;
 }
 
 int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,BVHJointID * jChildID)

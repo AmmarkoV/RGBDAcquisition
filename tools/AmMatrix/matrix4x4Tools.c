@@ -367,6 +367,8 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
 //---------------------------------------------------------
 void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 {
+    if (degrees!=0.0)
+    {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
     float cosV = (float) cosf((float)radians);
     float sinV = (float) sinf((float)radians);
@@ -374,8 +376,11 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
     m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
     m->m[4] = 0.0;  m->m[5] = cosV;    m->m[6]  = sinV;   m->m[7]  = 0.0;
     m->m[8] = 0.0;  m->m[9] = -1*sinV; m->m[10] = cosV;   m->m[11] = 0.0;
-    m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0; 
- 
+    m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0;
+    } else
+    {
+      create4x4FIdentityMatrix(m);
+    }
     // Rotate X formula.
     //create4x4FIdentityMatrix(m);
     //m->m[5] =    cosV; // [1,1]
@@ -385,16 +390,22 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 }
 //---------------------------------------------------------
 void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
-{
-    float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-    float cosV = (float) cosf((float)radians);
-    float sinV = (float) sinf((float)radians);
+{   
+    if (degrees!=0.0)
+    {
+     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+     float cosV = (float) cosf((float)radians);
+     float sinV = (float) sinf((float)radians);
 
-    m->m[0] = cosV;  m->m[1] = 0.0;  m->m[2]  = -1*sinV; m->m[3] = 0.0;
-    m->m[4] = 0.0;   m->m[5] = 1.0;  m->m[6]  = 0.0;     m->m[7] = 0.0;
-    m->m[8] = sinV;  m->m[9] = 0.0;  m->m[10] = cosV;    m->m[11] =0.0;
-    m->m[12]= 0.0;   m->m[13]= 0.0;  m->m[14] = 0.0;     m->m[15] = 1.0;
-    
+     m->m[0] = cosV;  m->m[1] = 0.0;  m->m[2]  = -1*sinV; m->m[3] = 0.0;
+     m->m[4] = 0.0;   m->m[5] = 1.0;  m->m[6]  = 0.0;     m->m[7] = 0.0;
+     m->m[8] = sinV;  m->m[9] = 0.0;  m->m[10] = cosV;    m->m[11] =0.0;
+     m->m[12]= 0.0;   m->m[13]= 0.0;  m->m[14] = 0.0;     m->m[15] = 1.0;
+    }
+     else
+    {
+      create4x4FIdentityMatrix(m);
+    }
     // Rotate Y formula.
     //create4x4FIdentityMatrix(m);
     //m->m[0] =    cosV; // [0,0]
@@ -404,7 +415,9 @@ void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
 }
 //---------------------------------------------------------
 void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
-{
+{    
+    if (degrees!=0.0)
+    {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
     float cosV = (float) cosf((float)radians);
     float sinV = (float) sinf((float)radians);
@@ -413,7 +426,12 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
     m->m[4] = -1*sinV; m->m[5] = cosV;  m->m[6]  = 0.0; m->m[7]  = 0.0;
     m->m[8] = 0.0;     m->m[9] = 0.0;   m->m[10] = 1.0; m->m[11] = 0.0;
     m->m[12]= 0.0;     m->m[13]= 0.0;   m->m[14] = 0.0; m->m[15] = 1.0;
-
+    }
+     else
+    {
+      create4x4FIdentityMatrix(m);
+    }
+    
     // Rotate Z formula.
     //create4x4FIdentityMatrix(m);
     //m->m[0] =    cosV;  // [0,0]
@@ -431,75 +449,71 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
 {
   if (rotationOrder!=0)
   {
-    struct Matrix4x4OfFloats rX;
-    struct Matrix4x4OfFloats rY;
-    struct Matrix4x4OfFloats rZ;
-
    char rXisIdentity=(degreesEulerX==0.0);
    char rYisIdentity=(degreesEulerY==0.0);
    char rZisIdentity=(degreesEulerZ==0.0);
    
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
-   { 
-   //Assuming the rotation axis are correct
-   //rX,rY,rZ should hold our 4x4 rotation matrices
-   create4x4FRotationX(&rX,degreesEulerX);   
-   create4x4FRotationY(&rY,degreesEulerY);
-   create4x4FRotationZ(&rZ,degreesEulerZ);
+   {
+    //Assuming the rotation axis are correct
+    //rX,rY,rZ should hold our 4x4 rotation matrices
+    struct Matrix4x4OfFloats rX;
+    create4x4FRotationX(&rX,degreesEulerX);   
+    struct Matrix4x4OfFloats rY;
+    create4x4FRotationY(&rY,degreesEulerY);
+    struct Matrix4x4OfFloats rZ;
+    create4x4FRotationZ(&rZ,degreesEulerZ);
    
 
-  switch (rotationOrder)
-  {
-    case ROTATION_ORDER_XYZ : 
+   switch (rotationOrder)
+   {
+     case ROTATION_ORDER_XYZ : 
        //multiplyThree4x4FMatrices(m,&rX,&rY,&rZ); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity); 
-    break;
-    case ROTATION_ORDER_XZY : 
+     break;
+     case ROTATION_ORDER_XZY : 
        //multiplyThree4x4FMatrices(m,&rX,&rZ,&rY); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity); 
-    break;
-    case ROTATION_ORDER_YXZ : 
+     break;
+     case ROTATION_ORDER_YXZ : 
        //multiplyThree4x4FMatrices(m,&rY,&rX,&rZ); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity); 
-    break;
-    case ROTATION_ORDER_YZX : 
+     break;
+     case ROTATION_ORDER_YZX : 
        //multiplyThree4x4FMatrices(m,&rY,&rZ,&rX); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity); 
-    break;
-    case ROTATION_ORDER_ZXY : 
+     break;
+     case ROTATION_ORDER_ZXY : 
        //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity); 
-    break;
-    case ROTATION_ORDER_ZYX : 
+     break;
+     case ROTATION_ORDER_ZYX : 
        //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity); 
-    break;
-    case ROTATION_ORDER_RPY:
+     break;
+     case ROTATION_ORDER_RPY:
        doRPYTransformationF(
                             m,
                             degreesEulerZ,//roll,
                             degreesEulerY,//pitch
                             degreesEulerX //heading
                            );
-    break;
-    default :
-      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
+     break;
+     default :
+       fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
+       create4x4FIdentityMatrix(m);
+     break;
+    }; 
+   }  
+    else 
+    { 
       create4x4FIdentityMatrix(m);
-    break;
-  }; 
-   } else
-   {
-    //All rotations are zero skip everything..   
-    create4x4FIdentityMatrix(m);
-   }
-    return ;
-  } else
-  {  
-    //No rotation type, get's you back an Identity Matrix..
-    fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: No rotation order given, returning identity..\n");
-    create4x4FIdentityMatrix(m);
-    return;
-  } 
+     }
+  } else 
+  { 
+  create4x4FIdentityMatrix(m);
+  }
+  return;
 }
 
 
