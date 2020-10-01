@@ -1076,13 +1076,12 @@ void * iterateChainLossWorkerThread(void * ptr)
 
   while (1)
   {
-     if (!ctx->problem->terminateThreads)
+     if (ctx->problem->work)
      { 
       fprintf(stderr,"Thread %u Begin Work\n",ctx->threadID);
       pthread_mutex_unlock(&ctx->problem->startWorkMutex);
      }else
      {
-       ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
        pthread_mutex_unlock(&ctx->problem->startWorkMutex);
        pthread_exit(NULL);
      }
@@ -1138,6 +1137,7 @@ void * iterateChainLossWorkerThread(void * ptr)
     pthread_cond_wait(&ctx->problem->startWorkCondition, &ctx->problem->startWorkMutex);
   }
  
+   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
   return 0;
 }
 
@@ -1168,7 +1168,7 @@ int multiThreadedSolver(
                       //Make sure the thread will not terminate just as it starts
                       problem->chain[chainID].terminate=0;
                       
-                      //Populate context passed to the thread 
+                      //Populate context that will get transmitted to the thread 
                       problem->workerContext[numberOfWorkerThreads].problem=problem;
                       problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
                       problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
@@ -1198,7 +1198,12 @@ int multiThreadedSolver(
   
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
-    {
+    { 
+         // Lock the "StartWorkMutex" to do all single threaded jobs.
+         
+         fprintf(stderr,"MainThread: pthread_mutex_lock(&problem->startWorkMutex); \n");
+         pthread_mutex_lock(&problem->startWorkMutex); 
+         
         //We go through each chain, if the chain is single threaded we do the same as the singleThreadedSolver
         //if the thread is parallel then we just ask it to start processing the current data and we then need to stop and wait to gather results..
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
@@ -1232,6 +1237,8 @@ int multiThreadedSolver(
               }
         }
         
+        problem->work=1;
+        printf("Main: Broadcast Signal To Start\n");
         
         //At this point of the code for the particular iteration all single threaded chains have been executed
         //All parallel threads have been started and now we must wait until they are done and gather their output 
@@ -1256,63 +1263,12 @@ int multiThreadedSolver(
             printf("Main: Complete Signal Recieved From Thread-%d\n",problem->completedWorkNumber);
            // This is where partial work on the batch data coordination will happen.  All of the worker threads will have to finish before we can start the next batch. 
           }
+        fprintf(stderr,"Done Waiting!\n");
         pthread_mutex_unlock(&problem->completeWorkMutex);
         //--------------------------------------------------
-      /*
-        //fprintf(stderr,"\nWaiting for threads to complete : ");
-        while (!allThreadsAreDone)
-        {
-          //Lets check if all our chains are done and copy back their results..!  
-          for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-            {
-              if (problem->chain[chainID].parallel )
-                 {
-                   if (problem->chain[chainID].status == BVH_IK_FINISHED_ITERATION)
-                     {
-                         ++threadsComplete;                      
-                        //Yey..! This thread has finished its iteration, normally we would gather the result by using the copyMotionBuffer call
-                        //however this will overwrite the solution of other stuff so we are really only interested in copyint the motion values
-                        //from partIDs that do not correspond to endEffectors..
-                        
-                        for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
-                           {
-                                if (!problem->chain[chainID].part[partID].endEffector)
-                                   {  
-                                       //Shorthand to address the correct motion values
-                                       unsigned int mIDS[3] ={
-                                                               problem->chain[chainID].part[partID].mIDStart,
-                                                               problem->chain[chainID].part[partID].mIDStart+1,
-                                                               problem->chain[chainID].part[partID].mIDStart+2
-                                                             };
-
-                                       //Copy back the solution of the chain to the "official" solution for the  whole  problem
-                                       problem->currentSolution->motion[mIDS[0]]=problem->chain[chainID].currentSolution->motion[mIDS[0]];
-                                       problem->currentSolution->motion[mIDS[1]]=problem->chain[chainID].currentSolution->motion[mIDS[1]];
-                                       problem->currentSolution->motion[mIDS[2]]=problem->chain[chainID].currentSolution->motion[mIDS[2]];
-                                    } //If a part is an end effector it has no parameters to copy
-                           }  //Copy every part of this chain
-                           
-                        problem->chain[chainID].status=BVH_IK_NOTSTARTED;
-                     } // If thread has finished its iteration  
-                 }// If this chain has a thread serving it
-            }//Check all chains..
-            
-            if (numberOfWorkerThreads==threadsComplete)
-            {
-                allThreadsAreDone=1;
-            } else
-            {
-                nsleep(10);
-                ++waitTime;
-                if (waitTime%5==0) { fprintf(stderr,"."); }
-            }
-         }
-         */
-         
     }
     
- 
-  pthread_mutex_lock(&problem->startWorkMutex);
+  
 }
 
 ///=====================================================================================

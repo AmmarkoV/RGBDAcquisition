@@ -121,6 +121,7 @@ struct ikProblem
   //Thread storage..
   //----------------------------------------
   int terminateThreads;
+  int work;
   int mainThreadWaiting;
   int completedWorkNumber;
   pthread_attr_t initializationAttribute;
