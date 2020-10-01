@@ -284,7 +284,7 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 
 
 void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
-{
+{   // https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/rotationMatrixGeneration.m
     float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
     float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
     float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
@@ -306,7 +306,7 @@ void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,fl
 
 
 void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
-{
+{   // https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/rotationMatrixGeneration.m
     //roll = X , pitch = Y , yaw = Z
     float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
     float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
@@ -330,27 +330,23 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
 
 
 void create4x4FMatrixFromEulerAnglesZXY(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
-{
-    /*
+{   // https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/rotationMatrixGeneration.m
     //roll = X , pitch = Y , yaw = Z
     float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
     float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
     float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
 
-    float cr = cos(z);
-    float sr = sin(z);
-    float cp = cos(y);
-    float sp = sin(y);
-    float cy = cos(x);
-    float sy = sin(x);
+    float cosZ = cos(z);
+    float sinZ = sin(z);
+    float cosY = cos(y);
+    float sinY = sin(y);
+    float cosX = cos(x);
+    float sinX = sin(x); 
 
-    float srsp = sr*sp;
-    float crsp = cr*sp;
-
-    m->m[0]  = cr*cp;  m->m[1]  = crsp*sy - sr*cy;   m->m[2]  = crsp*cy + sr*sy;  m->m[3]  = 0.0;
-    m->m[4]  = sr*cp;  m->m[5]  = srsp*sy + cr*cy;   m->m[6]  = srsp*cy - cr*sy;  m->m[7]  = 0.0;
-    m->m[8]  = -sp;    m->m[9]  = cp*sy;             m->m[10] = cp*cy;            m->m[11] = 0.0;
-    m->m[12] = 0;      m->m[13] = 0;                 m->m[14] = 0;                m->m[15] = 1.0;*/
+    m->m[0]  = cosY*cosZ + sinX*sinY*sinZ;    m->m[1]  = cosX * sinZ;    m->m[2]  = cosY*sinX*sinZ - cosZ*sinY;  m->m[3]  = 0.0;
+    m->m[4]  = -cosY*sinZ + cosZ*sinX*sinY;   m->m[5]  = cosX * cosZ;    m->m[6]  = cosY*cosZ*sinX + sinY*sinZ;  m->m[7]  = 0.0;
+    m->m[8]  = cosX*sinY;                     m->m[9]  = -sinX;          m->m[10] = cosX*cosY;                   m->m[11] = 0.0;
+    m->m[12] = 0;                             m->m[13] = 0;              m->m[14] = 0;                           m->m[15] = 1.0;
 }
 
 
@@ -449,7 +445,13 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
     {
         create4x4FMatrixFromEulerAnglesZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
         return;
-    }   
+    }  else
+    if (rotationOrder==ROTATION_ORDER_ZXY)
+    {
+        create4x4FMatrixFromEulerAnglesZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
+        return ;
+    } 
+       
        
        
     //Assuming the rotation axis are correct
