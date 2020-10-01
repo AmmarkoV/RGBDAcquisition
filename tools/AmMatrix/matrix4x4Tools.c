@@ -295,31 +295,13 @@ void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,fl
     float sp = sin( y );
     float cy = cos( z );
     float sy = sin( z );
-
-    m->m[0] = cp*cy ;
-    m->m[1] = cp*sy;
-    m->m[2] = -sp ;
-    m->m[3] = 0; // 4x4
-
-
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    m->m[4] = srsp*cy-cr*sy ;
-    m->m[5] = srsp*sy+cr*cy ;
-    m->m[6] = sr*cp ;
-    m->m[7] = 0; // 4x4
-
-    m->m[8] =  crsp*cy+sr*sy ;
-    m->m[9] =  crsp*sy-sr*cy ;
-    m->m[10]= cr*cp ;
-    m->m[11]= 0; // 4x4
-
-    // 4x4 last row
-    m->m[12]= 0;
-    m->m[13]= 0;
-    m->m[14]= 0;
-    m->m[15]= 1.0;
+    m->m[0] = cp*cy;          m->m[1] = cp*sy;           m->m[2] = -sp;    m->m[3] = 0;  
+    m->m[4] = srsp*cy-cr*sy;  m->m[5] = srsp*sy+cr*cy;   m->m[6] = sr*cp;  m->m[7] = 0;
+    m->m[8] =  crsp*cy+sr*sy; m->m[9] =  crsp*sy-sr*cy;  m->m[10]= cr*cp;  m->m[11]= 0; 
+    m->m[12]= 0;              m->m[13]= 0;               m->m[14]= 0;      m->m[15]= 1.0;
 }
 
 
@@ -329,7 +311,6 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
     float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
     float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
     float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
-
 
     float cr = cos(z);
     float sr = sin(z);
@@ -341,26 +322,35 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    m->m[0] = cr*cp;
-    m->m[1] = crsp*sy - sr*cy;
-    m->m[2] = crsp*cy + sr*sy;
-    m->m[3] = 0;  // 4x4
+    m->m[0]  = cr*cp;  m->m[1]  = crsp*sy - sr*cy;   m->m[2]  = crsp*cy + sr*sy;  m->m[3]  = 0.0;
+    m->m[4]  = sr*cp;  m->m[5]  = srsp*sy + cr*cy;   m->m[6]  = srsp*cy - cr*sy;  m->m[7]  = 0.0;
+    m->m[8]  = -sp;    m->m[9]  = cp*sy;             m->m[10] = cp*cy;            m->m[11] = 0.0;
+    m->m[12] = 0;      m->m[13] = 0;                 m->m[14] = 0;                m->m[15] = 1.0;
+}
 
-    m->m[4] = sr*cp;
-    m->m[5] = srsp*sy + cr*cy;
-    m->m[6] = srsp*cy - cr*sy;
-    m->m[7] = 0;  // 4x4
 
-    m->m[8] = -sp;
-    m->m[9] = cp*sy;
-    m->m[10] = cp*cy;
-    m->m[11] = 0;  // 4x4
+void create4x4FMatrixFromEulerAnglesZXY(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
+{
+    /*
+    //roll = X , pitch = Y , yaw = Z
+    float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
+    float y = (float) eulY * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulY);
+    float z = (float) eulZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulZ);
 
-     // 4x4 last row
-    m->m[12] = 0;
-    m->m[13] = 0;
-    m->m[14] = 0;
-    m->m[15] = 1;
+    float cr = cos(z);
+    float sr = sin(z);
+    float cp = cos(y);
+    float sp = sin(y);
+    float cy = cos(x);
+    float sy = sin(x);
+
+    float srsp = sr*sp;
+    float crsp = cr*sp;
+
+    m->m[0]  = cr*cp;  m->m[1]  = crsp*sy - sr*cy;   m->m[2]  = crsp*cy + sr*sy;  m->m[3]  = 0.0;
+    m->m[4]  = sr*cp;  m->m[5]  = srsp*sy + cr*cy;   m->m[6]  = srsp*cy - cr*sy;  m->m[7]  = 0.0;
+    m->m[8]  = -sp;    m->m[9]  = cp*sy;             m->m[10] = cp*cy;            m->m[11] = 0.0;
+    m->m[12] = 0;      m->m[13] = 0;                 m->m[14] = 0;                m->m[15] = 1.0;*/
 }
 
 
@@ -370,12 +360,12 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
     if (degrees!=0.0)
     {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-    float cosV = (float) cosf((float)radians);
-    float sinV = (float) sinf((float)radians);
+    float cosX = (float) cosf((float)radians);
+    float sinX = (float) sinf((float)radians);
  
     m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
-    m->m[4] = 0.0;  m->m[5] = cosV;    m->m[6]  = sinV;   m->m[7]  = 0.0;
-    m->m[8] = 0.0;  m->m[9] = -1*sinV; m->m[10] = cosV;   m->m[11] = 0.0;
+    m->m[4] = 0.0;  m->m[5] = cosX;    m->m[6]  = sinX;   m->m[7]  = 0.0;
+    m->m[8] = 0.0;  m->m[9] = -1*sinX; m->m[10] = cosX;   m->m[11] = 0.0;
     m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0;
     } else
     {
@@ -394,12 +384,12 @@ void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
     if (degrees!=0.0)
     {
      float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-     float cosV = (float) cosf((float)radians);
-     float sinV = (float) sinf((float)radians);
+     float cosY = (float) cosf((float)radians);
+     float sinY = (float) sinf((float)radians);
 
-     m->m[0] = cosV;  m->m[1] = 0.0;  m->m[2]  = -1*sinV; m->m[3] = 0.0;
+     m->m[0] = cosY;  m->m[1] = 0.0;  m->m[2]  = -1*sinY; m->m[3] = 0.0;
      m->m[4] = 0.0;   m->m[5] = 1.0;  m->m[6]  = 0.0;     m->m[7] = 0.0;
-     m->m[8] = sinV;  m->m[9] = 0.0;  m->m[10] = cosV;    m->m[11] =0.0;
+     m->m[8] = sinY;  m->m[9] = 0.0;  m->m[10] = cosY;    m->m[11] =0.0;
      m->m[12]= 0.0;   m->m[13]= 0.0;  m->m[14] = 0.0;     m->m[15] = 1.0;
     }
      else
@@ -419,11 +409,11 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
     if (degrees!=0.0)
     {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-    float cosV = (float) cosf((float)radians);
-    float sinV = (float) sinf((float)radians);
+    float cosZ = (float) cosf((float)radians);
+    float sinZ = (float) sinf((float)radians);
     
-    m->m[0] = cosV;    m->m[1] = sinV;  m->m[2]  = 0.0; m->m[3]  = 0.0;
-    m->m[4] = -1*sinV; m->m[5] = cosV;  m->m[6]  = 0.0; m->m[7]  = 0.0;
+    m->m[0] = cosZ;    m->m[1] = sinZ;  m->m[2]  = 0.0; m->m[3]  = 0.0;
+    m->m[4] = -1*sinZ; m->m[5] = cosZ;  m->m[6]  = 0.0; m->m[7]  = 0.0;
     m->m[8] = 0.0;     m->m[9] = 0.0;   m->m[10] = 1.0; m->m[11] = 0.0;
     m->m[12]= 0.0;     m->m[13]= 0.0;   m->m[14] = 0.0; m->m[15] = 1.0;
     }
@@ -455,6 +445,13 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
    {
+    if (rotationOrder==ROTATION_ORDER_ZYX)
+    {
+        create4x4FMatrixFromEulerAnglesZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
+        return;
+    }   
+       
+       
     //Assuming the rotation axis are correct
     //rX,rY,rZ should hold our 4x4 rotation matrices
     struct Matrix4x4OfFloats rX;
@@ -504,15 +501,11 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        create4x4FIdentityMatrix(m);
      break;
     }; 
-   }  
-    else 
-    { 
-      create4x4FIdentityMatrix(m);
-     }
-  } else 
-  { 
-  create4x4FIdentityMatrix(m);
+    return;
+   }
   }
+  
+  create4x4FIdentityMatrix(m); 
   return;
 }
 
@@ -1348,20 +1341,19 @@ return 0;
 
 int normalize3DPointFVector(float * vec)
 {
-  if ( vec[3]==1.0 ) { return 1; } else
-  if ( vec[3]==0.0 )
-  {
-    fprintf(stderr,"normalize3DPointFVector cannot be normalized since element 3 is zero\n");
-    return 0;
+  if ( vec[3]==1.0 ) { return 1; } 
+  else
+  if ( vec[3]!=0.0 )
+  { 
+    vec[0]=vec[0]/vec[3];
+    vec[1]=vec[1]/vec[3];
+    vec[2]=vec[2]/vec[3];
+    vec[3]=1.0; // vec[3]=vec[3]/vec[3];   
+    return 1;
   }
 
-
-  vec[0]=vec[0]/vec[3];
-  vec[1]=vec[1]/vec[3];
-  vec[2]=vec[2]/vec[3];
-  vec[3]=1.0; // vec[3]=vec[3]/vec[3];
-
-  return 1;
+ fprintf(stderr,"normalize3DPointFVector cannot be normalized since element 3 is zero\n");
+ return 0;
 }
 
 int normalize3DPointDVector(double * vec)
@@ -1458,13 +1450,13 @@ void create4x4FModelTransformation(
     if ( (rotationX==0.0) && (rotationY==0.0) && (rotationZ==0.0) )
     {
       //Fast path since a lot of the time the rotation component is not active
-      create4x4FIdentityMatrix(&intermediateMatrixRotation); 
+      //create4x4FIdentityMatrix(&intermediateMatrixRotation); It will get automatically skipped..!
       rotationSpecified=0;
     } else 
     if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
       fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
-      create4x4FIdentityMatrix(&intermediateMatrixRotation);
+      //create4x4FIdentityMatrix(&intermediateMatrixRotation);  It will get automatically skipped..!
       rotationSpecified=0;
     } else
     if (rotationOrder==ROTATION_ORDER_RPY)
@@ -1516,7 +1508,7 @@ void create4x4FModelTransformation(
     {
       case 0:   
         create4x4FIdentityMatrix(m); 
-      return;
+       return;
       case 1:   
         if (translationSpecified==0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
         if (rotationSpecified==0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
