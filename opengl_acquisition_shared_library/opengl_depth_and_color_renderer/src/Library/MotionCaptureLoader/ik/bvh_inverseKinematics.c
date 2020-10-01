@@ -525,7 +525,9 @@ float iteratePartLoss(
                       unsigned int verbose
                      )
 {
-    unsigned long startTime = GetTickCountMicrosecondsIK();
+    unsigned long startTime,endTime;
+
+    if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
 
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
@@ -894,10 +896,10 @@ if (iterationID==0)
             break;
         }
     }
-    unsigned long endTime = GetTickCountMicrosecondsIK();
+    
 
     if (verbose)
-    {
+    {   endTime = GetTickCountMicrosecondsIK();
         fprintf(stderr,"Optimization for joint %s \n", jointName);
         fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
         fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
@@ -1060,7 +1062,8 @@ void * iterateChainLossWorkerThread(void * ptr)
    
    //Instead of doing this here we believe what pthread_create tells us..
   /// ctx->problem->chain[ctx->chainID].threadIsSpawned = 1;
-   
+  unsigned int waitTimeBeforeNextJob=0;
+  
   while (!ctx->problem->chain[ctx->chainID].terminate)
   {
      if (ctx->problem->chain[ctx->chainID].permissionToStart)
@@ -1078,9 +1081,16 @@ void * iterateChainLossWorkerThread(void * ptr)
                            ctx->ikConfig->spring, 
                            ctx->ikConfig->gradientExplosionThreshold,
                            ctx->ikConfig->verbose
-                         );      
+                         );
+                         
+        //Make thread sleep just enough time for a constant framerate
+        if (waitTimeBeforeNextJob>0)    { waitTimeBeforeNextJob-=1;   }
+        if (waitTimeBeforeNextJob>1000) { waitTimeBeforeNextJob=1000; }
+        nsleep(waitTimeBeforeNextJob); //Just enough sleep 
     }
     nsleep(1);
+    //fprintf(stderr,"!");
+    ++waitTimeBeforeNextJob;
   }
  
   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
@@ -1214,9 +1224,9 @@ int multiThreadedSolver(
                 allThreadsAreDone=1;
             } else
             {
-                nsleep(1);
+                nsleep(10);
                 ++waitTime;
-                if (waitTime%5==0) { fprintf(stderr,"."); }
+                //if (waitTime%5==0) { fprintf(stderr,"."); }
             }
             
          }
@@ -1552,6 +1562,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           float * finalMAEInMM
                                                          )
 {
+
     if (problem==0)
     {
         fprintf(stderr,RED "No problem provided for IK..\n" NORMAL);
@@ -1583,6 +1594,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "There is something wrong with your setup, halting execution..\n" NORMAL);
         exit(0);
     }
+
+    unsigned long startTime = GetTickCountMicrosecondsIK();
 
     //Don't spam console..
     //viewProblem(problem);
@@ -1701,16 +1714,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
      
-     if (useMultipleThreads)
-        { fprintf(stderr,"MT"); }
-      
-    fprintf(stderr,"IK lr=%0.3f,  max start loss=%0.1f, Iterations=%u, epochs=%u, spring=%0.1f\n", 
-                                               ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
-                                               ikConfig->iterations,
-                                               ikConfig->epochs, 
-                                               ikConfig->spring
-           );
                
      
      if (ikConfig->verbose)
@@ -1852,6 +1855,18 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
     
+    unsigned long endTime = GetTickCountMicrosecondsIK();
+    
+     if (useMultipleThreads)
+        { fprintf(stderr,"MT"); }
+      
+    fprintf(stderr,"IK %lu μsec|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n", 
+                                               endTime-startTime,
+                                               ikConfig->learningRate,
+                                               ikConfig->maximumAcceptableStartingLoss,
+                                               ikConfig->iterations,
+                                               ikConfig->epochs );
+           
     return 1;
 }
 
