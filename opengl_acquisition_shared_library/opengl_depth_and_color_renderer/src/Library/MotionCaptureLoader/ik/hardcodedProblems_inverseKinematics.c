@@ -366,7 +366,6 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -402,7 +401,8 @@ int prepareDefaultRightHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -414,8 +414,7 @@ int prepareDefaultRightHandProblem(
     //Chain 2 is the Finger 3
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel
+    //----------------------------------------------------------
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -451,7 +450,8 @@ int prepareDefaultRightHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                          
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -460,8 +460,7 @@ int prepareDefaultRightHandProblem(
     //Chain 3 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
+    //----------------------------------------------------------
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -496,7 +495,8 @@ int prepareDefaultRightHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -508,8 +508,7 @@ int prepareDefaultRightHandProblem(
     //Chain 4 is the Finger 5
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
+    //---------------------------------------------------------- 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -544,7 +543,8 @@ int prepareDefaultRightHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -554,8 +554,7 @@ int prepareDefaultRightHandProblem(
     //Chain 5 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------       
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
+    //----------------------------------------------------------
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -591,7 +590,8 @@ int prepareDefaultRightHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                     
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -783,8 +783,7 @@ int prepareDefaultLeftHandProblem(
     //Chain 1 is the Finger 2
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel 
+    //---------------------------------------------------------- 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -820,7 +819,8 @@ int prepareDefaultLeftHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -832,8 +832,7 @@ int prepareDefaultLeftHandProblem(
     //Chain 2 is the Finger 3
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
+    //---------------------------------------------------------- 
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -869,7 +868,8 @@ int prepareDefaultLeftHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                           
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -878,8 +878,7 @@ int prepareDefaultLeftHandProblem(
     //Chain 3 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
+    //----------------------------------------------------------
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -915,7 +914,8 @@ int prepareDefaultLeftHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -928,7 +928,6 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -963,7 +962,8 @@ int prepareDefaultLeftHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -972,7 +972,6 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------      
-     problem->chain[chainID].parallel=1; //Fingers can be solved in parallel  
      checksum=0;
      correct=0;
      partID=0; // Reset counter..
@@ -1008,7 +1007,8 @@ int prepareDefaultLeftHandProblem(
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                       
                              
-    ++chainID;
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1266,8 +1266,7 @@ int prepareDefaultBodyProblem(
      //Next chain is the Head
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
+     //----------------------------------------------------------
      checksum=0;
      correct=0; 
      partID=0;
@@ -1335,6 +1334,7 @@ int prepareDefaultBodyProblem(
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
@@ -1350,8 +1350,7 @@ int prepareDefaultBodyProblem(
      //Next chain is the R Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
+     //----------------------------------------------------------
      checksum=0;
      correct=0; 
      partID=0;
@@ -1397,6 +1396,7 @@ int prepareDefaultBodyProblem(
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
@@ -1410,8 +1410,7 @@ int prepareDefaultBodyProblem(
      //Next chain  is the L Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
+     //----------------------------------------------------------
      checksum=0;
      correct=0; 
      partID=0;
@@ -1457,6 +1456,7 @@ int prepareDefaultBodyProblem(
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
@@ -1540,6 +1540,7 @@ int prepareDefaultBodyProblem(
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
     ++chainID;
     ++jobID;
     //----------------------------------------------------------
@@ -1556,7 +1557,6 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
      checksum=0;
      correct=0; 
      partID=0;
@@ -1620,6 +1620,7 @@ int prepareDefaultBodyProblem(
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
     ++chainID;
     ++jobID;
     //----------------------------------------------------------

@@ -1053,14 +1053,14 @@ int nsleep(long nanoseconds)
 }
 
  
-void * iterateChainLossThread(void * ptr)
+void * iterateChainLossWorkerThread(void * ptr)
 {
   //We are a thread so lets retrieve our variables..
   struct passIKContextToThread * ctx = (struct passIKContextToThread *) ptr;
    
    //Instead of doing this here we believe what pthread_create tells us..
   /// ctx->problem->chain[ctx->chainID].threadIsSpawned = 1;
-  
+   
   while (!ctx->problem->chain[ctx->chainID].terminate)
   {
      if (ctx->problem->chain[ctx->chainID].permissionToStart)
@@ -1080,7 +1080,7 @@ void * iterateChainLossThread(void * ptr)
                            ctx->ikConfig->verbose
                          );      
     }
-    //nsleep(10);
+    nsleep(1);
   }
  
   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
@@ -1095,6 +1095,7 @@ int multiThreadedSolver(
                         struct ikConfiguration * ikConfig
                        )
 {
+  unsigned int numberOfFreshlySpawnThreads=0;  
   unsigned int numberOfWorkerThreads = 0;
   
   //Make sure all threads needed are created but only paying the cost of creating a thread once..!
@@ -1113,13 +1114,21 @@ int multiThreadedSolver(
                       problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
                       
                       //Create the actual thread..
-                     int result = pthread_create(&problem->workerPool[numberOfWorkerThreads],0,iterateChainLossThread,(void*) &problem->workerContext[numberOfWorkerThreads]);
+                     int result = pthread_create(
+                                                  &problem->workerPool[numberOfWorkerThreads],
+                                                  0,
+                                                  iterateChainLossWorkerThread,
+                                                  (void*) &problem->workerContext[numberOfWorkerThreads]
+                                                 );
+                                                 
                      problem->chain[chainID].threadIsSpawned = (result==0);
+                     numberOfFreshlySpawnThreads+=(result==0);
                   }
                   ++numberOfWorkerThreads;
               }
         }
-
+  
+  fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
   
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
@@ -1205,9 +1214,9 @@ int multiThreadedSolver(
                 allThreadsAreDone=1;
             } else
             {
-                //nsleep(10);
+                nsleep(1);
                 ++waitTime;
-                if (waitTime%3==0) { fprintf(stderr,"."); }
+                if (waitTime%5==0) { fprintf(stderr,"."); }
             }
             
          }
