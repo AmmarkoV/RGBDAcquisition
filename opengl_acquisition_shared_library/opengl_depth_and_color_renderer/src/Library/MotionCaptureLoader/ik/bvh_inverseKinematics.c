@@ -934,6 +934,13 @@ if (iterationID==0)
     problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
     problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
     problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
+    
+    //Multi threaded code (and single threaded code) needs to also concurrently update the final solution for next iterations  
+    //In order to get rid of extra bureocracies with motion buffers we also perform the update here..
+    //Only a chain is responsible and should update the specific motion values anyways
+    problem->currentSolution->motion[mIDS[0]] = bestValues[0];
+    problem->currentSolution->motion[mIDS[1]] = bestValues[1];
+    problem->currentSolution->motion[mIDS[2]] = bestValues[2];
 
     return bestLoss;
 }
@@ -1021,11 +1028,12 @@ int singleThreadedSolver(
                               ikConfig->verbose
                            );
              
-             //After we finish we update the problem->currentSolution with what our chain came up with..
-            copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
+             //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
+             //If we are here it means problem->currentSolution has the best solution IK could find..
         }
     }
 
+   //We are running using a single thread so we mark everything finished at the same time..
    for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
            problem->chain[chainID].status = BVH_IK_FINISHED_EVERYTHING;
@@ -1110,8 +1118,8 @@ int multiThreadedSolver(
   
   //Make sure all threads needed are created but only paying the cost of creating a thread once..!
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
-        { 
-              if ( problem->chain[chainID].parallel )
+        {
+          if ( problem->chain[chainID].parallel )
               {
                   if (!problem->chain[chainID].threadIsSpawned)
                   {
@@ -1138,7 +1146,7 @@ int multiThreadedSolver(
               }
         }
   
-  fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
+  //fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
   
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
@@ -1166,8 +1174,8 @@ int multiThreadedSolver(
                                  ikConfig->verbose
                                 );
                                                  
-                  //After we finish we update the problem->currentSolution with what our chain came up with..
-                 copyMotionBuffer(problem->currentSolution,problem->chain[chainID].currentSolution);
+                  //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
+                  //If we are here it means problem->currentSolution has the best solution IK could find..
               } else
               {
                   //We just give the thread permission to start and we will process its output asynchronously later..
