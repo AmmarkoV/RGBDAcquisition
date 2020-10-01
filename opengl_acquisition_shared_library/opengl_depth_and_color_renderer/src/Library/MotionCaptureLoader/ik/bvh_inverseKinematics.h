@@ -21,7 +21,8 @@ extern "C"
 
 enum bvhIKSolutionStatus
 {
-  BVH_IK_NOTSTARTED=0,
+  BVH_IK_UNINITIALIZED=0,
+  BVH_IK_NOTSTARTED,
   BVH_IK_STARTED,
   BVH_IK_FINISHED_ITERATION,
   BVH_IK_FINISHED_EVERYTHING, 
@@ -88,6 +89,7 @@ struct passIKContextToThread
     struct ikProblem * problem;
     struct ikConfiguration * ikConfig; 
     unsigned int chainID;
+    unsigned int threadID;
 };
 
 
@@ -116,7 +118,21 @@ struct ikProblem
 
  struct ikChain chain[MAXIMUM_CHAINS];
 
- //Thread storage..
+  //Thread storage..
+  //----------------------------------------
+  int terminateThreads;
+  int mainThreadWaiting;
+  int completedWorkNumber;
+  pthread_attr_t initializationAttribute;
+ 
+  //Start conditions..
+  pthread_mutex_t startWorkMutex;
+  pthread_cond_t startWorkCondition;
+
+  //Set two.
+  pthread_mutex_t completeWorkMutex;
+  pthread_cond_t completeWorkCondition;
+ 
   pthread_t workerPool[MAXIMUM_CHAINS];
   struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
 };
