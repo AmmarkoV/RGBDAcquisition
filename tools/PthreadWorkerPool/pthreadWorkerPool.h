@@ -50,6 +50,16 @@ struct workerPool
 
 static char pthreadWorkerPoolVersion[]="0.0";
 
+
+
+static int threadpoolSetWorkersToWaitToStartWhileMainThreadWorks(struct workerPool * pool)
+{
+    
+}
+
+
+
+
 static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThreadsToSpawn,void * workerFunction, void * argument)
 {
   if (pool==0) { return 0; }
@@ -71,6 +81,10 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
   pthread_cond_init(&pool->completeWorkCondition,0);
   pthread_mutex_init(&pool->completeWorkMutex,0);
     
+    
+  pthread_attr_init(&pool->initializationAttribute);
+  pthread_attr_setdetachstate(&pool->initializationAttribute,PTHREAD_CREATE_JOINABLE);
+  
   int threadsCreated = 0;  
 
   for (unsigned int i=0; i<numberOfThreadsToSpawn; i++)
@@ -93,8 +107,35 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
    return (threadsCreated==numberOfThreadsToSpawn);
 }
 
+
+
+
 static int threadpoolDestroy(struct workerPool *pool)
 {
+  pthread_mutex_lock(&pool->startWorkMutex);
+  // Set the GAME OVER condition.
+  pool->work = 0;
+  pthread_cond_broadcast(&pool->startWorkCondition);
+  pthread_mutex_unlock(&pool->startWorkMutex);
+  
+  
+  for (unsigned int i=0; i<pool->numberOfThreads; i++)
+  {
+    pthread_join(pool->workerPoolIDs[i],0); 
+  }
+   
+  // Clean up and exit.
+  pthread_attr_destroy(&pool->initializationAttribute);
+  pthread_mutex_destroy(&pool->completeWorkMutex);
+  pthread_cond_destroy(&pool->completeWorkCondition);
+  pthread_mutex_destroy(&pool->startWorkMutex);
+  pthread_cond_destroy(&pool->startWorkCondition);
+  
+  free(pool->workerPoolContext); 
+  pool->workerPoolContext=0; 
+  free(pool->workerPoolIDs); 
+  pool->workerPoolIDs=0;      
+  return 1;
 }
 
 
