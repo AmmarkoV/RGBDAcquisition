@@ -1064,35 +1064,19 @@ int nsleep(long nanoseconds)
 }
 
  
-void * iterateChainLossWorkerThread(void * ptr)
+void * iterateChainLossWorkerThread(void * arg)
 {
   //We are a thread so lets retrieve our variables..
-  struct passIKContextToThread * ctx = (struct passIKContextToThread *) ptr;
-  fprintf(stderr,"Thread-%u/Chain-%u: Started..!\n",ctx->threadID,ctx->chainID);
+  struct threadContext * ptr = (struct threadContext *) arg;
+  struct passIKContextToThread * ctx = (struct passIKContextToThread *) ptr->argumentToPass;
+  fprintf(stderr,"Thread-%u/Chain-%u: Started..!\n",ptr->threadID,ctx->chainID);
   
-  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->problem->startWorkMutex);\n",ctx->threadID,ctx->chainID);
-  pthread_mutex_lock(&ctx->problem->startWorkMutex);
-  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_cond_wait(&ctx->problem->startWorkCondition,&ctx->problem->startWorkMutex);\n",ctx->threadID,ctx->chainID);
-  pthread_cond_wait(&ctx->problem->startWorkCondition,&ctx->problem->startWorkMutex);
+  threadpoolWorkerInitialWait(ptr);
 
-  while (1)
+  while (threadpoolWorkerLoopCondition(ptr))
   {
-     if (ctx->problem->work)
-     { 
-      //fprintf(stderr,"Thread %u Begin Work\n",ctx->threadID);
-      pthread_mutex_unlock(&ctx->problem->startWorkMutex);
-     }else
-     {
-       pthread_mutex_unlock(&ctx->problem->startWorkMutex);
-       pthread_exit(NULL);
-     }
-                          
-    // if (ctx->problem->chain[ctx->chainID].permissionToStart)
-    // {
-         // We need a new permission to start again...
-    //     ctx->problem->chain[ctx->chainID].permissionToStart = 0; 
-         
-         //fprintf(stderr,"Thread %u doing actual Work\n",ctx->threadID);
+    //fprintf(stderr,"Thread %u doing actual Work\n",ctx->threadID);
+    //--------------------------------
          iterateChainLoss(
                            ctx->problem,
                            ctx->problem->chain[ctx->chainID].currentIteration,
@@ -1105,40 +1089,10 @@ void * iterateChainLossWorkerThread(void * ptr)
                            ctx->ikConfig->gradientExplosionThreshold,
                            ctx->ikConfig->verbose
                          );
-   // }
     //--------------------------------
-    
-   
-    // Get a lock on "CompleteMutex" and make sure that the main thread is waiting, then set "TheCompletedBatch" to "ThisThreadNumber".  Set "MainThreadWaiting" to "FALSE".
-    // If the main thread is not waiting, continue trying to get a lock on "CompleteMutex" unitl "MainThreadWaiting" is "TRUE".
-    while ( 1 ) 
-    {
-      pthread_mutex_lock(&ctx->problem->completeWorkMutex);
-      if ( ctx->problem->mainThreadWaiting ) 
-          {
-             // While this thread still has a lock on the "CompleteMutex", set "MainThreadWaiting" to "FALSE", so that the next thread to maintain a lock will be the main thread.
-             ctx->problem->mainThreadWaiting = 0;
-             break;
-          }
-      pthread_mutex_unlock(&ctx->problem->completeWorkMutex);
-    }
-    ctx->problem->completedWorkNumber = ctx->chainID;
-    // Lock the "StartWorkMutex" before we send out the "CompleteCondition" signal.
-    // This way, we can enter a waiting state for the next round before the main thread broadcasts the "StartWorkCondition".
-    //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->problem->startWorkMutex);\n",ctx->threadID,ctx->chainID);
-    pthread_mutex_lock(&ctx->problem->startWorkMutex);
-    //fprintf(stderr,"Thread-%u: for chain %u Completed\n",ctx->threadID,ctx->chainID);
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_signal(&ctx->problem->completeWorkCondition);\n",ctx->threadID,ctx->chainID);
-    pthread_cond_signal(&ctx->problem->completeWorkCondition);
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_mutex_unlock(&ctx->problem->completeWorkMutex);\n",ctx->threadID,ctx->chainID);
-    pthread_mutex_unlock(&ctx->problem->completeWorkMutex);
-    // Wait for the Main thread to send us the next "StartWorkCondition" broadcast.
-    // Be sure to unlock the corresponding mutex immediately so that the other worker threads can exit their waiting state as well.
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_wait(&ctx->problem->startWorkCondition, &ctx->problem->startWorkMutex);\n",ctx->threadID,ctx->chainID);
-    pthread_cond_wait(&ctx->problem->startWorkCondition, &ctx->problem->startWorkMutex);
+    threadpoolWorkerLoopEnd(ptr);
   }
- 
-   ctx->problem->chain[ctx->chainID].threadIsSpawned=0;
+
   return 0;
 }
 
@@ -1153,57 +1107,40 @@ int multiThreadedSolver(
   unsigned int numberOfFreshlySpawnThreads=0;  
   unsigned int numberOfWorkerThreads = 0;
   
-  //Make sure we have a proper initialization..
-  problem->mainThreadWaiting=0;
-  pthread_attr_init(&problem->initializationAttribute);
-  pthread_attr_setdetachstate(&problem->initializationAttribute,PTHREAD_CREATE_JOINABLE);
-  
-  
   //Make sure all threads needed are created but only paying the cost of creating a thread once..!
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
           if ( problem->chain[chainID].parallel )
               {
-                  if (!problem->chain[chainID].threadIsSpawned)
-                  {
-                      //Make sure the thread will not terminate just as it starts
-                      problem->chain[chainID].terminate=0;
-                      
-                      //Populate context that will get transmitted to the thread 
-                      problem->workerContext[numberOfWorkerThreads].problem=problem;
-                      problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
-                      problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
-                      problem->workerContext[numberOfWorkerThreads].threadID=numberOfWorkerThreads;
-                      
-                      //Create the actual thread..
-                     int result = pthread_create(
-                                                  &problem->workerPool[numberOfWorkerThreads],
-                                                  &problem->initializationAttribute,
-                                                  iterateChainLossWorkerThread,
-                                                  (void*) &problem->workerContext[numberOfWorkerThreads]
-                                                 );
-                                                 
-                     problem->chain[chainID].threadIsSpawned = (result==0);
-                     numberOfFreshlySpawnThreads+=(result==0);
-                  }
-                  ++numberOfWorkerThreads;
+                 problem->workerContext[numberOfWorkerThreads].problem=problem;
+                 problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
+                 problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
+                 problem->workerContext[numberOfWorkerThreads].threadID=numberOfWorkerThreads;
+                 ++numberOfWorkerThreads;
               }
         }
-  
-  if (numberOfFreshlySpawnThreads>0)
-  {
-      fprintf(stderr,"Waiting for threads to wakeup..\n");
-      nsleep(1000*1000);
-  }
+        
+   if (!problem->threadPool.initialized)
+   {
+     if (
+         !threadpoolCreate(
+                            &problem->threadPool,
+                            numberOfWorkerThreads,
+                            (void*) iterateChainLossWorkerThread,
+                            (void*) &problem->workerContext[numberOfWorkerThreads]
+                          )
+        )
+     {
+        return 0;
+     }
+   } 
+
   //fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
   
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     { 
-         // Lock the "StartWorkMutex" to do all single threaded jobs.
-         
-         //fprintf(stderr,"MainThread: pthread_mutex_lock(&problem->startWorkMutex); \n");
-         pthread_mutex_lock(&problem->startWorkMutex); 
+         threadpoolMainThreadPrepareWorkForWorkers(&problem->threadPool);
          
         //We go through each chain, if the chain is single threaded we do the same as the singleThreadedSolver
         //if the thread is parallel then we just ask it to start processing the current data and we then need to stop and wait to gather results..
@@ -1231,38 +1168,10 @@ int multiThreadedSolver(
                                                  
                   //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
                   //If we are here it means problem->currentSolution has the best solution IK could find..
-              } else
-              {
-                  //We just give the thread permission to start and we will process its output asynchronously later..
-                  problem->chain[chainID].permissionToStart = 1;
               }
         }
         
-        problem->work=1;
-        //printf("Main: Broadcast Signal To Start\n");
-        
-        //At this point of the code for the particular iteration all single threaded chains have been executed
-        //All parallel threads have been started and now we must wait until they are done and gather their output  
-         
-         //fprintf(stderr,"Signaling that we are ready to start\n");
-         //Signal that we can start and wait for finish... 
-         pthread_mutex_lock(&problem->completeWorkMutex); //Make sure worker threads wont fall through after completion
-         pthread_cond_broadcast(&problem->startWorkCondition); //Broadcast starting condition 
-         pthread_mutex_unlock(&problem->startWorkMutex); //Now start worker threads
-         
-         //We now wait for "numberOfWorkerThreads" worker threads to finish 
-         for (int numberOfWorkerThreadsToWaitFor=0;  numberOfWorkerThreadsToWaitFor<numberOfWorkerThreads; numberOfWorkerThreadsToWaitFor++) 
-          {
-            //fprintf(stderr,"waiting for %u/%u threads\n",numberOfWorkerThreadsToWaitFor,numberOfWorkerThreads);
-            // Before entering a waiting state, set "MainThreadWaiting" to "TRUE" while we still have a lock on the "CompleteMutex".
-            // Worker threads will be waiting for this condition to be met before sending "CompleteCondition" signals.
-            problem->mainThreadWaiting = 1;
-            pthread_cond_wait(&problem->completeWorkCondition, &problem->completeWorkMutex);
-           // printf("Main: Complete Signal Recieved From Thread-%d\n",problem->completedWorkNumber);
-           // This is where partial work on the batch data coordination will happen.  All of the worker threads will have to finish before we can start the next batch. 
-          }
-        //fprintf(stderr,"Done Waiting!\n");
-        pthread_mutex_unlock(&problem->completeWorkMutex);
+        threadpoolMainThreadWaitForWorkersToFinish(&problem->threadPool);
         //--------------------------------------------------
     }
     

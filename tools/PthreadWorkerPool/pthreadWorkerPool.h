@@ -54,7 +54,8 @@ static char pthreadWorkerPoolVersion[]="0.1";
 
 
 static int threadpoolWorkerInitialWait(struct threadContext * ctx)
-{  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+{  
+  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
   pthread_mutex_lock(&ctx->pool->startWorkMutex);
   //fprintf(stderr,"Thread-%u/Chain-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
   pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);
@@ -112,6 +113,17 @@ static int threadpoolWorkerLoopEnd(struct threadContext * ctx)
 }
 
 
+
+static int threadpoolMainThreadPrepareWorkForWorkers(struct workerPool * pool)
+{  
+ if (pool->initialized)
+    {
+      //fprintf(stderr,"MainThread: pthread_mutex_lock(&problem->startWorkMutex); \n");
+      pthread_mutex_lock(&pool->startWorkMutex); 
+      return 1;
+   } 
+ return 0;
+}
 
 static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
 {

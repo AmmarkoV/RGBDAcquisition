@@ -118,8 +118,12 @@ struct ikProblem
 
  struct ikChain chain[MAXIMUM_CHAINS];
 
-  //Thread storage..
-  //----------------------------------------
+ //Thread storage..
+ //----------------------------------------
+ struct workerPool threadPool;
+ //----------------------------------------
+ 
+
   int terminateThreads;
   int work;
   int mainThreadWaiting;
