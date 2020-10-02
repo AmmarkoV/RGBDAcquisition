@@ -1068,8 +1068,10 @@ void * iterateChainLossWorkerThread(void * arg)
 {
   //We are a thread so lets retrieve our variables..
   struct threadContext * ptr = (struct threadContext *) arg;
-  struct passIKContextToThread * ctx = (struct passIKContextToThread *) ptr->argumentToPass;
-  fprintf(stderr,"Thread-%u/Chain-%u: Started..!\n",ptr->threadID,ctx->chainID);
+  fprintf(stderr,"Thread-%u: Started..!\n",ptr->threadID);
+  struct passIKContextToThread * contextArray = (struct passIKContextToThread *) ptr->argumentToPass;
+  struct passIKContextToThread * ctx = &contextArray[ptr->threadID];
+  fprintf(stderr,"Chain-%u: Started..!\n",ctx->chainID);
   
   threadpoolWorkerInitialWait(ptr);
 
@@ -1104,6 +1106,7 @@ int multiThreadedSolver(
                         struct ikConfiguration * ikConfig
                        )
 {
+  //fprintf(stderr,"multiThreadedSolver called\n");
   unsigned int numberOfFreshlySpawnThreads=0;  
   unsigned int numberOfWorkerThreads = 0;
   
@@ -1127,14 +1130,15 @@ int multiThreadedSolver(
                             &problem->threadPool,
                             numberOfWorkerThreads,
                             (void*) iterateChainLossWorkerThread,
-                            (void*) &problem->workerContext[numberOfWorkerThreads]
+                            (void*) &problem->workerContext
                           )
         )
      {
         return 0;
      }
+    fprintf(stderr,"Survived threadpool creation \n");
+    sleep(1);
    } 
-
   //fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
   
   //We will perform a number of iterations  each of which have to be synced in the end..

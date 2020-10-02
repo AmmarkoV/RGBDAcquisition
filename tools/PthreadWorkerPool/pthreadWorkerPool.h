@@ -8,6 +8,7 @@
 
 //The star of the show
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -55,9 +56,9 @@ static char pthreadWorkerPoolVersion[]="0.1";
 
 static int threadpoolWorkerInitialWait(struct threadContext * ctx)
 {  
-  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+  //fprintf(stderr,"Thread-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID);
   pthread_mutex_lock(&ctx->pool->startWorkMutex);
-  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+  //fprintf(stderr,"Thread-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID);
   pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);
   return 1; 
 }
@@ -204,7 +205,7 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
                                     &pool->workerPoolIDs[i],
                                     &pool->initializationAttribute,
                                     (void * (*)(void*)) workerFunction,
-                                    pool->workerPoolContext[i].argumentToPass
+                                    (void*) &pool->workerPoolContext[i]
                                    ); 
                                    
         threadsCreated += (result == 0);
