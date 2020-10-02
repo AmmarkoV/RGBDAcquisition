@@ -123,6 +123,8 @@ add_library(OGLRendererSandbox SHARED
             Scene/control.c
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
+            #PThreads automation
+            ../../../../tools/PthreadWorkerPool/pthreadWorkerPool.h
             #AmMatrix dependencies 
             ../../../../tools/AmMatrix/matrix3x3Tools.c 
             ../../../../tools/AmMatrix/matrix4x4Tools.c 

@@ -27,6 +27,7 @@
 #include "../export/bvh_to_svg.h"
 #include "../edit/bvh_cut_paste.h"
 
+#include "../../../../../../tools/PthreadWorkerPool/pthreadWorkerPool.h"
 
 // --------------------------------------------
 #include <errno.h>
