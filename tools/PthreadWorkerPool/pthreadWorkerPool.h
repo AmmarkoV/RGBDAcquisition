@@ -8,6 +8,7 @@
 
 //The star of the show
 #include <pthread.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -53,6 +54,16 @@ struct workerPool
 
 static char pthreadWorkerPoolVersion[]="0.1";
 
+
+static int nanoSleepT(long nanoseconds)
+{
+   struct timespec req, rem;
+
+   req.tv_sec = 0;              
+   req.tv_nsec = nanoseconds; 
+
+   return nanosleep(&req , &rem);
+}
 
 static int threadpoolWorkerInitialWait(struct threadContext * ctx)
 {  

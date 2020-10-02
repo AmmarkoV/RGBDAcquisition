@@ -1053,16 +1053,6 @@ int singleThreadedSolver(
 ///=====================================================================================
 
 
-int nsleep(long nanoseconds)
-{
-   struct timespec req, rem;
-
-   req.tv_sec = 0;              
-   req.tv_nsec = nanoseconds; 
-
-   return nanosleep(&req , &rem);
-}
-
  
 void * iterateChainLossWorkerThread(void * arg)
 {
