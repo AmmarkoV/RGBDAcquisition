@@ -18,6 +18,7 @@ extern "C"
 struct threadContext
 {
     void * argumentToPass;
+    struct workerPool * pool;
     unsigned int threadID;
 };
 
@@ -48,13 +49,101 @@ struct workerPool
   pthread_t * workerPoolIDs;
 };
 
-static char pthreadWorkerPoolVersion[]="0.0";
+static char pthreadWorkerPoolVersion[]="0.1";
 
 
+static int threadpoolWorkerInitialWait(struct threadContext * ctx)
+{  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+  pthread_mutex_lock(&ctx->pool->startWorkMutex);
+  //fprintf(stderr,"Thread-%u/Chain-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+  pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);
+  return 1; 
+}
 
-static int threadpoolSetWorkersToWaitToStartWhileMainThreadWorks(struct workerPool * pool)
+
+static int threadpoolWorkerLoopCondition(struct threadContext * ctx)
 {
+     if (ctx->pool->work)
+     { 
+      //fprintf(stderr,"Thread %u Begin Work\n",ctx->threadID);
+      pthread_mutex_unlock(&ctx->pool->startWorkMutex);
+      return 1;
+     }else
+     {
+       pthread_mutex_unlock(&ctx->pool->startWorkMutex);
+       pthread_exit(NULL);
+       return 0;
+     }
+}
+
+
+static int threadpoolWorkerLoopEnd(struct threadContext * ctx)
+{
+    // Get a lock on "CompleteMutex" and make sure that the main thread is waiting, then set "TheCompletedBatch" to "ThisThreadNumber".  Set "MainThreadWaiting" to "FALSE".
+    // If the main thread is not waiting, continue trying to get a lock on "CompleteMutex" unitl "MainThreadWaiting" is "TRUE".
+    while ( 1 ) 
+    {
+      pthread_mutex_lock(&ctx->pool->completeWorkMutex);
+      if ( ctx->pool->mainThreadWaiting ) 
+          {
+             // While this thread still has a lock on the "CompleteMutex", set "MainThreadWaiting" to "FALSE", so that the next thread to maintain a lock will be the main thread.
+             ctx->pool->mainThreadWaiting = 0;
+             break;
+          }
+      pthread_mutex_unlock(&ctx->pool->completeWorkMutex);
+    }
     
+    ctx->pool->completedWorkNumber = ctx->threadID;
+    // Lock the "StartWorkMutex" before we send out the "CompleteCondition" signal.
+    // This way, we can enter a waiting state for the next round before the main thread broadcasts the "StartWorkCondition".
+    //fprintf(stderr,"Thread-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID);
+    pthread_mutex_lock(&ctx->pool->startWorkMutex);
+    //fprintf(stderr,"Thread-%u: for chain %u Completed\n",ctx->threadID,ctx->chainID);
+    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_signal(&ctx->pool->completeWorkCondition);\n",ctx->threadID,ctx->chainID);
+    pthread_cond_signal(&ctx->pool->completeWorkCondition);
+    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_mutex_unlock(&ctx->pool->completeWorkMutex);\n",ctx->threadID,ctx->chainID);
+    pthread_mutex_unlock(&ctx->pool->completeWorkMutex);
+    // Wait for the Main thread to send us the next "StartWorkCondition" broadcast.
+    // Be sure to unlock the corresponding mutex immediately so that the other worker threads can exit their waiting state as well.
+    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
+    pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);
+}
+
+
+
+static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
+{
+    if (pool->initialized)
+    {
+        pool->work=1;
+        //printf("Main: Broadcast Signal To Start\n");
+        
+        //At this point of the code for the particular iteration all single threaded chains have been executed
+        //All parallel threads have been started and now we must wait until they are done and gather their output  
+         
+         //fprintf(stderr,"Signaling that we are ready to start\n");
+         //Signal that we can start and wait for finish... 
+         pthread_mutex_lock(&pool->completeWorkMutex); //Make sure worker threads wont fall through after completion
+         pthread_cond_broadcast(&pool->startWorkCondition); //Broadcast starting condition 
+         pthread_mutex_unlock(&pool->startWorkMutex); //Now start worker threads
+         
+         //We now wait for "numberOfWorkerThreads" worker threads to finish 
+         for (int numberOfWorkerThreadsToWaitFor=0;  numberOfWorkerThreadsToWaitFor<pool->numberOfThreads; numberOfWorkerThreadsToWaitFor++) 
+          {
+            //fprintf(stderr,"waiting for %u/%u threads\n",numberOfWorkerThreadsToWaitFor,numberOfWorkerThreads);
+            // Before entering a waiting state, set "MainThreadWaiting" to "TRUE" while we still have a lock on the "CompleteMutex".
+            // Worker threads will be waiting for this condition to be met before sending "CompleteCondition" signals.
+            pool->mainThreadWaiting = 1;
+            pthread_cond_wait(&pool->completeWorkCondition, &pool->completeWorkMutex);
+           // printf("Main: Complete Signal Recieved From Thread-%d\n",pool->completedWorkNumber);
+           // This is where partial work on the batch data coordination will happen.  All of the worker threads will have to finish before we can start the next batch. 
+          }
+        //fprintf(stderr,"Done Waiting!\n");
+        pthread_mutex_unlock(&pool->completeWorkMutex);
+        //--------------------------------------------------
+        return 1;
+    }
+  return 0;
 }
 
 
@@ -91,6 +180,7 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
      {
         pool->workerPoolContext[i].threadID=i;
         pool->workerPoolContext[i].argumentToPass=argument;
+        pool->workerPoolContext[i].pool=pool;
         
         int result = pthread_create(
                                     &pool->workerPoolIDs[i],
@@ -103,7 +193,7 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
      }
 
    pool->numberOfThreads = threadsCreated;
-   
+   pool->initialized = (threadsCreated==numberOfThreadsToSpawn);
    return (threadsCreated==numberOfThreadsToSpawn);
 }
 

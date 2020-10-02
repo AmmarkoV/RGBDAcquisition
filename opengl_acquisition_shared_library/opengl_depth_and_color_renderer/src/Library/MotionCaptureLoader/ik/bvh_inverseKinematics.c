@@ -1242,10 +1242,7 @@ int multiThreadedSolver(
         //printf("Main: Broadcast Signal To Start\n");
         
         //At this point of the code for the particular iteration all single threaded chains have been executed
-        //All parallel threads have been started and now we must wait until they are done and gather their output 
-        unsigned int allThreadsAreDone=0; 
-        unsigned int threadsComplete=0; //Each thread that is completed counts only once since its status is intercepted and changed..
-        unsigned int waitTime=0;
+        //All parallel threads have been started and now we must wait until they are done and gather their output  
          
          //fprintf(stderr,"Signaling that we are ready to start\n");
          //Signal that we can start and wait for finish... 
