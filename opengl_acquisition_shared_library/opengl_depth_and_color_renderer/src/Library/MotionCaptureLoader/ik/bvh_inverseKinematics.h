@@ -122,24 +122,7 @@ struct ikProblem
  //----------------------------------------
  struct workerPool threadPool;
  //----------------------------------------
- 
-
-  int terminateThreads;
-  int work;
-  int mainThreadWaiting;
-  int completedWorkNumber;
-  pthread_attr_t initializationAttribute;
- 
-  //Start conditions..
-  pthread_mutex_t startWorkMutex;
-  pthread_cond_t startWorkCondition;
-
-  //Set two.
-  pthread_mutex_t completeWorkMutex;
-  pthread_cond_t completeWorkCondition;
- 
-  pthread_t workerPool[MAXIMUM_CHAINS];
-  struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
+ struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
 };
 //---------------------------------------------------------
 //---------------------------------------------------------

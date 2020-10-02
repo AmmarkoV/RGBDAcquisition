@@ -205,11 +205,6 @@ int prepareDefaultRightHandProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 {
-    pthread_cond_init(&problem->startWorkCondition,0);
-    pthread_mutex_init(&problem->startWorkMutex,0);
-    pthread_cond_init(&problem->completeWorkCondition,0);
-    pthread_mutex_init(&problem->completeWorkMutex,0);
-           
     problem->mc = mc;
     problem->renderer = renderer;
 
@@ -628,12 +623,7 @@ int prepareDefaultLeftHandProblem(
     struct MotionBuffer * solution,
     struct BVH_Transform * bvhTargetTransform
 )
-{    
-    pthread_cond_init(&problem->startWorkCondition,0);
-    pthread_mutex_init(&problem->startWorkMutex,0);
-    pthread_cond_init(&problem->completeWorkCondition,0);
-    pthread_mutex_init(&problem->completeWorkMutex,0);
-    
+{
     problem->mc = mc;
     problem->renderer = renderer;
 
@@ -1052,16 +1042,6 @@ int prepareDefaultBodyProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 { 
-    //Initialize Threading for problem
-    pthread_cond_init(&problem->startWorkCondition,0);
-    pthread_mutex_init(&problem->startWorkMutex,0);
-    pthread_cond_init(&problem->completeWorkCondition,0);
-    pthread_mutex_init(&problem->completeWorkMutex,0);
-    
-    problem->terminateThreads=0; //Make sure threads are not autokilled on startup
-    problem->mainThreadWaiting=0; //No one is waiting initially
-    problem->completedWorkNumber=0; //No one completed..
-    
     problem->mc = mc;
     problem->renderer = renderer;
     
