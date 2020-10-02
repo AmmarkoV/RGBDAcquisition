@@ -8,7 +8,6 @@
 
 //The star of the show
 #include <pthread.h>
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -55,6 +54,7 @@ struct workerPool
 static char pthreadWorkerPoolVersion[]="0.1";
 
 
+#include <time.h>
 static int nanoSleepT(long nanoseconds)
 {
    struct timespec req, rem;
@@ -69,7 +69,6 @@ static int nanoSleepT(long nanoseconds)
 
 
 #include <sched.h>
- 
 static int set_realtime_priority() 
 {
      int ret;
