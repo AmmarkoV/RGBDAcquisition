@@ -8,6 +8,7 @@
 
 //The star of the show
 #include <pthread.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -107,6 +108,7 @@ static int threadpoolWorkerLoopEnd(struct threadContext * ctx)
     // Be sure to unlock the corresponding mutex immediately so that the other worker threads can exit their waiting state as well.
     //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
     pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);
+    return 1;
 }
 
 
@@ -149,7 +151,7 @@ static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
 
 
 
-static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThreadsToSpawn,void * workerFunction, void * argument)
+static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThreadsToSpawn,void *  workerFunction, void * argument)
 {
   if (pool==0) { return 0; }
   if (pool->workerPoolIDs!=0) { return 0; }
@@ -182,10 +184,14 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
         pool->workerPoolContext[i].argumentToPass=argument;
         pool->workerPoolContext[i].pool=pool;
         
+        //Wrap into a call..
+        //void ( *callWrapped) (void *) =0;
+        //callWrapped = (void(*) (void *) ) workerFunction;
+        
         int result = pthread_create(
                                     &pool->workerPoolIDs[i],
                                     &pool->initializationAttribute,
-                                    workerFunction,
+                                    (void * (*)(void*)) workerFunction,
                                     pool->workerPoolContext[i].argumentToPass
                                    ); 
                                    
