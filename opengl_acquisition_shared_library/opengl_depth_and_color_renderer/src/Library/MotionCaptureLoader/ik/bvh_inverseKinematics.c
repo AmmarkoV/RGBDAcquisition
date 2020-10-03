@@ -313,6 +313,14 @@ int cleanProblem(struct ikProblem * problem)
         problem->chain[chainID].threadIsSpawned=0;
     }
    
+   if (problem->threadPool.initialized)
+   {
+       if (!threadpoolDestroy(&problem->threadPool))
+       {
+           fprintf(stderr,"Failed deleting IK thread pool\n");
+       }
+   }
+   
     return 1;
 }
 
