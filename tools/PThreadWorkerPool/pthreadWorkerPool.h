@@ -25,6 +25,7 @@ struct threadContext
     void * argumentToPass;
     struct workerPool * pool;
     unsigned int threadID;
+    char threadInitialized;
 };
 
 
@@ -121,6 +122,7 @@ static int set_realtime_priority()
 
 static int threadpoolWorkerInitialWait(struct threadContext * ctx)
 {
+    ctx->threadInitialized = 1;
     //fprintf(stderr,"Thread-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID);
     pthread_mutex_lock(&ctx->pool->startWorkMutex);
     //fprintf(stderr,"Thread-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID);
@@ -273,6 +275,7 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
     for (unsigned int i=0; i<numberOfThreadsToSpawn; i++)
     {
         pool->workerPoolContext[i].threadID=i;
+        pool->workerPoolContext[i].threadInitialized = 0;
         pool->workerPoolContext[i].argumentToPass=argument;
         pool->workerPoolContext[i].pool=pool;
 
@@ -281,19 +284,35 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
         //callWrapped = (void(*) (void *) ) workerFunction;
 
         int result = pthread_create(
-                         &pool->workerPoolIDs[i],
-                         &pool->initializationAttribute,
-                         (void * (*)(void*)) workerFunction,
-                         (void*) &pool->workerPoolContext[i]
-                     );
+                                     &pool->workerPoolIDs[i],
+                                     &pool->initializationAttribute,
+                                     (void * (*)(void*)) workerFunction,
+                                     (void*) &pool->workerPoolContext[i]
+                                   );
 
         threadsCreated += (result == 0);
     }
 
     //Sleep while threads wake up..
     //If this sleep time is not enough a deadlock might occur, need to fix that
-    nanoSleepT(10000);
-
+    fprintf(stderr,"Waiting for threads to start : ");
+    while (1)
+    {
+      fprintf(stderr,".");
+      nanoSleepT(10000);
+      unsigned int threadsThatAreReady=0;
+      for (unsigned int i=0; i<threadsCreated; i++)
+      {
+          threadsThatAreReady+=pool->workerPoolContext[i].threadInitialized ;
+      }
+      
+      if (threadsThatAreReady==threadsCreated)
+      {
+          break;
+      }
+    }
+    fprintf(stderr," done \n");
+      
     pool->numberOfThreads = threadsCreated;
     pool->initialized = (threadsCreated==numberOfThreadsToSpawn);
     return (threadsCreated==numberOfThreadsToSpawn);
