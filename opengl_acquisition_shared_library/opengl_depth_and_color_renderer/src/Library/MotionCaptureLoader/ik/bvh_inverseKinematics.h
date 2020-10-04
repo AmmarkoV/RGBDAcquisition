@@ -5,7 +5,7 @@
 #include "../bvh_loader.h"
 #include "../export/bvh_export.h"
 
-#include "../../../../../../tools/PthreadWorkerPool/pthreadWorkerPool.h"
+#include "../../../../../../tools/PThreadWorkerPool/pthreadWorkerPool.h"
 
 #ifdef __cplusplus
 extern "C"
