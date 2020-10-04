@@ -1,5 +1,7 @@
 /** @file pthreadWorkerPool.h
- *  @brief  A header-only thread automization library to make lives easier
+ *  @brief  A header-only thread automization library to make your multithreaded-lives easier. To add to your project just copy this header to your code and don't forget to link with 
+ *  pthreads, for example : gcc -O3 -pthread yourProject.c -o threadsExample
+ *  https://github.com/AmmarkoV/PThreadWorkerPool
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
@@ -16,6 +18,7 @@ extern "C"
 {
 #endif
 
+static char pthreadWorkerPoolVersion[]="0.1";
 
 struct threadContext
 {
@@ -51,7 +54,6 @@ struct workerPool
   pthread_t * workerPoolIDs;
 };
 
-static char pthreadWorkerPoolVersion[]="0.1";
 
 
 #include <time.h>
@@ -268,7 +270,11 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
                                    
         threadsCreated += (result == 0);
      }
-
+   
+   //Sleep while threads wake up..
+   //If this sleep time is not enough a deadlock might occur, need to fix that
+   nanoSleepT(10000);
+  
    pool->numberOfThreads = threadsCreated;
    pool->initialized = (threadsCreated==numberOfThreadsToSpawn);
    return (threadsCreated==numberOfThreadsToSpawn);
