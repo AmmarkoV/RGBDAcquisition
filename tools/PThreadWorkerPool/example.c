@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         unsigned int iterationID;
         for (iterationID=0; iterationID<NUMBER_OF_ITERATIONS; iterationID++)
         {
-            fprintf(stdout,"Iteration %u \n",iterationID);
+            fprintf(stdout,"Iteration %u/%u \n",iterationID+1,NUMBER_OF_ITERATIONS);
             threadpoolMainThreadPrepareWorkForWorkers(&pool);
 
             fprintf(stdout,"Main thread preparing tasks..!\n");
