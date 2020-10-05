@@ -12,12 +12,10 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.24
+#define IK_VERSION 0.25
 
-#define MAXIMUM_CHAINS 20
-#define MAXIMUM_PARTS_OF_CHAIN 20
-
-
+#define MAXIMUM_CHAINS 10
+#define MAXIMUM_PARTS_OF_CHAIN 10
 
 enum bvhIKSolutionStatus
 {
@@ -29,7 +27,6 @@ enum bvhIKSolutionStatus
   //--------------------
   BVH_IK_STATES
 };
-
 
 struct ikChainParts
 {
@@ -56,7 +53,6 @@ struct ikChain
   unsigned char terminate;  
   unsigned char threadIsSpawned;  
   // --------------------------------------------------------------------------
-    
     
   unsigned int jobID;
   unsigned int groupID;  

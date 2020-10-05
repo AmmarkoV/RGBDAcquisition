@@ -7,6 +7,18 @@
 
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
+#define DUALFOOT 0
+
 int addNewPartToChainProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
@@ -27,13 +39,13 @@ int addNewPartToChainProblem(
 { 
     if (*chainID >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,"Reached limit of maximum chains.. (%u) \n",MAXIMUM_CHAINS);
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
       return 0;  
     }
     
     if (*partID >= MAXIMUM_PARTS_OF_CHAIN)
     {
-      fprintf(stderr,"Reached limit of maximum parts of the chain.. (%u) \n",MAXIMUM_PARTS_OF_CHAIN);
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
       return 0;  
     }
     
@@ -76,10 +88,10 @@ int addNewPartToChainProblem(
     else
     {
         bvh_printBVH(mc);
-        fprintf(stderr,"No %s in armature..\n",partName);
+        fprintf(stderr,RED "No %s in armature..\n" NORMAL,partName);
         if (alternatePartName!=0)
         {
-         fprintf(stderr,"Also checked for the alternate %s name in armature..\n",alternatePartName);    
+         fprintf(stderr,RED "Also checked for the alternate %s name in armature..\n" NORMAL,alternatePartName);    
         }
         //------
         return 0;
@@ -1429,7 +1441,6 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
-      
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1440,7 +1451,6 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-                             
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1453,7 +1463,6 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
-                 
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1478,8 +1487,7 @@ int prepareDefaultBodyProblem(
      //Next chain is the Right Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     problem->chain[chainID].parallel=1;
+     //----------------------------------------------------------
      checksum=0;
      correct=0; 
      partID=0;
@@ -1527,7 +1535,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-          /*                   
+               
+     #if DUALFOOT              
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1537,7 +1546,9 @@ int prepareDefaultBodyProblem(
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
-                             );*/
+                             );
+    #endif
+    
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1607,7 +1618,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-/*
+   
+     #if DUALFOOT
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1617,7 +1629,8 @@ int prepareDefaultBodyProblem(
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
-                             );              */          
+                             );
+    #endif
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1637,7 +1650,9 @@ int prepareDefaultBodyProblem(
     problem->numberOfChains = chainID;
     problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
-
+ 
+    viewProblem(problem);
+   
     return 1;
 }
 
@@ -1900,10 +1915,10 @@ int bvhTestIK(
                 }
             }
         }
-        freeMotionBuffer(previousSolution);
-        freeMotionBuffer(solution);
-        freeMotionBuffer(initialSolution);
-        freeMotionBuffer(groundTruth);
+        freeMotionBuffer(&previousSolution);
+        freeMotionBuffer(&solution);
+        freeMotionBuffer(&initialSolution);
+        freeMotionBuffer(&groundTruth);
     }
 
     return result;

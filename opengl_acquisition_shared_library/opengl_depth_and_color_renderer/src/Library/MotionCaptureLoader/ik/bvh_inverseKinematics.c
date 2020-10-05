@@ -42,11 +42,8 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
-
   
-
 unsigned long tickBaseIK = 0;
-
 
 void clear_line()
 {
@@ -301,13 +298,13 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
 
 int cleanProblem(struct ikProblem * problem)
 {
-    freeMotionBuffer(problem->previousSolution);
-    freeMotionBuffer(problem->initialSolution);
-    freeMotionBuffer(problem->currentSolution);
+    freeMotionBuffer(&problem->previousSolution);
+    freeMotionBuffer(&problem->initialSolution);
+    freeMotionBuffer(&problem->currentSolution);
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
-        freeMotionBuffer(problem->chain[chainID].currentSolution);
+        freeMotionBuffer(&problem->chain[chainID].currentSolution);
         //Terminate all threads..  
         problem->chain[chainID].terminate=1;
         problem->chain[chainID].threadIsSpawned=0;
@@ -545,6 +542,13 @@ float iteratePartLoss(
         problem->chain[chainID].part[partID].mIDStart+1,
         problem->chain[chainID].part[partID].mIDStart+2
     };
+    
+    /*
+    if (mIDS[2] >= problem->chain[chainID].currentSolution->bufferSize)
+    {
+        fprintf(stderr,RED "Part loss for chain %u / part %u out of motion vector\n" NORMAL,chainID,partID);
+       return NAN;
+    }*/
 
     //The original values we want to improve
     float originalValues[3] = 
@@ -1472,7 +1476,7 @@ int springToZeroParts(
              }
            }
     //------------------------------------------------
-    freeMotionBuffer(zeroSolution);
+    freeMotionBuffer(&zeroSolution);
    }
    return 0;
 }
@@ -1551,23 +1555,18 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Make sure our problem has the correct details ..
     problem->bvhTarget2DProjectionTransform =  bvhTargetTransform;  
       
-    #define RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION 0
+
+    if (!updateProblemSolutionToAllChains(problem,solution))
+           {
+             fprintf(stderr,RED "Failed broadcasting current solution to all chains\n" NORMAL);
+             return 0;
+           }
     
-    #if RELY_ON_PREVIOUS_SOLUTION_MORE_THAN_SOLUTION
-      updateProblemSolutionToAllChains(problem,previousSolution); 
-      if (!copyMotionBuffer(problem->previousSolution,solution) )              
-           { 
-             fprintf(stderr,RED "Failed copying previous solution (1)\n" NORMAL); 
-             return 0; 
+    if (!copyMotionBuffer(problem->previousSolution,previousSolution) )
+           {
+             fprintf(stderr,RED "Failed copying previous solution to problem\n" NORMAL);
+             return 0;
            }
-    #else
-      updateProblemSolutionToAllChains(problem,solution);
-      if (!copyMotionBuffer(problem->previousSolution,previousSolution) )      
-           { 
-             fprintf(stderr,RED "Failed copying previous solution (2)\n" NORMAL); 
-             return 0; 
-           }
-    #endif
         
     
     

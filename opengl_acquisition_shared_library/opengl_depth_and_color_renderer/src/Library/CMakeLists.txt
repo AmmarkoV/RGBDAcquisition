@@ -124,7 +124,7 @@ add_library(OGLRendererSandbox SHARED
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
             #PThreads automation
-            ../../../../tools/PthreadWorkerPool/pthreadWorkerPool.h
+            ../../../../tools/PThreadWorkerPool/pthreadWorkerPool.h
             #AmMatrix dependencies 
             ../../../../tools/AmMatrix/matrix3x3Tools.c 
             ../../../../tools/AmMatrix/matrix4x4Tools.c 

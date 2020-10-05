@@ -536,7 +536,7 @@ int bvh_selectJointsToHide2D(
 
 
 
-void freeMotionBuffer(struct MotionBuffer * mb);
+void freeMotionBuffer(struct MotionBuffer ** pointerToMB);
 int copyMotionBuffer(struct MotionBuffer * dst,struct MotionBuffer * src);
 struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc);
 struct MotionBuffer * mallocNewMotionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy);

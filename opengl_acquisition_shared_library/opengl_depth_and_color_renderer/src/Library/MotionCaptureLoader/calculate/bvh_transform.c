@@ -749,7 +749,7 @@ int bvh_loadTransformForFrame(
                                                populateTorso
                                               );
     }
-    freeMotionBuffer(frameMotionBuffer);
+    freeMotionBuffer(&frameMotionBuffer);
   }
 
   return result;

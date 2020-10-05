@@ -1150,13 +1150,9 @@ int bvh_selectJointsToHide2D(
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 
-
-
-
-
-
-void freeMotionBuffer(struct MotionBuffer * mb)
+void freeMotionBuffer(struct MotionBuffer ** pointerToMB)
 {
+ struct MotionBuffer * mb = *pointerToMB;
  if (mb!=0)
  {
   if(mb->motion!=0)
@@ -1165,6 +1161,8 @@ void freeMotionBuffer(struct MotionBuffer * mb)
      mb->motion=0;
    }
   free(mb);
+  //Also clean the pointer..
+  *pointerToMB=0;
  }
 }
 //---------------------------------------------------------
