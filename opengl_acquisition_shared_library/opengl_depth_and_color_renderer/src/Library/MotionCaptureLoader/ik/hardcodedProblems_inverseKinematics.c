@@ -18,7 +18,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 //This causes a double free.. :S ( double free or corruption (!prev) )
-#define DUALFOOT 0
+#define DUALFOOT 1
 
 int addNewPartToChainProblem(
     struct ikProblem * problem,
@@ -95,6 +95,7 @@ int addNewPartToChainProblem(
          fprintf(stderr,RED "Also checked for the alternate %s name in armature..\n" NORMAL,alternatePartName);    
         }
         //------
+        exit(0);
         return 0;
     }
 }
@@ -110,6 +111,9 @@ int prepareDefaultFaceProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 { 
+    //Cleanup problem structure..
+    memset(problem,0,sizeof(struct ikProblem));
+
     problem->mc = mc;
     problem->renderer = renderer;
 
@@ -219,6 +223,9 @@ int prepareDefaultRightHandProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 {
+    //Cleanup problem structure..
+    memset(problem,0,sizeof(struct ikProblem));
+
     problem->mc = mc;
     problem->renderer = renderer;
 
@@ -639,6 +646,9 @@ int prepareDefaultLeftHandProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 {
+    //Cleanup problem structure..
+    memset(problem,0,sizeof(struct ikProblem));
+
     problem->mc = mc;
     problem->renderer = renderer;
 
@@ -1058,6 +1068,10 @@ int prepareDefaultBodyProblem(
     struct BVH_Transform * bvhTargetTransform
 )
 { 
+    //Cleanup problem structure..
+    memset(problem,0,sizeof(struct ikProblem));
+    
+    
     problem->mc = mc;
     problem->renderer = renderer;
     

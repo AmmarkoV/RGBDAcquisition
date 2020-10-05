@@ -29,7 +29,7 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.43";
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
 * @ingroup BVH
 */
-#define MAX_BVH_JOINT_HIERARCHY_SIZE 1024
+#define MAX_BVH_JOINT_HIERARCHY_SIZE 1550
 
 
 /**

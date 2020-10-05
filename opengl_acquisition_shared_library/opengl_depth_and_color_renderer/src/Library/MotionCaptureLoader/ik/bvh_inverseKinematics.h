@@ -52,27 +52,23 @@ struct ikChain
   unsigned char permissionToStart;  
   unsigned char terminate;  
   unsigned char threadIsSpawned;  
-  // --------------------------------------------------------------------------
-    
-  unsigned int jobID;
-  unsigned int groupID;  
-
-  unsigned int numberOfParts;
-  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
-
-  struct MotionBuffer * currentSolution;
-  struct BVH_Transform current2DProjectionTransform;
-
-  // --------------------------------------------------------------------------
+  // -------------------------------------------------------------------------- 
   float initialError;
   float previousError;
   float currentError;
   // --------------------------------------------------------------------------
-  
   unsigned int encounteredAdoptedBest;
   unsigned int encounteredNumberOfNaNsAtStart;
   unsigned int encounteredExplodingGradients;
   unsigned int encounteredWorseSolutionsThanPrevious;
+  // --------------------------------------------------------------------------
+  unsigned int jobID;
+  unsigned int groupID;  
+  // -------------------------------------------------------------------------- 
+  unsigned int numberOfParts;
+  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
+  struct MotionBuffer * currentSolution;
+  struct BVH_Transform current2DProjectionTransform;
 };
 //---------------------------------------------------------
 //---------------------------------------------------------

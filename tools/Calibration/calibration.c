@@ -163,6 +163,8 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
 
   while ( fgets(line,MAX_LINE_CALIBRATION,fp)!=0 )
    {
+     if (line!=0)  
+     {
      lineLength = strlen ( line );
      if ( lineLength > 0 ) {
                                  if (line[lineLength-1]==10) { line[lineLength-1]=0; /*fprintf(stderr,"-1 newline \n");*/ }
@@ -294,14 +296,12 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
               case 1: calib->height = (unsigned int) atoi(line); break; 
              }
           }
-
-
-
         }
 
      ++linesAtCurrentCategory;
      ++i;
      line[0]=0;
+     }
    }
 
   fclose(fp);

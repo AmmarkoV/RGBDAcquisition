@@ -1286,7 +1286,14 @@ void compareChainsAndAdoptBest(
                                //---------------------------------
                               )
 {
- for (unsigned int chainID=startChain; chainID<endChain; chainID++)
+ //fprintf(stderr,"compareChainsAndAdoptBest started ");
+ if ( (currentSolution!=0) && (currentSolution->motion!=0) && (checkIfItIsBetterSolution!=0) && (checkIfItIsBetterSolution->motion!=0) )
+ {
+  if ( (currentSolution->bufferSize==checkIfItIsBetterSolution->bufferSize) )
+  {
+    if ( (problem->numberOfChains>startChain) && (problem->numberOfChains>endChain) )
+    {
+      for (unsigned int chainID=startChain; chainID<endChain; chainID++)
                 {
                   float currentSolutionChainLoss  = 0.0;  
                   float previousSolutionChainLoss = 0.0;  
@@ -1352,7 +1359,17 @@ void compareChainsAndAdoptBest(
                         }
                     }
                 }
-}
+  } else
+  {
+    fprintf(stderr,RED "compareChainsAndAdoptBest: Cannot operate on a chain [%u-%u] out of limits[%u]..\n" NORMAL,startChain,endChain,problem->numberOfChains); 
+  }
+ } else
+ {
+   fprintf(stderr,"compareChainsAndAdoptBest: Cannot operate on different size chains..\n");
+ }
+ }
+  //fprintf(stderr,"compareChainsAndAdoptBest survived ");
+}   
 
 
 
@@ -1375,8 +1392,8 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                                //---------------------------------
                                               )
 {
-   if (currentSolution==0)    { return 0; }
-   if (previousSolution==0)   { return 0; }
+   if ( (currentSolution==0)  || (currentSolution->motion==0) )     { return 0; }
+   if ( (previousSolution==0) || (previousSolution->motion==0) )    { return 0; }
    if (bvhTargetTransform==0) { return 0; }
    //fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
    //------------------------------------------------ 
@@ -1518,10 +1535,21 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         return 0;
     }
     
-    
     if  ( (solution==0) || (solution->motion==0) )
     {
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
+        return 0;
+    }
+    
+    if  ( (previousSolution==0) || (previousSolution->motion==0) )
+    {
+        fprintf(stderr,RED "No previous solution provided for IK..\n" NORMAL);
+        return 0;
+    }
+    
+    if  ( (penultimateSolution==0) || (penultimateSolution->motion==0) )
+    {
+        fprintf(stderr,RED "No penultimate solution provided for IK..\n" NORMAL);
         return 0;
     }
 
@@ -1589,7 +1617,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //---------------------------------
                                                    problem,
                                                    2, //Start Chain
-                                                   problem->numberOfChains, //End Chain
+                                                   problem->numberOfChains-1, //End Chain
                                                    //--------------------------------- 
                                                    ikConfig,
                                                    //---------------------------------
@@ -1651,12 +1679,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
      
-               
-     
-     if (ikConfig->verbose)
+          
+    if (ikConfig->verbose)
      {
-      float * m = problem->initialSolution->motion;      
-      fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+      float * m = problem->initialSolution->motion;
+      if (m!=0)
+      {
+       fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
 
         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
         { 
@@ -1664,8 +1693,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
         }
     
-      m = solution->motion;
-      fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);     
+       m = solution->motion;
+       fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
+      }
      }
      
     //---------------------------------------------------------------------------------------
@@ -1739,6 +1769,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                           );
         */
         
+        
+        if ( (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
+        {
         //This removes some weird noise from previous solution
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
@@ -1748,7 +1781,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //--------------------------------- 
                                                    problem,
                                                    2, //Start Chain
-                                                   problem->numberOfChains, //End Chain
+                                                   problem->numberOfChains-1, //End Chain
                                                    //--------------------------------- 
                                                    ikConfig,
                                                    //---------------------------------
@@ -1758,9 +1791,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    bvhTargetTransform
                                                    //---------------------------------
                                                    );
+        } 
         
         
-                
+              
+        if ( (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
+        {
         //This removes some weird noise from pre-previous solution 
         ensureFinalProposedSolutionIsBetterInParts( 
                                                    mc,
@@ -1770,7 +1806,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //--------------------------------- 
                                                    problem,
                                                    2, //Start Chain
-                                                   problem->numberOfChains, //End Chain
+                                                   problem->numberOfChains-1, //End Chain
                                                    //--------------------------------- 
                                                    ikConfig,
                                                    //---------------------------------
@@ -1780,6 +1816,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    bvhTargetTransform
                                                    //---------------------------------
                                                    );
+        }
         
     }
     //---------------------------------------------------------------------------------------
