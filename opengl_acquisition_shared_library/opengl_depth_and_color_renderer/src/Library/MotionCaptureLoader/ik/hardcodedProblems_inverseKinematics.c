@@ -1530,7 +1530,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.r",0,  // Joint
-                               1.0,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -1542,7 +1542,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.r",0,  // Joint
-                               1.0,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -1613,7 +1613,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.l",0, // Joint
-                               1.0,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -1625,7 +1625,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.l",0,  // Joint
-                               1.0,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
