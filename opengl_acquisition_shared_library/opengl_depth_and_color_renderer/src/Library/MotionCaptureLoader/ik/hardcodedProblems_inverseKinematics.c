@@ -17,6 +17,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+//This causes a double free.. :S ( double free or corruption (!prev) )
 #define DUALFOOT 0
 
 int addNewPartToChainProblem(
@@ -120,6 +121,7 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
+    snprintf(problem->problemDescription,64,"Face");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -227,7 +229,8 @@ int prepareDefaultRightHandProblem(
     //2D Projections Targeted
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
-
+    
+    snprintf(problem->problemDescription,64,"Right Hand");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -647,6 +650,7 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
+    snprintf(problem->problemDescription,64,"Left Hand");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -1066,6 +1070,7 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
+    snprintf(problem->problemDescription,64,"Body");
 
 
     //Chain #0 is Joint Hip-> to all its children

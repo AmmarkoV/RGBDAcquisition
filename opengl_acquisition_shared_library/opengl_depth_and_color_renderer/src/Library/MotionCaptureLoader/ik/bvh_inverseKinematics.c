@@ -1488,7 +1488,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           struct BVH_MotionCapture * mc,
                                                           struct simpleRenderer *renderer,
                                                           struct ikProblem * problem,
-                                                          struct ikConfiguration * ikConfig,
+                                                          struct ikConfiguration * ikConfig, 
                                                           //---------------------------------
                                                           struct MotionBuffer * penultimateSolution,
                                                           struct MotionBuffer * previousSolution,
@@ -1548,7 +1548,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     } else
     if (ikConfig->verbose)
     {
-      fprintf(stderr,RED "Not running initial position frustrum check\n" NORMAL);
+      fprintf(stderr,RED "%s problem, Not running initial position frustrum check\n" NORMAL,problem->problemDescription);
     }
     
     
@@ -1562,14 +1562,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
              return 0;
            }
     
+ 
     if (!copyMotionBuffer(problem->previousSolution,previousSolution) )
            {
              fprintf(stderr,RED "Failed copying previous solution to problem\n" NORMAL);
              return 0;
-           }
+           } 
         
-    
-    
     
     /*
     //Extrapolated guess

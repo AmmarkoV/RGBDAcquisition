@@ -79,6 +79,22 @@ struct ikChain
 //---------------------------------------------------------
 
 
+struct ikConfiguration
+{
+  float maximumAcceptableStartingLoss;
+  float learningRate;
+  unsigned int iterations;
+  unsigned int epochs;
+  unsigned int considerPreviousSolution;
+  unsigned int tryMaintainingLocalOptima;
+  float spring; 
+  float gradientExplosionThreshold;
+  unsigned int dumpScreenshots;
+  unsigned int verbose;
+  float ikVersion;
+};
+
+
 
 struct passIKContextToThread
 {
@@ -91,6 +107,7 @@ struct passIKContextToThread
 
 struct ikProblem
 {
+    
  //BVH file that reflects our problem
  struct BVH_MotionCapture * mc;
  //Renderer that handles 3D projections
@@ -119,27 +136,16 @@ struct ikProblem
  struct workerPool threadPool;
  //----------------------------------------
  struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
+
+
+ //----------------------------------------
+ char problemDescription[64];   
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 
-
-struct ikConfiguration
-{
-  float maximumAcceptableStartingLoss;
-  float learningRate;
-  unsigned int iterations;
-  unsigned int epochs;
-  unsigned int considerPreviousSolution;
-  unsigned int tryMaintainingLocalOptima;
-  float spring; 
-  float gradientExplosionThreshold;
-  unsigned int dumpScreenshots;
-  unsigned int verbose;
-  float ikVersion;
-};
 
 
 int cleanProblem(struct ikProblem * problem);
