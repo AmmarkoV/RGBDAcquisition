@@ -1529,7 +1529,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.r",0,  // Joint
+                              "endsite_toe1-2.r",0,  // Big Toe
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1541,7 +1541,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe5-3.r",0,  // Joint
+                              "endsite_toe5-3.r",0,  // Small Toe
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1612,7 +1612,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe1-2.l",0, // Joint
+                              "endsite_toe1-2.l",0, // Big Toe 
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1624,7 +1624,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_toe5-3.l",0,  // Joint
+                              "endsite_toe5-3.l",0,  // Small Toe
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -1650,7 +1650,8 @@ int prepareDefaultBodyProblem(
     problem->numberOfChains = chainID;
     problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
- 
+    
+    fprintf(stderr,"Body Problem : \n");
     viewProblem(problem);
    
     return 1;
