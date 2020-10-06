@@ -173,6 +173,17 @@ int prepareDefaultFaceProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck1",0,  // Joint 
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
       
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -443,6 +454,8 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    
+    
     
      //Next chain is the Mouth
      //----------------------------------------------------------
@@ -1649,6 +1662,16 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "neck",0,  // Joint 
+                               0.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "neck1",0,  // Joint 
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
