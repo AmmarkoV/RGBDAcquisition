@@ -1910,7 +1910,8 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              */
-                             
+                            
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1921,7 +1922,9 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-                             
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
+                                  
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1933,8 +1936,8 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-25.0,45.0,  -90.0,90.0,   -15.0,15.0);
-                             
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
+                        
       
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1946,6 +1949,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
                              
                              
      ++correct;
