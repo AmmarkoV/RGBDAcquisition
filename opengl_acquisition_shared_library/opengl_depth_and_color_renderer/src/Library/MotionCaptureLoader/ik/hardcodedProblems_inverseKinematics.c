@@ -1321,6 +1321,15 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               "finger2-3.l",0, // Joint
                               1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger2-3.l",0, // Joint
+                              1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1370,6 +1379,15 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               "finger3-3.l",0, // Joint
                               1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger3-3.l",0, // Joint
+                              1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1415,6 +1433,15 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger4-3.l",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             ); 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger4-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -1464,10 +1491,19 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               "finger5-3.l",0, // Joint
                               1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger5-3.l",0, // Joint
+                              1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-
+                             
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
@@ -1508,6 +1544,15 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-3.l",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger1-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
