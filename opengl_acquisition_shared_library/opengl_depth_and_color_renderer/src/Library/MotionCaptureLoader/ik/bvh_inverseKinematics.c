@@ -682,6 +682,16 @@ if (iterationID==0)
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
+ 
+    char limitsEngaged = problem->chain[chainID].part[partID].limits; 
+    //---------------------------------------------------------------------------------------
+    float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
+                                    problem->chain[chainID].part[partID].minimumLimitMID[1],
+                                    problem->chain[chainID].part[partID].minimumLimitMID[2] };
+    float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
+                                    problem->chain[chainID].part[partID].maximumLimitMID[1],
+                                    problem->chain[chainID].part[partID].maximumLimitMID[2] };
+    //---------------------------------------------------------------------------------------
 
     float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
     float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
@@ -860,6 +870,21 @@ if (iterationID==0)
         currentValues[0]+=delta[0];
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
+        
+        /*
+        if (limitsEngaged)
+        {
+          if (currentValues[0]<minimumLimitValues[0]) { currentValues[0]=minimumLimitValues[0]; } else
+          if (currentValues[0]>maximumLimitValues[0]) { currentValues[0]=maximumLimitValues[0]; }
+          //-------------------------------------------------------------------------------------
+          if (currentValues[1]<minimumLimitValues[1]) { currentValues[1]=minimumLimitValues[1]; } else
+          if (currentValues[1]>maximumLimitValues[1]) { currentValues[1]=maximumLimitValues[1]; }
+          //-------------------------------------------------------------------------------------
+          if (currentValues[2]<minimumLimitValues[2]) { currentValues[2]=minimumLimitValues[2]; } else
+          if (currentValues[2]>maximumLimitValues[2]) { currentValues[2]=maximumLimitValues[2]; }
+          //-------------------------------------------------------------------------------------
+        }*/
+        
         //----------------------------------------------
          
         
@@ -942,6 +967,19 @@ if (iterationID==0)
             ++problem->chain[chainID].encounteredWorseSolutionsThanPrevious;
          }
     }
+    
+    if (limitsEngaged)
+        {
+          if (bestValues[0]<minimumLimitValues[0]) { bestValues[0]=minimumLimitValues[0]; } else
+          if (bestValues[0]>maximumLimitValues[0]) { bestValues[0]=maximumLimitValues[0]; }
+          //-------------------------------------------------------------------------------------
+          if (bestValues[1]<minimumLimitValues[1]) { bestValues[1]=minimumLimitValues[1]; } else
+          if (bestValues[1]>maximumLimitValues[1]) { bestValues[1]=maximumLimitValues[1]; }
+          //-------------------------------------------------------------------------------------
+          if (bestValues[2]<minimumLimitValues[2]) { bestValues[2]=minimumLimitValues[2]; } else
+          if (bestValues[2]>maximumLimitValues[2]) { bestValues[2]=maximumLimitValues[2]; }
+          //-------------------------------------------------------------------------------------
+        }
 
     //After finishing with the optimization procedure we store the best result we achieved..!
     problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
