@@ -31,9 +31,16 @@ enum bvhIKSolutionStatus
 struct ikChainParts
 {
  BVHJointID jID;
+ //--------------
  float jointImportance;
+ //--------------
  BVHMotionChannelID mIDStart;
  BVHMotionChannelID mIDEnd;
+ //--------------
+ float minimumLimitMID[3];
+ float maximumLimitMID[3];
+ //--------------
+ char limits;
  char evaluated;
  char bigChanges;
  char endEffector;

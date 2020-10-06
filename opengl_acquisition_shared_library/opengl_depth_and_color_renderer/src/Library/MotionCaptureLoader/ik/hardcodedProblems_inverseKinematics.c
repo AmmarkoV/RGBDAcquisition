@@ -74,6 +74,7 @@ int addNewPartToChainProblem(
     if (foundJoint)
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
+        problem->chain[*chainID].part[*partID].limits=0;
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID; 
         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
@@ -99,6 +100,54 @@ int addNewPartToChainProblem(
         return 0;
     }
 }
+
+
+
+
+int addLimitsToPartOfChain(
+                            struct ikProblem * problem,
+                            struct BVH_MotionCapture * mc,
+                           //-----------------------------------------
+                           unsigned int chainID,
+                           unsigned int partID,
+                           //-----------------------------------------
+                           float minimumX,
+                           float maximumX,
+                           float minimumY,
+                           float maximumY,
+                           float minimumZ,
+                           float maximumZ 
+                          )
+{ 
+    if (chainID >= MAXIMUM_CHAINS)
+    {
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
+      return 0;  
+    }
+    
+    if (partID >= MAXIMUM_PARTS_OF_CHAIN)
+    {
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
+      return 0;  
+    }
+    
+    problem->chain[chainID].part[partID].limits=1; 
+    //Z X Y
+    problem->chain[chainID].part[partID].minimumLimitMID[0]=minimumZ;
+    problem->chain[chainID].part[partID].maximumLimitMID[0]=maximumZ;
+    problem->chain[chainID].part[partID].minimumLimitMID[1]=minimumX;
+    problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
+    problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
+    problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY; 
+    
+   //------
+   return 1; 
+}
+
+
+
+
+
 
 
 
@@ -682,7 +731,7 @@ int prepareDefaultRightHandProblem(
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     ++correct;
+    ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
@@ -744,8 +793,11 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+    //                                                  minX/maxX   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
+                                 
+    ++correct;
+    checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger2-2.r",0, // Joint
@@ -753,16 +805,30 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger2-3.r",0, // Joint
                               1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -5.0,45.0);
+
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger2-3.r",0, // Joint
+                              1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-                             
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
                              
@@ -793,6 +859,9 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+    //                                                  minX/maxX   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -802,11 +871,27 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger3-3.r",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -5.0,45.0);
+                             
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger3-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -838,6 +923,9 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX   -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -847,15 +935,31 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger4-3.r",0, // Joint
                               1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -5.0,45.0);
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger4-3.r",0, // Joint
+                              1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+
 
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -886,6 +990,9 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX   -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
+     
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -895,11 +1002,26 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger5-3.r",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    //                                                   -------   -------     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -5.0,45.0);
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger5-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -933,6 +1055,9 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,   -15.0,45.0);
+     
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -942,11 +1067,26 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX   -------     -------
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-45.0,45.0,  0.0,0.0,    0.0,0.0);
+     
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-3.r",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     //                                                  minX/maxX   -------     -------
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,0.0,  0.0,0.0,    0.0,0.0);
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_finger1-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
@@ -1667,6 +1807,7 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+                             
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
