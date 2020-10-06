@@ -219,6 +219,145 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
 
+
+
+
+
+
+
+
+     //Next chain is the R Eye Socket
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis03.r",0,  // Top eyelid 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis03.r",0,  // Top eyelid 
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis04.r",0,  // Bottom eyelid 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                                  
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis04.r",0,  // Bottom eyelid 
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    
+    
+    
+     //Next chain is the L Eye Socket
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis03.l",0,  // Top eyelid 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis03.l",0,  // Top eyelid 
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "orbicularis04.l",0,  // Bottom eyelid 
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                                  
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "endsite_orbicularis04.l",0,  // Bottom eyelid 
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
      //Next chain is the R Eye
      //----------------------------------------------------------
      //----------------------------------------------------------
@@ -226,34 +365,12 @@ int prepareDefaultFaceProblem(
      checksum=0;
      correct=0; 
      partID=0;
-    
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "orbicularis3.r",0,  // Top eyelid 
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
      
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_orbicularis3.r",0,  // Top eyelid 
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
-                             
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "orbicularis4.r",0,  // Bottom eyelid 
+                              "eye.r",0,  // Eye control 
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -264,9 +381,9 @@ int prepareDefaultFaceProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_orbicularis4.r",0,  // Bottom eyelid 
+                              "endsite_eye.r",0,  // Eye projection
                                1.0,     //Importance
-                               0,       //IsEndEffector
+                               1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -284,7 +401,7 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     
     
-    
+
      //Next chain is the L Eye
      //----------------------------------------------------------
      //----------------------------------------------------------
@@ -292,34 +409,12 @@ int prepareDefaultFaceProblem(
      checksum=0;
      correct=0; 
      partID=0;
-    
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "orbicularis3.l",0,  // Top eyelid 
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
      
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_orbicularis3.l",0,  // Top eyelid 
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
-                             
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
-                              //-----------------------------------------
-                              "orbicularis4.l",0,  // Bottom eyelid 
+                              "eye.l",0,  // Eye control 
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -330,9 +425,9 @@ int prepareDefaultFaceProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "endsite_orbicularis4.l",0,  // Bottom eyelid 
+                              "endsite_eye.l",0,  // Eye projection
                                1.0,     //Importance
-                               0,       //IsEndEffector
+                               1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -348,9 +443,6 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
     
      //Next chain is the Mouth
      //----------------------------------------------------------

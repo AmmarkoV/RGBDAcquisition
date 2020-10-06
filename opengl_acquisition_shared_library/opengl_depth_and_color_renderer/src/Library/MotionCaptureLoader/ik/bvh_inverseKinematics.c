@@ -1834,8 +1834,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
      if (useMultipleThreads)
         { fprintf(stderr,"MT"); }
       
-    fprintf(stderr,"IK %lu μsec|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n", 
+    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n", 
                                                endTime-startTime,
+                                               problem->problemDescription,
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
