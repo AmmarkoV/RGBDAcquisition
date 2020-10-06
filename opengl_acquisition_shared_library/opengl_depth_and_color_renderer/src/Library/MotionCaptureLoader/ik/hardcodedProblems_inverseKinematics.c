@@ -1932,6 +1932,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-25.0,45.0,  -90.0,90.0,   -15.0,15.0);
                              
       
      ++correct;
@@ -2152,13 +2154,15 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
                                                          
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.r",0,  // Big Toe
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2170,7 +2174,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.r",0,  // Small Toe
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2239,13 +2243,15 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
                                                          
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.l",0, // Big Toe 
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2257,7 +2263,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.l",0,  // Small Toe
-                               1.5,     //Importance
+                               2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
