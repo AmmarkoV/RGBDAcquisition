@@ -1547,7 +1547,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief This is a programmer friendly enumerator to access 3D output  extracted from the BVH file.\n");
-  fprintf(stdout," */\n");
+  fprintf(stdout," *  Use ./GroundTruthDumper --from dataset/headerWithHeadAndOneMotion.bvh --printc  to extract this automatically */ \n");
   fprintf(stdout,"enum BVH_3D_Output_Joints\n");
   fprintf(stdout,"{\n");
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
@@ -1568,7 +1568,48 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 
 
 
+  comma=',';
+  //coord='X'; It is always reassigned before use..
+  countOfChannels=0;
 
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief This is a programmer friendly enumerator to access 3D output  extracted from the BVH file.\n");
+  fprintf(stdout," *  Use ./GroundTruthDumper --from dataset/headerWithHeadAndOneMotion.bvh --printc  to extract this automatically\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"enum BVH_2D_Output_Joints\n");
+  fprintf(stdout,"{\n");
+  for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+     snprintf(label,512,"%s",bvhMotion->jointHierarchy[i].jointName);
+     uppercase(label);
+     coord='X';
+     fprintf(stdout,"BVH_2DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels);
+     ++countOfChannels;
+     coord='Y';
+     fprintf(stdout,"BVH_2DPOINT_%s%c%c//%u \n",label,coord,comma,countOfChannels);
+     ++countOfChannels;
+  }
+  fprintf(stdout,"};\n\n\n");
+
+
+  comma=',';
+  //coord='X'; It is always reassigned before use..
+  countOfChannels=0;
+
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief This is a programmer friendly enumerator to access 3D output  extracted from the BVH file.\n");
+  fprintf(stdout," *  Use ./GroundTruthDumper --from dataset/headerWithHeadAndOneMotion.bvh --printc  to extract this automatically\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"enum BVH_2D_Output_Joints\n");
+  fprintf(stdout,"{\n");
+  for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+     snprintf(label,512,"%s",bvhMotion->jointHierarchy[i].jointName);
+     uppercase(label); 
+     fprintf(stdout,"BVH_JOINT_%s%c//%u \n",label,comma,countOfChannels);
+     ++countOfChannels; 
+  }
+  fprintf(stdout,"};\n\n\n");
 
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief An array with BVH string labels\n");

@@ -110,12 +110,10 @@ struct passIKContextToThread
 
 struct ikProblem
 {
-    
  //BVH file that reflects our problem
  struct BVH_MotionCapture * mc;
  //Renderer that handles 3D projections
  struct simpleRenderer *renderer;
-
 
  //Previous solution
  struct MotionBuffer * previousSolution;
@@ -139,7 +137,6 @@ struct ikProblem
  struct workerPool threadPool;
  //----------------------------------------
  struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
-
 
  //----------------------------------------
  char problemDescription[64];   
