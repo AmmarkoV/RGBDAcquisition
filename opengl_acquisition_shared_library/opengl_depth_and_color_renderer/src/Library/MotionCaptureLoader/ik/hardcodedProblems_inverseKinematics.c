@@ -245,6 +245,16 @@ int prepareDefaultFaceProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "special04",0,// Joint
+                               1.0,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -594,6 +604,9 @@ int prepareDefaultFaceProblem(
 
 
 
+    problem->numberOfChains = chainID;
+    problem->numberOfGroups = groupID;
+    problem->numberOfJobs = jobID;
 
      return 1;
 }
