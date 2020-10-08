@@ -2147,7 +2147,7 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -20.0,20.0,   -10.0,90.0);
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -40.0,50.0,   -10.0,80.0);
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2167,7 +2167,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "rfoot",0,  // Joint
-                               1.5,     //Importance
+                               1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2180,7 +2180,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.r",0,  // Big Toe
-                               2.5,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2192,7 +2192,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.r",0,  // Small Toe
-                               2.5,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2236,7 +2236,7 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -20.0,20.0,   -90.0,10.0);
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -50.0,40.0,   -80.0,10.0);
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2256,7 +2256,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "lfoot",0,// Joint
-                               1.5,     //Importance
+                               1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2269,7 +2269,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe1-2.l",0, // Big Toe 
-                               2.5,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
@@ -2281,7 +2281,7 @@ int prepareDefaultBodyProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_toe5-3.l",0,  // Small Toe
-                               2.5,     //Importance
+                               1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
