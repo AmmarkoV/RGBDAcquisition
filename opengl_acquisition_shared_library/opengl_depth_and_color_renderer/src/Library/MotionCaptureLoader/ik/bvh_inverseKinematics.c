@@ -1492,7 +1492,10 @@ int springToZeroParts(
    
    if (zeroSolution!=0)
    {
-       
+    if ( (currentSolution->bufferSize==zeroSolution->bufferSize) )
+     {
+      if ( (problem->numberOfChains>startChain) && (problem->numberOfChains>endChain) )
+      {
         for (unsigned int chainID=startChain; chainID<endChain; chainID++)
                 {
                   unsigned int partIDStart = 0;
@@ -1532,6 +1535,8 @@ int springToZeroParts(
            }
     //------------------------------------------------
     freeMotionBuffer(&zeroSolution);
+   }
+    }
    }
    return 0;
 }
@@ -1788,7 +1793,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         }
         //----------------------------------------------------
         
-        /* 
+        /*
         //This is smoother but worse..
         springToZeroParts( 
                            mc,
