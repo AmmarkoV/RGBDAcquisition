@@ -165,9 +165,9 @@ int setOpenGLCalibration(int devID,struct calibration * calib)
 {
     fprintf(stderr,"setOpenGLCalibration(0,calib) called \n");
 
-    double * rodriguez = (double*) malloc(sizeof(double) * 3 );
-    double * translation = (double*) malloc(sizeof(double) * 3 );
-    double * camera = (double*) malloc(sizeof(double) * 9 );
+    float rodriguez[4]   = {0};
+    float translation[4] = {0};
+    float camera[16]     = {0};
 
     int i=0;
     for (i=0; i<3; i++) { rodriguez[i]=calib->extrinsicRotationRodriguez[i]; }
@@ -188,11 +188,8 @@ int setOpenGLCalibration(int devID,struct calibration * calib)
       } else
       {
         fprintf(stderr,"NOT setting Extrinsics for OpenGL\n");
-      }
-
-    free(rodriguez);
-    free(translation);
-    free(camera);
+      } 
+      
     return 1;
 }
 
