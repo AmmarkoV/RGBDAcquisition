@@ -150,6 +150,29 @@ int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,float * came
   return 1;
 }
 
+
+
+int sceneSetOpenGLIntrinsicCalibrationNew(struct VirtualStream * scene,float fx,float fy,float cx,float cy,float width,float height,float nearPlane,float farPlane)
+{
+  if (scene==0) { fprintf(stderr,"Cannot sceneSetOpenGLIntrinsicCalibration without an initialized VirtualStream\n"); return 0;}
+
+  scene->useIntrinsicMatrix=1;
+  scene->emulateProjectionMatrix[0]=fx;
+  scene->emulateProjectionMatrix[4]=fy;
+  scene->emulateProjectionMatrix[2]=cx;
+  scene->emulateProjectionMatrix[5]=cy;
+  WIDTH = width;
+  HEIGHT = height;
+  
+  scene->controls.nearPlane = nearPlane;
+  scene->controls.farPlane  = farPlane;
+  scene->emulateProjectionMatrixDeclared = 1;
+  scene->useIntrinsicMatrix = 0;
+  updateProjectionMatrix();
+  return 1;
+}
+
+
 int updateProjectionMatrix()
 {
   fprintf(stderr,"updateProjectionMatrix called ( %d x %d )  \n",WIDTH,HEIGHT);
@@ -160,7 +183,7 @@ int updateProjectionMatrix()
      {
        fprintf(stderr,YELLOW "Please note that intrinsics have been passed as an argument but we also have a projection matrix from trajectory parser , we will use the latter\n" NORMAL);
      }
-     fprintf(stderr,"Emulating Projection Matrix from Trajectory Parser");
+     fprintf(stderr,"Emulating Projection Matrix from Trajectory Parser\n");
      int viewport[4]={0};
      float fx = scene->emulateProjectionMatrix[0];
      float fy = scene->emulateProjectionMatrix[4];
@@ -169,7 +192,7 @@ int updateProjectionMatrix()
      float cy = scene->emulateProjectionMatrix[5];
      buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(scene->projectionMatrix,viewport,fx,fy,skew,cx,cy,WIDTH,HEIGHT,scene->controls.nearPlane,scene->controls.farPlane);
      scene->projectionMatrixDeclared =1;
-     fprintf(stderr,"Updated projection matrix using 3x3 matrix");
+     fprintf(stderr,"Updated projection matrix using 3x3 matrix\n");
   }
 
   if ( scene->projectionMatrixDeclared )
@@ -178,10 +201,10 @@ int updateProjectionMatrix()
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf( scene->projectionMatrix ); // we load a matrix of Doubles
 
-    if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport"); }
+    if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport\n"); }
     glViewport(0,0,WIDTH,HEIGHT);
 
-    print4x4FMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
+    print4x4FMatrix("OpenGL Projection Matrix Given by Trajectory Parser\n", scene->projectionMatrix ,0 );
 
   } else
   if (scene->useIntrinsicMatrix)

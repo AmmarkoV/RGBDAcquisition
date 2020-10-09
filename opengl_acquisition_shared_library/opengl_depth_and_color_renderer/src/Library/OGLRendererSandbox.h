@@ -39,6 +39,9 @@ int setOpenGLNearFarPlanes(float near ,float far);
 int setOpenGLIntrinsicCalibration(float * camera);
 
 
+
+int setOpenGLIntrinsicCalibrationNew(float fx,float fy,float cx,float cy,float width,float height,float nearPlane,float farPlane);
+
 /**
 * @brief Set OpenGL Intrinsic Parameters
 * @ingroup OGLRendererSandbox

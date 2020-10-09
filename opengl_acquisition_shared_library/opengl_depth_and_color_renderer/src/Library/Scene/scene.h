@@ -32,6 +32,8 @@ int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,float * came
 
 
 
+int sceneSetOpenGLIntrinsicCalibrationNew(struct VirtualStream * scene,float fx,float fy,float cx,float cy,float width,float height,float nearPlane,float farPlane);
+
 int setupSceneCameraBeforeRendering(struct VirtualStream * scene);
 
 /**

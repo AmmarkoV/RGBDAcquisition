@@ -11,6 +11,13 @@
 
 #include "opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h"
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 unsigned int openGL_WIDTH=640;
 unsigned int openGL_HEIGHT=480;
 unsigned int openGL_Framerate=0;
@@ -90,7 +97,10 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
 
 int controlOpenGLScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
 {
- fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
+ if ( (valueA!=0.0) || (valueB!=0.0) || (valueC!=0.0) )
+ {
+   fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
+ }
  return controlScene(name,variable,control,valueA,valueB,valueC);
 }
 
@@ -176,9 +186,17 @@ int setOpenGLCalibration(int devID,struct calibration * calib)
 
     fprintf(stderr,"Setting OpenGL near(%0.2f)/far(%0.2f) planes\n",calib->nearPlane , calib->farPlane);
     setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
-    fprintf(stderr,"Setting Intrinsics for OpenGL\n");
-    setOpenGLIntrinsicCalibration(camera);
-
+    fprintf(stderr,GREEN "Setting NEW Intrinsics for OpenGL\n" NORMAL);
+    //setOpenGLIntrinsicCalibration(camera);
+     
+    setOpenGLIntrinsicCalibrationNew( calib->intrinsic[0],
+                                      calib->intrinsic[4],
+                                      calib->intrinsic[2],
+                                      calib->intrinsic[5],
+                                      calib->width,
+                                      calib->height, 
+                                      calib->nearPlane,
+                                      calib->farPlane);
 
     if ( (rodriguez[0]!=0.0) || (rodriguez[1]!=0.0) || (rodriguez[2]!=0.0) ||
          (translation[0]!=0.0) || (translation[1]!=0.0) || (translation[2]!=0.0)   )

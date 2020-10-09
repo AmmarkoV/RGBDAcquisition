@@ -155,6 +155,14 @@ int setOpenGLIntrinsicCalibration(float * camera)
   return sceneSetOpenGLIntrinsicCalibration(getLoadedScene(),camera);
 }
 
+int setOpenGLIntrinsicCalibrationNew(float fx,float fy,float cx,float cy,float width,float height,float nearPlane,float farPlane)
+{
+  fprintf(stderr,"setOpenGLIntrinsicCalibrationNew: %0.1fx%0.1f\n",width,height);
+  fprintf(stderr,"fx:%0.2f|fy:%0.2f|cx:%0.2f|cy:%0.2f\n",fx,fy,cx,cy);
+  return sceneSetOpenGLIntrinsicCalibrationNew(getLoadedScene(),fx,fy,cx,cy,width,height,nearPlane,farPlane);
+}
+
+
 
 int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation , float scaleToDepthUnit)
 {
