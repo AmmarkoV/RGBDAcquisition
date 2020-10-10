@@ -21,7 +21,7 @@ set_target_properties(gl3 PROPERTIES
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
                       )
 
-add_executable(gl3Tex glx_test.c glx3.c ../Rendering/ShaderPipeline/shader_loader.c ../../../../../tools/AmMatrix/matrix4x4Tools.c ../../../../../tools/AmMatrix/matrixOpenGL.c)
+add_executable(gl3Tex glx_testRenderToTexture.c glx3.c ../Rendering/ShaderPipeline/shader_loader.c ../../../../../tools/AmMatrix/matrix4x4Tools.c ../../../../../tools/AmMatrix/matrixOpenGL.c)
 target_link_libraries(gl3Tex rt m GL GLU GLEW X11)  
 set_target_properties(gl3Tex PROPERTIES 
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"

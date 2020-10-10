@@ -37,6 +37,7 @@
 			<Add option="-lGLU" />
 			<Add option="-lX11" />
 			<Add option="-lGLEW" />
+			<Add option="-lm" />
 			<Add library="../../../../../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../../../../../acquisition/libRGBDAcquisition.so" />
 		</Linker>
@@ -92,9 +93,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
-			<envvars />
-			<code_completion />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
