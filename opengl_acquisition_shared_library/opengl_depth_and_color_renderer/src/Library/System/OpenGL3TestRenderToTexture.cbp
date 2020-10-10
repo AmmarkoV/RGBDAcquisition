@@ -36,6 +36,7 @@
 			<Add option="-lGLU" />
 			<Add option="-lX11" />
 			<Add option="-lGLEW" />
+			<Add option="-lm" />
 		</Linker>
 		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
@@ -65,9 +66,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
-			<envvars />
-			<code_completion />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>

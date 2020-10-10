@@ -363,9 +363,9 @@ int drawObjectAT(GLuint programID,
                  double pitch,
                  double yaw,
 
-                 double * projectionMatrixD,
-                 double * viewportMatrixD,
-                 double * viewMatrixD
+                 struct Matrix4x4OfFloats * projectionMatrix,
+                 struct Matrix4x4OfFloats * viewportMatrix,
+                 struct Matrix4x4OfFloats * viewMatrix
                  )
 {
        //Select Shader to render with
@@ -377,37 +377,35 @@ int drawObjectAT(GLuint programID,
        //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
 
-       double modelMatrixD[16];
-       create4x4ModelTransformation(
-                                    modelMatrixD,
-                                    //Rotation Component
-                                    roll,//roll
-                                    pitch ,//pitch
-                                    yaw ,//yaw
-                                    ROTATION_ORDER_RPY,
-
-                                    //Translation Component (XYZ)
-                                    (double) x/100,
-                                    (double) y/100,
-                                    (double) z/100,
-
-                                    10.0,//scaleX,
-                                    10.0,//scaleY,
-                                    10.0//scaleZ
+       struct Matrix4x4OfFloats modelMatrix={0};
+       create4x4FModelTransformation(
+                                     &modelMatrix,
+                                     //Rotation Component
+                                     roll,//roll
+                                     pitch ,//pitch
+                                     yaw ,//yaw
+                                     ROTATION_ORDER_RPY,
+                                     //-----------------
+                                     //Translation Component (XYZ)
+                                     (float) x/100,
+                                     (float) y/100,
+                                     (float) z/100,
+                                     //------------
+                                     10.0,//scaleX,
+                                     10.0,//scaleY,
+                                     10.0//scaleZ
                                    );
 
       //-------------------------------------------------------------------
-       double MVPD[16];
-       float MVP[16];
-       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-       copy4x4DMatrixToF(MVP , MVPD );
-       transpose4x4Matrix(MVP);
+       struct Matrix4x4OfFloats MVP={0};
+       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,&modelMatrix);
+       transpose4x4FMatrix(MVP.m);
       //-------------------------------------------------------------------
 
 
 
 		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
 
 
 
@@ -578,25 +576,24 @@ int doDrawing()
 
 
 
-
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
+     struct Matrix4x4OfFloats projectionMatrix={0};
+     struct Matrix4x4OfFloats viewportMatrix={0};
+     struct Matrix4x4OfFloats viewMatrix={0};
 
      prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
-                     0.0,        //skew
-                     WIDTH/2,    //cx
-                     HEIGHT/2,   //cy
-                     WIDTH,      //Window Width
-                     HEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
-                    );
+                              535.423889, //fx
+                              533.48468,  //fy
+                              0.0,        //skew
+                              WIDTH/2,    //cx
+                              HEIGHT/2,   //cy
+                              WIDTH,      //Window Width
+                              HEIGHT,     //Window Height
+                              1.0,        //Near
+                              255.0,      //Far
+                              &projectionMatrix,
+                              &viewMatrix,
+                              &viewportMatrix
+                             );
 
 
 
@@ -703,9 +700,9 @@ int doDrawing()
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
 
@@ -721,9 +718,9 @@ int doDrawing()
                   pitch,
                   yaw,
 
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix
                  );
 
 
