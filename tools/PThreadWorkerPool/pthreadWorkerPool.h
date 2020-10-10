@@ -1,7 +1,8 @@
 /** @file pthreadWorkerPool.h
- *  @brief  A header-only thread automization library to make your multithreaded-lives easier. To add to your project just copy this header to your code and don't forget to link with
+ *  @brief  A header-only thread automization library to make your multithreaded-lives easier. 
+ *  To add to your project just copy this header to your code and don't forget to link with
  *  pthreads, for example : gcc -O3 -pthread yourProject.c -o threadsExample
- *  https://github.com/AmmarkoV/PThreadWorkerPool
+ *  Repository : https://github.com/AmmarkoV/PThreadWorkerPool
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
@@ -18,7 +19,7 @@ extern "C"
 {
 #endif
 
-static char pthreadWorkerPoolVersion[]="0.1";
+static char pthreadWorkerPoolVersion[]="0.12";
 
 struct threadContext
 {
@@ -27,6 +28,7 @@ struct threadContext
     unsigned int threadID;
     char threadInitialized;
 };
+
 
 
 struct workerPool
@@ -67,7 +69,6 @@ static int nanoSleepT(long nanoseconds)
 
     return nanosleep(&req, &rem);
 }
-
 
 
 
@@ -118,24 +119,20 @@ static int set_realtime_priority()
 
 
 
-
-
 static int threadpoolWorkerInitialWait(struct threadContext * ctx)
 {
     ctx->threadInitialized = 1;
-    //fprintf(stderr,"Thread-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID);
     pthread_mutex_lock(&ctx->pool->startWorkMutex);
-    //fprintf(stderr,"Thread-%u: pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);\n",ctx->threadID);
     pthread_cond_wait(&ctx->pool->startWorkCondition,&ctx->pool->startWorkMutex);
     return 1;
 }
+
 
 
 static int threadpoolWorkerLoopCondition(struct threadContext * ctx)
 {
     if (ctx->pool->work)
     {
-        //fprintf(stderr,"Thread %u Begin Work\n",ctx->threadID);
         pthread_mutex_unlock(&ctx->pool->startWorkMutex);
         return 1;
     } else
@@ -145,6 +142,7 @@ static int threadpoolWorkerLoopCondition(struct threadContext * ctx)
         return 0;
     }
 }
+
 
 
 static int threadpoolWorkerLoopEnd(struct threadContext * ctx)
@@ -166,16 +164,11 @@ static int threadpoolWorkerLoopEnd(struct threadContext * ctx)
     ctx->pool->completedWorkNumber = ctx->threadID;
     // Lock the "StartWorkMutex" before we send out the "CompleteCondition" signal.
     // This way, we can enter a waiting state for the next round before the main thread broadcasts the "StartWorkCondition".
-    //fprintf(stderr,"Thread-%u: pthread_mutex_lock(&ctx->pool->startWorkMutex);\n",ctx->threadID);
     pthread_mutex_lock(&ctx->pool->startWorkMutex);
-    //fprintf(stderr,"Thread-%u: for chain %u Completed\n",ctx->threadID,ctx->chainID);
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_signal(&ctx->pool->completeWorkCondition);\n",ctx->threadID,ctx->chainID);
     pthread_cond_signal(&ctx->pool->completeWorkCondition);
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_mutex_unlock(&ctx->pool->completeWorkMutex);\n",ctx->threadID,ctx->chainID);
     pthread_mutex_unlock(&ctx->pool->completeWorkMutex);
     // Wait for the Main thread to send us the next "StartWorkCondition" broadcast.
     // Be sure to unlock the corresponding mutex immediately so that the other worker threads can exit their waiting state as well.
-    //fprintf(stderr,"Thread-%u/Chain-%u:  pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);\n",ctx->threadID,ctx->chainID);
     pthread_cond_wait(&ctx->pool->startWorkCondition, &ctx->pool->startWorkMutex);
     return 1;
 }
@@ -186,39 +179,37 @@ static int threadpoolMainThreadPrepareWorkForWorkers(struct workerPool * pool)
 {
     if (pool->initialized)
     {
-        //fprintf(stderr,"MainThread: pthread_mutex_lock(&problem->startWorkMutex); \n");
         pthread_mutex_lock(&pool->startWorkMutex);
         return 1;
     }
     return 0;
 }
 
+
+
 static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
 {
     if (pool->initialized)
     {
         pool->work=1;
-        //printf("Main: Broadcast Signal To Start\n");
 
-        //At this point of the code for the particular iteration all single threaded chains have been executed
-        //All parallel threads have been started and now we must wait until they are done and gather their output
-
-        //fprintf(stderr,"Signaling that we are ready to start\n");
         //Signal that we can start and wait for finish...
         pthread_mutex_lock(&pool->completeWorkMutex); //Make sure worker threads wont fall through after completion
         pthread_cond_broadcast(&pool->startWorkCondition); //Broadcast starting condition
         pthread_mutex_unlock(&pool->startWorkMutex); //Now start worker threads
 
+        //At this point of the code for the particular iteration all single threaded chains have been executed
+        //All parallel threads are running and now we must wait until they are done and gather their output
+
         //We now wait for "numberOfWorkerThreads" worker threads to finish
         for (int numberOfWorkerThreadsToWaitFor=0;  numberOfWorkerThreadsToWaitFor<pool->numberOfThreads; numberOfWorkerThreadsToWaitFor++)
         {
-            //fprintf(stderr,"waiting for %u/%u threads\n",numberOfWorkerThreadsToWaitFor,numberOfWorkerThreads);
             // Before entering a waiting state, set "MainThreadWaiting" to "TRUE" while we still have a lock on the "CompleteMutex".
             // Worker threads will be waiting for this condition to be met before sending "CompleteCondition" signals.
             pool->mainThreadWaiting = 1;
             pthread_cond_wait(&pool->completeWorkCondition, &pool->completeWorkMutex);
-            // printf("Main: Complete Signal Recieved From Thread-%d\n",pool->completedWorkNumber);
-            // This is where partial work on the batch data coordination will happen.  All of the worker threads will have to finish before we can start the next batch.
+            // This is where partial work on the batch data coordination will happen.  
+            // All of the worker threads will have to finish before we can start the next batch.
         }
         //fprintf(stderr,"Done Waiting!\n");
         pthread_mutex_unlock(&pool->completeWorkMutex);
@@ -227,7 +218,6 @@ static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
     }
     return 0;
 }
-
 
 
 
@@ -299,7 +289,7 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
     while (1)
     {
       fprintf(stderr,".");
-      nanoSleepT(10000);
+      nanoSleepT(1000);
       unsigned int threadsThatAreReady=0;
       for (unsigned int i=0; i<threadsCreated; i++)
       {
@@ -320,11 +310,10 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
 
 
 
-
 static int threadpoolDestroy(struct workerPool *pool)
 {
     pthread_mutex_lock(&pool->startWorkMutex);
-    // Set the GAME OVER condition.
+    // Set the conditions to stop all threads.
     pool->work = 0;
     pthread_cond_broadcast(&pool->startWorkCondition);
     pthread_mutex_unlock(&pool->startWorkMutex);
@@ -356,4 +345,3 @@ static int threadpoolDestroy(struct workerPool *pool)
 #endif
 
 #endif // PTHREADWORKERPOOL_H_INCLUDED
-
