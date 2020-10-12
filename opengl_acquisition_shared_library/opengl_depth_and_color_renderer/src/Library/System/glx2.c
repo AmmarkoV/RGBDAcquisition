@@ -21,7 +21,7 @@ static int snglBuf[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, None};
 static int dblBuf[]  = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};
 
 Display   *dpy;
-Window     win;
+Window     win2;
 
 GLboolean  doubleBuffer = GL_TRUE;
 
@@ -126,27 +126,27 @@ int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **a
 
 
 
-        win = XCreateWindow(dpy,
+        win2 = XCreateWindow(dpy,
                       RootWindow(dpy, vi->screen), 0, 0,
                       WIDTH, HEIGHT,
                       0, vi->depth,
                       InputOutput,
                       vi->visual,
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
-       XSetStandardProperties(dpy, win, "OpenGL2.x Control Window", "main", None, argv, argc, NULL);
+       XSetStandardProperties(dpy, win2, "OpenGL2.x Control Window", "main", None, argv, argc, NULL);
 
        if (debugMessages) { fprintf(stderr,"(6) bind the rendering context to the window \n"); }
        /*** (6) bind the rendering context to the window ***/
 
 
-       glXMakeCurrent(dpy, win, cx);
+       glXMakeCurrent(dpy, win2, cx);
        if (debugMessages) { fprintf(stderr,"(7) request the X window to be displayed on the screen\n"); }
        /*** (7) request the X window to be displayed on the screen ***/
       //Request the window to get Displayed
-      XMapWindow(dpy, win);
+      XMapWindow(dpy, win2);
       //Wait for window to be visible
       XEvent event;
-      XIfEvent( dpy, &event, WaitForNotify, (XPointer) win );
+      XIfEvent( dpy, &event, WaitForNotify, (XPointer) win2 );
     } else
     {
       fprintf(stderr,"Will not display a window..\n");
@@ -227,7 +227,7 @@ int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **a
 
 int glx2_endRedraw()
 {
-  if (doubleBuffer) glXSwapBuffers(dpy, win);/* buffer swap does implicit glFlush */
+  if (doubleBuffer) glXSwapBuffers(dpy, win2);/* buffer swap does implicit glFlush */
   else glFlush();  /* explicit flush for single buffered case */
   return 1;
 }
