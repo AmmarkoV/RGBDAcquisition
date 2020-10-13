@@ -122,9 +122,9 @@ int bvhMeasureIterationInfluence(
                          }
                    
                    
-                   const int MAX_ITERATIONS=15;
-                   float fpsResult[MAX_ITERATIONS];
-                   float accResult[MAX_ITERATIONS];
+                   const int MAX_ITERATIONS=25;
+                   float fpsResult[MAX_ITERATIONS+1];
+                   float accResult[MAX_ITERATIONS+1];
                    
                    
                    for (ikConfig.iterations=1; ikConfig.iterations<MAX_ITERATIONS; ikConfig.iterations++)
