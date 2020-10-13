@@ -123,10 +123,9 @@ int bvhMeasureIterationInfluence(
                    
                    
                    const int MAX_ITERATIONS=25;
-                   float fpsResult[MAX_ITERATIONS+1];
-                   float accResult[MAX_ITERATIONS+1];
                    
                    
+                   //fprintf(stdout,"Iterations,MAE,FPS\n"); 
                    for (ikConfig.iterations=1; ikConfig.iterations<MAX_ITERATIONS; ikConfig.iterations++)
                    {
                      //--------------------------------------------------------
@@ -180,9 +179,12 @@ int bvhMeasureIterationInfluence(
                         fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
                         
                         
-                        fpsResult[ikConfig.iterations]=convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
-                        accResult[ikConfig.iterations]=finalMAEInMM*10;
-                        fprintf(stderr,"%u/%u iteration / %0.2f MM / %0.2f \n",ikConfig.iterations,MAX_ITERATIONS,accResult[ikConfig.iterations],fpsResult[ikConfig.iterations]);
+                        float fpsResult =convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
+                        float accResult=finalMAEInMM*10;
+                        fprintf(stderr,"%u/%u iteration / %0.2f MM / %0.2f \n",ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
+                        
+                        
+                        fprintf(stdout,"%u %0.2f %0.2f\n",ikConfig.iterations,accResult,fpsResult); 
                         
                     }
                     else
@@ -192,12 +194,6 @@ int bvhMeasureIterationInfluence(
                    }
                    
                    
-                   fprintf(stderr,"Results for gnuplot :)\n"); 
-                   //fprintf(stdout,"Iterations,MAE,FPS\n"); 
-                   for (int i=MAX_ITERATIONS-1; i>0; i--)
-                   {
-                        fprintf(stdout,"%u %0.2f %0.2f\n",i,accResult[i],fpsResult[i]); 
-                   }
                    
                    
                   //Cleanup allocations needed for the problem..
