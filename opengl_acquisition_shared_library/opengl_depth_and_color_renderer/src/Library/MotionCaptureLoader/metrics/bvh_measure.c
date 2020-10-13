@@ -193,10 +193,10 @@ int bvhMeasureIterationInfluence(
                    
                    
                    fprintf(stderr,"Results for gnuplot :)\n"); 
-                   fprintf(stderr,"Iterations,MAE,FPS\n"); 
+                   fprintf(stdout,"Iterations,MAE,FPS\n"); 
                    for (int i=1; i<MAX_ITERATIONS; i++)
                    {
-                        fprintf(stderr,"%u,%0.2f,%0.2f\n",i,accResult[i],fpsResult[i]); 
+                        fprintf(stdout,"%u, %0.2f, %0.2f\n",i,accResult[i],fpsResult[i]); 
                    }
                    
                    
