@@ -61,10 +61,11 @@ int bvhMeasureIterationInfluence(
       for (int startFrame=60; startFrame<mc->numberOfFrames; startFrame+=30)
       for (int testIteration=0; testIteration<4; testIteration++)
       {
-        if (testIteration==0) { fIDPrevious=fIDSource-20;  } else
-        if (testIteration==1) { fIDPrevious=fIDSource-40; } else
-        if (testIteration==2) { fIDPrevious=fIDSource-60; } else
-        if (testIteration==3) { fIDPrevious=fIDSource-80; } 
+        fIDTarget = startFrame;
+        if (testIteration==0) { fIDSource=fIDTarget-5;  } else
+        if (testIteration==1) { fIDSource=fIDTarget-40; } else
+        if (testIteration==2) { fIDSource=fIDTarget-60; } else
+        if (testIteration==3) { fIDSource=fIDTarget-80; } 
         fprintf(stderr,"Started test iteration testing Source %u / Previous %u \n",fIDSource,fIDPrevious);
         
         
@@ -117,7 +118,7 @@ int bvhMeasureIterationInfluence(
                     ikConfig.epochs = epochs;
                     ikConfig.spring = spring;
                     ikConfig.gradientExplosionThreshold = 50;
-                    ikConfig.dumpScreenshots = 1;
+                    ikConfig.dumpScreenshots = 0;
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
                     ikConfig.verbose = 0;
                     ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
@@ -205,7 +206,7 @@ int bvhMeasureIterationInfluence(
                         
                         float fpsResult =convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
                         float accResult=finalMAEInMM*10;
-                        fprintf(stderr,"test %u | %u/%u iteration / %0.2f MM / %0.2f \n",testIteration,ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
+                        fprintf(stderr,"test %u | %u->%u / %u | %u/%u iteration / %0.2f MM / %0.2f \n",testIteration,fIDSource,fIDTarget,mc->numberOfFrames,ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
                         
                         // .dat output
                         fprintf(stdout,"%u %0.2f %0.2f %u\n",ikConfig.iterations,accResult,fpsResult,testIteration); 
