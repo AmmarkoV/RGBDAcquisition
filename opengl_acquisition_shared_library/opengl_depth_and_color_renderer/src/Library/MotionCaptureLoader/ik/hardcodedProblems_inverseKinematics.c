@@ -2505,6 +2505,7 @@ int bvhTestIK(
     struct MotionBuffer * initialSolution = mallocNewMotionBuffer(mc);
     struct MotionBuffer * solution        = mallocNewMotionBuffer(mc);
     struct MotionBuffer * previousSolution= mallocNewMotionBuffer(mc);
+    struct MotionBuffer * penultimateSolution= mallocNewMotionBuffer(mc);
 
 
 
@@ -2517,6 +2518,15 @@ int bvhTestIK(
             ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
         )
         {
+            //------------------------------------------------------------------------
+            if(fIDPrevious>0)
+            {
+              bvh_copyMotionFrameToMotionBuffer(mc,penultimateSolution,fIDPrevious-1);
+            } else
+            {
+              bvh_copyMotionFrameToMotionBuffer(mc,penultimateSolution,fIDPrevious); 
+            }
+            //------------------------------------------------------------------------
             initialSolution->motion[0]=0;
             initialSolution->motion[1]=0;
             initialSolution->motion[2]=distance;
@@ -2524,6 +2534,10 @@ int bvhTestIK(
             previousSolution->motion[0]=0;
             previousSolution->motion[1]=0;
             previousSolution->motion[2]=distance;
+            
+            penultimateSolution->motion[0]=0;
+            penultimateSolution->motion[1]=0;
+            penultimateSolution->motion[2]=distance;
 
             solution->motion[0]=0;
             solution->motion[1]=0;
@@ -2555,7 +2569,7 @@ int bvhTestIK(
 
 
     
-                       struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+                      struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
                       if (problem!=0)
                                      { memset(problem,0,sizeof(struct ikProblem)); } else
                                      { fprintf(stderr,"Failed to allocate memory for our IK problem..\n");  return 0; }
@@ -2569,7 +2583,7 @@ int bvhTestIK(
                                                                                             &bvhTargetTransform
                                                                                         )
                          )
-                        {
+                         {
                                fprintf(stderr,"Could not prepare the problem for IK solution\n");
                                free(problem);
                                return 0;
@@ -2585,7 +2599,7 @@ int bvhTestIK(
                             problem,
                             &ikConfig,
                             //---------------
-                            0, //This is pre-previous solution but we dont want it for our test..
+                            penultimateSolution,  
                             previousSolution,
                             solution,
                             groundTruth,

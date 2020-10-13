@@ -46,6 +46,8 @@ int prepareDefaultBodyProblem(
 );
 
 
+float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsigned long endTime);
+
 int bvhTestIK(
               struct BVH_MotionCapture * mc,
               float lr,

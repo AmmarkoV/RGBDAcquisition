@@ -1565,7 +1565,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           float * finalMAEInMM
                                                          )
 {
-
     if (problem==0)
     {
         fprintf(stderr,RED "No problem provided for IK..\n" NORMAL);
@@ -1583,7 +1582,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
         return 0;
     }
-    
+    /*
     if  ( (previousSolution==0) || (previousSolution->motion==0) )
     {
         fprintf(stderr,RED "No previous solution provided for IK..\n" NORMAL);
@@ -1594,7 +1593,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     {
         fprintf(stderr,RED "No penultimate solution provided for IK..\n" NORMAL);
         return 0;
-    }
+    }*/
 
     if (ikConfig==0)
     {
