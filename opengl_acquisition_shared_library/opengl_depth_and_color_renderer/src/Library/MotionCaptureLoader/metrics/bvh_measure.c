@@ -122,8 +122,12 @@ int bvhMeasureIterationInfluence(
                          }
                    
                    
+                   const int MAX_ITERATIONS=15;
+                   float fpsResult[MAX_ITERATIONS];
+                   float accResult[MAX_ITERATIONS];
                    
-                   for (ikConfig.iterations=1; ikConfig.iterations<10; ikConfig.iterations++)
+                   
+                   for (ikConfig.iterations=1; ikConfig.iterations<MAX_ITERATIONS; ikConfig.iterations++)
                    {
                      //--------------------------------------------------------
                      bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource);
@@ -176,16 +180,23 @@ int bvhMeasureIterationInfluence(
                         fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
                         
                         
-                        fprintf(stderr,"%u iterations / %0.2f MM / %0.2f \n",ikConfig.iterations,finalMAEInPixels,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
+                        fpsResult[ikConfig.iterations]=convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
+                        accResult[ikConfig.iterations]=finalMAEInMM*10;
+                        fprintf(stderr,"%u/%u iteration / %0.2f MM / %0.2f \n",ikConfig.iterations,MAX_ITERATIONS,accResult[ikConfig.iterations],fpsResult[ikConfig.iterations]);
                         
- 
                     }
                     else
                     {
                         fprintf(stderr,"Failed to run IK code..\n");
                     }
-
-                       
+                   }
+                   
+                   
+                   fprintf(stderr,"Results for gnuplot :)\n"); 
+                   fprintf(stderr,"Iterations,MAE,FPS\n"); 
+                   for (int i=1; i<MAX_ITERATIONS; i++)
+                   {
+                        fprintf(stderr,"%u,%0.2f,%0.2f\n",i,accResult[i],fpsResult[i]); 
                    }
                    
                    

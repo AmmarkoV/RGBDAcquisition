@@ -2646,9 +2646,6 @@ int bvhTestIK(
                         );
                         //-------------------------------------------------------------------------------------------------
                         
-                       //Cleanup allocations needed for the problem..
-                       cleanProblem(problem);
-                       free(problem); 
                     }
                     else
                     {
@@ -2656,6 +2653,9 @@ int bvhTestIK(
                     }
 
 
+                   //Cleanup allocations needed for the problem..
+                   cleanProblem(problem);
+                   free(problem); 
                 }
                 else
                 {
