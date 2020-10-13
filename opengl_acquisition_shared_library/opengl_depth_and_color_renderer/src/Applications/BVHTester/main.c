@@ -30,6 +30,7 @@
 #include "../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h"
 #include "../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.h"
 
+#include "../../Library/MotionCaptureLoader/metrics/bvh_measure.h"
 #include "../../Library/MotionCaptureLoader/tests/test.h"
 
 
@@ -365,6 +366,35 @@ int main(int argc,const char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           testMultipleLoad(argv[i+1]);
+          exit(0);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--tuneIterations")==0)
+        {
+          // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100
+
+          if (i+7>=argc)  { incorrectArguments(); }
+
+          unsigned int previousFrame=atoi(argv[i+1]);
+          unsigned int sourceFrame=atoi(argv[i+2]);
+          unsigned int targetFrame=atoi(argv[i+3]);
+          float        learningRate = atof(argv[i+4]);
+          unsigned int iterations=atoi(argv[i+5]);
+          unsigned int epochs=atoi(argv[i+6]);
+          float spring = atof(argv[i+7]);
+
+           bvhMeasureIterationInfluence(
+                      &bvhMotion,
+                      learningRate,
+                      spring,
+                      iterations,
+                      epochs,
+                      previousFrame,
+                      sourceFrame,
+                      targetFrame,
+                      multiThreaded
+                    );
+
           exit(0);
         } else
         //-----------------------------------------------------

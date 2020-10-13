@@ -33,11 +33,11 @@ int bvhMeasureIterationInfluence(
     float initialMAEInMM=0.0,finalMAEInMM=0.0;
 
     //Load all motion buffers
-    struct MotionBuffer * groundTruth     = mallocNewMotionBuffer(mc);
-    struct MotionBuffer * initialSolution = mallocNewMotionBuffer(mc);
-    struct MotionBuffer * solution        = mallocNewMotionBuffer(mc);
-    struct MotionBuffer * previousSolution= mallocNewMotionBuffer(mc);
-    struct MotionBuffer * penultimateSolution= mallocNewMotionBuffer(mc);
+    struct MotionBuffer * groundTruth         = mallocNewMotionBuffer(mc);
+    struct MotionBuffer * initialSolution     = mallocNewMotionBuffer(mc);
+    struct MotionBuffer * solution            = mallocNewMotionBuffer(mc);
+    struct MotionBuffer * previousSolution    = mallocNewMotionBuffer(mc);
+    struct MotionBuffer * penultimateSolution = mallocNewMotionBuffer(mc);
 
 
 
@@ -94,7 +94,7 @@ int bvhMeasureIterationInfluence(
                     ikConfig.gradientExplosionThreshold = 50;
                     ikConfig.dumpScreenshots = 1;
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
-                    ikConfig.verbose = 1;
+                    ikConfig.verbose = 0;
                     ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
                     ikConfig.ikVersion = IK_VERSION;
                     //------------------------------------
@@ -120,8 +120,19 @@ int bvhMeasureIterationInfluence(
                                free(problem);
                                return 0;
                          }
+                   
+                   
+                   
+                   for (ikConfig.iterations=1; ikConfig.iterations<10; ikConfig.iterations++)
+                   {
+                     //--------------------------------------------------------
+                     bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource);
+                     solution->motion[0]=0;
+                     solution->motion[1]=0;
+                     solution->motion[2]=distance;
+                     //--------------------------------------------------------
 
-
+                     
                    unsigned long startTime = GetTickCountMicrosecondsIK();
 
                     if (
@@ -164,17 +175,23 @@ int bvhMeasureIterationInfluence(
                         fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
                         fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
                         
+                        
+                        fprintf(stderr,"%u iterations / %0.2f MM / %0.2f \n",ikConfig.iterations,finalMAEInPixels,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
+                        
  
-                       //Cleanup allocations needed for the problem..
-                       cleanProblem(problem);
-                       free(problem); 
                     }
                     else
                     {
                         fprintf(stderr,"Failed to run IK code..\n");
                     }
 
-
+                       
+                   }
+                   
+                   
+                  //Cleanup allocations needed for the problem..
+                  cleanProblem(problem);
+                  free(problem); 
                 }
                 else
                 {
