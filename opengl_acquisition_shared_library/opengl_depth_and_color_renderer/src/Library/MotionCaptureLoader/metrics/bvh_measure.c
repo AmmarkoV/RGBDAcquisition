@@ -6,6 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
 int bvhMeasureIterationInfluence(
     struct BVH_MotionCapture * mc,
     float lr,
@@ -22,6 +34,8 @@ int bvhMeasureIterationInfluence(
 
     struct BVH_Transform bvhTargetTransform= {0};
 
+    const int MAX_ITERATIONS=25;
+                   
     struct simpleRenderer renderer= {0};
     const float distance=-150;
     simpleRendererDefaults( &renderer, 1920, 1080, 582.18394,   582.52915 );// https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
@@ -43,12 +57,23 @@ int bvhMeasureIterationInfluence(
 
     if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) && (previousSolution!=0) )
     {
+        
+      for (int startFrame=60; startFrame<mc->numberOfFrames; startFrame+=30)
+      for (int testIteration=0; testIteration<4; testIteration++)
+      {
+        if (testIteration==0) { fIDPrevious=fIDSource-20;  } else
+        if (testIteration==1) { fIDPrevious=fIDSource-40; } else
+        if (testIteration==2) { fIDPrevious=fIDSource-60; } else
+        if (testIteration==3) { fIDPrevious=fIDSource-80; } 
+        fprintf(stderr,"Started test iteration testing Source %u / Previous %u \n",fIDSource,fIDPrevious);
+        
+        
         if (
             ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) &&
             ( bvh_copyMotionFrameToMotionBuffer(mc,previousSolution,fIDPrevious) ) &&
             ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) ) &&
             ( bvh_copyMotionFrameToMotionBuffer(mc,groundTruth,fIDTarget) )
-        )
+           )
         {
             //------------------------------------------------------------------------
             if(fIDPrevious>0)
@@ -62,23 +87,23 @@ int bvhMeasureIterationInfluence(
             initialSolution->motion[0]=0;
             initialSolution->motion[1]=0;
             initialSolution->motion[2]=distance;
-
+            //-----------------------------------------
             previousSolution->motion[0]=0;
             previousSolution->motion[1]=0;
             previousSolution->motion[2]=distance;
-            
+            //-----------------------------------------
             penultimateSolution->motion[0]=0;
             penultimateSolution->motion[1]=0;
             penultimateSolution->motion[2]=distance;
-
+            //-----------------------------------------
             solution->motion[0]=0;
             solution->motion[1]=0;
             solution->motion[2]=distance;
-
-
+            //-----------------------------------------
             groundTruth->motion[0]=0;
             groundTruth->motion[1]=0;
             groundTruth->motion[2]=distance;
+            //------------------------------------------------------------------------
 
 
             if ( bvh_loadTransformForMotionBuffer(mc,groundTruth->motion,&bvhTargetTransform,0) )
@@ -101,28 +126,27 @@ int bvhMeasureIterationInfluence(
 
 
     
-                      struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+                      struct ikProblem * problem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
                       if (problem!=0)
                                      { memset(problem,0,sizeof(struct ikProblem)); } else
-                                     { fprintf(stderr,"Failed to allocate memory for our IK problem..\n");  return 0; }
+                                     { fprintf(stderr,RED "Failed to allocate memory for our IK problem..\n" NORMAL);  return 0; }
 
-                        if (!prepareDefaultBodyProblem(
-                                                                                            problem,
-                                                                                            mc,
-                                                                                            &renderer,
-                                                                                            previousSolution,
-                                                                                            solution,
-                                                                                            &bvhTargetTransform
-                                                                                        )
+                      if (!prepareDefaultBodyProblem(
+                                                       problem,
+                                                       mc,
+                                                       &renderer,
+                                                       previousSolution,
+                                                       solution,
+                                                       &bvhTargetTransform
+                                                      )
                          )
                          {
-                               fprintf(stderr,"Could not prepare the problem for IK solution\n");
+                               fprintf(stderr,RED "Could not prepare the problem for IK solution\n" NORMAL);
                                free(problem);
                                return 0;
                          }
                    
                    
-                   const int MAX_ITERATIONS=25;
                    
                    
                    //fprintf(stdout,"Iterations,MAE,FPS\n"); 
@@ -174,22 +198,22 @@ int bvhMeasureIterationInfluence(
                         //-------------------------------------------------------------------------------------------------------------
                         compareTwoMotionBuffers(mc,"Improvement",initialSolution,solution,groundTruth);
 
-                        fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
+                        //fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
                         fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
                         fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
                         
                         
                         float fpsResult =convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
                         float accResult=finalMAEInMM*10;
-                        fprintf(stderr,"%u/%u iteration / %0.2f MM / %0.2f \n",ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
+                        fprintf(stderr,"test %u | %u/%u iteration / %0.2f MM / %0.2f \n",testIteration,ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
                         
-                        
-                        fprintf(stdout,"%u %0.2f %0.2f\n",ikConfig.iterations,accResult,fpsResult); 
+                        // .dat output
+                        fprintf(stdout,"%u %0.2f %0.2f %u\n",ikConfig.iterations,accResult,fpsResult,testIteration); 
                         
                     }
                     else
                     {
-                        fprintf(stderr,"Failed to run IK code..\n");
+                        fprintf(stderr,RED "Failed to run IK code..\n" NORMAL);
                     }
                    }
                    
@@ -199,6 +223,7 @@ int bvhMeasureIterationInfluence(
                   //Cleanup allocations needed for the problem..
                   cleanProblem(problem);
                   free(problem); 
+                  problem=0;
                 }
                 else
                 {
@@ -206,12 +231,15 @@ int bvhMeasureIterationInfluence(
                 }
             }
         }
+        
+       fprintf(stdout,"\n\n"); 
+      } //Test loop
         freeMotionBuffer(&previousSolution);
         freeMotionBuffer(&solution);
         freeMotionBuffer(&initialSolution);
         freeMotionBuffer(&groundTruth);
-    }
-
+    } //Have correct data
+          
     return result;
 }
 
