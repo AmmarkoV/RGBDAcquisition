@@ -1874,6 +1874,28 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );             
 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "eye.l",0,// Joint
+                               2.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                             
+
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "eye.r",0,// Joint
+                               2.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
                                                                             
     //----------------------------------------------------------
     if (correct!=checksum) 

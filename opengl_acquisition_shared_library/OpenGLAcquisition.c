@@ -268,7 +268,6 @@ int startOpenGLModule(unsigned int max_devs,char * settings)
 {
     fprintf(stderr,"startOpenGLModule called on a dummy build of OpenGLAcquisition!\n");
     fprintf(stderr,"Please consider enabling #define BUILD_OPENGL 1 on acquisition/acquisition_setup.h\n");
-    return 0;
-  return 1;
+    return 0; 
 }
 #endif
