@@ -738,7 +738,6 @@ int main(int argc,const char **argv)
           srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-
               if (
                    !bvh_PerturbJointAngles(
                                      &bvhMotion,
