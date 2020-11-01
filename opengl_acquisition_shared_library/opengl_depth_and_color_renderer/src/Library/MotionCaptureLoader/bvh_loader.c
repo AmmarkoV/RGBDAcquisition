@@ -579,9 +579,9 @@ int bvh_getJointDimensions(
         if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }
        }
 
-       *xValue = bvhMotion->jointHierarchy[jID].offset[angleX];
-       *yValue = bvhMotion->jointHierarchy[jID].offset[angleY];
-       *zValue = bvhMotion->jointHierarchy[jID].offset[angleZ];
+       if (xValue!=0) { *xValue = bvhMotion->jointHierarchy[jID].offset[angleX]; }
+       if (yValue!=0) { *yValue = bvhMotion->jointHierarchy[jID].offset[angleY]; }
+       if (zValue!=0) { *zValue = bvhMotion->jointHierarchy[jID].offset[angleZ]; }
        
       return 1;
    }
