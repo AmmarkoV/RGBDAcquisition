@@ -379,6 +379,14 @@ int bvh_copyMotionFrameToMotionBuffer(
 //float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 
 
+int bvh_getJointDimensions(
+                              struct BVH_MotionCapture * bvhMotion,
+                              const char * jointName,
+                              float * xValue,
+                              float * yValue,
+                              float * zValue
+                             );
+
 int bvh_changeJointDimensions(
                               struct BVH_MotionCapture * bvhMotion,
                               const char * jointName,

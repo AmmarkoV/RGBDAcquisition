@@ -544,6 +544,55 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 }
 
 
+
+
+
+
+
+int bvh_getJointDimensions(
+                              struct BVH_MotionCapture * bvhMotion,
+                              const char * jointName,
+                              float * xValue,
+                              float * yValue,
+                              float * zValue
+                             )
+{
+   if (bvhMotion==0)
+    {
+     fprintf(stderr,"bvh_changeJointDimensions: Cannot work before having loaded a bvh file\n");
+     return 0;
+    }
+  
+
+    BVHJointID jID=0;
+   if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
+   //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+   {
+       unsigned int angleX = 0;
+       unsigned int angleY = 1;
+       unsigned int angleZ = 2;
+
+       for (int ch=0; ch<3; ch++)
+       {
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_X) { angleX = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Y) { angleY = ch; }
+        if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }
+       }
+
+       *xValue = bvhMotion->jointHierarchy[jID].offset[angleX];
+       *yValue = bvhMotion->jointHierarchy[jID].offset[angleY];
+       *zValue = bvhMotion->jointHierarchy[jID].offset[angleZ];
+       
+      return 1;
+   }
+
+ return 0;
+}
+
+
+
+
+
 int bvh_changeJointDimensions(
                               struct BVH_MotionCapture * bvhMotion,
                               const char * jointName,
@@ -557,9 +606,6 @@ int bvh_changeJointDimensions(
      fprintf(stderr,"bvh_changeJointDimensions: Cannot work before having loaded a bvh file\n");
      return 0;
     }
-
-
-
 
     //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
 
