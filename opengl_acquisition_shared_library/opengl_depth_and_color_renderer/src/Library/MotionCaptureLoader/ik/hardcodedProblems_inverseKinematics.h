@@ -23,7 +23,8 @@ int prepareDefaultRightHandProblem(
     struct simpleRenderer *renderer,
     struct MotionBuffer * previousSolution,
     struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
+    struct BVH_Transform * bvhTargetTransform,
+    int standalone
 );
 
 
@@ -33,7 +34,8 @@ int prepareDefaultLeftHandProblem(
     struct simpleRenderer *renderer,
     struct MotionBuffer * previousSolution,
     struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
+    struct BVH_Transform * bvhTargetTransform,
+    int standalone
 );
 
 int prepareDefaultBodyProblem(

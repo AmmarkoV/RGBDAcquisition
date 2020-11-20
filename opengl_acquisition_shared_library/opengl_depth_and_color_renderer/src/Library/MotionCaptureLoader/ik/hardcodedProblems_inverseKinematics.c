@@ -696,13 +696,14 @@ int prepareDefaultFaceProblem(
 
 
 int prepareDefaultRightHandProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
-)
+                                   struct ikProblem * problem,
+                                   struct BVH_MotionCapture * mc,
+                                   struct simpleRenderer *renderer,
+                                   struct MotionBuffer * previousSolution,
+                                   struct MotionBuffer * solution,
+                                   struct BVH_Transform * bvhTargetTransform,
+                                   int standalone
+                                  )
 {
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
@@ -1218,7 +1219,8 @@ int prepareDefaultLeftHandProblem(
     struct simpleRenderer *renderer,
     struct MotionBuffer * previousSolution,
     struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
+    struct BVH_Transform * bvhTargetTransform,
+    int standalone
 )
 {
     //Cleanup problem structure..
