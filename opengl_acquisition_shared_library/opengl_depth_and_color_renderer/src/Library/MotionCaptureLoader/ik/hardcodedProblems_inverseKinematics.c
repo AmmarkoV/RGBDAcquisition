@@ -738,16 +738,16 @@ int prepareDefaultRightHandProblem(
 
      if (!standalone)
      {
-     //Next chain is the R Shoulder
-     //----------------------------------------------------------
-     //----------------------------------------------------------
-     //---------------------------------------------------------- 
-     checksum=0;
-     correct=0; 
-     partID=0;
+       //Two modes, if we use a body then we will rely on its positional soluton
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       checksum=0;
+       correct=0; 
+       partID=0;
     
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+       ++correct;
+       checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "rshoulder","rShldr",  // Joint 
@@ -758,8 +758,8 @@ int prepareDefaultRightHandProblem(
                              );
                              
       
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+       ++correct;
+       checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "relbow","rForeArm",  // Joint
@@ -770,8 +770,8 @@ int prepareDefaultRightHandProblem(
                              );
                              
    
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+       ++correct;
+       checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "rhand",0,// Joint
@@ -782,19 +782,110 @@ int prepareDefaultRightHandProblem(
                              );
                              
                  
-    //----------------------------------------------------------
-    if (correct!=checksum) 
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
     
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+      ++chainID;
+      ++jobID;
+      //----------------------------------------------------------
+      //----------------------------------------------------------
+      //----------------------------------------------------------
      } else
      {
-        fprintf(stderr,"TODO IMPLEMENT");
+       //Second mode, assuming no body 
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       checksum=0;
+       correct=0; 
+       partID=0;
+    
+
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand",0,    // Joint
+                               2.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+       problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
+       problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
+       problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+                             
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand",0,    // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+       problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
+       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
+     
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                 
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+    
+      ++chainID;
+      ++jobID;
+      //----------------------------------------------------------
+      //----------------------------------------------------------
+      //----------------------------------------------------------
      }
 
 
@@ -1318,7 +1409,98 @@ int prepareDefaultLeftHandProblem(
     //---------------------------------------------------------- 
      } else
      {
-        fprintf(stderr,"TODO IMPLEMENT");
+       //Second mode, assuming no body 
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       //-----------------------------------------------------------------------
+       checksum=0;
+       correct=0; 
+       partID=0;
+    
+
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhand",0,    // Joint
+                               2.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+       problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
+       problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
+       problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+                             
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhand",0,    // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
+       problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
+       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
+     
+       ++correct;
+       checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger2-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger3-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger4-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "finger5-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+                 
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+    
+      ++chainID;
+      ++jobID;
+      //----------------------------------------------------------
+      //----------------------------------------------------------
+      //----------------------------------------------------------
      }
 
 
