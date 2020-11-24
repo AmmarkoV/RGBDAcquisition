@@ -157,7 +157,8 @@ int prepareDefaultFaceProblem(
     struct simpleRenderer *renderer,
     struct MotionBuffer * previousSolution,
     struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
+    struct BVH_Transform * bvhTargetTransform,
+    int standalone
 )
 { 
     //Cleanup problem structure..
@@ -211,6 +212,9 @@ int prepareDefaultFaceProblem(
                              );
                              */
                              
+                             
+     if (!standalone)
+     {
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -232,6 +236,7 @@ int prepareDefaultFaceProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+     }
                              
       
      ++correct;
