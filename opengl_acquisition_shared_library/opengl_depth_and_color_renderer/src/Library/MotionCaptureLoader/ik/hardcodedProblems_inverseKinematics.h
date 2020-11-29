@@ -28,7 +28,6 @@ int prepareDefaultRightHandProblem(
     int standalone
 );
 
-
 int prepareDefaultLeftHandProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
@@ -47,7 +46,6 @@ int prepareDefaultBodyProblem(
     struct MotionBuffer * solution,
     struct BVH_Transform * bvhTargetTransform
 );
-
 
 float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsigned long endTime);
 
