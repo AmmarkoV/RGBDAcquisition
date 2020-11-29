@@ -213,11 +213,9 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          {
          if (InputParser_WordCompareAuto(ipcB,0,"ROOT"))
               {
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //------------------------------------------------- ROOT ----------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
+               //------------------------------------------------- ROOT --------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
                //We encountered something like |ROOT Hips|
                if (debug) fprintf(stderr,"-R-");
                //Store new ROOT Joint Name
@@ -247,18 +245,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                {
                  fprintf(stderr,"We have run out of space for our joint hierarchy..\n");
                }
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+              //--------------------------------------------------------------------------------------------------------------------- 
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))
               {
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //------------------------------------------------- JOINT ----------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
+               //------------------------------------------------- JOINT -------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
                   
                //We encountered something like |JOINT Chest|
                if (debug) fprintf(stderr,"-J-");
@@ -279,23 +274,20 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
                currentJoint=jNum;
                
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
                ++jNum;
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"End"))
              {
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //------------------------------------------------- END SITE ----------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-               //We encountered something like |End Site|
+              //We encountered something like |End Site|
               if (debug) fprintf(stderr,"-E-");
               if (InputParser_WordCompareAuto(ipcB,1,"Site"))
                    {
+                    //---------------------------------------------------------------------------------------------------------------------
+                    //------------------------------------------------- END SITE ----------------------------------------------------
+                    //---------------------------------------------------------------------------------------------------------------------
                     if (debug) fprintf(stderr,"-S-");
                     if (jNum>0)
                     {
@@ -315,19 +307,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
                     currentJoint=jNum;
                     ++jNum;
+                   //---------------------------------------------------------------------------------------------------------------------
+                   //---------------------------------------------------------------------------------------------------------------------
+                   //---------------------------------------------------------------------------------------------------------------------
                    }
-                   
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
               } else
          if (InputParser_WordCompareAuto(ipcB,0,"CHANNELS"))
              {
                   //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //------------------------------------------------- CHANNELS ----------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+                  //------------------------------------------------- CHANNELS ----------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------
                   //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration
                   if (debug) fprintf(stderr,"-C");
@@ -340,50 +328,53 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                   bvhMotion->jointHierarchy[currentJoint].loadedChannels=loadedChannels;
                   if (debug) fprintf(stderr,"(%u)-",loadedChannels);
 
-                  //First wipe channels to make sure they are clean
+                  //In any case wipe channels to make sure they are clean
                   memset(bvhMotion->jointHierarchy[currentJoint].channelType,0,sizeof(char) * BVH_VALID_CHANNEL_NAMES);
-
-              if (debug) fprintf(stderr,"\nJOINT %u (%s) : ",currentJoint,bvhMotion->jointHierarchy[currentJoint].jointName);
-
-              //Now to store the channel labels
-              unsigned int cL=0; //Channel To Load
-              for (cL=0; cL<loadedChannels; cL++)
+                  
+                  if (loadedChannels<BVH_VALID_CHANNEL_NAMES)
                   {
-                   //For each declared channel we need to enumerate the label to a value
-                   unsigned int thisChannelID = enumerateInputParserChannel(ipcB,2+cL);
+                     if (debug) fprintf(stderr,"\nJOINT %u (%s) : ",currentJoint,bvhMotion->jointHierarchy[currentJoint].jointName);
 
-                   bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID;
+                     //Now to store the channel labels
+                     unsigned int cL=0; //Channel To Load
+                     for (cL=0; cL<loadedChannels; cL++)
+                       {
+                         //For each declared channel we need to enumerate the label to a value
+                         unsigned int thisChannelID = enumerateInputParserChannel(ipcB,2+cL);
 
-                   if (debug) fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);
+                         bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID;
 
-                   //Update jointToMotion Lookup Table..
-                   bvhMotion->jointToMotionLookup[currentJoint].channelIDMotionOffset[thisChannelID] = bvhMotion->numberOfValuesPerFrame;
+                         if (debug) fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);
 
-                   //Update motionToJoint Lookup Table..
-                   bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].channelID = thisChannelID;
-                   bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].jointID   = currentJoint;
-                   bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].parentID  = parentID;
+                         //Update jointToMotion Lookup Table..
+                         bvhMotion->jointToMotionLookup[currentJoint].channelIDMotionOffset[thisChannelID] = bvhMotion->numberOfValuesPerFrame;
 
-                   ++bvhMotion->numberOfValuesPerFrame;
+                         //Update motionToJoint Lookup Table..
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].channelID = thisChannelID;
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].jointID   = currentJoint;
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].parentID  = parentID;
+
+                         ++bvhMotion->numberOfValuesPerFrame;
+                       }
+                     if (debug) fprintf(stderr,"\n");
+
+                     bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint);
+                     //Done 
+                  }//The number of channels is small enough to be handled 
+                   else
+                  {
+                      fprintf(stderr,RED "Specified joint has too many channels (has %u, max is %u) and cannot be handled!\n" NORMAL,loadedChannels,BVH_VALID_CHANNEL_NAMES);
                   }
-                if (debug) fprintf(stderr,"\n");
-
-               bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint);
-              //Done
-              
                   //---------------------------------------------------------------------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-              } else
+             } else
          if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))
              {
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //------------------------------------------------- OFFSET ----------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //Reached something like |OFFSET 3.91 0.00 0.00|
+              //---------------------------------------------------------------------------------------------------------------------
+              //------------------------------------------------- OFFSET ------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+              //Reached something like |OFFSET 3.91 0.00 0.00|
               if (debug) fprintf(stderr,"-O-");
 
               //Store offsets..
@@ -401,16 +392,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  bvhMotion->jointHierarchy[currentJoint].offset[2]=0.0;
                 }
                  
-                 //Create 4x4 Matrix that contains the static transformation ( translation ) of the joint
-                 float * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation.m;
-                 m[0] =1.0;    m[1] =0.0;   m[2] =0.0;    m[3] = (float) bvhMotion->jointHierarchy[currentJoint].offset[0];
-                 m[4] =0.0;    m[5] =1.0;   m[6] =0.0;    m[7] = (float) bvhMotion->jointHierarchy[currentJoint].offset[1];
-                 m[8] =0.0;    m[9] =0.0;   m[10]=1.0;    m[11]= (float) bvhMotion->jointHierarchy[currentJoint].offset[2];
-                 m[12]=0.0;    m[13]=0.0;   m[14]=0.0;    m[15]=1.0; 
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
+              //Create 4x4 Matrix that contains the static transformation ( translation ) of the joint
+              float * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation.m;
+              m[0] =1.0;    m[1] =0.0;   m[2] =0.0;    m[3] = (float) bvhMotion->jointHierarchy[currentJoint].offset[0];
+              m[4] =0.0;    m[5] =1.0;   m[6] =0.0;    m[7] = (float) bvhMotion->jointHierarchy[currentJoint].offset[1];
+              m[8] =0.0;    m[9] =0.0;   m[10]=1.0;    m[11]= (float) bvhMotion->jointHierarchy[currentJoint].offset[2];
+              m[12]=0.0;    m[13]=0.0;   m[14]=0.0;    m[15]=1.0; 
+              //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
              } else
          if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
              {
