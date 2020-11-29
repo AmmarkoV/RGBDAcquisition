@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.43";
+static const char BVH_LOADER_VERSION_STRING [] = "0.44";
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
@@ -46,7 +46,7 @@ static const char * channelNames[] =
     "Xrotation",
     "Yrotation",
     "Zrotation",
-    //"Wrotation",
+    "Wrotation", //QBVH
     "Xposition",
     "Yposition",
     "Zposition",
@@ -62,7 +62,7 @@ enum CHANNEL_NAMES
   BVH_ROTATION_X,
   BVH_ROTATION_Y,
   BVH_ROTATION_Z,
-  //BVH_ROTATION_W,
+  BVH_ROTATION_W, //QBVH
   BVH_POSITION_X,
   BVH_POSITION_Y,
   BVH_POSITION_Z,
@@ -81,7 +81,8 @@ static const char * rotationOrderNames[] =
   "YZX",
   "ZXY",
   "ZYX",
-//=================
+  "QXQYQZQW", //QBVH
+//================= 
     "End of Channel Rotation Orders" ,
     "Unknown"
 };
@@ -96,6 +97,7 @@ enum CHANNEL_ROTATION_ORDER
   BVH_ROTATION_ORDER_YZX,
   BVH_ROTATION_ORDER_ZXY,
   BVH_ROTATION_ORDER_ZYX,
+  BVH_ROTATION_ORDER_QXQYQZQW, //QBVH
   //--------------------
   BVH_VALID_ROTATION_ORDER_NAMES
 };

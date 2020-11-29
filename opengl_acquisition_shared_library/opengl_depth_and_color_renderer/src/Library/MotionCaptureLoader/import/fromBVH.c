@@ -66,6 +66,7 @@ int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumen
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xrotation") ) {return BVH_ROTATION_X; } else
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yrotation") ) {return BVH_ROTATION_Y; } else
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zrotation") ) {return BVH_ROTATION_Z; } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Wrotation") ) {return BVH_ROTATION_W; } else //QBVH
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xposition") ) {return BVH_POSITION_X; } else
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yposition") ) {return BVH_POSITION_Y; } else
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zposition") ) {return BVH_POSITION_Z; }
@@ -217,7 +218,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //------------------------------------------------- ROOT --------------------------------------------------------------
                //---------------------------------------------------------------------------------------------------------------------
                //We encountered something like |ROOT Hips|
-               if (debug) fprintf(stderr,"-R-");
+               if (debug) {fprintf(stderr,"-R-");}
                //Store new ROOT Joint Name
                InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName ,MAX_BVH_JOINT_NAME);
                 
@@ -227,7 +228,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                 lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
                 bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);        
                
-               if (debug) fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
+               if (debug) {fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);}
                //Store new Joint Hierarchy Level
                //Rest of the information will be filled in when we reach an {
                    
@@ -256,7 +257,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //---------------------------------------------------------------------------------------------------------------------
                   
                //We encountered something like |JOINT Chest|
-               if (debug) fprintf(stderr,"-J-");
+               if (debug) {fprintf(stderr,"-J-");}
                //Store new Joint Name
                InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
                
@@ -266,7 +267,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                 lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
                 bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);              
                                   
-               if (debug) fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
+               if (debug) {fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);}
                //Store new Joint Hierarchy Level
                //Rest of the information will be filled in when we reach an {
                bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
@@ -282,13 +283,13 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          if (InputParser_WordCompareAuto(ipcB,0,"End"))
              {
               //We encountered something like |End Site|
-              if (debug) fprintf(stderr,"-E-");
+              if (debug) {fprintf(stderr,"-E-");}
               if (InputParser_WordCompareAuto(ipcB,1,"Site"))
                    {
                     //---------------------------------------------------------------------------------------------------------------------
                     //------------------------------------------------- END SITE ----------------------------------------------------
                     //---------------------------------------------------------------------------------------------------------------------
-                    if (debug) fprintf(stderr,"-S-");
+                    if (debug) {fprintf(stderr,"-S-");}
                     if (jNum>0)
                     {
                       int ret = snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);
@@ -318,7 +319,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                   //------------------------------------------------- CHANNELS ----------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------
                   //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration
-                  if (debug) fprintf(stderr,"-C");
+                  if (debug) {fprintf(stderr,"-C");}
 
                   //Remember the parentID as shorthand..
                   unsigned int parentID=bvhMotion->jointHierarchy[currentJoint].parentJoint;
@@ -326,14 +327,14 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                   //Read number of Channels
                   unsigned int loadedChannels = InputParser_GetWordInt(ipcB,1);
                   bvhMotion->jointHierarchy[currentJoint].loadedChannels=loadedChannels;
-                  if (debug) fprintf(stderr,"(%u)-",loadedChannels);
+                  if (debug) {fprintf(stderr,"(%u)-",loadedChannels);}
 
                   //In any case wipe channels to make sure they are clean
                   memset(bvhMotion->jointHierarchy[currentJoint].channelType,0,sizeof(char) * BVH_VALID_CHANNEL_NAMES);
                   
                   if (loadedChannels<BVH_VALID_CHANNEL_NAMES)
                   {
-                     if (debug) fprintf(stderr,"\nJOINT %u (%s) : ",currentJoint,bvhMotion->jointHierarchy[currentJoint].jointName);
+                     if (debug) {fprintf(stderr,"\nJOINT %u (%s) : ",currentJoint,bvhMotion->jointHierarchy[currentJoint].jointName);}
 
                      //Now to store the channel labels
                      unsigned int cL=0; //Channel To Load
@@ -344,7 +345,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
                          bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID;
 
-                         if (debug) fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);
+                         if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);}
 
                          //Update jointToMotion Lookup Table..
                          bvhMotion->jointToMotionLookup[currentJoint].channelIDMotionOffset[thisChannelID] = bvhMotion->numberOfValuesPerFrame;
@@ -356,7 +357,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
                          ++bvhMotion->numberOfValuesPerFrame;
                        }
-                     if (debug) fprintf(stderr,"\n");
+                     if (debug) {fprintf(stderr,"\n");}
 
                      bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint);
                      //Done 
@@ -375,7 +376,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               //------------------------------------------------- OFFSET ------------------------------------------------------------
               //---------------------------------------------------------------------------------------------------------------------
               //Reached something like |OFFSET 3.91 0.00 0.00|
-              if (debug) fprintf(stderr,"-O-");
+              if (debug) {fprintf(stderr,"-O-");}
 
               //Store offsets..
               //TODO: could check numB to make sure all offsets are present..
@@ -405,7 +406,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
              {
               //We reached an { so we need to finish our joint OR root declaration
-              if (debug) fprintf(stderr,"-{%u-",hierarchyLevel);
+              if (debug) {fprintf(stderr,"-{%u-",hierarchyLevel);}
               if (
                   bvhMotion->jointHierarchy[currentJoint].hierarchyLevel == hierarchyLevel
                  )
@@ -455,7 +456,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               }
 
               //-------------------------------------
-              if (debug) fprintf(stderr,"-%u}-",hierarchyLevel);
+              if (debug) {fprintf(stderr,"-%u}-",hierarchyLevel);}
              }
           else
          {
