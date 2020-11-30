@@ -150,6 +150,8 @@ void quaternionFromTwoVectors(float * quaternionOutput , float * vA , float * vB
 
 void generateRandomQuaternion(float * quaternionOutput);
 
+void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutput,float * quaternionInput,int quaternionConvention,float angleDistance);
+
 #ifdef __cplusplus
 }
 #endif

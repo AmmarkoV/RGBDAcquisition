@@ -452,6 +452,11 @@ void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutpu
     if (angleDistance<=0.0)
     {
         fprintf(stderr,"stochasticRandomQuaternionWithLessThanAngleDistance is not possible with angle %0.2f\n",angleDistance);
+        quaternionOutput[0]=quaternionInput[0];
+        quaternionOutput[1]=quaternionInput[1];
+        quaternionOutput[2]=quaternionInput[2];
+        quaternionOutput[3]=quaternionInput[3];
+        return;
     }
     
     //This is a stochastic call, if your angle distance is very small good luck..!
