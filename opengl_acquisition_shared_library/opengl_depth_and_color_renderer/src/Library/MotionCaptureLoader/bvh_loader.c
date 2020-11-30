@@ -122,6 +122,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
     }
   }
   
+  /*
   fprintf(stderr,GREEN "enumerateChannelOrder %s %s %s %s %s %s %s..!\n" NORMAL,
   channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[0]],
   channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[1]],
@@ -130,6 +131,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
   channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[4]],
   channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[5]],
   channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[6]]);
+  */
  
  if (quaternionUsed)
  { 
@@ -140,7 +142,17 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
           (bvhMotion->jointHierarchy[currentJoint].channelType[6]==BVH_ROTATION_Z)
         )
           {
-              fprintf(stderr,GREEN "Quaternion detected..!\n" NORMAL);
+              fprintf(stderr,GREEN "Root Quaternion detected..!\n" NORMAL);
+              return BVH_ROTATION_ORDER_QXQYQZQW;
+          } else
+     if ( 
+          (bvhMotion->jointHierarchy[currentJoint].channelType[0]==BVH_ROTATION_W) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[1]==BVH_ROTATION_X) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[2]==BVH_ROTATION_Y) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[3]==BVH_ROTATION_Z)
+        )
+          {
+              fprintf(stderr,GREEN "Joint Quaternion detected..!\n" NORMAL);
               return BVH_ROTATION_ORDER_QXQYQZQW;
           }
  } else
