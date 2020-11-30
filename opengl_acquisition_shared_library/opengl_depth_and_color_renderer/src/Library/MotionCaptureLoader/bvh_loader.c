@@ -121,6 +121,15 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
       quaternionUsed=1;
     }
   }
+  
+  fprintf(stderr,GREEN "enumerateChannelOrder %s %s %s %s %s %s %s..!\n" NORMAL,
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[0]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[1]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[2]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[3]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[4]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[5]],
+  channelNames[bvhMotion->jointHierarchy[currentJoint].channelType[6]]);
  
  if (quaternionUsed)
  { 
@@ -129,7 +138,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
           (bvhMotion->jointHierarchy[currentJoint].channelType[4]==BVH_ROTATION_X) &&
           (bvhMotion->jointHierarchy[currentJoint].channelType[5]==BVH_ROTATION_Y) &&
           (bvhMotion->jointHierarchy[currentJoint].channelType[6]==BVH_ROTATION_Z)
-          )
+        )
           {
               fprintf(stderr,GREEN "Quaternion detected..!\n" NORMAL);
               return BVH_ROTATION_ORDER_QXQYQZQW;
