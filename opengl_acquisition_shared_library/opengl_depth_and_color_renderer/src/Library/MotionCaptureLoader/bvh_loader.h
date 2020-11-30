@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.44";
+static const char BVH_LOADER_VERSION_STRING [] = "0.45";
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
@@ -97,7 +97,7 @@ enum CHANNEL_ROTATION_ORDER
   BVH_ROTATION_ORDER_YZX,
   BVH_ROTATION_ORDER_ZXY,
   BVH_ROTATION_ORDER_ZYX,
-  BVH_ROTATION_ORDER_QXQYQZQW, //QBVH
+  BVH_ROTATION_ORDER_QWQXQYQZ, //QBVH
   //--------------------
   BVH_VALID_ROTATION_ORDER_NAMES
 };
@@ -130,6 +130,20 @@ struct MotionBuffer
   unsigned int bufferSize;
 };
 
+
+struct jointPartOfKnownHierarchy
+{
+   char isAPartOfLeftFoot;
+   char isAPartOfRightFoot;
+   char isAPartOfLeftArm;
+   char isAPartOfRightArm;
+   char isAPartOfLeftHand;
+   char isAPartOfRightHand;
+   char isAPartOfHead;
+   char isAPartOfTorso;
+};
+
+
 /**
 * @brief Each BVH Joint has a number of properties,offsets and channels that are modeled using this structure
 * @ingroup BVH
@@ -139,6 +153,9 @@ struct BVH_Joint
   //--------------------
   char isImmuneToTorsoOcclusions;
   //--------------------
+  
+   struct jointPartOfKnownHierarchy partOfHierarchy;
+   /*
    char isAPartOfLeftFoot;
    char isAPartOfRightFoot;
    char isAPartOfLeftArm;
@@ -146,7 +163,7 @@ struct BVH_Joint
    char isAPartOfLeftHand;
    char isAPartOfRightHand;
    char isAPartOfHead;
-   char isAPartOfTorso;
+   char isAPartOfTorso;*/
   //--------------------
   char erase2DCoordinates;
   char isRoot;

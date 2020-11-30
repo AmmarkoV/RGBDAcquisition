@@ -143,7 +143,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
         )
           {
               fprintf(stderr,GREEN "Root Quaternion detected..!\n" NORMAL);
-              return BVH_ROTATION_ORDER_QXQYQZQW;
+              return BVH_ROTATION_ORDER_QWQXQYQZ;
           } else
      if ( 
           (bvhMotion->jointHierarchy[currentJoint].channelType[0]==BVH_ROTATION_W) &&
@@ -153,7 +153,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
         )
           {
               fprintf(stderr,GREEN "Joint Quaternion detected..!\n" NORMAL);
-              return BVH_ROTATION_ORDER_QXQYQZQW;
+              return BVH_ROTATION_ORDER_QWQXQYQZ;
           }
  } else
  {
@@ -268,6 +268,7 @@ int bvh_SetPositionRotation(
    mc->motionValues[mID+3]=rotation[0];
    mc->motionValues[mID+4]=rotation[1];
    mc->motionValues[mID+5]=rotation[2];
+   //TODO: add QBVH
   }
  return 1;
 }
@@ -289,6 +290,7 @@ int bvh_OffsetPositionRotation(
    mc->motionValues[mID+3]+=rotation[0];
    mc->motionValues[mID+4]+=rotation[1];
    mc->motionValues[mID+5]+=rotation[2];
+   //TODO: add QBVH
   }
  return 1;
 }
@@ -316,6 +318,7 @@ int bvh_ConstrainRotations(
    buffer = (float) mc->motionValues[mID+5];
    buffer = bvh_RemapAngleCentered0(buffer,0);
    mc->motionValues[mID+5] = (float) buffer;
+   //TODO: add QBVH
   }
  return 1;
 }
@@ -438,10 +441,6 @@ int bvh_getJointIDFromJointNameNocase(
 
 
 
-
-
-
-
 int bvh_getRootJointID(
                        struct BVH_MotionCapture * bvhMotion ,
                        BVHJointID * jID
@@ -452,18 +451,6 @@ int bvh_getRootJointID(
 
   *jID = bvhMotion->rootJointID;
   return 1;
-  /*
-   unsigned int i=0;
-   for (i=0; i<bvhMotion->jointHierarchySize; i++)
-   {
-     if (bvhMotion->jointHierarchy[i].isRoot)
-     {
-         *jID=i;
-         return 1;
-     }
-   }
- return 0;
- */
 }
 
 
@@ -707,7 +694,7 @@ int bvh_scaleAllOffsets(
                         float scalingRatio
                        )
 {
-   if (bvhMotion==0) { return 0; }
+   if (bvhMotion==0)      { return 0; }
    if (scalingRatio==1.0) { return 1; }
 
     for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -774,7 +761,7 @@ float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointI
        { 
          fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
        } 
-}
+    }
  return 0.0;
 }
 

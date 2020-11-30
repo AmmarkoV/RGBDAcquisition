@@ -1,5 +1,8 @@
 #include "bvh_rename.h"
 
+
+#include "../../../../../../tools/AmMatrix/quaternions.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,7 +71,7 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
                         || (strcmp(jN,"hip")==0) || (strcmp(jPN,"hip")==0)
                     )
                         {
-                            bvhMotion->jointHierarchy[jID].isAPartOfTorso=1;
+                            bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfTorso=1;
                         }
                     else
                         //----------------------------------------------------------------
@@ -76,7 +79,7 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
                             (strcmp(jN,"neck")==0) || (strcmp(jPN,"neck")==0) || (strcmp(jN,"nose")==0) || (strcmp(jPN,"nose")==0) || (strcmp(jN,"head")==0) || (strcmp(jPN,"head")==0)
                         )
                             {
-                                bvhMotion->jointHierarchy[jID].isAPartOfHead=1;
+                                bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfHead=1;
                             }
                         else
                             //----------------------------------------------------------------
@@ -84,28 +87,28 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
                                 (strcmp(jN,"rshoulder")==0) || (strcmp(jPN,"rshoulder")==0) || (strcmp(jN,"relbow")==0) || (strcmp(jPN,"relbow")==0) || (strcmp(jN,"rhand")==0)
                             )
                                 {
-                                    bvhMotion->jointHierarchy[jID].isAPartOfRightArm=1;
+                                    bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfRightArm=1;
                                 }
                     //----------------------------------------------------------------
                     if (
                         (strcmp(jN,"lshoulder")==0) || (strcmp(jPN,"lshoulder")==0) || (strcmp(jN,"lelbow")==0) || (strcmp(jPN,"lelbow")==0) || (strcmp(jN,"lhand")==0)
                     )
                         {
-                            bvhMotion->jointHierarchy[jID].isAPartOfLeftArm=1;
+                            bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfLeftArm=1;
                         }
                     //----------------------------------------------------------------
                     if (
                         (strcmp(jN,"rhip")==0) || (strcmp(jN,"rknee")==0) || (strcmp(jN,"rfoot")==0) || (strcmp(jPN,"rfoot")==0)
                     )
                         {
-                            bvhMotion->jointHierarchy[jID].isAPartOfRightFoot=1;
+                            bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfRightFoot=1;
                         }
                     //----------------------------------------------------------------
                     if (
                         (strcmp(jN,"lhip")==0) || (strcmp(jN,"lknee")==0) || (strcmp(jN,"lfoot")==0) || (strcmp(jPN,"lfoot")==0)
                     )
                         {
-                            bvhMotion->jointHierarchy[jID].isAPartOfLeftFoot=1;
+                            bvhMotion->jointHierarchy[jID].partOfHierarchy.isAPartOfLeftFoot=1;
                         }
                     //----------------------------------------------------------------
 

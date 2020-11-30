@@ -23,12 +23,12 @@ void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
       unsigned int connectorColorR=255;
       unsigned int connectorColorG=255;
       unsigned int connectorColorB=0;
-      if ( mc->jointHierarchy[jID].isAPartOfRightFoot ) { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
-      if ( mc->jointHierarchy[jID].isAPartOfRightArm )  { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
-      if ( mc->jointHierarchy[jID].isAPartOfLeftFoot )  { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
-      if ( mc->jointHierarchy[jID].isAPartOfLeftArm )   { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
-      if ( mc->jointHierarchy[jID].isAPartOfHead)       { connectorColorR=0; connectorColorG=0; connectorColorB=255; } else
-      if ( mc->jointHierarchy[jID].isAPartOfTorso )     { connectorColorR=0; connectorColorG=0; connectorColorB=255; }
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfRightFoot ) { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfRightArm )  { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfLeftFoot )  { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfLeftArm )   { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfHead)       { connectorColorR=0; connectorColorG=0; connectorColorB=255; } else
+      if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfTorso )     { connectorColorR=0; connectorColorG=0; connectorColorB=255; }
 
 
       if (bhv_jointHasParent(mc,jID))
