@@ -428,3 +428,47 @@ void quaternionFromTwoVectors(float * quaternionOutput , float * vA , float * vB
     quaternionOutput[3] = 0.5f * m; //qW
 }
 
+
+void generateRandomQuaternion(float * quaternionOutput)
+{
+ //Choose three points u, v, w ∈ [0,1] uniformly at random. A uniform, random quaternion is given by the simple expression:
+ //h = ( sqrt(1-u) sin(2πv), sqrt(1-u) cos(2πv), sqrt(u) sin(2πw), sqrt(u) cos(2πw))
+ if (quaternionOutput!=0)
+ {
+     float u = ((float) rand() / (RAND_MAX));
+     float v = ((float) rand() / (RAND_MAX));
+     float w = ((float) rand() / (RAND_MAX));
+     
+     quaternionOutput[0] = sqrt(1-u) * sin(2 * PI * v );
+     quaternionOutput[1] = sqrt(1-u) * cos(2 * PI * v );
+     quaternionOutput[2] = sqrt(u)   * sin(2 * PI * w );
+     quaternionOutput[3] = sqrt(u)   * sin(2 * PI * w );
+     normalizeQuaternions(&quaternionOutput[0],&quaternionOutput[1],&quaternionOutput[2],&quaternionOutput[3]);
+ }  
+}
+
+void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutput,float * quaternionInput,int quaternionConvention,float angleDistance)
+{
+    if (angleDistance<=0.0)
+    {
+        fprintf(stderr,"stochasticRandomQuaternionWithLessThanAngleDistance is not possible with angle %0.2f\n",angleDistance);
+    }
+    
+    //This is a stochastic call, if your angle distance is very small good luck..!
+    float qIX,qIY,qIZ,qIW;
+    handleQuaternionPackConvention(qIX,qIY,qIZ,qIW ,quaternionInput,quaternionConvention);
+    
+    float thisDistance;
+    do 
+    {
+     generateRandomQuaternion(quaternionOutput);
+     float qOX,qOY,qOZ,qOW;
+     handleQuaternionPackConvention(qOX,qOY,qOZ,qOW ,quaternionOutput,quaternionConvention);
+     thisDistance = anglesBetweenQuaternions(
+                                             qIX,qIY,qIZ,qIW,
+                                             qOX,qOY,qOZ,qOW
+                                            );
+    }
+    while (thisDistance>angleDistance);
+    
+}

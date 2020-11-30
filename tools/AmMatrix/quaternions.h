@@ -147,6 +147,9 @@ void quaternionRotate(float * quaternion , float rotX , float rotY, float rotZ ,
 
 void quaternionFromTwoVectors(float * quaternionOutput , float * vA , float * vB);
 
+
+void generateRandomQuaternion(float * quaternionOutput);
+
 #ifdef __cplusplus
 }
 #endif
