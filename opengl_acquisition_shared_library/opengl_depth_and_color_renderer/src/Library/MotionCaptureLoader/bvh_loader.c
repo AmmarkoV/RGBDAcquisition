@@ -108,9 +108,26 @@ int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC)
 }
 
 
+
+
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint)
 {
-  int channelOrder=enumerateChannelOrderFromTypes(
+  int channelOrder=BVH_ROTATION_ORDER_NONE;
+  int quaternionUsed = 0;
+  for (unsigned int i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
+  {
+    if (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_W)
+    {
+      quaternionUsed=1;
+    }
+  }
+ 
+ if (quaternionUsed)
+ { 
+     fprintf(stderr,GREEN "Quaternion detected..!\n" NORMAL);
+ } else
+ {
+   channelOrder=enumerateChannelOrderFromTypes(
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[0],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[1],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[2]
@@ -124,11 +141,14 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[5]
                                                  );
   }
+ }
+ 
   if (channelOrder==BVH_ROTATION_ORDER_NONE)
   {
-    fprintf(stderr,RED "BUG: Channel order still wrong, todo smarter channel order enumeration..\n" NORMAL);
+    fprintf(stderr,RED "BUG: Channel order still wrong, TODO smarter channel order enumeration..\n" NORMAL);
   }
-return channelOrder;
+
+ return channelOrder;
 }
 
 
