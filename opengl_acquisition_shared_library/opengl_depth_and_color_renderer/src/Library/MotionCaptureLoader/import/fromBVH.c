@@ -83,9 +83,9 @@ int thisLineOnlyHasX(const char * line,const char x)
   {
     if (line[i]==' ')  { } else
     if (line[i]=='\t') { } else
-    if (line[i]==10) { } else
-    if (line[i]==13) { } else
-    if (line[i]==x)  { } else
+    if (line[i]==10)   { } else
+    if (line[i]==13)   { } else
+    if (line[i]==x)    { } else
         {
            //fprintf(stderr,"Line Char %u is %u(%c)\n",i,(unsigned int) line[i],line[i]);
            return 0;
@@ -341,8 +341,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                      for (cL=0; cL<loadedChannels; cL++)
                        {
                          //For each declared channel we need to enumerate the label to a value
-                         unsigned int thisChannelID = enumerateInputParserChannel(ipcB,2+cL);
-
+                         unsigned int thisChannelID = enumerateInputParserChannel(ipcB,2+cL); 
                          bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID;
 
                          if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);}
