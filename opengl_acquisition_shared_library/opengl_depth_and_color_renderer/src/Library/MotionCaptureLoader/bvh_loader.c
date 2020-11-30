@@ -124,14 +124,23 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
  
  if (quaternionUsed)
  { 
-     fprintf(stderr,GREEN "Quaternion detected..!\n" NORMAL);
+     if ( 
+          (bvhMotion->jointHierarchy[currentJoint].channelType[3]==BVH_ROTATION_W) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[4]==BVH_ROTATION_X) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[5]==BVH_ROTATION_Y) &&
+          (bvhMotion->jointHierarchy[currentJoint].channelType[6]==BVH_ROTATION_Z)
+          )
+          {
+              fprintf(stderr,GREEN "Quaternion detected..!\n" NORMAL);
+              return BVH_ROTATION_ORDER_QXQYQZQW;
+          }
  } else
  {
    channelOrder=enumerateChannelOrderFromTypes(
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[0],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[1],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[2]
-                                                 );
+                                              );
 
   if (channelOrder==BVH_ROTATION_ORDER_NONE)
   {
