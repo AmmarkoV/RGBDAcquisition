@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.45";
+static const char BVH_LOADER_VERSION_STRING [] = "0.46";
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
@@ -154,16 +154,7 @@ struct BVH_Joint
   char isImmuneToTorsoOcclusions;
   //--------------------
   
-   struct jointPartOfKnownHierarchy partOfHierarchy;
-   /*
-   char isAPartOfLeftFoot;
-   char isAPartOfRightFoot;
-   char isAPartOfLeftArm;
-   char isAPartOfRightArm;
-   char isAPartOfLeftHand;
-   char isAPartOfRightHand;
-   char isAPartOfHead;
-   char isAPartOfTorso;*/
+  struct jointPartOfKnownHierarchy partOfHierarchy; 
   //--------------------
   char erase2DCoordinates;
   char isRoot;
@@ -175,8 +166,8 @@ struct BVH_Joint
   char jointNameLowercase[MAX_BVH_JOINT_NAME+1];
   unsigned int jointNameHash;
   //--------------------
-  unsigned int parentJoint;
-  unsigned int endSiteJoint;
+  BVHJointID parentJoint;
+  BVHJointID endSiteJoint;
   unsigned int hierarchyLevel;
   //--------------------
   float offset[3];
@@ -196,8 +187,8 @@ struct BVH_Joint
 */
 struct BVH_JointToMotion_LookupTable
 {
-  unsigned int jointMotionOffset;
-  unsigned int channelIDMotionOffset[BVH_VALID_CHANNEL_NAMES];
+  BVHMotionChannelID jointMotionOffset;
+  BVHMotionChannelID channelIDMotionOffset[BVH_VALID_CHANNEL_NAMES];
 };
 
 /**
@@ -206,9 +197,9 @@ struct BVH_JointToMotion_LookupTable
 */
 struct BVH_MotionToJoint_LookupTable
 {
-  unsigned int jointID;
-  unsigned int parentID;
-  unsigned int channelID;
+  BVHJointID jointID;
+  BVHJointID parentID;
+  BVHMotionChannelID channelID;
 };
 
 
@@ -240,7 +231,7 @@ struct BVH_MotionCapture
 
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
-  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
+  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*7];
 
   //Motion
   unsigned int numberOfValuesPerFrame;
