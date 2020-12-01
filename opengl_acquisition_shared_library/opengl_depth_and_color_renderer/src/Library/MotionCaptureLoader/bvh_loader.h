@@ -173,6 +173,10 @@ struct BVH_Joint
   float offset[3];
   struct Matrix4x4OfFloats staticTransformation;
   //--------------------
+  
+  char  hasPositionalChannels;
+  char  hasRotationalChannels;
+  char  hasQuaternionRotation;
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
   unsigned int loadedChannels;

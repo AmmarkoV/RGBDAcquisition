@@ -26,6 +26,10 @@
 
 #include "import/fromBVH.h"
 
+
+
+
+//----------------------------------------------------------
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -35,6 +39,7 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
+//----------------------------------------------------------
 #define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
 #define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
 #define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
@@ -43,6 +48,7 @@
 #define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+//----------------------------------------------------------
 
 
 
@@ -64,7 +70,7 @@
 //----------------------------------------------------------------------------------------------------
 
 
-int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC)
+int enumerateRotationChannelOrderFromTypes(char typeA,char typeB,char typeC)
 {
   switch (typeA)
   {
@@ -143,6 +149,9 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
         )
           {
               fprintf(stderr,GREEN "Root Quaternion detected..!\n" NORMAL);
+              bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 3-6 so there is also a positional channel
+              bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+              bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=1;
               return BVH_ROTATION_ORDER_QWQXQYQZ;
           } else
      if ( 
@@ -153,24 +162,40 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
         )
           {
               fprintf(stderr,GREEN "Joint Quaternion detected..!\n" NORMAL);
+              bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=0; //The Rotation is specified on offsets 0-3 so there is no positional channel
+              bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+              bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=1;
               return BVH_ROTATION_ORDER_QWQXQYQZ;
           }
  } else
  {
-   channelOrder=enumerateChannelOrderFromTypes(
+
+   channelOrder=enumerateRotationChannelOrderFromTypes(
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[0],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[1],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[2]
                                               );
-
-  if (channelOrder==BVH_ROTATION_ORDER_NONE)
-  {
-      channelOrder=enumerateChannelOrderFromTypes(
+    if (channelOrder!=BVH_ROTATION_ORDER_NONE)
+    {   
+      bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=0; //The Rotation is on offsets 0-2 so there is no positional channel
+      bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+      bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+    }
+   else
+   if (channelOrder==BVH_ROTATION_ORDER_NONE)
+    {
+      channelOrder=enumerateRotationChannelOrderFromTypes(
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[3],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[4],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[5]
                                                  );
-  }
+      if (channelOrder!=BVH_ROTATION_ORDER_NONE)
+        {   
+          bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 0-2 so there is no positional channel
+          bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+          bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+        }
+    }
  }
  
   if (channelOrder==BVH_ROTATION_ORDER_NONE)

@@ -359,6 +359,9 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                      if (debug) {fprintf(stderr,"\n");}
 
                      bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint);
+                       char  hasPositionalChannels;
+  char  hasRotationalChannels;
+  char  hasQuaternionRotation;
                      //Done 
                   }//The number of channels is small enough to be handled 
                    else
