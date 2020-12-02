@@ -71,7 +71,7 @@ int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumen
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yposition") ) {return BVH_POSITION_Y; } else
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zposition") ) {return BVH_POSITION_Z; }
 
-  return BVH_POSITION_NONE;
+  return BVH_CHANNEL_NONE;
 }
 
 
@@ -358,10 +358,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                        }
                      if (debug) {fprintf(stderr,"\n");}
 
-                     bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint);
-                       char  hasPositionalChannels;
-  char  hasRotationalChannels;
-  char  hasQuaternionRotation;
+                     bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint); 
                      //Done 
                   }//The number of channels is small enough to be handled 
                    else

@@ -58,14 +58,14 @@ static const char * channelNames[] =
 
 enum CHANNEL_NAMES
 {
-  BVH_POSITION_NONE=0,
-  BVH_ROTATION_X,
-  BVH_ROTATION_Y,
-  BVH_ROTATION_Z,
-  BVH_ROTATION_W, //QBVH
+  BVH_CHANNEL_NONE=0,
   BVH_POSITION_X,
   BVH_POSITION_Y,
   BVH_POSITION_Z,
+  BVH_ROTATION_W, //QBVH
+  BVH_ROTATION_X,
+  BVH_ROTATION_Y,
+  BVH_ROTATION_Z,
   //--------------------
   BVH_VALID_CHANNEL_NAMES
 };
@@ -100,6 +100,24 @@ enum CHANNEL_ROTATION_ORDER
   BVH_ROTATION_ORDER_QWQXQYQZ, //QBVH
   //--------------------
   BVH_VALID_ROTATION_ORDER_NAMES
+};
+
+
+/**
+ * @brief Regardless of the rotation order above when transcations happen motion buffers 
+ * get their channels rerouted to constant positions so that it is easier to manage them!
+ */
+enum MOTIONBUFFER_TRANSACTION_DATA_FIELDS
+{
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X=0,
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y,
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z,
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W, //QBVH
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X,
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y,
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z,
+ //-----------------------------
+ MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER
 };
 
 
@@ -522,7 +540,20 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
 */
 int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
 
-int bhv_populatePosXYZRotXYZFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData);
+
+
+/**
+* @brief A very important call that handles retreiving data from the motion buffer.. 
+* The data output array should be at least MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER elements long
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @param  Output float array that will hold the results
+* @param  Size of the output float array that should hold at least 6 floats
+* @return 1=Success/0=Failure
+*/
+int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData);
 
 /**
 * @brief Direct access to the motion data, without Joint hierarchy,Frame separation etc, should not be used unless you really know what you are doing..

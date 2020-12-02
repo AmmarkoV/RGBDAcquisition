@@ -3,6 +3,7 @@
 #include "bvh_transform.h"
 
 #include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../../tools/AmMatrix/quaternions.h"
  
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..
@@ -395,22 +396,6 @@ int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
 
 
 
-/**
- * @brief This is a MocapNET orientation.
- */
-enum MOTIONBUFFER_DATA_FIELDS
-{
- MOTIONBUFFER_DATA_FIELDS_POSX=0,
- MOTIONBUFFER_DATA_FIELDS_POSY,
- MOTIONBUFFER_DATA_FIELDS_POSZ,
- MOTIONBUFFER_DATA_FIELDS_ROTX,
- MOTIONBUFFER_DATA_FIELDS_ROTY,
- MOTIONBUFFER_DATA_FIELDS_ROTZ,
- //-----------------------------
- MOTIONBUFFER_DATA_FIELDS_NUMBER
-};
-
-
 
 static inline void bvh_prepareMatricesForTransform(
                                                    struct BVH_MotionCapture * bvhMotion,
@@ -421,29 +406,48 @@ static inline void bvh_prepareMatricesForTransform(
 {
   
   //data is the buffer where we will retrieve the values
-  float data[MOTIONBUFFER_DATA_FIELDS_NUMBER]={0};
+  float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
   //----------------------------------------------------
   
   //To Setup the dynamic transformation we must first get values from our bvhMotion structure
-  if (bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
+  if (bhv_retrieveDataFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
        create4x4FTranslationMatrix(
                                     &bvhTransform->joint[jID].dynamicTranslation,
-                                    data[MOTIONBUFFER_DATA_FIELDS_POSX],
-                                    data[MOTIONBUFFER_DATA_FIELDS_POSY],
-                                    data[MOTIONBUFFER_DATA_FIELDS_POSZ]
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X],
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y],
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]
                                   );
 
 
   if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
        {
-        create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                        &bvhTransform->joint[jID].dynamicRotation,
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTX],
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTY],
-                                                        -1*data[MOTIONBUFFER_DATA_FIELDS_ROTZ],
-                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
-                                                       ); 
+          if(!bvhMotion->jointHierarchy[jID].hasQuaternionRotation)
+          {
+            create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                             &bvhTransform->joint[jID].dynamicRotation,
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
+                                                            (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                           ); 
+              
+          } else
+          {
+              //Handle quaternion rotation here..
+              float quaternion[4]={
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W],
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                    data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]
+                                  }; 
+                                  
+              quaternion2Matrix4x4(
+                                    bvhTransform->joint[jID].dynamicRotation.m,
+                                    quaternion,
+                                    qWqXqYqZ
+                                   );
+          }
        } else
        {
          //No rotation order will get you an Identity rotation   
