@@ -272,10 +272,10 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
   if (bvhMotion==0) { return 0; }
-  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;  }
-  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;  }
+  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;        }
+  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;      }
   if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
-  if (bvhMotion->fileName!=0) { free(bvhMotion->fileName); }
+  if (bvhMotion->fileName!=0)                   {  free(bvhMotion->fileName);           bvhMotion->fileName=0;            }
   
   memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
 
