@@ -831,7 +831,7 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 int bvh_setJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID,float value)
 {
-   if ( (bvhMotion!=0) && (bvhMotion->jointHierarchySize>jID) )
+   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) )
    {
      unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
@@ -980,11 +980,7 @@ int bvh_copyMotionFrameToMotionBuffer(
                                        BVHFrameID fromfID
                                      )
 {
-   if (motionBuffer==0) { return 0; }
-   if (motionBuffer->motion==0) { return 0; }
-   if (motionBuffer->bufferSize < bvhMotion->numberOfValuesPerFrame) { return 0; }
-
-   if ( fromfID < bvhMotion->numberOfFrames )
+ if ( (motionBuffer!=0) && (motionBuffer->motion!=0) && ( bvhMotion->numberOfValuesPerFrame <= motionBuffer->bufferSize) && (fromfID < bvhMotion->numberOfFrames) )
    {
      memcpy(
              motionBuffer->motion,
@@ -1564,7 +1560,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
 
 void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 {
-
+  #warning "bvh_print_C_Header needs a complete rewrite.."
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief An array with BVH string labels\n");
   fprintf(stdout," */\n");
@@ -1575,16 +1571,29 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   unsigned int countOfChannels=0;
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
-    if (i==0)
+    if (bvhMotion->jointHierarchy[i].isRoot)
+    {
+    if (bvhMotion->jointHierarchy[i].hasPositionalChannels)
         {
            coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // 0\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // 1\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // 2\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           countOfChannels+=3;
+        }
+
+    if (bvhMotion->jointHierarchy[i].hasRotationalChannels)
+        {
+           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation) 
+           { 
+            coord='W'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+            ++countOfChannels;
+           }
            coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%crotation\"%c // 4\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
-           countOfChannels+=5;
-        } else
+        }
+           countOfChannels+=3;
+    } else
     {
      if (!bvhMotion->jointHierarchy[i].isEndSite)
         {
