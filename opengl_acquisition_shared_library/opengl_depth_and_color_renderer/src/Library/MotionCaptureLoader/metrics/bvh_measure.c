@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 
 
@@ -17,6 +18,83 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
+
+
+
+
+void compareMotionBuffers(const char * msg,struct MotionBuffer * guess,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if (guess->bufferSize != groundTruth->bufferSize)
+  {
+    fprintf(stderr,"compareMotionBuffers: Buffer Size mismatch..\n");
+    return ;
+  }
+
+  //--------------------------------------------------
+  fprintf(stderr,"Guess : ");
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,guess->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+  fprintf(stderr,"Truth : ");
+  for (unsigned int i=0; i<groundTruth->bufferSize; i++)
+  {
+    fprintf(stderr,"%0.2f " ,groundTruth->motion[i]);
+  }
+  fprintf(stderr,"\n");
+  //--------------------------------------------------
+
+
+  fprintf(stderr,"Diff : ");
+
+  for (unsigned int i=0; i<guess->bufferSize; i++)
+  {
+    float diff=fabs(groundTruth->motion[i] - guess->motion[i]);
+    if (fabs(diff)<0.1) { fprintf(stderr,GREEN "%0.2f " ,diff); } else
+                         { fprintf(stderr,RED "%0.2f " ,diff); }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
+void compareTwoMotionBuffers(struct BVH_MotionCapture * mc,const char * msg,struct MotionBuffer * guessA,struct MotionBuffer * guessB,struct MotionBuffer * groundTruth)
+{
+  fprintf(stderr,"%s \n",msg);
+  fprintf(stderr,"___________\n");
+
+  if ( (guessA->bufferSize != groundTruth->bufferSize) || (guessB->bufferSize != groundTruth->bufferSize) )
+  {
+    fprintf(stderr,"compareTwoMotionBuffers: Buffer Size mismatch..\n");
+    return ;
+  }
+
+
+  fprintf(stderr,"Diff : ");
+  for (unsigned int i=0; i<guessA->bufferSize; i++)
+  {
+    float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
+    float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
+    if ( (diffA==0.0) && (diffA==diffB) )  { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
+    {
+     if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
+                                           { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
+
+     unsigned int jID =mc->motionToJointLookup[i].jointID;
+     unsigned int chID=mc->motionToJointLookup[i].channelID;
+     fprintf(stderr,NORMAL "(%s#%u/%0.2f->%0.2f/%0.2f) ",mc->jointHierarchy[jID].jointName,chID,guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
+    }
+  }
+  fprintf(stderr,NORMAL "\n___________\n");
+}
+
+
+
+
 
 int bvhMeasureIterationInfluence(
     struct BVH_MotionCapture * mc,
