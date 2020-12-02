@@ -811,12 +811,12 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
   if (data == 0) { return 0; }
   if (sizeOfData < sizeof(float)* 6) { return 0; }
 
-  data[0]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
-  data[1]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
-  data[2]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
-  data[3]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
-  data[4]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
-  data[5]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
+  data[BVH_POSITION_X]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
+  data[BVH_POSITION_Y]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
+  data[BVH_POSITION_Z]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
+  data[BVH_ROTATION_X]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
+  data[BVH_ROTATION_Y]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
+  data[BVH_ROTATION_Z]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
   return 1;
 }
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
@@ -861,12 +861,12 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
   if (sizeOfData < sizeof(float)* 6) { return 0; }
 
   int successfulStores=0;
-  successfulStores+=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[0]);
-  successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[1]);
-  successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[2]);
-  successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[3]);
-  successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[4]);
-  successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[5]);
+  successfulStores+=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_X]);
+  successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Y]);
+  successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Z]);
+  successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_X]);
+  successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Y]);
+  successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Z]);
   return (successfulStores==6);
 }
 
@@ -917,22 +917,11 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
        data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);  
       }
       
-      
-      
-       //This code segment used to be just these 6 simple lines, however it run 2x slower :P
-       //data[0]=bvh_getJointPositionXAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       //data[1]=bvh_getJointPositionYAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       //data[2]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       //data[3]=bvh_getJointRotationXAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       //data[4]=bvh_getJointRotationYAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       //data[5]=bvh_getJointRotationZAtMotionBuffer(bvhMotion,jID,motionBuffer);
-       
-       unsigned int mID;
-       
-      if (bvhMotion->jointHierarchy[jID].hasRotationalChannels) //This used to be isRoot before QBVH
+    if (bvhMotion->jointHierarchy[jID].hasRotationalChannels) //This used to be isRoot before QBVH
       {
+       unsigned int mID;
        switch (bvhMotion->jointHierarchy[jID].channelRotationOrder)
-       {
+       { 
            case BVH_ROTATION_ORDER_ZXY : 
              //Special code to speed up cases that match the BVH specification ZXY rotation orders
              mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,BVH_ROTATION_X);
