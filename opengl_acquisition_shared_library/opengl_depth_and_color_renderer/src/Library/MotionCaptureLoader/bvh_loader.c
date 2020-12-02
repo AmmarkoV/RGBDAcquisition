@@ -925,7 +925,10 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
        #ifdef NAN
           // NAN is supported
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W]=NAN;
+       #else
+          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W]=0.0;
        #endif
+       
        unsigned int mID;
        switch (bvhMotion->jointHierarchy[jID].channelRotationOrder)
        { 
@@ -954,8 +957,14 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
        };
       } else
       {
-          //This is the case where a joint has no rotational channels!
+         //This is the case where a joint has no rotational channels! 
+         #ifdef NAN
+          // NAN is supported
+          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W]=NAN;
+         #else
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W]=0.0;
+         #endif
+         
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=0.0;
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=0.0;
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=0.0; 
