@@ -244,7 +244,15 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
   fd = fopen(filename,"r");
   if (fd!=0)
     {
-      snprintf(bvhMotion->fileName,2047,"%s",filename);
+      //Remember filename..!
+      //==========================================================================
+      unsigned int lengthOfFilename = strlen(filename)+1; //+1 to be null terminated..
+      if (bvhMotion->fileName!=0) { free(bvhMotion->fileName); }
+      bvhMotion->fileName = (char *) malloc(sizeof(char) * (lengthOfFilename)); 
+      if (bvhMotion->fileName!=0)
+        { snprintf(bvhMotion->fileName,lengthOfFilename,"%s",filename); }
+      //==========================================================================
+      
       if (readBVHHeader(bvhMotion,fd))
       {
        //If we have the header let's update the hashes
@@ -267,7 +275,8 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
   if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;  }
   if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;  }
   if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
-
+  if (bvhMotion->fileName!=0) { free(bvhMotion->fileName); }
+  
   memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
 
   return 1;
