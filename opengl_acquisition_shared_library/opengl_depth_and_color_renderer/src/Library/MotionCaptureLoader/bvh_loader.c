@@ -864,10 +864,11 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
    int successfulStores=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_X]);
    successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Y]);
    successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Z]);
+   successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_W]);
    successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_X]);
    successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Y]);
    successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Z]);
-   return (successfulStores==6); 
+   return (successfulStores==7); 
   }
   return 0;
 }
@@ -920,7 +921,11 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
       }
       
     if (bvhMotion->jointHierarchy[jID].hasRotationalChannels) //This used to be isRoot before QBVH
-      {
+      {  
+       #ifdef NAN
+          // NAN is supported
+          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W]=NAN;
+       #endif
        unsigned int mID;
        switch (bvhMotion->jointHierarchy[jID].channelRotationOrder)
        { 
