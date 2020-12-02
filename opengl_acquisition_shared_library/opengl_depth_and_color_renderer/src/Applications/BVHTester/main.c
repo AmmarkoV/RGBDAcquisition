@@ -19,6 +19,7 @@
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_c.h"
 
 #include "../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_randomize.h"

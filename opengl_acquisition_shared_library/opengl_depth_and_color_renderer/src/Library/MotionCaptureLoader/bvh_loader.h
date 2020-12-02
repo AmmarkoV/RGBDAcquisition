@@ -609,7 +609,6 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
 void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion);
 
 
-void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion);
 
 
 #ifdef __cplusplus
