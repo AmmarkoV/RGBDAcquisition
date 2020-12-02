@@ -433,7 +433,7 @@ int bvh_getJointIDFromJointName(
                                 )
 {
    if ( (bvhMotion!=0) && (jointName!=0) && (jID!=0) )
-   { 
+   {
     unsigned int i=0;
     for (i=0; i<bvhMotion->jointHierarchySize; i++)
     {
@@ -454,10 +454,8 @@ int bvh_getJointIDFromJointNameNocase(
                                       BVHJointID * jID
                                      )
 {
-  if (bvhMotion==0) { return 0; }
-  if (jointName==0) { return 0; }
-  if (jID==0)       { return 0; }
-  
+ if ( (bvhMotion!=0) && (jointName!=0) && (jID!=0) )
+ { 
   if (strlen(jointName)>=MAX_BVH_JOINT_NAME)
      {
        fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
@@ -477,6 +475,7 @@ int bvh_getJointIDFromJointNameNocase(
          return 1;
      }
    }
+ }
  return 0;
 }
 
@@ -498,7 +497,6 @@ int bvh_getRootJointID(
 
 int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 {
-    
   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) )
   {
        return bvhMotion->jointHierarchy[jID].parentJoint;
@@ -636,17 +634,12 @@ int bvh_getJointDimensions(
                               float * zValue
                              )
 {
-   if (bvhMotion==0)
+   if (bvhMotion!=0)
     {
-     fprintf(stderr,"bvh_changeJointDimensions: Cannot work before having loaded a bvh file\n");
-     return 0;
-    }
-  
-
-    BVHJointID jID=0;
-   if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
-   //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
-   {
+      BVHJointID jID=0;
+      if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
+      //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+      {
        unsigned int angleX = 0;
        unsigned int angleY = 1;
        unsigned int angleZ = 2;
@@ -661,10 +654,10 @@ int bvh_getJointDimensions(
        if (xValue!=0) { *xValue = bvhMotion->jointHierarchy[jID].offset[angleX]; }
        if (yValue!=0) { *yValue = bvhMotion->jointHierarchy[jID].offset[angleY]; }
        if (zValue!=0) { *zValue = bvhMotion->jointHierarchy[jID].offset[angleZ]; }
-       
-      return 1;
-   }
 
+      return 1;
+      }
+   }
  return 0;
 }
 
@@ -680,18 +673,14 @@ int bvh_changeJointDimensions(
                               float zScale
                              )
 {
-   if (bvhMotion==0)
-    {
-     fprintf(stderr,"bvh_changeJointDimensions: Cannot work before having loaded a bvh file\n");
-     return 0;
-    }
+ if (bvhMotion!=0)
+    { 
+      //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
 
-    //fprintf(stderr,"bvh_changeJointDimensions: %s %0.2f %0.2f %0.2f\n",jointName,xScale,yScale,zScale);
-
-    BVHJointID jID=0;
-   if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
-   //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
-   {
+      BVHJointID jID=0;
+      if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&jID) )
+      //if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+      {
        unsigned int angleX = 0;
        unsigned int angleY = 1;
        unsigned int angleZ = 2;
@@ -716,16 +705,17 @@ int bvh_changeJointDimensions(
        m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
 
       return 1;
-   }
+    }
 
- fprintf(stderr,"bvh_changeJointDimensions: Unable to locate joint %s \n",jointName);
- fprintf(stderr,"Joint List : ");
- for (unsigned int jIDIt=0; jIDIt<bvhMotion->jointHierarchySize; jIDIt++)
- {
-   if (jIDIt!=0) { fprintf(stderr,","); }
-   fprintf(stderr,"%s(or. %s)",bvhMotion->jointHierarchy[jIDIt].jointNameLowercase,bvhMotion->jointHierarchy[jIDIt].jointName);
- }
- fprintf(stderr,"\n");
+    fprintf(stderr,"bvh_changeJointDimensions: Unable to locate joint %s \n",jointName);
+    fprintf(stderr,"Joint List : ");
+    for (unsigned int jIDIt=0; jIDIt<bvhMotion->jointHierarchySize; jIDIt++)
+     {
+       if (jIDIt!=0) { fprintf(stderr,","); }
+       fprintf(stderr,"%s(or. %s)",bvhMotion->jointHierarchy[jIDIt].jointNameLowercase,bvhMotion->jointHierarchy[jIDIt].jointName);
+     }
+    fprintf(stderr,"\n");
+   }
  return 0;
 }
 
@@ -736,11 +726,11 @@ int bvh_scaleAllOffsets(
                         float scalingRatio
                        )
 {
-   if (bvhMotion==0)      { return 0; }
-   if (scalingRatio==1.0) { return 1; }
-
-    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+  if (scalingRatio==1.0) { return 1; }
+  if (bvhMotion!=0)      
     {
+     for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+     {
       bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
       bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
       bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
@@ -750,9 +740,10 @@ int bvh_scaleAllOffsets(
        m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (float) bvhMotion->jointHierarchy[jID].offset[1];
        m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (float) bvhMotion->jointHierarchy[jID].offset[2];
        m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
+     }
+     return 1;
     }
-
- return 1;
+  return 0;
 }
 
 
@@ -792,8 +783,7 @@ int bvh_getMotionChannelName(struct BVH_MotionCapture * bvhMotion,BVHMotionChann
 float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
 {
    if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) ) 
-    { 
-       
+    {
       unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
       if (mID<bvhMotion->motionValuesSize)
@@ -817,9 +807,8 @@ float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJo
 
 int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
 {
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 6) { return 0; }
-
+ if ( (data!=0) && (sizeOfData >= sizeof(float) * MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER) ) //QBVH
+  { 
   data[BVH_POSITION_X]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
   data[BVH_POSITION_Y]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
   data[BVH_POSITION_Z]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
@@ -827,7 +816,9 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
   data[BVH_ROTATION_X]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
   data[BVH_ROTATION_Y]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
   data[BVH_ROTATION_Z]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
-  return 1;
+  return 1; 
+  }
+  return 0;
 }
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
@@ -840,20 +831,21 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 int bvh_setJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID,float value)
 {
-   if (bvhMotion==0) { return 0.0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
-
-   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
-
-   if (mID>=bvhMotion->motionValuesSize)
+   if ( (bvhMotion!=0) && (bvhMotion->jointHierarchySize>jID) )
    {
-     fprintf(stderr,RED "bvh_setJointChannelAtFrame overflowed..\n" NORMAL);
-     return 0;
-   }
+     unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
-    bvhMotion->motionValues[mID]=value;
+     if (mID>=bvhMotion->motionValuesSize)
+     {
+       fprintf(stderr,RED "bvh_setJointChannelAtFrame overflowed..\n" NORMAL);
+       return 0;
+     }
+
+     bvhMotion->motionValues[mID]=value;
 
     return 1;
+   }
+   return 0;
 }
 
 int bvh_setJointRotationWAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_W,value); }
@@ -867,17 +859,17 @@ int bvh_setJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJoint
 
 int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
 {
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 6) { return 0; }
-
-  int successfulStores=0;
-  successfulStores+=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_X]);
-  successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Y]);
-  successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Z]);
-  successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_X]);
-  successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Y]);
-  successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Z]);
-  return (successfulStores==6);
+  if ( (bvhMotion!=0) && (data!=0) && (sizeOfData >= sizeof(float) * MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER) ) //QBVH
+  {
+   int successfulStores=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_X]);
+   successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Y]);
+   successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[BVH_POSITION_Z]);
+   successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_X]);
+   successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Y]);
+   successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[BVH_ROTATION_Z]);
+   return (successfulStores==6); 
+  }
+  return 0;
 }
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
