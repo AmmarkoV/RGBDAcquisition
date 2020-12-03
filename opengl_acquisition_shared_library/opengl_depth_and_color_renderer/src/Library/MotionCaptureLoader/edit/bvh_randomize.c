@@ -343,7 +343,7 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
         float randomQuaternion[4]; 
         
         //TODO: this or not todo ?
-        fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL ); 
+        //fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL ); 
         float buffer = randomRotations[0];
         randomRotations[0]=randomRotations[2];
         randomRotations[2]=buffer;
