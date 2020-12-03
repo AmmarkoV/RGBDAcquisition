@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
+ 
+#include "../../../../../../tools/AmMatrix/quaternions.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -331,22 +331,38 @@ int bvh_RandomizeRootRotationsOfFrameBasedOn3D(
      //regardless of rotation order, however to keep things compatible with the initial implementation I have I will just assume
      //the initial convention and will have to change this at some point in the future..  
      
-     if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+     if (mc->jointHierarchy[mc->rootJointID].hasRotationalChannels)
      {
-      //Quaternion handling here..
-      fprintf(stderr,RED "TODO: add quaternion handling here..\n" NORMAL);
-      bvh_setJointRotationWAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
-      bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
-      bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
-      bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
-         
-     } else
-     {
-      bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
-      bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
-      bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
-     }
+       float randomRotations[3] = {
+                                    randomFloatA(minimumRotation[0],maximumRotation[0]), 
+                                    randomFloatA(minimumRotation[1],maximumRotation[1]), 
+                                    randomFloatA(minimumRotation[2],maximumRotation[2]) 
+                                  }; 
+       if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+       {
+        float randomQuaternion[4]; 
+        
+        //TODO: this or not todo ?
+        fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL ); 
+        float buffer = randomRotations[0];
+        randomRotations[0]=randomRotations[2];
+        randomRotations[2]=buffer;
+        
+        
+        euler2Quaternions(randomQuaternion,randomRotations,qWqXqYqZ); 
+        bvh_setJointRotationWAtFrame(mc,jID,fID,randomQuaternion[0]);
+        bvh_setJointRotationXAtFrame(mc,jID,fID,randomQuaternion[1]);
+        bvh_setJointRotationYAtFrame(mc,jID,fID,randomQuaternion[2]);
+        bvh_setJointRotationZAtFrame(mc,jID,fID,randomQuaternion[3]); 
+       } else
+       {
+        bvh_setJointRotationZAtFrame(mc,jID,fID,randomRotations[0]);
+        bvh_setJointRotationYAtFrame(mc,jID,fID,randomRotations[1]);
+        bvh_setJointRotationXAtFrame(mc,jID,fID,randomRotations[2]);
+       }
      
+         
+     }
      //Old code, no one guarantees the 3,4,5 offsets are correct
      //unsigned int mID=fID*mc->numberOfValuesPerFrame;
      //mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
