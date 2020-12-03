@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.46";
+static const char BVH_LOADER_VERSION_STRING [] = "0.47";
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
@@ -43,13 +43,13 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.46";
 static const char * channelNames[] =
 {
     "no rotation channel",
-    "Xrotation",
-    "Yrotation",
-    "Zrotation",
-    "Wrotation", //QBVH
     "Xposition",
     "Yposition",
     "Zposition",
+    "Wrotation", //QBVH
+    "Xrotation",
+    "Yrotation",
+    "Zrotation",
 //=================
     "End of Channel Names" ,
     "Unknown"
