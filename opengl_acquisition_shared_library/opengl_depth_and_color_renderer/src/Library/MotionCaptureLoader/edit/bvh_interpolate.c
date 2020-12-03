@@ -12,26 +12,26 @@ int bvh_InterpolateMotion(struct BVH_MotionCapture * mc)
 
   if (newMotionValues!=0)
   {
-   unsigned int i,z,target=0;
+   unsigned int i,mID,target=0;
    for (i=0; i<mc->numberOfFrames-1; i++)
     {
       //First copy frame
-      for (z=0; z<mc->numberOfValuesPerFrame; z++)
-        { newMotionValues[target*mc->numberOfValuesPerFrame + z] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + z]; }
+      for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+        { newMotionValues[target*mc->numberOfValuesPerFrame + mID] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + mID]; }
       target++;
       //Then add an interpolated frame
-      for (z=0; z<mc->numberOfValuesPerFrame; z++)
-        { newMotionValues[target*mc->numberOfValuesPerFrame + z] = ( mc->motionValues[i*mc->numberOfValuesPerFrame + z] + mc->motionValues[(i+1)*mc->numberOfValuesPerFrame + z] ) / 2;  }
+      for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+        { newMotionValues[target*mc->numberOfValuesPerFrame + mID] = ( mc->motionValues[i*mc->numberOfValuesPerFrame + mID] + mc->motionValues[(i+1)*mc->numberOfValuesPerFrame + mID] ) / 2;  }
       target++;
     }
 
   //Copy last two frames
   i=mc->numberOfFrames-1;
-  for (z=0; z<mc->numberOfValuesPerFrame; z++)
-      { newMotionValues[target*mc->numberOfValuesPerFrame + z] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + z]; }
+  for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+      { newMotionValues[target*mc->numberOfValuesPerFrame + mID] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + mID]; }
    target++;
-  for (z=0; z<mc->numberOfValuesPerFrame; z++)
-      { newMotionValues[target*mc->numberOfValuesPerFrame + z] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + z]; }
+  for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+      { newMotionValues[target*mc->numberOfValuesPerFrame + mID] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + mID]; }
 
 
   float * oldMotionValues = mc->motionValues;

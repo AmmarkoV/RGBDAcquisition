@@ -3,7 +3,6 @@
 #include <string.h>
 #include "bvh_cut_paste.h"
 
-
 int scanJointHierarchyUntilThisGroupEnds(
                                          struct BVH_MotionCapture * mc,
                                          BVHJointID jID,
@@ -390,13 +389,3 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
  fprintf(stderr,"Errors occured during bvh_GrowMocapFileByMirroringJointAndItsChildren\n");
  return 0;
 }
-
-
-
-
-
-
-
-
-
-
