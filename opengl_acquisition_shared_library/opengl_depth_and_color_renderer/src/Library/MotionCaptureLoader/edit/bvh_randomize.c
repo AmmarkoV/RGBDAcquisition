@@ -331,9 +331,21 @@ int bvh_RandomizeRootRotationsOfFrameBasedOn3D(
      //regardless of rotation order, however to keep things compatible with the initial implementation I have I will just assume
      //the initial convention and will have to change this at some point in the future..  
      
-     bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
-     bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
-     bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
+     if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+     {
+      //Quaternion handling here..
+      fprintf(stderr,RED "TODO: add quaternion handling here..\n" NORMAL);
+      bvh_setJointRotationWAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
+      bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
+      bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
+      bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
+         
+     } else
+     {
+      bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
+      bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
+      bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
+     }
      
      //Old code, no one guarantees the 3,4,5 offsets are correct
      //unsigned int mID=fID*mc->numberOfValuesPerFrame;
