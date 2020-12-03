@@ -251,25 +251,106 @@ int bvh_eraseJoints(
 
 
 
+int bvh_RandomizeRootPositionsOfFrameBasedOn3D(
+                                              struct BVH_MotionCapture * mc,
+                                              BVHJointID jID,
+                                              BVHFrameID fID,
+                                              float * minimumPosition,
+                                              float * maximumPosition
+                                             )
+{
+ if (mc!=0)
+ {   
+  bvh_setJointPositionXAtFrame(mc,jID,fID,randomFloatA(minimumPosition[0],maximumPosition[0]));
+  bvh_setJointPositionYAtFrame(mc,jID,fID,randomFloatA(minimumPosition[1],maximumPosition[1]));
+  bvh_setJointPositionZAtFrame(mc,jID,fID,randomFloatA(minimumPosition[2],maximumPosition[2]));
+     
+  //Old code, no one guarantees the 0,1,2 offsets are correct
+  //unsigned int mID=fID*mc->numberOfValuesPerFrame;
+  //mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
+  //mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
+  //mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]); 
+  return 1;     
+ }
+
+  fprintf(stderr,"bvh_RandomizePositionsBasedOn3D: Cannot be done without positional channels on root joint\n");
+  return 0;
+}
+
+
+
 int bvh_RandomizePositionsBasedOn3D(
                                      struct BVH_MotionCapture * mc,
                                      float * minimumPosition,
                                      float * maximumPosition
                                     )
 {
+ if (mc!=0)
+ {
   fprintf(stderr,"Randomizing Positions of %u frames based on 3D coordinates\n",mc->numberOfFrames);
   fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
   fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
-  unsigned int fID=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
+  
+  if (mc->jointHierarchy[mc->rootJointID].hasPositionalChannels)
   {
-   unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
-   mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
-   mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]);
+   BVHJointID rootJID = mc->rootJointID; 
+   BVHFrameID fID=0;
+   
+   for (fID=0; fID<mc->numberOfFrames; fID++)
+    { 
+     bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPosition,maximumPosition);
+    }
+   return 1;    
   }
- return 1;
+ }
+
+  fprintf(stderr,"bvh_RandomizePositionsBasedOn3D: Cannot be done without positional channels on root joint\n");
+  return 0;
 }
+
+
+
+
+
+
+int bvh_RandomizeRootRotationsOfFrameBasedOn3D(
+                                               struct BVH_MotionCapture * mc,
+                                               BVHJointID jID,
+                                               BVHFrameID fID,
+                                               float * minimumRotation,
+                                               float * maximumRotation
+                                              )
+{
+
+ if (mc!=0)
+ { 
+     //There is a dilemma here..!
+     //The DAZ-friendly bvh files I use as source use a Zrotation Yrotation Xrotation channel rotation order for root joint and
+     //Zrotation Xrotation Yrotation for the rest of the joints, supposedly the minimumPosition[0-3] and maximumPosition[0-3] 
+     //should give information for the X rotation axis, then the Y rotation axis and then the Z rotation axis that would work 
+     //regardless of rotation order, however to keep things compatible with the initial implementation I have I will just assume
+     //the initial convention and will have to change this at some point in the future..  
+     
+     bvh_setJointRotationZAtFrame(mc,jID,fID,randomFloatA(minimumRotation[0],maximumRotation[0]));
+     bvh_setJointRotationYAtFrame(mc,jID,fID,randomFloatA(minimumRotation[1],maximumRotation[1]));
+     bvh_setJointRotationXAtFrame(mc,jID,fID,randomFloatA(minimumRotation[2],maximumRotation[2]));
+     
+     //Old code, no one guarantees the 3,4,5 offsets are correct
+     //unsigned int mID=fID*mc->numberOfValuesPerFrame;
+     //mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
+     //mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
+     //mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+   return 1;  
+  }
+  
+ fprintf(stderr,"bvh_RandomizeRotationsOfFrameBasedOn3D: Cannot be done without positional channels on root joint\n");
+ return 0;
+}
+
+
+
+
+
 
 
 int bvh_RandomizeRotationsBasedOn3D(
@@ -278,18 +359,27 @@ int bvh_RandomizeRotationsBasedOn3D(
                                      float * maximumRotation
                                     )
 {
+ if (mc!=0)
+ {
   fprintf(stderr,"Randomizing Rotations of %u frames based on 3D coordinates\n",mc->numberOfFrames);
   fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumRotation[0],minimumRotation[1],minimumRotation[2]);
   fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumRotation[0],maximumRotation[1],maximumRotation[2]);
-  unsigned int fID=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
+  
+  if (mc->jointHierarchy[mc->rootJointID].hasRotationalChannels)
   {
-   unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
-   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
-   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
-  }
- return 1;
+   BVHJointID rootJID = mc->rootJointID; 
+   BVHFrameID fID=0;
+   
+   for (fID=0; fID<mc->numberOfFrames; fID++)
+    {  
+      bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotation,maximumRotation);
+    }
+   return 1;
+  } 
+ }
+ 
+ fprintf(stderr,"bvh_RandomizeRotationsBasedOn3D: Cannot be done without positional channels on root joint\n");
+ return 0;
 }
 
 
@@ -303,8 +393,10 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  )
 {
-  return ( (bvh_RandomizePositionsBasedOn3D(mc,minimumPosition,maximumPosition)) &&
-            (bvh_RandomizeRotationsBasedOn3D(mc,minimumPosition,maximumPosition)) );
+  return ( 
+            (bvh_RandomizePositionsBasedOn3D(mc,minimumPosition,maximumPosition)) &&
+            (bvh_RandomizeRotationsBasedOn3D(mc,minimumPosition,maximumPosition)) 
+         );
 }
 
 
@@ -335,29 +427,22 @@ int bvh_RandomizePositionRotation2Ranges(
 
   //fprintf(stderr,"Exiting\n");
   //exit(0);
-
-  unsigned int fID=0;
+  BVHJointID rootJID = mc->rootJointID; 
+  BVHFrameID fID=0;
+   
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
    float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
 
    if (whichHalf<0.5)
-           {
-              mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeA[0],maximumPositionRangeA[0]);
-              mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeA[1],maximumPositionRangeA[1]);
-              mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeA[2],maximumPositionRangeA[2]);
-              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeA[0],maximumRotationRangeA[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeA[1],maximumRotationRangeA[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeA[2],maximumRotationRangeA[2]);
+           { 
+             bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA); 
+             bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeA,maximumPositionRangeA); 
            } else
            {
-              mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeB[0],maximumPositionRangeB[0]);
-              mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeB[1],maximumPositionRangeB[1]);
-              mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeB[2],maximumPositionRangeB[2]);
-              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeB[0],maximumRotationRangeB[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeB[1],maximumRotationRangeB[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeB[2],maximumRotationRangeB[2]);
+             bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB); 
+             bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeB,maximumPositionRangeB); 
            }
   }
  return 1;
@@ -387,6 +472,12 @@ int bvh_RandomizePositionFrom2D(
                                 )
 {
   fprintf(stderr,"Randomizing %u frames  using 2D randomizations \n",mc->numberOfFrames);
+  
+  if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+          {
+              fprintf(stderr,"TODO: Handle quaternion rotation here..!\n");
+          }
+
 
   unsigned int borderX=width/7; //8
   unsigned int borderY=height/4;//5
