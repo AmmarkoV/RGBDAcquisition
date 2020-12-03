@@ -251,7 +251,7 @@ int bvh_eraseJoints(
 
 
 
-int bvh_RandomizeRootPositionsOfFrameBasedOn3D(
+int bvh_RandomizePositionsOfFrameBasedOn3D(
                                               struct BVH_MotionCapture * mc,
                                               BVHJointID jID,
                                               BVHFrameID fID,
@@ -260,7 +260,7 @@ int bvh_RandomizeRootPositionsOfFrameBasedOn3D(
                                              )
 {
  if (mc!=0)
- {   
+ {
   bvh_setJointPositionXAtFrame(mc,jID,fID,randomFloatA(minimumPosition[0],maximumPosition[0]));
   bvh_setJointPositionYAtFrame(mc,jID,fID,randomFloatA(minimumPosition[1],maximumPosition[1]));
   bvh_setJointPositionZAtFrame(mc,jID,fID,randomFloatA(minimumPosition[2],maximumPosition[2]));
@@ -298,7 +298,7 @@ int bvh_RandomizePositionsBasedOn3D(
    
    for (fID=0; fID<mc->numberOfFrames; fID++)
     { 
-     bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPosition,maximumPosition);
+     bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPosition,maximumPosition);
     }
    return 1;    
   }
@@ -313,7 +313,7 @@ int bvh_RandomizePositionsBasedOn3D(
 
 
 
-int bvh_RandomizeRootRotationsOfFrameBasedOn3D(
+int bvh_RandomizeRotationsOfFrameBasedOn3D(
                                                struct BVH_MotionCapture * mc,
                                                BVHJointID jID,
                                                BVHFrameID fID,
@@ -400,7 +400,7 @@ int bvh_RandomizeRotationsBasedOn3D(
    
    for (fID=0; fID<mc->numberOfFrames; fID++)
     {  
-      bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotation,maximumRotation);
+      bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotation,maximumRotation);
     }
    return 1;
   } 
@@ -465,12 +465,12 @@ int bvh_RandomizePositionRotation2Ranges(
 
    if (whichHalf<0.5)
            { 
-             bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA); 
-             bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeA,maximumPositionRangeA); 
+             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA); 
+             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeA,maximumPositionRangeA); 
            } else
            {
-             bvh_RandomizeRootRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB); 
-             bvh_RandomizeRootPositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeB,maximumPositionRangeB); 
+             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB); 
+             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeB,maximumPositionRangeB); 
            }
   }
  return 1;
@@ -510,20 +510,35 @@ int bvh_RandomizePositionFrom2D(
   unsigned int borderX=width/7; //8
   unsigned int borderY=height/4;//5
 
-  unsigned int fID=0;
+  float positionX,positionY,positionZ;
+
+
+  BVHJointID rootJID = mc->rootJointID; 
+  BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
-   mc->motionValues[mID+2]=randomFloatA(minimumDepth,maximumDepth);
+   
+   positionZ = randomFloatA(minimumDepth,maximumDepth);
+   //mc->motionValues[mID+2]=randomFloatA(minimumDepth,maximumDepth);
    unsigned int x2D = borderX+ rand()%(width-borderX*2);
    unsigned int y2D = borderY+ rand()%(height-borderY*2);
-   transform2DFProjectedPointTo3DPoint(fX,fY,cX,cY,width,height,(float) x2D,(float) y2D,mc->motionValues[mID+2],&mc->motionValues[mID+0],&mc->motionValues[mID+1]);
+   //void transform2DFProjectedPointTo3DPoint(float fX,float fY,float cX,float cY,unsigned int width,unsigned int height,float x2D,float y2D,float depthValue,float * x3D,float * y3D)
+   //transform2DFProjectedPointTo3DPoint(fX,fY,cX,cY,width,height,(float) x2D,(float) y2D,mc->motionValues[mID+2],&mc->motionValues[mID+0],&mc->motionValues[mID+1]);
+   transform2DFProjectedPointTo3DPoint(fX,fY,cX,cY,width,height,(float) x2D,(float) y2D,positionZ,&positionX,&positionY);
 
-   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
-   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
-   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+   //Set random points..
+   bvh_setJointPositionXAtFrame(mc,rootJID,fID,positionX);
+   bvh_setJointPositionYAtFrame(mc,rootJID,fID,positionY);
+   bvh_setJointPositionZAtFrame(mc,rootJID,fID,positionZ);
+
+   //mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
+   //mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
+   //mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
   }
+ 
+ bvh_RandomizeRotationsBasedOn3D(mc,minimumRotation,maximumRotation);
  return 1;
 }
 
