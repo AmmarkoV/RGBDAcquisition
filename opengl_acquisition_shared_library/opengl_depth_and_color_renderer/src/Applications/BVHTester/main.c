@@ -880,6 +880,11 @@ int main(int argc,const char **argv)
           maximumRotation[1]=atof(argv[i+7]);
           maximumRotation[2]=atof(argv[i+8]);
           //----
+          
+          if (bvhMotion.jointHierarchy[bvhMotion.rootJointID].hasQuaternionRotation)
+          {
+              fprintf(stderr,"TODO: Handle quaternion rotation here..!\n");
+          }
 
           bvh_RandomizePositionFrom2D(
                                       &bvhMotion,

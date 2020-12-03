@@ -28,8 +28,7 @@
 #include "Tools/tools.h"
 #include "Tools/save_to_file.h"
 
-
-
+ 
 #include "TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "TrajectoryParser/TrajectoryCalculator.h"
 
