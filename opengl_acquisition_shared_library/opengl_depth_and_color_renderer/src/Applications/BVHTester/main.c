@@ -838,6 +838,7 @@ int main(int argc,const char **argv)
             }
         } else
         //-----------------------------------------------------
+        /*
         if (strcmp(argv[i],"--testRandomizationLimits")==0)
         {
           // ./BVHTester --from Motions/02_03.bvh --testRandomizationLimits -1400 -300 1000 1400 300 5000 --svg tmp/
@@ -860,7 +861,7 @@ int main(int argc,const char **argv)
                                         );
 
           bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
-        } else
+        } else*/
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2D")==0)
         {

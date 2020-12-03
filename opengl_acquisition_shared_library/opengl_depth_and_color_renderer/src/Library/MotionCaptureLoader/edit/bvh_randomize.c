@@ -319,7 +319,7 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
                                                BVHFrameID fID,
                                                float * minimumRotation,
                                                float * maximumRotation
-                                              )
+                                          )
 {
 
  if (mc!=0)
@@ -565,22 +565,18 @@ int bvh_RandomizePositionFrom2DRotation2Ranges(
                               );
 
   //Just Randomize Rotations like bvh_RandomizePositionRotation2Ranges
-  unsigned int fID=0;
+  BVHJointID rootJID = mc->rootJointID; 
+  BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
-  {
-   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+  { 
    float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
 
    if (whichHalf<0.5)
            {
-              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeA[0],maximumRotationRangeA[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeA[1],maximumRotationRangeA[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeA[2],maximumRotationRangeA[2]);
+              bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA);
            } else
            {
-              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeB[0],maximumRotationRangeB[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeB[1],maximumRotationRangeB[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeB[2],maximumRotationRangeB[2]);
+              bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB);
            }
   }
  return 1;
@@ -589,7 +585,7 @@ int bvh_RandomizePositionFrom2DRotation2Ranges(
 
 
 
-
+/*
 int bvh_TestRandomizationLimitsXYZ(
                                    struct BVH_MotionCapture * mc,
                                    float * minimumPosition,
@@ -631,10 +627,4 @@ int bvh_TestRandomizationLimitsXYZ(
 
   return 1;
 }
-
-
-
-
-
-
-
+*/

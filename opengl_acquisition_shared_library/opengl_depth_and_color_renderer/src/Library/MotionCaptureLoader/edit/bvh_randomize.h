@@ -80,12 +80,13 @@ int bvh_RandomizePositionFrom2D(
                                  float fX,float fY,float cX,float cY,unsigned int width,unsigned int height
                                 );
 
+/*
 int bvh_TestRandomizationLimitsXYZ(
                                    struct BVH_MotionCapture * mc,
                                    float * minimumPosition,
                                    float * maximumPosition
                                   );
-
+*/
 
 
 #ifdef __cplusplus
