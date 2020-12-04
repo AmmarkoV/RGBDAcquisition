@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
  
-#include "../../../../../../tools/AmMatrix/quaternions.h"
+#include "../mathLibrary.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */

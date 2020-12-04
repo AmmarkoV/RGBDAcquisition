@@ -1,7 +1,8 @@
 #include "bvh_rename.h"
 
 
-#include "../../../../../../tools/AmMatrix/quaternions.h"
+#include "../mathLibrary.h"
+//#include "../../../../../../tools/AmMatrix/quaternions.h"
 
 #include <stdio.h>
 #include <stdlib.h>

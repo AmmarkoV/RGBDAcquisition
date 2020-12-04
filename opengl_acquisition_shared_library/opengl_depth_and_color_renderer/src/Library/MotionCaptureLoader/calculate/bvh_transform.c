@@ -2,8 +2,9 @@
 #include <math.h>
 #include "bvh_transform.h"
 
-#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../../../tools/AmMatrix/quaternions.h"
+//#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
+//#include "../../../../../../tools/AmMatrix/quaternions.h"
+#include "../mathLibrary.h"
  
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..

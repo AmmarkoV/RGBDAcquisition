@@ -17,6 +17,10 @@ extern "C"
 //BVH Code version
 static const char BVH_LOADER_VERSION_STRING [] = "0.47";
 
+/**
+* @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here 
+* @ingroup BVH
+*/
 #include "mathLibrary.h"
 
 /**
