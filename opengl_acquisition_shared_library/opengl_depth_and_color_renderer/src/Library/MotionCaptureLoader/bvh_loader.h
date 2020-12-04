@@ -17,7 +17,7 @@ extern "C"
 //BVH Code version
 static const char BVH_LOADER_VERSION_STRING [] = "0.47";
 
-#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "mathLibrary.h"
 
 /**
 * @brief MAX_BVH_JOINT_NAME is the maximum label size for Joint names
