@@ -2,7 +2,6 @@
 
 
 #include "../mathLibrary.h"
-//#include "../../../../../../tools/AmMatrix/quaternions.h"
 
 #include <stdio.h>
 #include <stdlib.h>

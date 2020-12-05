@@ -4,7 +4,6 @@
 
 #include "../bvh_loader.h"
 #include "../calculate/bvh_transform.h"
-//#include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 #include "../mathLibrary.h"
  
 #ifdef __cplusplus

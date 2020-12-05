@@ -3,10 +3,6 @@
 
 #include "../bvh_loader.h"
 #include "bvh_transform.h"
-
-
-//#include "../../../../../../tools/AmMatrix/simpleRenderer.h"
-//#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../mathLibrary.h"
 
 #ifdef __cplusplus
