@@ -2,9 +2,16 @@
 #include "../edit/bvh_rename.h"
 #include <stdio.h> 
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 {
-  #warning "bvh_print_C_Header needs a complete rewrite.."
+  fprintf(stderr,RED "bvh_print_C_Header needs a complete rewrite..\n" NORMAL);
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief An array with BVH string labels\n");
   fprintf(stdout," */\n");
@@ -35,8 +42,8 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%crotation\"%c // 4\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
-        }
            countOfChannels+=3;
+        }
     } else
     {
      if (!bvhMotion->jointHierarchy[i].isEndSite)
@@ -84,6 +91,13 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            coord='Z'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//2 \n",label);
+
+           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation) 
+           { 
+            coord='W'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+            uppercase(label);
+            fprintf(stdout,"BVH_MOTION_%s,//3 \n",label);
+           }
 
            coord='Z'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
