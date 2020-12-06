@@ -36,17 +36,17 @@ float randomFloatA( float minVal, float maxVal )
 }
 
 int bvh_PerturbJointAnglesRange(
-                           struct BVH_MotionCapture * mc,
-                           unsigned int numberOfValues,
-                           float  start,
-                           float  end,
-                           unsigned int specificChannel,
-                           const char **argv,
-                           unsigned int iplus2
-                          )
+                                 struct BVH_MotionCapture * mc,
+                                 unsigned int numberOfValues,
+                                 float start,
+                                 float end,
+                                 unsigned int specificChannel,
+                                 const char **argv,
+                                 unsigned int iplus2
+                                )
 {
 
-  fprintf(stderr,"Asked to randomize %u Joint Angles in the range [%0.2f,%0.2f] deviation\n",numberOfValues,start,end);
+  fprintf(stderr,"\nRandomizing %u Joint Angles @ channel %u in the range [%0.2f,%0.2f] deviation\n",numberOfValues,specificChannel,start,end);
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (selectedJoints!=0)
   {
