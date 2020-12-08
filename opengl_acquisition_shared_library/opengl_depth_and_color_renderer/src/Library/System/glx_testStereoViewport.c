@@ -43,7 +43,7 @@
 #define originalHEIGHT 1920
 #define tilesToDoX 2
 #define tilesToDoY 1
-#define shrinkingFactor 4
+#define shrinkingFactor 1
 //--------------------------------------------
 
 
@@ -170,8 +170,8 @@ int doTiledDrawing(
      struct Matrix4x4OfFloats viewMatrix;
 
      prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
+                     1235.423889, //fx
+                     1233.48468,  //fy
                      0.0,        //skew
                      (float) originalWIDTH/2,    //cx
                      (float) originalHEIGHT/2,   //cy
@@ -190,8 +190,8 @@ int doTiledDrawing(
         float yaw=0.0;//(float)   (rand()%90);
 
         float x=-259.231f;//(float)  (1000-rand()%2000);
-        float y=-54.976f;//(float) (100-rand()%200);
-        float z=2699.735f;//(float)  (700+rand()%1000);
+        float y=-854.976f;//(float) (100-rand()%200);
+        float z=3699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
@@ -202,9 +202,6 @@ int doTiledDrawing(
   {
     for (tx=0; tx<tilesX; tx++)
     {
-       roll+=1.0;
-       pitch+=1.5;
-
      glViewport(viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight );
 
 
@@ -251,7 +248,7 @@ int doTiledDrawing(
                   &viewMatrix
                  );
 
-
+      viewMatrix.m[3]+=1.0;
     }
   }
   return 1;
@@ -295,7 +292,7 @@ int doSingleDrawing(
         float yaw=0.0;//(float)   (rand()%90);
 
         float x=-259.231f;//(float)  (1000-rand()%2000);
-        float y=-54.976f;//(float) (100-rand()%200);
+        float y=-1254.976f;//(float) (100-rand()%200);
         float z=2699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
