@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="OpenGL3TestStereo" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="./gl3Stereo" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="./gl3Stereo" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-DUSE_GLEW" />
+		</Compiler>
+		<Linker>
+			<Add option="-lGL" />
+			<Add option="-lGLU" />
+			<Add option="-lX11" />
+			<Add option="-lGLEW" />
+			<Add option="-lm" />
+			<Add library="../../../../../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../../../../../acquisition/libRGBDAcquisition.so" />
+		</Linker>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.h" />
+		<Unit filename="../ModelLoader/model_loader_tri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ModelLoader/model_loader_tri.h" />
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.h" />
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.h" />
+		<Unit filename="../Rendering/downloadFromRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/downloadFromRenderer.h" />
+		<Unit filename="../Tools/save_to_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/save_to_file.h" />
+		<Unit filename="../Tools/tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/tools.h" />
+		<Unit filename="glx3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="glx3.h" />
+		<Unit filename="glx_testStereoViewport.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

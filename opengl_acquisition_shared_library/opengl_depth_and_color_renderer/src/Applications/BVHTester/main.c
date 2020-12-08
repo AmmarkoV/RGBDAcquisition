@@ -259,6 +259,9 @@ int extractMinimaMaximaFromBVHList(const char * filename)
 
 int main(int argc,const char **argv)
 {
+    srand(time(NULL)); // randomize seed
+    
+    
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
     const char * fromBVHFile="Motions/example.bvh"; 
