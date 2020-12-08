@@ -255,82 +255,8 @@ int doTiledDrawing(
 }
 
 
-int doSingleDrawing(
-                   int programID,
-                   GLuint MVPMatrixID ,
-                   GLuint cubeVao,
-                   unsigned int cubeTriangleCount,
-                   GLuint pyramidVao,
-                   unsigned int pyramidTriangleCount,
-                   unsigned int tilesX,
-                   unsigned int tilesY)
-{
-
-     struct Matrix4x4OfFloats projectionMatrix;
-     struct Matrix4x4OfFloats viewportMatrix;
-     struct Matrix4x4OfFloats viewMatrix;
-
-     prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
-                     0.0,        //skew
-                     WIDTH/2,    //cx
-                     HEIGHT/2,   //cy
-                     WIDTH,      //Window Width
-                     HEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     &projectionMatrix,
-                     &viewMatrix,
-                     &viewportMatrix
-                    );
 
 
-     //-------------------------------------------------------------------
-        float roll=0.0;//(float)  (rand()%90);
-        float pitch=0.0;//(float) (rand()%90);
-        float yaw=0.0;//(float)   (rand()%90);
-
-        float x=-259.231f;//(float)  (1000-rand()%2000);
-        float y=-1254.976f;//(float) (100-rand()%200);
-        float z=2699.735f;//(float)  (700+rand()%1000);
-     //-------------------------------------------------------------------
-     //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
-     drawObjectAT(
-                  programID,
-                  cubeVao,
-                  MVPMatrixID,
-                  cubeTriangleCount,
-                  x-400,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  &projectionMatrix,
-                  &viewportMatrix,
-                  &viewMatrix
-                 );
-
-     drawObjectAT(
-                  programID,
-                  pyramidVao,
-                  MVPMatrixID,
-                  pyramidTriangleCount,
-                  x+1100,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw+180,
-
-                  &projectionMatrix,
-                  &viewportMatrix,
-                  &viewMatrix
-                 );
- return 1;
-}
 
 int doDrawing()
 {
@@ -345,12 +271,6 @@ int doDrawing()
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
-
-
-
-
-
-
 
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
@@ -438,34 +358,16 @@ int doDrawing()
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
-
-      #define DO_MULTI 1
-      //--------------------------------------
-      #if DO_MULTI
-      doTiledDrawing(
-                     programID,
-                     MVPMatrixID,
-                     cubeVAO,
-                     cubeTriangleCount,
-                     humanVAO,
-                     humanTriangleCount,
-                     tilesToDoX,
-                     tilesToDoY
-                    );
-      #else
-      //--------------------------------------
-      doSingleDrawing(
-                     programID,
-                     MVPMatrixID,
-                     cubeVAO,
-                     cubeTriangleCount,
-                     humanVAO,
-                     humanTriangleCount,
-                     16,
-                     16
-                    );
-      //--------------------------------------
-      #endif // DO_MULTI
+        doTiledDrawing(
+                       programID,
+                       MVPMatrixID,
+                       cubeVAO,
+                       cubeTriangleCount,
+                       humanVAO,
+                       humanTriangleCount,
+                       tilesToDoX,
+                       tilesToDoY
+                      );
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebufferToScreen(
