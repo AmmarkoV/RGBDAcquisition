@@ -55,7 +55,8 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=forceRotation[0];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=forceRotation[1];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=forceRotation[2];
-   if (!mc->jointHierarchy[rootJoint].hasQuaternionRotation)
+   
+   if (mc->jointHierarchy[rootJoint].hasQuaternionRotation)
    {
         fprintf(stderr,RED "performPointProjectionsForFrameForcingPositionAndRotation: Cannot handle quaternions..\n" NORMAL);
         return 0;
