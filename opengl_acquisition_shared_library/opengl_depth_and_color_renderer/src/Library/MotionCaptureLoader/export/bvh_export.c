@@ -41,21 +41,25 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
         return 0;
       }
 
-   float dataOriginal[6]={0};
+   float dataOriginal[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
    if (!bhv_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
       {
         fprintf(stderr,"Error accessing original position/rotation data for frame %u\n",fID);
         return 0;
       }
 
-   float dataOur[6]={0};
-   dataOur[0]=forcePosition[0];
-   dataOur[1]=forcePosition[1];
-   dataOur[2]=forcePosition[2];
-   dataOur[3]=forceRotation[0];
-   dataOur[4]=forceRotation[1];
-   dataOur[5]=forceRotation[2];
-
+   float dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0}; 
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=forcePosition[0];
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=forcePosition[1];
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=forcePosition[2];
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=forceRotation[0];
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=forceRotation[1];
+   dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=forceRotation[2];
+   if (!mc->jointHierarchy[rootJoint].hasQuaternionRotation)
+   {
+        fprintf(stderr,"performPointProjectionsForFrameForcingPositionAndRotation: Cannot handle quaternions..\n");
+        return 0;
+   }
 
    if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
       {
