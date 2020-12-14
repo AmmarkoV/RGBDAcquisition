@@ -37,14 +37,14 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
                            )
       )
       {
-        fprintf(stderr,"Error accessing root joint for frame %u\n",fID);
+        fprintf(stderr,RED "Error accessing root joint for frame %u\n" NORMAL,fID);
         return 0;
       }
 
    float dataOriginal[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
    if (!bhv_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
       {
-        fprintf(stderr,"Error accessing original position/rotation data for frame %u\n",fID);
+        fprintf(stderr,RED "Error accessing original position/rotation data for frame %u\n" NORMAL,fID);
         return 0;
       }
 
@@ -57,13 +57,13 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=forceRotation[2];
    if (!mc->jointHierarchy[rootJoint].hasQuaternionRotation)
    {
-        fprintf(stderr,"performPointProjectionsForFrameForcingPositionAndRotation: Cannot handle quaternions..\n");
+        fprintf(stderr,RED "performPointProjectionsForFrameForcingPositionAndRotation: Cannot handle quaternions..\n" NORMAL);
         return 0;
    }
 
    if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
       {
-        fprintf(stderr,"Error adjusting position/rotation data for frame %u\n",fID);
+        fprintf(stderr,RED "Error adjusting position/rotation data for frame %u\n" NORMAL,fID);
         return 0;
       }
 
@@ -75,7 +75,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
 
         if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
         {
-         fprintf(stderr,"Error restoring original data for frame %u\n",fID);
+         fprintf(stderr,RED "Error restoring original data for frame %u\n" NORMAL,fID);
          return 0;
         }
 
