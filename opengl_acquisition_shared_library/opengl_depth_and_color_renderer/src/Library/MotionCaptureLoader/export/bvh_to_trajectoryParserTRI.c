@@ -104,30 +104,30 @@ int getAssociatedPositionsAndRotationsForJointID(
           return 0;
         }
 
-  float data[8]={0};
+  float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
   if (bhv_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
          {
-           *posX=data[0];
-           *posY=data[1];
-           *posZ=data[2];
+           *posX=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X];
+           *posY=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y];
+           *posZ=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z];
 
            #define INVERT_ANGLES 0
 
            #if INVERT_ANGLES
-            data[3]=data[3]*-1;
-            data[4]=data[4]*-1;
-            data[5]=data[5]*-1;
+            data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]*-1;
+            data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]*-1;
+            data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]*-1;
            #endif // INVERT_ANGLES
 
 
           //---------------------------------------------------------------------------------------------------
-           *rotX = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
+           *rotX = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X];
            *rotX+= bvhtri->jointAssociation[jAssociationID].offset[0];
           //---------------------------------------------------------------------------------------------------
-           *rotY = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[4];
+           *rotY = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y];
            *rotY+= bvhtri->jointAssociation[jAssociationID].offset[1];
           //---------------------------------------------------------------------------------------------------
-           *rotZ = bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * data[5];
+           *rotZ = bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z];
            *rotZ+= bvhtri->jointAssociation[jAssociationID].offset[2];
           //---------------------------------------------------------------------------------------------------
           return 1;
