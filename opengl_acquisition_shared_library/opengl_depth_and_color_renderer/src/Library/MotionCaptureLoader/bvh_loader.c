@@ -234,6 +234,19 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 
 
 
+int bvh_free(struct BVH_MotionCapture * bvhMotion)
+{
+  if (bvhMotion==0) { return 0; }
+  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;        }
+  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;      }
+  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
+  if (bvhMotion->fileName!=0)                   {  free(bvhMotion->fileName);           bvhMotion->fileName=0;            }
+  
+  memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
+
+  return 1;
+}
+
 //----------------------------------------------------------------------------------------------------
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
 {
@@ -267,20 +280,6 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
     }
  return successfullRead;
 }
-
-
-int bvh_free(struct BVH_MotionCapture * bvhMotion)
-{
-  if (bvhMotion==0) { return 0; }
-  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;        }
-  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;      }
-  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
-  if (bvhMotion->fileName!=0)                   {  free(bvhMotion->fileName);           bvhMotion->fileName=0;            }
-  
-  memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
-
-  return 1;
-}
 //----------------------------------------------------------------------------------------------------
 
 
@@ -288,21 +287,36 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
 
 int bvh_SetPositionRotation(
                              struct BVH_MotionCapture * mc,
-                             float * position,
-                             float * rotation
+                             float * position, //Position X, Position Y, Position Z 
+                             float * rotation  //This is always the same regardless of rotation order Rotation X, Rotation Y, Rotation Z
                             )
 {
   unsigned int fID=0;
+  
+  unsigned int positionXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_X);
+  unsigned int positionYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Y);
+  unsigned int positionZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Z);
+  
+  unsigned int rotationXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_X);
+  unsigned int rotationYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Y);
+  unsigned int rotationZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Z);
+  if (rotationXOffset!=3) 
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the first rotation you gave now corresponds to the X channel\n"); }
+  if (rotationYOffset!=4) 
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the second rotation you gave now corresponds to the Y channel\n"); }
+  if (rotationZOffset!=5) 
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the third rotation you gave now corresponds to the Z channel\n"); }
+  //This does not handle QBVH
+   //TODO: add QBVH
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+0]=position[0];
-   mc->motionValues[mID+1]=position[1];
-   mc->motionValues[mID+2]=position[2];
-   mc->motionValues[mID+3]=rotation[0];
-   mc->motionValues[mID+4]=rotation[1];
-   mc->motionValues[mID+5]=rotation[2];
-   //TODO: add QBVH
+   mc->motionValues[mID+positionXOffset]=position[0];
+   mc->motionValues[mID+positionYOffset]=position[1];
+   mc->motionValues[mID+positionZOffset]=position[2];
+   mc->motionValues[mID+rotationXOffset]=rotation[0];
+   mc->motionValues[mID+rotationYOffset]=rotation[1];
+   mc->motionValues[mID+rotationZOffset]=rotation[2];
   }
  return 1;
 }
@@ -646,6 +660,7 @@ int bvh_getJointDimensions(
 
        for (int ch=0; ch<3; ch++)
        {
+           //TODO: add qbvh support
         if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_X) { angleX = ch; }
         if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Y) { angleY = ch; }
         if (bvhMotion->jointHierarchy[jID].channelType[ch]==BVH_ROTATION_Z) { angleZ = ch; }

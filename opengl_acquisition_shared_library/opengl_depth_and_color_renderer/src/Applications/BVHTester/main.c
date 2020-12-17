@@ -150,7 +150,7 @@ int testMultipleLoad(const char * filename)
                   }
 
                   ++fileNumber;
-                  if (fileNumber==10) { done=1; }
+                  //if (fileNumber==10) { done=1; }
                 }
 
           if (line!=0) { free(line); }
