@@ -360,14 +360,8 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
         bvh_setJointRotationYAtFrame(mc,jID,fID,randomRotations[1]);
         bvh_setJointRotationXAtFrame(mc,jID,fID,randomRotations[2]);
        }
-     
-         
      }
-     //Old code, no one guarantees the 3,4,5 offsets are correct
-     //unsigned int mID=fID*mc->numberOfValuesPerFrame;
-     //mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
-     //mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
-     //mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+     
    return 1;  
   }
   
