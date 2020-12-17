@@ -191,7 +191,7 @@ int main(int argc,const char **argv)
 
     struct BVH_RendererConfiguration renderingConfiguration={0};
 
-    // Emulate GoPro by default..
+    // Emulate GoPro Hero4 @ FullHD mode by default..
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
     renderingConfiguration.width=1920;
     renderingConfiguration.height=1080;
