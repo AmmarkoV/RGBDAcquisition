@@ -20,4 +20,7 @@ int bvhMeasureIterationInfluence(
     unsigned int multiThreaded
 );
 
+
+int extractMinimaMaximaFromBVHList(const char * filename);
+
 #endif
