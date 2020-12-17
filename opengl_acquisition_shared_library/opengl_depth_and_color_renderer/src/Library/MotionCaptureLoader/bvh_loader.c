@@ -369,40 +369,6 @@ int bvh_OffsetPositionRotation(
 
 
 
-int bvh_ConstrainRotations(
-                           struct BVH_MotionCapture * mc,
-                           unsigned int constrainOrientation
-                          )
-{
-  fprintf(stderr,RED "bvh_ConstrainRotations is deprecated because it complicates things * a lot * \n" NORMAL);
-  
-  //TODO : qbvh ,  no
-  unsigned int fID=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
-  {
-   unsigned int mID=fID*mc->numberOfValuesPerFrame;
-
-   float buffer = (float) mc->motionValues[mID+3];
-   buffer = bvh_RemapAngleCentered0(buffer,0);
-   mc->motionValues[mID+3] = (float) buffer;
-
-   buffer = (float) mc->motionValues[mID+4];
-   buffer = bvh_RemapAngleCentered0(buffer,constrainOrientation);
-   mc->motionValues[mID+4] = (float) buffer;
-
-   buffer = (float) mc->motionValues[mID+5];
-   buffer = bvh_RemapAngleCentered0(buffer,0);
-   mc->motionValues[mID+5] = (float) buffer;
-   //TODO: add QBVH
-  }
- return 1;
-}
-
-
-
-
-
-
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

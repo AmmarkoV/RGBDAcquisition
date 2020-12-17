@@ -300,13 +300,6 @@ int bvh_OffsetPositionRotation(
                               );
 
 
-int bvh_ConstrainRotations(
-                           struct BVH_MotionCapture * mc,
-                           unsigned int constrainOrientation
-                          );
-
-
-
 /**
 * @brief Get Parent joint .
 * @ingroup BVH

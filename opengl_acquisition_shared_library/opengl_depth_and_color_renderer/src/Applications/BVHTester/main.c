@@ -485,7 +485,6 @@ int main(int argc,const char **argv)
 
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
-          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--merge")==0)
@@ -580,7 +579,6 @@ int main(int argc,const char **argv)
                                   &bvhMotion,
                                   &cameraPositionRotation
                                  );
-          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
@@ -598,8 +596,6 @@ int main(int argc,const char **argv)
                                      &bvhMotion,
                                      &cameraPositionRotation
                                     );
-
-          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)
@@ -743,8 +739,6 @@ int main(int argc,const char **argv)
                                       renderingConfiguration.width,
                                       renderingConfiguration.height
                                      );
-
-          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -782,8 +776,6 @@ int main(int argc,const char **argv)
                                          maximumPosition,
                                          maximumRotation
                                        );
-
-          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2Dranges")==0)
@@ -830,8 +822,6 @@ int main(int argc,const char **argv)
                                       renderingConfiguration.width,
                                       renderingConfiguration.height
                                      );
-
-         //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeranges")==0)
@@ -894,8 +884,6 @@ int main(int argc,const char **argv)
                                                 maximumPositionRangeB,
                                                 maximumRotationRangeB
                                               );
-
-          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         }  else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
