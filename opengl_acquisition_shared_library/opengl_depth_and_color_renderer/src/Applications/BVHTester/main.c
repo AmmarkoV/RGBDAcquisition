@@ -303,13 +303,11 @@ int main(int argc,const char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
-        
         //-----------------------------------------------------
         if (strcmp(argv[i],"--mt")==0)
         {
            multiThreaded=1;
         } else
-        
         //-----------------------------------------------------
         if (strcmp(argv[i],"--printparams")==0)
         {
@@ -591,7 +589,7 @@ int main(int argc,const char **argv)
 
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
-          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--merge")==0)
@@ -652,7 +650,6 @@ int main(int argc,const char **argv)
         //                          );
         //} else
         //-----------------------------------------------------
-
         //-----------------------------------------------------
         if (strcmp(argv[i],"--interpolate")==0)
         {
@@ -687,7 +684,6 @@ int main(int argc,const char **argv)
                                   &bvhMotion,
                                   &cameraPositionRotation
                                  );
-
           //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
@@ -748,7 +744,6 @@ int main(int argc,const char **argv)
                                     )
                  )  { haltOnError(immediatelyHaltOnError,"Error while perturbing joint angles"); }
             }
-            //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeJointAngles")==0)
@@ -794,8 +789,7 @@ int main(int argc,const char **argv)
                                      i+2
                                     )
                  ) { haltOnError(immediatelyHaltOnError,"Error while selecting Joints"); }
-            }
-            //exit(0);
+            } 
         } else
         //-----------------------------------------------------
         //-----------------------------------------------------
@@ -816,7 +810,6 @@ int main(int argc,const char **argv)
                                             )
                  ) { haltOnError(immediatelyHaltOnError,"Error while selecting 2D Joints"); }
             }
-            //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--eraseJoints")==0)
@@ -836,31 +829,6 @@ int main(int argc,const char **argv)
                  ) { haltOnError(immediatelyHaltOnError,"Error while selecting joints to erase"); }
             }
         } else
-        //-----------------------------------------------------
-        /*
-        if (strcmp(argv[i],"--testRandomizationLimits")==0)
-        {
-          // ./BVHTester --from Motions/02_03.bvh --testRandomizationLimits -1400 -300 1000 1400 300 5000 --svg tmp/
-          if (i+6>=argc)  { incorrectArguments(); }
-          float minimumPositionTest[3];
-          float maximumPositionTest[3];
-          //----
-          minimumPositionTest[0]=-1*atof(argv[i+1])/10;
-          minimumPositionTest[1]=-1*atof(argv[i+2])/10;
-          minimumPositionTest[2]=-1*atof(argv[i+3])/10;
-          //----
-          maximumPositionTest[0]=-1*atof(argv[i+4])/10;
-          maximumPositionTest[1]=-1*atof(argv[i+5])/10;
-          maximumPositionTest[2]=-1*atof(argv[i+6])/10;
-
-          bvh_TestRandomizationLimitsXYZ(
-                                         &bvhMotion,
-                                         minimumPositionTest,
-                                         maximumPositionTest
-                                        );
-
-          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
-        } else*/
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2D")==0)
         {
@@ -900,7 +868,7 @@ int main(int argc,const char **argv)
                                       renderingConfiguration.height
                                      );
 
-          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -939,7 +907,7 @@ int main(int argc,const char **argv)
                                          maximumRotation
                                        );
 
-          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2Dranges")==0)
@@ -987,7 +955,7 @@ int main(int argc,const char **argv)
                                       renderingConfiguration.height
                                      );
 
-          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
+         //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeranges")==0)
@@ -1051,7 +1019,7 @@ int main(int argc,const char **argv)
                                                 maximumRotationRangeB
                                               );
 
-          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         }  else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
