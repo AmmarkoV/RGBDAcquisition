@@ -166,7 +166,6 @@ int bvh_loadTransformForFrame(
                                BVHFrameID fID ,
                                struct BVH_Transform * bvhTransform,
                                unsigned int populateTorso
-                               //,float * rotationOffset
                              );
 
 int bvh_removeTranslationFromTransform(

@@ -675,43 +675,39 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--setPositionRotation")==0)
         {
           if (i+6>=argc)  { incorrectArguments(); }
-          float cameraPositionOffset[3];
-          float cameraRotationOffset[3];
-
-          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
-          cameraPositionOffset[1]=-1*atof(argv[i+2])/10;
-          cameraPositionOffset[2]=-1*atof(argv[i+3])/10;
-          cameraRotationOffset[0]=atof(argv[i+4]);
-          cameraRotationOffset[1]=atof(argv[i+5]);
-          cameraRotationOffset[2]=atof(argv[i+6]);
+           
+          struct motionTransactionData  cameraPositionRotation={0};  
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=-1*atof(argv[i+1])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=-1*atof(argv[i+2])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=-1*atof(argv[i+3])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=atof(argv[i+4]);
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=atof(argv[i+5]);
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=atof(argv[i+6]);
           bvh_SetPositionRotation(
                                   &bvhMotion,
-                                  cameraPositionOffset,
-                                  cameraRotationOffset
+                                  &cameraPositionRotation
                                  );
 
-          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
         {
           if (i+6>=argc)  { incorrectArguments(); }
-          float cameraPositionOffset[3];
-          float cameraRotationOffset[3];
-
-          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
-          cameraPositionOffset[1]=-1*atof(argv[i+2])/10;
-          cameraPositionOffset[2]=-1*atof(argv[i+3])/10;
-          cameraRotationOffset[0]=atof(argv[i+4]);
-          cameraRotationOffset[1]=atof(argv[i+5]);
-          cameraRotationOffset[2]=atof(argv[i+6]);
+          
+          struct motionTransactionData  cameraPositionRotation={0};  
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=-1*atof(argv[i+1])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=-1*atof(argv[i+2])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=-1*atof(argv[i+3])/10;
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=atof(argv[i+4]);
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=atof(argv[i+5]);
+          cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=atof(argv[i+6]);
           bvh_OffsetPositionRotation(
                                      &bvhMotion,
-                                     cameraPositionOffset,
-                                     cameraRotationOffset
+                                     &cameraPositionRotation
                                     );
 
-          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
+          //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizedOrientation")==0)

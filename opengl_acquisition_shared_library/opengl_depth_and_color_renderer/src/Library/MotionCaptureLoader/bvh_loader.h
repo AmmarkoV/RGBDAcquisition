@@ -125,6 +125,14 @@ enum MOTIONBUFFER_TRANSACTION_DATA_FIELDS
 };
 
 
+/**
+ * @brief This is a relatively clean way to make sure all motion transactions adhere to the above fields..
+ */
+struct motionTransactionData
+{
+  float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER];
+};
+
 
 
 enum ORIENTATION_ENFORCER_IDS
@@ -298,15 +306,13 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion);
 
 int bvh_SetPositionRotation(
                             struct BVH_MotionCapture * mc,
-                            float * position,
-                            float * rotation
+                            struct motionTransactionData * positionAndRotation
                            );
 
 
 int bvh_OffsetPositionRotation(
                                struct BVH_MotionCapture * mc,
-                               float * position,
-                               float * rotation
+                               struct motionTransactionData * positionAndRotation
                               );
 
 

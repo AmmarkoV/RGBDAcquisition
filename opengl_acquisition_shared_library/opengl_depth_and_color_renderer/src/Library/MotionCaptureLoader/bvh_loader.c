@@ -287,36 +287,46 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 
 int bvh_SetPositionRotation(
                              struct BVH_MotionCapture * mc,
-                             float * position, //Position X, Position Y, Position Z 
-                             float * rotation  //This is always the same regardless of rotation order Rotation X, Rotation Y, Rotation Z
-                            )
+                             struct motionTransactionData * positionAndRotation
+                           )
 {
-  unsigned int fID=0;
-  
+  //---------------------------------------------------------------------------------------------------------------
   unsigned int positionXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_X);
   unsigned int positionYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Y);
   unsigned int positionZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Z);
-  
+  //---------------------------------------------------------------------------------------------------------------
   unsigned int rotationXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_X);
   unsigned int rotationYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Y);
   unsigned int rotationZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Z);
+  //---------------------------------------------------------------------------------------------------------------
   if (rotationXOffset!=3) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the first rotation you gave now corresponds to the X channel\n"); }
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the first rotation you supplied now corresponds to the X channel\n");  }
   if (rotationYOffset!=4) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the second rotation you gave now corresponds to the Y channel\n"); }
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the second rotation you supplied now corresponds to the Y channel\n"); }
   if (rotationZOffset!=5) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the third rotation you gave now corresponds to the Z channel\n"); }
-  //This does not handle QBVH
-   //TODO: add QBVH
+     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the third rotation you supplied now corresponds to the Z channel\n");  }
+     
+  unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+positionXOffset]=position[0];
-   mc->motionValues[mID+positionYOffset]=position[1];
-   mc->motionValues[mID+positionZOffset]=position[2];
-   mc->motionValues[mID+rotationXOffset]=rotation[0];
-   mc->motionValues[mID+rotationYOffset]=rotation[1];
-   mc->motionValues[mID+rotationZOffset]=rotation[2];
+   mc->motionValues[mID+positionXOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X];
+   mc->motionValues[mID+positionYOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y];
+   mc->motionValues[mID+positionZOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z];
+   mc->motionValues[mID+rotationXOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X];
+   mc->motionValues[mID+rotationYOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y];
+   mc->motionValues[mID+rotationZOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z];
+  }
+  
+  //Special case when we have a root quaternion, we need to also update it..!
+  if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+  {
+    unsigned int rotationWOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_W);
+    for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+       unsigned int mID=fID*mc->numberOfValuesPerFrame;
+       mc->motionValues[mID+rotationWOffset]=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W];
+      }
   }
  return 1;
 }
@@ -324,21 +334,48 @@ int bvh_SetPositionRotation(
 
 int bvh_OffsetPositionRotation(
                                struct BVH_MotionCapture * mc,
-                               float * position,
-                               float * rotation
+                               struct motionTransactionData * positionAndRotation
                               )
 {
+  //---------------------------------------------------------------------------------------------------------------
+  unsigned int positionXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_X);
+  unsigned int positionYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Y);
+  unsigned int positionZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_POSITION_Z);
+  //---------------------------------------------------------------------------------------------------------------
+  unsigned int rotationXOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_X);
+  unsigned int rotationYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Y);
+  unsigned int rotationZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Z);
+  //---------------------------------------------------------------------------------------------------------------
+  if (rotationXOffset!=3) 
+     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the first rotation you gave now corresponds to the X channel\n");  }
+  if (rotationYOffset!=4) 
+     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the second rotation you gave now corresponds to the Y channel\n"); }
+  if (rotationZOffset!=5) 
+     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the third rotation you gave now corresponds to the Z channel\n");  }    
+    
+    
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+0]+=position[0];
-   mc->motionValues[mID+1]+=position[1];
-   mc->motionValues[mID+2]+=position[2];
-   mc->motionValues[mID+3]+=rotation[0];
-   mc->motionValues[mID+4]+=rotation[1];
-   mc->motionValues[mID+5]+=rotation[2];
-   //TODO: add QBVH
+   mc->motionValues[mID+positionXOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X];
+   mc->motionValues[mID+positionYOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y];
+   mc->motionValues[mID+positionZOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z];
+   mc->motionValues[mID+rotationXOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X];
+   mc->motionValues[mID+rotationYOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y];
+   mc->motionValues[mID+rotationZOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z];
+  }
+  
+    
+  //Special case when we have a root quaternion, we need to also update it..!
+  if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
+  {
+    unsigned int rotationWOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_W);
+    for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+       unsigned int mID=fID*mc->numberOfValuesPerFrame;
+       mc->motionValues[mID+rotationWOffset]+=positionAndRotation->data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W];
+      }
   }
  return 1;
 }
@@ -350,6 +387,9 @@ int bvh_ConstrainRotations(
                            unsigned int constrainOrientation
                           )
 {
+  fprintf(stderr,RED "bvh_ConstrainRotations is deprecated because it complicates things * a lot * \n" NORMAL);
+  
+  //TODO : qbvh ,  no
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
