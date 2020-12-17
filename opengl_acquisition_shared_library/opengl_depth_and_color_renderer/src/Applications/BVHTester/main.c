@@ -84,7 +84,6 @@ void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,
 }
 
 
-
 void haltOnError(unsigned int haltingSwitch,const char * message)
 {
   fprintf(stderr,RED "=======================================\n");

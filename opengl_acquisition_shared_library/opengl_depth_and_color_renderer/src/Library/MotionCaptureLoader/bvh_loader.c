@@ -299,13 +299,7 @@ int bvh_SetPositionRotation(
   unsigned int rotationYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Y);
   unsigned int rotationZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Z);
   //---------------------------------------------------------------------------------------------------------------
-  if (rotationXOffset!=3) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the first rotation you supplied now corresponds to the X channel\n");  }
-  if (rotationYOffset!=4) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the second rotation you supplied now corresponds to the Y channel\n"); }
-  if (rotationZOffset!=5) 
-     { fprintf(stderr,YELLOW "bvh_SetPositionRotation: Please note that the third rotation you supplied now corresponds to the Z channel\n");  }
-     
+  
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
@@ -346,14 +340,7 @@ int bvh_OffsetPositionRotation(
   unsigned int rotationYOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Y);
   unsigned int rotationZOffset = bvh_resolveFrameAndJointAndChannelToMotionID(mc,mc->rootJointID,0,BVH_ROTATION_Z);
   //---------------------------------------------------------------------------------------------------------------
-  if (rotationXOffset!=3) 
-     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the first rotation you gave now corresponds to the X channel\n");  }
-  if (rotationYOffset!=4) 
-     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the second rotation you gave now corresponds to the Y channel\n"); }
-  if (rotationZOffset!=5) 
-     { fprintf(stderr,YELLOW "bvh_OffsetPositionRotation: Please note that the third rotation you gave now corresponds to the Z channel\n");  }    
-    
-    
+  
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
