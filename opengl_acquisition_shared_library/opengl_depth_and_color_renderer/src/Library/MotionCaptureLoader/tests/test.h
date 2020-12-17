@@ -10,8 +10,6 @@ extern "C"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName);
 
-int bvh_testConstrainRotations();
-
 #ifdef __cplusplus
 }
 #endif

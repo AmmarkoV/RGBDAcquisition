@@ -277,10 +277,6 @@ int main(int argc,const char **argv)
     //unsigned int flipOrientation = 0;
     //unsigned int flipRandomizationOrientation = 0;
 
-
-    unsigned int regularOrientation = BVH_ENFORCE_NO_ORIENTATION;
-    unsigned int randomizedOrientation =   BVH_ENFORCE_NO_ORIENTATION;
-    unsigned int csvOrientation = BVH_ENFORCE_NO_ORIENTATION;
     unsigned int filterBehindCamera=1;
     unsigned int filterIfAnyJointOutsideof2DFrame=1;
     unsigned int filterTopWeirdRandomSkeletons=1;
@@ -348,12 +344,6 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--printc")==0)
         {
           bvh_print_C_Header(&bvhMotion);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--test")==0)
-        {
-          bvh_testConstrainRotations();
-          exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--extractmotionrangeforlistoffiles")==0)
@@ -704,26 +694,6 @@ int main(int argc,const char **argv)
                                     );
 
           //bvh_ConstrainRotations(&bvhMotion,regularOrientation);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--randomizedOrientation")==0)
-        {
-             //flipRandomizationOrientation=1;
-             if (strcmp("front",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
-             if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
-             if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    } else
-                                                 {  haltOnError(immediatelyHaltOnError,"Randomized Orientation offered is wrong "); }
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--csvOrientation")==0)
-        {
-             //flipRandomizationOrientation=1;
-             if (strcmp("front",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
-             if (strcmp("back",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
-             if (strcmp("left",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    } else
-                                                 {  haltOnError(immediatelyHaltOnError,"CSV Orientation offered is wrong "); }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)
@@ -1085,7 +1055,6 @@ int main(int argc,const char **argv)
                      convertToSVG,
                      convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
                      &bvhMotion,
-                     csvOrientation,
                      &renderingConfiguration,
                      &filterStats,
                      occlusions,

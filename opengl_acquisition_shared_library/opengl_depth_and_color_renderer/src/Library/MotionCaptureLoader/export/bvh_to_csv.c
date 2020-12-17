@@ -342,7 +342,6 @@ int dumpBVHToCSVBody(
                        const char * filename2D,
                        const char * filename3D,
                        const char * filenameBVH,
-                       unsigned int csvOrientation,
                        struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -497,6 +496,8 @@ int dumpBVHToCSVBody(
 
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
 
+
+/*           //NO LONGER NEEDED, neural networks work fine without being centered @ 0!
              //Due to the particular requirements of MocapNET we need to be able to split orientations in CSV files..
              //We want the neural network to only work with values normalized and centered around 0
              if (csvOrientation!=BVH_ENFORCE_NO_ORIENTATION)
@@ -511,6 +512,8 @@ int dumpBVHToCSVBody(
                   value=(float) bvh_RemapAngleCentered0((float) value,csvOrientation);
               }
              }
+*/
+
 
              if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
              fprintf(fpBVH,"%0.5f",value);

@@ -134,22 +134,6 @@ struct motionTransactionData
 };
 
 
-
-enum ORIENTATION_ENFORCER_IDS
-{
-  BVH_ENFORCE_NO_ORIENTATION=0,
-  BVH_ENFORCE_FRONT_ORIENTATION,
-  BVH_ENFORCE_BACK_ORIENTATION,
-  BVH_ENFORCE_LEFT_ORIENTATION,
-  BVH_ENFORCE_RIGHT_ORIENTATION,
-  //--------------------
-  BVH_VALID_ENFORCED_ORIENTATION_NAMES
-};
-
-
-
-extern const char * rotationOrderNames[];
-
 typedef unsigned int BVHJointID;
 typedef unsigned int BVHFrameID;
 typedef unsigned int BVHMotionChannelID;

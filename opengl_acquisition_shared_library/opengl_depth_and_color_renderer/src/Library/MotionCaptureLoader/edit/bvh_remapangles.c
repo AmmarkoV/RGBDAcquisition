@@ -66,6 +66,7 @@ float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation)
 
 float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 {
+    /*
    float angleShifted = angle;
    //We want to add 180 degrees to the model so 0 is oriented towards us..!
    switch (constrainOrientation)
@@ -76,7 +77,7 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
       case BVH_ENFORCE_LEFT_ORIENTATION :    angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,0); break;
       case BVH_ENFORCE_RIGHT_ORIENTATION :   angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,1); break;
    };
-
-   fprintf(stderr,"Did not change angle, due to incorrect BVH_ENFORCE_XX constrain..\n");
+*/
+   fprintf(stderr,"bvh_RemapAngleCentered0: Did not change angle using deprecated code..\n");
   return angle;
 }
