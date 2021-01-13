@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.47";
+static const char BVH_LOADER_VERSION_STRING [] = "0.48";
 
 /**
 * @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here 
