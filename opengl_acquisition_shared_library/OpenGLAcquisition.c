@@ -59,10 +59,10 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
 
    openGL_Framerate=framerate;
 
-  if(openGLColorFrame!=0) { openGLColorFrame= (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
+  if(openGLColorFrame!=0) { openGLColorFrame = (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
                           { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); }
 
-  if(openGLDepthFrame!=0) { openGLDepthFrame= (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
+  if(openGLDepthFrame!=0) { openGLDepthFrame = (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
 

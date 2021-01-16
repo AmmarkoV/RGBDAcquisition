@@ -410,9 +410,11 @@ int extractMinimaMaximaFromBVHList(const char * filename)
           fprintf(stdout,"\n\n//--------------------------\n");
           
           bvh_free(&bvhMotion);
-          fprintf(stderr,"Freed final file `%s`\n",line);
           
-          if (line!=0) { free(line); }
+          if (line!=0) { 
+                         fprintf(stderr,"Freed final file `%s`\n",line);
+                         free(line); 
+                       }
           fclose(fp);
           return 1;
         }
