@@ -471,7 +471,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     } //We have line input from file
 
    //Free incoming line buffer..
-   if (line) { free(line); }
+   if (line) { free(line); line=0;}
 
    if (hierarchyLevel!=0)
    {
@@ -577,7 +577,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     }
 
    //Free incoming line buffer..
-   if (line) { free(line); }
+   if (line) { free(line); line=0; }
 
    InputParser_Destroy(ipc);
   }

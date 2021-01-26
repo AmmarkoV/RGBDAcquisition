@@ -60,7 +60,9 @@ int main()
         unoptimizedTime+=endUnoptimized - startUnoptimized;
 
         unsigned long startOptimized = GetTickCountMicrosecondsMN();
+        #if INTEL_OPTIMIZATIONS
         multiplyTwo4x4FMatrices_SSE(testResultOptimized.m,matrixA.m,matrixB.m);
+        #endif
         unsigned long endOptimized = GetTickCountMicrosecondsMN();
         optimizedTime+=endOptimized - startOptimized; 
         
