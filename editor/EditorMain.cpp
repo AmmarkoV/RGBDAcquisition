@@ -28,6 +28,7 @@
 #include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition_mux/AcquisitionMux.h"
 #include "../acquisition/Acquisition.h"
+#include "../tools/Calibration/calibration.h"
 #include "SelectCalibration.h"
 #include "SelectAcquisitionGraph.h"
 #include "SelectModule.h"
@@ -1558,7 +1559,7 @@ void EditorFrame::DoBlobTracking()
 
       for (i=0; i<result->listLength; i++)
        {
-           transform2DFProjectedPointTo3DPoint(&calib,
+           transform2DProjectedPointTo3DPoint(&calib,
                                                result->data[i].x,
                                                result->data[i].y,
                                                result->data[i].z,

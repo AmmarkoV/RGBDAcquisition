@@ -184,7 +184,7 @@ unsigned int SelectCalibration::depthUnitToScaleSelection(double depthUnit)
 
 int SelectCalibration::updateModelViewMatrixBox()
 {
-  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(&calib);
+  float * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(&calib);
   if (m!=0)
      {
        char buf[2048];
@@ -259,6 +259,7 @@ int SelectCalibration::reloadCalibrationFormFromValues()
   ComboBoxScale->SetSelection(depthUnitToScaleSelection(calib.depthUnit));
 
   Refresh();
+  return 1;
 }
 
 
