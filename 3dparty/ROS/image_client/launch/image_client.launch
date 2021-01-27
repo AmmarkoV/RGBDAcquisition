@@ -1,0 +1,17 @@
+<launch>   
+   <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
+    <node name="image_client" pkg="image_client" type="run_it.sh" required="true" output="screen" cwd="node"> 
+      <param name="camera" value="$(arg camera)" />
+      <param name="deviceID" value="$(arg deviceID)" /> 
+      <param name="moduleID" value="$(arg moduleID)" /> 
+      <param name="width" value="$(arg width)" /> 
+      <param name="height" value="$(arg height)" /> 
+      <param name="framerate" value="$(arg framerate)" /> 
+      <param name="frame" value="$(arg frame)" /> 
+      <param name="highRate" value="50" /> 
+      <param name="midRate" value="15" /> 
+      <param name="lowRate" value="5" /> 
+      <param name="useSkeleton" value="0" />  
+    </node>  
+
+</launch>
