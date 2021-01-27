@@ -464,6 +464,9 @@ int main(int argc, char **argv)
      ros::NodeHandle nh;
      nhPtr = &nh;
 
+     int disableColorStream=0;
+     int disableDepthStream=0;
+
      std::string from;
      std::string module;
      std::string name;
@@ -489,9 +492,14 @@ int main(int argc, char **argv)
      private_node_handle_.param("moduleID", module, std::string(""));
      private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
 
+     private_node_handle_.param("disableColorStream",disableColorStream,0);
+     private_node_handle_.param("disableDepthStream",disableDepthStream,0);
+
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
 
+     if (disableColorStream) { acquisitionDisableStream(moduleID,devID,0); }
+     if (disableDepthStream) { acquisitionDisableStream(moduleID,devID,1); }
 
      //Decide on devID
 /*

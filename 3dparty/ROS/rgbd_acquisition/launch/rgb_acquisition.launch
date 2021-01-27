@@ -34,7 +34,7 @@
       <param name="lowRate" value="5" /> 
       <param name="useSkeleton" value="0" />  
       <param name="disableColorStream" value="0" />  
-      <param name="disableDepthStream" value="0" />  
+      <param name="disableDepthStream" value="1" />  
     </node>  
 
    <node pkg="nodelet" type="nodelet" name="nodelet_manager" ns="$(arg camera)" args="manager" output="screen"/>
