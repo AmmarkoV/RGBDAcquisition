@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#roslaunch rgbd_acquisition rgbd_acquisition.launch deviceID:=/dev/video0 moduleID:=V4L2 width:=640 height:=480 framerate:=30
+
 
 STARTDIR=`pwd`
 

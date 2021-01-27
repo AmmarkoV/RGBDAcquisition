@@ -5,6 +5,11 @@ STARTDIR=`pwd`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+cd ..
+cd ..
+cd ..
+ROOT_ROS_WORKSPACE=`pwd`
+cd "$DIR"
 
 red=$(printf "\033[31m")
 green=$(printf "\033[32m") 
@@ -16,20 +21,20 @@ echo `pwd`
 
 BINNAME="rgbd_acquisition"
 
-PATHOFBIN="../../../devel/lib/$BINNAME/$BINNAME"
+PATHOFBIN="$ROOT_ROS_WORKSPACE/devel/lib/$BINNAME/$BINNAME"
 if [ -e $PATHOFBIN ]
 then
  echo "$green Running freshly compiled file $normal" 
 else 
- echo "$red Could not find freshly compiled file @ $DIR/$PATHOFBIN $normal" 
-PATHOFBIN="./$BINNAME" 
+ echo "$red Could not find freshly compiled file @ $PATHOFBIN $normal" 
+ PATHOFBIN="./$BINNAME" 
   
-if [ ! -e $PATHOFBIN ]
-then 
-  echo "$red Could not find $BINNAME binary!  $normal"
-else
-  echo "$green Found $BINNAME binary! $normal"
-fi
+ if [ ! -e $PATHOFBIN ]
+   then 
+     echo "$red Could not find $BINNAME binary!  $normal"
+   else
+     echo "$green Found $BINNAME binary! $normal"
+   fi
 fi 
 
 LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" $@
