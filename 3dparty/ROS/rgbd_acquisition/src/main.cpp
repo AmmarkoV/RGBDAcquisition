@@ -498,8 +498,6 @@ int main(int argc, char **argv)
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
 
-     if (disableColorStream) { acquisitionDisableStream(moduleID,devID,0); }
-     if (disableDepthStream) { acquisitionDisableStream(moduleID,devID,1); }
 
      //Decide on devID
 /*
@@ -580,6 +578,9 @@ int main(int argc, char **argv)
        return 1;
    }
 
+
+     if (disableColorStream) { acquisitionDisableStream(moduleID,devID,0); }
+     if (disableDepthStream) { acquisitionDisableStream(moduleID,devID,1); }
 
    #if EMMIT_CALIBRATION
     acquisitionSetColorCalibration(moduleID,devID,&calibRGB);
