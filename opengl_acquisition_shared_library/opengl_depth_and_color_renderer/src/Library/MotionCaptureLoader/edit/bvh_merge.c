@@ -14,6 +14,7 @@
 // ./BVHTester --from Motions/DAZFriendlyCMUPlusHead.bvh --merge Motions/49_04.bvh Motions/mergeDazFriendlyMoreThan19.profile --bvh testMerge.bvh
 // ./BVHTester --from Motions/DAZFriendlyCMUPlusHead.bvh --print --merge Motions/02_03.bvh Motions/mergeDazFriendlyAndAddHead.profile --bvh testMerge.bvh
 // ./BVHTester --from Motions/DAZFriendlyCMUPlusHead.bvh --print --merge Motions/102_01cc.bvh Motions/mergeDazFriendlyAndAddHead.profile --bvh testMerge2.bvh
+// ./BVHTester --from Motions/head.bvh --merge Motions/heads/face_65_eyesupright.bvh Motions/mergeHead.profile --bvh test.bvh 
 
 int bvh_mergeWith(
                    struct BVH_MotionCapture * targetMC,

@@ -96,7 +96,7 @@ int addNewPartToChainProblem(
          fprintf(stderr,RED "Also checked for the alternate %s name in armature..\n" NORMAL,alternatePartName);    
         }
         //------
-        exit(0);
+        //exit(0); <- this is extreme..
         return 0;
     }
 }
@@ -1984,7 +1984,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "hip",0,    // Joint
+                              "hip","Hips",    // Joint
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
@@ -1998,7 +1998,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "hip",0,    // Joint
+                              "hip","Hips",    // Joint
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
