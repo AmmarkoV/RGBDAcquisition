@@ -161,6 +161,12 @@ int prepareDefaultFaceProblem(
     int standalone
 )
 { 
+    if (problem==0) 
+         { 
+           fprintf(stderr,"prepareDefaultFaceProblem called without an ikProblem structure\n"); 
+           return 0; 
+         }
+         
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
 
@@ -710,6 +716,11 @@ int prepareDefaultRightHandProblem(
                                    int standalone
                                   )
 {
+    if (problem==0) 
+         { 
+           fprintf(stderr,"prepareDefaultRightHandProblem called without an ikProblem structure\n"); 
+           return 0; 
+         }
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
 
@@ -1324,6 +1335,11 @@ int prepareDefaultLeftHandProblem(
     int standalone
 )
 {
+    if (problem==0) 
+         { 
+           fprintf(stderr,"prepareDefaultLeftHandProblem called without an ikProblem structure\n"); 
+           return 0; 
+         }
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
 
@@ -1933,7 +1949,13 @@ int prepareDefaultBodyProblem(
     struct MotionBuffer * solution,
     struct BVH_Transform * bvhTargetTransform
 )
-{ 
+{
+    if (problem==0) 
+         { 
+           fprintf(stderr,"prepareDefaultBodyProblem called without an ikProblem structure\n"); 
+           return 0; 
+         }
+    
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
     
