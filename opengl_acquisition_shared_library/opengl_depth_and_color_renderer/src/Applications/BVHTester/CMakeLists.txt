@@ -40,6 +40,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.c
               ../../Library/MotionCaptureLoader/import/fromBVH.c
               ../../Library/MotionCaptureLoader/export/bvh_export.c
+              ../../Library/MotionCaptureLoader/export/bvh_to_c.c
               ../../Library/MotionCaptureLoader/export/bvh_to_bvh.c
               ../../Library/MotionCaptureLoader/export/bvh_to_svg.c
               ../../Library/MotionCaptureLoader/export/bvh_to_csv.c
