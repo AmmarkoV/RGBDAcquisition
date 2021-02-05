@@ -441,6 +441,9 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
    {
+
+
+    /* //THIS WAS WRONG..!
     if (rotationOrder==ROTATION_ORDER_ZYX)
     {
         create4x4FMatrixFromEulerAnglesZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
@@ -450,9 +453,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
     {
         create4x4FMatrixFromEulerAnglesZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
         return ;
-    } 
-       
-       
+    } */
        
     //Assuming the rotation axis are correct
     //rX,rY,rZ should hold our 4x4 rotation matrices
@@ -463,6 +464,8 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
     struct Matrix4x4OfFloats rZ;
     create4x4FRotationZ(&rZ,degreesEulerZ);
    
+   // ./BVHGUI2 --from dataset/MotionCapture/lafan1/dance2_subject2.bvh 
+   // ./BVHGUI2 --from dataset/headerWithHeadAndOneMotion.bvh 
 
    switch (rotationOrder)
    {
@@ -483,12 +486,15 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity); 
      break;
      case ROTATION_ORDER_ZXY : 
+       //This is the rotation order commonly used in all joints of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
        //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity); 
      break;
      case ROTATION_ORDER_ZYX : 
+       //This is the rotation order used in the LAFAN1 dataset ( https://github.com/ubisoft/ubisoft-laforge-animation-dataset )
+       //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release ) 
        //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity); 
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_RPY:
        doRPYTransformationF(

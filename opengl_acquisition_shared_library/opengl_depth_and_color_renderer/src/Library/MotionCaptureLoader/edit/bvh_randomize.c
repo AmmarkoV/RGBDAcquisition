@@ -340,7 +340,9 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
                                   }; 
        if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
        {
-        float randomQuaternion[4]; 
+         //This is a very important part of the code..
+         //We assume a ZYX Rotation order we have inherited from https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release
+         float randomQuaternion[4]; 
         
         //TODO: this or not todo ?
         //fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL ); 
@@ -348,7 +350,7 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
         randomRotations[0]=randomRotations[2];
         randomRotations[2]=buffer;
         
-        
+        //BVH Quaternion
         euler2Quaternions(randomQuaternion,randomRotations,qWqXqYqZ); 
         bvh_setJointRotationWAtFrame(mc,jID,fID,randomQuaternion[0]);
         bvh_setJointRotationXAtFrame(mc,jID,fID,randomQuaternion[1]);

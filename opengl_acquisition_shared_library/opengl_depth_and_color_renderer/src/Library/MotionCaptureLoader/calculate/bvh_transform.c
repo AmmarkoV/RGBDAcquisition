@@ -433,6 +433,7 @@ static inline void bvh_prepareMatricesForTransform(
               
           } else
           {
+              //BVH Quaternion
               //Handle quaternion rotation here..
               float quaternion[4]={
                                     data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W],
@@ -440,7 +441,10 @@ static inline void bvh_prepareMatricesForTransform(
                                     data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                     data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]
                                   }; 
-                                  
+              
+              //Make sure quaternion is normalized otherwise conversion will fail on next step..
+              normalizeQuaternions(&quaternion[1],&quaternion[2],&quaternion[3],&quaternion[0]);
+              
               quaternion2Matrix4x4(
                                     bvhTransform->joint[jID].dynamicRotation.m,
                                     quaternion,

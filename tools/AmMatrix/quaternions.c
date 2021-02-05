@@ -164,10 +164,7 @@ void euler2Quaternions(float * quaternions,float * euler,int quaternionConventio
     float sinY2 = sin((float) eY/2); //sin(θ/2);
     float cosZ2 = cos((float) eZ/2); //cos(ψ/2);
     float sinZ2 = sin((float) eZ/2); //sin(ψ/2);
-
-
-
-
+ 
     float qX = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
     float qY = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
     float qZ = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);

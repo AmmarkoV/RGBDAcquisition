@@ -722,8 +722,8 @@ int main(int argc,const char **argv)
           //----
           
           if (bvhMotion.jointHierarchy[bvhMotion.rootJointID].hasQuaternionRotation)
-          {
-              fprintf(stderr,"TODO: Handle quaternion rotation here..!\n");
+          { //BVH Quaternion
+              fprintf(stderr,"Quaternion rotations handled  in bvh_RandomizeRotationsOfFrameBasedOn3D using euler2Quaternions..!\n");
           }
 
           bvh_RandomizePositionFrom2D(
