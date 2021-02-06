@@ -446,6 +446,8 @@ void generateRandomQuaternion(float * quaternionOutput)
      quaternionOutput[1] = sqrt(1-u) * cos(2 * PI * v );
      quaternionOutput[2] = sqrt(u)   * sin(2 * PI * w );
      quaternionOutput[3] = sqrt(u)   * sin(2 * PI * w );
+     
+     //Be 100% sure that the quaternion is normalized..
      normalizeQuaternions(&quaternionOutput[0],&quaternionOutput[1],&quaternionOutput[2],&quaternionOutput[3]);
  }  
 }
