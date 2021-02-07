@@ -844,8 +844,15 @@ int prepareDefaultRightHandProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
-     
+       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position   
+       
+       /*
+       if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
+       {
+         fprintf(stderr,"Initialization of rhand uses quaternion..\n");
+         problem->chain[chainID].part[partID-1].mIDEnd+=1;
+       }*/
+       
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1373,7 +1380,7 @@ int prepareDefaultLeftHandProblem(
 
     
      if (!standalone)
-     { 
+     {
      //Next chain is the L Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
@@ -1463,9 +1470,15 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+       
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
        problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
-     
+       /*
+       if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
+       {
+         fprintf(stderr,"Initialization of lhand uses quaternion..\n");
+         problem->chain[chainID].part[partID-1].mIDEnd+=1;
+       }*/
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -2027,8 +2040,8 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
      problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-     problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position        
-
+     problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
+     
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,

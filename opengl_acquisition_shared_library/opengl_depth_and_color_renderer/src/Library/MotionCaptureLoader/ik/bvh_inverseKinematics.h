@@ -37,8 +37,8 @@ struct ikChainParts
  BVHMotionChannelID mIDStart;
  BVHMotionChannelID mIDEnd;
  //--------------
- float minimumLimitMID[3];
- float maximumLimitMID[3];
+ float minimumLimitMID[4];
+ float maximumLimitMID[4];
  //--------------
  char limits;
  char evaluated;
