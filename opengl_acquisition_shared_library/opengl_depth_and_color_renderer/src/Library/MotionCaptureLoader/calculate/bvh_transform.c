@@ -227,6 +227,8 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
    fprintf(stderr,"bvh_printBVHTransform for %s\n",label); 
    fprintf(stderr,"jointHierarchySize=%u\n",bvhMotion->jointHierarchySize); 
    fprintf(stderr,"useOptimizations=%u\n",bvhTransform->useOptimizations); 
+   
+   fprintf(stderr,"skipCalculationsForJoint:\n");
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
       if (bvhTransform->skipCalculationsForJoint[jID])
@@ -234,11 +236,13 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
          fprintf(stderr,"skipCalculationsForJoint[%u]=%u\n",jID,bvhTransform->skipCalculationsForJoint[jID]);
       }
    } 
+   fprintf(stderr,"\n");
   
   
    fprintf(stderr,"jointIDTransformHashPopulated=%u\n",bvhTransform->jointIDTransformHashPopulated);
    fprintf(stderr,"lengthOfListOfJointIDsToTransform=%u\n",bvhTransform->lengthOfListOfJointIDsToTransform);
-  
+   
+   fprintf(stderr,"listOfJointIDsToTransform:\n");
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
       if (bvhTransform->listOfJointIDsToTransform[jID])
@@ -246,15 +250,17 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
          fprintf(stderr,"listOfJointIDsToTransform[%u]=%u\n",jID,bvhTransform->listOfJointIDsToTransform[jID]);
       }
    }  
+   fprintf(stderr,"\n");
   
    fprintf(stderr,"jointsOccludedIn2DProjection=%u\n",bvhTransform->jointsOccludedIn2DProjection);
    fprintf(stderr,"centerPosition[3]={%0.2f,%0.2f,%0.2f}\n",bvhTransform->centerPosition[0],bvhTransform->centerPosition[1],bvhTransform->centerPosition[2]);
  
     for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-   {
-      if (bvhTransform->listOfJointIDsToTransform[jID])
+    {
+      //if (bvhTransform->listOfJointIDsToTransform[jID])
       {
          fprintf(stderr,"joint[%u]={\n",jID);
+         fprintf(stderr,"            name=%s\n",bvhMotion->jointHierarchy[jID].jointName); 
          fprintf(stderr,"            bvhTransform->joint[%u].pos2DCalculated=%u\n",jID,bvhTransform->joint[jID].pos2DCalculated); 
          fprintf(stderr,"            bvhTransform->joint[%u].isBehindCamera=%u\n",jID,bvhTransform->joint[jID].isBehindCamera); 
          fprintf(stderr,"            bvhTransform->joint[%u].isOccluded=%u\n",jID,bvhTransform->joint[jID].isOccluded); 
