@@ -210,6 +210,61 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
 
 
 
+void bvh_printBVHTransform(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
+{
+   fprintf(stderr,"useOptimizations=%u\n",bvhTransform->useOptimizations); 
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+      if (bvhTransform->skipCalculationsForJoint[jID])
+      {
+         fprintf(stderr,"skipCalculationsForJoint[%u]=%u\n",jID,bvhTransform->skipCalculationsForJoint[jID]);
+      }
+   } 
+  
+  
+   fprintf(stderr,"jointIDTransformHashPopulated=%u\n",bvhTransform->jointIDTransformHashPopulated);
+   fprintf(stderr,"lengthOfListOfJointIDsToTransform=%u\n",bvhTransform->lengthOfListOfJointIDsToTransform);
+  
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+      if (bvhTransform->listOfJointIDsToTransform[jID])
+      {
+         fprintf(stderr,"listOfJointIDsToTransform[%u]=%u\n",jID,bvhTransform->listOfJointIDsToTransform[jID]);
+      }
+   }  
+  
+   fprintf(stderr,"jointsOccludedIn2DProjection=%u\n",bvhTransform->jointsOccludedIn2DProjection);
+   fprintf(stderr,"centerPosition[3]={%0.2f,%0.2f,%0.2f}\n",bvhTransform->centerPosition[0],bvhTransform->centerPosition[1],bvhTransform->centerPosition[2]);
+ 
+    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+      if (bvhTransform->listOfJointIDsToTransform[jID])
+      {
+         fprintf(stderr,"joint[%u]={\n",jID);
+         fprintf(stderr,"            bvhTransform->joint[%u].pos2DCalculated=%u\n",jID,bvhTransform->joint[jID].pos2DCalculated); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isBehindCamera=%u\n",jID,bvhTransform->joint[jID].isBehindCamera); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isOccluded=%u\n",jID,bvhTransform->joint[jID].isOccluded); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isChainTrasformationComputed=%u\n",jID,bvhTransform->joint[jID].isChainTrasformationComputed); 
+         
+         fprintf(stderr,"\n            bvhTransform->joint[%u].pos2D={%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1]); 
+         fprintf(stderr,"\n            bvhTransform->joint[%u].pos3D={%0.2f,%0.2f,%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1],bvhTransform->joint[jID].pos2D[2],bvhTransform->joint[jID].pos2D[3]); 
+         
+         print4x4FMatrix("localToWorldTransformation",bvhTransform->joint[jID].localToWorldTransformation.m,1);
+         fprintf(stderr,"\n");
+         print4x4FMatrix("chainTransformation",bvhTransform->joint[jID].chainTransformation.m,1);
+         fprintf(stderr,"\n");
+         print4x4FMatrix("dynamicTranslation",bvhTransform->joint[jID].dynamicTranslation.m,1);
+         fprintf(stderr,"\n");
+         print4x4FMatrix("dynamicRotation",bvhTransform->joint[jID].dynamicRotation.m,1);
+         fprintf(stderr,"\n");
+         
+         fprintf(stderr,"}\n");
+      }
+   }    
+}
+
+
+
 void bvh_printNotSkippedJoints(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
 { 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
