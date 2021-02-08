@@ -210,8 +210,22 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
 
 
 
-void bvh_printBVHTransform(struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
+void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMotion ,struct BVH_Transform * bvhTransform)
 {
+   if (bvhMotion==0)
+   {
+       fprintf(stderr,"bvh_printBVHTransform, no bvhMotion..!\n");
+       return;
+   }
+   if (bvhTransform==0)
+   {
+       fprintf(stderr,"bvh_printBVHTransform, no bvhTransform..!\n");
+       return;
+   }
+   
+   
+   fprintf(stderr,"bvh_printBVHTransform for %s\n",label); 
+   fprintf(stderr,"jointHierarchySize=%u\n",bvhMotion->jointHierarchySize); 
    fprintf(stderr,"useOptimizations=%u\n",bvhTransform->useOptimizations); 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
