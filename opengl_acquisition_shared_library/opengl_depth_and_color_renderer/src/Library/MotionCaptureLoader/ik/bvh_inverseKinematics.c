@@ -278,18 +278,19 @@ float meanBVH3DDistance(
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
-    if (updatedSolution==0)           { return 0; }
-    if (problem->currentSolution==0)  { return 0; }
-    if (problem->initialSolution==0)  { return 0; }
+    if (updatedSolution==0)           { fprintf(stderr,"updateProblemSolutionToAllChains: No updated solution\n"); return 0; }
+    if (problem->currentSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No currentSolution\n");  return 0; }
+    if (problem->initialSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No initialSolution\n");  return 0; }
     
     //Actual copy ------------------------------------------------------------------
-    if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  { return 0; }
-    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  { return 0; }
+    if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating currentSolution\n");  return 0; }
+    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating initialSolution\n"); return 0; }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
         if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution))
         {
+            fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating currentSolution for chain %u\n",chainID);
             return 0;
         }
     }
