@@ -286,9 +286,11 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,float rodriguezY,float rodriguezZ)
 {
   if (m==0) { return 0; }
-
-
-  float x = rodriguezX , y = rodriguezY , z = rodriguezZ;
+ 
+  float x = rodriguezX  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+  float y = rodriguezY  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+  float z = rodriguezZ  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+  //-----------------------------------
   float th = sqrt( x*x + y*y + z*z );
   float cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
