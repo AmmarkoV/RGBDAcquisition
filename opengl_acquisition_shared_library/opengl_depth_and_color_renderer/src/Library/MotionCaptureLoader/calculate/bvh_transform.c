@@ -496,17 +496,19 @@ static inline void bvh_prepareMatricesForTransform(
 
   if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  ) 
        {
-          if(!bvhMotion->jointHierarchy[jID].hasQuaternionRotation)
+          if(bvhMotion->jointHierarchy[jID].hasRodriguesRotation)
           {
+            //fprintf(stderr,"Rodrigues Transformation %f %f %f\n",-1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],-1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],-1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]);
             create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                              &bvhTransform->joint[jID].dynamicRotation,
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                            (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                            BVH_ROTATION_ORDER_RODRIGUES
                                                            ); 
               
           } else
+          if(bvhMotion->jointHierarchy[jID].hasQuaternionRotation)
           {
               //BVH Quaternion
               //Handle quaternion rotation here..
@@ -525,6 +527,16 @@ static inline void bvh_prepareMatricesForTransform(
                                     quaternion,
                                     qWqXqYqZ
                                    );
+          } else
+          { //Generic rotation case..
+            create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                             &bvhTransform->joint[jID].dynamicRotation,
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
+                                                            (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                           ); 
+              
           }
        } else
        {

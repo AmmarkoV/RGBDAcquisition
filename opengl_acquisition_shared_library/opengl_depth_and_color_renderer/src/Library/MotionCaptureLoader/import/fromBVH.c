@@ -345,27 +345,16 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                        {
                          //For each declared channel we need to enumerate the label to a value
                          unsigned int thisChannelID = enumerateInputParserChannel(ipcB,2+cL); 
-                         bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID;
-
-                         if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);}
-
-                         //Update jointToMotion Lookup Table..
-                         bvhMotion->jointToMotionLookup[currentJoint].channelIDMotionOffset[thisChannelID] = bvhMotion->numberOfValuesPerFrame;
-
-                         //Update motionToJoint Lookup Table..
-                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].channelID = thisChannelID;
-                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].jointID   = currentJoint;
-                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].parentID  = parentID;
-
-                         ++bvhMotion->numberOfValuesPerFrame;
+                         bvhMotion->jointHierarchy[currentJoint].channelType[cL]=thisChannelID; 
                        }
-                     if (debug) {fprintf(stderr,"\n");}
-
+                     
+                     //Derive the rotation order..
                      bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint); 
+                     
                      
                      //Fast (and slightly ugly) hack to transport angles like regular euler angles..
                      if (bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation)
-                     { 
+                     {
                        for (cL=0; cL<loadedChannels; cL++)
                        {
                          //For each declared channel we need to enumerate the label to a value
@@ -380,6 +369,29 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                        }
                        //--------------------------------------------------------------------------
                      }
+                     
+                     //We can now update lookup tables..
+                     for (cL=0; cL<loadedChannels; cL++)
+                       {
+                         //For each declared channel we need to enumerate the label to a value
+                         unsigned int thisChannelID = bvhMotion->jointHierarchy[currentJoint].channelType[cL]; 
+                         
+                         if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],bvhMotion->numberOfValuesPerFrame);}
+                         
+                         //Update jointToMotion Lookup Table..
+                         bvhMotion->jointToMotionLookup[currentJoint].channelIDMotionOffset[thisChannelID] = bvhMotion->numberOfValuesPerFrame;
+
+                         //Update motionToJoint Lookup Table..
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].channelID = thisChannelID;
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].jointID   = currentJoint;
+                         bvhMotion->motionToJointLookup[bvhMotion->numberOfValuesPerFrame].parentID  = parentID;
+
+                         ++bvhMotion->numberOfValuesPerFrame;
+                       }
+                       
+                     if (debug) {fprintf(stderr,"\n");}
+
+                     
                      //Done 
                   }//The number of channels is small enough to be handled 
                    else
