@@ -399,6 +399,22 @@ void axisAngle2Quaternion(float * quaternionOutput,float xx,float yy,float zz,fl
     handleQuaternionPackConvention(x,y,z,w,quaternionOutput,quaternionConvention);
 }
 
+/*
+void fromAnyEulerRotationOrderToQuaternion()
+ * {
+ * 
+                   rX = tf2::Quaternion(tf2::Vector3(-1,0,0),degreesToRadians(-xRotation));
+                   rY = tf2::Quaternion(tf2::Vector3(0,-1,0),degreesToRadians(-yRotation));
+                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation)); 
+                   qXYZW = rZ * rY * rX;
+            or 
+                   
+                   rX = tf2::Quaternion(tf2::Vector3(-1,0,0),degreesToRadians(-xRotation));
+                   rY = tf2::Quaternion(tf2::Vector3(0,-1,0),degreesToRadians(-yRotation));
+                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation)); 
+                   qXYZW = rZ * rX * rY;
+ * }
+*/
 
 void quaternionRotate(float * quaternion , float rotX , float rotY, float rotZ , float angleDegrees , int quaternionConvention)
 {

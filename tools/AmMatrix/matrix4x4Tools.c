@@ -283,6 +283,38 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 
 
 
+int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,float rodriguezY,float rodriguezZ)
+{
+  if (m==0) { return 0; }
+
+
+  float x = rodriguezX , y = rodriguezY , z = rodriguezZ;
+  float th = sqrt( x*x + y*y + z*z );
+  float cosTh = cos(th);
+  x = x / th; y = y / th; z = z / th;
+
+  if ( th < 0.00001 )
+    {
+       create4x4FIdentityMatrix(m); 
+       return 1;
+    }
+
+   //NORMAL RESULT
+   m->m[0]=x*x * (1 - cosTh) + cosTh;          m->m[1]=x*y*(1 - cosTh) - z*sin(th);      m->m[2]=x*z*(1 - cosTh) + y*sin(th);   m->m[3]=0.0;
+   m->m[4]=x*y*(1 - cosTh) + z*sin(th);        m->m[5]=y*y*(1 - cosTh) + cosTh;          m->m[6]=y*z*(1 - cosTh) - x*sin(th);   m->m[7]=0.0;
+   m->m[8]=x*z*(1 - cosTh) - y*sin(th);        m->m[9]=y*z*(1 - cosTh) + x*sin(th);      m->m[10]=z*z*(1 - cosTh) + cosTh;      m->m[11]=0.0;
+   m->m[12]=0.0;                               m->m[13]=0.0;                             m->m[14]=0.0;                          m->m[15]=1.0; 
+
+  #if PRINT_MATRIX_DEBUGGING
+   fprintf(stderr,"rodriguez %f %f %f\n ",rodriguezX,rodriguezY,rodriguezZ);
+   print4x4FMatrix("Rodriguez Initial", result);
+  #endif // PRINT_MATRIX_DEBUGGING
+
+  return 1;
+}
+
+
+
 void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,float eulX,float eulY,float eulZ)
 {   // https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/AmMatrix/rotationMatrixGeneration.m
     float x = (float) eulX * ( (float) M_PI / 180.0 ); //degrees_to_radF(eulX);
@@ -504,6 +536,9 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
                             degreesEulerX //heading
                            );
      break;
+     case ROTATION_ORDER_RODRIGUEZ : 
+       create4x4FMatrixFromRodriguez(m,degreesEulerX,degreesEulerY,degreesEulerZ);
+     break; 
      default :
        fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
        create4x4FIdentityMatrix(m);
