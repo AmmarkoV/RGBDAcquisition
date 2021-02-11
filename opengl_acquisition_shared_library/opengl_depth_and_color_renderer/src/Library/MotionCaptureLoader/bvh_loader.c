@@ -1487,7 +1487,13 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
     fprintf(stdout,"isRoot %u - ",(unsigned int) bvhMotion->jointHierarchy[i].isRoot);
     fprintf(stdout,"isEndSite %u - ",(unsigned int) bvhMotion->jointHierarchy[i].isEndSite);
     fprintf(stdout,"hasEndSite %u\n",(unsigned int) bvhMotion->jointHierarchy[i].hasEndSite);
+
+    fprintf(stdout,"hasQuaternion %u - ",(unsigned int) bvhMotion->jointHierarchy[i].hasQuaternionRotation);
+    fprintf(stdout,"hasRodrigues %u - ",(unsigned int) bvhMotion->jointHierarchy[i].hasRodriguesRotation);
+    fprintf(stdout,"hasPosition %u\n",(unsigned int) bvhMotion->jointHierarchy[i].hasPositionalChannels);
+
     fprintf(stdout,"level %u\n",bvhMotion->jointHierarchy[i].hierarchyLevel );
+    
     fprintf(stdout,"----------------------------------\n");
   }
 
