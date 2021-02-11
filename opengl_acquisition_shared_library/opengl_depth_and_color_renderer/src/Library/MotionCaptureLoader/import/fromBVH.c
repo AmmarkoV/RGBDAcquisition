@@ -63,13 +63,16 @@ int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJo
 
 int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumentNumber)
 {
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xrotation") ) {return BVH_ROTATION_X; } else
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yrotation") ) {return BVH_ROTATION_Y; } else
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zrotation") ) {return BVH_ROTATION_Z; } else
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Wrotation") ) {return BVH_ROTATION_W; } else //QBVH
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xposition") ) {return BVH_POSITION_X; } else
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yposition") ) {return BVH_POSITION_Y; } else
-  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zposition") ) {return BVH_POSITION_Z; }
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xrodrigues") ) {return BVH_RODRIGUES_X; } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yrodrigues") ) {return BVH_RODRIGUES_Y; } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zrodrigues") ) {return BVH_RODRIGUES_Z; } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xrotation") )  {return BVH_ROTATION_X;  } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yrotation") )  {return BVH_ROTATION_Y;  } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zrotation") )  {return BVH_ROTATION_Z;  } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Wrotation") )  {return BVH_ROTATION_W;  } else //QBVH
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xposition") )  {return BVH_POSITION_X;  } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Yposition") )  {return BVH_POSITION_Y;  } else
+  if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Zposition") )  {return BVH_POSITION_Z;  }
 
   return BVH_CHANNEL_NONE;
 }
@@ -359,6 +362,24 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                      if (debug) {fprintf(stderr,"\n");}
 
                      bvhMotion->jointHierarchy[currentJoint].channelRotationOrder = enumerateChannelOrder(bvhMotion,currentJoint); 
+                     
+                     //Fast (and slightly ugly) hack to transport angles like regular euler angles..
+                     if (bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation)
+                     { 
+                       for (cL=0; cL<loadedChannels; cL++)
+                       {
+                         //For each declared channel we need to enumerate the label to a value
+                         if ( bvhMotion->jointHierarchy[currentJoint].channelType[cL]==BVH_RODRIGUES_X)
+                              {  bvhMotion->jointHierarchy[currentJoint].channelType[cL]=BVH_ROTATION_X; }
+                              
+                         if ( bvhMotion->jointHierarchy[currentJoint].channelType[cL]==BVH_RODRIGUES_Y)
+                              {  bvhMotion->jointHierarchy[currentJoint].channelType[cL]=BVH_ROTATION_Y; }
+                               
+                         if ( bvhMotion->jointHierarchy[currentJoint].channelType[cL]==BVH_RODRIGUES_Z)
+                              {  bvhMotion->jointHierarchy[currentJoint].channelType[cL]=BVH_ROTATION_Z; } 
+                       }
+                       //--------------------------------------------------------------------------
+                     }
                      //Done 
                   }//The number of channels is small enough to be handled 
                    else

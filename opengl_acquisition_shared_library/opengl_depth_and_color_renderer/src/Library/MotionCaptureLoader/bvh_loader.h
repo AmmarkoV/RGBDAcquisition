@@ -63,13 +63,16 @@ static const char * channelNames[] =
 enum CHANNEL_NAMES
 {
   BVH_CHANNEL_NONE=0,
-  BVH_POSITION_X,
-  BVH_POSITION_Y,
-  BVH_POSITION_Z,
-  BVH_ROTATION_W, //QBVH
-  BVH_ROTATION_X,
-  BVH_ROTATION_Y,
-  BVH_ROTATION_Z,
+  BVH_POSITION_X, //1
+  BVH_POSITION_Y, //2
+  BVH_POSITION_Z, //3
+  BVH_ROTATION_W, //4 QBVH
+  BVH_ROTATION_X, //5
+  BVH_ROTATION_Y, //6
+  BVH_ROTATION_Z, //7
+  BVH_RODRIGUES_X,//8
+  BVH_RODRIGUES_Y,//9
+  BVH_RODRIGUES_Z,//10
   //--------------------
   BVH_VALID_CHANNEL_NAMES
 };
@@ -86,6 +89,7 @@ static const char * rotationOrderNames[] =
   "ZXY",
   "ZYX",
   "QXQYQZQW", //QBVH
+  "RODRIGUES",//QBVH
 //================= 
     "End of Channel Rotation Orders" ,
     "Unknown"
@@ -102,6 +106,7 @@ enum CHANNEL_ROTATION_ORDER
   BVH_ROTATION_ORDER_ZXY,
   BVH_ROTATION_ORDER_ZYX,
   BVH_ROTATION_ORDER_QWQXQYQZ, //QBVH
+  BVH_ROTATION_ORDER_RODRIGUES, //QBVH
   //--------------------
   BVH_VALID_ROTATION_ORDER_NAMES
 };
@@ -191,6 +196,7 @@ struct BVH_Joint
   char  hasPositionalChannels;
   char  hasRotationalChannels;
   char  hasQuaternionRotation;
+  char  hasRodriguesRotation;
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
   unsigned int loadedChannels;

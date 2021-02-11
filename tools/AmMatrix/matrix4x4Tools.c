@@ -536,7 +536,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
                             degreesEulerX //heading
                            );
      break;
-     case ROTATION_ORDER_RODRIGUEZ : 
+     case ROTATION_ORDER_RODRIGUES : 
        create4x4FMatrixFromRodriguez(m,degreesEulerX,degreesEulerY,degreesEulerZ);
      break; 
      default :

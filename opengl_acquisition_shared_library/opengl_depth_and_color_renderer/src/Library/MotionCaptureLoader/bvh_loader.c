@@ -72,6 +72,9 @@
 
 int enumerateRotationChannelOrderFromTypes(char typeA,char typeB,char typeC)
 {
+  if ( (typeA==BVH_RODRIGUES_X) && (typeB==BVH_RODRIGUES_Y) && (typeC==BVH_RODRIGUES_Z) )
+          { return BVH_ROTATION_ORDER_RODRIGUES; }
+    
   switch (typeA)
   {
     case BVH_ROTATION_X :
@@ -120,6 +123,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 {
   int channelOrder=BVH_ROTATION_ORDER_NONE;
   int quaternionUsed = 0;
+  
   for (unsigned int i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
   {
     if (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_W)
@@ -140,7 +144,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
   */
  
  if (quaternionUsed) //QBVH
- { 
+ {
      if ( 
           (bvhMotion->jointHierarchy[currentJoint].channelType[3]==BVH_ROTATION_W) &&
           (bvhMotion->jointHierarchy[currentJoint].channelType[4]==BVH_ROTATION_X) &&
@@ -148,10 +152,16 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
           (bvhMotion->jointHierarchy[currentJoint].channelType[6]==BVH_ROTATION_Z)
         )
           {
-              fprintf(stderr,GREEN "Root Quaternion detected..!\n" NORMAL);
+              fprintf(stderr,GREEN "Root Quaternion detected ( %u/%u/%u/%u )..!\n" NORMAL,
+                             bvhMotion->jointHierarchy[currentJoint].channelType[3],
+                             bvhMotion->jointHierarchy[currentJoint].channelType[4],
+                             bvhMotion->jointHierarchy[currentJoint].channelType[5],
+                             bvhMotion->jointHierarchy[currentJoint].channelType[6]);
+                             
               bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 3-6 so there is also a positional channel
               bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
               bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=1;
+              bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
               return BVH_ROTATION_ORDER_QWQXQYQZ;
           } else
      if ( 
@@ -165,6 +175,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
               bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=0; //The Rotation is specified on offsets 0-3 so there is no positional channel
               bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
               bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=1;
+              bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
               return BVH_ROTATION_ORDER_QWQXQYQZ;
           }
  } else
@@ -175,11 +186,20 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[1],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[2]
                                               );
+                                              
+    if (channelOrder==BVH_ROTATION_ORDER_RODRIGUES)
+    {
+      bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=0; //The Rotation is on offsets 0-2 so there is no positional channel
+      bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+      bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+      bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=1;
+    } else
     if (channelOrder!=BVH_ROTATION_ORDER_NONE)
     {   
       bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=0; //The Rotation is on offsets 0-2 so there is no positional channel
       bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
       bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+      bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
     }
    else
    if (channelOrder==BVH_ROTATION_ORDER_NONE)
@@ -189,13 +209,24 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[4],
                                                   bvhMotion->jointHierarchy[currentJoint].channelType[5]
                                                  );
-      if (channelOrder!=BVH_ROTATION_ORDER_NONE)
+    if (channelOrder==BVH_ROTATION_ORDER_RODRIGUES)
+    {
+      bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 0-2 so there is no positional channel
+      bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+      bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+      bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=1;
+    } else
+    if (channelOrder!=BVH_ROTATION_ORDER_NONE)
         {   
           bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 0-2 so there is no positional channel
           bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
           bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
+          bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
+        } else
+        {
+            fprintf(stderr,"Failed to resolve rotation order.. :(\n");
         }
-    }
+    }  
  }
  
   if (channelOrder==BVH_ROTATION_ORDER_NONE)
