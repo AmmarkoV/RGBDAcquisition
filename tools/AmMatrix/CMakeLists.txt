@@ -28,6 +28,7 @@ add_library(
             solveHomography.c
             solveLinearSystemGJ.c 
             simpleRenderer.c
+            solids.c
            )
 target_link_libraries(AmMatrix m rt )
 
