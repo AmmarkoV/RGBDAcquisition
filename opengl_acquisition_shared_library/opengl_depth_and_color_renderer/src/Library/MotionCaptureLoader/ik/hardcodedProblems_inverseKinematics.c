@@ -843,15 +843,16 @@ int prepareDefaultRightHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
+                             
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
        problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position   
        
-       /*
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
-         fprintf(stderr,"Initialization of rhand uses quaternion..\n");
+         fprintf(stderr,"Initialization of rhand uses quaternion..\n"); //ignore w
+         problem->chain[chainID].part[partID-1].mIDStart+=1;
          problem->chain[chainID].part[partID-1].mIDEnd+=1;
-       }*/
+       }
        
        ++correct;
        checksum+=addNewPartToChainProblem(
@@ -1473,12 +1474,13 @@ int prepareDefaultLeftHandProblem(
        
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
        problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
-       /*
+       
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
          fprintf(stderr,"Initialization of lhand uses quaternion..\n");
+         problem->chain[chainID].part[partID-1].mIDStart+=1;
          problem->chain[chainID].part[partID-1].mIDEnd+=1;
-       }*/
+       }
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
