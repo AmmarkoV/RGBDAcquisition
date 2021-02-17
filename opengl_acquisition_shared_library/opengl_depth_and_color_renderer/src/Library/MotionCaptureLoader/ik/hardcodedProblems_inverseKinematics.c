@@ -849,7 +849,20 @@ int prepareDefaultRightHandProblem(
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
+         //Since quaternions have 4 coordinates, and the main loop of optimization only handles 3
+         //We add another "chain" to cover everything
          fprintf(stderr,"Initialization of rhand uses quaternion..\n"); //ignore w
+         
+         ++correct;
+         checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rhand",0,    // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
          problem->chain[chainID].part[partID-1].mIDStart+=1;
          problem->chain[chainID].part[partID-1].mIDEnd+=1;
        }
@@ -1477,7 +1490,20 @@ int prepareDefaultLeftHandProblem(
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
-         fprintf(stderr,"Initialization of lhand uses quaternion..\n");
+         //Since quaternions have 4 coordinates, and the main loop of optimization only handles 3
+         //We add another "chain" to cover everything
+         fprintf(stderr,"Initialization of lhand uses quaternion..\n"); //ignore w
+         
+         ++correct;
+         checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lhand",0,    // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID
+                             );
          problem->chain[chainID].part[partID-1].mIDStart+=1;
          problem->chain[chainID].part[partID-1].mIDEnd+=1;
        }
