@@ -537,8 +537,8 @@ float iteratePartLoss(
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
     
      
-    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr*10;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
-    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/100;  gradientExplosionThreshold=gradientExplosionThreshold/10; }
+    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
+    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold/10; }
 
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
