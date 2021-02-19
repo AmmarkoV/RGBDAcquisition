@@ -837,19 +837,16 @@ if (iterationID==0)
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
 
 
+        //Safeguard agains gradient explosions which we detect when we see large gradients  
+        unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  ); 
+        unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) ); 
+
         if  ( 
-                //Safeguard agains gradient explosions which we detect when we see large gradients  
-                 (fabs(delta[0]>gradientExplosionThreshold)) || 
-                 (fabs(delta[1]>gradientExplosionThreshold)) || 
-                 (fabs(delta[2]>gradientExplosionThreshold)) ||  
-                 //Safeguard against NaNs
-                 (delta[0]!=delta[0]) || 
-                 (delta[1]!=delta[1]) || 
-                 (delta[2]!=delta[2]) 
-             )
+               (deltaExploded) || (encounteredNaNDelta) 
+            )
         {
             ++problem->chain[chainID].encounteredExplodingGradients;
-            fprintf(stderr,RED "%s EXPLODED @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
+            fprintf(stderr,RED "EXPLODED %s @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
             if (verbose)
             {
              fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
