@@ -1294,7 +1294,7 @@ int prepareDefaultRightHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-2.r",0, // Joint
-                              1.0,     //Importance
+                              0.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1306,7 +1306,7 @@ int prepareDefaultRightHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-3.r",0, // Joint
-                              1.0,     //Importance
+                              2.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1318,7 +1318,7 @@ int prepareDefaultRightHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_finger1-3.r",0, // Joint
-                              2.0,     //Importance
+                              3.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1932,7 +1932,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-2.l",0, // Joint
-                              1.0,     //Importance
+                              0.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1944,7 +1944,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "finger1-3.l",0, // Joint
-                              1.0,     //Importance
+                              2.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
@@ -1956,7 +1956,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "endsite_finger1-3.l",0, // Joint
-                              2.0,     //Importance
+                              3.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
