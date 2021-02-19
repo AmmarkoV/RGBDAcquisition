@@ -42,6 +42,7 @@ struct ikChainParts
  //--------------
  char limits;
  char evaluated;
+ char smallChanges;
  char bigChanges;
  char endEffector;
 };

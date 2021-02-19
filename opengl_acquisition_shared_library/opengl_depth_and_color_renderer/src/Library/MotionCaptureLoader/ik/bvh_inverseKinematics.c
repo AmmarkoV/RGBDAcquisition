@@ -535,6 +535,10 @@ float iteratePartLoss(
     unsigned long startTime,endTime;
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
+    
+     
+    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr*10;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
+    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/100;  gradientExplosionThreshold=gradientExplosionThreshold/10; }
 
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
@@ -560,7 +564,7 @@ float iteratePartLoss(
     }; 
     
     //The original values we want to improve
-    unsigned int weHaveAPreviousSolutionHistory=0;
+    unsigned int weHaveAPreviousSolutionHistory=(problem->previousSolution!=0);
     float previousSolution[3] = 
     {
         originalValues[0],
@@ -568,19 +572,18 @@ float iteratePartLoss(
         originalValues[2]
     }; 
     
-    if (problem->previousSolution!=0)
-    {    
-        weHaveAPreviousSolutionHistory=1;
+    if (weHaveAPreviousSolutionHistory)
+    {
         previousSolution[0] = problem->previousSolution->motion[mIDS[0]];
         previousSolution[1] = problem->previousSolution->motion[mIDS[1]];
         previousSolution[2] = problem->previousSolution->motion[mIDS[2]];
     }
-    
+
     //Shorthand to access joint ID and joint Name witout having to traverse the problem 
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
+
     //Our armature has 500 d.o.f, if we do a calculateChainLoss this will calculate each and every one of them!!
     //Obviously we want to be really fast so we can't afford this, in order to speed up computations we will need to transform all parent joints
     //until the end joint of our chain...  iterateChainLoss
@@ -596,10 +599,14 @@ float iteratePartLoss(
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
  
- //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
-   if (initialLoss!=initialLoss)
+   //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
+   unsigned int initialLossIsNaN  = (initialLoss!=initialLoss);
+   unsigned int initialLossIsZero = (initialLoss==0.0);
+   
+   
+   if (initialLossIsNaN)
    {
-        ++problem->chain[chainID].encounteredNumberOfNaNsAtStart;
+       ++problem->chain[chainID].encounteredNumberOfNaNsAtStart;
        if(verbose)
          { 
            fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
@@ -608,7 +615,7 @@ float iteratePartLoss(
        return initialLoss;
    }
       else
-   if (initialLoss==0.0)
+   if (initialLossIsZero)
    {
         //If our loss is perfect we obviously can't improve it..
         if (verbose)
@@ -624,8 +631,9 @@ float iteratePartLoss(
         
         //If we are really.. really.. far from the solution we don't want to try and do IK
         //as it will improve loss but may lead to a weird and incorrect pose 
-        if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) ) //Dont do that chain
+        if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) ) 
         {
+            //We won't process a chain that is not the positional chain and is further than our maximum acceptable starting loss
             if (verbose)
                     { fprintf( stderr, RED"\nWon't optimize %s,  exceeded maximum acceptable starting loss by %0.2f%%\n" NORMAL,jointName, ((float) 100*initialLoss/maximumAcceptableStartingLoss) ); }
 
@@ -721,10 +729,10 @@ if (iterationID==0)
     float delta[3]= {d,d,d};
 
 
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
     {
        //Are we at a global optimum? -------------------------------------------------------------------
@@ -841,7 +849,7 @@ if (iterationID==0)
              )
         {
             ++problem->chain[chainID].encounteredExplodingGradients;
-            fprintf(stderr,RED "EXPLODING GRADIENT @ %s %u/%u!\n" NORMAL,jointName,currentEpoch,epochs);
+            fprintf(stderr,RED "%s EXPLODED @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
             if (verbose)
             {
              fprintf(stderr,RED "previousDeltas[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousDelta[0],previousDelta[1],previousDelta[2]);
@@ -872,7 +880,7 @@ if (iterationID==0)
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
         
-        /*
+        
         if (limitsEngaged)
         {
           if (currentValues[0]<minimumLimitValues[0]) { currentValues[0]=minimumLimitValues[0]; } else
@@ -884,7 +892,7 @@ if (iterationID==0)
           if (currentValues[2]<minimumLimitValues[2]) { currentValues[2]=minimumLimitValues[2]; } else
           if (currentValues[2]>maximumLimitValues[2]) { currentValues[2]=maximumLimitValues[2]; }
           //-------------------------------------------------------------------------------------
-        }*/
+        }
         
         //----------------------------------------------
          

@@ -844,6 +844,7 @@ int prepareDefaultRightHandProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
                              
+       problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
        problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position   
        
@@ -863,8 +864,9 @@ int prepareDefaultRightHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-         problem->chain[chainID].part[partID-1].mIDStart+=1;
-         problem->chain[chainID].part[partID-1].mIDEnd+=1;
+        problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
+        problem->chain[chainID].part[partID-1].mIDStart=4;
+        problem->chain[chainID].part[partID-1].mIDEnd=6;
        }
        
        ++correct;
@@ -1485,6 +1487,7 @@ int prepareDefaultLeftHandProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
        
+       problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
        problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
        problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
        
@@ -1504,8 +1507,10 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID
                              );
-         problem->chain[chainID].part[partID-1].mIDStart+=1;
-         problem->chain[chainID].part[partID-1].mIDEnd+=1;
+                             
+         problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
+         problem->chain[chainID].part[partID-1].mIDStart=4;
+         problem->chain[chainID].part[partID-1].mIDEnd=6;
        }
        ++correct;
        checksum+=addNewPartToChainProblem(
