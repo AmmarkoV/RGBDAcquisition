@@ -1477,6 +1477,13 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
      fprintf(stdout,"Has no channels\n");
     }
     //===============================================================
+    //TODO
+    float distance =  bvhMotion->jointHierarchy[i].offset[0] * bvhMotion->jointHierarchy[i].offset[0];
+          distance += bvhMotion->jointHierarchy[i].offset[1] * bvhMotion->jointHierarchy[i].offset[1];
+          distance += bvhMotion->jointHierarchy[i].offset[2] * bvhMotion->jointHierarchy[i].offset[2];
+     distance = sqrt(distance);
+     fprintf(stdout,"Length : %0.2f\n",distance); 
+    //===============================================================
      fprintf(stdout,"Offset : ");
      for (unsigned int z=0; z<3; z++)
       {
