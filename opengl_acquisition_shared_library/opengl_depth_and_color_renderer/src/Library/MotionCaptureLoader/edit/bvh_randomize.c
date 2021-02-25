@@ -91,70 +91,111 @@ int bvh_RandomizeBasedOnIKProblem(
   //-----------------------------------------------------------------------------------------------
   float * minimumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
   float * maximumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
+  char * hasRandomization  = (char *) malloc(sizeof(char) * mc->numberOfValuesPerFrame);
   
-  if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) )
+  if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) && (hasRandomization!=0) )
   {
+   memset(minimumRandomizationLimit,sizeof(float) * mc->numberOfValuesPerFrame,0);
+   memset(maximumRandomizationLimit,sizeof(float) * mc->numberOfValuesPerFrame,0);
+   memset(hasRandomization,sizeof(char) * mc->numberOfValuesPerFrame,0);
+   
+   
+   unsigned int mIDOffset;
+   float minimumLimit;
+   float maximumLimit;
+   unsigned int channelID;
+   
+   //First retrieve the minimum maximum limits from problem chains..!
    for (unsigned int chainID=0; chainID<tP.numberOfChains; chainID++)
     {
       for (unsigned int partID=0; partID<tP.chain[chainID].numberOfParts; partID++)
        { 
            if (tP.chain[chainID].part[partID].limits)
            {
-             unsigned int jID = tP.chain[chainID].part[partID].jID;
+             unsigned int jID = tP.chain[chainID].part[partID].jID; 
              fprintf(stderr,"Limits declared for => ChainID(%u) / PartID(%u) [jID=%u|%s]\n",chainID,partID,jID,mc->jointHierarchy[jID].jointName);
              
              const char * jName = mc->jointHierarchy[jID].jointName;
              
-             float minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
-             float maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
              unsigned int mIDOffset = tP.chain[chainID].part[partID].mIDStart;
-             //problem->chain[chainID].part[partID].mIDEnd
-             //mc->jointHierarchy[jID].channelType[0].
-             fprintf(stderr,"Channel #0(%s)  => [%0.2f,%0.2f]\n",jName,minimumLimit,maximumLimit);
-              
-             minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
-             maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
-             mIDOffset = tP.chain[chainID].part[partID].mIDStart+1;
-             fprintf(stderr,"Channel #1(%s)  => [%0.2f,%0.2f]\n",jName,tP.chain[chainID].part[partID].minimumLimitMID[1],tP.chain[chainID].part[partID].maximumLimitMID[1]);
+             if (jID==mc->motionToJointLookup[mIDOffset].jointID)
+             {
+              minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
+              maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
+              if (minimumLimit>maximumLimit)
+               {
+                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
+                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
+               }
+              channelID = mc->motionToJointLookup[mIDOffset].channelID;
+              minimumRandomizationLimit[mIDOffset]=minimumLimit;
+              maximumRandomizationLimit[mIDOffset]=maximumLimit;
+              hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
+              fprintf(stderr,"Channel #0(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+             }
              
-             minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
-             maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+             mIDOffset = tP.chain[chainID].part[partID].mIDStart+1;
+             if (jID==mc->motionToJointLookup[mIDOffset].jointID)
+             {
+              minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
+              maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
+              if (minimumLimit>maximumLimit)
+               {
+                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
+                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
+               }
+              channelID = mc->motionToJointLookup[mIDOffset].channelID;
+              minimumRandomizationLimit[mIDOffset]=minimumLimit;
+              maximumRandomizationLimit[mIDOffset]=maximumLimit;
+              hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
+              fprintf(stderr,"Channel #1(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+             }
+             
              mIDOffset = tP.chain[chainID].part[partID].mIDEnd;
-             fprintf(stderr,"Channel #2(%s)  => [%0.2f,%0.2f]\n",jName,tP.chain[chainID].part[partID].minimumLimitMID[2],tP.chain[chainID].part[partID].maximumLimitMID[2]); 
+             if (jID==mc->motionToJointLookup[mIDOffset].jointID)
+             {
+               minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
+               maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+               if (minimumLimit>maximumLimit)
+               {
+                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
+                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+               }
+               channelID = mc->motionToJointLookup[mIDOffset].channelID;
+               minimumRandomizationLimit[mIDOffset]=minimumLimit;
+               maximumRandomizationLimit[mIDOffset]=maximumLimit;
+               hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
+               fprintf(stderr,"Channel #2(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+             }
            }
         }
     }
-      
-      /*
-    problem->chain[chainID].part[partID].limits=1; 
-    //Z X Y
-    problem->chain[chainID].part[partID].minimumLimitMID[0]=minimumZ;
-    problem->chain[chainID].part[partID].maximumLimitMID[0]=maximumZ;
-    problem->chain[chainID].part[partID].minimumLimitMID[1]=minimumX;
-    problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
-    problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
-    problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY; */
-      
-      
-    //First grab the minimum maximum limits..!
-    for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-    {
-        
-    }
-      
-      
-      
-      
-  //-----------------------------------------------------------------------------------------------
-  unsigned int fID=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
+       
+       
+    //minimumRandomizationLimit and maximumRandomizationLimit 
+     unsigned int fID=0;
+     for (fID=0; fID<mc->numberOfFrames; fID++)
       {
-      } 
+       unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
+       unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
+
+       for (unsigned int mID=mIDStart; mID<mIDEnd; mID++)
+         {
+             unsigned int localMID = mID - mIDStart;
+             
+             if (hasRandomization[localMID])
+                {
+                  mc->motionValues[mID] = randomFloatA(minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]); 
+                  fprintf(stderr,"mID(%u)=%f[%0.2f/%0.2f] ",mID,mc->motionValues[mID],minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]);
+                }
+         }
+      }
+  //----------------------------------------------------------------------------------------------- 
   }
    
   if (minimumRandomizationLimit!=0) { free(minimumRandomizationLimit); }
   if (maximumRandomizationLimit!=0) { free(maximumRandomizationLimit); }
-   
+  if (hasRandomization!=0)          { free(hasRandomization);          }
    return success;
 }
 
