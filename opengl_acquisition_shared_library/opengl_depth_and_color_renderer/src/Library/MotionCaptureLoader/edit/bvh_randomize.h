@@ -12,6 +12,12 @@ extern "C"
 
 float randomFloatA( float minVal, float maxVal );
 
+
+int bvh_RandomizeBasedOnIKProblem(
+                                  struct BVH_MotionCapture * mc,
+                                  const char * ikProblemName
+                                 );
+
 int bvh_PerturbJointAnglesRange(
                            struct BVH_MotionCapture * mc,
                            unsigned int numberOfValues,

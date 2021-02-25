@@ -1396,8 +1396,8 @@ struct MotionBuffer * mallocNewMotionBuffer(struct BVH_MotionCapture * mc)
 struct MotionBuffer * mallocNewMotionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy)
 {
   if (mc==0) { return 0; }
-  if (whatToCopy==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty"); return 0; }
-  if (whatToCopy->motion==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty"); return 0; }
+  if (whatToCopy==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty\n"); return 0; }
+  if (whatToCopy->motion==0) { fprintf(stderr,"mallocNewMotionBufferAndCopy: Unable to copy from empty motion\n"); return 0; }
   //----------------------
 
   struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));

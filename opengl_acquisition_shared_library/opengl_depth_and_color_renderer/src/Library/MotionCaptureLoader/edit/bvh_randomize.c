@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
+
+#include "../ik/hardcodedProblems_inverseKinematics.h"
 #include "../mathLibrary.h"
 
 #define NORMAL   "\033[0m"
@@ -41,6 +42,122 @@ float randomFloatA( float minVal, float maxVal )
    return minVal;
   }
 }
+
+
+int bvh_RandomizeBasedOnIKProblem(
+                                  struct BVH_MotionCapture * mc,
+                                  const char * ikProblemName
+                                 )
+{ 
+   int success=0;
+   struct ikProblem tP={0};
+   
+   fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",ikProblemName);
+   if (strcmp(ikProblemName,"lhand")==0)
+   {
+          prepareDefaultLeftHandProblem(
+                                         &tP,
+                                         mc,
+                                         0,//struct simpleRenderer *renderer,
+                                         0,//struct MotionBuffer * previousSolution,
+                                         0,//struct MotionBuffer * solution,
+                                         0,//struct BVH_Transform * bvhTargetTransform,
+                                         1//standalone
+                                        );
+          fprintf(stderr,"Initialized LHand..!");
+          success=1;
+   }  else
+   if (strcmp(ikProblemName,"rhand")==0)
+   {
+          prepareDefaultRightHandProblem(
+                                         &tP,
+                                         mc,
+                                         0,//struct simpleRenderer *renderer,
+                                         0,//struct MotionBuffer * previousSolution,
+                                         0,//struct MotionBuffer * solution,
+                                         0,//struct BVH_Transform * bvhTargetTransform,
+                                         1//standalone
+                                        );
+          fprintf(stderr,"Initialized RHand..!"); 
+          success=1;
+   } else
+   {
+       fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: Could not identify %s ik problem!\n",ikProblemName);
+       return 0;
+   }
+ 
+  
+  //Now to actually do randomizations..! 
+  //-----------------------------------------------------------------------------------------------
+  float * minimumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
+  float * maximumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
+  
+  if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) )
+  {
+   for (unsigned int chainID=0; chainID<tP.numberOfChains; chainID++)
+    {
+      for (unsigned int partID=0; partID<tP.chain[chainID].numberOfParts; partID++)
+       { 
+           if (tP.chain[chainID].part[partID].limits)
+           {
+             unsigned int jID = tP.chain[chainID].part[partID].jID;
+             fprintf(stderr,"Limits declared for => ChainID(%u) / PartID(%u) [jID=%u|%s]\n",chainID,partID,jID,mc->jointHierarchy[jID].jointName);
+             
+             const char * jName = mc->jointHierarchy[jID].jointName;
+             
+             float minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
+             float maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
+             unsigned int mIDOffset = tP.chain[chainID].part[partID].mIDStart;
+             //problem->chain[chainID].part[partID].mIDEnd
+             //mc->jointHierarchy[jID].channelType[0].
+             fprintf(stderr,"Channel #0(%s)  => [%0.2f,%0.2f]\n",jName,minimumLimit,maximumLimit);
+              
+             minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
+             maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
+             mIDOffset = tP.chain[chainID].part[partID].mIDStart+1;
+             fprintf(stderr,"Channel #1(%s)  => [%0.2f,%0.2f]\n",jName,tP.chain[chainID].part[partID].minimumLimitMID[1],tP.chain[chainID].part[partID].maximumLimitMID[1]);
+             
+             minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
+             maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+             mIDOffset = tP.chain[chainID].part[partID].mIDEnd;
+             fprintf(stderr,"Channel #2(%s)  => [%0.2f,%0.2f]\n",jName,tP.chain[chainID].part[partID].minimumLimitMID[2],tP.chain[chainID].part[partID].maximumLimitMID[2]); 
+           }
+        }
+    }
+      
+      /*
+    problem->chain[chainID].part[partID].limits=1; 
+    //Z X Y
+    problem->chain[chainID].part[partID].minimumLimitMID[0]=minimumZ;
+    problem->chain[chainID].part[partID].maximumLimitMID[0]=maximumZ;
+    problem->chain[chainID].part[partID].minimumLimitMID[1]=minimumX;
+    problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
+    problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
+    problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY; */
+      
+      
+    //First grab the minimum maximum limits..!
+    for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+    {
+        
+    }
+      
+      
+      
+      
+  //-----------------------------------------------------------------------------------------------
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+      } 
+  }
+   
+  if (minimumRandomizationLimit!=0) { free(minimumRandomizationLimit); }
+  if (maximumRandomizationLimit!=0) { free(maximumRandomizationLimit); }
+   
+   return success;
+}
+
 
 int bvh_PerturbJointAnglesRange(
                                  struct BVH_MotionCapture * mc,

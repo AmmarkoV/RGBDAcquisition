@@ -645,6 +645,21 @@ int main(int argc,const char **argv)
             //exit(0);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomizeBasedOnIKConstrains")==0)
+        {
+          // ./BVHTester --from dataset/lhand.qbvh --repeat 100 --randomizeBasedOnIKConstrains lhand --bvh restR.bvh
+          if (i+1>=argc)  { incorrectArguments(); }
+          char * nameOfIKProblem=argv[i+1];
+           
+          srand(time(NULL)); 
+              if (
+                   !bvh_RandomizeBasedOnIKProblem(
+                                                   &bvhMotion,
+                                                   nameOfIKProblem
+                                                 )
+                 )  { haltOnError(immediatelyHaltOnError,"Error while randomizing joint angles based on IK problem"); } 
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--selectJoints")==0)
         {
           if (i+2>=argc)  { incorrectArguments(); }

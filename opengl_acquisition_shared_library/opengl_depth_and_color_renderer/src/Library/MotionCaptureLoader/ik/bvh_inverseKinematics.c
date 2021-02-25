@@ -539,7 +539,15 @@ float iteratePartLoss(
      
     if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
     if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold/10; }
-
+    
+    unsigned int numberOfMIDElements = problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
+    if (numberOfMIDElements!=3)
+    {
+       fprintf(stderr,"Only 3 element parts acceptable for iteration..\n");
+       exit(0);
+    } 
+    
+    
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
     {

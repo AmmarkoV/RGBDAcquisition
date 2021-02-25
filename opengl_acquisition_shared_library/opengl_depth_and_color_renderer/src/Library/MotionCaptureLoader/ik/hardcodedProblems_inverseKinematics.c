@@ -1368,7 +1368,7 @@ int prepareDefaultLeftHandProblem(
 
     problem->mc = mc;
     problem->renderer = renderer;
-
+     
     problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
     problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
     problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
