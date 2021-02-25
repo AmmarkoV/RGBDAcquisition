@@ -16,6 +16,8 @@
 
 float randomFloatA( float minVal, float maxVal )
 {
+  if (minVal!=maxVal) 
+   { 
     if (maxVal<minVal)
     {
       float buf = minVal;
@@ -33,6 +35,11 @@ float randomFloatA( float minVal, float maxVal )
     if (value>maxVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",minVal,maxVal,value); }
 
     return value;
+  } 
+  else
+  {
+   return minVal;
+  }
 }
 
 int bvh_PerturbJointAnglesRange(
