@@ -564,6 +564,22 @@ int main(int argc,const char **argv)
                                                    );
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--set")==0)
+        {
+          //./BVHTester --from dataset/lhand.qbvh --repeat 100 --set 3 0.5 --set 4 -0.5 --set 5 -0.5 --set 6 0.5 --bvh restR.bvh
+
+          if (i+2>=argc)  { incorrectArguments(); }
+          
+          int mID=atoi(argv[i+1]);
+          float value=atof(argv[i+2]);
+          
+          bvh_setMIDValue(
+                          &bvhMotion,
+                          mID,
+                          value 
+                         );
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--setPositionRotation")==0)
         {
           if (i+6>=argc)  { incorrectArguments(); }

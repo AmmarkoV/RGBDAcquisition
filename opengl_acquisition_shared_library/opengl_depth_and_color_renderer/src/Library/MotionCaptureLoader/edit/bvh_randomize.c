@@ -186,7 +186,7 @@ int bvh_RandomizeBasedOnIKProblem(
              if (hasRandomization[localMID])
                 {
                   mc->motionValues[mID] = randomFloatA(minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]); 
-                  fprintf(stderr,"mID(%u)=%f[%0.2f/%0.2f] ",mID,mc->motionValues[mID],minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]);
+                  //fprintf(stderr,"mID(%u)=%f[%0.2f/%0.2f] ",mID,mc->motionValues[mID],minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]);
                 }
          }
       }

@@ -314,6 +314,21 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 //----------------------------------------------------------------------------------------------------
 
 
+int bvh_setMIDValue(
+               struct BVH_MotionCapture * mc,
+               unsigned int mID,
+               float value
+              )
+{
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int absMID=mID+(fID*mc->numberOfValuesPerFrame);
+   mc->motionValues[absMID]=value;
+  }
+}
+
+
 
 
 int bvh_SetPositionRotation(

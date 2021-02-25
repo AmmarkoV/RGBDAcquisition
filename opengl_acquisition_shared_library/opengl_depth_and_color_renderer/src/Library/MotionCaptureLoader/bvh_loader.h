@@ -294,6 +294,12 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 int bvh_free(struct BVH_MotionCapture * bvhMotion);
 
 
+int bvh_setMIDValue(
+               struct BVH_MotionCapture * mc,
+               unsigned int mID,
+               float value
+              );
+
 int bvh_SetPositionRotation(
                             struct BVH_MotionCapture * mc,
                             struct motionTransactionData * positionAndRotation

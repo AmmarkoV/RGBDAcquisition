@@ -139,7 +139,6 @@ int addLimitsToPartOfChain(
     problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
     problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
     problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY; 
-    
    //------
    return 1; 
 }
@@ -1925,7 +1924,7 @@ int prepareDefaultLeftHandProblem(
                               &groupID,&jobID,&chainID,&partID
                              );
      //                                                   minX/maxX    -------     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -20.0,20.0,  0.0,0.0,   -20.0,10.0);
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -20.0,48.0,  0.0,0.0,   -85.0,10.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1936,8 +1935,8 @@ int prepareDefaultLeftHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                  minX/maxX    minY/maxY     -------
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-70.0,45.0,   -70.0,35.0,    0.0,0.0);
+     //                                                   minX/maxX    minY/maxY     -------
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -40.0,45.0,   -70.0,35.0,    0.0,0.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
