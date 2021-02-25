@@ -925,14 +925,14 @@ int prepareDefaultRightHandProblem(
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
-     }
+     } //End of standalone chain mode
 
 
 
 
 
 
-     //CHAIN 0 ----------------------------
+     //CHAIN 1 ----------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
      //---------------------------------------------------------- 
@@ -1007,7 +1007,7 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     
     
-    //Chain 1 is the Finger 2
+    //Chain 2 is the Finger 2
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1073,7 +1073,7 @@ int prepareDefaultRightHandProblem(
 
     
     
-    //Chain 2 is the Finger 3
+    //Chain 3 is the Finger 3
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1138,7 +1138,7 @@ int prepareDefaultRightHandProblem(
 
 
     
-    //Chain 3 is the Finger 4
+    //Chain 4 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1205,7 +1205,7 @@ int prepareDefaultRightHandProblem(
 
 
 
-    //Chain 4 is the Finger 5
+    //Chain 5 is the Finger 5
     //----------------------------------------------------------
     //----------------------------------------------------------
     //---------------------------------------------------------- 
@@ -1269,7 +1269,7 @@ int prepareDefaultRightHandProblem(
 
 
 
-    //Chain 5 is the Finger 1 ( Thumb )
+    //Chain 6 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1286,8 +1286,8 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   -------   -------     minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,   -15.0,45.0);
+     //                                                   minX/maxX   -------    minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -10.0,10.0,  0.0,0.0,   -10.0,20.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1298,8 +1298,8 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                  minX/maxX   -------     -------
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,-45.0,45.0,  0.0,0.0,    0.0,0.0);
+     //                                                  minX/maxX    minY/maxY     -------
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-45.0,70.0,  -35.0,70.0,    0.0,0.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1310,8 +1310,8 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                  minX/maxX   -------     -------
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,0.0,  0.0,0.0,    0.0,0.0);
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,50.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1924,8 +1924,8 @@ int prepareDefaultLeftHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   -------   -------     minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,   -45.0,15.0);
+     //                                                   minX/maxX    -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -10.0,10.0,  0.0,0.0,   -20.0,10.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1936,8 +1936,8 @@ int prepareDefaultLeftHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                  minX/maxX   -------     -------
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,-45.0,45.0,  0.0,0.0,    0.0,0.0);
+     //                                                  minX/maxX    minY/maxY     -------
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-70.0,45.0,   -70.0,35.0,    0.0,0.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1947,9 +1947,9 @@ int prepareDefaultLeftHandProblem(
                               2.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
-                             );
-     //                                                  minX/maxX   -------     -------
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,0.0,  0.0,0.0,    0.0,0.0);
+                             ); 
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -50.0,0.0);
 
      ++correct;
      checksum+=addNewPartToChainProblem(
