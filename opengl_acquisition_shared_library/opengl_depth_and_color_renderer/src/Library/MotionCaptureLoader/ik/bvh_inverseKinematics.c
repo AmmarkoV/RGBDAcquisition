@@ -543,7 +543,7 @@ float iteratePartLoss(
     unsigned int numberOfMIDElements = problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
     if (numberOfMIDElements!=3)
     {
-       fprintf(stderr,"Only 3 element parts acceptable for iteration ( got %u @ chain %u / part %u ) ..\n",numberOfMIDElements,chainID,partID);
+       fprintf(stderr,"iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n",problem->problemDescription,numberOfMIDElements,chainID,partID);
        //exit(0);
     } 
     
