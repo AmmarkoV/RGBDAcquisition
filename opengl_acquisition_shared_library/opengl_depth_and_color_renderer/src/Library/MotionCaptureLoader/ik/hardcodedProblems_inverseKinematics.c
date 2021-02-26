@@ -1280,13 +1280,26 @@ int prepareDefaultRightHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
+                              "__rthumb",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     //                                                    minX/maxX   minY/maxY    minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
                               "rthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   minX/maxX   -------    minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -20.0,20.0,  0.0,0.0,   -10.0,20.0);
+     //                                                   minX/maxX    minY/maxY   minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1297,8 +1310,8 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   minX/maxX    minY/maxY     -------
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -45.0,70.0,  -35.0,70.0,    0.0,0.0);
+     //                                                   minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1918,13 +1931,26 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
+                              "__lthumb",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     //                                                   minX/maxX     minY/maxY   minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
+     
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
                               "lthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   minX/maxX    -------     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -20.0,48.0,  0.0,0.0,   -85.0,10.0);
+     //                                                   minX/maxX     minY/maxY    minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1935,8 +1961,8 @@ int prepareDefaultLeftHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
-     //                                                   minX/maxX    minY/maxY     -------
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -40.0,45.0,   -70.0,35.0,    0.0,0.0);
+     //                                                   minX/maxX    minY/maxY      0minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
      
      ++correct;
      checksum+=addNewPartToChainProblem(
