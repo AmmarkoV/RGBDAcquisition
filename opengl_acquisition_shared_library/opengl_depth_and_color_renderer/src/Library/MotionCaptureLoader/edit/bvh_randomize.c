@@ -43,6 +43,7 @@ float randomFloatA( float minVal, float maxVal )
   }
 }
 
+//./BVHGUI2 --from dataset/lhand.qbvh --set 3 0.5 --set 4 -0.5 --set 5 -0.5 --set 6 0.5 --set 64 -85 --set 65 48 --set 68 25 --set 67 -43
 
 int bvh_RandomizeBasedOnIKProblem(
                                   struct BVH_MotionCapture * mc,
