@@ -547,15 +547,16 @@ float iteratePartLoss(
        fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
        fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
        //exit(0);
+       return NAN;
     } 
     
     
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
     {
-        problem->chain[chainID].part[partID].mIDStart,
-        problem->chain[chainID].part[partID].mIDStart+1,
-        problem->chain[chainID].part[partID].mIDStart+2
+        problem->chain[chainID].part[partID].mIDStart,   //This is ok because we have checked for 3 elements above
+        problem->chain[chainID].part[partID].mIDStart+1, //This is ok because we have checked for 3 elements above
+        problem->chain[chainID].part[partID].mIDStart+2  //This is ok because we have checked for 3 elements above
     };
     
     /*
