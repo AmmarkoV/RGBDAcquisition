@@ -540,10 +540,12 @@ float iteratePartLoss(
     if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
     if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/100;   gradientExplosionThreshold=gradientExplosionThreshold/10; }
     
-    unsigned int numberOfMIDElements = problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
+    unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
     if (numberOfMIDElements!=3)
     {
-       fprintf(stderr,"iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n",problem->problemDescription,numberOfMIDElements,chainID,partID);
+       fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
+       fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
+       fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
        //exit(0);
     } 
     
