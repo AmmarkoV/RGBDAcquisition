@@ -1277,7 +1277,10 @@ int prepareDefaultRightHandProblem(
      partID=0; // Reset counter..
      
      ++correct;
-     checksum+=addNewPartToChainProblem(
+     
+     if (!standalone)
+     {
+      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
                               "__rthumb",0, // Joint
@@ -1285,6 +1288,17 @@ int prepareDefaultRightHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     } else
+     {
+      checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "rthumbBase",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+     }
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      
@@ -1928,6 +1942,9 @@ int prepareDefaultLeftHandProblem(
      partID=0; // Reset counter..
      
      ++correct;
+     
+     if (!standalone)
+     {
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
@@ -1936,6 +1953,18 @@ int prepareDefaultLeftHandProblem(
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID
                              );
+     }
+       else
+    {
+     checksum+=addNewPartToChainProblem(
+                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              //-----------------------------------------
+                              "lthumbBase",0, // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID
+                             );
+    }
      //                                                   minX/maxX     minY/maxY   minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
      
