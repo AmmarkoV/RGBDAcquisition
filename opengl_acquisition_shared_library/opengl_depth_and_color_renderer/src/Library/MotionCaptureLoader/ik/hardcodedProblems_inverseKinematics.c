@@ -87,8 +87,14 @@ int addNewPartToChainProblem(
         
         if (!forceSpecificMIDs)
         {
-         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation encountered
          problem->chain[*chainID].part[*partID].mIDEnd=problem->chain[*chainID].part[*partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1; 
+         unsigned int coordinatesToRegress = 1 + problem->chain[*chainID].part[*partID].mIDEnd - problem->chain[*chainID].part[*partID].mIDStart;
+         
+         if ( ( coordinatesToRegress != 3) && ( coordinatesToRegress != 0) )
+         {
+           fprintf(stderr,RED "Bug detected on joint %s, coordinates to regress are != 3 and not zero..\n" NORMAL,partName);    
+         }
         } else
         {
          //Use custom mIDS Start/End ( for root position rotation ) 
@@ -906,11 +912,13 @@ int prepareDefaultRightHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              0, //We assume the root joint is the first and the X pos has index 0
+                              2  //We assume the root joint is the first and the Z pos has index 2
                              );
        problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
-       problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-       problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+       //problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
+       //problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
                              
        ++correct;
        checksum+=addNewPartToChainProblem(
@@ -922,12 +930,14 @@ int prepareDefaultRightHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              3, //We assume the root joint is the first and the first rotation component has index 3
+                              5  //We assume the root joint is the first and the last rotation component has index 5
                              );
                              
        problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-       problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position   
+       //problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
+       //problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position   
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
@@ -945,11 +955,13 @@ int prepareDefaultRightHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
+                              6  //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components ending at 4
                              );
         problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-        problem->chain[chainID].part[partID-1].mIDStart=4;
-        problem->chain[chainID].part[partID-1].mIDEnd=6;
+        //problem->chain[chainID].part[partID-1].mIDStart=4;
+        //problem->chain[chainID].part[partID-1].mIDEnd=6;
        }
        
        ++correct;
@@ -1638,15 +1650,14 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              0, //We have a position which since it comes from root joint should start at 0
+                              2  //We have a position which since it comes from root joint should end at 2
                              );
        unsigned int partThatJustWasCreated = partID - 1;
        problem->chain[chainID].part[partThatJustWasCreated].bigChanges=1; //Big changes
-       problem->chain[chainID].part[partThatJustWasCreated].mIDStart=0;   //Direct substitution is only possible because we know this is the root / first position
-       problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=2;     //Direct substitution is only possible because we know this is the root / first position
-       //fprintf(stderr,"mIDS Part %u Pos %u -> %u ..\n",partThatJustWasCreated,problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
-
-
+       //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=0;   //Direct substitution is only possible because we know this is the root / first position
+       //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=2;     //Direct substitution is only possible because we know this is the root / first position 
 
        ++correct;
        checksum+=addNewPartToChainProblem(
@@ -1658,13 +1669,14 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              3, //We have a rotation which since it comes from root joint should start at 3
+                              5  //We have a rotation which since it comes from root joint should end at 5
                              );
        partThatJustWasCreated = partID - 1;
        problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
-       problem->chain[chainID].part[partThatJustWasCreated].mIDStart=3;     //Direct substitution is only possible because we know this is the root / first position
-       problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=5;       //Direct substitution is only possible because we know this is the root / first position  
-       //fprintf(stderr,"mIDS Q1 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd ); 
+       //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=3;     //Direct substitution is only possible because we know this is the root / first position
+       //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=5;       //Direct substitution is only possible because we know this is the root / first position 
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
@@ -1682,13 +1694,15 @@ int prepareDefaultLeftHandProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
+                              6  //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components ending at 4
                              );
                              
          partThatJustWasCreated = partID - 1;
          problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
-         problem->chain[chainID].part[partThatJustWasCreated].mIDStart=4;
-         problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=6;
+         //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=4;
+         //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=6;
          //fprintf(stderr,"mIDS Q2 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
        }
        
@@ -2316,11 +2330,13 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              0, //We have a position which since it comes from root joint should start at 0
+                              2  //We have a position which since it comes from root joint should end at 2
                              );
      problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
-     problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-     problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+     //problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
+     //problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2332,10 +2348,12 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
+                              1, //Force specific mIDStart/mIDEnd
+                              3, //We have a rotation which since it comes from root joint should start at 3
+                              5  //We have a rotation which since it comes from root joint should end at 5
                              );
-     problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-     problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
+     //problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
+     //problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
      
      ++correct;
      checksum+=addNewPartToChainProblem(
