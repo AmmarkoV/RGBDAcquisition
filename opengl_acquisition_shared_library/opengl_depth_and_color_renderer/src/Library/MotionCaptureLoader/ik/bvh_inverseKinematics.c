@@ -546,8 +546,9 @@ float iteratePartLoss(
        fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
        fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
        fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
-       //exit(0);
-       return NAN;
+       
+       fprintf(stderr,RED "forcing 3 elements from %u -> %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart,problem->chain[chainID].part[partID].mIDStart+2);
+       //return NAN;
     } 
     
     

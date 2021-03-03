@@ -32,10 +32,15 @@ int addNewPartToChainProblem(
     char * alternatePartName,
     float importance,
     int isEndEffector,
+    //-----------------------------------------
     unsigned int * groupID,
     unsigned int * jobID,
     unsigned int * chainID,
-    unsigned int * partID
+    unsigned int * partID,
+    //-----------------------------------------
+    char forceSpecificMIDs,
+    unsigned int mIDStart,
+    unsigned int mIDEnd 
     )
 { 
     if (*chainID >= MAXIMUM_CHAINS)
@@ -77,10 +82,19 @@ int addNewPartToChainProblem(
         problem->chain[*chainID].part[*partID].limits=0;
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID; 
-        problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-        problem->chain[*chainID].part[*partID].mIDEnd=problem->chain[*chainID].part[*partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
         problem->chain[*chainID].part[*partID].jointImportance=importance;
         problem->chain[*chainID].part[*partID].endEffector=isEndEffector;
+        
+        if (!forceSpecificMIDs)
+        {
+         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+         problem->chain[*chainID].part[*partID].mIDEnd=problem->chain[*chainID].part[*partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1; 
+        } else
+        {
+         //Use custom mIDS Start/End ( for root position rotation ) 
+         problem->chain[*chainID].part[*partID].mIDStart=mIDStart; 
+         problem->chain[*chainID].part[*partID].mIDEnd=mIDEnd; 
+        }
         
         *partID+=1;                      
         problem->chain[*chainID].numberOfParts=*partID;
@@ -228,7 +242,9 @@ int prepareDefaultFaceProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -239,7 +255,9 @@ int prepareDefaultFaceProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      }
                              
@@ -252,7 +270,9 @@ int prepareDefaultFaceProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -263,7 +283,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -274,7 +296,9 @@ int prepareDefaultFaceProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
 
@@ -286,7 +310,9 @@ int prepareDefaultFaceProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //----------------------------------------------------------
     if (correct!=checksum) 
@@ -322,7 +348,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      
      ++correct;
@@ -333,7 +361,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -344,7 +374,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                   
      ++correct;
@@ -355,7 +387,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -388,7 +422,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      
      ++correct;
@@ -399,7 +435,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -410,7 +448,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                   
      ++correct;
@@ -421,7 +461,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -454,7 +496,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                   
      ++correct;
@@ -465,7 +509,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -498,7 +544,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                   
      ++correct;
@@ -509,7 +557,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -542,7 +592,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -553,7 +605,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      
      ++correct;
@@ -564,7 +618,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -575,7 +631,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                   
      ++correct;
@@ -586,7 +644,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -597,7 +657,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
      ++correct;
@@ -608,7 +670,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -642,7 +706,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -653,7 +719,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -664,7 +732,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -675,7 +745,9 @@ int prepareDefaultFaceProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
@@ -769,7 +841,9 @@ int prepareDefaultRightHandProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
       
@@ -781,7 +855,9 @@ int prepareDefaultRightHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
    
@@ -793,7 +869,9 @@ int prepareDefaultRightHandProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                  
@@ -826,7 +904,9 @@ int prepareDefaultRightHandProblem(
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
        problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
        problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
@@ -840,7 +920,9 @@ int prepareDefaultRightHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
        problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
@@ -861,7 +943,9 @@ int prepareDefaultRightHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
         problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
         problem->chain[chainID].part[partID-1].mIDStart=4;
@@ -875,7 +959,9 @@ int prepareDefaultRightHandProblem(
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -884,7 +970,9 @@ int prepareDefaultRightHandProblem(
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -893,7 +981,9 @@ int prepareDefaultRightHandProblem(
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -902,7 +992,9 @@ int prepareDefaultRightHandProblem(
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -911,7 +1003,9 @@ int prepareDefaultRightHandProblem(
                               "rthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                  
       //----------------------------------------------------------
@@ -947,7 +1041,9 @@ int prepareDefaultRightHandProblem(
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,15.0,  -45.0,90.0,   -17.0,45.0);
@@ -959,7 +1055,9 @@ int prepareDefaultRightHandProblem(
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     ++correct;
      checksum+=addNewPartToChainProblem(
@@ -968,7 +1066,9 @@ int prepareDefaultRightHandProblem(
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -977,7 +1077,9 @@ int prepareDefaultRightHandProblem(
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -986,7 +1088,9 @@ int prepareDefaultRightHandProblem(
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -995,7 +1099,9 @@ int prepareDefaultRightHandProblem(
                               "rthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1021,7 +1127,9 @@ int prepareDefaultRightHandProblem(
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                  minX/maxX   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
@@ -1033,7 +1141,9 @@ int prepareDefaultRightHandProblem(
                               "finger2-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
@@ -1045,7 +1155,9 @@ int prepareDefaultRightHandProblem(
                               "finger2-3.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,45.0);
@@ -1057,7 +1169,9 @@ int prepareDefaultRightHandProblem(
                               "endsite_finger2-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1087,7 +1201,9 @@ int prepareDefaultRightHandProblem(
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                  minX/maxX   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
@@ -1099,7 +1215,9 @@ int prepareDefaultRightHandProblem(
                               "finger3-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
@@ -1111,7 +1229,9 @@ int prepareDefaultRightHandProblem(
                               "finger3-3.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
@@ -1124,7 +1244,9 @@ int prepareDefaultRightHandProblem(
                               "endsite_finger3-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1151,7 +1273,9 @@ int prepareDefaultRightHandProblem(
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
@@ -1163,7 +1287,9 @@ int prepareDefaultRightHandProblem(
                               "finger4-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
@@ -1175,7 +1301,9 @@ int prepareDefaultRightHandProblem(
                               "finger4-3.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
@@ -1187,7 +1315,9 @@ int prepareDefaultRightHandProblem(
                               "endsite_finger4-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
 
@@ -1218,7 +1348,9 @@ int prepareDefaultRightHandProblem(
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-18.0,15.0,  0.0,0.0,   -10.0,90.0);
@@ -1230,7 +1362,9 @@ int prepareDefaultRightHandProblem(
                               "finger5-2.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
@@ -1242,7 +1376,9 @@ int prepareDefaultRightHandProblem(
                               "finger5-3.r",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
@@ -1254,7 +1390,9 @@ int prepareDefaultRightHandProblem(
                               "endsite_finger5-3.r",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     if (correct!=checksum) 
@@ -1278,27 +1416,16 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      
-     if (!standalone)
-     {
       checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "__rthumb",0, // Joint
+                              "rthumbBase","__rthumb", // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
-                             );
-     } else
-     {
-      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              "rthumbBase",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              0,0,0 //Automatic mID Start/End assignment
                              );
-     }
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      
@@ -1310,7 +1437,9 @@ int prepareDefaultRightHandProblem(
                               "rthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX    minY/maxY   minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
@@ -1322,7 +1451,9 @@ int prepareDefaultRightHandProblem(
                               "finger1-2.r",0, // Joint
                               0.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
@@ -1334,7 +1465,9 @@ int prepareDefaultRightHandProblem(
                               "finger1-3.r",0, // Joint
                               2.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                    minX/max   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -50.0,0.0,  0.0,0.0,    0.0,50.0);
@@ -1346,7 +1479,9 @@ int prepareDefaultRightHandProblem(
                               "endsite_finger1-3.r",0, // Joint
                               3.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1439,7 +1574,9 @@ int prepareDefaultLeftHandProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
       
@@ -1451,7 +1588,9 @@ int prepareDefaultLeftHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                              
@@ -1463,7 +1602,9 @@ int prepareDefaultLeftHandProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                  
@@ -1486,7 +1627,6 @@ int prepareDefaultLeftHandProblem(
        checksum=0;
        correct=0; 
        partID=0;
-    
 
        ++correct;
        checksum+=addNewPartToChainProblem(
@@ -1496,12 +1636,18 @@ int prepareDefaultLeftHandProblem(
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
-       problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
-       problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-       problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
-                             
+       unsigned int partThatJustWasCreated = partID - 1;
+       problem->chain[chainID].part[partThatJustWasCreated].bigChanges=1; //Big changes
+       problem->chain[chainID].part[partThatJustWasCreated].mIDStart=0;   //Direct substitution is only possible because we know this is the root / first position
+       problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=2;     //Direct substitution is only possible because we know this is the root / first position
+       //fprintf(stderr,"mIDS Part %u Pos %u -> %u ..\n",partThatJustWasCreated,problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
+
+
+
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1510,12 +1656,15 @@ int prepareDefaultLeftHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
-       
-       problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-       problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-       problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position    
+       partThatJustWasCreated = partID - 1;
+       problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
+       problem->chain[chainID].part[partThatJustWasCreated].mIDStart=3;     //Direct substitution is only possible because we know this is the root / first position
+       problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=5;       //Direct substitution is only possible because we know this is the root / first position  
+       //fprintf(stderr,"mIDS Q1 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd ); 
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
@@ -1531,13 +1680,18 @@ int prepareDefaultLeftHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
-         problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-         problem->chain[chainID].part[partID-1].mIDStart=4;
-         problem->chain[chainID].part[partID-1].mIDEnd=6;
+         partThatJustWasCreated = partID - 1;
+         problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
+         problem->chain[chainID].part[partThatJustWasCreated].mIDStart=4;
+         problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=6;
+         //fprintf(stderr,"mIDS Q2 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
        }
+       
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
@@ -1545,7 +1699,9 @@ int prepareDefaultLeftHandProblem(
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1554,7 +1710,9 @@ int prepareDefaultLeftHandProblem(
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1563,7 +1721,9 @@ int prepareDefaultLeftHandProblem(
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1572,7 +1732,9 @@ int prepareDefaultLeftHandProblem(
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1581,7 +1743,9 @@ int prepareDefaultLeftHandProblem(
                               "lthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                  
       //----------------------------------------------------------
@@ -1614,7 +1778,9 @@ int prepareDefaultLeftHandProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,15.0,  -90.0,45.0,   -45.0,17.0);
@@ -1626,7 +1792,9 @@ int prepareDefaultLeftHandProblem(
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1635,7 +1803,9 @@ int prepareDefaultLeftHandProblem(
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1644,7 +1814,9 @@ int prepareDefaultLeftHandProblem(
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1653,7 +1825,9 @@ int prepareDefaultLeftHandProblem(
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -1662,7 +1836,9 @@ int prepareDefaultLeftHandProblem(
                               "lthumb",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1688,7 +1864,9 @@ int prepareDefaultLeftHandProblem(
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,18.0,  0.0,0.0,   -90.0,10.0);
@@ -1700,7 +1878,9 @@ int prepareDefaultLeftHandProblem(
                               "finger2-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
@@ -1712,7 +1892,9 @@ int prepareDefaultLeftHandProblem(
                               "finger2-3.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
@@ -1724,7 +1906,9 @@ int prepareDefaultLeftHandProblem(
                               "endsite_finger2-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1755,7 +1939,9 @@ int prepareDefaultLeftHandProblem(
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,18.0,  0.0,0.0,   -90.0,10.0);
@@ -1767,7 +1953,9 @@ int prepareDefaultLeftHandProblem(
                               "finger3-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
@@ -1779,7 +1967,9 @@ int prepareDefaultLeftHandProblem(
                               "finger3-3.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
@@ -1791,7 +1981,9 @@ int prepareDefaultLeftHandProblem(
                               "endsite_finger3-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1819,7 +2011,9 @@ int prepareDefaultLeftHandProblem(
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,18.0,  0.0,0.0,   -90.0,10.0);
@@ -1831,7 +2025,9 @@ int prepareDefaultLeftHandProblem(
                               "finger4-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
@@ -1843,7 +2039,9 @@ int prepareDefaultLeftHandProblem(
                               "finger4-3.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              ); 
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
@@ -1855,7 +2053,9 @@ int prepareDefaultLeftHandProblem(
                               "endsite_finger4-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
 
     if (correct!=checksum) 
@@ -1885,7 +2085,9 @@ int prepareDefaultLeftHandProblem(
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX   -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,18.0,  0.0,0.0,   -90.0,10.0);
@@ -1897,7 +2099,9 @@ int prepareDefaultLeftHandProblem(
                               "finger5-2.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
@@ -1909,7 +2113,9 @@ int prepareDefaultLeftHandProblem(
                               "finger5-3.l",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                   -------   -------     minZ/maxZ
     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
@@ -1921,7 +2127,9 @@ int prepareDefaultLeftHandProblem(
                               "endsite_finger5-3.l",0, // Joint
                               1.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -1943,28 +2151,16 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      
-     if (!standalone)
-     {
      checksum+=addNewPartToChainProblem(
                               problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
                               //-----------------------------------------
-                              "__lthumb",0, // Joint
+                              "lthumbBase","__lthumb", // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
-                             );
-     }
-       else
-    {
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
-                              "lthumbBase",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              0,0,0 //Automatic mID Start/End assignment
                              );
-    }
      //                                                   minX/maxX     minY/maxY   minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
      
@@ -1976,7 +2172,9 @@ int prepareDefaultLeftHandProblem(
                               "lthumb",0, // Joint
                               1.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX     minY/maxY    minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
@@ -1988,7 +2186,9 @@ int prepareDefaultLeftHandProblem(
                               "finger1-2.l",0, // Joint
                               0.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX    minY/maxY      0minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
@@ -2000,7 +2200,9 @@ int prepareDefaultLeftHandProblem(
                               "finger1-3.l",0, // Joint
                               2.0,     //Importance
                               0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              ); 
      //                                                   minX/maxX    -------     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,50.0,    0.0,0.0,    -50.0,0.0);
@@ -2012,7 +2214,9 @@ int prepareDefaultLeftHandProblem(
                               "endsite_finger1-3.l",0, // Joint
                               3.0,     //Importance
                               1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     if (correct!=checksum) 
@@ -2110,7 +2314,9 @@ int prepareDefaultBodyProblem(
                                2.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
      problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
@@ -2124,7 +2330,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
      problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
@@ -2137,7 +2345,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );                   
 
      ++correct;
@@ -2148,7 +2358,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );            
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2158,7 +2370,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );                   
 
      ++correct;
@@ -2169,7 +2383,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );                   
  
      ++correct;
@@ -2180,7 +2396,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );             
 
      ++correct;
@@ -2191,7 +2409,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );             
 
      ++correct;
@@ -2202,7 +2422,9 @@ int prepareDefaultBodyProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
 
@@ -2214,7 +2436,9 @@ int prepareDefaultBodyProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                                                                             
     //----------------------------------------------------------
@@ -2265,7 +2489,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
@@ -2279,7 +2505,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                              
@@ -2291,7 +2519,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                              
@@ -2303,7 +2533,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     //----------------------------------------------------------
@@ -2354,7 +2586,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
@@ -2367,7 +2601,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
@@ -2381,7 +2617,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
@@ -2395,7 +2633,9 @@ int prepareDefaultBodyProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
 
@@ -2407,7 +2647,9 @@ int prepareDefaultBodyProblem(
                                2.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     //----------------------------------------------------------
     if (correct!=checksum) 
@@ -2443,7 +2685,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
       
@@ -2455,7 +2699,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                              
@@ -2467,7 +2713,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
                  
@@ -2503,7 +2751,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -2514,7 +2764,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
      ++correct;
@@ -2525,7 +2777,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                              
     //----------------------------------------------------------
@@ -2565,7 +2819,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -40.0,50.0,   -10.0,80.0);
@@ -2578,7 +2834,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
@@ -2591,7 +2849,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
@@ -2604,7 +2864,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
                
      #if DUALFOOT              
@@ -2616,7 +2878,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     #endif
     
@@ -2654,7 +2918,9 @@ int prepareDefaultBodyProblem(
                                0.5,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -50.0,40.0,   -80.0,10.0);
@@ -2667,7 +2933,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
@@ -2680,7 +2948,9 @@ int prepareDefaultBodyProblem(
                                1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
@@ -2693,7 +2963,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
    
      #if DUALFOOT
@@ -2705,7 +2977,9 @@ int prepareDefaultBodyProblem(
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
                              );
     #endif
     //----------------------------------------------------------
