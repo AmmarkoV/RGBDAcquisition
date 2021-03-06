@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.5";
+static const char BVH_LOADER_VERSION_STRING [] = "0.51";
 
 /**
 * @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here 
@@ -31,6 +31,7 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.5";
 
 /**
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
+* The human file I use has 1 Root + 164 Joints + 47 End Sites = 212 I set a similar maximum here to ensure better caching.. 
 * @ingroup BVH
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 1550
@@ -181,8 +182,8 @@ struct BVH_Joint
   char isEndSite;
   char hasEndSite;
   //--------------------
-  char jointName[MAX_BVH_JOINT_NAME+1];
-  char jointNameLowercase[MAX_BVH_JOINT_NAME+1];
+  char jointName[MAX_BVH_JOINT_NAME+1]; //+Null terminator space
+  char jointNameLowercase[MAX_BVH_JOINT_NAME+1]; //+Null terminator space
   unsigned int jointNameHash;
   //--------------------
   BVHJointID parentJoint;
@@ -245,7 +246,7 @@ struct BVH_MotionCapture
   unsigned int rootJointID;
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
-  struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE+32]; //End Joints need extra space so lets give them +32 bytes
+  struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE]; //End Site Joints need extra space so be sure they are accounted for in MAX_BVH_JOINT_HIERARCHY_SIZE
 
   //We may want to only work with specific selected joints..!
   unsigned int selectionIncludesEndSites;

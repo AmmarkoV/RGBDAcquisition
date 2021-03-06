@@ -665,7 +665,7 @@ int main(int argc,const char **argv)
         {
           // ./BVHTester --from dataset/lhand.qbvh --repeat 100 --randomizeBasedOnIKConstrains lhand --bvh restR.bvh
           if (i+1>=argc)  { incorrectArguments(); }
-          char * nameOfIKProblem=argv[i+1];
+          const char * nameOfIKProblem=argv[i+1];
            
           srand(time(NULL)); 
               if (
