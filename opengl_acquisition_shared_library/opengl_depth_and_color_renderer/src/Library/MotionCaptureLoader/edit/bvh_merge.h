@@ -16,8 +16,6 @@ struct BVH_MergeAssociations
    char jointAssociationTargetToSourceExists[MAX_BVH_JOINT_HIERARCHY_SIZE];
    unsigned int jointAssociationTargetToSource[MAX_BVH_JOINT_HIERARCHY_SIZE];
    unsigned int jointAssociationSourceToTarget[MAX_BVH_JOINT_HIERARCHY_SIZE];
-
-
 };
 
 int bvh_mergeWith(

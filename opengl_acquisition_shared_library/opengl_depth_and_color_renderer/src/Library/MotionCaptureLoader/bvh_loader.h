@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char BVH_LOADER_VERSION_STRING [] = "0.51";
+static const char BVH_LOADER_VERSION_STRING [] = "0.55";
 
 /**
 * @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here 
@@ -27,7 +27,7 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.51";
 * @brief MAX_BVH_JOINT_NAME is the maximum label size for Joint names
 * @ingroup BVH
 */
-#define MAX_BVH_JOINT_NAME 128
+#define MAX_BVH_JOINT_NAME 32
 
 /**
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
@@ -36,7 +36,6 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.51";
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 1550
 
-#define MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME MAX_BVH_JOINT_HIERARCHY_SIZE*7
 
 /**
 * @brief MAX_BVH_FILE_LINE_SIZE is the maximum number of a valid line in an incoming  BVH file

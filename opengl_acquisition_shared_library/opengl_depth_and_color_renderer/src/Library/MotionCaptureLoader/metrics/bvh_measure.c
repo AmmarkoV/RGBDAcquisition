@@ -338,15 +338,11 @@ int extractMinimaMaximaFromBVHList(const char * filename)
             unsigned int numberOfValues=0; 
             
             
-            fprintf(stderr,"MAX_BVH_JOINT_HIERARCHY_SIZE = %u\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
-            fprintf(stderr,"MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME = %u\n",MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME); 
-            float * minima = (float*) malloc(sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
-            float * maxima = (float*) malloc(sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+            float * minima = 0;
+            float * maxima = 0;
             
-            if ( (minima!=0) && (maxima!=0) )
-            {
-             memset(minima,0,sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
-             memset(maxima,0,sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+            if ( (minima==0) && (maxima==0) )
+            { 
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
@@ -383,7 +379,28 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                       bvh_renameJointsForCompatibility(&bvhMotion);
                       fprintf(stderr,"Did rename `%s`\n",line);
                       
+                      if (numberOfValues!=0)
+                      {
+                          if (numberOfValues != bvhMotion.numberOfValuesPerFrame)
+                          {
+                              fprintf(stderr,"Incorrect number of arguments..!");
+                              fprintf(stderr,"Expected %u and got %u..!",numberOfValues,bvhMotion.numberOfValuesPerFrame);
+                              exit(1);
+                          }
+                      }
+                      
                       numberOfValues = bvhMotion.numberOfValuesPerFrame;
+                      
+                      
+                      float * minima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                      float * maxima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+            
+                      if ( (minima!=0) && (maxima!=0) )
+                        {
+                         memset(minima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                         memset(maxima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                        }
+                      
                       
                       unsigned int mIDAbsolute=0;
                       for (unsigned int fID=0; fID<bvhMotion.numberOfFrames; fID++)
@@ -405,17 +422,23 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                   //if (fileNumber==10) { break; }
                 }
           
-          fprintf(stdout,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
-          fprintf(stdout,"float minimumLimits[%u]={0};\n",numberOfValues);
-          fprintf(stdout,"float maximumLimits[%u]={0};\n",numberOfValues);
-          fprintf(stdout,"//--------------------------\n");
-          for (unsigned int mID=7; mID<numberOfValues; mID++)
-                         {
-                            unsigned int jID = bvhMotion.motionToJointLookup[mID].jointID;
-                            if (minima[mID]!=0.0) { fprintf(stdout,"minimumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,minima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }  
-                            if (maxima[mID]!=0.0) { fprintf(stdout,"maximumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,maxima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }
-                         }
-          fprintf(stdout,"\n\n//--------------------------\n");
+           if ( (maxima!=0) && (minima!=0) ) 
+                          {
+                             fprintf(stdout,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
+                             fprintf(stdout,"float minimumLimits[%u]={0};\n",numberOfValues);
+                             fprintf(stdout,"float maximumLimits[%u]={0};\n",numberOfValues);
+                             fprintf(stdout,"//--------------------------\n");
+                             for (unsigned int mID=7; mID<numberOfValues; mID++)
+                                            {
+                                               unsigned int jID = bvhMotion.motionToJointLookup[mID].jointID;
+                                               if (minima[mID]!=0.0) { fprintf(stdout,"minimumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,minima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }  
+                                               if (maxima[mID]!=0.0) { fprintf(stdout,"maximumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,maxima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }
+                                            }
+                             fprintf(stdout,"\n\n//--------------------------\n");
+                           } else
+                           {
+                               fprintf(stdout,"Error with number of values, possibly mixed files..\n");
+                           }
           
           bvh_free(&bvhMotion);
           
@@ -425,8 +448,8 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                        }
                        
             //Done using memory
-            free(minima);
-            free(maxima);
+            if(minima!=0) { free(minima); }
+            if(maxima!=0) { free(maxima); }
           } //correct allocations on minimum/maximum limits
            else
           {

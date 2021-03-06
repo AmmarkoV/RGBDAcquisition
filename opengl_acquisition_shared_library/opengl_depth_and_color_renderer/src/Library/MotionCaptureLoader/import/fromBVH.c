@@ -161,8 +161,8 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 
 void errorReachedMemoryLimit(unsigned int jID)
 { 
-  fprintf(stderr,RED "We have reached the maximum allowed number of joints in hierarchy (%u)\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
-  fprintf(stderr,    "please recompile with a larger MAX_BVH_JOINT_HIERARCHY_SIZE\n" NORMAL); 
+  fprintf(stderr,RED "We have reached the maximum allowed number of joints in hierarchy (%u out of bounds)\n",jID);
+  fprintf(stderr,    "don't know how this happened since dynamic allocation should cover any input size..\n" NORMAL); 
   exit(1);
 }
 
@@ -312,8 +312,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
 {
   #if STATIC_SIZES
     fprintf(stderr,YELLOW "Using legacy allocation sizes\n" NORMAL); 
-    bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE; //legacy way 
-    bvhMotion->motionValuesSize       = MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME; //legacy way  
+    bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;   //legacy way 
+    bvhMotion->motionValuesSize       = MAX_BVH_JOINT_HIERARCHY_SIZE*7; //legacy way  
   #else
     fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
     fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame); 
