@@ -159,7 +159,12 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 }
 
 
-
+void errorReachedMemoryLimit(unsigned int jID)
+{ 
+  fprintf(stderr,RED "We have reached the maximum allowed number of joints in hierarchy (%u)\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
+  fprintf(stderr,    "please recompile with a larger MAX_BVH_JOINT_HIERARCHY_SIZE\n" NORMAL); 
+  exit(1);
+}
 
 
 
@@ -236,7 +241,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //Rest of the information will be filled in when we reach an {
                    
                
-               if (jNum<MAX_BVH_JOINT_HIERARCHY_SIZE)
+               if (jNum<bvhMotion->MAX_jointHierarchySize)
                { 
                  bvhMotion->rootJointID=jNum;
                  bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
@@ -248,6 +253,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                } else
                {
                  fprintf(stderr,"We have run out of space for our joint hierarchy..\n");
+                 errorReachedMemoryLimit(jNum);
                }
               //---------------------------------------------------------------------------------------------------------------------
               //---------------------------------------------------------------------------------------------------------------------
@@ -261,8 +267,12 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                   
                //We encountered something like |JOINT Chest|
                if (debug) {fprintf(stderr,"-J-");}
-               //Store new Joint Name
-               InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
+               
+               
+               if (jNum<bvhMotion->MAX_jointHierarchySize)
+               { 
+                //Store new Joint Name
+                InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
                
                 //Also store lowercase version of joint name for internal use   
                 strncpy(bvhMotion->jointHierarchy[jNum].jointNameLowercase,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
@@ -270,18 +280,22 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                 lowercase(bvhMotion->jointHierarchy[jNum].jointNameLowercase);                     
                 bvhMotion->jointHierarchy[jNum].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jNum].jointNameLowercase);              
                                   
-               if (debug) {fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);}
-               //Store new Joint Hierarchy Level
-               //Rest of the information will be filled in when we reach an {
-               bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
-               //Update lookup table to remember ordering
-               bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
-               currentJoint=jNum;
+                if (debug) {fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);}
+                //Store new Joint Hierarchy Level
+                //Rest of the information will be filled in when we reach an {
+                bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+                //Update lookup table to remember ordering
+                bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
+                currentJoint=jNum;
                
-               //---------------------------------------------------------------------------------------------------------------------
-               //---------------------------------------------------------------------------------------------------------------------
-               //---------------------------------------------------------------------------------------------------------------------
-               ++jNum;
+                //---------------------------------------------------------------------------------------------------------------------
+                //---------------------------------------------------------------------------------------------------------------------
+                //---------------------------------------------------------------------------------------------------------------------
+                ++jNum;
+               }  else
+               {
+                 errorReachedMemoryLimit(jNum);
+               }
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"End"))
              {
@@ -305,12 +319,19 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     {
                       snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite");
                     }
-                    bvhMotion->jointHierarchy[jNum].isEndSite=1;
-                    bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
-                    //Update lookup table to remember ordering
-                    bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
-                    currentJoint=jNum;
-                    ++jNum;
+                    
+                    if (jNum<bvhMotion->MAX_jointHierarchySize)
+                    { 
+                     bvhMotion->jointHierarchy[jNum].isEndSite=1;
+                     bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+                     //Update lookup table to remember ordering
+                     bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
+                     currentJoint=jNum;
+                     ++jNum;
+                    } else
+                    {
+                     errorReachedMemoryLimit(jNum);
+                    }
                    //---------------------------------------------------------------------------------------------------------------------
                    //---------------------------------------------------------------------------------------------------------------------
                    //---------------------------------------------------------------------------------------------------------------------

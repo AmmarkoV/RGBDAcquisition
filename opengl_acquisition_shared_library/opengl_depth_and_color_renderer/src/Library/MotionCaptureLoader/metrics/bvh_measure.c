@@ -336,8 +336,10 @@ int extractMinimaMaximaFromBVHList(const char * filename)
            
             struct BVH_MotionCapture bvhMotion={0}; 
             unsigned int numberOfValues=0; 
-            float minima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
-            float maxima[MAX_BVH_JOINT_HIERARCHY_SIZE]={0};
+            fprintf(stderr,"MAX_BVH_JOINT_HIERARCHY_SIZE = %u\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
+            fprintf(stderr,"MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME = %u\n",MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+            float minima[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME]={0};
+            float maxima[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME]={0};
             
             char * line = NULL;
             size_t len = 0;

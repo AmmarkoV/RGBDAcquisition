@@ -36,6 +36,7 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.51";
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 1550
 
+#define MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME MAX_BVH_JOINT_HIERARCHY_SIZE*7
 
 /**
 * @brief MAX_BVH_FILE_LINE_SIZE is the maximum number of a valid line in an incoming  BVH file
@@ -256,7 +257,7 @@ struct BVH_MotionCapture
 
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
-  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*7];
+  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME];
 
   //Motion
   unsigned int numberOfValuesPerFrame;
