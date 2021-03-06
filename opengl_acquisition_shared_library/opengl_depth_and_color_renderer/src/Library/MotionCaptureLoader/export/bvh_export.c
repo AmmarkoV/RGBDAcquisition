@@ -191,6 +191,7 @@ int dumpBVHToSVGCSV(
 
     simpleRendererInitializeFromExplicitConfiguration(&renderer);
     fprintf(stderr,"Direct Rendering is not implemented yet, please don't use it..\n");
+    bvh_freeTransform(&bvhTransform);
     exit(1);
   } else
   {
@@ -313,7 +314,8 @@ int dumpBVHToSVGCSV(
   }
   //------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------
-
+ 
+ bvh_freeTransform(&bvhTransform);
 
  return (framesDumped==mc->numberOfFrames);
 }

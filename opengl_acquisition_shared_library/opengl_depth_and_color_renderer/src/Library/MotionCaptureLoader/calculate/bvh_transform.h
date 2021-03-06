@@ -94,6 +94,7 @@ struct BVH_TransformedJoint
 
 struct BVH_Transform
 {
+  char transformStructInitialized;
   unsigned int numberOfJointsToTransform; //TODO: populate this
   
   char useOptimizations;
@@ -178,6 +179,7 @@ int bvh_removeTranslationFromTransform(
                                       );
 
 
+int bvh_freeTransform(struct BVH_Transform * bvhTransform);
 
 #ifdef __cplusplus
 }

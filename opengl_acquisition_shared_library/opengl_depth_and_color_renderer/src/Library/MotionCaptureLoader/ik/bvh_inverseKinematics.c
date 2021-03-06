@@ -1475,7 +1475,9 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                         );
                return 1;
              }
-           }
+           } 
+    bvh_freeTransform(&bvhCurrentTransform);
+    bvh_freeTransform(&bvhPreviousTransform);
    //------------------------------------------------
    return 0;
 }
@@ -1786,7 +1788,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
            //-----------------------------------------------
            struct BVH_Transform bvhPreviousTransform = {0}; 
            if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
-           {  
+           {
             float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
                                                                                    
             if (previousMAEInPixels<*finalMAEInPixels)
@@ -1799,8 +1801,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             }           
             
             }
+            bvh_freeTransform(&bvhPreviousTransform);
            //-----------------------------------------------
-           
         }
        }
         //----------------------------------------------------
@@ -1901,7 +1903,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
                                                ikConfig->epochs );
-           
+    
+    bvh_freeTransform(&bvhCurrentTransform);
+    
     return 1;
 }
 

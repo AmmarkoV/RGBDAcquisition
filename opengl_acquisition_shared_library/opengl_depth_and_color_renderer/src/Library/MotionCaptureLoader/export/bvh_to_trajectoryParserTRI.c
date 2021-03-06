@@ -260,6 +260,7 @@ int dumpBVHJointToTP(
            fprintf(fp,"%0.4f,",bvhTransform.joint[jID].dynamicRotation[i]);
          }
          fprintf(fp,"\n");
+         bvh_freeTransform(&bvhTransform);
         //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         #else
               fprintf(
@@ -295,7 +296,6 @@ int dumpBVHToTrajectoryParserTRI(
                                   unsigned int includeSpheres
                                 )
 {
-  //struct BVH_Transform bvhTransform={0};
   unsigned int jID=0;
   FILE * fp = fopen(filename,"w");
 

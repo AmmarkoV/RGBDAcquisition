@@ -70,6 +70,8 @@ void dumpSphereBody(
              );
      }
      fprintf(fp,"\n");
+     
+     bvh_freeTransform(bvhTransform);
     }
 }
 

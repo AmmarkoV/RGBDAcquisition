@@ -3208,6 +3208,7 @@ int bvhTestIK(
                          {
                                fprintf(stderr,"Could not prepare the problem for IK solution\n");
                                free(problem);
+                               bvh_freeTransform(&bvhTargetTransform);
                                return 0;
                          }
 
@@ -3290,7 +3291,8 @@ int bvhTestIK(
         freeMotionBuffer(&initialSolution);
         freeMotionBuffer(&groundTruth);
     }
-
+    
+    bvh_freeTransform(&bvhTargetTransform);
     return result;
 }
 

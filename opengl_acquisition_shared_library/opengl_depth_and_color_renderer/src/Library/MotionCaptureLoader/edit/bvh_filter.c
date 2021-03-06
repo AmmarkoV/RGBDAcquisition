@@ -280,6 +280,7 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
   }
 
 
+ bvh_freeTransform(&bvhTransform);
  free(framesToRemove);
 
  return 1;

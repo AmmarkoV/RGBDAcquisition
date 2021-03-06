@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "bvh_transform.h"
 
@@ -880,4 +881,13 @@ int bvh_removeTranslationFromTransform(
   }
 
   return 0;
+}
+
+
+
+int bvh_freeTransform(struct BVH_Transform * bvhTransform)
+{
+    //fprintf(stderr,"TODO: implement bvh_freeTransform\n");
+    //exit(1);
+    return 0;
 }
