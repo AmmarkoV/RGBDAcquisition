@@ -191,21 +191,22 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
 { 
   //Normaly we should check if the bvhTransform structure is null but given that this call is called millions of times only if you have a transform
   //we skip the check
-  //if (bvhTransform==0) { return 0; }
- 
-  if (bvhTransform->useOptimizations) 
-  {
-     //If we are using optimizations and this joint is not skipped then transform this joint
-     //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
-     //if (jID<MAX_BVH_JOINT_HIERARCHY_SIZE)  
-     //     { 
-            return  (!bvhTransform->skipCalculationsForJoint[jID]); 
-     //     }
-  } else
-  {
-     //If we are not using optimizations then transform every joint 
-     return 1;
-  } 
+  //if (bvhTransform!=0) 
+  //  { 
+       if (bvhTransform->useOptimizations) 
+        {
+         //If we are using optimizations and this joint is not skipped then transform this joint
+         //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
+         //if (jID<bvhTransform->numberOfJointsToTransform) //MAX_BVH_JOINT_HIERARCHY_SIZE  
+         //     { 
+                 return  (!bvhTransform->skipCalculationsForJoint[jID]); 
+         //     }
+        } else
+        {
+         //If we are not using optimizations then transform every joint 
+         return 1;
+        } 
+  // } return 0;
 }
 
 

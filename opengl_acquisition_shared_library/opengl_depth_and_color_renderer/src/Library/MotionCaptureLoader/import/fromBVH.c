@@ -173,7 +173,7 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
   if (fd!=0)
   {
    //The outputs of this function are these
-   bvhMotion->numberOfValuesPerFrame = 0; 
+   bvhMotion->motionValuesSize=0;
    bvhMotion->MAX_jointHierarchySize = 0;
    //--------------------------------------
   
@@ -252,7 +252,7 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
                   //---------------------------------------------------------------------------------------------------------------------
                   //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration
                   unsigned int loadedChannels = InputParser_GetWordInt(ipcB,1); 
-                  bvhMotion->numberOfValuesPerFrame += loadedChannels; 
+                  bvhMotion->motionValuesSize += loadedChannels; 
                   //---------------------------------------------------------------------------------------------------------------------
              } else
          if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
@@ -298,27 +298,60 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
    InputParser_Destroy(ipcB);
    //We need file to be open..!
    rewind(fd);
+   bvhMotion->linesParsed=0; //reset lines parsed..
    return ( (bvhMotion->jointHierarchySize>0) &&  (bvhMotion->numberOfValuesPerFrame>0) );
   }
  return 0;
 }
 
 
+#define STATIC_SIZES 0
 
 
-
-int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
+int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
 {
-  bvhMotion->linesParsed=0;
-  bvhMotion->numberOfValuesPerFrame = 0;//57;
-  bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
-
-  fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
-  fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame);
-  bvhMotion->numberOfValuesPerFrame = 0;//57;
+  #if STATIC_SIZES
+    fprintf(stderr,YELLOW "Using legacy allocation sizes\n" NORMAL); 
+    bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE; //legacy way 
+    bvhMotion->motionValuesSize       = MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME; //legacy way  
+  #else
+    fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
+    fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame); 
+    //Make space for an off by one mistake ;P
+    //bvhMotion->MAX_jointHierarchySize+=1;
+    //bvhMotion->motionValuesSize+=1;
+  #endif
   
+  bvhMotion->linesParsed=0; //make sure these are clean..
+  bvhMotion->numberOfValuesPerFrame = 0; //make sure these are clean.. 
   
-  //exit(0);
+  if  (bvhMotion->jointHierarchy!=0)       { free(bvhMotion->jointHierarchy);      bvhMotion->jointHierarchy=0;} 
+  bvhMotion->jointHierarchy       = (struct BVH_Joint *)                     malloc( sizeof(struct BVH_Joint) * bvhMotion->MAX_jointHierarchySize);
+  
+  if  (bvhMotion->jointToMotionLookup!=0)  { free(bvhMotion->jointToMotionLookup); bvhMotion->jointToMotionLookup=0;}
+  bvhMotion->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * bvhMotion->MAX_jointHierarchySize);
+  
+  if  (bvhMotion->motionToJointLookup!=0)  { free(bvhMotion->motionToJointLookup); bvhMotion->motionToJointLookup=0;}
+  bvhMotion->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * bvhMotion->motionValuesSize); // bvhMotion->MAX_jointHierarchySize * 7
+ 
+  if ( 
+       (bvhMotion->jointHierarchy==0) || (bvhMotion->jointToMotionLookup==0) || (bvhMotion->motionToJointLookup==0)
+     )
+       {
+         fprintf(stderr,RED "Failed allocating memory, giving up on loading BVH file\n" NORMAL); 
+         if  (bvhMotion->jointHierarchy!=0)       { free(bvhMotion->jointHierarchy);      bvhMotion->jointHierarchy=0;}
+         if  (bvhMotion->jointToMotionLookup!=0)  { free(bvhMotion->jointToMotionLookup); bvhMotion->jointToMotionLookup=0;}
+         if  (bvhMotion->motionToJointLookup!=0)  { free(bvhMotion->motionToJointLookup); bvhMotion->motionToJointLookup=0;}
+         //----------------------------------
+         bvhMotion->MAX_jointHierarchySize=0;
+         bvhMotion->motionValuesSize=0;
+         return 0;
+       }
+   
+  //Clean everything..!
+  memset(bvhMotion->jointHierarchy,0,sizeof(struct BVH_Joint) * bvhMotion->MAX_jointHierarchySize);
+  memset(bvhMotion->jointToMotionLookup,0,sizeof(struct BVH_JointToMotion_LookupTable) * bvhMotion->MAX_jointHierarchySize);
+  memset(bvhMotion->motionToJointLookup,0,sizeof(struct BVH_MotionToJoint_LookupTable) * bvhMotion->motionValuesSize);
   
   //Let's start parsing again..
   bvhMotion->linesParsed=0;
@@ -377,7 +410,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //We encountered something like |ROOT Hips|
                if (debug) {fprintf(stderr,"-R-");}
                //Store new ROOT Joint Name
-               InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName ,MAX_BVH_JOINT_NAME);
+               InputParser_GetWord(ipcB,1,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
                 
                 //Also store lowercase version of joint name for internal use   
                 strncpy(bvhMotion->jointHierarchy[jNum].jointNameLowercase,bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME);
@@ -683,6 +716,29 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
    }
 
    bvhMotion->jointHierarchySize = jNum;
+   
+   
+  #if STATIC_SIZES 
+     fprintf(stderr,YELLOW "Static sizes no finishing check...\n" NORMAL);
+  #else
+   if (bvhMotion->jointHierarchySize!=bvhMotion->MAX_jointHierarchySize)
+   {
+     fprintf(stderr,RED "BUG: We allocated more memory than what was needed for joint hierarchy..\n" NORMAL);
+     fprintf(stderr,RED "used %u vs allocated %u ..\n" NORMAL,bvhMotion->jointHierarchySize,bvhMotion->MAX_jointHierarchySize);
+     exit(0);
+   }
+   
+   if (bvhMotion->motionValuesSize != bvhMotion->numberOfValuesPerFrame)
+   {
+     fprintf(stderr,RED "BUG: We allocated more memory than what was needed for values hierarchy..\n" NORMAL);
+     fprintf(stderr,RED "used %u vs allocated %u ..\n" NORMAL,bvhMotion->numberOfValuesPerFrame,bvhMotion->motionValuesSize);
+     exit(0);
+   }
+  #endif
+  
+   //Pretend Motion Values Size is 0 numberOfValuesPerFrame will hold the value now
+   //It will be set @ readBVHMotion call..
+   bvhMotion->motionValuesSize=0;
 
    InputParser_Destroy(ipc);
    InputParser_Destroy(ipcB);
@@ -759,6 +815,16 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                 bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1);
              }  else
          {
+           //Take care of multiple uses of the same structure..
+           if (bvhMotion->motionValues!=0)
+           {
+               fprintf(stderr,"Motion values allocation was dirty, doing cleanup..!");
+               bvhMotion->motionValuesSize = 0;
+               free(bvhMotion->motionValues);
+               bvhMotion->motionValues = 0; 
+           }
+             
+           
            if (bvhMotion->motionValues==0)
            {
              //If we haven't yet allocated a motionValues array we need to do so now..!
@@ -768,7 +834,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
              {
                fprintf(stderr,"Failed to allocate enough memory for motion values..\n");
              }
-           }
+           }  
 
            //This is motion input
            InputParser_GetWord(ipc,0,str,MAX_BVH_FILE_LINE_SIZE);

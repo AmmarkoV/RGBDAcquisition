@@ -94,6 +94,8 @@ struct BVH_TransformedJoint
 
 struct BVH_Transform
 {
+  unsigned int numberOfJointsToTransform; //TODO: populate this
+  
   char useOptimizations;
   unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   

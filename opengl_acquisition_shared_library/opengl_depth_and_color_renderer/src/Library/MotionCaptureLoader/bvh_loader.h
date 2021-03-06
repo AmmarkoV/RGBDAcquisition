@@ -248,7 +248,7 @@ struct BVH_MotionCapture
   unsigned int rootJointID;
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
-  struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE]; //End Site Joints need extra space so be sure they are accounted for in MAX_BVH_JOINT_HIERARCHY_SIZE
+  struct BVH_Joint * jointHierarchy; //End Site Joints need extra space so be sure they are accounted for in MAX_BVH_JOINT_HIERARCHY_SIZE
   //--------------
 
   //We may want to only work with specific selected joints..!
@@ -259,8 +259,8 @@ struct BVH_MotionCapture
   //----------------------------------------------------------
 
   //Lookup Tables..
-  struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
-  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME];
+  struct BVH_JointToMotion_LookupTable * jointToMotionLookup;
+  struct BVH_MotionToJoint_LookupTable * motionToJointLookup;
   //---------------------------------------------------------------------------------------------
 
   //Motion

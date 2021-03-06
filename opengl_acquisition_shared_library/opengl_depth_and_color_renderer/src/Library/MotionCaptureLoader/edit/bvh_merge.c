@@ -42,7 +42,7 @@ int bvh_mergeWith(
 
      struct BVH_MergeAssociations rules={0};
  
-     if ( (sourceMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) && (targetMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) )
+     if ( (sourceMC->jointHierarchySize<sourceMC->MAX_jointHierarchySize) && (targetMC->jointHierarchySize<targetMC->MAX_jointHierarchySize) )
      {
       for (unsigned int sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
       {
@@ -68,8 +68,8 @@ int bvh_mergeWith(
      } else
      {
        fprintf(stderr,RED "Joint hierarchy is too big..\n" NORMAL);
-       fprintf(stderr,"Source Joint Hierarchy has a size of %u ( max is %d )\n",sourceMC->jointHierarchySize,MAX_BVH_JOINT_HIERARCHY_SIZE);
-       fprintf(stderr,"Target Joint Hierarchy has a size of %u ( max is %d )\n",targetMC->jointHierarchySize,MAX_BVH_JOINT_HIERARCHY_SIZE);
+       fprintf(stderr,"Source Joint Hierarchy has a size of %u ( max is %d )\n",sourceMC->jointHierarchySize,sourceMC->MAX_jointHierarchySize);
+       fprintf(stderr,"Target Joint Hierarchy has a size of %u ( max is %d )\n",targetMC->jointHierarchySize,targetMC->MAX_jointHierarchySize);
      }
 
      fprintf(stderr,"Will copy %u frames from source to target",targetMC->numberOfFrames);

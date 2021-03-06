@@ -273,6 +273,11 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
   if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
   if (bvhMotion->fileName!=0)                   {  free(bvhMotion->fileName);           bvhMotion->fileName=0;            }
   
+  if  (bvhMotion->jointHierarchy!=0)            { free(bvhMotion->jointHierarchy);      bvhMotion->jointHierarchy=0;}
+  if  (bvhMotion->jointToMotionLookup!=0)       { free(bvhMotion->jointToMotionLookup); bvhMotion->jointToMotionLookup=0;}
+  if  (bvhMotion->motionToJointLookup!=0)       { free(bvhMotion->motionToJointLookup); bvhMotion->motionToJointLookup=0;}
+  
+  //Wipe everything
   memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
 
   return 1;
@@ -932,7 +937,9 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 float bvh_getJointChannelAtMotionBuffer(struct BVH_MotionCapture * bvhMotion, BVHJointID jID,float * motionBuffer, unsigned int channelTypeID)
 {
-   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) ) 
+   if (bvhMotion!=0)
+   {
+       if (jID<bvhMotion->jointHierarchySize)
        { 
          unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,channelTypeID);
 
@@ -940,8 +947,12 @@ float bvh_getJointChannelAtMotionBuffer(struct BVH_MotionCapture * bvhMotion, BV
            {
              return motionBuffer[mID];
            }
-         fprintf(stderr,RED "bvh_getJointChannelAtMotionBuffer overflowed..\n" NORMAL);
+         fprintf(stderr,RED "bvh_getJointChannelAtMotionBuffer error ( tried to access mID %u/%u )..\n" NORMAL,mID,bvhMotion->motionValuesSize);
+       } else
+       {
+         fprintf(stderr,RED "bvh_getJointChannelAtMotionBuffer error ( tried to access jID %u/%u )..\n" NORMAL,jID,bvhMotion->MAX_jointHierarchySize); 
        }
+   }
  return 0.0; 
 }
 

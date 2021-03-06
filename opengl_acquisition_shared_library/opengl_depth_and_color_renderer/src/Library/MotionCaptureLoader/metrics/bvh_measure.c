@@ -336,11 +336,17 @@ int extractMinimaMaximaFromBVHList(const char * filename)
            
             struct BVH_MotionCapture bvhMotion={0}; 
             unsigned int numberOfValues=0; 
-            fprintf(stderr,"MAX_BVH_JOINT_HIERARCHY_SIZE = %u\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
-            fprintf(stderr,"MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME = %u\n",MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
-            float minima[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME]={0};
-            float maxima[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME]={0};
             
+            
+            fprintf(stderr,"MAX_BVH_JOINT_HIERARCHY_SIZE = %u\n",MAX_BVH_JOINT_HIERARCHY_SIZE);
+            fprintf(stderr,"MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME = %u\n",MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME); 
+            float * minima = (float*) malloc(sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+            float * maxima = (float*) malloc(sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+            
+            if ( (minima!=0) && (maxima!=0) )
+            {
+             memset(minima,0,sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
+             memset(maxima,0,sizeof(float) * MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME);
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
@@ -417,6 +423,17 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                          fprintf(stderr,"Freed final file `%s`\n",line);
                          free(line); 
                        }
+                       
+            //Done using memory
+            free(minima);
+            free(maxima);
+          } //correct allocations on minimum/maximum limits
+           else
+          {
+              fprintf(stderr,"Could not allocate enough memory..\n");
+              if (minima!=0) { free(minima); }
+              if (maxima!=0) { free(maxima); }
+          }
           fclose(fp);
           return 1;
         }
