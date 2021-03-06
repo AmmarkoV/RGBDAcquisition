@@ -238,35 +238,41 @@ struct BVH_MotionCapture
 {
   float scaleWorld;
 
-  //Header
+  // Header
   unsigned int numberOfFrames;
   unsigned int numberOfFramesEncountered;
   float frameTime;
+  //--------
 
   //Joint Hierarchy
   unsigned int rootJointID;
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE]; //End Site Joints need extra space so be sure they are accounted for in MAX_BVH_JOINT_HIERARCHY_SIZE
+  //--------------
 
   //We may want to only work with specific selected joints..!
   unsigned int selectionIncludesEndSites;
   unsigned int numberOfJointsWeWantToSelect;
   unsigned int * selectedJoints;
   unsigned int * hideSelectedJoints;
+  //----------------------------------------------------------
 
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
   struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_MOTIONFIELDS_PER_FRAME];
+  //---------------------------------------------------------------------------------------------
 
   //Motion
   unsigned int numberOfValuesPerFrame;
   unsigned int motionValuesSize;
   float * motionValues;
+  //-------------------
 
   //Internal Variables..
   char * fileName;
   unsigned int linesParsed;
+  //------------------------
 
   //---------
   char debug;

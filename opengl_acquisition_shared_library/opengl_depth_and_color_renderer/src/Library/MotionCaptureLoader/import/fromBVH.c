@@ -168,11 +168,179 @@ void errorReachedMemoryLimit(unsigned int jID)
 
 
 
+int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture * bvhMotion , FILE * fd)
+{
+  if (fd!=0)
+  {
+   bvhMotion->numberOfValuesPerFrame = 0; 
+   bvhMotion->MAX_jointHierarchySize = 0;
+  
+   struct InputParserC * ipc = InputParser_Create(4096,5);
+   InputParser_SetDelimeter(ipc,0,':');
+   InputParser_SetDelimeter(ipc,1,'[');
+   InputParser_SetDelimeter(ipc,2,']');
+   InputParser_SetDelimeter(ipc,3,10);
+   InputParser_SetDelimeter(ipc,4,13);
+
+   struct InputParserC * ipcB = InputParser_Create(4096,4);
+   InputParser_SetDelimeter(ipcB,0,' ');
+   InputParser_SetDelimeter(ipcB,1,'\t');
+   InputParser_SetDelimeter(ipcB,2,10);
+   InputParser_SetDelimeter(ipcB,3,13);
+    
+    unsigned int atHeaderSection=0;
+    unsigned int jointsEncountered=0; //this is used internally instead of jointHierarchySize to make code more readable
+    unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
+    unsigned int hierarchyLevel=0;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    int done=0;
+    while  ( (!done) && ((read = getline(&line, &len, fd)) != -1) )
+    {
+       ++bvhMotion->linesParsed;
+       //printf("Retrieved line of length %zu :\n %s", read,line);
+       int num = InputParser_SeperateWords(ipc,line,1);
+
+
+      if (num>0)
+      { //We have content..
+       if (!atHeaderSection)
+       {
+          //We won't start parsing unless we reach a HIERARCHY line
+          if (InputParser_WordCompareAuto(ipc,0,"HIERARCHY"))  { atHeaderSection=1; }
+       } else
+       {
+         int numB = InputParser_SeperateWords(ipcB,line,1);
+         if (numB>0)
+         {
+         if (InputParser_WordCompareAuto(ipcB,0,"ROOT"))
+              {
+               //---------------------------------------------------------------------------------------------------------------------
+               //------------------------------------------------- ROOT --------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------
+               ++jointsEncountered;
+               //---------------------------------------------------------------------------------------------------------------------
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))
+              {
+               //---------------------------------------------------------------------------------------------------------------------
+               //------------------------------------------------- JOINT -------------------------------------------------------------
+               //---------------------------------------------------------------------------------------------------------------------   
+                ++jointsEncountered; 
+               //---------------------------------------------------------------------------------------------------------------------
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"End"))
+             {
+              //We encountered something like |End Site| 
+              if (InputParser_WordCompareAuto(ipcB,1,"Site"))
+                   {
+                    //---------------------------------------------------------------------------------------------------------------------
+                    //------------------------------------------------- END SITE ----------------------------------------------------------
+                    //--------------------------------------------------------------------------------------------------------------------- 
+                     ++jointsEncountered;  
+                    //---------------------------------------------------------------------------------------------------------------------
+                   }
+              } else
+         if (InputParser_WordCompareAuto(ipcB,0,"CHANNELS"))
+             {
+                  //---------------------------------------------------------------------------------------------------------------------
+                  //------------------------------------------------- CHANNELS ----------------------------------------------------------
+                  //---------------------------------------------------------------------------------------------------------------------
+                  //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration  
+                  
+                  //Read number of Channels
+                  unsigned int loadedChannels = InputParser_GetWordInt(ipcB,1); 
+                  bvhMotion->numberOfValuesPerFrame += loadedChannels; 
+                  //---------------------------------------------------------------------------------------------------------------------
+                  //---------------------------------------------------------------------------------------------------------------------
+                  //---------------------------------------------------------------------------------------------------------------------
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))
+             {
+              //---------------------------------------------------------------------------------------------------------------------
+              //------------------------------------------------- OFFSET ------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+               //Ignore offsets
+              //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+              //---------------------------------------------------------------------------------------------------------------------
+             } else
+         if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
+             {
+               ++hierarchyLevel;
+              } else
+         if ( (InputParser_WordCompareAuto(ipcB,0,"}")) || (thisLineOnlyHasX(line,'}') ) )
+             {
+              //We reached an } so we pop one hierarchyLevel
+              if (hierarchyLevel>0)
+                 {
+                  --hierarchyLevel;
+                 } else
+                 {
+                   fprintf(stderr,RED "Erroneous BVH hierarchy..\n" NORMAL);
+                 }
+
+              if (hierarchyLevel==0)
+              {
+                //We are done..
+                done=1;
+              }
+
+              //------------------------------------- 
+             }
+          else
+         {
+            //Unexpected input..
+            fprintf(stderr,"BVH Header, Unexpected line num (%u) of length %zd :\n" , bvhMotion->linesParsed , read);
+            fprintf(stderr,"%s\n", line);
+            //exit(0);
+         }
+
+         } // We have header content
+       } // We are at header section
+      } //We have content
+    } //We have line input from file
+
+   //Free incoming line buffer..
+   if (line) { free(line); line=0;}
+
+   if (hierarchyLevel!=0)
+   {
+     fprintf(stderr,RED "Missing } braces..\n" NORMAL);
+     atHeaderSection = 0;
+   }
+   
+   bvhMotion->MAX_jointHierarchySize = jointsEncountered; 
+
+   InputParser_Destroy(ipc);
+   InputParser_Destroy(ipcB);
+   //We need file to be open..!
+   rewind(fd);
+   return ( (bvhMotion->jointHierarchySize>0) &&  (bvhMotion->numberOfValuesPerFrame>0) );
+  }
+ return 0;
+}
+
+
+
+
+
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
+    
   bvhMotion->linesParsed=0;
   bvhMotion->numberOfValuesPerFrame = 0;//57;
   bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
+
+  //fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
+  //fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame);
+  //bvhMotion->numberOfValuesPerFrame = 0;//57;
+  //exit(0);
+  
+  //Let's start parsing again..
+  bvhMotion->linesParsed=0;
 
   int atHeaderSection=0;
 
