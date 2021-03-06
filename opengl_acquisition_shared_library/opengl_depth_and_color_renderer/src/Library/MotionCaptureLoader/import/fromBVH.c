@@ -172,8 +172,10 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
 {
   if (fd!=0)
   {
+   //The outputs of this function are these
    bvhMotion->numberOfValuesPerFrame = 0; 
    bvhMotion->MAX_jointHierarchySize = 0;
+   //--------------------------------------
   
    struct InputParserC * ipc = InputParser_Create(4096,5);
    InputParser_SetDelimeter(ipc,0,':');
@@ -187,7 +189,7 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
    InputParser_SetDelimeter(ipcB,1,'\t');
    InputParser_SetDelimeter(ipcB,2,10);
    InputParser_SetDelimeter(ipcB,3,13);
-    
+
     unsigned int atHeaderSection=0;
     unsigned int jointsEncountered=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
@@ -248,29 +250,15 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
                   //---------------------------------------------------------------------------------------------------------------------
                   //------------------------------------------------- CHANNELS ----------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------
-                  //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration  
-                  
-                  //Read number of Channels
+                  //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration
                   unsigned int loadedChannels = InputParser_GetWordInt(ipcB,1); 
                   bvhMotion->numberOfValuesPerFrame += loadedChannels; 
                   //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-                  //---------------------------------------------------------------------------------------------------------------------
-             } else
-         if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))
-             {
-              //---------------------------------------------------------------------------------------------------------------------
-              //------------------------------------------------- OFFSET ------------------------------------------------------------
-              //---------------------------------------------------------------------------------------------------------------------
-               //Ignore offsets
-              //---------------------------------------------------------------------------------------------------------------------
-              //---------------------------------------------------------------------------------------------------------------------
-              //---------------------------------------------------------------------------------------------------------------------
              } else
          if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
              {
                ++hierarchyLevel;
-              } else
+             } else
          if ( (InputParser_WordCompareAuto(ipcB,0,"}")) || (thisLineOnlyHasX(line,'}') ) )
              {
               //We reached an } so we pop one hierarchyLevel
@@ -283,21 +271,12 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
                  }
 
               if (hierarchyLevel==0)
-              {
-                //We are done..
-                done=1;
-              }
-
+                 {
+                  //We are done..
+                  done=1;
+                 }
               //------------------------------------- 
              }
-          else
-         {
-            //Unexpected input..
-            fprintf(stderr,"BVH Header, Unexpected line num (%u) of length %zd :\n" , bvhMotion->linesParsed , read);
-            fprintf(stderr,"%s\n", line);
-            //exit(0);
-         }
-
          } // We have header content
        } // We are at header section
       } //We have content
@@ -312,6 +291,7 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
      atHeaderSection = 0;
    }
    
+   //Remember max hierarchy size
    bvhMotion->MAX_jointHierarchySize = jointsEncountered; 
 
    InputParser_Destroy(ipc);
@@ -329,14 +309,15 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
 
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
-    
   bvhMotion->linesParsed=0;
   bvhMotion->numberOfValuesPerFrame = 0;//57;
   bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
 
-  //fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
-  //fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame);
-  //bvhMotion->numberOfValuesPerFrame = 0;//57;
+  fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
+  fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame);
+  bvhMotion->numberOfValuesPerFrame = 0;//57;
+  
+  
   //exit(0);
   
   //Let's start parsing again..
