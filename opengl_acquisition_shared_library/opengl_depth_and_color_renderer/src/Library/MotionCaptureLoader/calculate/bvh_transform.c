@@ -269,7 +269,7 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
          fprintf(stderr,"            bvhTransform->joint[%u].isChainTrasformationComputed=%u\n",jID,bvhTransform->joint[jID].isChainTrasformationComputed); 
          
          fprintf(stderr,"\n            bvhTransform->joint[%u].pos2D={%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1]); 
-         fprintf(stderr,"\n            bvhTransform->joint[%u].pos3D={%0.2f,%0.2f,%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1],bvhTransform->joint[jID].pos2D[2],bvhTransform->joint[jID].pos2D[3]); 
+         fprintf(stderr,"\n            bvhTransform->joint[%u].pos3D={%0.2f,%0.2f,%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2],bvhTransform->joint[jID].pos3D[3]); 
          
          print4x4FMatrix("localToWorldTransformation",bvhTransform->joint[jID].localToWorldTransformation.m,1);
          fprintf(stderr,"\n");

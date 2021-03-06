@@ -341,8 +341,6 @@ int extractMinimaMaximaFromBVHList(const char * filename)
             float * minima = 0;
             float * maxima = 0;
             
-            if ( (minima==0) && (maxima==0) )
-            { 
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
@@ -450,13 +448,7 @@ int extractMinimaMaximaFromBVHList(const char * filename)
             //Done using memory
             if(minima!=0) { free(minima); }
             if(maxima!=0) { free(maxima); }
-          } //correct allocations on minimum/maximum limits
-           else
-          {
-              fprintf(stderr,"Could not allocate enough memory..\n");
-              if (minima!=0) { free(minima); }
-              if (maxima!=0) { free(maxima); }
-          }
+          
           fclose(fp);
           return 1;
         }

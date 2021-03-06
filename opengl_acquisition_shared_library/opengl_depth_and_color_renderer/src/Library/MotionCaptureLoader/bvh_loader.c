@@ -119,6 +119,7 @@ int enumerateRotationChannelOrderFromTypes(char typeA,char typeB,char typeC)
 
 
 
+
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint)
 {
   int channelOrder=BVH_ROTATION_ORDER_NONE;

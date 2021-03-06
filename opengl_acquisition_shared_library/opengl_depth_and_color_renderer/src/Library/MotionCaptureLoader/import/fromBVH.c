@@ -192,7 +192,6 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
 
     unsigned int atHeaderSection=0;
     unsigned int jointsEncountered=0; //this is used internally instead of jointHierarchySize to make code more readable
-    unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int hierarchyLevel=0;
     char * line = NULL;
     size_t len = 0;
@@ -287,8 +286,8 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
 
    if (hierarchyLevel!=0)
    {
-     fprintf(stderr,RED "Missing } braces..\n" NORMAL);
-     atHeaderSection = 0;
+     atHeaderSection = 0; //We finished with header..
+     fprintf(stderr,RED "Missing } braces , atHeaderSection->%u..\n" NORMAL,atHeaderSection);
    }
    
    //Remember max hierarchy size
@@ -593,7 +592,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
                   }//The number of channels is small enough to be handled 
                    else
                   {
-                      fprintf(stderr,RED "Specified joint has too many channels (has %u, max is %u) and cannot be handled!\n" NORMAL,loadedChannels,BVH_VALID_CHANNEL_NAMES);
+                      fprintf(stderr,RED "Specified joint has too many channels (has %u, max is %d) and cannot be handled!\n" NORMAL,loadedChannels,BVH_VALID_CHANNEL_NAMES);
                   }
                   //---------------------------------------------------------------------------------------------------------------------
                   //---------------------------------------------------------------------------------------------------------------------

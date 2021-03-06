@@ -55,6 +55,9 @@ static const char * channelNames[] =
     "Xrotation",
     "Yrotation",
     "Zrotation",
+    "RodriguesX",
+    "RodriguesY",
+    "RodriguesZ",
 //=================
     "End of Channel Names" ,
     "Unknown"
