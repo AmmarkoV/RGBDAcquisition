@@ -304,23 +304,17 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
  return 0;
 }
 
-
-#define STATIC_SIZES 0
+ 
 
 
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
-{
-  #if STATIC_SIZES
-    fprintf(stderr,YELLOW "Using legacy allocation sizes\n" NORMAL); 
-    bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;   //legacy way 
-    bvhMotion->motionValuesSize       = MAX_BVH_JOINT_HIERARCHY_SIZE*7; //legacy way  
-  #else
-    fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
-    fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame); 
-    //Make space for an off by one mistake ;P
-    //bvhMotion->MAX_jointHierarchySize+=1;
-    //bvhMotion->motionValuesSize+=1;
-  #endif
+{ 
+  fastBVHFileToDetermineNumberOfJointsAndMotionFields(bvhMotion,fd);  
+  fprintf(stderr,GREEN "Fast BVH parser revealed %u joints / %u motion fields\n" NORMAL,bvhMotion->MAX_jointHierarchySize,bvhMotion->numberOfValuesPerFrame); 
+  
+  //Make space for an off by one mistake ;P
+  //bvhMotion->MAX_jointHierarchySize+=1;
+  //bvhMotion->motionValuesSize+=1; 
   
   bvhMotion->linesParsed=0; //make sure these are clean..
   bvhMotion->numberOfValuesPerFrame = 0; //make sure these are clean.. 
@@ -717,10 +711,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
 
    bvhMotion->jointHierarchySize = jNum;
    
-   
-  #if STATIC_SIZES 
-     fprintf(stderr,YELLOW "Static sizes no finishing check...\n" NORMAL);
-  #else
+    
    if (bvhMotion->jointHierarchySize!=bvhMotion->MAX_jointHierarchySize)
    {
      fprintf(stderr,RED "BUG: We allocated more memory than what was needed for joint hierarchy..\n" NORMAL);
@@ -733,8 +724,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
      fprintf(stderr,RED "BUG: We allocated more memory than what was needed for values hierarchy..\n" NORMAL);
      fprintf(stderr,RED "used %u vs allocated %u ..\n" NORMAL,bvhMotion->numberOfValuesPerFrame,bvhMotion->motionValuesSize);
      exit(0);
-   }
-  #endif
+   } 
   
    //Pretend Motion Values Size is 0 numberOfValuesPerFrame will hold the value now
    //It will be set @ readBVHMotion call..

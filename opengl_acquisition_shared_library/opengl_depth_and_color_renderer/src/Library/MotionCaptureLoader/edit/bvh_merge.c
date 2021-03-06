@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -41,7 +42,27 @@ int bvh_mergeWith(
      }
 
      struct BVH_MergeAssociations rules={0};
- 
+     
+     unsigned int maxOfMaxJointHierarchySize = sourceMC->MAX_jointHierarchySize;
+     if (maxOfMaxJointHierarchySize<targetMC->MAX_jointHierarchySize) {  maxOfMaxJointHierarchySize=targetMC->MAX_jointHierarchySize; }
+     
+     rules.jointAssociationSourceToTargetExists = (char*)    malloc(sizeof(char) * maxOfMaxJointHierarchySize);
+     rules.jointAssociationTargetToSourceExists = (char*)    malloc(sizeof(char) * maxOfMaxJointHierarchySize);
+     rules.jointAssociationTargetToSource = (unsigned int*)  malloc(sizeof(unsigned int) * maxOfMaxJointHierarchySize);
+     rules.jointAssociationSourceToTarget = (unsigned int*)  malloc(sizeof(unsigned int) * maxOfMaxJointHierarchySize);
+     
+     if (
+          (rules.jointAssociationSourceToTargetExists) &&
+          (rules.jointAssociationTargetToSourceExists) &&
+          (rules.jointAssociationTargetToSource)       &&
+          (rules.jointAssociationSourceToTarget)
+        )
+     {
+      memset(rules.jointAssociationSourceToTargetExists,0,sizeof(char) * maxOfMaxJointHierarchySize);
+      memset(rules.jointAssociationTargetToSourceExists,0,sizeof(char) * maxOfMaxJointHierarchySize);
+      memset(rules.jointAssociationTargetToSource,0,sizeof(unsigned int) * maxOfMaxJointHierarchySize);
+      memset(rules.jointAssociationSourceToTarget,0,sizeof(unsigned int) * maxOfMaxJointHierarchySize);
+          
      if ( (sourceMC->jointHierarchySize<sourceMC->MAX_jointHierarchySize) && (targetMC->jointHierarchySize<targetMC->MAX_jointHierarchySize) )
      {
       for (unsigned int sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
@@ -92,6 +113,13 @@ int bvh_mergeWith(
 
      targetMC->numberOfFramesEncountered = sourceMC->numberOfFramesEncountered;
 
+   }
+     if (rules.jointAssociationSourceToTargetExists) { free(rules.jointAssociationSourceToTargetExists); }
+     if (rules.jointAssociationTargetToSourceExists) { free(rules.jointAssociationTargetToSourceExists); }
+     if (rules.jointAssociationTargetToSource)       { free(rules.jointAssociationTargetToSource); }
+     if (rules.jointAssociationSourceToTarget)       { free(rules.jointAssociationSourceToTarget); } 
+     
+ 
      return 1;
    } else
    { fprintf(stderr,RED "Could not allocate enough space to hold the merged motion buffers..\n" NORMAL); }

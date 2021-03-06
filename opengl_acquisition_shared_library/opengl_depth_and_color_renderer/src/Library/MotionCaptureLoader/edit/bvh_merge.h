@@ -12,10 +12,10 @@ extern "C"
 
 struct BVH_MergeAssociations
 {
-   char jointAssociationSourceToTargetExists[MAX_BVH_JOINT_HIERARCHY_SIZE];
-   char jointAssociationTargetToSourceExists[MAX_BVH_JOINT_HIERARCHY_SIZE];
-   unsigned int jointAssociationTargetToSource[MAX_BVH_JOINT_HIERARCHY_SIZE];
-   unsigned int jointAssociationSourceToTarget[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   char * jointAssociationSourceToTargetExists;
+   char * jointAssociationTargetToSourceExists;
+   unsigned int * jointAssociationTargetToSource;
+   unsigned int * jointAssociationSourceToTarget;
 };
 
 int bvh_mergeWith(
