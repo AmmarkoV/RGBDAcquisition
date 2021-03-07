@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include "../calculate/bvh_transform.h"
 
 
 
@@ -60,6 +61,12 @@ int addNewPartToChainProblem(
     problem->chain[*chainID].status = BVH_IK_NOTSTARTED;
     problem->chain[*chainID].permissionToStart = 0;
     problem->chain[*chainID].parallel=0;
+
+    if (!bvh_allocateTransform(mc,&problem->chain[*chainID].current2DProjectionTransform))
+    {
+      fprintf(stderr,RED "Could not allocate transforms needed for chain (%u/%u) \n" NORMAL,*chainID,MAXIMUM_PARTS_OF_CHAIN);
+        return 0;
+    }
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
     

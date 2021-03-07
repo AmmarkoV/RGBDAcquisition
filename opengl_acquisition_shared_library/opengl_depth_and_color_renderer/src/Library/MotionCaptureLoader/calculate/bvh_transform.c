@@ -199,16 +199,17 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
         {
          //If we are using optimizations and this joint is not skipped then transform this joint
          //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
-         //if (jID<bvhTransform->numberOfJointsToTransform) 
-         //     { 
+         if (jID<bvhTransform->numberOfJointsToTransform)  //<- check can be disabled for speedup
+              { 
                  return  (!bvhTransform->skipCalculationsForJoint[jID]); 
-         //     }
+              }
         } else
         {
          //If we are not using optimizations then transform every joint 
          return 1;
         } 
   // } return 0;
+  return 0;
 }
 
 
@@ -229,14 +230,14 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
    
    fprintf(stderr,"bvh_printBVHTransform for %s\n",label); 
    fprintf(stderr,"jointHierarchySize=%u\n",bvhMotion->jointHierarchySize); 
-   fprintf(stderr,"useOptimizations=%u\n",bvhTransform->useOptimizations); 
+   fprintf(stderr,"useOptimizations=%u\n",(unsigned int) bvhTransform->useOptimizations); 
    
    fprintf(stderr,"skipCalculationsForJoint:\n");
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
       if (bvhTransform->skipCalculationsForJoint[jID])
       {
-         fprintf(stderr,"skipCalculationsForJoint[%u]=%u\n",jID,bvhTransform->skipCalculationsForJoint[jID]);
+         fprintf(stderr,"skipCalculationsForJoint[%u]=%u\n",jID,(unsigned int) bvhTransform->skipCalculationsForJoint[jID]);
       }
    } 
    fprintf(stderr,"\n");
@@ -264,10 +265,10 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
       {
          fprintf(stderr,"joint[%u]={\n",jID);
          fprintf(stderr,"            name=%s\n",bvhMotion->jointHierarchy[jID].jointName); 
-         fprintf(stderr,"            bvhTransform->joint[%u].pos2DCalculated=%u\n",jID,bvhTransform->joint[jID].pos2DCalculated); 
-         fprintf(stderr,"            bvhTransform->joint[%u].isBehindCamera=%u\n",jID,bvhTransform->joint[jID].isBehindCamera); 
-         fprintf(stderr,"            bvhTransform->joint[%u].isOccluded=%u\n",jID,bvhTransform->joint[jID].isOccluded); 
-         fprintf(stderr,"            bvhTransform->joint[%u].isChainTrasformationComputed=%u\n",jID,bvhTransform->joint[jID].isChainTrasformationComputed); 
+         fprintf(stderr,"            bvhTransform->joint[%u].pos2DCalculated=%u\n",jID,(unsigned int) bvhTransform->joint[jID].pos2DCalculated); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isBehindCamera=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isBehindCamera); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isOccluded=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isOccluded); 
+         fprintf(stderr,"            bvhTransform->joint[%u].isChainTrasformationComputed=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isChainTrasformationComputed); 
          
          fprintf(stderr,"\n            bvhTransform->joint[%u].pos2D={%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1]); 
          fprintf(stderr,"\n            bvhTransform->joint[%u].pos3D={%0.2f,%0.2f,%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2],bvhTransform->joint[jID].pos3D[3]); 
@@ -374,6 +375,7 @@ int bvh_markAllJointsAsUselessInTransform(
 {
   if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
+  if (bvhMotion->jointHierarchySize>=bvhTransform->numberOfJointsSpaceAllocated) { fprintf(stderr,"bvh_markAllJointsAsUselessInTransform error..\n "); return 0; } 
   bvhTransform->useOptimizations=1;
 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -405,8 +407,15 @@ int bvh_markJointAndParentsAsUsefulInTransform(
   //We want to make sure all parent joints until root ( jID->0 ) are set to not skip calculations..
   while (jID!=0)
       {
-           bvhTransform->skipCalculationsForJoint[jID]=0;
-           jID = bvhMotion->jointHierarchy[jID].parentJoint;
+           if (jID<bvhTransform->numberOfJointsSpaceAllocated) 
+           {
+            bvhTransform->skipCalculationsForJoint[jID]=0;
+            jID = bvhMotion->jointHierarchy[jID].parentJoint;
+           } else
+           {
+             fprintf(stderr,"bvh_markJointAndParentsAsUsefulInTransform: invalid jID encountered while traversing parents (%u/%u)\n",jID,bvhTransform->numberOfJointsSpaceAllocated); 
+             break;
+           }
       }
  
   bvhTransform->skipCalculationsForJoint[0]=0;
@@ -432,10 +441,17 @@ int bvh_markJointAndParentsAsUselessInTransform(
   bvhTransform->useOptimizations=1;
    
 
-  while (jID!=0)
+  while (jID!=0) 
       {
-           bvhTransform->skipCalculationsForJoint[jID]=1;
-           jID = bvhMotion->jointHierarchy[jID].parentJoint;
+           if (jID<bvhTransform->numberOfJointsSpaceAllocated) 
+           {
+            bvhTransform->skipCalculationsForJoint[jID]=1;
+            jID = bvhMotion->jointHierarchy[jID].parentJoint;
+           } else
+           {
+             fprintf(stderr,"bvh_markJointAndParentsAsUselessInTransform: invalid jID encountered while traversing parents\n"); 
+             break;
+           }
       }
 
   bvhTransform->skipCalculationsForJoint[0]=1;
@@ -667,7 +683,6 @@ static inline void bvh_performActualTransform(
 
 int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
 {
-  
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
   if ( (bvhMotion!=0) &&  (bvhTransform!=0))
   { 
@@ -685,7 +700,7 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
        } else
        {
          //Second case, force reallocations and cleanup of data..
-         bvhTransform->numberOfJointsSpaceAllocated = MAX_BVH_JOINT_HIERARCHY_SIZE;// bvhMotion->MAX_jointHierarchySize;
+         bvhTransform->numberOfJointsSpaceAllocated = bvhMotion->MAX_jointHierarchySize;
          bvhTransform->numberOfJointsToTransform = bvhMotion->jointHierarchySize;
 
          if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
@@ -708,9 +723,11 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
     
     return bvhTransform->transformStructInitialized;
   }
-  #else
-  
-  return 1;
+  #else 
+      bvhTransform->numberOfJointsSpaceAllocated = MAX_BVH_TRANSFORM_SIZE_TMP;
+      bvhTransform->numberOfJointsToTransform = bvhMotion->jointHierarchySize;
+      bvhTransform->transformStructInitialized=1;
+   return 1;
   #endif
 }
 
@@ -750,7 +767,7 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
     
   //First of all we need to clean the BVH_Transform structure
   bvhTransform->jointsOccludedIn2DProjection=0;
- 
+   
 
   //First of all we need to populate all local dynamic transformation of our chain
   //This step only has to do with our Motion Buffer and doesn't performi the final transformations

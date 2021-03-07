@@ -298,9 +298,13 @@ int main(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testIK")==0)
         {
-          // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100
+          // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
 
-          if (i+7>=argc)  { incorrectArguments(); }
+          if (i+7>=argc)  {
+                             fprintf(stderr,"--testIK requires 7 arguments, previousFrame sourceFrame targetFrame learningRate iterations epochs spring.."); 
+                             fprintf(stderr,"got %u ",argc-i); 
+                             incorrectArguments(); 
+                          }
 
           unsigned int previousFrame=atoi(argv[i+1]);
           unsigned int sourceFrame=atoi(argv[i+2]);

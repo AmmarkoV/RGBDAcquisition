@@ -101,6 +101,8 @@ struct BVH_TransformedJoint
 #endif
 
 
+//MAX_BVH_JOINT_HIERARCHY_SIZE
+#define MAX_BVH_TRANSFORM_SIZE_TMP MAX_BVH_JOINT_HIERARCHY_SIZE
 
 struct BVH_Transform
 {
@@ -115,7 +117,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    unsigned char * skipCalculationsForJoint;
   #else 
-   unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   unsigned char skipCalculationsForJoint[MAX_BVH_TRANSFORM_SIZE_TMP]; 
   #endif
   
   //Transform hashing 
@@ -124,7 +126,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    BVHJointID * listOfJointIDsToTransform;
   #else
-   BVHJointID listOfJointIDsToTransform[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   BVHJointID listOfJointIDsToTransform[MAX_BVH_TRANSFORM_SIZE_TMP];
   #endif
 
   //Actual Tranformation data
@@ -132,7 +134,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    struct BVH_TransformedJoint * joint;
   #else 
-   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   struct BVH_TransformedJoint joint[MAX_BVH_TRANSFORM_SIZE_TMP];
   #endif
   float centerPosition[3];
   unsigned int jointsOccludedIn2DProjection;
@@ -205,6 +207,7 @@ int bvh_removeTranslationFromTransform(
                                       );
 
 
+int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform);
 int bvh_freeTransform(struct BVH_Transform * bvhTransform);
 
 #ifdef __cplusplus
