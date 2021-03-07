@@ -23,10 +23,6 @@
 int addNewPartToChainProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform,
     //-----------------------------------------
     char * partName,
     char * alternatePartName,
@@ -229,7 +225,7 @@ int prepareDefaultFaceProblem(
      /*
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "chest",0,// Joint
                                0.5,     //Importance
@@ -244,7 +240,7 @@ int prepareDefaultFaceProblem(
      {
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck",0,  // Joint 
                                0.5,     //Importance
@@ -257,7 +253,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck1",0,  // Joint 
                                0.5,     //Importance
@@ -272,7 +268,7 @@ int prepareDefaultFaceProblem(
       
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "head",0,  // Joint
                                0.5,     //Importance
@@ -285,7 +281,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "special04",0,// Joint
                                1.0,     //Importance
@@ -298,7 +294,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.l",0,// Joint
                                2.5,     //Importance
@@ -312,7 +308,7 @@ int prepareDefaultFaceProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.r",0,// Joint
                                2.5,     //Importance
@@ -350,7 +346,7 @@ int prepareDefaultFaceProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "orbicularis03.r",0,  // Top eyelid 
                                1.0,     //Importance
@@ -363,7 +359,7 @@ int prepareDefaultFaceProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_orbicularis03.r",0,  // Top eyelid 
                                1.0,     //Importance
@@ -376,7 +372,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "orbicularis04.r",0,  // Bottom eyelid 
                                1.0,     //Importance
@@ -389,7 +385,7 @@ int prepareDefaultFaceProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_orbicularis04.r",0,  // Bottom eyelid 
                                1.0,     //Importance
@@ -424,7 +420,7 @@ int prepareDefaultFaceProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "orbicularis03.l",0,  // Top eyelid 
                                1.0,     //Importance
@@ -437,7 +433,7 @@ int prepareDefaultFaceProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_orbicularis03.l",0,  // Top eyelid 
                                1.0,     //Importance
@@ -450,7 +446,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "orbicularis04.l",0,  // Bottom eyelid 
                                1.0,     //Importance
@@ -463,7 +459,7 @@ int prepareDefaultFaceProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_orbicularis04.l",0,  // Bottom eyelid 
                                1.0,     //Importance
@@ -498,7 +494,7 @@ int prepareDefaultFaceProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.r",0,  // Eye control 
                                1.0,     //Importance
@@ -511,7 +507,7 @@ int prepareDefaultFaceProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_eye.r",0,  // Eye projection
                                1.0,     //Importance
@@ -546,7 +542,7 @@ int prepareDefaultFaceProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.l",0,  // Eye control 
                                1.0,     //Importance
@@ -559,7 +555,7 @@ int prepareDefaultFaceProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_eye.l",0,  // Eye projection
                                1.0,     //Importance
@@ -594,7 +590,7 @@ int prepareDefaultFaceProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "jaw",0,  // Bottom mouth/center 
                                1.0,     //Importance
@@ -607,7 +603,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris01",0,  // Bottom mouth/center 
                                1.0,     //Importance
@@ -620,7 +616,7 @@ int prepareDefaultFaceProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris07.r",0,  // Bottom mouth/right 
                                1.0,     //Importance
@@ -633,7 +629,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris07.l",0,  // Bottom mouth/left 
                                1.0,     //Importance
@@ -646,7 +642,7 @@ int prepareDefaultFaceProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris05",0,  // Top mouth/center 
                                1.0,     //Importance
@@ -659,7 +655,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris03.r",0,  // Top mouth/right 
                                1.0,     //Importance
@@ -672,7 +668,7 @@ int prepareDefaultFaceProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "oris03.l",0,  // Top mouth/left 
                                1.0,     //Importance
@@ -708,7 +704,7 @@ int prepareDefaultFaceProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "risorius03.l",0,  // Left Cheek middle
                                1.0,     //Importance
@@ -721,7 +717,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "levator05.l",0,  // Left Cheek middle
                                1.0,     //Importance
@@ -734,7 +730,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "risorius03.r",0,  // Right Cheek middle
                                1.0,     //Importance
@@ -747,7 +743,7 @@ int prepareDefaultFaceProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "levator05.r",0,  // Left Cheek middle
                                1.0,     //Importance
@@ -843,7 +839,7 @@ int prepareDefaultRightHandProblem(
     
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rshoulder","rShldr",  // Joint 
                                0.5,     //Importance
@@ -857,7 +853,7 @@ int prepareDefaultRightHandProblem(
       
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "relbow","rForeArm",  // Joint
                                1.0,     //Importance
@@ -871,7 +867,7 @@ int prepareDefaultRightHandProblem(
    
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0,// Joint
                                1.5,     //Importance
@@ -906,7 +902,7 @@ int prepareDefaultRightHandProblem(
 
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0,    // Joint
                                2.0,     //Importance
@@ -924,7 +920,7 @@ int prepareDefaultRightHandProblem(
                              
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0,    // Joint
                                1.0,     //Importance
@@ -949,7 +945,7 @@ int prepareDefaultRightHandProblem(
          
          ++correct;
          checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0,    // Joint
                                1.0,     //Importance
@@ -968,7 +964,7 @@ int prepareDefaultRightHandProblem(
        
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
@@ -979,7 +975,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
@@ -990,7 +986,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
@@ -1001,7 +997,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
@@ -1012,7 +1008,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rthumb",0, // Joint
                               1.0,     //Importance
@@ -1050,7 +1046,7 @@ int prepareDefaultRightHandProblem(
      /*
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0, // Joint
                                2.0,     //Importance
@@ -1065,7 +1061,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
@@ -1076,7 +1072,7 @@ int prepareDefaultRightHandProblem(
                              );
     ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
@@ -1087,7 +1083,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
@@ -1098,7 +1094,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
@@ -1109,7 +1105,7 @@ int prepareDefaultRightHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rthumb",0, // Joint
                               1.0,     //Importance
@@ -1137,7 +1133,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.r",0, // Joint
                               1.0,     //Importance
@@ -1151,7 +1147,7 @@ int prepareDefaultRightHandProblem(
                                  
     ++correct;
     checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-2.r",0, // Joint
                               1.0,     //Importance
@@ -1165,7 +1161,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-3.r",0, // Joint
                               1.0,     //Importance
@@ -1179,7 +1175,7 @@ int prepareDefaultRightHandProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger2-3.r",0, // Joint
                               1.0,     //Importance
@@ -1211,7 +1207,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.r",0, // Joint
                               1.0,     //Importance
@@ -1225,7 +1221,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-2.r",0, // Joint
                               1.0,     //Importance
@@ -1239,7 +1235,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-3.r",0, // Joint
                               1.0,     //Importance
@@ -1254,7 +1250,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger3-3.r",0, // Joint
                               1.0,     //Importance
@@ -1283,7 +1279,7 @@ int prepareDefaultRightHandProblem(
      partID=0; // Reset counter..
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.r",0, // Joint
                               1.0,     //Importance
@@ -1297,7 +1293,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-2.r",0, // Joint
                               1.0,     //Importance
@@ -1311,7 +1307,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-3.r",0, // Joint
                               1.0,     //Importance
@@ -1325,7 +1321,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger4-3.r",0, // Joint
                               1.0,     //Importance
@@ -1358,7 +1354,7 @@ int prepareDefaultRightHandProblem(
      partID=0; // Reset counter..
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.r",0, // Joint
                               1.0,     //Importance
@@ -1372,7 +1368,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-2.r",0, // Joint
                               1.0,     //Importance
@@ -1386,7 +1382,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-3.r",0, // Joint
                               1.0,     //Importance
@@ -1400,7 +1396,7 @@ int prepareDefaultRightHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger5-3.r",0, // Joint
                               1.0,     //Importance
@@ -1432,7 +1428,7 @@ int prepareDefaultRightHandProblem(
      ++correct;
      
       checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rthumbBase","__rthumb", // Joint
                               1.0,     //Importance
@@ -1447,7 +1443,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rthumb",0, // Joint
                               1.0,     //Importance
@@ -1461,7 +1457,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger1-2.r",0, // Joint
                               0.0,     //Importance
@@ -1475,7 +1471,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger1-3.r",0, // Joint
                               2.0,     //Importance
@@ -1489,7 +1485,7 @@ int prepareDefaultRightHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger1-3.r",0, // Joint
                               3.0,     //Importance
@@ -1583,7 +1579,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lshoulder","lShldr",  // Joint 
                                0.5,     //Importance
@@ -1597,7 +1593,7 @@ int prepareDefaultLeftHandProblem(
       
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lelbow","lForeArm",  // Joint
                                1.0,     //Importance
@@ -1611,7 +1607,7 @@ int prepareDefaultLeftHandProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhand",0,// Joint
                                1.5,     //Importance
@@ -1645,7 +1641,7 @@ int prepareDefaultLeftHandProblem(
 
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
                                2.0,     //Importance
@@ -1664,7 +1660,7 @@ int prepareDefaultLeftHandProblem(
 
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
                                1.0,     //Importance
@@ -1689,7 +1685,7 @@ int prepareDefaultLeftHandProblem(
          
          ++correct;
          checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
                                1.0,     //Importance
@@ -1711,7 +1707,7 @@ int prepareDefaultLeftHandProblem(
        
        ++correct;
        checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
@@ -1722,7 +1718,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
@@ -1733,7 +1729,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
@@ -1744,7 +1740,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
@@ -1755,7 +1751,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lthumb",0, // Joint
                               1.0,     //Importance
@@ -1789,7 +1785,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
@@ -1800,7 +1796,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
@@ -1811,7 +1807,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
@@ -1822,7 +1818,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
@@ -1833,7 +1829,7 @@ int prepareDefaultLeftHandProblem(
                              );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lthumb",0, // Joint
                               1.0,     //Importance
@@ -1861,7 +1857,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-1.l",0, // Joint
                               1.0,     //Importance
@@ -1875,7 +1871,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-2.l",0, // Joint
                               1.0,     //Importance
@@ -1889,7 +1885,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger2-3.l",0, // Joint
                               1.0,     //Importance
@@ -1903,7 +1899,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger2-3.l",0, // Joint
                               1.0,     //Importance
@@ -1936,7 +1932,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-1.l",0, // Joint
                               1.0,     //Importance
@@ -1950,7 +1946,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-2.l",0, // Joint
                               1.0,     //Importance
@@ -1964,7 +1960,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger3-3.l",0, // Joint
                               1.0,     //Importance
@@ -1978,7 +1974,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger3-3.l",0, // Joint
                               1.0,     //Importance
@@ -2008,7 +2004,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-1.l",0, // Joint
                               1.0,     //Importance
@@ -2022,7 +2018,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-2.l",0, // Joint
                               1.0,     //Importance
@@ -2036,7 +2032,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger4-3.l",0, // Joint
                               1.0,     //Importance
@@ -2050,7 +2046,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger4-3.l",0, // Joint
                               1.0,     //Importance
@@ -2082,7 +2078,7 @@ int prepareDefaultLeftHandProblem(
      partID=0; // Reset counter..
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-1.l",0, // Joint
                               1.0,     //Importance
@@ -2096,7 +2092,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-2.l",0, // Joint
                               1.0,     //Importance
@@ -2110,7 +2106,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger5-3.l",0, // Joint
                               1.0,     //Importance
@@ -2124,7 +2120,7 @@ int prepareDefaultLeftHandProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger5-3.l",0, // Joint
                               1.0,     //Importance
@@ -2154,7 +2150,7 @@ int prepareDefaultLeftHandProblem(
      ++correct;
      
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lthumbBase","__lthumb", // Joint
                               1.0,     //Importance
@@ -2169,7 +2165,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lthumb",0, // Joint
                               1.0,     //Importance
@@ -2183,7 +2179,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger1-2.l",0, // Joint
                               0.0,     //Importance
@@ -2197,7 +2193,7 @@ int prepareDefaultLeftHandProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "finger1-3.l",0, // Joint
                               2.0,     //Importance
@@ -2211,7 +2207,7 @@ int prepareDefaultLeftHandProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_finger1-3.l",0, // Joint
                               3.0,     //Importance
@@ -2310,7 +2306,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "hip","Hips",    // Joint
                                2.0,     //Importance
@@ -2328,7 +2324,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "hip","Hips",    // Joint
                                1.0,     //Importance
@@ -2345,7 +2341,7 @@ int prepareDefaultBodyProblem(
      
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck",0,    // Joint
                                1.0,     //Importance
@@ -2358,7 +2354,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "head",0,    // Joint
                                1.0,     //Importance
@@ -2370,7 +2366,7 @@ int prepareDefaultBodyProblem(
                              );            
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rshoulder","rShldr", // Joint 
                                1.0,     //Importance
@@ -2383,7 +2379,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lshoulder","lShldr",      // Joint
                                1.0,     //Importance
@@ -2396,7 +2392,7 @@ int prepareDefaultBodyProblem(
  
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhip","rThigh", // Joint
                                1.5,     //Importance
@@ -2409,7 +2405,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhip","lThigh", // Joint
                                1.5,     //Importance
@@ -2422,7 +2418,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.l",0,// Joint
                                2.5,     //Importance
@@ -2436,7 +2432,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.r",0,// Joint
                                2.5,     //Importance
@@ -2474,7 +2470,7 @@ int prepareDefaultBodyProblem(
     /*
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "abdomen",0,// Joint
                                0.5,     //Importance
@@ -2489,7 +2485,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "chest",0,// Joint
                                0.5,     //Importance
@@ -2505,7 +2501,7 @@ int prepareDefaultBodyProblem(
    
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck",0, // Joint
                                0.5,     //Importance
@@ -2519,7 +2515,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rshoulder","rShldr", // Joint
                                1.0,     //Importance
@@ -2533,7 +2529,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lshoulder","lForeArm",    // Joint
                                1.0,     //Importance
@@ -2573,7 +2569,7 @@ int prepareDefaultBodyProblem(
      /*
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "chest",0,// Joint
                                0.5,     //Importance
@@ -2586,7 +2582,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck",0,  // Joint 
                                0.5,     //Importance
@@ -2601,7 +2597,7 @@ int prepareDefaultBodyProblem(
                                   
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "neck1",0,  // Joint 
                                0.5,     //Importance
@@ -2617,7 +2613,7 @@ int prepareDefaultBodyProblem(
       
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "head",0,  // Joint
                                0.5,     //Importance
@@ -2633,7 +2629,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.l",0,// Joint
                                2.5,     //Importance
@@ -2647,7 +2643,7 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "eye.r",0,// Joint
                                2.5,     //Importance
@@ -2685,7 +2681,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rshoulder","rShldr",  // Joint 
                                0.5,     //Importance
@@ -2699,7 +2695,7 @@ int prepareDefaultBodyProblem(
       
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "relbow","rForeArm",  // Joint
                                1.0,     //Importance
@@ -2713,7 +2709,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhand",0,// Joint
                                1.5,     //Importance
@@ -2751,7 +2747,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lshoulder","lShldr",   // Joint
                                0.5,     //Importance
@@ -2764,7 +2760,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lelbow","lForeArm",  // Joint
                                1.0,     //Importance
@@ -2777,7 +2773,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhand",0,  // Joint
                                1.5,     //Importance
@@ -2819,7 +2815,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rhip","rThigh", // Joint
                                0.5,     //Importance
@@ -2834,7 +2830,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rknee","rShin", // Joint
                                1.0,     //Importance
@@ -2849,7 +2845,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "rfoot",0,  // Joint
                                1.0,     //Importance
@@ -2864,7 +2860,7 @@ int prepareDefaultBodyProblem(
                                                          
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_toe1-2.r",0,  // Big Toe
                                1.5,     //Importance
@@ -2878,7 +2874,7 @@ int prepareDefaultBodyProblem(
      #if DUALFOOT              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_toe5-3.r",0,  // Small Toe
                                1.5,     //Importance
@@ -2918,7 +2914,7 @@ int prepareDefaultBodyProblem(
     
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lhip","lThigh",  // Joint
                                0.5,     //Importance
@@ -2933,7 +2929,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lknee","lShin",  // Joint
                                1.0,     //Importance
@@ -2948,7 +2944,7 @@ int prepareDefaultBodyProblem(
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "lfoot",0,// Joint
                                1.0,     //Importance
@@ -2963,7 +2959,7 @@ int prepareDefaultBodyProblem(
                                                          
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_toe1-2.l",0, // Big Toe 
                                1.5,     //Importance
@@ -2977,7 +2973,7 @@ int prepareDefaultBodyProblem(
      #if DUALFOOT
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,renderer,previousSolution,solution,bvhTargetTransform,
+                              problem,mc, 
                               //-----------------------------------------
                               "endsite_toe5-3.l",0,  // Small Toe
                                1.5,     //Importance

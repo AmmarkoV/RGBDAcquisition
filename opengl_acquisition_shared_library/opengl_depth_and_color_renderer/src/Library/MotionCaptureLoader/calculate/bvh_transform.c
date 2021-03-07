@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "bvh_transform.h"
 
@@ -198,7 +199,7 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
         {
          //If we are using optimizations and this joint is not skipped then transform this joint
          //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
-         //if (jID<bvhTransform->numberOfJointsToTransform) //MAX_BVH_JOINT_HIERARCHY_SIZE  
+         //if (jID<bvhTransform->numberOfJointsToTransform) 
          //     { 
                  return  (!bvhTransform->skipCalculationsForJoint[jID]); 
          //     }
@@ -664,6 +665,66 @@ static inline void bvh_performActualTransform(
 
 
 
+int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
+{
+  
+  #if DYNAMIC_TRANSFORM_ALLOCATIONS
+  if ( (bvhMotion!=0) &&  (bvhTransform!=0))
+  { 
+    //Two cases when we want to allocate a BVH Transform.
+    if ( 
+         (bvhTransform->numberOfJointsSpaceAllocated>=bvhMotion->MAX_jointHierarchySize) &&
+         (bvhTransform->skipCalculationsForJoint!=0) &&
+         (bvhTransform->joint!=0) &&
+         (bvhTransform->listOfJointIDsToTransform!=0)
+       )
+       {
+         //First case, smart and fast path is that if we already have enough space allocated we change nothing but the number of joints
+         //that we want to transform, this way there is no reallocations on multiple sequencial transforms..
+         bvhTransform->numberOfJointsToTransform = bvhMotion->jointHierarchySize; 
+       } else
+       {
+         //Second case, force reallocations and cleanup of data..
+         bvhTransform->numberOfJointsSpaceAllocated = MAX_BVH_JOINT_HIERARCHY_SIZE;// bvhMotion->MAX_jointHierarchySize;
+         bvhTransform->numberOfJointsToTransform = bvhMotion->jointHierarchySize;
+
+         if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
+         if (bvhTransform->joint!=0)                     { free(bvhTransform->joint);                     bvhTransform->joint=0; }
+         if (bvhTransform->listOfJointIDsToTransform!=0) { free(bvhTransform->listOfJointIDsToTransform); bvhTransform->listOfJointIDsToTransform=0; }
+
+         bvhTransform->skipCalculationsForJoint  = (unsigned char *)               malloc(sizeof(unsigned char)               * bvhTransform->numberOfJointsSpaceAllocated);
+         bvhTransform->joint                     = (struct BVH_TransformedJoint *) malloc(sizeof(struct BVH_TransformedJoint) * bvhTransform->numberOfJointsSpaceAllocated);
+         bvhTransform->listOfJointIDsToTransform = (BVHJointID *)                  malloc(sizeof(BVHJointID)                  * bvhTransform->numberOfJointsSpaceAllocated);
+
+         memset(bvhTransform->skipCalculationsForJoint, 0,sizeof(unsigned char) * bvhTransform->numberOfJointsSpaceAllocated);
+         memset(bvhTransform->joint,                    0,sizeof(struct BVH_TransformedJoint) * bvhTransform->numberOfJointsSpaceAllocated);
+         memset(bvhTransform->listOfJointIDsToTransform,0,sizeof(BVHJointID) * bvhTransform->numberOfJointsSpaceAllocated);
+       }
+
+    bvhTransform->transformStructInitialized = ( (bvhTransform->skipCalculationsForJoint!=0) && (bvhTransform->joint!=0) && (bvhTransform->listOfJointIDsToTransform!=0) );
+    
+    return bvhTransform->transformStructInitialized;
+  }
+  #else
+  
+  return 1;
+  #endif
+}
+
+
+
+int bvh_freeTransform(struct BVH_Transform * bvhTransform)
+{
+    #if DYNAMIC_TRANSFORM_ALLOCATIONS
+     if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
+     if (bvhTransform->joint!=0)                     { free(bvhTransform->joint);                     bvhTransform->joint=0;                    }
+     if (bvhTransform->listOfJointIDsToTransform!=0) { free(bvhTransform->listOfJointIDsToTransform); bvhTransform->listOfJointIDsToTransform=0;}
+     
+     bvhTransform->transformStructInitialized=0;
+    #endif
+    return 1;
+}
+
 
 int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
                                                              struct BVH_MotionCapture * bvhMotion,
@@ -676,7 +737,14 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
 {
   //Only do transforms on allocated context 
   if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
-  { 
+  {
+    //Make sure there is enough memory allocated..
+    if (!bvh_allocateTransform(bvhMotion,bvhTransform))
+    {
+      fprintf(stderr,"Failed allocating memory for bvh trasnform :(\n");
+      return 0;
+    }
+    
   //First of all we need to clean the BVH_Transform structure
   bvhTransform->jointsOccludedIn2DProjection=0;
  
@@ -746,7 +814,14 @@ int bvh_loadTransformForMotionBuffer(
 {
   //Only do transforms on allocated context 
   if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
-  { 
+  {
+   //Make sure enough memory is allocated.. 
+   if (!bvh_allocateTransform(bvhMotion,bvhTransform))
+    {
+      fprintf(stderr,"Failed allocating memory for bvh trasnform :(\n");
+      return 0;
+    }  
+    
   //First of all we need to clean the BVH_Transform structure
   bvhTransform->jointsOccludedIn2DProjection=0;
  
@@ -832,22 +907,27 @@ int bvh_loadTransformForFrame(
                              )
 {
   int result = 0;
-  struct MotionBuffer * frameMotionBuffer  = mallocNewMotionBuffer(bvhMotion);
-
-  if (frameMotionBuffer!=0)
-  {
-    if  ( bvh_copyMotionFrameToMotionBuffer(bvhMotion,frameMotionBuffer,fID)  )
+  if (bvh_allocateTransform(bvhMotion,bvhTransform))
     {
-     result = bvh_loadTransformForMotionBuffer(
-                                               bvhMotion ,
-                                               frameMotionBuffer->motion,
-                                               bvhTransform,
-                                               populateTorso
-                                              );
-    }
-    freeMotionBuffer(&frameMotionBuffer);
-  }
+      struct MotionBuffer * frameMotionBuffer  = mallocNewMotionBuffer(bvhMotion);
 
+      if (frameMotionBuffer!=0)
+       {
+         if  ( bvh_copyMotionFrameToMotionBuffer(bvhMotion,frameMotionBuffer,fID)  )
+           {
+            result = bvh_loadTransformForMotionBuffer(
+                                                      bvhMotion ,
+                                                      frameMotionBuffer->motion,
+                                                      bvhTransform,
+                                                      populateTorso
+                                                    );
+           }
+         freeMotionBuffer(&frameMotionBuffer);
+      }
+    } else
+    {
+        fprintf(stderr,"Could not allocate memory for BVH Transform\n");
+    }
   return result;
 }
 
@@ -883,11 +963,3 @@ int bvh_removeTranslationFromTransform(
   return 0;
 }
 
-
-
-int bvh_freeTransform(struct BVH_Transform * bvhTransform)
-{
-    //fprintf(stderr,"TODO: implement bvh_freeTransform\n");
-    //exit(1);
-    return 0;
-}

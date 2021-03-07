@@ -798,26 +798,27 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                 //fprintf(stderr,"Frames (%s)..\n",line);
                 bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1);
                 //fprintf(stderr,"Frames number (%u)..\n",bvhMotion->numberOfFrames);
+                
+                //Take care of multiple uses of the same structure..
+                if (bvhMotion->motionValues!=0)
+                 {
+                  fprintf(stderr,"Motion values allocation was dirty when we reached the new Frames declaration\n");
+                  //BUG: If a Frames structure is not hit the motion values allocation will not be updated.. 
+                  bvhMotion->motionValuesSize = 0;
+                  free(bvhMotion->motionValues);
+                  bvhMotion->motionValues = 0; 
+                 } 
               } else
          if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))
              {
                 bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1);
              }  else
-         {
-           //Take care of multiple uses of the same structure..
-           if (bvhMotion->motionValues!=0)
-           {
-               fprintf(stderr,"Motion values allocation was dirty, doing cleanup..!");
-               bvhMotion->motionValuesSize = 0;
-               free(bvhMotion->motionValues);
-               bvhMotion->motionValues = 0; 
-           }
-             
-           
+         { 
            if (bvhMotion->motionValues==0)
            {
              //If we haven't yet allocated a motionValues array we need to do so now..!
              bvhMotion->motionValuesSize = bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame;
+             fprintf(stderr,"Allocating %lu bytes of memory to hold BVH motions \n",sizeof(float) * bvhMotion->motionValuesSize);
              bvhMotion->motionValues = (float*)  malloc(sizeof(float) * (1+bvhMotion->motionValuesSize));
              if (bvhMotion->motionValues==0)
              {
