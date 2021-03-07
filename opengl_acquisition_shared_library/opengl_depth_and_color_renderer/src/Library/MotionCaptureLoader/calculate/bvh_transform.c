@@ -694,6 +694,9 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
 
          bvhTransform->skipCalculationsForJoint  = (unsigned char *)               malloc(sizeof(unsigned char)               * bvhTransform->numberOfJointsSpaceAllocated);
          bvhTransform->joint                     = (struct BVH_TransformedJoint *) malloc(sizeof(struct BVH_TransformedJoint) * bvhTransform->numberOfJointsSpaceAllocated);
+         
+         ///https://software.intel.com/content/www/us/en/develop/articles/coding-for-performance-data-alignment-and-structures.html
+         // This should probably use _mm_malloc! arr1=(struct s2 *)_mm_malloc(sizeof(struct s2)*my_size,32);
          bvhTransform->listOfJointIDsToTransform = (BVHJointID *)                  malloc(sizeof(BVHJointID)                  * bvhTransform->numberOfJointsSpaceAllocated);
 
          memset(bvhTransform->skipCalculationsForJoint, 0,sizeof(unsigned char) * bvhTransform->numberOfJointsSpaceAllocated);

@@ -113,26 +113,26 @@ struct BVH_Transform
   char useOptimizations;
   
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
-  unsigned char * skipCalculationsForJoint;
+   unsigned char * skipCalculationsForJoint;
   #else 
-  unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   unsigned char skipCalculationsForJoint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   #endif
   
   //Transform hashing 
   unsigned int jointIDTransformHashPopulated;
   unsigned int lengthOfListOfJointIDsToTransform;
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
-  BVHJointID * listOfJointIDsToTransform;
+   BVHJointID * listOfJointIDsToTransform;
   #else
-  BVHJointID listOfJointIDsToTransform[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   BVHJointID listOfJointIDsToTransform[MAX_BVH_JOINT_HIERARCHY_SIZE];
   #endif
 
   //Actual Tranformation data
   struct rectangleArea torso;
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
-  struct BVH_TransformedJoint * joint;
+   struct BVH_TransformedJoint * joint;
   #else 
-  struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   #endif
   float centerPosition[3];
   unsigned int jointsOccludedIn2DProjection;
