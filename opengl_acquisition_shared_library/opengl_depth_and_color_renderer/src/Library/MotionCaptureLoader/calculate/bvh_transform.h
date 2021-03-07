@@ -96,13 +96,9 @@ struct BVH_TransformedJoint
 //Transforms should happen on dynamically allocated memory blocks..
 #define DYNAMIC_TRANSFORM_ALLOCATIONS 0
 
-#if DYNAMIC_TRANSFORM_ALLOCATIONS
- #warning "Dynamic transformations allocate non-aligned memory blocks leading on errors.."
-#endif
-
 
 //MAX_BVH_JOINT_HIERARCHY_SIZE
-#define MAX_BVH_TRANSFORM_SIZE_TMP MAX_BVH_JOINT_HIERARCHY_SIZE
+#define MAX_BVH_TRANSFORM_SIZE MAX_BVH_JOINT_HIERARCHY_SIZE
 
 struct BVH_Transform
 {
@@ -117,7 +113,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    unsigned char * skipCalculationsForJoint;
   #else 
-   unsigned char skipCalculationsForJoint[MAX_BVH_TRANSFORM_SIZE_TMP]; 
+   unsigned char skipCalculationsForJoint[MAX_BVH_TRANSFORM_SIZE]; 
   #endif
   
   //Transform hashing 
@@ -126,7 +122,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    BVHJointID * listOfJointIDsToTransform;
   #else
-   BVHJointID listOfJointIDsToTransform[MAX_BVH_TRANSFORM_SIZE_TMP];
+   BVHJointID listOfJointIDsToTransform[MAX_BVH_TRANSFORM_SIZE];
   #endif
 
   //Actual Tranformation data
@@ -134,7 +130,7 @@ struct BVH_Transform
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    struct BVH_TransformedJoint * joint;
   #else 
-   struct BVH_TransformedJoint joint[MAX_BVH_TRANSFORM_SIZE_TMP];
+   struct BVH_TransformedJoint joint[MAX_BVH_TRANSFORM_SIZE];
   #endif
   float centerPosition[3];
   unsigned int jointsOccludedIn2DProjection;

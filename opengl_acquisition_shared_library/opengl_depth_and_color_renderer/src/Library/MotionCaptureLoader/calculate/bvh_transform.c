@@ -375,7 +375,11 @@ int bvh_markAllJointsAsUselessInTransform(
 {
   if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
-  if (bvhMotion->jointHierarchySize>=bvhTransform->numberOfJointsSpaceAllocated) { fprintf(stderr,"bvh_markAllJointsAsUselessInTransform error..\n "); return 0; } 
+  if (bvhMotion->jointHierarchySize>bvhTransform->numberOfJointsSpaceAllocated) 
+       { 
+         fprintf(stderr,"bvh_markAllJointsAsUselessInTransform error %u/%u..\n ",bvhMotion->jointHierarchySize,bvhTransform->numberOfJointsSpaceAllocated); 
+         return 0; 
+       } 
   bvhTransform->useOptimizations=1;
 
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
@@ -724,7 +728,7 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
     return bvhTransform->transformStructInitialized;
   }
   #else 
-      bvhTransform->numberOfJointsSpaceAllocated = MAX_BVH_TRANSFORM_SIZE_TMP;
+      bvhTransform->numberOfJointsSpaceAllocated = MAX_BVH_TRANSFORM_SIZE;
       bvhTransform->numberOfJointsToTransform = bvhMotion->jointHierarchySize;
       bvhTransform->transformStructInitialized=1;
    return 1;
