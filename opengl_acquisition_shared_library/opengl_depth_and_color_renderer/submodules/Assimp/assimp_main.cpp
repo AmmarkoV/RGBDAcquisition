@@ -13,6 +13,7 @@ int textureLoadAndPaint(struct TRI_Model * model,char * filename)
   struct Image * image = readImage(filename,PNG_CODEC,0);
   if (image!=0)
   {
+   fprintf(stderr,"Loaded %s => width:%u / height:%u \n",filename,image->width,image->height);
    if ( paintTRIUsingTexture(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
    {
     fprintf(stderr,"Successfully painted TRI model using %s texture\n",filename);

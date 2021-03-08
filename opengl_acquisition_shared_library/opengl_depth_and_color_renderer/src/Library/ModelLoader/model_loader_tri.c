@@ -632,11 +632,33 @@ int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , un
 {
   if (triModel!=0)
   {
-    if (triModel->header.numberOfColors>0 )
+    if ( (triModel->header.numberOfColors>0 ) && ( triModel->header.numberOfTextureCoords>0) )
     {
-       if (triModel->colors!=0)
+       if ( (triModel->colors!=0) && (triModel->textureCoords!=0) )
        {
+         float * clr = triModel->colors;
+         float * clrLimit = triModel->colors + triModel->header.numberOfColors;
 
+         float * tex = triModel->textureCoords;
+         while (clr<clrLimit)
+         {
+           float u = *tex; ++tex;
+           float v = *tex; ++tex;
+
+           unsigned int x = (unsigned int) (u * width);
+           unsigned int y = (unsigned int) (v * height);
+
+           if ( (x<width) && (y<height) )
+           {
+            unsigned char * p = pixels + (y * width * channels) + x * channels;
+            *clr = (float) *p/255; ++clr; ++p;
+            *clr = (float) *p/255; ++clr; ++p;
+            *clr = (float) *p/255; ++clr; ++p;
+           } else
+           {
+             clr+=3;
+           }
+         }
 
          return 1;
        }
