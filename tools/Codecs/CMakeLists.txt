@@ -2,6 +2,9 @@ project( Codecs )
 cmake_minimum_required( VERSION 2.8.7 )
 
 
+set(CMAKE_CXX_FLAGS "-s -O3 -fPIC -march=native -mtune=native") # -fuse-ld=gold
+set(CMAKE_C_FLAGS "-s -O3 -fPIC -march=native -mtune=native")  # -fuse-ld=gold
+
 IF( ENABLE_JPG )
  MESSAGE("JPGs will be included in this codec build")
  set(JPG_Libs jpeg ) 
