@@ -5,9 +5,23 @@
 
 #include "assimp_loader.h"
 #include "assimp_bvh.h"
+#include "../../../../tools/Codecs/codecs.h"
 
-
-
+int textureLoadAndPaint(struct TRI_Model * model,char * filename)
+{
+  int success=0;
+  struct Image * image = readImage(filename,PNG_CODEC,0);
+  if (image!=0)
+  {
+   if ( paintTRIUsingTexture(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
+   {
+    fprintf(stderr,"Successfully painted TRI model using %s texture\n",filename);
+    success=1;
+   }
+   destroyImage(image);
+  }
+ return success;
+}
 
 
 
@@ -19,13 +33,11 @@ int main (int argc, char *argv[])
  fprintf(stderr,"assimpTester %s %s %s \n",argv[1],argv[2],argv[3]);
 
 
- if ( (strstr(argv[2],".dae")!=0) ||
-    (strstr(argv[2],".obj")!=0) )
-
+ if ( (strstr(argv[2],".dae")!=0) || (strstr(argv[2],".obj")!=0) )
  {
 
- struct TRI_Model *flatModel    =  allocateModelTri();
- struct TRI_Model *originalModel=  allocateModelTri();
+ struct TRI_Model * flatModel    =  allocateModelTri();
+ struct TRI_Model * originalModel=  allocateModelTri();
 
  int selectMesh=0;
  if (argc>=5)
@@ -40,6 +52,10 @@ int main (int argc, char *argv[])
 
     for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--applytexture")==0)
+            {
+                textureLoadAndPaint(originalModel,argv[i+1]);
+            } else
            if (strcmp(argv[i],"--paint")==0)
             {
                int r = atoi(argv[i+1]);

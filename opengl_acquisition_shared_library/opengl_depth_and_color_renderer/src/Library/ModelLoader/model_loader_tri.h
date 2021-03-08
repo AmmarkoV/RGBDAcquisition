@@ -248,6 +248,19 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel);
 
 
 
+/**
+* @brief  Force colors on vertices by sampling a texture
+* @ingroup TRI
+* @param  input TRI structure with mesh we want to color
+* @param  Pixel images
+* @param  Width of image
+* @param  Height of image
+* @param  Bitsperpixel
+* @param  channels of image
+* @retval 0=Failure,1=Success
+*/
+int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels);
+
 
 /**
 * @brief  Force a specific color on all vertices of TRI file

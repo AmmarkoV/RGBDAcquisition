@@ -627,6 +627,26 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
  return 0;
 }
 
+
+int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
+{
+  if (triModel!=0)
+  {
+    if (triModel->header.numberOfColors>0 )
+    {
+       if (triModel->colors!=0)
+       {
+
+
+         return 1;
+       }
+    }
+  }
+  fprintf(stderr,"Failed to paint TRI file..\n");
+  return 0;
+}
+
+
 int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
 {
   if (triModel!=0)
@@ -652,8 +672,6 @@ int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
        }
     }
   }
-
-
   fprintf(stderr,"Failed to paint TRI file..\n");
   return 0;
 }

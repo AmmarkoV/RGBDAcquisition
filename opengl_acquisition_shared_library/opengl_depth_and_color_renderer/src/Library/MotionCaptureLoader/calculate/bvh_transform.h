@@ -92,7 +92,6 @@ struct BVH_TransformedJoint
 #endif
 
 
-
 //Transforms should happen on dynamically allocated memory blocks..
 #define DYNAMIC_TRANSFORM_ALLOCATIONS 0
 
