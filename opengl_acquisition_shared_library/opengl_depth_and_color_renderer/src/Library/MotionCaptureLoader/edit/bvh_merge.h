@@ -24,6 +24,12 @@ int bvh_mergeWith(
                    const char * pathToMergeRules
                  );
 
+
+
+int bvh_mergeOffsetsInMotions(
+                               struct BVH_MotionCapture * targetMC
+                             );
+
 #ifdef __cplusplus
 }
 #endif

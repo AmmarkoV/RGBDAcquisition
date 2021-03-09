@@ -493,8 +493,7 @@ int main(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--addpositionalchannels")==0)
         { 
-            fprintf(stderr,"TODO: implement adding positional channels\n");
-            exit(1);
+           bvh_mergeOffsetsInMotions(&bvhMotion);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--merge")==0)

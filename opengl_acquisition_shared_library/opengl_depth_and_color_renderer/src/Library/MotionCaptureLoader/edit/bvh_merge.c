@@ -128,3 +128,17 @@ int bvh_mergeWith(
 
  return 0;
 }
+
+
+
+
+
+
+
+
+int bvh_mergeOffsetsInMotions(
+                               struct BVH_MotionCapture * targetMC
+                             )
+{
+    return 0;
+}
