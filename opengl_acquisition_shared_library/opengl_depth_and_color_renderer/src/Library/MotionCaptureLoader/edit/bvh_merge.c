@@ -142,7 +142,7 @@ int bvh_mergeWith(
 
 
 int bvh_mergeOffsetsInMotions(
-                               struct BVH_MotionCapture * targetMC
+                               struct BVH_MotionCapture * mc
                              )
 {
     //We need to update 3 things..!
@@ -153,10 +153,14 @@ int bvh_mergeOffsetsInMotions(
 
     //3)We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
        
-   if (targetMC->motionValues!=0)
+   if (mc->motionValues!=0)
    {
-       
-       
+       unsigned int newNumberOfValuesPerFrame = 0;
+       for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+           newNumberOfValuesPerFrame+=mc->jointHierarchy[jID].loadedChannels;
+       }
+       fprintf(stderr,"BVH file will be resized to accomodate %u channels instead of the old %u\n",newNumberOfValuesPerFrame,mc->numberOfValuesPerFrame); 
        
        return 1; //Goal
    }

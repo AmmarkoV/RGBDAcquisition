@@ -27,7 +27,7 @@ int bvh_mergeWith(
 
 
 int bvh_mergeOffsetsInMotions(
-                               struct BVH_MotionCapture * targetMC
+                               struct BVH_MotionCapture * mc
                              );
 
 #ifdef __cplusplus
