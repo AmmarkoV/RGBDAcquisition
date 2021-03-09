@@ -131,8 +131,13 @@ int bvh_mergeWith(
 
 
 
+// -----------------------------------------
 
+// -----------------------------------------
 
+// -----------------------------------------
+
+// -----------------------------------------
 
 
 
@@ -140,5 +145,21 @@ int bvh_mergeOffsetsInMotions(
                                struct BVH_MotionCapture * targetMC
                              )
 {
-    return 0;
+    //We need to update 3 things..!
+    
+    //1) First allocate a brand new motion buffer that will hold the new offsets + the old rotations+offsets, and swap it for the old one..
+    
+    //2) We need to update numberOfValuesPerFrame motionValuesSize
+
+    //3)We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
+       
+   if (targetMC->motionValues!=0)
+   {
+       
+       
+       
+       return 1; //Goal
+   }
+  
+   return 0;
 }
