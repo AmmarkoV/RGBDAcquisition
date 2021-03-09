@@ -144,7 +144,9 @@ int bvh_mergeWith(
 int bvh_mergeOffsetsInMotions(
                                struct BVH_MotionCapture * mc
                              )
-{
+{  
+    // Test : ./GroundTruthDumper --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
+
     //We need to update 3 things..!
     
     //1) First allocate a brand new motion buffer that will hold the new offsets + the old rotations+offsets, and swap it for the old one..
@@ -156,11 +158,15 @@ int bvh_mergeOffsetsInMotions(
    if (mc->motionValues!=0)
    {
        unsigned int newNumberOfValuesPerFrame = 0;
+       unsigned int newMotionValuesSize=0;
        for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
        {
            newNumberOfValuesPerFrame+=mc->jointHierarchy[jID].loadedChannels;
        }
        fprintf(stderr,"BVH file will be resized to accomodate %u channels instead of the old %u\n",newNumberOfValuesPerFrame,mc->numberOfValuesPerFrame); 
+       
+       newMotionValuesSize=newNumberOfValuesPerFrame*mc->numberOfFrames;
+       fprintf(stderr,"Total size will be adjusted to %u instead of the old %u\n",newMotionValuesSize,mc->motionValuesSize); 
        
        return 1; //Goal
    }
