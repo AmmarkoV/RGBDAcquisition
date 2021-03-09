@@ -168,7 +168,42 @@ int bvh_mergeOffsetsInMotions(
        newMotionValuesSize=newNumberOfValuesPerFrame*mc->numberOfFrames;
        fprintf(stderr,"Total size will be adjusted to %u instead of the old %u\n",newMotionValuesSize,mc->motionValuesSize); 
        
-       return 1; //Goal
+       float * newMotionValues = (float*) malloc(sizeof(float) * newMotionValuesSize);
+       if (newMotionValues!=0)
+       {
+         //
+         BVHMotionChannelID oldMID=0,newMID=0;
+         for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
+          {
+           for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              //All joints will gain a positional channel
+              if (!mc->jointHierarchy[jID].hasPositionalChannels) 
+              {
+                  //If this joint did not have a positional component we will add it..! 
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[0]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[1]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[2]; ++newMID;
+                  mc->jointHierarchy[jID].hasPositionalChannels = 1;
+              }
+
+             //Copy existing information..
+             for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+               {
+                newMotionValues[newMID] = mc->motionValues[oldMID];   ++oldMID;  ++newMID;
+               }
+            } 
+          }
+         
+         //Deallocate old buffer..
+         free(mc->motionValues);
+         
+         //Update everything to new data..
+         mc->motionValues = newMotionValues;
+         mc->motionValuesSize = newMotionValuesSize;
+         mc->numberOfValuesPerFrame = newNumberOfValuesPerFrame; 
+         return 1; //Goal 
+       }
    }
   
    return 0;
