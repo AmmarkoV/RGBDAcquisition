@@ -139,6 +139,38 @@ int bvh_mergeWith(
 
 // -----------------------------------------
 
+ 
+int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
+{
+  //Free previous joint lookups
+  if  (mc->jointToMotionLookup!=0)  { free(mc->jointToMotionLookup); mc->jointToMotionLookup=0;}
+  mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
+  
+  if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
+  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize); // bvhMotion->MAX_jointHierarchySize * 7
+ 
+  if ( 
+       (mc->jointToMotionLookup!=0) || (mc->motionToJointLookup!=0)
+     )
+     {
+       fprintf(stderr,RED "Failed allocating memory, giving up on loading BVH file\n" NORMAL);  
+  
+       //Clean everything..! 
+       memset(mc->jointToMotionLookup,0,sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
+       memset(mc->motionToJointLookup,0,sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize);
+    
+       //Repopulate everything..!
+       BVHMotionChannelID mID=0;
+       for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+       
+            }
+            
+       return 1;
+     }
+  return 0;
+}
+
 
 
 int bvh_mergeOffsetsInMotions(
@@ -202,7 +234,12 @@ int bvh_mergeOffsetsInMotions(
          mc->motionValues = newMotionValues;
          mc->motionValuesSize = newMotionValuesSize;
          mc->numberOfValuesPerFrame = newNumberOfValuesPerFrame; 
-         return 1; //Goal 
+         
+         if ( bvh_updateJointLookupMaps(mc) )
+         {
+           return 1; //Goal 
+         }
+         
        }
    }
   
