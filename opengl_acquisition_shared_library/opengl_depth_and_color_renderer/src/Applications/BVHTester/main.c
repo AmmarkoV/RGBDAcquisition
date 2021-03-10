@@ -645,6 +645,23 @@ int main(int argc,const char **argv)
             }
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomizeMID")==0)
+        {
+          //------------------------------------------
+          BVHMotionChannelID mID=atoi(argv[i+1]);
+          float startOfRandomization=atof(argv[i+2]);
+          float endOfRandomization=atof(argv[i+3]);
+          //------------------------------------------
+           if (
+               bvh_RandomizeSingleMIDInRange(
+                                             &bvhMotion,
+                                             mID,
+                                             startOfRandomization,
+                                             endOfRandomization
+                                            )
+              )  { haltOnError(immediatelyHaltOnError,"Error while randomizing a single mID angle"); }
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeJointAngles")==0)
         {
           // ./BVHTester --from Motions/DAZFriendlyCMUPlusHeadAndHandsAndFeet.bvh --repeat 100 --randomizeJointAngles 15 -65 0 1 finger5-1.l finger5-2.l finger5-3.l finger4-1.l finger4-2.l finger4-3.l finger3-1.l finger3-2.l finger3-3.l finger2-1.l finger2-2.l finger2-3.l finger1-1.l finger1-2.l finger1-3.l --randomizeJointAngles 5 -90 0 1 finger5-1.l finger4-1.l finger3-1.l finger2-1.l finger1-1.l --randomizeJointAngles 2 -75 75 2 finger1-1.l finger1-2.l --randomizeJointAngles 1 -45 0 3 finger1-1.l --bvh restR.bvh

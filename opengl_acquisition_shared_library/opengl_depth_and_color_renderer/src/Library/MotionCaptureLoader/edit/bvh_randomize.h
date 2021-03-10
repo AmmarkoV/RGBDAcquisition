@@ -38,6 +38,13 @@ int bvh_PerturbJointAngles(
                           );
 
 
+int bvh_RandomizeSingleMIDInRange(
+                                  struct BVH_MotionCapture * mc,
+                                  BVHMotionChannelID mID,
+                                  float start,
+                                  float end
+                                 );
+
 int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,

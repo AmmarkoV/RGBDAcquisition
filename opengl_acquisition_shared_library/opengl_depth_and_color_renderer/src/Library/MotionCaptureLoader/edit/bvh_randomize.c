@@ -316,6 +316,30 @@ int bvh_PerturbJointAngles(
 
 
 
+int bvh_RandomizeSingleMIDInRange(
+                                   struct BVH_MotionCapture * mc,
+                                   BVHMotionChannelID mID,
+                                   float start,
+                                   float end
+                                )
+{
+  if ( (mc!=0) && (mc->motionToJointLookup!=0) )
+    {
+     BVHJointID jID = mc->motionToJointLookup[mID].jointID;
+     fprintf(stderr,GREEN "Asked to randomize Joint %s (jID=%u) using range %0.2f - %0.2f across %u frames\n" NORMAL,mc->jointHierarchy[jID].jointName,jID,start,end,mc->numberOfFrames);
+    
+     unsigned int fID=0;
+     for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+       unsigned int mIDOfSpecificFrame=mID + fID*mc->numberOfValuesPerFrame;
+ 
+       mc->motionValues[mIDOfSpecificFrame]=randomFloatA(start,end);
+      }
+      
+     return 1; 
+    }
+   return 0;
+}
 
 
 
