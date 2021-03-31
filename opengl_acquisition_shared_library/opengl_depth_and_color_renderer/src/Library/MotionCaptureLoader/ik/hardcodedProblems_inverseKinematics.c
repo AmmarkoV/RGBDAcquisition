@@ -2489,7 +2489,8 @@ int prepareDefaultBodyProblem(
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
      */
                              
-                             
+    
+    /* //Unfortunately there is no Chest joint in the Body25 and trying to solve for one introduces wobblyness..
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -2504,7 +2505,7 @@ int prepareDefaultBodyProblem(
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-                             
+    */
    
      ++correct;
      checksum+=addNewPartToChainProblem(
