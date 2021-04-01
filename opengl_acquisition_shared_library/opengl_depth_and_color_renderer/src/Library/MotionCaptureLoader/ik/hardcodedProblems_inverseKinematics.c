@@ -950,6 +950,10 @@ int prepareDefaultRightHandProblem(
          //We add another "chain" to cover everything
          fprintf(stderr,"Initialization of rhand uses quaternion..\n"); //ignore w
          
+         //Add quaternion limit to previous 
+         //                                                  minQW/maxQW    minQX/maxQX     minQY/maxQY
+         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,        -1.0,1.0);
+         
          ++correct;
          checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -967,6 +971,8 @@ int prepareDefaultRightHandProblem(
         problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
         //problem->chain[chainID].part[partID-1].mIDStart=4;
         //problem->chain[chainID].part[partID-1].mIDEnd=6;
+         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
+         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
        }
        
        ++correct;
@@ -1689,6 +1695,9 @@ int prepareDefaultLeftHandProblem(
          //Since quaternions have 4 coordinates, and the main loop of optimization only handles 3
          //We add another "chain" to cover everything
          fprintf(stderr,"Initialization of lhand uses quaternion..\n"); //ignore w
+       
+         //                                                  minQW/maxQW    minQX/maxQX     minQY/maxQY
+         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,       -1.0,1.0,       -1.0,1.0);
          
          ++correct;
          checksum+=addNewPartToChainProblem(
@@ -1710,6 +1719,8 @@ int prepareDefaultLeftHandProblem(
          //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=4;
          //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=6;
          //fprintf(stderr,"mIDS Q2 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
+         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
+         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
        }
        
        ++correct;
