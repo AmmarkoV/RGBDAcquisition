@@ -39,8 +39,10 @@ struct ikChainParts
  //--------------
  float minimumLimitMID[4];
  float maximumLimitMID[4];
+ float mAE[4];
  //--------------
  char limits;
+ char maeDeclared;
  char evaluated;
  char smallChanges;
  char bigChanges;

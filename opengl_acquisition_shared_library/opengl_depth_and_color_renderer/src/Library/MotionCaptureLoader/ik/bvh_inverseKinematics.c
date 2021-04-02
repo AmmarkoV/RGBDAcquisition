@@ -537,8 +537,8 @@ float iteratePartLoss(
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
     
      
-    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/10;   gradientExplosionThreshold=gradientExplosionThreshold*10; } else
-    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/1000;   gradientExplosionThreshold=gradientExplosionThreshold/20; }
+    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/10;     gradientExplosionThreshold=gradientExplosionThreshold*10; } else
+    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/1000;   gradientExplosionThreshold=gradientExplosionThreshold/15; }
     
     unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
     if (numberOfMIDElements!=3)

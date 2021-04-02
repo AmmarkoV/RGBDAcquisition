@@ -172,6 +172,41 @@ int addLimitsToPartOfChain(
 
 
 
+int addEstimatedMAEToPartOfChain(
+                                 struct ikProblem * problem,
+                                 struct BVH_MotionCapture * mc,
+                                 //-----------------------------------------
+                                 unsigned int chainID,
+                                 unsigned int partID,
+                                 //-----------------------------------------
+                                 float mAE_X,
+                                 float mAE_Y,
+                                 float mAE_Z  
+                                )
+{ 
+    if (chainID >= MAXIMUM_CHAINS)
+    {
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
+      return 0;  
+    }
+    
+    if (partID >= MAXIMUM_PARTS_OF_CHAIN)
+    {
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
+      return 0;  
+    }
+    
+    problem->chain[chainID].part[partID].maeDeclared=1; 
+    //Z X Y
+    problem->chain[chainID].part[partID].mAE[0]=mAE_Z; 
+    problem->chain[chainID].part[partID].mAE[1]=mAE_X; 
+    problem->chain[chainID].part[partID].mAE[2]=mAE_Y; 
+   //------
+   return 1; 
+}
+
+
+
 
 
 
