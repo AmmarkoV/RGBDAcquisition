@@ -714,6 +714,34 @@ if (iterationID==0)
                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
     //---------------------------------------------------------------------------------------
 
+    if ( problem->chain[chainID].part[partID].maeDeclared )
+    {
+       //Update Minima ------------------------------------------------------------
+       float newMin = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[0]); }
+       minimumLimitValues[0]=newMin;
+       
+       newMin = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[1]); }
+       minimumLimitValues[1]=newMin;
+       
+       newMin = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[2]); }
+       minimumLimitValues[2]=newMin;
+       //---------------------------------------------------------------------------
+       float newMax = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[0]); }
+       maximumLimitValues[0]=newMax;
+       
+       newMax = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[1]); }
+       maximumLimitValues[1]=newMax;
+       
+       newMax = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[2]); }
+       maximumLimitValues[2]=newMax;
+    }  
+
     float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
     float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
     float bestValues[3]     = { originalValues[0],originalValues[1],originalValues[2] };
