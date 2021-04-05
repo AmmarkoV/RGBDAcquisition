@@ -920,7 +920,9 @@ int prepareDefaultRightHandProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
                              
-                 
+     //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,10.0,      -20.0,20.0,     -60.0,60.0);
+     
       //----------------------------------------------------------
       if (correct!=checksum) 
          { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -1700,7 +1702,9 @@ int prepareDefaultLeftHandProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
                              
-                 
+    //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -10.0,180.0,      -20.0,20.0,     -60.0,60.0);
+         
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
