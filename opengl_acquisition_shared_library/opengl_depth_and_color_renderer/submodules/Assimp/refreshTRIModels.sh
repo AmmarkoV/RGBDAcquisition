@@ -26,6 +26,7 @@ cd "$DIR"
 ln -s AmmarH.tri Ammar.tri
 ln -s ElinaH.tri Elina.tri
 
-./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --paint 123 123 123
+#./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --paint 123 123 123
+./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
 
 exit 0

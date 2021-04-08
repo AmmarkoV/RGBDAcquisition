@@ -918,14 +918,13 @@ int prepareDefaultRightHandProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             );
-                             
+                             );                           
      //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,10.0,      -20.0,20.0,     -60.0,60.0);
      
       //----------------------------------------------------------
       if (correct!=checksum) 
-         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+         { fprintf(stderr,"Failed at non-standalone rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
       //----------------------------------------------------------
     
       ++chainID;
@@ -933,7 +932,106 @@ int prepareDefaultRightHandProblem(
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
-     } else
+      
+      
+        
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //We add a specific kinematic chain that will just handle the wrist pose since the pose retreived when concatenating
+    //seperate hands and bodies can be difficult to estimate..
+     checksum=0;
+     correct=0; 
+     partID=0;
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "rhand",0,// Joint
+                               1.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             ); 
+     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
+     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
+                             
+    //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
+     
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger2-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger3-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger4-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger5-1.r",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "rthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                 
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at common non-standalone rHand wrist chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+    
+      ++chainID;
+      ++jobID;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+    
+     } //end of non-standalone mode that also has a body..
+      else
      {
        //Second mode, assuming no body 
        //-----------------------------------------------------------------------
@@ -1016,6 +1114,12 @@ int prepareDefaultRightHandProblem(
          addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.34,      0.25,     0.34 );
        }
        
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at standalone rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+     
+     //The rest is common for both standalone and non standalone hands..! 
        ++correct;
        checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -1074,7 +1178,7 @@ int prepareDefaultRightHandProblem(
                  
       //----------------------------------------------------------
       if (correct!=checksum) 
-         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+         { fprintf(stderr,"Failed at standalone/non-standalone common rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
       //----------------------------------------------------------
     
       ++chainID;
@@ -1082,8 +1186,8 @@ int prepareDefaultRightHandProblem(
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
-     } //End of standalone chain mode
 
+     } //End of standalone chain mode
 
 
 
@@ -1700,14 +1804,16 @@ int prepareDefaultLeftHandProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             );
+                             ); 
+     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
+     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
                              
     //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -10.0,180.0,      -20.0,20.0,     -60.0,60.0);
          
     //----------------------------------------------------------
     if (correct!=checksum) 
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+         { fprintf(stderr,"Failed at non-standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
     //----------------------------------------------------------
     
     ++chainID;
@@ -1715,7 +1821,106 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //---------------------------------------------------------- 
-     } else
+    
+    
+    
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //We add a specific kinematic chain that will just handle the wrist pose since the pose retreived when concatenating
+    //seperate hands and bodies can be difficult to estimate..
+     checksum=0;
+     correct=0; 
+     partID=0;
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "lhand",0,// Joint
+                               1.5,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             ); 
+     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
+     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
+                             
+    //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
+     
+      
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger2-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger3-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger4-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "finger5-1.l",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "lthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                 
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at common standalone/non-standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+    
+      ++chainID;
+      ++jobID;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+    
+     } //end of non-standalone mode that also has a body..
+      else
      {
        //Second mode, assuming no body 
        //-----------------------------------------------------------------------
@@ -1800,8 +2005,15 @@ int prepareDefaultLeftHandProblem(
          addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.34,      0.25,     0.34 );
        }
        
-       ++correct;
-       checksum+=addNewPartToChainProblem(
+       
+      //----------------------------------------------------------
+      if (correct!=checksum) 
+         { fprintf(stderr,"Failed at standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      //----------------------------------------------------------
+    
+    //This is the common bases of fingers 
+     ++correct;
+     checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger2-1.l",0, // Joint
@@ -1858,7 +2070,7 @@ int prepareDefaultLeftHandProblem(
                  
       //----------------------------------------------------------
       if (correct!=checksum) 
-         { fprintf(stderr,"Failed at non-standalone chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+         { fprintf(stderr,"Failed at common standalone/non-standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
       //----------------------------------------------------------
     
       ++chainID;
@@ -1866,7 +2078,8 @@ int prepareDefaultLeftHandProblem(
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
-     }
+   
+    }
 
 
 
