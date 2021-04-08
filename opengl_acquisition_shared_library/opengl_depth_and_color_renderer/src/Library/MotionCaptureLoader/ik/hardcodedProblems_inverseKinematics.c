@@ -955,10 +955,7 @@ int prepareDefaultRightHandProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             ); 
-     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
-     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
-                             
+                             );
     //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
      
@@ -1804,10 +1801,7 @@ int prepareDefaultLeftHandProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             ); 
-     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
-     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
-                             
+                             );         
     //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -10.0,180.0,      -20.0,20.0,     -60.0,60.0);
          
@@ -1844,10 +1838,7 @@ int prepareDefaultLeftHandProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             ); 
-     //Since wrist solutions come from the body BVH neural network we can't expect a very good initial solution..
-     problem->chain[chainID].part[partID-1].dontTrustInitialSolution=1; // <- This should do some extra search steps to help with results..
-                             
+                             );              
     //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
      
@@ -2994,6 +2985,35 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
+                             
+                             
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "ear.l","__temporalis02.l",// Joint
+                               2.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
+
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "ear.r","__temporalis02.r",// Joint
+                               2.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
     //----------------------------------------------------------
     if (correct!=checksum) 
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }

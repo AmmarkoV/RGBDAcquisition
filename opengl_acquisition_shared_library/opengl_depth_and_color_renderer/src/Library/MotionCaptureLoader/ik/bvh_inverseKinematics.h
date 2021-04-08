@@ -44,7 +44,6 @@ struct ikChainParts
  char limits;
  char maeDeclared;
  char evaluated;
- char dontTrustInitialSolution;
  char smallChanges;
  char bigChanges;
  char endEffector;
