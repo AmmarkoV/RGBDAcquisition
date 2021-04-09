@@ -2913,7 +2913,7 @@ int prepareDefaultBodyProblem(
                              );
                              */
                             
-    
+  
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -2928,7 +2928,8 @@ int prepareDefaultBodyProblem(
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-                                  
+    
+     /*
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -2943,7 +2944,7 @@ int prepareDefaultBodyProblem(
                              );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-                        
+     */
       
      ++correct;
      checksum+=addNewPartToChainProblem(
