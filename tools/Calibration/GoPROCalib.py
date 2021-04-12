@@ -186,6 +186,7 @@ def ImageProcessing(n_boards, board_w, board_h, board_dim):
     print('fY = ',intrinsic_matrix[1][1]) 
     print('cX = ',intrinsic_matrix[0][2]) 
     print('cY = ',intrinsic_matrix[1][2]) 
+    print(' ')
 
     print('Distortion Coefficients: ')
     print(str(distCoeff))
