@@ -12,16 +12,17 @@ import cv2, sys
 import numpy as np
 
 #Import Information
-filename = 'GOPR3784.MP4'
+filename = 'GOPRO4K.MP4' #GOPR3784.MP4
 #Input the number of board images to use for calibration (recommended: ~20)
 n_boards = 17
 #Input the number of squares on the board (width and height)
 board_w = 9
 board_h = 6
 #Board dimensions (typically in cm)
-board_dim = 22
+board_dim = 21
 #Image resolution
-image_size = (2704,1520)
+#image_size = (2704,1520) #2.7 K 
+image_size = (2704,1520) #2.7 K 
 
 #Crop mask 
 # A value of 0 will crop out all the black pixels.  This will result in a loss of some actual pixels.
@@ -49,6 +50,7 @@ def ImageCollect(filename, n_boards):
     #Collect Calibration Images
     print('-----------------------------------------------------------------')
     print('Loading video...')
+    print('Press space when you see a clean frame...!')
 
     #Load the file given to the function
     video = cv2.VideoCapture(filename)
@@ -179,6 +181,12 @@ def ImageProcessing(n_boards, board_w, board_h, board_dim):
     print('Intrinsic Matrix: ')
     print(str(intrinsic_matrix))
     print(' ')
+
+    print('fX = ',intrinsic_matrix[0][0]) 
+    print('fY = ',intrinsic_matrix[1][1]) 
+    print('cX = ',intrinsic_matrix[0][2]) 
+    print('cY = ',intrinsic_matrix[1][2]) 
+
     print('Distortion Coefficients: ')
     print(str(distCoeff))
     print(' ') 
