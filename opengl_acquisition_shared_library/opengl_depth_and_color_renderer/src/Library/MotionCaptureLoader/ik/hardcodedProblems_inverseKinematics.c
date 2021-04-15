@@ -18,8 +18,9 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+//Attempt to add a second foot solution chain
 //This causes a double free.. :S ( double free or corruption (!prev) )
-#define DUALFOOT 1
+#define DUALFOOT 0
 
 int addNewPartToChainProblem(
     struct ikProblem * problem,
@@ -3235,7 +3236,6 @@ int prepareDefaultBodyProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
                
-     #if DUALFOOT              
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
@@ -3247,8 +3247,7 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             );
-    #endif
+                             ); 
     
     //----------------------------------------------------------
     if (correct!=checksum) 
@@ -3264,6 +3263,82 @@ int prepareDefaultBodyProblem(
 
  
  
+
+
+
+
+
+     #if DUALFOOT              
+
+     //Next chain is the Right Sole
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "rfoot",0,  // Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+                                                         
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_toe1-2.r",0,  // Big Toe
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_toe5-3.r",0,  // Small Toe
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             ); 
+    
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    #endif
+    
+ 
+ 
+
+
+
+
+
 
 
 
@@ -3333,6 +3408,77 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_toe5-3.l",0,  // Small Toe
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             ); 
+    //----------------------------------------------------------
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    //----------------------------------------------------------
+    
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel  
+    ++chainID;
+    ++jobID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+     #if DUALFOOT              
+ 
+     //Next chain  is the Left Sole
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //---------------------------------------------------------- 
+     checksum=0;
+     correct=0; 
+     partID=0;
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "lfoot",0,// Joint
+                               1.0,     //Importance
+                               0,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+                                                         
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_toe1-2.l",0, // Big Toe 
+                               1.5,     //Importance
+                               1,       //IsEndEffector
+                              //-----------------------------------------
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
    
      #if DUALFOOT
      ++correct;
@@ -3359,6 +3505,14 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+   #endif
+
+
+
+
+
+
+
 
     ++groupID;
 
