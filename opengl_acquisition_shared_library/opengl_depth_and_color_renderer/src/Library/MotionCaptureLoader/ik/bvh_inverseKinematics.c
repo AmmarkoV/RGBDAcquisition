@@ -529,6 +529,7 @@ float iteratePartLoss(
                       unsigned int tryMaintainingLocalOptima,
                       float spring,
                       float gradientExplosionThreshold,
+                      char useSolutionHistory,
                       unsigned int verbose
                      )
 {
@@ -577,6 +578,8 @@ float iteratePartLoss(
     
     //The original values we want to improve
     unsigned int weHaveAPreviousSolutionHistory=(problem->previousSolution!=0);
+    if (!useSolutionHistory) { weHaveAPreviousSolutionHistory=0; }
+    
     float previousSolution[3] = 
     {
         originalValues[0],
@@ -1056,6 +1059,7 @@ int iterateChainLoss(
                      unsigned int tryMaintainingLocalOptima,
                      float spring, 
                      float gradientExplosionThreshold,
+                     char useSolutionHistory,
                      unsigned int verbose
                     )
 {
@@ -1084,6 +1088,7 @@ int iterateChainLoss(
                              tryMaintainingLocalOptima,
                              spring, 
                              gradientExplosionThreshold,
+                             useSolutionHistory,
                              verbose
                            );
          }
@@ -1122,6 +1127,7 @@ int singleThreadedSolver(
                               ikConfig->tryMaintainingLocalOptima,
                               ikConfig->spring, 
                               ikConfig->gradientExplosionThreshold,
+                              (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                               ikConfig->verbose
                            );
              
@@ -1175,6 +1181,7 @@ void * iterateChainLossWorkerThread(void * arg)
                            ctx->ikConfig->tryMaintainingLocalOptima,
                            ctx->ikConfig->spring, 
                            ctx->ikConfig->gradientExplosionThreshold,
+                           (!ctx->ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                            ctx->ikConfig->verbose
                          );
     //--------------------------------
@@ -1253,6 +1260,7 @@ int multiThreadedSolver(
                                  ikConfig->tryMaintainingLocalOptima,
                                  ikConfig->spring,
                                  ikConfig->gradientExplosionThreshold,
+                                 (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                                  ikConfig->verbose
                                 );
                                                  
@@ -1662,7 +1670,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //viewProblem(problem);
     if (problem->chain[0].part[0].jID==0)
     { 
-      ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution); 
+      if (!ikConfig->dontUseSolutionHistory)
+       { 
+         ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
+       } 
     } else
     if (ikConfig->verbose)
     {
@@ -1776,11 +1787,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
       if (m!=0)
       {
        fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
-
-        if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
-        { 
+        
+        if (!ikConfig->dontUseSolutionHistory)
+        {
+         if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
+         { 
             m = problem->previousSolution->motion;
             fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
+         }
         }
     
        m = solution->motion;
@@ -1812,8 +1826,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         //----------------------------------------------------
         if (*finalMAEInPixels!=0)
         {
+           if (!ikConfig->dontUseSolutionHistory)
+           {
            //Perform projection on previous solution 
-           //-----------------------------------------------
+           //----------------------------------------------- 
            struct BVH_Transform bvhPreviousTransform = {0}; 
            if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
            {
@@ -1831,6 +1847,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             }
             bvh_freeTransform(&bvhPreviousTransform);
            //-----------------------------------------------
+           }
         }
        }
         //----------------------------------------------------
@@ -1860,7 +1877,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         */
         
         
-        if ( (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
+        if ( (!ikConfig->dontUseSolutionHistory) && (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from previous solution
         ensureFinalProposedSolutionIsBetterInParts( 
@@ -1885,7 +1902,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         
         
               
-        if ( (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
+        if ( (!ikConfig->dontUseSolutionHistory) && (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from pre-previous solution 
         ensureFinalProposedSolutionIsBetterInParts( 

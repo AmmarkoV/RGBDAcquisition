@@ -201,6 +201,7 @@ int bvhMeasureIterationInfluence(
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
                     ikConfig.verbose = 0;
                     ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
+                    ikConfig.dontUseSolutionHistory=1; //<- should I use solution history ?
                     ikConfig.ikVersion = IK_VERSION;
                     //------------------------------------
 

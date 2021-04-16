@@ -12,10 +12,10 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.25
+#define IK_VERSION 0.35
 
-#define MAXIMUM_CHAINS 10
-#define MAXIMUM_PARTS_OF_CHAIN 10
+#define MAXIMUM_CHAINS 16
+#define MAXIMUM_PARTS_OF_CHAIN 16
 
 enum bvhIKSolutionStatus
 {
@@ -97,6 +97,7 @@ struct ikConfiguration
   float gradientExplosionThreshold;
   unsigned int dumpScreenshots;
   unsigned int verbose;
+  char dontUseSolutionHistory;
   float ikVersion;
 };
 

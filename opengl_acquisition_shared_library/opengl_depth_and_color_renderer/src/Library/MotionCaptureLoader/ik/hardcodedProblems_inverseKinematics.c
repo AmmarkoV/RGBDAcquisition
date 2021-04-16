@@ -3700,6 +3700,7 @@ int bvhTestIK(
                     ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
                     ikConfig.verbose = 1;
                     ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
+                    ikConfig.dontUseSolutionHistory=0;
                     ikConfig.ikVersion = IK_VERSION;
                     //------------------------------------
 
