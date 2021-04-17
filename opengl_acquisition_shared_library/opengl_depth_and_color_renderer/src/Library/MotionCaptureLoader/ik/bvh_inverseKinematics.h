@@ -101,7 +101,26 @@ struct ikConfiguration
   float ikVersion;
 };
 
-
+static void printIkConfiguration(struct ikConfiguration * ikConfig)
+{
+  fprintf(stderr,"ikConfig ---------------\n");
+  if (ikConfig!=0)
+  {
+   fprintf(stderr,"learningRate = %f \n",ikConfig->learningRate);
+   fprintf(stderr,"maximumAcceptableStartingLoss = %f \n",ikConfig->maximumAcceptableStartingLoss);
+   fprintf(stderr,"iterations = %u \n",ikConfig->iterations);
+   fprintf(stderr,"epochs = %u \n",ikConfig->epochs);
+   fprintf(stderr,"considerPreviousSolution = %u \n",ikConfig->considerPreviousSolution);
+   fprintf(stderr,"tryMaintainingLocalOptima = %u \n",ikConfig->tryMaintainingLocalOptima);
+   fprintf(stderr,"spring = %f \n",ikConfig->spring);
+   fprintf(stderr,"gradientExplosionThreshold = %f \n",ikConfig->gradientExplosionThreshold);
+   fprintf(stderr,"dumpScreenshots = %u \n",ikConfig->dumpScreenshots);
+   fprintf(stderr,"verbose = %u \n",ikConfig->verbose);
+   fprintf(stderr,"dontUseSolutionHistory = %u \n",ikConfig->dontUseSolutionHistory);
+   fprintf(stderr,"ikVersion = %f ( bin %f ) \n",ikConfig->ikVersion,IK_VERSION);
+  } 
+  fprintf(stderr,"------------------------\n");
+};
 
 struct passIKContextToThread
 {

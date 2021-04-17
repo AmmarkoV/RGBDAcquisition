@@ -2486,7 +2486,7 @@ int prepareDefaultLeftHandProblem(
      //                                                   minX/maxX     minY/maxY   minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   13.0,     12.6,     12.6 );
+     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   13.0,     20.0,     20.0 );
      //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
      
      
@@ -2504,7 +2504,7 @@ int prepareDefaultLeftHandProblem(
      //                                                   minX/maxX     minY/maxY    minZ/maxZ
      addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   15.3,     15.9,     17.1 );     
+     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   15.3,     40.0,     40.0 );     
      //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   5.5,     14.8,     11.1 );     
      
      ++correct;
