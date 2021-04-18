@@ -274,7 +274,7 @@ int bvh_loadBVHToTRIAssociationFile(
     fprintf( stderr,"%u Associations\n", bvhtri->numberOfJointAssociations );
 
 
-    if (line) { free(line); }
+    if (line!=0) { free(line); }
 
     fclose(fp);
     InputParser_Destroy(ipc);

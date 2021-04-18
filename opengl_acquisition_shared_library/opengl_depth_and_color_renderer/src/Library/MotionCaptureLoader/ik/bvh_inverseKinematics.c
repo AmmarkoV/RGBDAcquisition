@@ -306,9 +306,17 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
 
 int cleanProblem(struct ikProblem * problem)
 {
+    if (problem==0) { fprintf(stderr,"Cannot clean null problem\n"); return 0; } 
+        
     freeMotionBuffer(&problem->previousSolution);
     freeMotionBuffer(&problem->initialSolution);
     freeMotionBuffer(&problem->currentSolution);
+    
+    if (problem->numberOfChains >= MAXIMUM_CHAINS)
+    {
+        fprintf(stderr,"Cannot clean problem with overflowing number of chains %u/%u \n",problem->numberOfChains,MAXIMUM_CHAINS); 
+        return 0;
+    }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
@@ -1603,6 +1611,7 @@ int springToZeroParts(
            }
     //------------------------------------------------
     freeMotionBuffer(&zeroSolution);
+    zeroSolution=0;
    }
     }
    }
@@ -1679,7 +1688,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     {
       fprintf(stderr,RED "%s problem, Not running initial position frustrum check\n" NORMAL,problem->problemDescription);
     }
-    
     
     //Make sure our problem has the correct details ..
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;  
@@ -1767,6 +1775,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
 
+
+
      if (useMultipleThreads)
      {
       //Solve the problem using multiple threads..!
@@ -1779,7 +1789,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
-     
+
           
     if (ikConfig->verbose)
      {
@@ -1950,7 +1960,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->epochs );
     
     bvh_freeTransform(&bvhCurrentTransform);
-    
+     
     return 1;
 }
 

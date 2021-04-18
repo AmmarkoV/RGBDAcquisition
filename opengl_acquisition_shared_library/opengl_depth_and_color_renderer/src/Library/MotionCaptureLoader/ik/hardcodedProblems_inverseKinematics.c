@@ -24,7 +24,7 @@
 
 //Attempt to add a second thumb solution chain
 //This causes a double free.. :S ( double free or corruption (!prev) ) / free(): invalid next size (fast)
-#define DUALTHUMB 0
+#define DUALTHUMB 1
 
 int addNewPartToChainProblem(
     struct ikProblem * problem,
@@ -3945,9 +3945,13 @@ int bvhTestIK(
             }
         }
         freeMotionBuffer(&previousSolution);
+        previousSolution=0;
         freeMotionBuffer(&solution);
+        solution=0;
         freeMotionBuffer(&initialSolution);
+        initialSolution=0;
         freeMotionBuffer(&groundTruth);
+        groundTruth=0;
     }
     
     bvh_freeTransform(&bvhTargetTransform);

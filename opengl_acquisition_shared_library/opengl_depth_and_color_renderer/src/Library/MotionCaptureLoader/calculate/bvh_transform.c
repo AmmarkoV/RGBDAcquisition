@@ -728,9 +728,14 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
          // This should probably use _mm_malloc! arr1=(struct s2 *)_mm_malloc(sizeof(struct s2)*my_size,32);
          bvhTransform->listOfJointIDsToTransform = (BVHJointID *)                  malloc(sizeof(BVHJointID)                  * bvhTransform->numberOfJointsSpaceAllocated);
 
-         memset(bvhTransform->skipCalculationsForJoint, 0,sizeof(unsigned char) * bvhTransform->numberOfJointsSpaceAllocated);
-         memset(bvhTransform->joint,                    0,sizeof(struct BVH_TransformedJoint) * bvhTransform->numberOfJointsSpaceAllocated);
-         memset(bvhTransform->listOfJointIDsToTransform,0,sizeof(BVHJointID) * bvhTransform->numberOfJointsSpaceAllocated);
+         if (bvhTransform->skipCalculationsForJoint!=0) 
+              { memset(bvhTransform->skipCalculationsForJoint, 0,sizeof(unsigned char) * bvhTransform->numberOfJointsSpaceAllocated); }
+              
+         if (bvhTransform->joint!=0)
+              { memset(bvhTransform->joint,                    0,sizeof(struct BVH_TransformedJoint) * bvhTransform->numberOfJointsSpaceAllocated); }
+         
+         if (bvhTransform->listOfJointIDsToTransform!=0)
+              { memset(bvhTransform->listOfJointIDsToTransform,0,sizeof(BVHJointID) * bvhTransform->numberOfJointsSpaceAllocated); }
        }
 
     bvhTransform->transformStructInitialized = ( (bvhTransform->skipCalculationsForJoint!=0) && (bvhTransform->joint!=0) && (bvhTransform->listOfJointIDsToTransform!=0) );
@@ -749,18 +754,18 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
 
 int bvh_freeTransform(struct BVH_Transform * bvhTransform)
 {
-    #if DYNAMIC_TRANSFORM_ALLOCATIONS
     if(bvhTransform!=0)
     {
-     //fprintf(stderr,"bvh_freeTransform : ");
-     if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
-     if (bvhTransform->joint!=0)                     { free(bvhTransform->joint);                     bvhTransform->joint=0;                    }
-     if (bvhTransform->listOfJointIDsToTransform!=0) { free(bvhTransform->listOfJointIDsToTransform); bvhTransform->listOfJointIDsToTransform=0;}
-     
+     #if DYNAMIC_TRANSFORM_ALLOCATIONS
+      //fprintf(stderr,"bvh_freeTransform : ");
+      if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
+      if (bvhTransform->joint!=0)                     { free(bvhTransform->joint);                     bvhTransform->joint=0;                    }
+      if (bvhTransform->listOfJointIDsToTransform!=0) { free(bvhTransform->listOfJointIDsToTransform); bvhTransform->listOfJointIDsToTransform=0;}
+    #endif
+    
      bvhTransform->transformStructInitialized=0;
      //fprintf(stderr,"survived..\n"); 
     }
-    #endif
     return 1;
 }
 
@@ -873,7 +878,23 @@ int bvh_loadTransformForMotionBuffer(
   //This saves CPU time on the second part of this call as well as enables
   //economic subsequent calls on the IK code..
   bvhTransform->lengthOfListOfJointIDsToTransform=0;
-  
+   
+  //Guard against worst case scenarios..
+  #if DYNAMIC_TRANSFORM_ALLOCATIONS
+   if (bvhTransform->numberOfJointsSpaceAllocated<bvhMotion->jointHierarchySize)
+   {
+    fprintf(stderr,RED "Not enough space for joint IDs that need transform, aborting\n" NORMAL);
+    return 0;
+   }
+  #else
+   if (MAX_BVH_TRANSFORM_SIZE<bvhMotion->jointHierarchySize)
+   {
+    fprintf(stderr,RED "Not enough space for joint IDs that need transform, aborting\n" NORMAL);
+    return 0;
+   }
+  #endif
+   
+   
    for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))

@@ -316,9 +316,13 @@ int bvhMeasureIterationInfluence(
        fprintf(stdout,"\n\n"); 
       } //Test loop
         freeMotionBuffer(&previousSolution);
+        previousSolution = 0; // Double make sure that variable is clean
         freeMotionBuffer(&solution);
+        solution = 0;         // Double make sure that variable is clean
         freeMotionBuffer(&initialSolution);
+        initialSolution = 0;  // Double make sure that variable is clean
         freeMotionBuffer(&groundTruth);
+        groundTruth = 0;      // Double make sure that variable is clean
     } //Have correct data
           
     return result;
