@@ -278,14 +278,21 @@ float meanBVH3DDistance(
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
+    if (problem==0)                   { fprintf(stderr,"updateProblemSolutionToAllChains: No Problem\n");          return 0; }
     if (updatedSolution==0)           { fprintf(stderr,"updateProblemSolutionToAllChains: No updated solution\n"); return 0; }
     if (problem->currentSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No currentSolution\n");  return 0; }
     if (problem->initialSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No initialSolution\n");  return 0; }
     
     //Actual copy ------------------------------------------------------------------
     if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating currentSolution\n");  return 0; }
-    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating initialSolution\n"); return 0; }
-
+    if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating initialSolution\n");  return 0; }
+    
+    if (problem->numberOfChains >= MAXIMUM_CHAINS)
+    {
+      fprintf(stderr,"updateProblemSolutionToAllChains: Too many chains.. %u/%u \n",problem->numberOfChains,MAXIMUM_CHAINS);  
+      return 0; 
+    }
+    
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
         if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution))
@@ -326,12 +333,12 @@ int cleanProblem(struct ikProblem * problem)
 int viewProblem(struct ikProblem * problem)
 {
     fprintf(stderr,"\n\n\n\n");
-    fprintf(stderr,"The IK problem we want to solve has %u groups of subproblems\n",problem->numberOfGroups);
-    fprintf(stderr,"It is also ultimately divided into %u kinematic chains\n",problem->numberOfChains);
+    fprintf(stderr,"The IK problem " GREEN "\"%s\"" NORMAL " we want to solve \n",problem->problemDescription); //problem->numberOfGroups
+    fprintf(stderr,"is ultimately divided into %u kinematic chains\n",problem->numberOfChains);
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
-        fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
+        fprintf(stderr,GREEN "Chain %u has %u parts : " NORMAL,chainID,problem->chain[chainID].numberOfParts);
         for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
         {
             unsigned int jID=problem->chain[chainID].part[partID].jID;
@@ -533,11 +540,16 @@ float iteratePartLoss(
                       unsigned int verbose
                      )
 {
-    unsigned long startTime,endTime;
+    unsigned long startTime;
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
     
-     
+    if (problem->chain[chainID].part[partID].endEffector)
+        {
+          fprintf(stderr,RED "What are we doing iteratePartLoss of endEffector..\n" NORMAL);
+          return 0.0;
+        }
+    
     if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/10;     gradientExplosionThreshold=gradientExplosionThreshold*10; } else
     if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/1000;   gradientExplosionThreshold=gradientExplosionThreshold/15; }
     
@@ -986,7 +998,7 @@ if (iterationID==0)
     
 
     if (verbose)
-    {   endTime = GetTickCountMicrosecondsIK();
+    {   unsigned long endTime = GetTickCountMicrosecondsIK();
         fprintf(stderr,"Optimization for joint %s \n", jointName);
         fprintf(stderr,"Improved loss from %0.2f to %0.2f ( %0.2f%% ) in %lu microseconds \n",initialLoss,bestLoss, 100 - ( (float) 100* bestLoss/initialLoss ),endTime-startTime);
         fprintf(stderr,"Optimized values changed from %0.2f,%0.2f,%0.2f to %0.2f,%0.2f,%0.2f\n",originalValues[0],originalValues[1],originalValues[2],bestValues[0],bestValues[1],bestValues[2]);
@@ -1200,7 +1212,7 @@ int multiThreadedSolver(
                        )
 {
   //fprintf(stderr,"multiThreadedSolver called\n");
-  unsigned int numberOfFreshlySpawnThreads=0;  
+  //unsigned int numberOfFreshlySpawnThreads=0;  
   unsigned int numberOfWorkerThreads = 0;
   
   //Make sure all threads needed are created but only paying the cost of creating a thread once..!
@@ -1400,7 +1412,7 @@ void compareChainsAndAdoptBest(
                 
                      if (failedProjections==0)     
                      {
-                      unsigned int jID=problem->chain[chainID].part[partID].jID;
+                      jID=problem->chain[chainID].part[partID].jID;
                          
                       ///Warning: When you change this please change meanBVH2DDistance as well!
                       float cX=(float) bvhCheckIfItIsBetterTransform->joint[jID].pos2D[0];
@@ -1638,18 +1650,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
         return 0;
     }
-    /*
-    if  ( (previousSolution==0) || (previousSolution->motion==0) )
-    {
-        fprintf(stderr,RED "No previous solution provided for IK..\n" NORMAL);
-        return 0;
-    }
-    
-    if  ( (penultimateSolution==0) || (penultimateSolution->motion==0) )
-    {
-        fprintf(stderr,RED "No penultimate solution provided for IK..\n" NORMAL);
-        return 0;
-    }*/
 
     if (ikConfig==0)
     {
@@ -1682,7 +1682,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     
     
     //Make sure our problem has the correct details ..
-    problem->bvhTarget2DProjectionTransform =  bvhTargetTransform;  
+    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;  
       
 
     if (!updateProblemSolutionToAllChains(problem,solution))

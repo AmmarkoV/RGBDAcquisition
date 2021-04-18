@@ -22,6 +22,10 @@
 //This causes a double free.. :S ( double free or corruption (!prev) )
 #define DUALFOOT 0
 
+//Attempt to add a second thumb solution chain
+//This causes a double free.. :S ( double free or corruption (!prev) ) / free(): invalid next size (fast)
+#define DUALTHUMB 0
+
 int addNewPartToChainProblem(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
@@ -37,19 +41,19 @@ int addNewPartToChainProblem(
     unsigned int * partID,
     //-----------------------------------------
     char forceSpecificMIDs,
-    unsigned int mIDStart,
-    unsigned int mIDEnd 
+    BVHMotionChannelID mIDStart,
+    BVHMotionChannelID mIDEnd 
     )
 { 
     if (*chainID >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%d) \n" NORMAL,MAXIMUM_CHAINS);
       return 0;  
     }
     
     if (*partID >= MAXIMUM_PARTS_OF_CHAIN)
     {
-      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%d) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
       return 0;  
     }
     
@@ -65,8 +69,8 @@ int addNewPartToChainProblem(
 
     if (!bvh_allocateTransform(mc,&problem->chain[*chainID].current2DProjectionTransform))
     {
-      fprintf(stderr,RED "Could not allocate transforms needed for chain (%u/%u) \n" NORMAL,*chainID,MAXIMUM_PARTS_OF_CHAIN);
-        return 0;
+      fprintf(stderr,RED "Could not allocate transforms needed for chain (%u/%d) \n" NORMAL,*chainID,MAXIMUM_PARTS_OF_CHAIN);
+      return 0;
     }
 
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
@@ -91,9 +95,17 @@ int addNewPartToChainProblem(
         
         if (!forceSpecificMIDs)
         {
-         problem->chain[*chainID].part[*partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation encountered
-         problem->chain[*chainID].part[*partID].mIDEnd=problem->chain[*chainID].part[*partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1; 
-         unsigned int coordinatesToRegress = 1 + problem->chain[*chainID].part[*partID].mIDEnd - problem->chain[*chainID].part[*partID].mIDStart;
+         BVHMotionChannelID mIDAutoStart = mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation encountered
+         BVHMotionChannelID mIDAutoEnd = mIDAutoStart + mc->jointHierarchy[thisJID].loadedChannels-1; 
+         //-------------------------------------------------------------------------------------------------------------------------
+         if ( (mIDStart > problem->mc->numberOfValuesPerFrame) || (mIDEnd > problem->mc->numberOfValuesPerFrame) )
+             {
+                 fprintf(stderr,RED "Bug detected on joint %s (chain id %u / part id %u), coordinates out of mID limits..\n" NORMAL,partName,*chainID,*partID);
+                 return 0;
+             } 
+         problem->chain[*chainID].part[*partID].mIDStart=mIDAutoStart;
+         problem->chain[*chainID].part[*partID].mIDEnd=mIDAutoEnd;
+         unsigned int coordinatesToRegress = 1 + mIDAutoEnd - mIDAutoStart;
          
          if ( ( coordinatesToRegress != 3) && ( coordinatesToRegress != 0) )
          {
@@ -131,8 +143,8 @@ int addNewPartToChainProblem(
 
 
 int addLimitsToPartOfChain(
-                            struct ikProblem * problem,
-                            struct BVH_MotionCapture * mc,
+                           struct ikProblem * problem,
+                           struct BVH_MotionCapture * mc,
                            //-----------------------------------------
                            unsigned int chainID,
                            unsigned int partID,
@@ -147,13 +159,13 @@ int addLimitsToPartOfChain(
 { 
     if (chainID >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%d) \n" NORMAL,MAXIMUM_CHAINS);
       return 0;  
     }
     
     if (partID >= MAXIMUM_PARTS_OF_CHAIN)
     {
-      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%d) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
       return 0;  
     }
     
@@ -187,13 +199,13 @@ int addEstimatedMAEToPartOfChain(
 { 
     if (chainID >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,RED "Reached limit of maximum chains.. (%u) \n" NORMAL,MAXIMUM_CHAINS);
+      fprintf(stderr,RED "Reached limit of maximum chains.. (%d) \n" NORMAL,MAXIMUM_CHAINS);
       return 0;  
     }
     
     if (partID >= MAXIMUM_PARTS_OF_CHAIN)
     {
-      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%u) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
+      fprintf(stderr,RED "Reached limit of maximum parts of the chain.. (%d) \n" NORMAL,MAXIMUM_PARTS_OF_CHAIN);
       return 0;  
     }
     
@@ -241,7 +253,7 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
-    snprintf(problem->problemDescription,64,"Face");
+    snprintf(problem->problemDescription,MAXIMUM_PROBLEM_DESCRIPTION,"Face");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -254,7 +266,7 @@ int prepareDefaultFaceProblem(
     unsigned int jobID=0;
     unsigned int chainID=0;
     unsigned int partID=0;
-    BVHJointID thisJID=0;
+    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -813,7 +825,7 @@ int prepareDefaultFaceProblem(
     
 
     problem->numberOfChains = chainID;
-    problem->numberOfGroups = groupID;
+    //problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
 
      return 1;
@@ -853,7 +865,7 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
     
-    snprintf(problem->problemDescription,64,"Right Hand");
+    snprintf(problem->problemDescription,MAXIMUM_PROBLEM_DESCRIPTION,"Right Hand");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -866,7 +878,7 @@ int prepareDefaultRightHandProblem(
     unsigned int jobID=0;
     unsigned int chainID=0;
     unsigned int partID=0;
-    BVHJointID thisJID=0;
+    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -1593,6 +1605,70 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
 
+    
+    #if DUALTHUMB
+    //Thumb is complex so it has a minichain 
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "rthumbBase","__rthumb", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     //                                                    minX/maxX   minY/maxY    minZ/maxZ
+     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "rthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_finger1-3.r",0, // Joint
+                              3.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
+                             
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                     
+                             
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    #endif
+    
+
+
 
 
 
@@ -1605,8 +1681,7 @@ int prepareDefaultRightHandProblem(
      partID=0; // Reset counter..
      
      ++correct;
-     
-      checksum+=addNewPartToChainProblem(
+     checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "rthumbBase","__rthumb", // Joint
@@ -1642,7 +1717,7 @@ int prepareDefaultRightHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger1-2.r",0, // Joint
-                              0.0,     //Importance
+                              1.5,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -1674,7 +1749,7 @@ int prepareDefaultRightHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "endsite_finger1-3.r",0, // Joint
-                              3.0,     //Importance
+                              5.0,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -1690,7 +1765,7 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
 
     problem->numberOfChains = chainID;
-    problem->numberOfGroups = groupID;
+    //problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
     
   return 1;
@@ -1735,7 +1810,7 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
-    snprintf(problem->problemDescription,64,"Left Hand");
+    snprintf(problem->problemDescription,MAXIMUM_PROBLEM_DESCRIPTION,"Left Hand");
 
 
     //Chain #0 is Joint Right Hand-> to all its children
@@ -1748,7 +1823,7 @@ int prepareDefaultLeftHandProblem(
     unsigned int jobID=0;
     unsigned int chainID=0;
     unsigned int partID=0;
-    BVHJointID thisJID=0;
+    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -2463,6 +2538,75 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
 
 
+
+
+    #if DUALTHUMB
+    //Thumb is complex so it has a minichain 
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+     checksum=0;
+     correct=0;
+     partID=0; // Reset counter..
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "lthumbBase","__lthumb", // Joint
+                              1.0,     //Importance
+                              0,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+     problem->chain[chainID].part[partID-1].bigChanges=1;
+     //                                                    minX/maxX   minY/maxY    minZ/maxZ
+     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
+     
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "lthumb",0, // Joint
+                              1.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
+    
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                              problem,mc, 
+                              //-----------------------------------------
+                              "endsite_finger1-3.l",0, // Joint
+                              3.0,     //Importance
+                              1,       //IsEndEffector
+                              &groupID,&jobID,&chainID,&partID,
+                              //-----------------------------------------
+                              0,0,0 //Automatic mID Start/End assignment
+                             );
+                             
+                             
+    if (correct!=checksum) 
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }                     
+                             
+    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel  
+     ++chainID;
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    //----------------------------------------------------------
+    #endif
+    
+
+
+
+
+
     //Chain 5 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -2488,7 +2632,6 @@ int prepareDefaultLeftHandProblem(
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   13.0,     20.0,     20.0 );
      //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
-     
      
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2560,7 +2703,7 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
 
     problem->numberOfChains = chainID;
-    problem->numberOfGroups = groupID;
+    //problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
     
   return 1;
@@ -2608,7 +2751,7 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
-    snprintf(problem->problemDescription,64,"Body");
+    snprintf(problem->problemDescription,MAXIMUM_PROBLEM_DESCRIPTION,"Body");
 
 
     //Chain #0 is Joint Hip-> to all its children
@@ -2621,7 +2764,7 @@ int prepareDefaultBodyProblem(
     unsigned int jobID=0;
     unsigned int chainID=0;
     unsigned int partID=0;
-    BVHJointID thisJID=0;
+    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -3517,7 +3660,7 @@ int prepareDefaultBodyProblem(
     ++groupID;
 
     problem->numberOfChains = chainID;
-    problem->numberOfGroups = groupID;
+    //problem->numberOfGroups = groupID;
     problem->numberOfJobs = jobID;
     
     fprintf(stderr,"Body Problem : \n");

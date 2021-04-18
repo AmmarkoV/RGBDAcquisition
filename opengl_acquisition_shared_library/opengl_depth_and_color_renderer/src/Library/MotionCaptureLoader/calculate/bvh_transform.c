@@ -11,6 +11,16 @@
 #define FAST_OFFSET_TRANSLATION 1
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+  
  
 
 float max(float a,float b)
@@ -740,11 +750,16 @@ int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transf
 int bvh_freeTransform(struct BVH_Transform * bvhTransform)
 {
     #if DYNAMIC_TRANSFORM_ALLOCATIONS
+    if(bvhTransform!=0)
+    {
+     //fprintf(stderr,"bvh_freeTransform : ");
      if (bvhTransform->skipCalculationsForJoint!=0)  { free(bvhTransform->skipCalculationsForJoint);  bvhTransform->skipCalculationsForJoint=0; }
      if (bvhTransform->joint!=0)                     { free(bvhTransform->joint);                     bvhTransform->joint=0;                    }
      if (bvhTransform->listOfJointIDsToTransform!=0) { free(bvhTransform->listOfJointIDsToTransform); bvhTransform->listOfJointIDsToTransform=0;}
      
      bvhTransform->transformStructInitialized=0;
+     //fprintf(stderr,"survived..\n"); 
+    }
     #endif
     return 1;
 }
@@ -842,7 +857,7 @@ int bvh_loadTransformForMotionBuffer(
    //Make sure enough memory is allocated.. 
    if (!bvh_allocateTransform(bvhMotion,bvhTransform))
     {
-      fprintf(stderr,"Failed allocating memory for bvh trasnform :(\n");
+      fprintf(stderr,RED "Failed allocating memory for bvh transform :(\n" NORMAL);
       return 0;
     }  
     

@@ -1,7 +1,7 @@
 #ifndef BVH_INVERSEKINEMATICS_H_INCLUDED
 #define BVH_INVERSEKINEMATICS_H_INCLUDED
 
-
+#include <string.h>
 #include "../bvh_loader.h"
 #include "../export/bvh_export.h"
 
@@ -12,10 +12,11 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.35
+#define IK_VERSION 0.37
 
 #define MAXIMUM_CHAINS 16
 #define MAXIMUM_PARTS_OF_CHAIN 16
+#define MAXIMUM_PROBLEM_DESCRIPTION 64
 
 enum bvhIKSolutionStatus
 {
@@ -76,7 +77,7 @@ struct ikChain
   unsigned int groupID;  
   // -------------------------------------------------------------------------- 
   unsigned int numberOfParts;
-  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
+  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN+1];
   struct MotionBuffer * currentSolution;
   struct BVH_Transform current2DProjectionTransform;
 };
@@ -116,7 +117,7 @@ static void printIkConfiguration(struct ikConfiguration * ikConfig)
    fprintf(stderr,"gradientExplosionThreshold = %f \n",ikConfig->gradientExplosionThreshold);
    fprintf(stderr,"dumpScreenshots = %u \n",ikConfig->dumpScreenshots);
    fprintf(stderr,"verbose = %u \n",ikConfig->verbose);
-   fprintf(stderr,"dontUseSolutionHistory = %u \n",ikConfig->dontUseSolutionHistory);
+   fprintf(stderr,"dontUseSolutionHistory = %u \n",(unsigned int) ikConfig->dontUseSolutionHistory);
    fprintf(stderr,"ikVersion = %f ( bin %f ) \n",ikConfig->ikVersion,IK_VERSION);
   } 
   fprintf(stderr,"------------------------\n");
@@ -150,25 +151,35 @@ struct ikProblem
 
  //Chain of subproblems that need to be solved
  unsigned int numberOfChains;
- unsigned int numberOfGroups;
+ //unsigned int numberOfGroups; groups not needed since multiple problems are used, one for each "group"
  unsigned int numberOfJobs;
 
- struct ikChain chain[MAXIMUM_CHAINS];
+ struct ikChain chain[MAXIMUM_CHAINS+1];
 
  //Thread storage..
  //----------------------------------------
  struct workerPool threadPool;
  //----------------------------------------
- struct passIKContextToThread workerContext[MAXIMUM_CHAINS];
+ struct passIKContextToThread workerContext[MAXIMUM_CHAINS+1];
 
  //----------------------------------------
- char problemDescription[64];   
+ char problemDescription[MAXIMUM_PROBLEM_DESCRIPTION+1];   
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 
+static struct ikProblem * allocateEmptyIKProblem()
+{
+    struct ikProblem * emptyProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+     if (emptyProblem!=0) 
+         { 
+            memset(emptyProblem,0,sizeof(struct ikProblem)); 
+         } else
+         { fprintf(stderr,"Failed to allocate memory for our IK Problem..\n"); }
+     return emptyProblem;
+}
 
 
 int cleanProblem(struct ikProblem * problem);
