@@ -163,11 +163,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
            img=0;
          }
         #if DEBUG_READING_IMAGES
-	     char ppmfilename[512]={0};
-	     strcpy(ppmfilename,filename);
-	     strcat(ppmfilename,".ppm");
-	     WritePPM(ppmfilename,img);
-	    #endif
+         char ppmfilename[513]={0};
+         snprintf(ppmfilename,512,"%s.ppm",filename);
+         //strcpy(ppmfilename,filename);
+         //strcat(ppmfilename,".ppm");
+         WritePPM(ppmfilename,img);
+        #endif
      #else
        fprintf(stderr,RED "JPG File requested (%s) , but this build of Codec Library does not have JPG Support :(" NORMAL , filename);
      #endif
@@ -183,11 +184,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
            img=0;
          }
         #if DEBUG_READING_IMAGES
-	     char ppmfilename[512]={0};
-	     strcpy(ppmfilename,filename);
-	     strcat(ppmfilename,".ppm");
-	     WritePPM(ppmfilename,img);
-	    #endif
+         char ppmfilename[513]={0};
+         snprintf(ppmfilename,512,"%s.ppm",filename);
+         //strcpy(ppmfilename,filename);
+         //strcat(ppmfilename,".ppm");
+         WritePPM(ppmfilename,img);
+       #endif
      #else
        fprintf(stderr,RED "PFM File requested (%s) , but this build of Codec Library does not have PFM Support :(" NORMAL , filename);
      #endif
@@ -203,11 +205,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
            img=0;
          }
         #if DEBUG_READING_IMAGES
-	     char ppmfilename[512]={0};
-	     strcpy(ppmfilename,filename);
-	     strcat(ppmfilename,".ppm");
-	     WritePPM(ppmfilename,img);
-	    #endif
+         char ppmfilename[513]={0};
+         snprintf(ppmfilename,512,"%s.ppm",filename);
+         //strcpy(ppmfilename,filename);
+         //strcat(ppmfilename,".ppm");
+         WritePPM(ppmfilename,img);
+        #endif
      #else
        fprintf(stderr,RED "PNG File requested (%s) , but this build of Codec Library does not have PNG Support :(" NORMAL , filename);
      #endif
@@ -391,11 +394,12 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
       case PNG_CODEC :
        if (!WritePNG(filename,pic)) { free(pic); pic=0; }
         #if DEBUG_READING_IMAGES
-	     char ppmfilename[512]={0};
-	     strcpy(ppmfilename,filename);
-	     strcat(ppmfilename,".png");
-	     WritePNG(ppmfilename,pic);
-	    #endif
+         char ppmfilename[513]={0}; 
+         snprintf(ppmfilename,512,"%s.png",filename);
+         //strcpy(ppmfilename,filename);
+         //strcat(ppmfilename,".png");
+         WritePNG(ppmfilename,pic);
+        #endif
       break;
      #else
       case PNG_CODEC :

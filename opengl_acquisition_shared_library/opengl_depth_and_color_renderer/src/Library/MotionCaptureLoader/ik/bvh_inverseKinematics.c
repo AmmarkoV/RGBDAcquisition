@@ -1398,6 +1398,7 @@ void compareChainsAndAdoptBest(
                                //---------------------------------
                               )
 {
+    //DEBUG THIS..!
  //fprintf(stderr,"compareChainsAndAdoptBest started ");
  if ( (currentSolution!=0) && (currentSolution->motion!=0) && (checkIfItIsBetterSolution!=0) && (checkIfItIsBetterSolution->motion!=0) )
  {
@@ -1438,13 +1439,13 @@ void compareChainsAndAdoptBest(
                         if ((sX!=0.0) || (sY!=0.0))
                         { 
                           //Our current solution
-                          currentSolutionChainLoss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                          currentSolutionChainLoss += getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
 
                         if ((cX!=0.0) || (cY!=0.0))
                         { 
                           //The solution we want to check if is better
-                          previousSolutionChainLoss+= getSquared2DPointDistance(cX,cY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                          previousSolutionChainLoss += getSquared2DPointDistance(cX,cY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
                       }
                      }
@@ -1459,15 +1460,33 @@ void compareChainsAndAdoptBest(
                         
                         for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                         {
+                         //Only perform this on non end-effector parts of chains 
+                         if (!problem->chain[chainID].part[partID].endEffector)
+                         {
+                         //----------------------------------------------------------------------------------
                          unsigned int mIDS[3] = {
                                                  problem->chain[chainID].part[partID].mIDStart,
                                                  problem->chain[chainID].part[partID].mIDStart+1,
                                                  problem->chain[chainID].part[partID].mIDStart+2
                                                 };
-
-                         currentSolution->motion[mIDS[0]]=checkIfItIsBetterSolution->motion[mIDS[0]];
-                         currentSolution->motion[mIDS[1]]=checkIfItIsBetterSolution->motion[mIDS[1]];
-                         currentSolution->motion[mIDS[2]]=checkIfItIsBetterSolution->motion[mIDS[2]];
+                         //----------------------------------------------------------------------------------
+                         if ( 
+                              (mIDS[0]<currentSolution->bufferSize) && 
+                              (mIDS[1]<currentSolution->bufferSize) && 
+                              (mIDS[2]<currentSolution->bufferSize) 
+                           )
+                              {
+                                currentSolution->motion[mIDS[0]]=checkIfItIsBetterSolution->motion[mIDS[0]];
+                                currentSolution->motion[mIDS[1]]=checkIfItIsBetterSolution->motion[mIDS[1]];
+                                currentSolution->motion[mIDS[2]]=checkIfItIsBetterSolution->motion[mIDS[2]];
+                              } else
+                              {
+                                viewProblem(problem);
+                                fprintf(stderr,RED "BUG: compareChainsAndAdoptBest: Incorrect chain mIDS for chain %u part %u\n" NORMAL,chainID,partID);
+                                fprintf(stderr,RED "mIDS[0]=%u mIDS[1]=%u mIDS[2]=%u\n" NORMAL,mIDS[0],mIDS[1],mIDS[2]);
+                              } 
+                         //---------------------------------------------------------------------------------- 
+                         }
                         }
                     }
                 }

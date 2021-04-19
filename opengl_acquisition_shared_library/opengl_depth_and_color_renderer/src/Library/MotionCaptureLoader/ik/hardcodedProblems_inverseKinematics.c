@@ -19,11 +19,9 @@
 #define WHITE   "\033[37m"      /* White */
 
 //Attempt to add a second foot solution chain
-//This causes a double free.. :S ( double free or corruption (!prev) )
-#define DUALFOOT 0
+#define DUALFOOT 1
 
 //Attempt to add a second thumb solution chain
-//This causes a double free.. :S ( double free or corruption (!prev) ) / free(): invalid next size (fast)
 #define DUALTHUMB 1
 
 int addNewPartToChainProblem(
@@ -93,6 +91,13 @@ int addNewPartToChainProblem(
         problem->chain[*chainID].part[*partID].jointImportance=importance;
         problem->chain[*chainID].part[*partID].endEffector=isEndEffector;
         
+        if (isEndEffector)
+        {
+            //End Effectors do not have/need motion channels..
+            problem->chain[*chainID].part[*partID].mIDStart=0; 
+            problem->chain[*chainID].part[*partID].mIDEnd=0; 
+        } 
+         else
         if (!forceSpecificMIDs)
         {
          BVHMotionChannelID mIDAutoStart = mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation encountered
@@ -102,7 +107,7 @@ int addNewPartToChainProblem(
              {
                  fprintf(stderr,RED "Bug detected on joint %s (chain id %u / part id %u), coordinates out of mID limits..\n" NORMAL,partName,*chainID,*partID);
                  return 0;
-             } 
+             }
          problem->chain[*chainID].part[*partID].mIDStart=mIDAutoStart;
          problem->chain[*chainID].part[*partID].mIDEnd=mIDAutoEnd;
          unsigned int coordinatesToRegress = 1 + mIDAutoEnd - mIDAutoStart;
