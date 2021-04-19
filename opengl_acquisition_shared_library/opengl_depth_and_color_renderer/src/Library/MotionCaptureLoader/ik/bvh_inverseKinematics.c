@@ -1398,7 +1398,6 @@ void compareChainsAndAdoptBest(
                                //---------------------------------
                               )
 {
-    //DEBUG THIS..!
  //fprintf(stderr,"compareChainsAndAdoptBest started ");
  if ( (currentSolution!=0) && (currentSolution->motion!=0) && (checkIfItIsBetterSolution!=0) && (checkIfItIsBetterSolution->motion!=0) )
  {
