@@ -98,7 +98,9 @@ int drawObjectAT(GLuint programID,
        //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
 
+       struct Matrix4x4OfFloats modelMatrix={0};
        double modelMatrixD[16];
+       /*
        create4x4DModelTransformation(
                                     modelMatrixD,
                                     //Rotation Component
@@ -115,7 +117,28 @@ int drawObjectAT(GLuint programID,
                                     10.0,//scaleX,
                                     10.0,//scaleY,
                                     10.0//scaleZ
-                                   );
+                                   );*/
+
+
+         create4x4FModelTransformation(
+                                        &modelMatrix,
+                                        //Rotation Component
+                                        roll,//roll
+                                        pitch ,//pitch
+                                        yaw ,//yaw
+                                        ROTATION_ORDER_RPY,
+
+                                        //Translation Component (XYZ)
+                                        (double) x/100,
+                                        (double) y/100,
+                                        (double) z/100,
+
+                                        10.0,//scaleX,
+                                        10.0,//scaleY,
+                                        10.0//scaleZ
+                                      );
+          copy4x4FMatrixTo4x4D(modelMatrixD,modelMatrix.m);
+
 
       //-------------------------------------------------------------------
        double MVPD[16];
