@@ -502,8 +502,8 @@ int bvh_RandomizePositionsBasedOn3D(
  if (mc!=0)
  {
   fprintf(stderr,"Randomizing Positions of %u frames based on 3D coordinates\n",mc->numberOfFrames);
-  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
-  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f) ",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)\n",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
   
   if (mc->jointHierarchy[mc->rootJointID].hasPositionalChannels)
   {

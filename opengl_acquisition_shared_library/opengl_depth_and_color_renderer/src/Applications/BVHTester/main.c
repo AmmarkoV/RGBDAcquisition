@@ -657,12 +657,12 @@ int main(int argc,const char **argv)
           float endOfRandomization=atof(argv[i+3]);
           //------------------------------------------
            if (
-               bvh_RandomizeSingleMIDInRange(
-                                             &bvhMotion,
-                                             mID,
-                                             startOfRandomization,
-                                             endOfRandomization
-                                            )
+                !bvh_RandomizeSingleMIDInRange(
+                                               &bvhMotion,
+                                               mID,
+                                               startOfRandomization,
+                                               endOfRandomization
+                                              )
               )  { haltOnError(immediatelyHaltOnError,"Error while randomizing a single mID angle"); }
         } else
         //-----------------------------------------------------
