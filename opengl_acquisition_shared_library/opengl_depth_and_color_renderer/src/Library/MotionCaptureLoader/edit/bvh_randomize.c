@@ -50,6 +50,12 @@ int bvh_RandomizeBasedOnIKProblem(
                                   const char * ikProblemName
                                  )
 { 
+   if (ikProblemName==0) 
+       { 
+          fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot work without the name of the IK problem\n");
+          return 0; 
+       }
+       
    int success=0;
    struct ikProblem tP={0};
    
@@ -92,13 +98,13 @@ int bvh_RandomizeBasedOnIKProblem(
   //-----------------------------------------------------------------------------------------------
   float * minimumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
   float * maximumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
-  char * hasRandomization  = (char *) malloc(sizeof(char) * mc->numberOfValuesPerFrame);
+  char * hasRandomization           = (char *)  malloc(sizeof(char)  * mc->numberOfValuesPerFrame);
   
   if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) && (hasRandomization!=0) )
-  {
-   memset(minimumRandomizationLimit,sizeof(float) * mc->numberOfValuesPerFrame,0);
-   memset(maximumRandomizationLimit,sizeof(float) * mc->numberOfValuesPerFrame,0);
-   memset(hasRandomization,sizeof(char) * mc->numberOfValuesPerFrame,0);
+  { 
+   memset(minimumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
+   memset(maximumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
+   memset(hasRandomization,         0,sizeof(char)  * mc->numberOfValuesPerFrame);
    
    
    unsigned int mIDOffset;
