@@ -49,7 +49,13 @@ int bvh_RandomizeBasedOnIKProblem(
                                   struct BVH_MotionCapture * mc,
                                   const char * ikProblemName
                                  )
-{ 
+{
+   fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: starting..\n");
+   if (mc==0) 
+       { 
+          fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot work without a motion capture file\n");
+          return 0; 
+       }
    if (ikProblemName==0) 
        { 
           fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot work without the name of the IK problem\n");
@@ -57,13 +63,22 @@ int bvh_RandomizeBasedOnIKProblem(
        }
        
    int success=0;
-   struct ikProblem tP={0};
+   
+   //struct ikProblem tP={0};
+   struct ikProblem * tP = allocateEmptyIKProblem();
+   if (tP==0)
+   {
+       fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot allocateEmptyIKProblem\n");
+       return 0;
+   }
+   
    
    fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",ikProblemName);
    if (strcmp(ikProblemName,"lhand")==0)
    {
-          prepareDefaultLeftHandProblem(
-                                         &tP,
+          fprintf(stderr,"Trying to initalize LHand.. ");
+          success=prepareDefaultLeftHandProblem(
+                                         tP,
                                          mc,
                                          0,//struct simpleRenderer *renderer,
                                          0,//struct MotionBuffer * previousSolution,
@@ -71,13 +86,13 @@ int bvh_RandomizeBasedOnIKProblem(
                                          0,//struct BVH_Transform * bvhTargetTransform,
                                          1//standalone
                                         );
-          fprintf(stderr,"Initialized LHand..!");
-          success=1;
+          fprintf(stderr," result = %d !\n",success);
    }  else
    if (strcmp(ikProblemName,"rhand")==0)
    {
-          prepareDefaultRightHandProblem(
-                                         &tP,
+          fprintf(stderr,"Trying to initalize RHand.. ");
+          success=prepareDefaultRightHandProblem(
+                                         tP,
                                          mc,
                                          0,//struct simpleRenderer *renderer,
                                          0,//struct MotionBuffer * previousSolution,
@@ -85,11 +100,12 @@ int bvh_RandomizeBasedOnIKProblem(
                                          0,//struct BVH_Transform * bvhTargetTransform,
                                          1//standalone
                                         );
-          fprintf(stderr,"Initialized RHand..!"); 
-          success=1;
+          fprintf(stderr," result = %d !\n",success); 
    } else
    {
        fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: Could not identify %s ik problem!\n",ikProblemName);
+       
+       free(tP);
        return 0;
    }
  
@@ -101,38 +117,38 @@ int bvh_RandomizeBasedOnIKProblem(
   char * hasRandomization           = (char *)  malloc(sizeof(char)  * mc->numberOfValuesPerFrame);
   
   if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) && (hasRandomization!=0) )
-  { 
+  {
    memset(minimumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
    memset(maximumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
    memset(hasRandomization,         0,sizeof(char)  * mc->numberOfValuesPerFrame);
    
    
-   unsigned int mIDOffset;
+   //unsigned int mIDOffset;
    float minimumLimit;
    float maximumLimit;
    unsigned int channelID;
    
    //First retrieve the minimum maximum limits from problem chains..!
-   for (unsigned int chainID=0; chainID<tP.numberOfChains; chainID++)
+   for (unsigned int chainID=0; chainID<tP->numberOfChains; chainID++)
     {
-      for (unsigned int partID=0; partID<tP.chain[chainID].numberOfParts; partID++)
+      for (unsigned int partID=0; partID<tP->chain[chainID].numberOfParts; partID++)
        { 
-           if (tP.chain[chainID].part[partID].limits)
+           if (tP->chain[chainID].part[partID].limits)
            {
-             unsigned int jID = tP.chain[chainID].part[partID].jID; 
+             unsigned int jID = tP->chain[chainID].part[partID].jID; 
              fprintf(stderr,"Limits declared for => ChainID(%u) / PartID(%u) [jID=%u|%s]\n",chainID,partID,jID,mc->jointHierarchy[jID].jointName);
              
              const char * jName = mc->jointHierarchy[jID].jointName;
              
-             unsigned int mIDOffset = tP.chain[chainID].part[partID].mIDStart;
+             unsigned int mIDOffset = tP->chain[chainID].part[partID].mIDStart;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
-              minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
-              maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
+              minimumLimit = tP->chain[chainID].part[partID].minimumLimitMID[0];
+              maximumLimit = tP->chain[chainID].part[partID].maximumLimitMID[0];
               if (minimumLimit>maximumLimit)
                {
-                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[0];
-                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[0];
+                 maximumLimit = tP->chain[chainID].part[partID].minimumLimitMID[0];
+                 minimumLimit = tP->chain[chainID].part[partID].maximumLimitMID[0];
                }
               channelID = mc->motionToJointLookup[mIDOffset].channelID;
               minimumRandomizationLimit[mIDOffset]=minimumLimit;
@@ -141,15 +157,15 @@ int bvh_RandomizeBasedOnIKProblem(
               fprintf(stderr,"Channel #0(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
              
-             mIDOffset = tP.chain[chainID].part[partID].mIDStart+1;
+             mIDOffset = tP->chain[chainID].part[partID].mIDStart+1;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
-              minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
-              maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
+              minimumLimit = tP->chain[chainID].part[partID].minimumLimitMID[1];
+              maximumLimit = tP->chain[chainID].part[partID].maximumLimitMID[1];
               if (minimumLimit>maximumLimit)
                {
-                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[1];
-                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[1];
+                 maximumLimit = tP->chain[chainID].part[partID].minimumLimitMID[1];
+                 minimumLimit = tP->chain[chainID].part[partID].maximumLimitMID[1];
                }
               channelID = mc->motionToJointLookup[mIDOffset].channelID;
               minimumRandomizationLimit[mIDOffset]=minimumLimit;
@@ -158,15 +174,15 @@ int bvh_RandomizeBasedOnIKProblem(
               fprintf(stderr,"Channel #1(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
              
-             mIDOffset = tP.chain[chainID].part[partID].mIDEnd;
+             mIDOffset = tP->chain[chainID].part[partID].mIDEnd;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
-               minimumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
-               maximumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+               minimumLimit = tP->chain[chainID].part[partID].minimumLimitMID[2];
+               maximumLimit = tP->chain[chainID].part[partID].maximumLimitMID[2];
                if (minimumLimit>maximumLimit)
                {
-                 maximumLimit = tP.chain[chainID].part[partID].minimumLimitMID[2];
-                 minimumLimit = tP.chain[chainID].part[partID].maximumLimitMID[2];
+                 maximumLimit = tP->chain[chainID].part[partID].minimumLimitMID[2];
+                 minimumLimit = tP->chain[chainID].part[partID].maximumLimitMID[2];
                }
                channelID = mc->motionToJointLookup[mIDOffset].channelID;
                minimumRandomizationLimit[mIDOffset]=minimumLimit;
@@ -203,7 +219,9 @@ int bvh_RandomizeBasedOnIKProblem(
   if (minimumRandomizationLimit!=0) { free(minimumRandomizationLimit); }
   if (maximumRandomizationLimit!=0) { free(maximumRandomizationLimit); }
   if (hasRandomization!=0)          { free(hasRandomization);          }
-   return success;
+  
+  free(tP);
+  return success;
 }
 
 

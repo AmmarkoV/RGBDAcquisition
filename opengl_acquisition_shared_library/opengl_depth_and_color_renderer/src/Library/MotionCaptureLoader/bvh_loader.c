@@ -520,19 +520,29 @@ int bvh_getJointIDFromJointNameNocase(
        fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
        return 0;
      }
-
-   char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
-   snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
-   lowercase(jointNameLowercase);
-
-  unsigned int i=0;
-   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   
+   unsigned int jointNameLength = strlen(jointName);
+   
+   //Moved to heap @ 2021/04/21 trying to debug a stack overflow.. :P
+   //char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
+   char * jointNameLowercase = (char *) malloc(sizeof(char) * (jointNameLength+1)); //extra space for the null termination..
+   
+   if (jointNameLowercase!=0)
    {
-     if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
-     {
+     snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
+     lowercase(jointNameLowercase);
+
+     unsigned int i=0;
+     for (i=0; i<bvhMotion->jointHierarchySize; i++)
+      {
+        if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
+        {
          *jID=i;
+         free(jointNameLowercase);
          return 1;
-     }
+        }
+       } 
+    free(jointNameLowercase);
    }
  }
  return 0;
@@ -1226,11 +1236,14 @@ int bvh_selectJointsToHide2D(
               //bvh_getJointIDFromJointName(mc,argv[i],&jID)
            )
          {
-           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
-           mc->hideSelectedJoints[jID]=1;
-           fprintf(stderr,"%u ",jID);
+           if (jID<mc->jointHierarchySize)
+           {
+            //------------------------------------------------- 
+            fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+            mc->hideSelectedJoints[jID]=1;
+            fprintf(stderr,"%u ",jID);
 
-           if(includeEndSites)
+            if(includeEndSites)
                    {
                      if(mc->selectionIncludesEndSites)
                           {
@@ -1247,8 +1260,12 @@ int bvh_selectJointsToHide2D(
                                   mc->hideSelectedJoints[jID]=2;
                                 }
                    }
-           //-------------------------------------------------
-
+            //------------------------------------------------- 
+           } else
+         {
+           fprintf(stderr,RED "Joint retreived is erroneous.. " NORMAL);
+           success=0;
+         }
          } else
          {
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);

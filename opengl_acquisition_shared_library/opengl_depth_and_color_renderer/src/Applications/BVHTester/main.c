@@ -160,6 +160,16 @@ int testMultipleLoad(const char * filename)
 }
 
 
+void printCallingParameters(int argc,const char **argv)
+{
+  fprintf(stderr,"Utility was called using following parameters :\n");
+  unsigned int z=0;
+  for (z=0; z<argc; z++)
+            {
+              fprintf(stderr," %s",argv[z]);
+            }
+  fprintf(stderr,"\n");
+}
 
 
 
@@ -213,13 +223,7 @@ int main(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--printparams")==0)
         {
-           fprintf(stderr,"Utility was called using following parameters :\n");
-           unsigned int z=0;
-           for (z=0; z<argc; z++)
-            {
-              fprintf(stderr," %s",argv[z]);
-            }
-           fprintf(stderr,"\n");
+           printCallingParameters(argc,argv);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--debug")==0)
@@ -694,7 +698,7 @@ int main(int argc,const char **argv)
           // ./BVHTester --from dataset/lhand.qbvh --repeat 100 --randomizeBasedOnIKConstrains lhand --bvh restR.bvh
           if (i+1>=argc)  { incorrectArguments(); }
           const char * nameOfIKProblem=argv[i+1];
-           
+          fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",nameOfIKProblem);
           srand(time(NULL)); 
               if (
                    !bvh_RandomizeBasedOnIKProblem(
@@ -995,6 +999,17 @@ int main(int argc,const char **argv)
           if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
           convertToSVG=1;
         }
+        //-----------------------------------------------------
+        /* else 
+        //Check for incorrect input, this needs to become a smarter check
+        {
+             if ((i>0) && (argv[i][0]!="-"))
+             {
+              fprintf(stderr,RED "Unidentified argument %u = %s ..!" NORMAL,i,argv[i]);
+              incorrectArguments();
+              printCallingParameters(argc,argv); 
+             }
+        }*/
     }
 
     //SVG or CSV output ..
