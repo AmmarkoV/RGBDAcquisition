@@ -439,6 +439,8 @@ float calculateChainLoss(
            #endif 
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
+                   if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
+                   {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
                          
                         ///Warning: When you change this please change meanBVH2DDistance as well!
@@ -456,9 +458,8 @@ float calculateChainLoss(
                          else
                         {
                            fprintf(stderr,RED "Joint %u failed to be projected (source=%u,target=%u)\n"NORMAL,jID,((sX!=0.0) || (sY!=0.0)),((tX!=0.0) || (tY!=0.0)));
-                        }*/
-                        
-                        
+                        }*/ 
+                   } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
                 } //We add ever part of this chain
             } else  // We successfully projected the BVH file to 2D points..
            { fprintf(stderr,RED "Could not calculate transform projections to 2D for chain %u \n"NORMAL,chainID); }

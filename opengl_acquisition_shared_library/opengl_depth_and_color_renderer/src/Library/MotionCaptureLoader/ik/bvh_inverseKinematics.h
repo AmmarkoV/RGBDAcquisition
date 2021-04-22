@@ -42,12 +42,13 @@ struct ikChainParts
  float maximumLimitMID[4];
  float mAE[4];
  //--------------
- char limits;
- char maeDeclared;
- char evaluated;
- char smallChanges;
- char bigChanges;
- char endEffector;
+ unsigned char limits;
+ unsigned char maeDeclared;
+ unsigned char evaluated;
+ unsigned char smallChanges;
+ unsigned char bigChanges;
+ unsigned char endEffector;
+ unsigned char ignoreJointOwnError;
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -62,7 +63,7 @@ struct ikChain
   unsigned char status; // enum bvhIKSolutionStatus
   unsigned char permissionToStart;  
   unsigned char terminate;  
-  unsigned char threadIsSpawned;  
+  unsigned char threadIsSpawned;
   // -------------------------------------------------------------------------- 
   float initialError;
   float previousError;
