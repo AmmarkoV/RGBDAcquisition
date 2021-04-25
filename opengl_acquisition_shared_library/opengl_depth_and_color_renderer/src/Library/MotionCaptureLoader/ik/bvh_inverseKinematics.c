@@ -1343,7 +1343,7 @@ int ensureInitialPositionIsInFrustrum(
    if (previousSolution==0) { return 0; } 
    if (previousSolution->motion==0) { return 0; } 
     
-   float closestDistanceToCameraInCM=15; //30 cm 
+   float closestDistanceToCameraInCM=13; //30 cm 
     
    //TODO : 
    //Ensure that  pose is not out of the bounds of camera ?
@@ -1369,8 +1369,8 @@ int ensureInitialPositionIsInFrustrum(
 
         if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
         {
-                 fprintf(stderr,RED "Warning: Didn't manage to solve problem, brute forcing it ! ..\n" NORMAL);
-                 solution->motion[2]=-140;
+                 solution->motion[2]=-130;
+                 fprintf(stderr,RED "Warning: ensureInitialPositionIsInFrustrum will push solution back to %f ..\n" NORMAL,solution->motion[2]);
         }
     }
      
