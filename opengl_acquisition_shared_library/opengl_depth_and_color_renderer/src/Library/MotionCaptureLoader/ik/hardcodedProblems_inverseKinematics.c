@@ -1830,7 +1830,16 @@ int prepareDefaultLeftHandProblem(
     unsigned int partID=0;
     //BVHJointID thisJID=0;
     //----------------------------------------------------------
-
+ 
+ 
+     
+     //IK Tuning settings
+    //----------------------------------------------------------
+     float BASE_ENDPOINT_IMPORTANCE     = 0.2;
+     float CLOSEST_ENDPOINT_IMPORTANCE  = 1.0;
+     float MEDIAN_ENDPOINT_IMPORTANCE   = 2.0;
+     float FURTHEST_ENDPOINT_IMPORTANCE = 3.0;
+    //----------------------------------------------------------
 
     
      if (standalone==0)
@@ -2007,7 +2016,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
-                               2.0,     //Importance
+                               1.0,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
@@ -2026,7 +2035,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
-                               1.0,     //Importance
+                               0.1,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
@@ -2056,7 +2065,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "lhand",0,    // Joint
-                               1.0,     //Importance
+                               0.1,     //Importance
                                0,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
@@ -2150,7 +2159,6 @@ int prepareDefaultLeftHandProblem(
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
-   
     }
 
 
@@ -2240,7 +2248,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger2-1.l",0, // Joint
-                              1.0,     //Importance
+                              0.1,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2255,9 +2263,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "finger2-2.l",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              "finger2-2.l",0,             //Joint
+                              CLOSEST_ENDPOINT_IMPORTANCE, //Importance
+                              0,                           //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2271,9 +2279,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "finger2-3.l",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              "finger2-3.l",0,            //Joint
+                              MEDIAN_ENDPOINT_IMPORTANCE, //Importance
+                              0,                          //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2287,9 +2295,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "endsite_finger2-3.l",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
+                              "endsite_finger2-3.l",0,      // Joint
+                              FURTHEST_ENDPOINT_IMPORTANCE, //Importance
+                              1,                            //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2321,7 +2329,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger3-1.l",0, // Joint
-                              1.0,     //Importance
+                              0.1,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2337,7 +2345,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger3-2.l",0, // Joint
-                              1.0,     //Importance
+                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2353,7 +2361,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger3-3.l",0, // Joint
-                              1.0,     //Importance
+                              MEDIAN_ENDPOINT_IMPORTANCE,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2368,8 +2376,8 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "endsite_finger3-3.l",0, // Joint
-                              1.0,     //Importance
+                              "endsite_finger3-3.l",0,       // Joint
+                              FURTHEST_ENDPOINT_IMPORTANCE,  //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2399,7 +2407,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger4-1.l",0, // Joint
-                              1.0,     //Importance
+                              0.1,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2415,7 +2423,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger4-2.l",0, // Joint
-                              1.0,     //Importance
+                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2431,7 +2439,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger4-3.l",0, // Joint
-                              1.0,     //Importance
+                              MEDIAN_ENDPOINT_IMPORTANCE,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2447,7 +2455,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "endsite_finger4-3.l",0, // Joint
-                              1.0,     //Importance
+                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2479,7 +2487,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger5-1.l",0, // Joint
-                              1.0,     //Importance
+                              0.1,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2494,9 +2502,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "finger5-2.l",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              "finger5-2.l",0,                 // Joint
+                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
+                              0,                               //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2510,9 +2518,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "finger5-3.l",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              "finger5-3.l",0,                // Joint
+                              MEDIAN_ENDPOINT_IMPORTANCE,     //Importance
+                              0,                              //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2527,7 +2535,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "endsite_finger5-3.l",0, // Joint
-                              1.0,     //Importance
+                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
                               1,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2559,7 +2567,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "lthumbBase","__lthumb", // Joint
-                              1.0,     //Importance
+                              0.1,     //Importance
                               0,       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2575,9 +2583,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "lthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
+                              "lthumb",0,                      // Joint
+                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
+                              1,                               //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2588,9 +2596,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "endsite_finger1-3.l",0, // Joint
-                              3.0,     //Importance
-                              1,       //IsEndEffector
+                              "endsite_finger1-3.l",0,          // Joint
+                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
+                              1,                                //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2626,8 +2634,8 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "lthumbBase","__lthumb", // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              0.1,                     //Importance
+                              0,                       //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2642,9 +2650,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "lthumb",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
+                              "lthumb",0,                     // Joint
+                              CLOSEST_ENDPOINT_IMPORTANCE,    //Importance
+                              0,                              //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2660,8 +2668,8 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger1-2.l",0, // Joint
-                              0.0,     //Importance
-                              0,       //IsEndEffector
+                              0.2,             //Importance
+                              0,               //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2675,9 +2683,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "finger1-3.l",0, // Joint
-                              2.0,     //Importance
-                              0,       //IsEndEffector
+                              "finger1-3.l",0,               // Joint
+                              MEDIAN_ENDPOINT_IMPORTANCE,    //Importance
+                              0,                             //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
@@ -2691,9 +2699,9 @@ int prepareDefaultLeftHandProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc, 
                               //-----------------------------------------
-                              "endsite_finger1-3.l",0, // Joint
-                              3.0,     //Importance
-                              1,       //IsEndEffector
+                              "endsite_finger1-3.l",0,        // Joint
+                              FURTHEST_ENDPOINT_IMPORTANCE,   //Importance
+                              1,                              //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
