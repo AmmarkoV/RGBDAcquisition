@@ -1837,6 +1837,7 @@ int prepareDefaultLeftHandProblem(
     //{0.2,1.0,2.0,3.0}; Mean 14.1
     //{0.5,1.0,1.5,2.0}; Mean 13.6
     //{0.3,0.6,1.2,2.0}; Mean 13.6231 
+    //{0.3,0.6,1.2,2.5}; Mean 13.8871 
      float allTuningInOne[]={0.3,0.6,1.2,2.5};
      float BASE_ENDPOINT_IMPORTANCE     = allTuningInOne[0];
      float CLOSEST_ENDPOINT_IMPORTANCE  = allTuningInOne[1];

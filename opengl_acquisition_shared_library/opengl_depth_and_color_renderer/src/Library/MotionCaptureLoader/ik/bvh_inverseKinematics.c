@@ -1334,6 +1334,7 @@ int extrapolateSolution(
 
 
 int ensureInitialPositionIsInFrustrum(
+                                      struct ikProblem * problem,
                                       struct simpleRenderer *renderer,
                                       struct MotionBuffer * solution,
                                       struct MotionBuffer * previousSolution
@@ -1346,6 +1347,13 @@ int ensureInitialPositionIsInFrustrum(
    if (previousSolution->motion==0) { return 0; } 
     
    float closestDistanceToCameraInCM=13; //30 cm 
+   
+   
+   if (problem->nearCutoffPlaneDeclared)
+       {
+           //Overriding with near cutoff plane declared in problem
+           closestDistanceToCameraInCM = problem->nearCutoffPlane;
+       } 
     
    //TODO : 
    //Ensure that  pose is not out of the bounds of camera ?
@@ -1702,7 +1710,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     { 
       if (!ikConfig->dontUseSolutionHistory)
        { 
-         ensureInitialPositionIsInFrustrum(renderer,solution,previousSolution);
+         ensureInitialPositionIsInFrustrum(problem,renderer,solution,previousSolution);
        } 
     } else
     if (ikConfig->verbose)

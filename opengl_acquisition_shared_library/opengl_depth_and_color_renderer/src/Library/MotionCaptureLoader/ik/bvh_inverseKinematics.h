@@ -157,6 +157,13 @@ struct ikProblem
 
  struct ikChain chain[MAXIMUM_CHAINS+1];
 
+ //We need a cutoff plane to prevent inverted 
+ //hierarchies from being compared..
+ //----------------------------------------
+ float nearCutoffPlane;
+ char  nearCutoffPlaneDeclared;
+ //----------------------------------------
+
  //Thread storage..
  //----------------------------------------
  struct workerPool threadPool;
