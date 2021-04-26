@@ -439,7 +439,9 @@ float calculateChainLoss(
            #endif 
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
-                   if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
+                   //if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
+                    if (problem->chain[chainID].part[partID].jointImportance!=0.0)
+                    //If the joint importance is zero then why go through all this trouble..
                    {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
                          

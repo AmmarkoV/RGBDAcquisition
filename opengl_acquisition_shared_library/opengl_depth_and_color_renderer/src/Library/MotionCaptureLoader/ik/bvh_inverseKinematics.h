@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.37
+#define IK_VERSION 0.38
 
 #define MAXIMUM_CHAINS 16
 #define MAXIMUM_PARTS_OF_CHAIN 16
@@ -48,7 +48,7 @@ struct ikChainParts
  unsigned char smallChanges;
  unsigned char bigChanges;
  unsigned char endEffector;
- unsigned char ignoreJointOwnError;
+ //unsigned char ignoreJointOwnError; just set jointImportance to 0.0
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
