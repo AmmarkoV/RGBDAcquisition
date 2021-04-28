@@ -1838,7 +1838,14 @@ int prepareDefaultLeftHandProblem(
     //{0.5,1.0,1.5,2.0}; Mean 13.6
     //{0.3,0.6,1.2,2.0}; Mean 13.6231 
     //{0.3,0.6,1.2,2.5}; Mean 13.8871 
-     float allTuningInOne[]={0.3,0.6,1.2,2.5};
+    //{0.3,0.6,1.2,2.0}  Mean 13.67104 
+    //{0.3,0.6,1.2,2.5}; Mean 13.67104  
+    //{0.2,0.6,1.2,1.7}; Mean 13.445 
+    //{0.2,0.5,1.1,1.5}; Mean 13.5842
+    //{0.2,0.5,1.1,1.7}; Mean 13.5802 with lr(0.001) -> Mean   :17.9565  lr (0.02) ->  Mean   : 15.424 // Mean   :10.7307 
+    //{0.1,0.5,1.0,1.5}; Mean 10.7725  
+    //----------------------------------------------------------
+     float allTuningInOne[]={0.1,0.5,1.1,1.6};
      float BASE_ENDPOINT_IMPORTANCE     = allTuningInOne[0];
      float CLOSEST_ENDPOINT_IMPORTANCE  = allTuningInOne[1];
      float MEDIAN_ENDPOINT_IMPORTANCE   = allTuningInOne[2];
@@ -1963,8 +1970,6 @@ int prepareDefaultLeftHandProblem(
                              );
        unsigned int partThatJustWasCreated = partID - 1;
        problem->chain[chainID].part[partThatJustWasCreated].bigChanges=1; //Big changes
-       //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=0;   //Direct substitution is only possible because we know this is the root / first position
-       //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=2;     //Direct substitution is only possible because we know this is the root / first position 
 
        ++correct;
        checksum+=addNewPartToChainProblem(
@@ -1982,8 +1987,6 @@ int prepareDefaultLeftHandProblem(
                              );
        partThatJustWasCreated = partID - 1;
        problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
-       //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=3;     //Direct substitution is only possible because we know this is the root / first position
-       //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=5;       //Direct substitution is only possible because we know this is the root / first position 
        
        if(mc->jointHierarchy[0].channelRotationOrder=BVH_ROTATION_ORDER_QWQXQYQZ)
        {
@@ -2013,8 +2016,6 @@ int prepareDefaultLeftHandProblem(
                              
          partThatJustWasCreated = partID - 1;
          problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
-         //problem->chain[chainID].part[partThatJustWasCreated].mIDStart=4;
-         //problem->chain[chainID].part[partThatJustWasCreated].mIDEnd=6;
          //fprintf(stderr,"mIDS Q2 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
          //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
          addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
@@ -2359,7 +2360,7 @@ int prepareDefaultLeftHandProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  -------    minY/maxY      minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -8.0,15.0,   -90.0,10.0);
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -8.0,25.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.0,     13.7 );
      
@@ -2533,7 +2534,7 @@ int prepareDefaultLeftHandProblem(
                               problem,mc, 
                               //-----------------------------------------
                               "finger1-2.l",0,               // Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE,    //Importance
+                              MEDIAN_ENDPOINT_IMPORTANCE,    //Importance / should this be 0 ?
                               0,                             //IsEndEffector
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
