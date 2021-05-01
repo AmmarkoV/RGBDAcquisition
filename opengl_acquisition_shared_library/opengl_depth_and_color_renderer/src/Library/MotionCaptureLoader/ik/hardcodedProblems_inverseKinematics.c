@@ -1554,7 +1554,7 @@ int prepareDefaultRightHandProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
      //                                                  -------    minY/maxY    minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -15.0,8.0,   -10.0,90.0);
+     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -25.0,8.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.0,     13.7 );
 
@@ -1844,8 +1844,16 @@ int prepareDefaultLeftHandProblem(
     //{0.2,0.5,1.1,1.5}; Mean 13.5842
     //{0.2,0.5,1.1,1.7}; Mean 13.5802 with lr(0.001) -> Mean   :17.9565  lr (0.02) ->  Mean   : 15.424 // Mean   :10.7307 
     //{0.1,0.5,1.0,1.5}; Mean 10.7725  
+    //{0.1,0.5,1.1,1.6}; Mean   :10.50822 
+    //{0.1,0.5,1.1,1.5}; Mean   :10.5206 
+    //{0.1,0.5,1.1,1.65}; Mean   :10.5783 
+    //{0.1,0.5,1.1,1.55}; Mean   :10.4840  
+    //{0.1,0.5,1.0,1.55}; Mean   :10.5080  
+    //Switch to 128 / 59B
+    //{0.1,0.5,1.15,1.55}; Mean   :10.5741
+
     //----------------------------------------------------------
-     float allTuningInOne[]={0.1,0.5,1.1,1.6};
+     float allTuningInOne[]={0.1,0.5,1.15,1.55};
      float BASE_ENDPOINT_IMPORTANCE     = allTuningInOne[0];
      float CLOSEST_ENDPOINT_IMPORTANCE  = allTuningInOne[1];
      float MEDIAN_ENDPOINT_IMPORTANCE   = allTuningInOne[2];
