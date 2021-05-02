@@ -1005,6 +1005,23 @@ if (iterationID==0)
             executedEpochs=currentEpoch;
             break;
         }
+        
+        
+        //Learning rate decay..
+        //3/4  Mean   :10.4969 
+        //3/5  Mean   :10.34537
+        //2/5  Mean   :10.2781
+        //1/6  Mean   :10.2230 
+        //2/6  Mean   :10.12284  
+        //2/7  Mean   :10.0943
+        //3/8  Mean   :10.1463
+        //3/10 Mean   :10.1280
+        //25/70 Mean   :10.22975  
+        //15/70 Mean   :10.1823  
+
+
+        float learningRateDecayRate = (float) 19/70;
+        lr = (float) learningRateDecayRate * lr;
     }
     
 
