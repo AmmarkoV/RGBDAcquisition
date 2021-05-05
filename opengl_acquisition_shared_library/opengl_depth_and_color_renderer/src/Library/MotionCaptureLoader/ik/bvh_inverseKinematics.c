@@ -1018,9 +1018,14 @@ if (iterationID==0)
         //3/10 Mean   :10.1280
         //25/70 Mean   :10.22975  
         //15/70 Mean   :10.1823  
+        //Distance to -350
+        //2/7   Mean   :10.1286  
+        //Distance to -330
+        //2/7   Mean   : 9.9858  
+        //2/7 Mean   : 9.93695  
 
 
-        float learningRateDecayRate = (float) 19/70;
+        float learningRateDecayRate = (float) 2/7;
         lr = (float) learningRateDecayRate * lr;
     }
     
