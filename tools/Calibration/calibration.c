@@ -200,7 +200,7 @@ int RefreshCalibration(const char * filename,struct calibration * calib)
            calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->intrinsic[0] = (double)  internationalAtof(line); break;
+             case 1 :  calib->intrinsic[0] = (double) internationalAtof(line); break;
              case 2 :  calib->intrinsic[1] = (double) internationalAtof(line); break;
              case 3 :  calib->intrinsic[2] = (double) internationalAtof(line); break;
              case 4 :  calib->intrinsic[3] = (double) internationalAtof(line); break;

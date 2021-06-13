@@ -3099,8 +3099,9 @@ int prepareDefaultBodyProblem(
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
-                             );
-                             
+                             ); 
+    //                                                     minX/maxX     minY/maxY     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,30.0,    -60.0,60.0,   -170.0,0.0);
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -3165,6 +3166,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
+    //                                                     minX/maxX     minY/maxY     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,30.0,    -60.0,60.0,   0.0,170.0);
                              
      ++correct;
      checksum+=addNewPartToChainProblem(
