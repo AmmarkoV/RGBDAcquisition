@@ -1122,20 +1122,20 @@ int iterateChainLoss(
     {
         if (!problem->chain[chainID].part[partID].endEffector)
         { //If the part is  not an end effector it has parameters to change and improve
-            iteratePartLoss(
-                             problem,
-                             iterationID,
-                             chainID,
-                             partID,
-                             lr,
-                             maximumAcceptableStartingLoss,
-                             epochs,
-                             tryMaintainingLocalOptima,
-                             spring, 
-                             gradientExplosionThreshold,
-                             useSolutionHistory,
-                             verbose
-                           );
+                              iteratePartLoss(
+                                               problem,
+                                               iterationID,
+                                               chainID,
+                                               partID,
+                                               lr,
+                                               maximumAcceptableStartingLoss,
+                                               epochs,
+                                               tryMaintainingLocalOptima,
+                                               spring, 
+                                               gradientExplosionThreshold,
+                                               useSolutionHistory,
+                                               verbose
+                                               );
          }
     }
 

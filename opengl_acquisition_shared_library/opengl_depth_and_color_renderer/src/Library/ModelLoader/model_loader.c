@@ -822,7 +822,7 @@ if (mod->initialized!=1)
   fprintf(stderr,"getModelBoneIDFromBoneName: Unsupported model type\n");
  }
 
-  fprintf(stderr,"Searching model %s for a bone named %s , could not find it\n",mod->pathOfModel , boneName);
+  fprintf(stderr,RED "Searching model %s for a bone named %s , could not find it\n" NORMAL,mod->pathOfModel , boneName);
  return 0;
 }
 
