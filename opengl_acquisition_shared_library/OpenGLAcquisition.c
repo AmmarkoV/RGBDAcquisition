@@ -60,17 +60,19 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
    openGL_Framerate=framerate;
    
   //--------------------------------------------------------------------------------------------------------------------------------
-  if(openGLColorFrame!=0) { openGLColorFrame = (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
-                          { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3);                  }
-                          
+  //if(openGLColorFrame!=0) { openGLColorFrame = (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
+  //                        { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3);                  }
+  if(openGLColorFrame!=0) { free(openGLColorFrame); openGLColorFrame=0; } 
+  openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3);
   if (openGLColorFrame==0)
   {
       fprintf(stderr,"Allocation of a %ux%ux3 color buffer for frames failed..\n",openGL_WIDTH,openGL_HEIGHT);
   }
   //--------------------------------------------------------------------------------------------------------------------------------
-  if(openGLDepthFrame!=0) { openGLDepthFrame = (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
-                          { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1);                  }
-
+  //if(openGLDepthFrame!=0) { openGLDepthFrame = (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
+  //                        { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1);                  }
+  if(openGLDepthFrame!=0) { free(openGLDepthFrame); openGLDepthFrame=0; }
+  openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1);
   if (openGLDepthFrame==0)
   {
       fprintf(stderr,"Allocation of a %ux%ux1 depth buffer for frames failed..\n",openGL_WIDTH,openGL_HEIGHT);

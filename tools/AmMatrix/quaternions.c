@@ -481,14 +481,14 @@ void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutpu
     }
     
     //This is a stochastic call, if your angle distance is very small good luck..!
-    float qIX,qIY,qIZ,qIW;
+    float qIX=0.0,qIY=0.0,qIZ=0.0,qIW=1.0;
     handleQuaternionPackConvention(qIX,qIY,qIZ,qIW ,quaternionInput,quaternionConvention);
     
     float thisDistance;
     do 
     {
      generateRandomQuaternion(quaternionOutput);
-     float qOX,qOY,qOZ,qOW;
+     float qOX=0.0,qOY=0.0,qOZ=0.0,qOW=1.0;
      handleQuaternionPackConvention(qOX,qOY,qOZ,qOW ,quaternionOutput,quaternionConvention);
      thisDistance = anglesBetweenQuaternions(
                                              qIX,qIY,qIZ,qIW,

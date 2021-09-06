@@ -236,8 +236,10 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
 
 ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName,unsigned int * found)
 {
-  if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName); }
-  if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
+ if (found==0)    { fprintf(stderr,"Can't get object id without a place to store it\n");                                              return 0;}
+ if (typeName==0) { fprintf(stderr,"Can't get object id without a name\n");                                                 *found=0; return 0;}
+ if (stream==0)   { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName);                          *found=0; return 0;}
+ if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName);    *found=0; return 0;}
 
  #if USE_HASHMAPS
  unsigned long index;
