@@ -234,7 +234,7 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
  while(!feof(file))
  {
   buf[0] = 0;// ? NULL;
-  readBytes+=fscanf(file,"%s", buf);
+  readBytes+=fscanf(file,"%127s", buf);
 
   if (!strcmp(buf,"newmtl")) { mat_num ++; } else
                              { fgets(buf, sizeof(buf), file); }
@@ -275,11 +275,11 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
   while(!feof(file))
  {
   buf[0] = 0;//? NULL;
-  readBytes+=fscanf(file,"%s", buf);
+  readBytes+=fscanf(file,"%127s", buf);
 
   if (!strcmp(buf,"newmtl"))
   {
-   readBytes+=fscanf(file,"%s",buf1);
+   readBytes+=fscanf(file,"%127s",buf1);
    mat_num ++;
 
    strcpy(obj->matList[mat_num].name, buf1);
@@ -784,14 +784,14 @@ int readOBJ(struct OBJ_Model * obj)
 
       case 'g': // group eat up rest of line
                 fgets(buf, sizeof(buf), file);
-             sscanf(buf, "%s", buf);
+             sscanf(buf, "%127s", buf);
              grp = FindGroup(obj,buf);
                 obj->groups[grp].material = material;
    break;
 
       case 'f': //face
                 v = 0;  n = 0; t = 0;
-                fscanf(file, "%s", buf);
+                fscanf(file, "%127s", buf);
                 // can be one of %d, %d//%d, %d/%d, %d/%d/%d
                 if (strstr(buf, "//"))
                 { //  v//n

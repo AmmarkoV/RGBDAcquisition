@@ -351,7 +351,7 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
      triModelOUT->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
      memset(triModelOUT->bones, 0 , sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
 
-     unsigned int boneNum=0,itemSize,count;
+     unsigned int boneNum=0;
      for (boneNum=0; boneNum<triModelIN->header.numberOfBones; boneNum++)
         {
          //First read dimensions of bone string and the number of weights for the bone..
@@ -544,7 +544,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
          if (triModel->bones)
          {
-          unsigned int boneNum=0,itemSize,count;
+          unsigned int boneNum=0;
           for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
           {
           //First read dimensions of bone string and the number of weights for the bone..

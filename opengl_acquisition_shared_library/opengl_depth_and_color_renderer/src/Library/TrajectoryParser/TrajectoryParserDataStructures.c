@@ -1305,7 +1305,9 @@ int modelFileExists(const char * filename)
 
 int downloadModel(const char * model , const char * path)
 {
-    fprintf(stderr,YELLOW "downloadModel `%s` `%s`\n" NORMAL,model,path);
+  if (model==0) { return 0; }
+  if (path==0)  { return 0; }
+  fprintf(stderr,YELLOW "downloadModel `%s` `%s`\n" NORMAL,model,path);
 
   unsigned int itIsAHardcodedModel;
   isModelnameAHardcodedModel(model,&itIsAHardcodedModel);

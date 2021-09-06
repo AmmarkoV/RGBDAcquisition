@@ -345,6 +345,7 @@ int extractMinimaMaximaFromBVHList(const char * filename)
             
             float * minima = 0;
             float * maxima = 0;
+            unsigned int minmaxSize = 0;
             
             char * line = NULL;
             size_t len = 0;
@@ -394,14 +395,31 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                       
                       numberOfValues = bvhMotion.numberOfValuesPerFrame;
                       
-                      
-                      float * minima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
-                      float * maxima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                      fprintf(stderr,"There needs to be a check for alternating BVH file sizes..!");
+                      if (minima==0)
+                           { 
+                             minima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame); 
+                             minmaxSize=bvhMotion.numberOfValuesPerFrame; 
+                             memset(minima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                           }
+                      if (maxima==0)
+                           { 
+                             maxima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame); 
+                             minmaxSize=bvhMotion.numberOfValuesPerFrame; 
+                             memset(maxima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                           }
             
                       if ( (minima!=0) && (maxima!=0) )
                         {
-                         memset(minima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
-                         memset(maxima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                            if (minmaxSize!=bvhMotion.numberOfValuesPerFrame)
+                            {
+                               fprintf(stderr,"Inconsistent BVH files of different number of parameters given.. Terminating.. \n");            
+                               free(minima); minima=0;
+                               free(maxima); maxima=0;
+                               bvh_free(&bvhMotion);
+                               fclose(fp);
+                               return 0; 
+                            }
                         }
                       
                       
@@ -451,8 +469,8 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                        }
                        
             //Done using memory
-            if(minima!=0) { free(minima); }
-            if(maxima!=0) { free(maxima); }
+            if(minima!=0) { free(minima); minima=0; }
+            if(maxima!=0) { free(maxima); maxima=0; }
           
           fclose(fp);
           return 1;
