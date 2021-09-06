@@ -153,7 +153,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
           (bvhMotion->jointHierarchy[currentJoint].channelType[6]==BVH_ROTATION_Z)
         )
           {
-              fprintf(stderr,GREEN "Root Quaternion detected ( %u/%u/%u/%u )..!\n" NORMAL,
+              fprintf(stderr,GREEN "Root Quaternion detected ( %d/%d/%d/%d )..!\n" NORMAL,
                              bvhMotion->jointHierarchy[currentJoint].channelType[3],
                              bvhMotion->jointHierarchy[currentJoint].channelType[4],
                              bvhMotion->jointHierarchy[currentJoint].channelType[5],

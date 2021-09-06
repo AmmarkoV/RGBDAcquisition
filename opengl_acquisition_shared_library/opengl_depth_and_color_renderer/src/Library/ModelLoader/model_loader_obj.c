@@ -906,7 +906,7 @@ int readOBJ(struct OBJ_Model * obj)
     }
   }
   fclose(file);
-  printf("Model has %ld faces %lu colors \n",obj->numFaces, obj->numColors);
+  printf("Model has %lu faces %lu colors \n",obj->numFaces, obj->numColors);
   for(i=0; i<obj->numGroups; i++)
   {
   // fprintf(stderr,"Group %s has %ld faces and material %s, \t \n",obj->groups[i].name,obj->groups[i].numFaces,obj->matList[obj->groups[i].material].name);
@@ -1413,11 +1413,11 @@ struct OBJ_Model * loadObj(const char * directory,const char * filename /*This d
 
 
     unsigned int directory_length = strlen(directory);
-    if (directory_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge directory filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
+    if (directory_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge directory filename provided , will not loadObject ( %d char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
  strncpy(obj->directory, directory, MAX_MODEL_PATHS );
 
     unsigned int file_name_length = strlen(filename);
-    if (file_name_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
+    if (file_name_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge filename provided , will not loadObject ( %d char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
  strncpy(obj->filename, filename, MAX_MODEL_PATHS );
 
     if (!readOBJ(obj) ) { fprintf(stderr," Could not read object %s \n",filename); unloadObj(obj); return 0;}

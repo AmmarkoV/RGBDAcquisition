@@ -289,7 +289,7 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
     
     if (problem->numberOfChains >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,"updateProblemSolutionToAllChains: Too many chains.. %u/%u \n",problem->numberOfChains,MAXIMUM_CHAINS);  
+      fprintf(stderr,"updateProblemSolutionToAllChains: Too many chains.. %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS);  
       return 0; 
     }
     
@@ -314,7 +314,7 @@ int cleanProblem(struct ikProblem * problem)
     
     if (problem->numberOfChains >= MAXIMUM_CHAINS)
     {
-        fprintf(stderr,"Cannot clean problem with overflowing number of chains %u/%u \n",problem->numberOfChains,MAXIMUM_CHAINS); 
+        fprintf(stderr,"Cannot clean problem with overflowing number of chains %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS); 
         return 0;
     }
 

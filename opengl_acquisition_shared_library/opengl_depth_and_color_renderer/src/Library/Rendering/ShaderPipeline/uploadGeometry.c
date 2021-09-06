@@ -47,7 +47,7 @@ pushObjectToBufferData(
 
     fprintf(stderr,
              "Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,
-             sizeOfVertices/sizeof(float),
+             (unsigned long) sizeOfVertices/sizeof(float),
              sizeOfVertices,
              sizeOfNormals/sizeof(float),
              sizeOfNormals

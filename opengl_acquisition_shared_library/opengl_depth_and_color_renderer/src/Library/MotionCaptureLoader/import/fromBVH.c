@@ -818,7 +818,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
            {
              //If we haven't yet allocated a motionValues array we need to do so now..!
              bvhMotion->motionValuesSize = bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame;
-             fprintf(stderr,"Allocating %lu bytes of memory to hold BVH motions \n",sizeof(float) * bvhMotion->motionValuesSize);
+             fprintf(stderr,"Allocating %lu bytes of memory to hold BVH motions \n",(unsigned long) sizeof(float) * bvhMotion->motionValuesSize);
              bvhMotion->motionValues = (float*)  malloc(sizeof(float) * (1+bvhMotion->motionValuesSize));
              if (bvhMotion->motionValues==0)
              {

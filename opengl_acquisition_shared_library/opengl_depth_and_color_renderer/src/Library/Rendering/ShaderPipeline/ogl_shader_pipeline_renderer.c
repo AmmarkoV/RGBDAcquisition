@@ -274,7 +274,7 @@ void doOGLShaderDrawCalllist(
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
-    fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
+    fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL, (unsigned long) numberOfVertices/sizeof(float),(unsigned long) numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
 
 
   int generateNewBuffer=1;
