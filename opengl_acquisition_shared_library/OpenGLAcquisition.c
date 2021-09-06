@@ -58,14 +58,26 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
    }
 
    openGL_Framerate=framerate;
-
+   
+  //--------------------------------------------------------------------------------------------------------------------------------
   if(openGLColorFrame!=0) { openGLColorFrame = (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
-                          { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); }
-
+                          { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3);                  }
+                          
+  if (openGLColorFrame==0)
+  {
+      fprintf(stderr,"Allocation of a %ux%ux3 color buffer for frames failed..\n",openGL_WIDTH,openGL_HEIGHT);
+  }
+  //--------------------------------------------------------------------------------------------------------------------------------
   if(openGLDepthFrame!=0) { openGLDepthFrame = (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
-                          { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
+                          { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1);                  }
 
+  if (openGLDepthFrame==0)
+  {
+      fprintf(stderr,"Allocation of a %ux%ux1 depth buffer for frames failed..\n",openGL_WIDTH,openGL_HEIGHT);
+  }
+  //--------------------------------------------------------------------------------------------------------------------------------
 
+  
     if (!tryStartingWithoutWindow)
     {
        if (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,1 /*View Window*/,devName) )
@@ -99,7 +111,7 @@ int controlOpenGLScene(const char * name,const char * variable,int control,float
 {
  if ( (valueA!=0.0) || (valueB!=0.0) || (valueC!=0.0) )
  {
-   fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
+   fprintf(stderr,"Object %s -> variable %s[%d] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
  }
  return controlScene(name,variable,control,valueA,valueB,valueC);
 }

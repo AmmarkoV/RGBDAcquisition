@@ -515,7 +515,7 @@ int readOBJ(struct OBJ_Model * obj)
   //Group Pass
   rewind(file);
   numgroups = 1;
-  while(fscanf(file, "%s", buf) != EOF)
+  while(fscanf(file, "%127s", buf) != EOF)
   {
    if(buf[0]=='g')
     numgroups++;
@@ -537,12 +537,12 @@ int readOBJ(struct OBJ_Model * obj)
   //numfaces = 0;
   cur_group = AddGroup(obj,"default");
   obj->groups[0].material=0;
-  while(fscanf(file, "%s", buf) != EOF)
+  while(fscanf(file, "%127s", buf) != EOF)
   {
 
    if(strcmp(buf, "mtllib")==0)
    {
-    readResults+=fscanf(file, "%s", buf1);
+    readResults+=fscanf(file, "%127s", buf1);
     strcpy(obj->matLib,  buf1);
     loadMTL(obj,obj->directory ,buf1);
     printf("loadmtl %s survived\n", obj->matLib);
@@ -583,13 +583,13 @@ int readOBJ(struct OBJ_Model * obj)
 
      case 'g': //group eat up rest of line
                fgets(buf, sizeof(buf), file);
-               sscanf(buf, "%s", buf);
+               sscanf(buf, "%127s", buf);
             cur_group = AddGroup(obj,buf);
      break;
 
      case 'f': // face
                 v =0; n = 0; t = 0;
-                readResults+=fscanf(file, "%s", buf); // can be one of %d, %d//%d, %d/%d, %d/%d/%d
+                readResults+=fscanf(file, "%127s", buf); // can be one of %d, %d//%d, %d/%d, %d/%d/%d
                 if (strstr(buf, "//"))
                   { //        v//n
                     sscanf(buf, "%lu//%lu", &v, &n);   //changed %d to %lu
@@ -640,12 +640,12 @@ int readOBJ(struct OBJ_Model * obj)
   obj->numTexs = numtexs;
   obj->numColors = numcolors;
 
-  printf("Vertices : %ld\n",obj->numVertices);
-  printf("Normals  : %ld\n",obj->numNormals);
-  printf("Faces    : %ld\n",obj->numFaces);
-  printf("Groups   : %ld\n",obj->numGroups);
-  printf("Texes   : %ld\n",obj->numTexs);
-  printf("Colors   : %ld\n",obj->numColors);
+  printf("Vertices : %lu\n",obj->numVertices);
+  printf("Normals  : %lu\n",obj->numNormals);
+  printf("Faces    : %lu\n",obj->numFaces);
+  printf("Groups   : %lu\n",obj->numGroups);
+  printf("Texes   : %lu\n",obj->numTexs);
+  printf("Colors   : %lu\n",obj->numColors);
 
   if (wrongDecimalSeperatorBug)
   {
@@ -713,11 +713,11 @@ int readOBJ(struct OBJ_Model * obj)
 
   while(!feof(file))
   {
-    readResults+=fscanf(file, "%s", buf);
+    readResults+=fscanf(file, "%127s", buf);
 
  if(!strcmp(buf, "usemtl"))
  {
-    readResults+=fscanf(file, "%s", buf1);
+    readResults+=fscanf(file, "%127s", buf1);
     unsigned int foundMaterial;
     if ( FindMaterial( obj, buf1 , &foundMaterial) )
           {

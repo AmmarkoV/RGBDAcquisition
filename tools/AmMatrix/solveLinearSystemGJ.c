@@ -314,7 +314,8 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
         fprintf(stderr,"Line %u is not ok ,  %u/%d oks \n",line,ok,ElementsNumber);
     }
 
-    if (line==0) { break; } else { --line; }
+    if (line==0) { break; } else 
+                 { --line; }
   }
 
   return 1;
