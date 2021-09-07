@@ -1175,7 +1175,7 @@ int singleThreadedSolver(
                               (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                               ikConfig->verbose
                            );
-             
+
              //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
              //If we are here it means problem->currentSolution has the best solution IK could find..
         }
