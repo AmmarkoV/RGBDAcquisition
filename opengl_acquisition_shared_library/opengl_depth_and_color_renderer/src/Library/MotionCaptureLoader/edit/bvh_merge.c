@@ -285,40 +285,41 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
             return 0;
           }
    bvh_renameJointsForCompatibility(&bvhNeutralFile);
-   
-   /*
-   int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parentJoint)
-  */
-  
+   bvh_selectChildrenOfJoint(&bvhNeutralFile,parentJoint);
+    
    if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
     { 
       fprintf(stderr,"Found %u records in it\n",ctftm_getNumberOfRecords(&bvhfiles));
       for (int i=0; i<ctftm_getNumberOfRecords(&bvhfiles); i++)
       {
-          fprintf(stderr,"Record %u = Value `%s`\n",i,ctftm_getRecords(&bvhfiles,i));
+          char * record = ctftm_getRecords(&bvhfiles,i);
+          if (record!=0)
+          { 
+           fprintf(stderr,"Record %u = Value `%s`\n",i,record);
           
-          char filename[1024];
-          snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,ctftm_getRecords(&bvhfiles,i));
+           char filename[1024];
+           snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,record);
           
-          if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
-          {
-            fprintf(stderr,"Error loading bvh file %s ..\n",filename);
-            break;
-          } else
-          {
+           if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
+           {
+             fprintf(stderr,"Error loading bvh file %s ..\n",filename);
+             break;
+           } else
+           {
               //Do stuff here..
+              bvh_renameJointsForCompatibility(&bvhFaceFileToBeMerged);
+              bvh_selectChildrenOfJoint(&bvhFaceFileToBeMerged,parentJoint);
+              
+              
+              
+              
+              
+              
               
              bvh_free(&bvhFaceFileToBeMerged);
+           } 
           }
-          
-          
       }
-    
-    
-    
-    
-    
-    
     }
 
 
