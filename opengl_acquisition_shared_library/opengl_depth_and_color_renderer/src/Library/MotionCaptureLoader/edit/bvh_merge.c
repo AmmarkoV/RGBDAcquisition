@@ -261,7 +261,7 @@ int bvh_mergeOffsetsInMotions(
 // We basically want the same HIERARCHY across all files and we want to encode the different offsets on the MOTION part of the BVH files..
 //
 // Use : 
-//          ./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt
+//          ./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt dataset/faces/
 //
 //
 int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
@@ -269,6 +269,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
   const char * pathToNeutralFile = argv[startAt];
   const char * parentJoint = argv[startAt+1];
   const char * pathToListOfFiles = argv[startAt+2];
+  const char * pathToPrependToFilesOfList = argv[startAt+3];
     
   fprintf(stderr,"mergeFacesRobot, Neutral BVH file : %s ",pathToNeutralFile);
   fprintf(stderr,"mergeFacesRobot, Parent Joint : %s ",parentJoint);
@@ -284,6 +285,10 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
             return 0;
           }
    bvh_renameJointsForCompatibility(&bvhNeutralFile);
+   
+   /*
+   int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parentJoint)
+  */
   
    if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
     { 
@@ -291,9 +296,13 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
       for (int i=0; i<ctftm_getNumberOfRecords(&bvhfiles); i++)
       {
           fprintf(stderr,"Record %u = Value `%s`\n",i,ctftm_getRecords(&bvhfiles,i));
-          if (!bvh_loadBVH(ctftm_getRecords(&bvhfiles,i),&bvhFaceFileToBeMerged, scaleWorld))
+          
+          char filename[1024];
+          snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,ctftm_getRecords(&bvhfiles,i));
+          
+          if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
           {
-            fprintf(stderr,"Error loading bvh file %s ..\n",ctftm_getRecords(&bvhfiles,i));
+            fprintf(stderr,"Error loading bvh file %s ..\n",filename);
             break;
           } else
           {
