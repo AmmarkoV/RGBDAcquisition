@@ -1,4 +1,5 @@
 #include "bvh_merge.h"
+#include "bvh_rename.h"
 #include "../calculate/bvh_to_tri_pose.h"
 #include "bvh_cut_paste.h"
 
@@ -255,20 +256,36 @@ int bvh_mergeOffsetsInMotions(
 
 
 
-
-//./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt
-
+// We want to use a neutral BVH file as our "master" BVH  and basically perform the following 2 operations
+// First of all extend all motion vectors of "parentJoint" and all their children adding Positional X Y Z coordinates
+// Second use the offsets of the neutral file as zero and resolve all offsets of BVH files in pathToListOfFiles so that they share the same
+// HIERARCHY Offsets and have all their differences "explained" by the MOTION 
+// We basically want the same HIERARCHY across all files and we want to encode the different offsets on the MOTION part of the BVH files..
+//
+// Use : 
+//          ./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt
+//
+//
 int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
 {
-  char * pathToNeutralFile = argv[startAt];
-  char * parentJoint = argv[startAt+1];
-  char * pathToListOfFiles = argv[startAt+2];
+  const char * pathToNeutralFile = argv[startAt];
+  const char * parentJoint = argv[startAt+1];
+  const char * pathToListOfFiles = argv[startAt+2];
     
-  
   fprintf(stderr,"mergeFacesRobot, Neutral BVH file : %s ",pathToNeutralFile);
   fprintf(stderr,"mergeFacesRobot, Parent Joint : %s ",parentJoint);
   fprintf(stderr,"mergeFacesRobot, List of files : %s ",pathToListOfFiles);
   struct cTextFileToMemory bvhfiles;
+  struct BVH_MotionCapture bvhNeutralFile={0};
+  struct BVH_MotionCapture bvhFaceFileToBeMerged={0};
+  float scaleWorld = 1.0; 
+  
+   if (!bvh_loadBVH(pathToNeutralFile, &bvhNeutralFile, scaleWorld))
+          {
+            fprintf(stderr,"Error loading bvh file..\n");
+            return 0;
+          }
+   bvh_renameJointsForCompatibility(&bvhNeutralFile);
   
    if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
     { 
@@ -276,18 +293,29 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
       for (int i=0; i<ctftm_getNumberOfRecords(&bvhfiles); i++)
       {
           fprintf(stderr,"Record %u = Value `%s`\n",i,ctftm_getRecords(&bvhfiles,i));
-      }
-    }
-    
-    /*
-  fromBVHFile=argv[i+1];
-          //First of all we need to load the BVH file
-          if (!bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld))
+          if (!bvh_loadBVH(ctftm_getRecords(&bvhfiles,i),&bvhFaceFileToBeMerged, scaleWorld))
           {
-            haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
+            fprintf(stderr,"Error loading bvh file %s ..\n",ctftm_getRecords(&bvhfiles,i));
+            break;
+          } else
+          {
+              //Do stuff here..
+              
+             bvh_free(&bvhFaceFileToBeMerged);
           }
+          
+          
+      }
+    
+    
+    
+    
+    
+    
+    }
 
-          //Change joint names..
-          bvh_renameJointsForCompatibility(&bvhMotion);*/
-  return 0;
+
+    bvh_free(&bvhNeutralFile);
+
+  return 1;
 }
