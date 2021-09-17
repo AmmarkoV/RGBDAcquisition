@@ -1185,51 +1185,12 @@ int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parent
                                    }
                                  }
    
+   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+   {
+       mc->selectedJoints[jID] = bvh_isJointAChildrenID(mc,parentJID,jID);
+   }
 
-   /*
-   bvh_isJointAChildrenID(
-                           mc,
-                           BVHJointID parentJID,
-                           BVHJointID childJID
-                          )*/
-   
-    /*
-  unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (selectedJoints!=0)
-  {
-    unsigned int success=1;
-    memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0;
-    fprintf(stderr,"Erasing : ");
-    unsigned int i=0;
-    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
-     {
-      if (
-           //bvh_getJointIDFromJointName(
-           bvh_getJointIDFromJointNameNocase(
-                                       mc,
-                                       argv[i],
-                                       &jID
-                                      )
-         )
-         {
-           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
-           mc->jointHierarchy[jID].erase2DCoordinates=1;
-
-           for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
-           {
-               if (mc->motionToJointLookup[mID].jointID == jID)
-               {
-                selectedJoints[mID]=1;
-                fprintf(stderr,"%u ",mID);
-               }
-           }
-           //-------------------------------------------------
-         }
-     }
-  }
-  */
-  return 0;
+  return 1;
 }
 
 
