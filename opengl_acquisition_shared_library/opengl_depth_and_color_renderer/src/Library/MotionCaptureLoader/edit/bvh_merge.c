@@ -266,6 +266,7 @@ int bvh_mergeOffsetsInMotions(
 //
 int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
 {
+  char filename[1024]={0};
   const char * pathToNeutralFile = argv[startAt];
   const char * parentJoint = argv[startAt+1];
   const char * pathToListOfFiles = argv[startAt+2];
@@ -293,14 +294,11 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
       for (int i=0; i<ctftm_getNumberOfRecords(&bvhfiles); i++)
       {
           char * record = ctftm_getRecords(&bvhfiles,i);
-          if (record!=0)
+          if ( (record!=0) && (strlen(record)>1) )
           {
-           if (strlen(record)>0)
-           {
-            fprintf(stderr,"Record %u = Value `%s`\n",i,record);
-          
-            char filename[1024];
             snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,record);
+            fprintf(stderr,"Record %u = Value `%s`\n",i,filename);
+          
            
             if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
             {
@@ -311,16 +309,21 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               //Do stuff here..
               bvh_renameJointsForCompatibility(&bvhFaceFileToBeMerged);
               bvh_selectChildrenOfJoint(&bvhFaceFileToBeMerged,parentJoint);
+              //-----------------------------------------------------------------------
+              //-----------------------------------------------------------------------
+              //-----------------------------------------------------------------------
               
               
               
               
               
               
-              
+              //-----------------------------------------------------------------------
+              //-----------------------------------------------------------------------
+              //-----------------------------------------------------------------------
               bvh_free(&bvhFaceFileToBeMerged);
             } 
-           }
+           
           }
       }
     }
