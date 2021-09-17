@@ -2,6 +2,8 @@
 #include "../calculate/bvh_to_tri_pose.h"
 #include "bvh_cut_paste.h"
 
+#include "cTextFileToMemory.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -245,4 +247,47 @@ int bvh_mergeOffsetsInMotions(
    }
   
    return 0;
+}
+
+
+
+
+
+
+
+
+//./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt
+
+int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
+{
+  char * pathToNeutralFile = argv[startAt];
+  char * parentJoint = argv[startAt+1];
+  char * pathToListOfFiles = argv[startAt+2];
+    
+  
+  fprintf(stderr,"mergeFacesRobot, Neutral BVH file : %s ",pathToNeutralFile);
+  fprintf(stderr,"mergeFacesRobot, Parent Joint : %s ",parentJoint);
+  fprintf(stderr,"mergeFacesRobot, List of files : %s ",pathToListOfFiles);
+  struct cTextFileToMemory bvhfiles;
+  
+   if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
+    { 
+      fprintf(stderr,"Found %u records in it\n",ctftm_getNumberOfRecords(&bvhfiles));
+      for (int i=0; i<ctftm_getNumberOfRecords(&bvhfiles); i++)
+      {
+          fprintf(stderr,"Record %u = Value `%s`\n",i,ctftm_getRecords(&bvhfiles,i));
+      }
+    }
+    
+    /*
+  fromBVHFile=argv[i+1];
+          //First of all we need to load the BVH file
+          if (!bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld))
+          {
+            haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
+          }
+
+          //Change joint names..
+          bvh_renameJointsForCompatibility(&bvhMotion);*/
+  return 0;
 }

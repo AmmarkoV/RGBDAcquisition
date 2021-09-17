@@ -216,6 +216,11 @@ int main(int argc,const char **argv)
     for (i=0; i<argc; i++)
     {
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--headrobot")==0)
+        {
+          bvh_mergeFacesRobot(i+1,argc,argv);
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--mt")==0)
         {
            multiThreaded=1;

@@ -30,6 +30,13 @@ int bvh_mergeOffsetsInMotions(
                                struct BVH_MotionCapture * mc
                              );
 
+
+int bvh_mergeFacesRobot(
+                         int startAt,
+                         int argc,
+                         const char **argv
+                        );
+
 #ifdef __cplusplus
 }
 #endif
