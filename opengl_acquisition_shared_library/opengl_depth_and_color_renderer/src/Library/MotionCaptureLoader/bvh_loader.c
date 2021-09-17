@@ -573,6 +573,39 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
  return 0;
 }
 
+
+
+int bvh_isJointAChildrenID(
+                           struct BVH_MotionCapture * bvhMotion,
+                           BVHJointID parentJID,
+                           BVHJointID childJID
+                          )
+{
+  if ( (bvhMotion!=0) && (parentJID!=0)  && (childJID!=0) )
+  {
+   unsigned int jumps = 0; 
+
+   BVHJointID jID = childJID;
+    while (jID!=bvhMotion->rootJointID)
+    { 
+      if(bvhMotion->jointHierarchy[jID].parentJoint == parentJID) { return 1; }
+      if(jID == parentJID)                                        { return 1; }  
+      
+      //Jump to parent..
+      jID = bvhMotion->jointHierarchy[jID].parentJoint;
+                  
+       if (jumps > bvhMotion->jointHierarchySize)
+                  { 
+                    fprintf(stderr,RED "BUG: more jumps than hierarchy size ?" NORMAL); 
+                    return 0; 
+                  }
+      ++jumps;
+    } 
+  }
+  return 0;
+}
+
+
 int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,const char **argv)
 {
     bvh_printBVH(bvhMotion);
@@ -1107,6 +1140,105 @@ int bvh_copyMotionFrame(
    }
  return 0;
 }
+
+
+
+
+
+
+
+int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parentJoint)
+{
+   if (mc==0)                 { return 0; } 
+   if (mc->jointHierarchy==0) { return 0; } 
+   if (parentJoint==0)        { return 0; } 
+   //=======================================
+   
+   BVHJointID parentJID=0;
+   
+   if (
+       !bvh_getJointIDFromJointNameNocase(
+                                           mc,
+                                           parentJoint,
+                                           &parentJID
+                                         )
+      )
+      {
+        fprintf(stderr,RED "bvh_selectChildrenOfJoint: Could not resolve joint %s..\n" NORMAL,parentJoint);
+        return 0; 
+      }
+   
+   
+   
+     if (mc->selectedJoints!=0) {
+                                   fprintf(stderr,YELLOW "Multiple selection of joints taking place..\n" NORMAL); 
+                                } else
+                                {
+                                 mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+                                 if (mc->selectedJoints==0)
+                                   {
+                                     fprintf(stderr,RED "bvh_selectChildrenOfJoint failed to allocate selectedJoints\n" NORMAL);
+                                     return 0;
+                                   } else
+                                   {
+                                      memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
+                                   }
+                                 }
+   
+
+   /*
+   bvh_isJointAChildrenID(
+                           mc,
+                           BVHJointID parentJID,
+                           BVHJointID childJID
+                          )*/
+   
+    /*
+  unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (selectedJoints!=0)
+  {
+    unsigned int success=1;
+    memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
+    BVHJointID jID=0;
+    fprintf(stderr,"Erasing : ");
+    unsigned int i=0;
+    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
+     {
+      if (
+           //bvh_getJointIDFromJointName(
+           bvh_getJointIDFromJointNameNocase(
+                                       mc,
+                                       argv[i],
+                                       &jID
+                                      )
+         )
+         {
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+           mc->jointHierarchy[jID].erase2DCoordinates=1;
+
+           for (unsigned int mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           {
+               if (mc->motionToJointLookup[mID].jointID == jID)
+               {
+                selectedJoints[mID]=1;
+                fprintf(stderr,"%u ",mID);
+               }
+           }
+           //-------------------------------------------------
+         }
+     }
+  }
+  */
+  return 0;
+}
+
+
+
+
+
+
+
+
 
 
 int bvh_selectJoints(

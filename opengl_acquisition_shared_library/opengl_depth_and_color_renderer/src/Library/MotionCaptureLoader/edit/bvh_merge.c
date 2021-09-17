@@ -254,8 +254,6 @@ int bvh_mergeOffsetsInMotions(
 
 
 
-
-
 // We want to use a neutral BVH file as our "master" BVH  and basically perform the following 2 operations
 // First of all extend all motion vectors of "parentJoint" and all their children adding Positional X Y Z coordinates
 // Second use the offsets of the neutral file as zero and resolve all offsets of BVH files in pathToListOfFiles so that they share the same

@@ -332,6 +332,20 @@ int bvh_OffsetPositionRotation(
 int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
+/**
+* @brief Get Parent joint .
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Parent joint ID we want to make sure that the next supplied joint is a children of
+* @param  Child of joint ID we want to make sure that is a children ( not necessarily the first one ) 
+* @return 1=HasParent/0=NoParent-Error
+*/
+int bvh_isJointAChildrenID(
+                           struct BVH_MotionCapture * bvhMotion,
+                           BVHJointID parentJID,
+                           BVHJointID childJID
+                          );
+
 
 int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,const char **argv);
 
@@ -582,6 +596,16 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 */
 float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
 
+
+
+/**
+* @brief Perform a select query marking all the children of a specific joint ..
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint name we want to select plus all its children
+* @return 1=Success/0=Failure
+*/
+int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parentJoint);
 
 
 int bvh_selectJoints(
