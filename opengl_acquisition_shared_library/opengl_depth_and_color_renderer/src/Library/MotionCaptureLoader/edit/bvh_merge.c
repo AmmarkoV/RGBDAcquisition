@@ -294,18 +294,20 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
       {
           char * record = ctftm_getRecords(&bvhfiles,i);
           if (record!=0)
-          { 
-           fprintf(stderr,"Record %u = Value `%s`\n",i,record);
-          
-           char filename[1024];
-           snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,record);
-          
-           if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
+          {
+           if (strlen(record)>0)
            {
+            fprintf(stderr,"Record %u = Value `%s`\n",i,record);
+          
+            char filename[1024];
+            snprintf(filename,1024,"%s/%s",pathToPrependToFilesOfList,record);
+           
+            if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
+            {
              fprintf(stderr,"Error loading bvh file %s ..\n",filename);
              break;
-           } else
-           {
+            } else
+            {
               //Do stuff here..
               bvh_renameJointsForCompatibility(&bvhFaceFileToBeMerged);
               bvh_selectChildrenOfJoint(&bvhFaceFileToBeMerged,parentJoint);
@@ -316,14 +318,13 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               
               
               
-             bvh_free(&bvhFaceFileToBeMerged);
-           } 
+              bvh_free(&bvhFaceFileToBeMerged);
+            } 
+           }
           }
       }
     }
 
-
-    bvh_free(&bvhNeutralFile);
-
+  bvh_free(&bvhNeutralFile);
   return 1;
 }
