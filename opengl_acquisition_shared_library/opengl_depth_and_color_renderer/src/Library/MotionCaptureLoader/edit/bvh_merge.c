@@ -150,7 +150,7 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
   mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
   //---------------------------
   if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
-  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize); // bvhMotion->MAX_jointHierarchySize * 7
+  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize); // mc->MAX_jointHierarchySize * 7
   //---------------------------
  
   if (
@@ -166,8 +166,26 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
        //Repopulate everything..!
        BVHMotionChannelID mID=0;
        for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
-            {
-              
+            { 
+              //We can now update lookup tables..
+              for (unsigned int cL=0; cL<mc->jointHierarchy[jID].loadedChannels; cL++)
+                       {
+                         //For each declared channel we need to enumerate the label to a value
+                         unsigned int thisChannelID = mc->jointHierarchy[jID].channelType[cL]; 
+                         
+                         //if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],mc->numberOfValuesPerFrame);}
+                         
+                         //Update jointToMotion Lookup Table..
+                         mc->jointToMotionLookup[jID].channelIDMotionOffset[thisChannelID] = mID; 
+                         ++mID;
+
+                         //Update motionToJoint Lookup Table..
+                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].channelID = thisChannelID;
+                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].jointID   = jID;
+                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].parentID  = mc->jointHierarchy[jID].parentJoint; 
+
+                         ++mc->numberOfValuesPerFrame;
+                       }
             }
 
        return 1;
@@ -318,7 +336,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               {
                   if (bvhFaceFileToBeMerged.selectedJoints[jID])
                   {
-                     fprintf(stderr,"Joint %s selected ",bvhFaceFileToBeMerged.jointHierarchy[jID].jointName);
+                     fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",bvhFaceFileToBeMerged.jointHierarchy[jID].jointName,bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder);
                      bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels = 1;
                      //bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder  = 1;
                      
@@ -329,7 +347,6 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                      bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
                      bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
                   }
-
               }
               
               

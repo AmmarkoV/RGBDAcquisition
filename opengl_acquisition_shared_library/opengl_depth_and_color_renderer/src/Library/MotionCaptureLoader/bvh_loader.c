@@ -219,7 +219,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
     } else
     if (channelOrder!=BVH_ROTATION_ORDER_NONE)
         {   
-          bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 0-2 so there is no positional channel
+          bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; //The Rotation is on offsets 0-2 so there is no positional channel(?)
           bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
           bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=0;
           bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
