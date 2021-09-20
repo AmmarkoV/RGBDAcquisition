@@ -183,10 +183,10 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
  {
 
    channelOrder=enumerateRotationChannelOrderFromTypes(
-                                                  bvhMotion->jointHierarchy[currentJoint].channelType[0],
-                                                  bvhMotion->jointHierarchy[currentJoint].channelType[1],
-                                                  bvhMotion->jointHierarchy[currentJoint].channelType[2]
-                                              );
+                                                       bvhMotion->jointHierarchy[currentJoint].channelType[0],
+                                                       bvhMotion->jointHierarchy[currentJoint].channelType[1],
+                                                       bvhMotion->jointHierarchy[currentJoint].channelType[2]
+                                                      );
                                               
     if (channelOrder==BVH_ROTATION_ORDER_RODRIGUES)
     {

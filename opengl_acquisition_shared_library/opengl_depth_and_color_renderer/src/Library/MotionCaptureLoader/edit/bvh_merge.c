@@ -261,7 +261,7 @@ int bvh_mergeOffsetsInMotions(
 // We basically want the same HIERARCHY across all files and we want to encode the different offsets on the MOTION part of the BVH files..
 //
 // Use : 
-//          ./BVHTester --headrobot dataset/faces/neutral.bvh Neck dataset/faces/list.txt dataset/faces/
+//          ./BVHTester --headrobot dataset/faces/neutral.bvh Head dataset/faces/list.txt dataset/faces/
 //
 //
 int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
@@ -314,7 +314,23 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               //-----------------------------------------------------------------------
               
               
-              
+              for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
+              {
+                  if (bvhFaceFileToBeMerged.selectedJoints[jID])
+                  {
+                     fprintf(stderr,"Joint %s selected ",bvhFaceFileToBeMerged.jointHierarchy[jID].jointName);
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels = 1;
+                     //bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder  = 1;
+                     
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[3] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0];
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[4] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1];
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[5] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2];
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
+                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
+                  }
+
+              }
               
               
               
