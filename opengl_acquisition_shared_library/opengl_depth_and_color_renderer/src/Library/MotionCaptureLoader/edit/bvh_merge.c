@@ -331,25 +331,34 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
               
+              //bvh_updateJointLookupMaps(&bvhFaceFileToBeMerged);
               
               for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
               {
                   if (bvhFaceFileToBeMerged.selectedJoints[jID])
                   {
                      fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",bvhFaceFileToBeMerged.jointHierarchy[jID].jointName,bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder);
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels = 1;
-                     //bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder  = 1;
-                     
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[3] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0];
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[4] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1];
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[5] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2];
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
-                     bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
+                     if (!bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels)
+                     {
+                         //Add positional component..
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[3] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0];
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[4] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1];
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[5] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2];
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
+
+                         // Set Positional Channel..
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels = 1;
+
+                         //Add to loaded channels..
+                         bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels+=3;
+                     }
                   }
               }
               
-              
+              //Updated joint lookup maps..
+              bvh_updateJointLookupMaps(&bvhFaceFileToBeMerged);
               
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
