@@ -150,15 +150,13 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
   mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
   //---------------------------
   if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
-  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize); // mc->MAX_jointHierarchySize * 7
+  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize);
   //---------------------------
  
   if (
-       (mc->jointToMotionLookup!=0) || (mc->motionToJointLookup!=0)
+       (mc->jointToMotionLookup!=0) && (mc->motionToJointLookup!=0)
      )
      {
-       fprintf(stderr,RED "Failed allocating memory, giving up on loading BVH file\n" NORMAL);  
-  
        //Clean everything..! 
        memset(mc->jointToMotionLookup,0,sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
        memset(mc->motionToJointLookup,0,sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize);
@@ -190,6 +188,9 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
 
        return 1;
      }
+
+  //---------------------
+  fprintf(stderr,RED "Failed allocating memory, giving up on bvh_updateJointLookupMaps\n" NORMAL);  
   return 0;
 }
 
