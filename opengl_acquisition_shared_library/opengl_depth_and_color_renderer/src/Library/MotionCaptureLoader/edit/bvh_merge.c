@@ -145,6 +145,31 @@ int bvh_mergeWith(
  
 int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
 {
+  // Make sure the max joint hierarchy is in sync with the current joint hierarchy
+  if (mc->MAX_jointHierarchySize < mc->jointHierarchySize)
+     {
+      fprintf(stderr,YELLOW "increasing MAX_jointHierarchySize from %u to %u ..\n" NORMAL,mc->MAX_jointHierarchySize,mc->jointHierarchySize);
+      mc->MAX_jointHierarchySize = mc->jointHierarchySize;
+     }
+    
+    
+   //Recount required motion values, they might have increased.. 
+   fprintf(stderr,"Total Joints %u \n",mc->jointHierarchySize);
+   unsigned int totalChannelsRecounted=0;
+   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              //We can now update lookup tables..
+              totalChannelsRecounted += mc->jointHierarchy[jID].loadedChannels;
+              
+              //fprintf(stderr,RED " %u " NORMAL,mc->jointHierarchy[jID].loadedChannels);
+            }
+   if (totalChannelsRecounted>mc->motionValuesSize)
+      {
+       fprintf(stderr,YELLOW "increasing Total Motion Channels from %u to %u \n" NORMAL,mc->motionValuesSize,totalChannelsRecounted); 
+       mc->motionValuesSize=totalChannelsRecounted;
+      }
+
+
   //Free previous joint lookups
   if  (mc->jointToMotionLookup!=0)  { free(mc->jointToMotionLookup); mc->jointToMotionLookup=0;}
   mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
@@ -164,10 +189,16 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
        //Repopulate everything..!
        BVHMotionChannelID mID=0;
        for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
-            { 
+            {
               //We can now update lookup tables..
               for (unsigned int cL=0; cL<mc->jointHierarchy[jID].loadedChannels; cL++)
-                       {
+                       { 
+                         if (mc->motionValuesSize <= mID)
+                         {
+                             fprintf(stderr,RED "Not enough memory for motion to joint lookup table..\n" NORMAL);
+                             return 0; 
+                         }
+                         
                          //For each declared channel we need to enumerate the label to a value
                          unsigned int thisChannelID = mc->jointHierarchy[jID].channelType[cL]; 
                          
@@ -175,14 +206,13 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
                          
                          //Update jointToMotion Lookup Table..
                          mc->jointToMotionLookup[jID].channelIDMotionOffset[thisChannelID] = mID; 
-                         ++mID;
 
                          //Update motionToJoint Lookup Table..
-                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].channelID = thisChannelID;
-                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].jointID   = jID;
-                         mc->motionToJointLookup[mc->numberOfValuesPerFrame].parentID  = mc->jointHierarchy[jID].parentJoint; 
+                         mc->motionToJointLookup[mID].channelID = thisChannelID;
+                         mc->motionToJointLookup[mID].jointID   = jID;
+                         mc->motionToJointLookup[mID].parentID  = mc->jointHierarchy[jID].parentJoint; 
 
-                         ++mc->numberOfValuesPerFrame;
+                         ++mID;
                        }
             }
 
