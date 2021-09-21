@@ -403,8 +403,14 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
               
-              if ( bvh_expandPositionalChannelsOfSelectedJoints(&bvhFaceFileToBeMerged) )
+              
+              if ( 
+                   (bvhNeutralFile.jointHierarchySize==bvhFaceFileOriginal.jointHierarchySize) &&
+                   (bvhNeutralFile.jointHierarchySize==bvhFaceFileToBeMerged.jointHierarchySize)
+                 )
               {
+               if ( bvh_expandPositionalChannelsOfSelectedJoints(&bvhFaceFileToBeMerged) )
+               {
                 //From here on bvhFaceFileToBeMerged also has the new positional channels allocated and enabled after joint "parentJoint"
                 //bvhFaceFileOriginal has its original layout.. Last step is to copy the original channels to their correct targets..!
                 
@@ -412,16 +418,20 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                 BVHMotionChannelID mIDMerged=0;
                 for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
                 {
-                  if ( 
-                       (bvhFaceFileOriginal.selectedJoints[jID]) && (bvhFaceFileToBeMerged.selectedJoints[jID])
-                     )
+                  if ( (bvhFaceFileOriginal.selectedJoints[jID]) && (bvhFaceFileToBeMerged.selectedJoints[jID]) )
                   {
                      //The only way for loaded channels to differ is because of the bvh_expandPositionalChannelsOfSelectedJoints call..
                      if ( bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels != bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels )
                      {
                       //Ok this is one of the affected joints that we added positional channels to..!
+                      //There where no positional channels in the bvhFaceFileOriginal so what we do is we will subtract the original XYZ offsets from the neutral XYZ offsets
+
                       
-                      
+                      //The final loadedChannels of the original bvh file get copied
+                      for (unsigned int channelID=0; channelID<bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels; channelID++)
+                        {
+                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   ++mIDMerged;  ++mIDOriginal;
+                        } 
                       
                       /*
                       bvhNeutralFile.jointHierarchy[jID].offset[0];
@@ -454,11 +464,15 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   }
                 }
                 
-              } 
-              //-----------------------------------------------------------------------
-              //-----------------------------------------------------------------------
-              //-----------------------------------------------------------------------
-              bvh_free(&bvhFaceFileToBeMerged);
+              }  
+             } else
+             {
+                fprintf(stderr,RED "Mismatching BVH joint hierarchy sizes.. !\n" NORMAL);
+             }
+             //-----------------------------------------------------------------------
+             //-----------------------------------------------------------------------
+             //-----------------------------------------------------------------------
+             bvh_free(&bvhFaceFileToBeMerged);
             } 
            
           }
