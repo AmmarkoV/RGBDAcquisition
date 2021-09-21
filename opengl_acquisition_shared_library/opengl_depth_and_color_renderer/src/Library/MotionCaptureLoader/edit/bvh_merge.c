@@ -200,9 +200,7 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
                          }
                          
                          //For each declared channel we need to enumerate the label to a value
-                         unsigned int thisChannelID = mc->jointHierarchy[jID].channelType[cL]; 
-                         
-                         //if (debug) {fprintf(stderr,"#%u %s=%u ",cL,channelNames[thisChannelID],mc->numberOfValuesPerFrame);}
+                         unsigned int thisChannelID = mc->jointHierarchy[jID].channelType[cL];
                          
                          //Update jointToMotion Lookup Table..
                          mc->jointToMotionLookup[jID].channelIDMotionOffset[thisChannelID] = mID; 
@@ -301,6 +299,42 @@ int bvh_mergeOffsetsInMotions(
 
 
 
+int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
+{
+ if ( (mc!=0) && (mc->selectedJoints!=0) && (mc->jointHierarchy!=0) )
+ {
+    for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+              {
+                  if (mc->selectedJoints[jID])
+                  {
+                     fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].channelRotationOrder);
+                     if (!mc->jointHierarchy[jID].hasPositionalChannels)
+                     {
+                         //Add positional component..
+                         mc->jointHierarchy[jID].channelType[3] = mc->jointHierarchy[jID].channelType[0];
+                         mc->jointHierarchy[jID].channelType[4] = mc->jointHierarchy[jID].channelType[1];
+                         mc->jointHierarchy[jID].channelType[5] = mc->jointHierarchy[jID].channelType[2];
+                         mc->jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
+                         mc->jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
+                         mc->jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
+
+                         // Set Positional Channel..
+                         mc->jointHierarchy[jID].hasPositionalChannels = 1;
+
+                         //Add to loaded channels..
+                         mc->jointHierarchy[jID].loadedChannels+=3;
+                     }
+                  }
+              }
+              
+  //Updated joint lookup maps..
+  bvh_updateJointLookupMaps(mc);
+  return 1; 
+ }
+ 
+ return 0;
+}
+
 
 
 // We want to use a neutral BVH file as our "master" BVH  and basically perform the following 2 operations
@@ -326,6 +360,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
   fprintf(stderr,"mergeFacesRobot, List of files : %s ",pathToListOfFiles);
   struct cTextFileToMemory bvhfiles;
   struct BVH_MotionCapture bvhNeutralFile={0};
+  struct BVH_MotionCapture bvhFaceFileOriginal={0};
   struct BVH_MotionCapture bvhFaceFileToBeMerged={0};
   float scaleWorld = 1.0; 
   
@@ -349,48 +384,31 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
             fprintf(stderr,"Record %u = Value `%s`\n",i,filename);
           
            
-            if (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged, scaleWorld))
+            if (
+                 (!bvh_loadBVH(filename,&bvhFaceFileToBeMerged,scaleWorld)) ||
+                 (!bvh_loadBVH(filename,&bvhFaceFileOriginal,scaleWorld))
+               )
             {
              fprintf(stderr,"Error loading bvh file %s ..\n",filename);
              break;
             } else
             {
-              //Do stuff here..
+              //Complete loading of BVH files ..
+              bvh_renameJointsForCompatibility(&bvhFaceFileOriginal);
+              bvh_selectChildrenOfJoint(&bvhFaceFileOriginal,parentJoint);
+              //-----------------------------------------------------------------------
               bvh_renameJointsForCompatibility(&bvhFaceFileToBeMerged);
               bvh_selectChildrenOfJoint(&bvhFaceFileToBeMerged,parentJoint);
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
-              //-----------------------------------------------------------------------
               
-              //bvh_updateJointLookupMaps(&bvhFaceFileToBeMerged);
-              
-              for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
+              if ( bvh_expandPositionalChannelsOfSelectedJoints(&bvhFaceFileToBeMerged) )
               {
-                  if (bvhFaceFileToBeMerged.selectedJoints[jID])
-                  {
-                     fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",bvhFaceFileToBeMerged.jointHierarchy[jID].jointName,bvhFaceFileToBeMerged.jointHierarchy[jID].channelRotationOrder);
-                     if (!bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels)
-                     {
-                         //Add positional component..
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[3] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0];
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[4] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1];
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[5] = bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2];
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
-
-                         // Set Positional Channel..
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].hasPositionalChannels = 1;
-
-                         //Add to loaded channels..
-                         bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels+=3;
-                     }
-                  }
-              }
-              
-              //Updated joint lookup maps..
-              bvh_updateJointLookupMaps(&bvhFaceFileToBeMerged);
-              
+                //From here on bvhFaceFileToBeMerged also has the new positional channels allocated and enabled after joint "parentJoint"
+                //bvhFaceFileOriginal has its original layout.. Last step is to copy the original channels to their correct targets..!
+                  
+                  
+              } 
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
