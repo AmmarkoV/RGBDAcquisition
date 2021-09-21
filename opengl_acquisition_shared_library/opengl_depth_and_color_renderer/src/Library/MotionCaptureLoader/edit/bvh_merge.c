@@ -307,7 +307,7 @@ int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
               {
                   if (mc->selectedJoints[jID])
                   {
-                     fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].channelRotationOrder);
+                     //fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].channelRotationOrder);
                      if (!mc->jointHierarchy[jID].hasPositionalChannels)
                      {
                          //Add positional component..
@@ -407,8 +407,53 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
               {
                 //From here on bvhFaceFileToBeMerged also has the new positional channels allocated and enabled after joint "parentJoint"
                 //bvhFaceFileOriginal has its original layout.. Last step is to copy the original channels to their correct targets..!
-                  
-                  
+                
+                BVHMotionChannelID mIDOriginal=0;
+                BVHMotionChannelID mIDMerged=0;
+                for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
+                {
+                  if ( 
+                       (bvhFaceFileOriginal.selectedJoints[jID]) && (bvhFaceFileToBeMerged.selectedJoints[jID])
+                     )
+                  {
+                     //The only way for loaded channels to differ is because of the bvh_expandPositionalChannelsOfSelectedJoints call..
+                     if ( bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels != bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels )
+                     {
+                      //Ok this is one of the affected joints that we added positional channels to..!
+                      
+                      
+                      
+                      /*
+                      bvhNeutralFile.jointHierarchy[jID].offset[0];
+                      bvhNeutralFile.jointHierarchy[jID].offset[1];
+                      bvhNeutralFile.jointHierarchy[jID].offset[2];
+                      
+                     fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].channelRotationOrder);
+                         //Add positional component..
+                         mc->jointHierarchy[jID].channelType[3] = mc->jointHierarchy[jID].channelType[0];
+                         mc->jointHierarchy[jID].channelType[4] = mc->jointHierarchy[jID].channelType[1];
+                         mc->jointHierarchy[jID].channelType[5] = mc->jointHierarchy[jID].channelType[2];
+                         mc->jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
+                         mc->jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
+                         mc->jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
+
+                         // Set Positional Channel..
+                         mc->jointHierarchy[jID].hasPositionalChannels = 1;
+
+                         //Add to loaded channels..
+                         mc->jointHierarchy[jID].loadedChannels+=3;*/
+                     }
+                  }
+                   else
+                  {
+                    //If this not an altered join just perform 1:1 copy of the loaded channels..
+                    for (unsigned int channelID=0; channelID<bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels; channelID++)
+                      {
+                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   ++mIDMerged;  ++mIDOriginal;
+                      }
+                  }
+                }
+                
               } 
               //-----------------------------------------------------------------------
               //-----------------------------------------------------------------------
