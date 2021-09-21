@@ -393,7 +393,8 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
              break;
             } else
             {
-              //Complete loading of BVH files ..
+              //Complete loading of BVH files by doing renames and selecting the joints we are
+              //interested in  ..
               bvh_renameJointsForCompatibility(&bvhFaceFileOriginal);
               bvh_selectChildrenOfJoint(&bvhFaceFileOriginal,parentJoint);
               //-----------------------------------------------------------------------
