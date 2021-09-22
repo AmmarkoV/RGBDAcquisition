@@ -1,6 +1,7 @@
 #include "bvh_merge.h"
 #include "bvh_rename.h"
 #include "../import/fromBVH.h"
+#include "../export/bvh_to_bvh.h"
 #include "../calculate/bvh_to_tri_pose.h"
 #include "bvh_cut_paste.h"
 
@@ -431,7 +432,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //X Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
+                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
                         bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] = bvhNeutralFile.jointHierarchy[jID].offset[0];
                         ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
@@ -513,9 +514,19 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
              //-----------------------------------------------------------------------
              //-----------------------------------------------------------------------
              //-----------------------------------------------------------------------
+           
+             snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,record);
+             dumpBVHToBVH(
+                           filename,
+                           &bvhFaceFileToBeMerged
+                        );
+             bvh_free(&bvhFaceFileOriginal);
              bvh_free(&bvhFaceFileToBeMerged);
             } 
            
+           
+           
+           //Done with file..
           }
       }
     }
