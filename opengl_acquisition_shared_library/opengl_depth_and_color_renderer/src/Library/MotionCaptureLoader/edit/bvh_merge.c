@@ -313,10 +313,15 @@ int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
                      //fprintf(stderr,"JointSelected(%s,rotOrder:%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].channelRotationOrder);
                      if (!mc->jointHierarchy[jID].hasPositionalChannels)
                      {
-                         //Add positional component..
-                         mc->jointHierarchy[jID].channelType[3] = mc->jointHierarchy[jID].channelType[0];
-                         mc->jointHierarchy[jID].channelType[4] = mc->jointHierarchy[jID].channelType[1];
-                         mc->jointHierarchy[jID].channelType[5] = mc->jointHierarchy[jID].channelType[2];
+                         for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                         {
+                           mc->jointHierarchy[jID].channelType[3+channelID] = mc->jointHierarchy[jID].channelType[channelID];
+                         }
+                         //mc->jointHierarchy[jID].channelType[3] = mc->jointHierarchy[jID].channelType[0];
+                         //mc->jointHierarchy[jID].channelType[4] = mc->jointHierarchy[jID].channelType[1];
+                         //mc->jointHierarchy[jID].channelType[5] = mc->jointHierarchy[jID].channelType[2];
+                         
+                         //Finally add the positional component..
                          mc->jointHierarchy[jID].channelType[0] = BVH_POSITION_X;
                          mc->jointHierarchy[jID].channelType[1] = BVH_POSITION_Y;
                          mc->jointHierarchy[jID].channelType[2] = BVH_POSITION_Z;
