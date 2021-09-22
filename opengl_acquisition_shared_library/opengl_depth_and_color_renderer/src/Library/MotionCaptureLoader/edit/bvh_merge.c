@@ -153,6 +153,8 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
       fprintf(stderr,YELLOW "increasing MAX_jointHierarchySize from %u to %u ..\n" NORMAL,mc->MAX_jointHierarchySize,mc->jointHierarchySize);
       mc->MAX_jointHierarchySize = mc->jointHierarchySize;
      }
+   //-------------------------------------------------------------------------------
+    
     
     
    //Recount required motion values, they might have increased.. 
@@ -171,14 +173,15 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
        mc->motionValuesSize=totalChannelsRecounted;
        mc->numberOfValuesPerFrame=totalChannelsRecounted;
       }
+   //-------------------------------------------------------------------------------
 
 
   //Free previous joint lookups
   if  (mc->jointToMotionLookup!=0)  { free(mc->jointToMotionLookup); mc->jointToMotionLookup=0;}
-  mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * mc->MAX_jointHierarchySize);
+  mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * (mc->MAX_jointHierarchySize+1));
   //---------------------------
   if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
-  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * mc->motionValuesSize);
+  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * (mc->motionValuesSize+1));
   //---------------------------
  
   if (
@@ -227,79 +230,6 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
 
 
 
-int bvh_mergeOffsetsInMotions(
-                               struct BVH_MotionCapture * mc
-                             )
-{  
-    // Test : ./GroundTruthDumper --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
-
-    //We need to update 3 things..!
-    
-    //1) First allocate a brand new motion buffer that will hold the new offsets + the old rotations+offsets, and swap it for the old one..
-    
-    //2) We need to update numberOfValuesPerFrame motionValuesSize
-
-    //3)We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
-       
-   if (mc->motionValues!=0)
-   {
-       unsigned int newNumberOfValuesPerFrame = 0;
-       unsigned int newMotionValuesSize=0;
-       for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-           newNumberOfValuesPerFrame+=mc->jointHierarchy[jID].loadedChannels;
-       }
-       fprintf(stderr,"BVH file will be resized to accomodate %u channels instead of the old %u\n",newNumberOfValuesPerFrame,mc->numberOfValuesPerFrame); 
-       
-       newMotionValuesSize=newNumberOfValuesPerFrame*mc->numberOfFrames;
-       fprintf(stderr,"Total size will be adjusted to %u instead of the old %u\n",newMotionValuesSize,mc->motionValuesSize); 
-       
-       float * newMotionValues = (float*) malloc(sizeof(float) * newMotionValuesSize);
-       if (newMotionValues!=0)
-       {
-         //
-         BVHMotionChannelID oldMID=0,newMID=0;
-         for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
-          {
-           for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
-            {
-              //All joints will gain a positional channel
-              if (!mc->jointHierarchy[jID].hasPositionalChannels) 
-              {
-                  //If this joint did not have a positional component we will add it..! 
-                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[0]; ++newMID;
-                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[1]; ++newMID;
-                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[2]; ++newMID;
-                  mc->jointHierarchy[jID].hasPositionalChannels = 1;
-              }
-
-             //Copy existing information..
-             for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
-               {
-                newMotionValues[newMID] = mc->motionValues[oldMID];   ++oldMID;  ++newMID;
-               }
-            } 
-          }
-         
-         //Deallocate old buffer..
-         free(mc->motionValues);
-         
-         //Update everything to new data..
-         mc->motionValues = newMotionValues;
-         mc->motionValuesSize = newMotionValuesSize;
-         mc->numberOfValuesPerFrame = newNumberOfValuesPerFrame; 
-         
-         if ( bvh_updateJointLookupMaps(mc) )
-         {
-           return 1; //Goal 
-         }
-         
-       }
-   }
-  
-   return 0;
-}
-
 
 
 int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
@@ -336,8 +266,7 @@ int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
               }
               
   //Updated joint lookup maps..
-  bvh_updateJointLookupMaps(mc);
-  return 1; 
+  return bvh_updateJointLookupMaps(mc); 
  }
  
  return 0;
@@ -483,18 +412,20 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                         fprintf(stderr,RED "Merged mID %u -> %u / %u \n" NORMAL,mIDMerged,mIDMerged+originalLoadedChannels,bvhFaceFileToBeMerged.numberOfValuesPerFrame); 
                         break; 
                      }
-                     }
+                    }
                   }
                    else
                   {
+                     //This is not an altered join so we just need perform 1:1 copy of the loaded channels..
+                     //We will first perform an array bounds check to make sure we won't write/read incorrectly..
                      unsigned int originalLoadedChannels =  bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels;
                      if (
                             (mIDOriginal + originalLoadedChannels <= bvhFaceFileOriginal.numberOfValuesPerFrame) &&
                             (mIDMerged   + originalLoadedChannels <= bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                          )
                     {
-                    //If this not an altered join just perform 1:1 copy of the loaded channels..
-                    for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
+                      //We are in bounds so copy the channels 1:1
+                      for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
                       {
                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   ++mIDMerged;  ++mIDOriginal;
                       }
@@ -514,7 +445,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                              filename,
                              &bvhFaceFileToBeMerged
                             ); 
-              }  
+              }
              } else
              {
                 fprintf(stderr,RED "Mismatching BVH joint hierarchy sizes.. !\n" NORMAL);
@@ -539,4 +470,84 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
 
   bvh_free(&bvhNeutralFile);
   return 1;
+}
+
+
+// ---------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------
+
+int bvh_mergeOffsetsInMotions(
+                               struct BVH_MotionCapture * mc
+                             )
+{  
+    // Test : ./GroundTruthDumper --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
+
+    //We need to update 3 things..!
+    
+    //1) First allocate a brand new motion buffer that will hold the new offsets + the old rotations+offsets, and swap it for the old one..
+    
+    //2) We need to update numberOfValuesPerFrame motionValuesSize
+
+    //3)We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
+       
+   if (mc->motionValues!=0)
+   {
+       unsigned int newNumberOfValuesPerFrame = 0;
+       unsigned int newMotionValuesSize=0;
+       for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+           newNumberOfValuesPerFrame+=mc->jointHierarchy[jID].loadedChannels;
+       }
+       fprintf(stderr,"BVH file will be resized to accomodate %u channels instead of the old %u\n",newNumberOfValuesPerFrame,mc->numberOfValuesPerFrame); 
+       
+       newMotionValuesSize=newNumberOfValuesPerFrame*mc->numberOfFrames;
+       fprintf(stderr,"Total size will be adjusted to %u instead of the old %u\n",newMotionValuesSize,mc->motionValuesSize); 
+       
+       float * newMotionValues = (float*) malloc(sizeof(float) * newMotionValuesSize);
+       if (newMotionValues!=0)
+       {
+         //
+         BVHMotionChannelID oldMID=0,newMID=0;
+         for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
+          {
+           for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              //All joints will gain a positional channel
+              if (!mc->jointHierarchy[jID].hasPositionalChannels) 
+              {
+                  //If this joint did not have a positional component we will add it..! 
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[0]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[1]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[2]; ++newMID;
+                  mc->jointHierarchy[jID].hasPositionalChannels = 1;
+              }
+
+             //Copy existing information..
+             for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+               {
+                newMotionValues[newMID] = mc->motionValues[oldMID];   ++oldMID;  ++newMID;
+               }
+            } 
+          }
+         
+         //Deallocate old buffer..
+         free(mc->motionValues);
+         
+         //Update everything to new data..
+         mc->motionValues = newMotionValues;
+         mc->motionValuesSize = newMotionValuesSize;
+         mc->numberOfValuesPerFrame = newNumberOfValuesPerFrame; 
+         
+         if ( bvh_updateJointLookupMaps(mc) )
+         {
+           return 1; //Goal 
+         }
+         
+       }
+   }
+  
+   return 0;
 }
