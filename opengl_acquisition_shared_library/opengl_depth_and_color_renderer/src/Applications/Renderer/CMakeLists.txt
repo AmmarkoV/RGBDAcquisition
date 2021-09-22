@@ -32,7 +32,7 @@ IF( ENABLE_SHADERS )
 ENDIF( ENABLE_SHADERS )
 
 add_executable(Renderer main.c ) 
-target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox Codecs  ${PNG_Libs} ${JPG_Libs}  ${GLEW_Libs}  ) 
+target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox Codecs ${PNG_Libs} ${JPG_Libs}  ${GLEW_Libs}  ) 
 add_dependencies(Renderer OGLRendererSandbox)  
        
  

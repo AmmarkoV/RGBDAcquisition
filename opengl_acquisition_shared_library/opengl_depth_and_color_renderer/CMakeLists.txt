@@ -18,6 +18,14 @@ add_definitions(-DINTEL_OPTIMIZATIONS)
 endif(INTEL_OPTIMIZATIONS)
 
 
+#Add the codecs needed for the correct building..
+#Depending on the build directory this might not work :S
+set(CODECS_DIRECTORY "../../tools/Codecs") 
+add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/tools/Codecs) 
+#ADD_LIBRARY(Codecs STATIC IMPORTED) 
+#SET_TARGET_PROPERTIES(Codecs PROPERTIES IMPORTED_LOCATION ${CODECS_DIRECTORY}/libCodecs.a) 
+
+
 IF( ENABLE_HIGH_PERFORMANCE_BUILD )
  set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
  set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
@@ -29,10 +37,6 @@ IF( ENABLE_AMMARSERVER )
 
  execute_process(COMMAND submodules/linkAmmarServer.sh)
 ENDIF( ENABLE_AMMARSERVER )
-
-#Add the codecs needed for the correct building
-set(CODECS_DIRECTORY "../../tools/Codecs") 
-add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs)
 
 add_subdirectory (src/Library)
 
