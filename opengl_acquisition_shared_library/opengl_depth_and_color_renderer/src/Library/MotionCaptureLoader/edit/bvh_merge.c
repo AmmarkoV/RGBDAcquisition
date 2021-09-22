@@ -508,6 +508,12 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   }
                 }
                 
+                //Success adding positional channels..
+                snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,record);
+                dumpBVHToBVH(
+                             filename,
+                             &bvhFaceFileToBeMerged
+                            ); 
               }  
              } else
              {
@@ -520,11 +526,6 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
              //-----------------------------------------------------------------------
              //-----------------------------------------------------------------------
            
-             snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,record);
-             dumpBVHToBVH(
-                           filename,
-                           &bvhFaceFileToBeMerged
-                        );
              bvh_free(&bvhFaceFileOriginal);
              bvh_free(&bvhFaceFileToBeMerged);
             } 
