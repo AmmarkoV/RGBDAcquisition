@@ -303,6 +303,17 @@ int fastBVHFileToDetermineNumberOfJointsAndMotionFields(struct BVH_MotionCapture
  return 0;
 }
 
+
+
+void bvh_populateStaticTransformationOfJoint(struct BVH_MotionCapture * bvhMotion,BVHJointID jID)
+{
+    float * m = bvhMotion->jointHierarchy[jID].staticTransformation.m;
+    m[0] =1.0;    m[1] =0.0;   m[2] =0.0;    m[3] = (float) bvhMotion->jointHierarchy[jID].offset[0];
+    m[4] =0.0;    m[5] =1.0;   m[6] =0.0;    m[7] = (float) bvhMotion->jointHierarchy[jID].offset[1];
+    m[8] =0.0;    m[9] =0.0;   m[10]=1.0;    m[11]= (float) bvhMotion->jointHierarchy[jID].offset[2];
+    m[12]=0.0;    m[13]=0.0;   m[14]=0.0;    m[15]=1.0; 
+}
+
  
 
 
@@ -622,11 +633,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
                 }
                  
               //Create 4x4 Matrix that contains the static transformation ( translation ) of the joint
-              float * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation.m;
-              m[0] =1.0;    m[1] =0.0;   m[2] =0.0;    m[3] = (float) bvhMotion->jointHierarchy[currentJoint].offset[0];
-              m[4] =0.0;    m[5] =1.0;   m[6] =0.0;    m[7] = (float) bvhMotion->jointHierarchy[currentJoint].offset[1];
-              m[8] =0.0;    m[9] =0.0;   m[10]=1.0;    m[11]= (float) bvhMotion->jointHierarchy[currentJoint].offset[2];
-              m[12]=0.0;    m[13]=0.0;   m[14]=0.0;    m[15]=1.0; 
+              bvh_populateStaticTransformationOfJoint(bvhMotion,currentJoint);
               //---------------------------------------------------------------------------------------------------------------------
               //---------------------------------------------------------------------------------------------------------------------
               //---------------------------------------------------------------------------------------------------------------------

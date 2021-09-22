@@ -11,6 +11,8 @@ extern "C"
 #endif
 
 
+void bvh_populateStaticTransformationOfJoint(struct BVH_MotionCapture * bvhMotion,BVHJointID jID);
+
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd );
 
 
