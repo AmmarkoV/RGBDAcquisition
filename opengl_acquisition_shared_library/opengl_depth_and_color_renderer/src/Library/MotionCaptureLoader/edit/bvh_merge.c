@@ -427,7 +427,9 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //We are in bounds so copy the channels 1:1
                       for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
                       {
-                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   ++mIDMerged;  ++mIDOriginal;
+                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   
+                         ++mIDMerged;  
+                         ++mIDOriginal;
                       }
                     }  else 
                     { 
