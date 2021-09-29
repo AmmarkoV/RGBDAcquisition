@@ -164,7 +164,6 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
             {
               //We can now update lookup tables..
               totalChannelsRecounted += mc->jointHierarchy[jID].loadedChannels;
-              
               //fprintf(stderr,RED " %u " NORMAL,mc->jointHierarchy[jID].loadedChannels);
             }
    if (totalChannelsRecounted>mc->motionValuesSize)
@@ -183,7 +182,9 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
   //-------------------------------------------------------------------------------
   if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
   mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * (mc->motionValuesSize+1) );
-  fprintf(stderr,YELLOW "mc->motionToJointLookup[%u] allocated\n" NORMAL,mc->motionValuesSize); 
+  //-------------------------------------------------------------------------------
+  if  (mc->motionValues!=0)  { free(mc->motionValues); mc->motionValues=0;}
+  mc->motionValues = (float*)  malloc(sizeof(float) * (1+mc->motionValuesSize));
   //-------------------------------------------------------------------------------
  
   if (

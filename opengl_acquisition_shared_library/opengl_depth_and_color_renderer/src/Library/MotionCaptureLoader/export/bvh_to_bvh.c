@@ -113,7 +113,7 @@ int dumpBVHToBVH(
         {
           unsigned int currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
 
-          if (jID+1<mc->jointHierarchySize) { hasNext=1; }
+          if (jID+1<mc->jointHierarchySize) { hasNext=1; } else { hasNext = 0; }
 
           if (hasNext) { nextHierarchyLevel=mc->jointHierarchy[jID+1].hierarchyLevel; } else
                                   { nextHierarchyLevel=0; }
