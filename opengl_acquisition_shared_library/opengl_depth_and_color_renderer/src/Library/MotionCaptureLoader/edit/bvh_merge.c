@@ -401,6 +401,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                        //The final loadedChannels of the original bvh file get copied
                        for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
                         {
+                         fprintf(stderr,"bvhFaceFileToBeMerged.motionValues[%u/%u] = bvhFaceFileOriginal.motionValues[%u/%u];\n",mIDMerged,bvhFaceFileToBeMerged.numberOfValuesPerFrame,mIDOriginal,bvhFaceFileOriginal.numberOfValuesPerFrame);
                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   
                          ++mIDMerged;  
                          ++mIDOriginal;
