@@ -170,19 +170,21 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
    if (totalChannelsRecounted>mc->motionValuesSize)
       {
        fprintf(stderr,YELLOW "increasing Total Motion Channels from %u to %u \n" NORMAL,mc->motionValuesSize,totalChannelsRecounted); 
-       mc->motionValuesSize=totalChannelsRecounted;
-       mc->numberOfValuesPerFrame=totalChannelsRecounted;
+       mc->motionValuesSize = totalChannelsRecounted;
+       mc->numberOfValuesPerFrame = totalChannelsRecounted;
       }
    //-------------------------------------------------------------------------------
 
 
   //Free previous joint lookups
+  //-------------------------------------------------------------------------------
   if  (mc->jointToMotionLookup!=0)  { free(mc->jointToMotionLookup); mc->jointToMotionLookup=0;}
-  mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * (mc->MAX_jointHierarchySize+1));
-  //---------------------------
+  mc->jointToMotionLookup  = (struct BVH_JointToMotion_LookupTable *) malloc( sizeof(struct BVH_JointToMotion_LookupTable) * (mc->MAX_jointHierarchySize+1) );
+  //-------------------------------------------------------------------------------
   if  (mc->motionToJointLookup!=0)  { free(mc->motionToJointLookup); mc->motionToJointLookup=0;}
-  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * (mc->motionValuesSize+1));
-  //---------------------------
+  mc->motionToJointLookup  = (struct BVH_MotionToJoint_LookupTable *) malloc( sizeof(struct BVH_MotionToJoint_LookupTable) * (mc->motionValuesSize+1) );
+  fprintf(stderr,YELLOW "mc->motionToJointLookup[%u] allocated\n" NORMAL,mc->motionValuesSize); 
+  //-------------------------------------------------------------------------------
  
   if (
        (mc->jointToMotionLookup!=0) && (mc->motionToJointLookup!=0)
@@ -244,7 +246,7 @@ int bvh_expandPositionalChannelsOfSelectedJoints(struct BVH_MotionCapture * mc)
                      if (!mc->jointHierarchy[jID].hasPositionalChannels)
                      {
                          for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
-                         {
+                         { //Shift all channels 3 positions down
                            mc->jointHierarchy[jID].channelType[3+channelID] = mc->jointHierarchy[jID].channelType[channelID];
                          }
                          //mc->jointHierarchy[jID].channelType[3] = mc->jointHierarchy[jID].channelType[0];
@@ -448,6 +450,9 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                              filename,
                              &bvhFaceFileToBeMerged
                             ); 
+              } else
+              {
+                  fprintf(stderr,RED "Failed to expand BVH joint hierarchy using bvh_expandPositionalChannelsOfSelectedJoints.. !\n" NORMAL);
               }
              } else
              {
