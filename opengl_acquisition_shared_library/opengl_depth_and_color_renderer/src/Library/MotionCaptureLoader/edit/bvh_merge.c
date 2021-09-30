@@ -198,6 +198,7 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
 
        //Repopulate everything..!
        BVHMotionChannelID mID=0;
+       
        for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
             {
               //We can now update lookup tables..
@@ -305,6 +306,8 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
   struct BVH_MotionCapture bvhFaceFileToBeMerged={0};
   float scaleWorld = 1.0; 
   
+  const int debugFields=1;
+  
    if (!bvh_loadBVH(pathToNeutralFile, &bvhNeutralFile, scaleWorld))
           {
             fprintf(stderr,"Error loading bvh file..\n");
@@ -370,33 +373,45 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //X Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 0.0;
-                        bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] = bvhNeutralFile.jointHierarchy[jID].offset[0];
-
-                        //bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
-                        //bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] = bvhNeutralFile.jointHierarchy[jID].offset[0];
+                        if (debugFields)
+                        {
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 666.0;
+                        } else
+                        {
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
+                          bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] = bvhNeutralFile.jointHierarchy[jID].offset[0];
+                        }
+                        
                         ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
                       
                       //Y Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 0.0; 
-                        bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] = bvhNeutralFile.jointHierarchy[jID].offset[1];
-                        
-                        //bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[1] - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
-                        //bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] = bvhNeutralFile.jointHierarchy[jID].offset[1];
+                        if (debugFields)
+                        {
+                         bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 0.0;
+                        } else
+                        {
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[1] - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
+                          bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] = bvhNeutralFile.jointHierarchy[jID].offset[1];
+                        } 
+                      
                         ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
                       
                       //Z Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                      bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 0.0;
-                      bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] = bvhNeutralFile.jointHierarchy[jID].offset[2];
+                        if (debugFields)
+                        {
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = -666.0;
+                        } else
+                        {
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
+                          bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] = bvhNeutralFile.jointHierarchy[jID].offset[2];
+                        }
                       
-                      //bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
-                      //bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] = bvhNeutralFile.jointHierarchy[jID].offset[2];
                       ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
 
@@ -420,12 +435,24 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                          ++mIDOriginal;
                         }
                       }  else
-                     { 
+                      { 
                         fprintf(stderr,RED "Overflow at final copy jointID %u \n" NORMAL,jID); 
                         fprintf(stderr,RED "Original mID %u -> %u / %u \n" NORMAL,mIDOriginal,mIDOriginal+originalLoadedChannels,bvhFaceFileOriginal.numberOfValuesPerFrame); 
-                        fprintf(stderr,RED "Merged mID %u -> %u / %u \n" NORMAL,mIDMerged,mIDMerged+originalLoadedChannels,bvhFaceFileToBeMerged.numberOfValuesPerFrame); 
+                        fprintf(stderr,RED "Merged mID %u -> %u / %u \n" NORMAL,mIDMerged,mIDMerged+originalLoadedChannels,bvhFaceFileToBeMerged.numberOfValuesPerFrame);
                         break; 
-                     }
+                      }
+                    } else
+                    {
+                        //If the two joints have the same number of channels then we just copy one to the other..
+                        unsigned int originalLoadedChannels =  bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels;
+                        //---------------------------------------------------------------------------------------------
+                        for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
+                        {
+                         //fprintf(stderr,"bvhFaceFileToBeMerged.motionValues[%u/%u] = bvhFaceFileOriginal.motionValues[%u/%u];\n",mIDMerged,bvhFaceFileToBeMerged.numberOfValuesPerFrame,mIDOriginal,bvhFaceFileOriginal.numberOfValuesPerFrame);
+                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   
+                         ++mIDMerged;  
+                         ++mIDOriginal;
+                        }
                     }
                   }
                    else
@@ -446,13 +473,13 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                          ++mIDOriginal;
                       }
                     }  else 
-                    { 
+                    {
                         fprintf(stderr,RED "Overflow at 1:1 copy jointID %u \n" NORMAL,jID); 
                         fprintf(stderr,RED "Original mID %u -> %u / %u \n" NORMAL,mIDOriginal,mIDOriginal+originalLoadedChannels,bvhFaceFileOriginal.numberOfValuesPerFrame); 
-                        fprintf(stderr,RED "Merged mID %u -> %u / %u \n" NORMAL,mIDMerged,mIDMerged+originalLoadedChannels,bvhFaceFileToBeMerged.numberOfValuesPerFrame); 
+                        fprintf(stderr,RED "Merged mID %u -> %u / %u \n" NORMAL,mIDMerged,mIDMerged+originalLoadedChannels,bvhFaceFileToBeMerged.numberOfValuesPerFrame);
                         break; 
                      }
-                  }
+                  } // end of non altered join solution
                 }
                 
                 //Success adding positional channels..

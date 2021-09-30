@@ -1180,12 +1180,11 @@ int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parent
                                    {
                                      fprintf(stderr,RED "bvh_selectChildrenOfJoint failed to allocate selectedJoints\n" NORMAL);
                                      return 0;
-                                   } else
-                                   {
-                                      memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-                                   }
+                                   }  
                                  }
    
+   //This select erases the previous one..
+   memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
    for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
    {
        mc->selectedJoints[jID] = bvh_isJointAChildrenID(mc,parentJID,jID);
