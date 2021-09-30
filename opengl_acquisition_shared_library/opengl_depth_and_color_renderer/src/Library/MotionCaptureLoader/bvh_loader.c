@@ -1024,6 +1024,7 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
       } else
       {
        //Only Root joint has a position field..
+       //fprintf(stderr,"jID %u (%s) has a position field..\n",jID,bvhMotion->jointHierarchy[jID].jointName);
        data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=bvh_getJointPositionXAtMotionBuffer(bvhMotion,jID,motionBuffer);
        data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=bvh_getJointPositionYAtMotionBuffer(bvhMotion,jID,motionBuffer);
        data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=bvh_getJointPositionZAtMotionBuffer(bvhMotion,jID,motionBuffer);  

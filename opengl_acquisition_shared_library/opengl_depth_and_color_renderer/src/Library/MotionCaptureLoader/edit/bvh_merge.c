@@ -404,7 +404,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                        //The final loadedChannels of the original bvh file get copied
                        for (unsigned int channelID=0; channelID<originalLoadedChannels; channelID++)
                         {
-                         fprintf(stderr,"bvhFaceFileToBeMerged.motionValues[%u/%u] = bvhFaceFileOriginal.motionValues[%u/%u];\n",mIDMerged,bvhFaceFileToBeMerged.numberOfValuesPerFrame,mIDOriginal,bvhFaceFileOriginal.numberOfValuesPerFrame);
+                         //fprintf(stderr,"bvhFaceFileToBeMerged.motionValues[%u/%u] = bvhFaceFileOriginal.motionValues[%u/%u];\n",mIDMerged,bvhFaceFileToBeMerged.numberOfValuesPerFrame,mIDOriginal,bvhFaceFileOriginal.numberOfValuesPerFrame);
                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   
                          ++mIDMerged;  
                          ++mIDOriginal;
@@ -420,7 +420,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   }
                    else
                   {
-                     //This is not an altered join so we just need perform 1:1 copy of the loaded channels..
+                     //This is not an altered join so we just need to perform 1:1 copy of the loaded channels..
                      //We will first perform an array bounds check to make sure we won't write/read incorrectly..
                      unsigned int originalLoadedChannels =  bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels;
                      if (
