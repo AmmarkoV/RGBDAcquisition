@@ -212,7 +212,7 @@ int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc)
                          unsigned int thisChannelID = mc->jointHierarchy[jID].channelType[cL];
                          
                          //Update jointToMotion Lookup Table..
-                         mc->jointToMotionLookup[jID].channelIDMotionOffset[thisChannelID] = mID; 
+                         mc->jointToMotionLookup[jID].channelIDMotionOffset[thisChannelID] = mID;
 
                          //Update motionToJoint Lookup Table..
                          mc->motionToJointLookup[mID].channelID = thisChannelID;
@@ -377,7 +377,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //Y Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
+                        bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[1] - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
                         bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] = bvhNeutralFile.jointHierarchy[jID].offset[1];
                         ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
@@ -385,7 +385,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //Z Position ______________________________________________________________________________________________________________________________________________
                       if (mIDMerged<bvhFaceFileToBeMerged.numberOfValuesPerFrame)
                       {
-                      bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
+                      bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
                       bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] = bvhNeutralFile.jointHierarchy[jID].offset[2];
                       ++mIDMerged;
                       } else { fprintf(stderr,RED "Overflow at jointID %u / mID %u \n" NORMAL,jID,mIDMerged); break; }
