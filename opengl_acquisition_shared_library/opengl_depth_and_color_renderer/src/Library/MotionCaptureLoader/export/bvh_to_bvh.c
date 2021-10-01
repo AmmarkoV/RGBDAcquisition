@@ -30,14 +30,14 @@ void writeBVHHierarchyClosingSection(
 {
   unsigned int hierarchyLevel=0;
 
-  fprintf(stderr,"Close Sections from %u->%u : ",hierarchyLevelEnd,hierarchyLevelStart);
+  //fprintf(stderr,"Close Sections from %u->%u : ",hierarchyLevelEnd,hierarchyLevelStart);
   for (hierarchyLevel=hierarchyLevelEnd+1; hierarchyLevel>hierarchyLevelStart; hierarchyLevel--)
   {
-   fprintf(stderr,"%u ",hierarchyLevel);
+   //fprintf(stderr,"%u ",hierarchyLevel);
    indent(fp,hierarchyLevel-1);  fprintf(fp,"}\n");
   }
 
-  fprintf(stderr,"done \n");
+  //fprintf(stderr,"done \n");
 }
 
 
@@ -116,7 +116,7 @@ int dumpBVHToBVH(
           if (jID+1<mc->jointHierarchySize) { hasNext=1; } else { hasNext = 0; }
 
           if (hasNext) { nextHierarchyLevel=mc->jointHierarchy[jID+1].hierarchyLevel; } else
-                                  { nextHierarchyLevel=0; }
+                       { nextHierarchyLevel=0; }
 
           writeBVHHierarchyOpenningSection(fp,mc,jID);
 
@@ -141,7 +141,7 @@ int dumpBVHToBVH(
         for (unsigned int mID=fID*mc->numberOfValuesPerFrame; mID<(fID+1)*mc->numberOfValuesPerFrame; mID++)
          {
            if (valueIsZero(mc->motionValues[mID]))
-           {
+           { //Make file smaller and cleaner instead of spamming it with values like 4.8946335e-17
             fprintf(fp,"0 ");
            } else
            {
