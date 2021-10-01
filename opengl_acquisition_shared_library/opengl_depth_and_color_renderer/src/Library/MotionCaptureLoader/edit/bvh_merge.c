@@ -327,7 +327,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                 return 0;
                }
     //Debug neutral file expansion..
-    snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,pathToNeutralFile);
+    snprintf(filename,1024,"%s/merged_NEUTRAL.bvh",pathToPrependToFilesOfList);
     dumpBVHToBVH(
                   filename,
                   &bvhNeutralFile
@@ -398,6 +398,15 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                 
                 for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
                 {
+                  if  (strcmp(bvhFaceFileOriginal.jointHierarchy[jID].jointName,bvhNeutralFile.jointHierarchy[jID].jointName)!=0)
+                  {
+                      fprintf(stderr,"Joint name (%s) of file to process does not match up to neutral file joint name (%s)",
+                      bvhFaceFileOriginal.jointHierarchy[jID].jointName,
+                      bvhNeutralFile.jointHierarchy[jID].jointName
+                      );
+                      break;
+                  }
+                  
                   //Enforce correct mIDs by querying jointToMotionLookup tables instead of performing count here.. 
                   mIDOriginal = bvhFaceFileOriginal.jointToMotionLookup[jID].jointMotionOffset;
                   mIDMerged   = bvhFaceFileToBeMerged.jointToMotionLookup[jID].jointMotionOffset;
