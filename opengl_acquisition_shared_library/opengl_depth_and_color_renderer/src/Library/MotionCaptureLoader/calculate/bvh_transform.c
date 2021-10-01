@@ -718,15 +718,29 @@ static inline void bvh_performActualTransform(
          create4x4FIdentityMatrix(&bvhTransform->joint[parentID].chainTransformation);
         }
 
-
-        multiplyTwo4x4FMatricesS(
-                                //Output AxB
-                                &bvhTransform->joint[jID].localToWorldTransformation ,
-                                //Parent Output A
-                                &bvhTransform->joint[parentID].chainTransformation,
-                                //This Transform B
-                                &bvhMotion->jointHierarchy[jID].staticTransformation
-                              );
+        if (bvhMotion->jointHierarchy[jID].hasPositionalChannels)
+        {
+          //Special case where joint has positional channels..
+          //We will ignore our static Transform and just use the positional channels encountered
+          multiplyTwo4x4FMatricesS(
+                                  //Output AxB
+                                  &bvhTransform->joint[jID].localToWorldTransformation ,
+                                  //Parent Output A
+                                  &bvhTransform->joint[parentID].chainTransformation,
+                                  //This Transform B
+                                  &bvhTransform->joint[jID].dynamicTranslation
+                                 );
+        } else
+        {
+         multiplyTwo4x4FMatricesS(
+                                  //Output AxB
+                                  &bvhTransform->joint[jID].localToWorldTransformation ,
+                                  //Parent Output A
+                                  &bvhTransform->joint[parentID].chainTransformation,
+                                  //This Transform B
+                                  &bvhMotion->jointHierarchy[jID].staticTransformation
+                                 );
+        }
       } else
       if ( bvhMotion->jointHierarchy[jID].isRoot)
       {
