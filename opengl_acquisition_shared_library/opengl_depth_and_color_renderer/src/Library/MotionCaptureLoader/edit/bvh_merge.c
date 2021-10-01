@@ -319,6 +319,20 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
           }
    bvh_renameJointsForCompatibility(&bvhNeutralFile);
    bvh_selectChildrenOfJoint(&bvhNeutralFile,parentJoint);
+   
+   
+   if (!bvh_expandPositionalChannelsOfSelectedJoints(&bvhNeutralFile) )
+               {
+                fprintf(stderr,"Error expanding neutral bvh file, everything else will fail..\n");
+                return 0;
+               }
+    //Debug neutral file expansion..
+    snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,pathToNeutralFile);
+    dumpBVHToBVH(
+                  filename,
+                  &bvhNeutralFile
+                 ); 
+                 
     
    if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
     { 
