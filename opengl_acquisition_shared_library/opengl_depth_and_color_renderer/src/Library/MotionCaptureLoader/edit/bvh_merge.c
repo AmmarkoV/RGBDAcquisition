@@ -320,19 +320,11 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
    bvh_renameJointsForCompatibility(&bvhNeutralFile);
    bvh_selectChildrenOfJoint(&bvhNeutralFile,parentJoint);
    
-   
    if (!bvh_expandPositionalChannelsOfSelectedJoints(&bvhNeutralFile) )
                {
                 fprintf(stderr,"Error expanding neutral bvh file, everything else will fail..\n");
                 return 0;
                }
-    //Debug neutral file expansion..
-    snprintf(filename,1024,"%s/merged_NEUTRAL.bvh",pathToPrependToFilesOfList);
-    dumpBVHToBVH(
-                  filename,
-                  &bvhNeutralFile
-                 ); 
-                 
     
    if ( ctftm_loadTextFileToMemory(&bvhfiles,pathToListOfFiles) )
     { 
@@ -380,6 +372,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                 BVHMotionChannelID mIDMerged=0;
                 
                 
+                /*
                 fprintf(stderr,"Selected Joints : ");
                 for (BVHJointID jID=0; jID<bvhFaceFileToBeMerged.jointHierarchySize; jID++)
                 {
@@ -392,7 +385,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                               );
                   }
                 }
-                fprintf(stderr,"\n");
+                fprintf(stderr,"\n");*/
                 
                 
                 
@@ -402,8 +395,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   {
                       fprintf(stderr,"Joint name (%s) of file to process does not match up to neutral file joint name (%s)",
                       bvhFaceFileOriginal.jointHierarchy[jID].jointName,
-                      bvhNeutralFile.jointHierarchy[jID].jointName
-                      );
+                      bvhNeutralFile.jointHierarchy[jID].jointName);
                       break;
                   }
                   
@@ -440,23 +432,23 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //==============================================================================================
 
                       //X Position _____________________________________________________________________________________________________________________________________
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0];// - bvhNeutralFile.jointHierarchy[jID].offset[0];
                           bvhFaceFileToBeMerged.jointHierarchy[jID].offset[0] = bvhNeutralFile.jointHierarchy[jID].offset[0];
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
+                          //bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
                           ++mIDMerged;
                       //______________________________________________________________________________________________________________________________________________
                       
                       //Y Position _____________________________________________________________________________________________________________________________________
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[1] - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[1];// - bvhNeutralFile.jointHierarchy[jID].offset[1]; 
                           bvhFaceFileToBeMerged.jointHierarchy[jID].offset[1] = bvhNeutralFile.jointHierarchy[jID].offset[1];
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
+                          //bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
                           ++mIDMerged;
                       //______________________________________________________________________________________________________________________________________________
                       
                       //Z Position _____________________________________________________________________________________________________________________________________
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2];// - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
                           bvhFaceFileToBeMerged.jointHierarchy[jID].offset[2] = bvhNeutralFile.jointHierarchy[jID].offset[2];
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
+                          //bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
                           ++mIDMerged;
                       //______________________________________________________________________________________________________________________________________________
  
@@ -466,7 +458,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                         {
                          //fprintf(stderr,"bvhFaceFileToBeMerged.motionValues[%u/%u] = bvhFaceFileOriginal.motionValues[%u/%u];\n",mIDMerged,bvhFaceFileToBeMerged.numberOfValuesPerFrame,mIDOriginal,bvhFaceFileOriginal.numberOfValuesPerFrame);
                          bvhFaceFileToBeMerged.motionValues[mIDMerged] = bvhFaceFileOriginal.motionValues[mIDOriginal];   
-                         bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
+                         //bvhFaceFileToBeMerged.motionValues[mIDMerged] = 0.0;
                           
                          ++mIDMerged;  
                          ++mIDOriginal;
