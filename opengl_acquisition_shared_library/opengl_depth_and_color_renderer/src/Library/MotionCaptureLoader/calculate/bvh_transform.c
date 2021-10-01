@@ -740,7 +740,7 @@ static inline void bvh_performActualTransform(
       } else
       if ( bvhMotion->jointHierarchy[jID].isRoot)
       {
-       //If we are the root node there is no parent..
+       //If we are the root node there is no parent so we skip the multiplication with the "Identity" chainTransformation..
        //If there is no parent we will only set our position and copy to the final transform
        
        //Skip the matrix multiplication..
@@ -760,7 +760,7 @@ static inline void bvh_performActualTransform(
     bvhTransform->joint[jID].isChainTrasformationComputed=1;
     multiplyTwo4x4FMatricesS(
                            //Output AxB
-                           &bvhTransform->joint[jID].chainTransformation ,
+                           &bvhTransform->joint[jID].chainTransformation,
                            //A
                            &bvhTransform->joint[jID].localToWorldTransformation,
                            //B
