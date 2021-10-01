@@ -384,8 +384,9 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   {
                      //The only way for loaded channels to differ is because of the bvh_expandPositionalChannelsOfSelectedJoints call..
                      if (
-                          ( bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels == 3) &&
-                          ( bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels == 6) 
+                          (bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels == 3) && 
+                          (bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels == 6) && 
+                          (!bvhFaceFileOriginal.jointHierarchy[jID].isEndSite) 
                         )
                      {
                       //Ok this is one of the affected joints that we added positional channels to..!
@@ -460,8 +461,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                     if (bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels != bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels)
                     {
                         fprintf(stderr,RED "ERROR: Mismatched encountered channels at merged file jointID %u (%s) / mID %u \n" NORMAL,jID,bvhFaceFileOriginal.jointHierarchy[jID].jointName,mIDMerged); 
-                        fprintf(stderr,RED "Original Channel count was %u, Merged Channel count is %u \n" NORMAL,bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels,
-                                                                                                               bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels); 
+                        fprintf(stderr,RED "Original Channel count was %u, Merged Channel count is %u \n" NORMAL,bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels,bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels); 
                         break;
                     }
                     
