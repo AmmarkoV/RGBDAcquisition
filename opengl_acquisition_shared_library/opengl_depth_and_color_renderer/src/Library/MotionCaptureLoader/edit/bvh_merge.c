@@ -385,8 +385,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                      //The only way for loaded channels to differ is because of the bvh_expandPositionalChannelsOfSelectedJoints call..
                      if (
                           (bvhFaceFileOriginal.jointHierarchy[jID].loadedChannels == 3) && 
-                          (bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels == 6) && 
-                          (!bvhFaceFileOriginal.jointHierarchy[jID].isEndSite) 
+                          (bvhFaceFileToBeMerged.jointHierarchy[jID].loadedChannels == 6)
                         )
                      {
                       //Ok this is one of the affected joints that we added positional channels to..!
