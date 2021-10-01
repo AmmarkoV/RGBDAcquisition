@@ -311,7 +311,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
   struct BVH_MotionCapture bvhFaceFileToBeMerged={0};
   float scaleWorld = 1.0; 
   
-  const int debugFields=0;
+  const int debugFields=1;
   
    if (!bvh_loadBVH(pathToNeutralFile, &bvhNeutralFile, scaleWorld))
           {
@@ -371,8 +371,15 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                   mIDOriginal = bvhFaceFileOriginal.jointToMotionLookup[jID].jointMotionOffset;
                   mIDMerged   = bvhFaceFileToBeMerged.jointToMotionLookup[jID].jointMotionOffset;
                   
+                  //This should be set to 1 by default and only gets overriden
+                  //if the joint needs special attention..
                   char performRegularChannelCopy = 1;
                   
+                  if (bvhFaceFileOriginal.jointHierarchy[jID].isEndSite)
+                  {
+                    //ignore endsites.. 
+                    performRegularChannelCopy=0;
+                  } else
                   if ( (bvhFaceFileOriginal.selectedJoints[jID]) && (bvhFaceFileToBeMerged.selectedJoints[jID]) )
                   {
                      //The only way for loaded channels to differ is because of the bvh_expandPositionalChannelsOfSelectedJoints call..
@@ -395,7 +402,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //X Position _____________________________________________________________________________________________________________________________________
                         if (debugFields)
                         {
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 666.0;
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = 0.0666;
                         } else
                         {
                           bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[0] - bvhNeutralFile.jointHierarchy[jID].offset[0];
@@ -419,7 +426,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                       //Z Position _____________________________________________________________________________________________________________________________________
                         if (debugFields)
                         {
-                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = -666.0;
+                          bvhFaceFileToBeMerged.motionValues[mIDMerged]       = -0.0666;
                         } else
                         {
                           bvhFaceFileToBeMerged.motionValues[mIDMerged]       = bvhFaceFileOriginal.jointHierarchy[jID].offset[2] - bvhNeutralFile.jointHierarchy[jID].offset[2]; 
