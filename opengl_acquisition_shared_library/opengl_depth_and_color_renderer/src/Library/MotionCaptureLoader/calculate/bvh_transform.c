@@ -759,13 +759,13 @@ static inline void bvh_performActualTransform(
 
     bvhTransform->joint[jID].isChainTrasformationComputed=1;
     multiplyTwo4x4FMatricesS(
-                           //Output AxB
-                           &bvhTransform->joint[jID].chainTransformation,
-                           //A
-                           &bvhTransform->joint[jID].localToWorldTransformation,
-                           //B
-                           &bvhTransform->joint[jID].dynamicRotation
-                          );
+                             //Output AxB
+                             &bvhTransform->joint[jID].chainTransformation,
+                             //A
+                             &bvhTransform->joint[jID].localToWorldTransformation,
+                             //B
+                             &bvhTransform->joint[jID].dynamicRotation
+                            );
 
 
    //Also do 3D position calculation..
