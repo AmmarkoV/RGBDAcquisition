@@ -1,11 +1,11 @@
 /** @file bvh_transform.h
- *  @brief  BVH 3D Transormation code.  
+ *  @brief  BVH 3D Transormation code.
  *          This part of the code does not deal with loading or changing the BVH file but just performing 3D transformations.
- *          In order to keep things clean all transforms take place in the BVH_Transform structure. The 3D calculation code is 
- *          also seperated using the AmMatrix sublibrary https://github.com/AmmarkoV/RGBDAcquisition/tree/master/tools/AmMatrix  
+ *          In order to keep things clean all transforms take place in the BVH_Transform structure. The 3D calculation code is
+ *          also seperated using the AmMatrix sublibrary https://github.com/AmmarkoV/RGBDAcquisition/tree/master/tools/AmMatrix
  *  @author Ammar Qammaz (AmmarkoV)
  */
- 
+
 #ifndef BVH_TRANSFORM_H_INCLUDED
 #define BVH_TRANSFORM_H_INCLUDED
 
@@ -83,7 +83,7 @@ struct BVH_TransformedJoint
 
 
 //Hashing means to generate a new table that only contains
-//The needed fields for transforms in order to try skipping 
+//The needed fields for transforms in order to try skipping
 //checks we know that will fail
 #define USE_TRANSFORM_HASHING 0
 
@@ -101,21 +101,21 @@ struct BVH_TransformedJoint
 
 struct BVH_Transform
 {
-  //Memory Managment flags..
+  //Memory Management flags..
   char transformStructInitialized;
   unsigned int numberOfJointsSpaceAllocated;
   unsigned int numberOfJointsToTransform;
-  
+
   //Skip Joint Optimization Logic
   char useOptimizations;
-  
+
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    unsigned char * skipCalculationsForJoint;
-  #else 
-   unsigned char skipCalculationsForJoint[MAX_BVH_TRANSFORM_SIZE]; 
+  #else
+   unsigned char skipCalculationsForJoint[MAX_BVH_TRANSFORM_SIZE];
   #endif
-  
-  //Transform hashing 
+
+  //Transform hashing
   unsigned int jointIDTransformHashPopulated;
   unsigned int lengthOfListOfJointIDsToTransform;
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
@@ -124,11 +124,11 @@ struct BVH_Transform
    BVHJointID listOfJointIDsToTransform[MAX_BVH_TRANSFORM_SIZE];
   #endif
 
-  //Actual Tranformation data
+  //Actual Transformation data
   struct rectangleArea torso;
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    struct BVH_TransformedJoint * joint;
-  #else 
+  #else
    struct BVH_TransformedJoint joint[MAX_BVH_TRANSFORM_SIZE];
   #endif
   float centerPosition[3];
@@ -178,7 +178,7 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
                                                              struct BVH_Transform * bvhTransform,
                                                              unsigned int populateTorso,
                                                              BVHJointID * listOfJointIDsToTransform,
-                                                             unsigned int lengthOfJointIDList 
+                                                             unsigned int lengthOfJointIDList
                                                             );
 
 
