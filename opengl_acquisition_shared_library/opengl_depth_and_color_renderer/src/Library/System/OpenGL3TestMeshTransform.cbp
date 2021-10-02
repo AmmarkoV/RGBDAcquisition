@@ -58,6 +58,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.h" />
+		<Unit filename="../ModelLoader/model_loader_transform_joints.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ModelLoader/model_loader_transform_joints.h" />
 		<Unit filename="../ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -188,6 +192,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Tools/tools.h" />
+		<Unit filename="../TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../TrajectoryParser/InputParser_C.h" />
 		<Unit filename="glx3.c">
 			<Option compilerVar="CC" />
 		</Unit>
