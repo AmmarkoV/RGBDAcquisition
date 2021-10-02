@@ -282,6 +282,18 @@ int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
 */
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
+
+
+
+/**
+* @brief  Convert all TRI Bone names to lowercase to make them easier to parse
+* @ingroup TRI
+* @param  TRI structure with the bone names we want to make lowercase
+* @retval 0=Failure,1=Success
+*/
+int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel);
+
+
 /**
 * @brief  Search inside the bone tree of a TRI Model and get back a specific boneID
 * @ingroup TRI

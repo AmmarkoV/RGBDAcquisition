@@ -32,14 +32,14 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_Mo
         for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
         {
          struct TRI_Bones * bone = &model->bones[boneID];
-         fprintf(stderr,"Bone %u/%u = %s \n",boneID,model->header.numberOfBones,bone->boneName);
+         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model->header.numberOfBones,bone->boneName);
         }
 
-        fprintf(stderr,"BVH file %s has %u jones\n",bvh->fileName,bvh->jointHierarchySize);
+        fprintf(stderr,"BVH file %s has %u joints\n",bvh->fileName,bvh->jointHierarchySize);
         for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
         {
           //bvhTransform->joint[jID].
-
+         fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
         }
 
 

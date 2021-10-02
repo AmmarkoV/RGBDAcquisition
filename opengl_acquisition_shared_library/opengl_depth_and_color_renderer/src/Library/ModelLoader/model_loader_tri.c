@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+//For lowercase
+#include <ctype.h>
+
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -608,7 +611,29 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
-int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName , unsigned int * boneIDResult)
+void TRI_lowercase(char *a)
+{
+    if (a==0)
+        {
+            return;
+        }
+    while (*a!=0)
+        {
+            *a = tolower(*a);
+            ++a;
+        }
+}
+
+int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
+{
+  for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+  {
+    TRI_lowercase(triModel->bones[boneID].boneName);
+  }
+}
+
+
+int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName , unsigned int * boneIDResult)
 {
 if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
   {
@@ -785,6 +810,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
         fflush(fd);
         fclose(fd);
+        fprintf(stderr,GREEN "Success writing TRI model %s to disk \n" NORMAL,filename);
         return 1;
     }
   return 0;
@@ -846,7 +872,7 @@ void doTriDrawCalllist(struct TRI_Model * tri )
     }
   glEnd();
  #else
-  fprintf(stderr,"OpenGL code not compiled in this model loader TRI code.. \n");
+  fprintf(stderr,YELLOW "OpenGL code not compiled in this model loader TRI code.. \n" NORMAL);
  #endif // INCLUDE_OPENGL_CODE
 }
 
