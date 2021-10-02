@@ -28,7 +28,11 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_Mo
                                 )
      )
      {
+        for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+        {
+          bvhTransform->joint[jID].
 
+        }
 
 
      }
