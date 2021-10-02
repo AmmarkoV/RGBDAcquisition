@@ -60,6 +60,7 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader_hardcoded.h 
             ModelLoader/model_loader_transform_joints.c
             ModelLoader/model_loader_transform_joints.h
+            ModelLoader/tri_bvh_controller.h
             ModelLoader/model_processor.c
             ModelLoader/model_processor.h
             ModelLoader/model_converter.c

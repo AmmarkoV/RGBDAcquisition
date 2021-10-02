@@ -296,7 +296,6 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
-
 unsigned int * convertTRIBonesToParentList(struct TRI_Model * in , unsigned int * outputNumberOfBones)
 {
 
@@ -496,9 +495,6 @@ int setTRIModelBoneInitialPosition(struct TRI_Model * in)
 
    return 0;
 }
-
-
-
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
@@ -709,16 +705,15 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
 
 /* This is direct setting of the joint data , overwriting default values */
 void recursiveJointHierarchyTransformerDirect(
-                                         struct TRI_Model * in  ,
-                                         int curBone ,
-                                         float * parentTransformUntouched ,
-                                         float * jointData , unsigned int jointDataSize ,
-                                         unsigned int recursionLevel
-                                       )
+                                               struct TRI_Model * in  ,
+                                               int curBone ,
+                                               float * parentTransformUntouched ,
+                                               float * jointData , unsigned int jointDataSize ,
+                                               unsigned int recursionLevel
+                                             )
 {
   if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT (%u/%u)\n_____________________\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
-
 
    unsigned int i=0;
    float parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
@@ -727,14 +722,14 @@ void recursiveJointHierarchyTransformerDirect(
 
   if ( in->bones[curBone].info->boneWeightsNumber>0 )
   {
-	  //////////////////
-	  //NO, WRONG!! in->bones[curBone].info->altered is set by an arbitrary rot==identity (in the calling function) but nothing prevent it
-	  // from being so, especially when I try to debug it....
-	  //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
-	  float newRot[16],nodeCopy[16];
-	  copy4x4FMatrix(newRot,&jointData[curBone*16]);
-	  copy4x4FMatrix(nodeCopy,nodeTransformation);
-	  multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeCopy,newRot);
+    //////////////////
+    //NO, WRONG!! in->bones[curBone].info->altered is set by an arbitrary rot==identity (in the calling function) but nothing prevent it
+    // from being so, especially when I try to debug it....
+    //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
+      float newRot[16],nodeCopy[16];
+      copy4x4FMatrix(newRot,&jointData[curBone*16]);
+      copy4x4FMatrix(nodeCopy,nodeTransformation);
+      multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeCopy,newRot);
 
 
       multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
@@ -749,12 +744,12 @@ void recursiveJointHierarchyTransformerDirect(
       {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHierarchyTransformerDirect(
-                                           in  ,
-                                           curBoneChild ,
-                                           globalTransformation ,
-                                           jointData , jointDataSize ,
-                                           recursionLevel+1
-                                         );
+                                                 in  ,
+                                                 curBoneChild ,
+                                                 globalTransformation ,
+                                                 jointData , jointDataSize ,
+                                                 recursionLevel+1
+                                                );
       }
     } else
     {
@@ -763,12 +758,12 @@ void recursiveJointHierarchyTransformerDirect(
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHierarchyTransformerDirect(
-                                           in  ,
-                                           curBoneChild ,
-                                           globalTransformation ,
-                                           jointData , jointDataSize ,
-                                           recursionLevel+1
-                                         );
+                                                 in  ,
+                                                 curBoneChild ,
+                                                 globalTransformation ,
+                                                 jointData , jointDataSize ,
+                                                 recursionLevel+1
+                                                );
        }
     }
 }
@@ -807,8 +802,11 @@ void recursiveJointHierarchyTransformer(
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       //Set all matrices to identity..
       float translation[16]={0} , rotation[16]={0} , scaling[16]={0}; 
+      //------------------------------------------------------------------------------------------
       translation[0] = 1.0; translation[5] = 1.0; translation[10] = 1.0; translation[15] = 1.0;
+      //------------------------------------------------------------------------------------------
       rotation[0] = 1.0;    rotation[5] = 1.0;    rotation[10] = 1.0;    rotation[15] = 1.0;
+      //------------------------------------------------------------------------------------------
       scaling[0] = 1.0;     scaling[5] = 1.0;     scaling[10] = 1.0;     scaling[15] = 1.0;
       //------------------------------------------------------------------------------------------
 
@@ -843,7 +841,7 @@ void recursiveJointHierarchyTransformer(
                                            globalTransformation ,
                                            jointData , jointDataSize ,
                                            recursionLevel+1
-                                         );
+                                          );
       }
     } else
     {
@@ -857,7 +855,7 @@ void recursiveJointHierarchyTransformer(
                                            globalTransformation ,
                                            jointData , jointDataSize ,
                                            recursionLevel+1
-                                         );
+                                          );
        }
     }
 }

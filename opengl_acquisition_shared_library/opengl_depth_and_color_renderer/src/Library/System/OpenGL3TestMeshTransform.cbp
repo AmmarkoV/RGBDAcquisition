@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="OpenGL3TestMeshTransform" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="./gl3MeshTransform" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="./gl3MeshTransform" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-DUSE_GLEW" />
+		</Compiler>
+		<Linker>
+			<Add option="-lGL" />
+			<Add option="-lGLU" />
+			<Add option="-lX11" />
+			<Add option="-lGLEW" />
+			<Add option="-lm" />
+			<Add option="-pthread" />
+			<Add library="../../../../../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../../../../../acquisition/libRGBDAcquisition.so" />
+		</Linker>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/quaternions.h" />
+		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.h" />
+		<Unit filename="../ModelLoader/model_loader_tri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ModelLoader/model_loader_tri.h" />
+		<Unit filename="../MotionCaptureLoader/bvh_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_project.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_project.h" />
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_to_tri_pose.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_to_tri_pose.h" />
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_transform.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/calculate/bvh_transform.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_cut_paste.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_cut_paste.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_filter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_filter.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_interpolate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_interpolate.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_merge.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_merge.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_randomize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_randomize.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_remapangles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_remapangles.h" />
+		<Unit filename="../MotionCaptureLoader/edit/bvh_rename.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/edit/bvh_rename.h" />
+		<Unit filename="../MotionCaptureLoader/edit/cTextFileToMemory.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_export.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_export.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_bvh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_bvh.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_c.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_c.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_csv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_csv.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_svg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_svg.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
+		<Unit filename="../MotionCaptureLoader/ik/bvh_inverseKinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/ik/bvh_inverseKinematics.h" />
+		<Unit filename="../MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.h" />
+		<Unit filename="../MotionCaptureLoader/ik/levmar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/ik/levmar.h" />
+		<Unit filename="../MotionCaptureLoader/import/fromBVH.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/import/fromBVH.h" />
+		<Unit filename="../MotionCaptureLoader/mathLibrary.h" />
+		<Unit filename="../MotionCaptureLoader/metrics/bvh_measure.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/metrics/bvh_measure.h" />
+		<Unit filename="../MotionCaptureLoader/tests/test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/tests/test.h" />
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.h" />
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadTextures.h" />
+		<Unit filename="../Rendering/downloadFromRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/downloadFromRenderer.h" />
+		<Unit filename="../Tools/save_to_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/save_to_file.h" />
+		<Unit filename="../Tools/tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/tools.h" />
+		<Unit filename="glx3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="glx3.h" />
+		<Unit filename="glx_testMeshTransform.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
