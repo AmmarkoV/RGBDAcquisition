@@ -462,6 +462,8 @@ int main(int argc,const char **argv)
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
+   animateTRIModelUsingBVHArmature(&triModel,&mc,0);
+
    doDrawing();
 
   stop_glx3_stuff();
