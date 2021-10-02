@@ -462,7 +462,8 @@ int main(int argc,const char **argv)
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
-   animateTRIModelUsingBVHArmature(&triModel,&mc,0);
+   //&triModel
+   animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,0);
 
    doDrawing();
 

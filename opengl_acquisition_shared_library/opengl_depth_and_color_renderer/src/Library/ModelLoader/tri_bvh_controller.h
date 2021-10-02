@@ -28,15 +28,27 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_Mo
                                 )
      )
      {
+        fprintf(stderr,"TRI file %s has %u bones\n",model->name,model->header.numberOfBones);
+        for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+        {
+         struct TRI_Bones * bone = &model->bones[boneID];
+         fprintf(stderr,"Bone %u/%u = %s \n",boneID,model->header.numberOfBones,bone->boneName);
+        }
+
+        fprintf(stderr,"BVH file %s has %u jones\n",bvh->fileName,bvh->jointHierarchySize);
         for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
         {
-          bvhTransform->joint[jID].
+          //bvhTransform->joint[jID].
 
         }
 
 
+        return 0;
+     } else
+     {
+       fprintf(stderr,"Error: Failed executing bvh transform\n");
      }
-
+ exit(0);
  return 0;
 }
 
