@@ -22,6 +22,8 @@
 #include "../ModelLoader/hardcoded_shapes.h"
 #include "../ModelLoader/model_loader_tri.h"
 
+#include "../ModelLoader/tri_bvh_controller.h"
+
 #include "../MotionCaptureLoader/bvh_loader.h"
 
 #include "glx3.h"
@@ -193,7 +195,7 @@ int doTiledDrawing(
 
         float x=-259.231f;//(float)  (1000-rand()%2000);
         float y=-854.976f;//(float) (100-rand()%200);
-        float z=3699.735f;//(float)  (700+rand()%1000);
+        float z=4699.735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;

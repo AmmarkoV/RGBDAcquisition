@@ -66,6 +66,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../ModelLoader/model_loader_tri.h" />
+		<Unit filename="../ModelLoader/tri_bvh_controller.h" />
 		<Unit filename="../MotionCaptureLoader/bvh_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
