@@ -10,8 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//For lowercase
-#include <ctype.h>
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -608,28 +606,6 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         return 1;
     }
   return 0;
-}
-
-
-void TRI_lowercase(char *a)
-{
-    if (a==0)
-        {
-            return;
-        }
-    while (*a!=0)
-        {
-            *a = tolower(*a);
-            ++a;
-        }
-}
-
-int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
-{
-  for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
-  {
-    TRI_lowercase(triModel->bones[boneID].boneName);
-  }
 }
 
 

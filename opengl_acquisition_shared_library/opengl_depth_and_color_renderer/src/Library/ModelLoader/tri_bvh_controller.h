@@ -12,6 +12,37 @@
 #include "../MotionCaptureLoader/bvh_loader.h"
 #include "../MotionCaptureLoader/calculate/bvh_transform.h"
 
+
+//For lowercase
+#include <ctype.h>
+
+
+void TRIBVH_lowercase(char *a)
+{
+    if (a==0)
+        {
+            return;
+        }
+    while (*a!=0)
+        {
+            *a = tolower(*a);
+            ++a;
+        }
+}
+
+int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
+{
+  for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+  {
+    TRIBVH_lowercase(triModel->bones[boneID].boneName);
+  }
+ return 0;
+}
+
+
+
+
+
 const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_MotionCapture * bvh,unsigned int frameID)
 {
  if (model==0) { return 0; }
