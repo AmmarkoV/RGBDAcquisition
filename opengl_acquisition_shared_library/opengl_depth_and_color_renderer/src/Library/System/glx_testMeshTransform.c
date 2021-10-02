@@ -114,13 +114,13 @@ int drawObjectAT(GLuint programID,
                                     ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
-                                    (float) x/100,
-                                    (float) y/100,
-                                    (float) z/100,
+                                    (float) x,
+                                    (float) y,
+                                    (float) z,
 
-                                    10.0,//scaleX,
-                                    10.0,//scaleY,
-                                    10.0//scaleZ
+                                    1.0,//scaleX,
+                                    1.0,//scaleY,
+                                    1.0//scaleZ
                                    );
 
       //-------------------------------------------------------------------
@@ -163,8 +163,8 @@ int doTiledDrawing(
                    GLuint MVPMatrixID ,
                    GLuint cubeVao,
                    unsigned int cubeTriangleCount,
-                   GLuint pyramidVao,
-                   unsigned int pyramidTriangleCount,
+                   GLuint humanVao,
+                   unsigned int humanTriangleCount,
                    unsigned int tilesX,
                    unsigned int tilesY
                    )
@@ -189,13 +189,13 @@ int doTiledDrawing(
                     );
 
      //-------------------------------------------------------------------
-        float roll=0.0;//(float)  (rand()%90);
+        float roll=180.0;//(float)  (rand()%90);
         float pitch=0.0;//(float) (rand()%90);
         float yaw=0.0;//(float)   (rand()%90);
 
-        float x=-259.231f;//(float)  (1000-rand()%2000);
-        float y=-854.976f;//(float) (100-rand()%200);
-        float z=4699.735f;//(float)  (700+rand()%1000);
+        float x=0.0f;//(float)  (1000-rand()%2000);
+        float y=-8.976f;//(float) (100-rand()%200);
+        float z=26.99735f;//(float)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
@@ -218,6 +218,7 @@ int doTiledDrawing(
                                                   newViewport
                                                 );
 
+                                                /*
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
                   programID,
@@ -234,13 +235,13 @@ int doTiledDrawing(
                   &viewportMatrix,
                   &viewMatrix
                  );
-
+*/
      drawObjectAT(
                   programID,
-                  pyramidVao,
+                  humanVao,
                   MVPMatrixID,
-                  pyramidTriangleCount,
-                  x+1100,
+                  humanTriangleCount,
+                  x,
                   y,
                   z,
                   roll,

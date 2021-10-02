@@ -11,7 +11,15 @@
 #include "model_loader_transform_joints.h"
 #include "../MotionCaptureLoader/bvh_loader.h"
 
+const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_MotionCapture * bvh)
+{
+ if (model==0) { return 0; }
+ if (bvh==0)   { return 0; }
+ //--------------------------
 
+
+ return 0;
+}
 
 
 
