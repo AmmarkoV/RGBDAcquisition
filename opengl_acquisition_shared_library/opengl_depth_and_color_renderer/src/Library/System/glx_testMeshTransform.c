@@ -22,6 +22,8 @@
 #include "../ModelLoader/hardcoded_shapes.h"
 #include "../ModelLoader/model_loader_tri.h"
 
+#include "../MotionCaptureLoader/bvh_loader.h"
+
 #include "glx3.h"
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -39,9 +41,9 @@
 
 
 //Change this to change MultiRendering numbers
-#define originalWIDTH 916
-#define originalHEIGHT 1920
-#define tilesToDoX 2
+#define originalWIDTH 1080
+#define originalHEIGHT 1080
+#define tilesToDoX 1
 #define tilesToDoY 1
 #define shrinkingFactor 1
 //--------------------------------------------
@@ -424,9 +426,10 @@ int main(int argc,const char **argv)
 	 	return 1;
    }
 
-   #define defaultModelToLoad "../../../Models/Ammar.tri"
+   #define defaultModelToLoad "makehuman.tri"
    const char * modelToLoad = defaultModelToLoad;
 
+   struct BVH_MotionCapture mc = {0};
 
     for (int i=0; i<argc; i++)
         {
@@ -440,6 +443,11 @@ int main(int argc,const char **argv)
 
         }
 
+    if (!bvh_loadBVH("merged_neutral.bvh",&mc,1.0) ) // This is the new armature that includes the head
+        {
+          fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
+          return 0;
+        }
 
 
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )
