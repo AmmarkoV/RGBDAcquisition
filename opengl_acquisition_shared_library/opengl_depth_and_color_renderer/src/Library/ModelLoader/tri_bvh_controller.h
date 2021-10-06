@@ -80,12 +80,12 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
 
         applyVertexTransformation(modelOriginal,&model);
 
-        return 0;
+        return 1;
      } else
      {
        fprintf(stderr,"Error: Failed executing bvh transform\n");
      }
- exit(0);
+
  return 0;
 }
 

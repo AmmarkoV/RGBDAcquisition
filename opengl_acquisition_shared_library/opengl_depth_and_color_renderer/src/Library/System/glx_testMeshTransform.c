@@ -21,6 +21,7 @@
 
 #include "../ModelLoader/hardcoded_shapes.h"
 #include "../ModelLoader/model_loader_tri.h"
+#include "../ModelLoader/model_loader_transform_joints.h"
 
 #include "../ModelLoader/tri_bvh_controller.h"
 

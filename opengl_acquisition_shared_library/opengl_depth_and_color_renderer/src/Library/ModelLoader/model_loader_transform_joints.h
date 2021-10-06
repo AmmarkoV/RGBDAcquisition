@@ -164,6 +164,9 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
                                                       unsigned int method
                                                      );
 
+
+int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn );
+
 void printModelTransform(struct TRI_Model * in);
 
 /**

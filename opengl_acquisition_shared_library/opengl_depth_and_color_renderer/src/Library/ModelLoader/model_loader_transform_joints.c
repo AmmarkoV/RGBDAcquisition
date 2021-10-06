@@ -178,10 +178,10 @@ void HsvToRgb(float h,float S,float V, float * r, float * g, float * b)
 
 
 void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *oG,float *oB)
-{ 
+{
   unsigned int sCoef=10;
   unsigned int vCoef=40;
- 
+
   unsigned int hStep = (unsigned int) 360/maxID;
   unsigned int sStep = (unsigned int) sCoef/maxID;
   unsigned int vStep = (unsigned int) vCoef/maxID;
@@ -801,7 +801,7 @@ void recursiveJointHierarchyTransformer(
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       //Set all matrices to identity..
-      float translation[16]={0} , rotation[16]={0} , scaling[16]={0}; 
+      float translation[16]={0} , rotation[16]={0} , scaling[16]={0};
       //------------------------------------------------------------------------------------------
       translation[0] = 1.0; translation[5] = 1.0; translation[10] = 1.0; translation[15] = 1.0;
       //------------------------------------------------------------------------------------------
@@ -866,7 +866,9 @@ void recursiveJointHierarchyTransformer(
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
   //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
-  float transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
+  struct Vector4x1OfFloats transformedPosition={0},transformedNormal={0},position={0},normal={0};
+
+  //float transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
   unsigned int i,k;
  //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
@@ -892,7 +894,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[k].info->finalVertexTransformation);
-         
+
        //V is the vertice we will be working in this loop
        unsigned int v = triModelIn->bones[k].weightIndex[i];
        //W is the weight that we have for the specific bone
@@ -901,30 +903,30 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
        //Vertice transformation ----------------------------------------------
        //We load our input into position/normal
-       position[0] = triModelIn->vertices[v*3+0];
-       position[1] = triModelIn->vertices[v*3+1];
-       position[2] = triModelIn->vertices[v*3+2];
-       position[3] = 1.0;
+       position.m[0] = triModelIn->vertices[v*3+0];
+       position.m[1] = triModelIn->vertices[v*3+1];
+       position.m[2] = triModelIn->vertices[v*3+2];
+       position.m[3] = 1.0;
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
-       transform3DPointFVectorUsing4x4FMatrix(transformedPosition,&alignedMatrixHolder,position);
-       triModelOut->vertices[v*3+0] += (float) transformedPosition[0] * w;
-       triModelOut->vertices[v*3+1] += (float) transformedPosition[1] * w;
-       triModelOut->vertices[v*3+2] += (float) transformedPosition[2] * w;
+       transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&alignedMatrixHolder,&position);
+       triModelOut->vertices[v*3+0] += (float) transformedPosition.m[0] * w;
+       triModelOut->vertices[v*3+1] += (float) transformedPosition.m[1] * w;
+       triModelOut->vertices[v*3+2] += (float) transformedPosition.m[2] * w;
        //----------------------------------------------------------------------
 
 
        //Normal transformation ----------------------------------------------
-       normal[0]   = triModelIn->normal[v*3+0];
-       normal[1]   = triModelIn->normal[v*3+1];
-       normal[2]   = triModelIn->normal[v*3+2];
-       normal[3]   = 0.0;
+       normal.m[0]   = triModelIn->normal[v*3+0];
+       normal.m[1]   = triModelIn->normal[v*3+1];
+       normal.m[2]   = triModelIn->normal[v*3+2];
+       normal.m[3]   = 0.0;
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
-       transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal,&alignedMatrixHolder,normal);
-       triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
-       triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
-       triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
+       transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&alignedMatrixHolder,normal.m);
+       triModelOut->normal[v*3+0] += (float) transformedNormal.m[0] * w;
+       triModelOut->normal[v*3+1] += (float) transformedNormal.m[1] * w;
+       triModelOut->normal[v*3+2] += (float) transformedNormal.m[2] * w;
        //----------------------------------------------------------------------
 
      }
@@ -1010,7 +1012,7 @@ int doModelTransform(
   m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
   m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
   m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
-  
+
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
