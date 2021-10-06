@@ -43,11 +43,16 @@ int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
 
 
 
-const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_MotionCapture * bvh,unsigned int frameID)
+const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struct BVH_MotionCapture * bvh,unsigned int frameID)
 {
- if (model==0) { return 0; }
+ if (modelOriginal==0) { return 0; }
  if (bvh==0)   { return 0; }
  //--------------------------
+
+ struct TRI_Model model={0};
+
+ copyModelTri( &model , modelOriginal , 1 /*We also want bone data*/);
+
 
   struct BVH_Transform bvhTransform={0};
   if (
@@ -59,11 +64,11 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_Mo
                                 )
      )
      {
-        fprintf(stderr,"TRI file %s has %u bones\n",model->name,model->header.numberOfBones);
-        for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+        fprintf(stderr,"TRI file %s has %u bones\n",model.name,model.header.numberOfBones);
+        for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
         {
-         struct TRI_Bones * bone = &model->bones[boneID];
-         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model->header.numberOfBones,bone->boneName);
+         struct TRI_Bones * bone = &model.bones[boneID];
+         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model.header.numberOfBones,bone->boneName);
         }
 
         fprintf(stderr,"BVH file %s has %u joints\n",bvh->fileName,bvh->jointHierarchySize);
@@ -73,6 +78,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * model,struct BVH_Mo
          fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
         }
 
+        applyVertexTransformation(modelOriginal,&model);
 
         return 0;
      } else

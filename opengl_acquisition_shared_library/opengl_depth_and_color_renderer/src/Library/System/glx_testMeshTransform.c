@@ -60,9 +60,6 @@ unsigned long lastRenderingTime = 0;
 unsigned int framesRendered=0;
 
 
-struct TRI_Model indexedTriModel={0};
-struct TRI_Model triModel={0};
-
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
     return 0;
@@ -263,7 +260,7 @@ int doTiledDrawing(
 
 
 
-int doDrawing()
+int doDrawing(struct TRI_Model * triModel)
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
@@ -314,17 +311,17 @@ int doDrawing()
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
-    unsigned int humanTriangleCount  =  (unsigned int)  triModel.header.numberOfVertices/3;
+    unsigned int humanTriangleCount  =  (unsigned int)  triModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
                              programID  ,
-                             triModel.vertices  ,  triModel.header.numberOfVertices * sizeof(float) ,
-                             triModel.normal    ,  triModel.header.numberOfNormals  * sizeof(float),
+                             triModel->vertices  ,  triModel->header.numberOfVertices * sizeof(float) ,
+                             triModel->normal    ,  triModel->header.numberOfNormals  * sizeof(float),
                              0,0,
                              //triModel.textureCoords  ,  triModel.header.numberOfTextureCoords ,
-                             triModel.colors  ,  triModel.header.numberOfColors  * sizeof(float) ,
+                             triModel->colors  ,  triModel->header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
     fprintf(stderr,"Ready to render: ");
@@ -432,9 +429,15 @@ int main(int argc,const char **argv)
    #define defaultModelToLoad "makehuman.tri"
    const char * modelToLoad = defaultModelToLoad;
 
+   //------------------------------------------------------
    struct BVH_MotionCapture mc = {0};
+   //------------------------------------------------------
+   struct TRI_Model indexedTriModel={0};
+   struct TRI_Model triModel={0};
+   //------------------------------------------------------
 
-    for (int i=0; i<argc; i++)
+   //------------------------------------------------------
+   for (int i=0; i<argc; i++)
         {
            if (strcmp(argv[i],"--from")==0)
                     {
@@ -445,27 +448,31 @@ int main(int argc,const char **argv)
                     }
 
         }
-
-    if (!bvh_loadBVH("merged_neutral.bvh",&mc,1.0) ) // This is the new armature that includes the head
+   //------------------------------------------------------
+   if (!bvh_loadBVH("merged_neutral.bvh",&mc,1.0) ) // This is the new armature that includes the head
         {
           fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
           return 0;
         }
-
-
+   //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )
    {
      fprintf(stderr,"please cd ../../Models/\n");
      fprintf(stderr,"and then wget http://ammar.gr/models/Ammar.tri\n");
      return 0;
    }
+   //------------------------------------------------------
+
+
+   //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
+   //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
    //&triModel
    animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,0);
 
-   doDrawing();
+   doDrawing(&triModel);
 
   stop_glx3_stuff();
  return 0;
