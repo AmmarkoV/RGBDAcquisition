@@ -78,6 +78,44 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
          fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
         }
 
+        int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * model.header.numberOfBones);
+
+        if (lookupTableFromTRIToBVH!=0)
+        {
+          memset(lookupTableFromTRIToBVH,0,sizeof(int) * model.header.numberOfBones);
+
+          for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+           {
+              for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
+              {
+                struct TRI_Bones * bone = &model.bones[boneID];
+                if (strcmp(bone->boneName,bvh->jointHierarchy[jID].jointName)==0)
+                {
+                  fprintf(stderr,"BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
+                  fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model.header.numberOfBones,bone->boneName);
+                  lookupTableFromTRIToBVH[boneID]=jID;
+                }
+              }
+           }
+
+          for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
+              {
+                if (lookupTableFromTRIToBVH[boneID]!=0)
+                {
+                  BVHJointID jID = lookupTableFromTRIToBVH[boneID];
+
+                  memcpy(
+                         model.bones[boneID].info->finalVertexTransformation,
+                         bvhTransform.joint[jID].chainTransformation.m,
+                         sizeof(float) * 16
+                        );
+                }
+              }
+
+         free(lookupTableFromTRIToBVH);
+        }
+
+
         applyVertexTransformation(modelOriginal,&model);
 
         return 1;
