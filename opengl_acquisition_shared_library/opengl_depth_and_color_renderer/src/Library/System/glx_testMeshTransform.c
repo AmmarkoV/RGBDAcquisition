@@ -215,7 +215,9 @@ int doTiledDrawing(
                                                   viewportMatrix.m,
                                                   newViewport
                                                 );
-
+     //-------------------------------
+     //-------------------------------
+     //-------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
                   programID,
@@ -223,8 +225,8 @@ int doTiledDrawing(
                   MVPMatrixID,
                   eyeTriangleCount,
                   x,
-                  y,
-                  z,
+                  y+0.05,
+                  z+0.8,
                   roll,
                   pitch,
                   yaw,
@@ -233,7 +235,9 @@ int doTiledDrawing(
                   &viewportMatrix,
                   &viewMatrix
                  );
-
+     //-------------------------------
+     //-------------------------------
+     //-------------------------------
      drawObjectAT(
                   programID,
                   humanVao,
@@ -250,6 +254,9 @@ int doTiledDrawing(
                   &viewportMatrix,
                   &viewMatrix
                  );
+     //-------------------------------
+     //-------------------------------
+     //-------------------------------
 
       viewMatrix.m[3]+=1.0;
     }
