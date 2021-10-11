@@ -467,12 +467,15 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )
    {
-     fprintf(stderr,"please cd ../../Models/\n");
-     fprintf(stderr,"and then wget http://ammar.gr/models/Ammar.tri\n");
+     fprintf(stderr,"Please : \n");
+     fprintf(stderr,"wget http://ammar.gr/mocapnet/makehuman.tri\n");
      return 0;
    }
-   if (!loadModelTri("eye.tri", &indexedEyeModel ) )
+   //------------------------------------------------------
+   if (!loadModelTri("eyes.tri", &indexedEyeModel ) )
    {
+     fprintf(stderr,"Please : \n");
+     fprintf(stderr,"wget http://ammar.gr/mocapnet/eyes.tri\n");
      return 0;
    }
    //------------------------------------------------------
