@@ -80,7 +80,6 @@ int drawObjectAT(GLuint programID,
                  GLuint MatrixID,
                  unsigned int triangleCount,
 
-
                  float x,
                  float y,
                  float z,
