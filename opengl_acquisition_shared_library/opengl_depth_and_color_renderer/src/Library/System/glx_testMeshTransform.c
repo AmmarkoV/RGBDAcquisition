@@ -159,42 +159,42 @@ int drawObjectAT(GLuint programID,
 int doTiledDrawing(
                    int programID,
                    GLuint MVPMatrixID ,
-                   GLuint cubeVao,
-                   unsigned int cubeTriangleCount,
+                   GLuint eyeVao,
+                   unsigned int eyeTriangleCount,
                    GLuint humanVao,
                    unsigned int humanTriangleCount,
                    unsigned int tilesX,
                    unsigned int tilesY
                    )
 {
-     struct Matrix4x4OfFloats projectionMatrix;
-     struct Matrix4x4OfFloats viewportMatrix;
-     struct Matrix4x4OfFloats viewMatrix;
+  struct Matrix4x4OfFloats projectionMatrix;
+  struct Matrix4x4OfFloats viewportMatrix;
+  struct Matrix4x4OfFloats viewMatrix;
 
-     prepareRenderingMatrices(
-                     1235.423889, //fx
-                     1233.48468,  //fy
-                     0.0,        //skew
-                     (float) originalWIDTH/2,    //cx
-                     (float) originalHEIGHT/2,   //cy
-                     (float) originalWIDTH,      //Window Width
-                     (float) originalHEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     &projectionMatrix,
-                     &viewMatrix,
-                     &viewportMatrix
-                    );
+  prepareRenderingMatrices(
+                              1235.423889, //fx
+                              1233.48468,  //fy
+                              0.0,        //skew
+                              (float) originalWIDTH/2,    //cx
+                              (float) originalHEIGHT/2,   //cy
+                              (float) originalWIDTH,      //Window Width
+                              (float) originalHEIGHT,     //Window Height
+                              1.0,        //Near
+                              255.0,      //Far
+                              &projectionMatrix,
+                              &viewMatrix,
+                              &viewportMatrix
+                         );
 
-     //-------------------------------------------------------------------
-        float roll=180.0;//(float)  (rand()%90);
-        float pitch=0.0;//(float) (rand()%90);
-        float yaw=0.0;//(float)   (rand()%90);
+  //-------------------------------------------------------------------
+  float roll=180.0;//(float)  (rand()%90);
+  float pitch=0.0;//(float) (rand()%90);
+  float yaw=0.0;//(float)   (rand()%90);
 
-        float x=0.0f;//(float)  (1000-rand()%2000);
-        float y=-8.976f;//(float) (100-rand()%200);
-        float z=26.99735f;//(float)  (700+rand()%1000);
-     //-------------------------------------------------------------------
+  float x=0.0f;//(float)  (1000-rand()%2000);
+  float y=-8.976f;//(float) (100-rand()%200);
+  float z=26.99735f;//(float)  (700+rand()%1000);
+  //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
   unsigned int viewportHeight = (unsigned int) HEIGHT / tilesY;
@@ -216,24 +216,24 @@ int doTiledDrawing(
                                                   newViewport
                                                 );
 
-                                                /*
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
                   programID,
-                  cubeVao,
+                  eyeVao,
                   MVPMatrixID,
-                  cubeTriangleCount,
-                  x-400,
+                  eyeTriangleCount,
+                  x,
                   y,
                   z,
                   roll,
                   pitch,
                   yaw,
+
                   &projectionMatrix,
                   &viewportMatrix,
                   &viewMatrix
                  );
-*/
+
      drawObjectAT(
                   programID,
                   humanVao,
@@ -261,7 +261,7 @@ int doTiledDrawing(
 
 
 
-int doDrawing(struct TRI_Model * triModel)
+int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
@@ -294,18 +294,19 @@ int doDrawing(struct TRI_Model * triModel)
     fprintf(stderr,"Ready to start pushing geometry  ");
 
 
-    GLuint cubeVAO;
-    GLuint cubeArrayBuffer;
-    unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
+    GLuint eyeVAO;
+    GLuint eyeArrayBuffer;
+    unsigned int eyeTriangleCount  =  (unsigned int)  eyeModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &cubeVAO,
-                             &cubeArrayBuffer,
+                             &eyeVAO,
+                             &eyeArrayBuffer,
                              programID  ,
-                             cubeCoords  ,  sizeof(cubeCoords) ,
-                             cubeNormals ,  sizeof(cubeNormals) ,
+                             eyeModel->vertices  ,  eyeModel->header.numberOfVertices * sizeof(float) ,
+                             eyeModel->normal    ,  eyeModel->header.numberOfNormals  * sizeof(float),
                              0 ,  0, //No Texture
-                             cubeColors  ,  sizeof(cubeColors),
+                             //eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords ,
+                             eyeModel->colors  ,  eyeModel->header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
 
@@ -364,8 +365,8 @@ int doDrawing(struct TRI_Model * triModel)
         doTiledDrawing(
                        programID,
                        MVPMatrixID,
-                       cubeVAO,
-                       cubeTriangleCount,
+                       eyeVAO,
+                       eyeTriangleCount,
                        humanVAO,
                        humanTriangleCount,
                        tilesToDoX,
@@ -409,7 +410,7 @@ int doDrawing(struct TRI_Model * triModel)
 	//glDeleteBuffers(1, &colorbuffer);
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &humanVAO);
-	glDeleteVertexArrays(1, &cubeVAO);
+	glDeleteVertexArrays(1, &eyeVAO);
 }
 
 
@@ -433,6 +434,8 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    struct BVH_MotionCapture mc = {0};
    //------------------------------------------------------
+   struct TRI_Model indexedEyeModel={0};
+   struct TRI_Model eyeModel={0};
    struct TRI_Model indexedTriModel={0};
    struct TRI_Model triModel={0};
    //------------------------------------------------------
@@ -462,6 +465,10 @@ int main(int argc,const char **argv)
      fprintf(stderr,"and then wget http://ammar.gr/models/Ammar.tri\n");
      return 0;
    }
+   if (!loadModelTri("eye.tri", &indexedEyeModel ) )
+   {
+     return 0;
+   }
    //------------------------------------------------------
 
 
@@ -469,10 +476,11 @@ int main(int argc,const char **argv)
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
+   fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
 
    animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,0);
 
-   doDrawing(&triModel);
+   doDrawing(&triModel,&eyeModel);
 
   stop_glx3_stuff();
  return 0;
