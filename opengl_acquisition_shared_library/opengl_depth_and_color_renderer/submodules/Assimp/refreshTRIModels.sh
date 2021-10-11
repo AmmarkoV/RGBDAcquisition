@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 ./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
-./assimpTester --convert eye.dae eye.tri --applytexture brown_eye.png
+./assimpTester --convert eyes.dae eyes.tri #--applytexture brown_eye.png
 
 exit 0
 

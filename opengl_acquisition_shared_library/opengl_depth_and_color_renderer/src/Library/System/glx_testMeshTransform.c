@@ -354,27 +354,27 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         doOGLDrawing(
-                       programID,
-                       MVPMatrixID,
-                       eyeVAO,
-                       eyeTriangleCount,
-                       humanVAO,
-                       humanTriangleCount,
-                       WIDTH,
-                       HEIGHT
-                      );
+                     programID,
+                     MVPMatrixID,
+                     eyeVAO,
+                     eyeTriangleCount,
+                     humanVAO,
+                     humanTriangleCount,
+                     WIDTH,
+                     HEIGHT
+                    );
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebufferToScreen(
-                        programFrameBufferID,
-                        quad_vertexbuffer,
-                        //renderedDepth,
-                        renderedTexture,
-                        texID,
-                        timeID,
-                        resolutionID,
-                        WIDTH,HEIGHT
-                       );
+                                programFrameBufferID,
+                                quad_vertexbuffer,
+                                //renderedDepth,
+                                renderedTexture,
+                                texID,
+                                timeID,
+                                resolutionID,
+                                WIDTH,HEIGHT
+                               );
 
 		// Swap buffers
         glx3_endRedraw();
