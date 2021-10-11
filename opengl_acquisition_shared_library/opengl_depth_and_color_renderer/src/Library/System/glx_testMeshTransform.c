@@ -284,7 +284,6 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
-
 	// Use our shader
 	glUseProgram(programID);
 
@@ -298,7 +297,6 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
 	glDepthFunc(GL_LESS);
 
     fprintf(stderr,"Ready to start pushing geometry  ");
-
 
     GLuint eyeVAO;
     GLuint eyeArrayBuffer;
@@ -315,7 +313,6 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
                              eyeModel->colors  ,  eyeModel->header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
-
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
@@ -334,8 +331,6 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
                            );
     fprintf(stderr,"Ready to render: ");
 
-
-
      GLuint FramebufferName = 0;
      GLuint renderedTexture;
      GLuint renderedDepth;
@@ -353,17 +348,14 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
 
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
-
 	do{
         // Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-
        //-----------------------------------------------
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
-
 
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
@@ -390,7 +382,6 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
                         resolutionID,
                         WIDTH,HEIGHT
                        );
-
 
 		// Swap buffers
         glx3_endRedraw();
@@ -456,7 +447,6 @@ int main(int argc,const char **argv)
                                 modelToLoad = argv[i+1];
                             }
                     }
-
         }
    //------------------------------------------------------
    if (!bvh_loadBVH("merged_neutral.bvh",&mc,1.0) ) // This is the new armature that includes the head
@@ -480,7 +470,6 @@ int main(int argc,const char **argv)
    }
    //------------------------------------------------------
 
-
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 
@@ -491,7 +480,7 @@ int main(int argc,const char **argv)
 
    doDrawing(&triModel,&eyeModel);
 
-  stop_glx3_stuff();
+   stop_glx3_stuff();
  return 0;
 }
 
