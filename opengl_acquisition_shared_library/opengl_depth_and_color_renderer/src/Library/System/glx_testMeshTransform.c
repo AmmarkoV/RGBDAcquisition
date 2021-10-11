@@ -155,15 +155,15 @@ int drawObjectAT(GLuint programID,
 
 
 
-int doTiledDrawing(
+int doOGLDrawing(
                    int programID,
                    GLuint MVPMatrixID ,
                    GLuint eyeVao,
                    unsigned int eyeTriangleCount,
                    GLuint humanVao,
                    unsigned int humanTriangleCount,
-                   unsigned int tilesX,
-                   unsigned int tilesY
+                   unsigned int width,
+                   unsigned int height
                    )
 {
   struct Matrix4x4OfFloats projectionMatrix;
@@ -195,25 +195,19 @@ int doTiledDrawing(
   float z=26.99735f;//(float)  (700+rand()%1000);
   //-------------------------------------------------------------------
 
-  unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
-  unsigned int viewportHeight = (unsigned int) HEIGHT / tilesY;
+  unsigned int viewportWidth = (unsigned int) width;
+  unsigned int viewportHeight = (unsigned int) height;
 
-  unsigned int tx,ty;
-  for (ty=0; ty<tilesY; ty++)
-  {
-    for (tx=0; tx<tilesX; tx++)
-    {
-     glViewport(viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight );
+  glViewport(0,0, viewportWidth , viewportHeight );
 
-
-     float newViewport[4]={viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight};
-     float projectionMatrixViewportCorrected[16];
-     correctProjectionMatrixForDifferentViewport(
+  float newViewport[4]={0,0, viewportWidth , viewportHeight};
+  float projectionMatrixViewportCorrected[16];
+  correctProjectionMatrixForDifferentViewport(
                                                   projectionMatrixViewportCorrected,
                                                   projectionMatrix.m,
                                                   viewportMatrix.m,
                                                   newViewport
-                                                );
+                                             );
      //-------------------------------
      //-------------------------------
      //-------------------------------
@@ -258,8 +252,7 @@ int doTiledDrawing(
      //-------------------------------
 
       viewMatrix.m[3]+=1.0;
-    }
-  }
+
   return 1;
 }
 
@@ -360,15 +353,15 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
-        doTiledDrawing(
+        doOGLDrawing(
                        programID,
                        MVPMatrixID,
                        eyeVAO,
                        eyeTriangleCount,
                        humanVAO,
                        humanTriangleCount,
-                       tilesToDoX,
-                       tilesToDoY
+                       WIDTH,
+                       HEIGHT
                       );
 
         //We have accumulated all data on the framebuffer and will now draw it back..
