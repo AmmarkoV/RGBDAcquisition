@@ -466,12 +466,18 @@ int main(int argc,const char **argv)
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 
-   fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
    fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
 
-   animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,0);
+   for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
+   {
+     fprintf(stderr,"BVG Frame %u \n",fID);
+     animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,fID);
+     fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
+     doDrawing(&triModel,&eyeModel);
+     usleep(1000);
+   }
 
-   doDrawing(&triModel,&eyeModel);
+
 
    stop_glx3_stuff();
  return 0;

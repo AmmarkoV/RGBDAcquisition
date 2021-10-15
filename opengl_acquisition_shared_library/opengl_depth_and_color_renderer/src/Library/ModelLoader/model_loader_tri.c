@@ -93,6 +93,17 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed)
 {
+    if ( (triModel==0) || (indexed==0) )
+    {
+      fprintf(stderr,"\n\nerror : Cannot flatten with null models\n");
+      return 0;
+    }
+    //===================================================================
+
+    //Get rid of old data..
+    deallocInternalsOfModelTri(triModel);
+
+
     triModel->header.triType = TRI_LOADER_VERSION;
     triModel->header.floatSize = sizeof(float);
     triModel->header.nameSize = indexed->header.nameSize;
@@ -110,20 +121,21 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 
     fprintf(stderr,"\n\nwarning : Flattening a model loses its bone structure for now .. \n");
 
+
     triModel->name = (char * ) malloc( (triModel->header.nameSize+1)  * sizeof(char));
     memcpy(triModel->name , indexed->name , triModel->header.nameSize);
     triModel->name[triModel->header.nameSize]=0;
 
 
-	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices  *3 *3    * sizeof(float));
-	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals   *3 *3     * sizeof(float));
-	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2  * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors    *3  *3    * sizeof(float));
-    triModel->indices        = 0;
-    triModel->bones          = 0;
-    unsigned int i=0;
+    //Allocate space for new data..
+	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices      *3 *3     * sizeof(float));
+	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals       *3 *3     * sizeof(float));
+	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2     * sizeof(float));
+    triModel->colors         = (float*) malloc( triModel->header.numberOfColors        *3  *3    * sizeof(float));
+    triModel->indices        = 0; //Flat tri models dont have indices
+    triModel->bones          = 0; //Flat tri models dont have bones
 
-    unsigned int o=0,n=0,t=0,c=0;
+    unsigned int i=0,o=0,n=0,t=0,c=0;
 	for (i = 0; i < indexed->header.numberOfIndices/3; i++)
     {
 		unsigned int faceTriA = indexed->indices[(i*3)+0];

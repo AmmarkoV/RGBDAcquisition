@@ -523,7 +523,7 @@ void colorCodeBones(struct TRI_Model * in)
       in->colors = (float*) malloc(sizeof(float) * in->header.numberOfColors );
     }
 
-   if (
+   if  (
         (in->colors!=0) &&
         (in->header.numberOfColors!=0) &&
         (in->header.numberOfVertices!=0)
