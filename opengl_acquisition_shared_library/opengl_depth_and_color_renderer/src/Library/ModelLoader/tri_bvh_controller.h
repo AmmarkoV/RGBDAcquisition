@@ -104,8 +104,12 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
                 {
                   BVHJointID jID = lookupTableFromTRIToBVH[boneID];
 
+                  //Force no alterations..
+                  model.bones[boneID].info->altered=0;
+
+
                   memcpy(
-                         model.bones[boneID].info->finalVertexTransformation,
+                         model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                          bvhTransform.joint[jID].chainTransformation.m,
                          sizeof(float) * 16
                         );

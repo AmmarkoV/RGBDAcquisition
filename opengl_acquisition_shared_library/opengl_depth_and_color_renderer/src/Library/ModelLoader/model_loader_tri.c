@@ -131,7 +131,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices      *3 *3     * sizeof(float));
 	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals       *3 *3     * sizeof(float));
 	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2     * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors        *3  *3    * sizeof(float));
+    triModel->colors         = (float*) malloc( triModel->header.numberOfColors        *3 *3     * sizeof(float));
     triModel->indices        = 0; //Flat tri models dont have indices
     triModel->bones          = 0; //Flat tri models dont have bones
 
