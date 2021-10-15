@@ -33,7 +33,7 @@ enum mat4x4Item
     I31     , I32 , I33 , I34 ,
     I41     , I42 , I43 , I44
 };
- 
+
 enum mat4x4RTItem
 {
     r0 = 0 , r1, r2 , t0 ,
@@ -41,7 +41,7 @@ enum mat4x4RTItem
     r6     , r7 ,r8 , t2 ,
     zero0  , zero1 , zero2 , one0
 };
- 
+
 enum mat4x4EItem
 {
     e0 = 0 , e1  , e2  , e3 ,
@@ -114,34 +114,43 @@ void print4x4FMathematicaMatrix(const char * str , float * matrix3x3,int forcePr
 
 void copy3x3FMatrixTo4x4F(float * out,float * in)
 {
-  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=0.0;
-  out[4]=in[3];   out[5]=in[4];   out[6]=in[5];   out[7]=0.0;
-  out[8]=in[6];   out[9]=in[7];   out[10]=in[8];  out[11]=0.0;
-  out[12]=0.0;    out[13]=0.0;    out[14]=0.0;    out[15]=1.0;
+  if ((out!=0) && (in!=0))
+  {
+   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=0.0;
+   out[4]=in[3];   out[5]=in[4];   out[6]=in[5];   out[7]=0.0;
+   out[8]=in[6];   out[9]=in[7];   out[10]=in[8];  out[11]=0.0;
+   out[12]=0.0;    out[13]=0.0;    out[14]=0.0;    out[15]=1.0;
+  }
 }
 
 void copy4x4FMatrix(float * out,float * in)
 {
-  #if OPTIMIZED
-  memcpy(out,in,16*sizeof(float));
-  #else
-  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
-  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
-  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
-  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
-  #endif // OPTIMIZED
+  if ((out!=0) && (in!=0))
+  {
+   #if OPTIMIZED
+    memcpy(out,in,16*sizeof(float));
+   #else
+    out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
+    out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
+    out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
+    out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+   #endif // OPTIMIZED
+  }
 }
 
 void copy4x4DMatrix(double * out,double * in)
 {
-  #if OPTIMIZED
-  memcpy(out,in,16*sizeof(double));
-  #else
-  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
-  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
-  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
-  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
-  #endif // OPTIMIZED
+  if ((out!=0) && (in!=0))
+  {
+   #if OPTIMIZED
+    memcpy(out,in,16*sizeof(double));
+   #else
+    out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
+    out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
+    out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
+    out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+   #endif // OPTIMIZED
+  }
 }
 
 
@@ -161,13 +170,13 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
     dest[12]=(float)m[12]; dest[13]=(float)m[13]; dest[14]=(float)m[14];  dest[15]=(float)m[15];
 }
 
- 
+
 
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 {
-   /*#if INTEL_OPTIMIZATIONS          
+   /*#if INTEL_OPTIMIZATIONS
     // 0.79 instruction fetch
-    __m128 zero = _mm_setzero_ps(); 
+    __m128 zero = _mm_setzero_ps();
     _mm_store_ps(&m->m[0], zero);
     m->m[0] = 1.0;
     _mm_store_ps(&m->m[4], zero);
@@ -175,17 +184,17 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     _mm_store_ps(&m->m[8], zero);
     m->m[10] = 1.0;
     _mm_store_ps(&m->m[12], zero);
-    m->m[15] = 1.0; 
+    m->m[15] = 1.0;
     return;
    #else*/
-   #if OPTIMIZED 
+   #if OPTIMIZED
     // 0.61 instruction fetch
-    memset(m->m,0,16*sizeof(float)); 
+    memset(m->m,0,16*sizeof(float));
     m->m[0] = 1.0;
     m->m[5] = 1.0;
     m->m[10] = 1.0;
     m->m[15] = 1.0;
-   return; 
+   return;
   #else
     //0.77 instruction fetch
     m->m[0] = 1.0;  m->m[1] = 0.0;  m->m[2] = 0.0;   m->m[3] = 0.0;
@@ -197,16 +206,16 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
  // #endif //INTEL optimizations are more optimizing.. :P
 }
 
- 
+
 
 //static inline
 float degrees_to_radF(float degrees)
 {
     return (float) degrees * ( (float) M_PI / 180.0 );
 }
- 
- 
- 
+
+
+
 
 int floatPEq(float * element , float value )
 {
@@ -278,7 +287,7 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
           *yaw = atan2(-m->m[8],m->m[0]);
           *pitch = asin(m->m[4]);
           *roll = atan2(-m->m[6],m->m[5]);
-        } 
+        }
 }
 
 
@@ -286,7 +295,7 @@ void convert4x4FMatrixToRPY(struct Matrix4x4OfFloats * m ,float *roll,float *pit
 int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,float rodriguezY,float rodriguezZ)
 {
   if (m==0) { return 0; }
- 
+
   float x = rodriguezX  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
   float y = rodriguezY  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
   float z = rodriguezZ  * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
@@ -297,7 +306,7 @@ int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,
 
   if ( th < 0.00001 )
     {
-       create4x4FIdentityMatrix(m); 
+       create4x4FIdentityMatrix(m);
        return 1;
     }
 
@@ -305,7 +314,7 @@ int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,
    m->m[0]=x*x * (1 - cosTh) + cosTh;          m->m[1]=x*y*(1 - cosTh) - z*sin(th);      m->m[2]=x*z*(1 - cosTh) + y*sin(th);   m->m[3]=0.0;
    m->m[4]=x*y*(1 - cosTh) + z*sin(th);        m->m[5]=y*y*(1 - cosTh) + cosTh;          m->m[6]=y*z*(1 - cosTh) - x*sin(th);   m->m[7]=0.0;
    m->m[8]=x*z*(1 - cosTh) - y*sin(th);        m->m[9]=y*z*(1 - cosTh) + x*sin(th);      m->m[10]=z*z*(1 - cosTh) + cosTh;      m->m[11]=0.0;
-   m->m[12]=0.0;                               m->m[13]=0.0;                             m->m[14]=0.0;                          m->m[15]=1.0; 
+   m->m[12]=0.0;                               m->m[13]=0.0;                             m->m[14]=0.0;                          m->m[15]=1.0;
 
   #if PRINT_MATRIX_DEBUGGING
    fprintf(stderr,"rodriguez %f %f %f\n ",rodriguezX,rodriguezY,rodriguezZ);
@@ -332,9 +341,9 @@ void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,fl
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    m->m[0] = cp*cy;          m->m[1] = cp*sy;           m->m[2] = -sp;    m->m[3] = 0;  
+    m->m[0] = cp*cy;          m->m[1] = cp*sy;           m->m[2] = -sp;    m->m[3] = 0;
     m->m[4] = srsp*cy-cr*sy;  m->m[5] = srsp*sy+cr*cy;   m->m[6] = sr*cp;  m->m[7] = 0;
-    m->m[8] =  crsp*cy+sr*sy; m->m[9] =  crsp*sy-sr*cy;  m->m[10]= cr*cp;  m->m[11]= 0; 
+    m->m[8] =  crsp*cy+sr*sy; m->m[9] =  crsp*sy-sr*cy;  m->m[10]= cr*cp;  m->m[11]= 0;
     m->m[12]= 0;              m->m[13]= 0;               m->m[14]= 0;      m->m[15]= 1.0;
 }
 
@@ -375,7 +384,7 @@ void create4x4FMatrixFromEulerAnglesZXY(struct Matrix4x4OfFloats * m ,float eulX
     float cosY = cos(y);
     float sinY = sin(y);
     float cosX = cos(x);
-    float sinX = sin(x); 
+    float sinX = sin(x);
 
     m->m[0]  = cosY*cosZ + sinX*sinY*sinZ;    m->m[1]  = cosX * sinZ;    m->m[2]  = cosY*sinX*sinZ - cosZ*sinY;  m->m[3]  = 0.0;
     m->m[4]  = -cosY*sinZ + cosZ*sinX*sinY;   m->m[5]  = cosX * cosZ;    m->m[6]  = cosY*cosZ*sinX + sinY*sinZ;  m->m[7]  = 0.0;
@@ -392,7 +401,7 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
     float cosX = (float) cosf((float)radians);
     float sinX = (float) sinf((float)radians);
- 
+
     m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
     m->m[4] = 0.0;  m->m[5] = cosX;    m->m[6]  = sinX;   m->m[7]  = 0.0;
     m->m[8] = 0.0;  m->m[9] = -1*sinX; m->m[10] = cosX;   m->m[11] = 0.0;
@@ -410,7 +419,7 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
 }
 //---------------------------------------------------------
 void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
-{   
+{
     if (degrees!=0.0)
     {
      float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
@@ -435,13 +444,13 @@ void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
 }
 //---------------------------------------------------------
 void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
-{    
+{
     if (degrees!=0.0)
     {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
     float cosZ = (float) cosf((float)radians);
     float sinZ = (float) sinf((float)radians);
-    
+
     m->m[0] = cosZ;    m->m[1] = sinZ;  m->m[2]  = 0.0; m->m[3]  = 0.0;
     m->m[4] = -1*sinZ; m->m[5] = cosZ;  m->m[6]  = 0.0; m->m[7]  = 0.0;
     m->m[8] = 0.0;     m->m[9] = 0.0;   m->m[10] = 1.0; m->m[11] = 0.0;
@@ -451,7 +460,7 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
     {
       create4x4FIdentityMatrix(m);
     }
-    
+
     // Rotate Z formula.
     //create4x4FIdentityMatrix(m);
     //m->m[0] =    cosV;  // [0,0]
@@ -460,7 +469,7 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
     //m->m[5] =    cosV;  // [1,1]
 }
 //---------------------------------------------------------
- 
+
 
 
 
@@ -472,7 +481,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    char rXisIdentity=(degreesEulerX==0.0);
    char rYisIdentity=(degreesEulerY==0.0);
    char rZisIdentity=(degreesEulerZ==0.0);
-   
+
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
    {
 
@@ -488,46 +497,46 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
         create4x4FMatrixFromEulerAnglesZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
         return ;
     } */
-       
+
     //Assuming the rotation axis are correct
     //rX,rY,rZ should hold our 4x4 rotation matrices
     struct Matrix4x4OfFloats rX;
-    create4x4FRotationX(&rX,degreesEulerX);   
+    create4x4FRotationX(&rX,degreesEulerX);
     struct Matrix4x4OfFloats rY;
     create4x4FRotationY(&rY,degreesEulerY);
     struct Matrix4x4OfFloats rZ;
     create4x4FRotationZ(&rZ,degreesEulerZ);
-   
-   // ./BVHGUI2 --from dataset/MotionCapture/lafan1/dance2_subject2.bvh 
-   // ./BVHGUI2 --from dataset/headerWithHeadAndOneMotion.bvh 
+
+   // ./BVHGUI2 --from dataset/MotionCapture/lafan1/dance2_subject2.bvh
+   // ./BVHGUI2 --from dataset/headerWithHeadAndOneMotion.bvh
 
    switch (rotationOrder)
    {
-     case ROTATION_ORDER_XYZ : 
-       //multiplyThree4x4FMatrices(m,&rX,&rY,&rZ); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity); 
+     case ROTATION_ORDER_XYZ :
+       //multiplyThree4x4FMatrices(m,&rX,&rY,&rZ);
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity);
      break;
-     case ROTATION_ORDER_XZY : 
-       //multiplyThree4x4FMatrices(m,&rX,&rZ,&rY); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity); 
+     case ROTATION_ORDER_XZY :
+       //multiplyThree4x4FMatrices(m,&rX,&rZ,&rY);
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity);
      break;
-     case ROTATION_ORDER_YXZ : 
-       //multiplyThree4x4FMatrices(m,&rY,&rX,&rZ); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity); 
+     case ROTATION_ORDER_YXZ :
+       //multiplyThree4x4FMatrices(m,&rY,&rX,&rZ);
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity);
      break;
-     case ROTATION_ORDER_YZX : 
-       //multiplyThree4x4FMatrices(m,&rY,&rZ,&rX); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity); 
+     case ROTATION_ORDER_YZX :
+       //multiplyThree4x4FMatrices(m,&rY,&rZ,&rX);
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity);
      break;
-     case ROTATION_ORDER_ZXY : 
+     case ROTATION_ORDER_ZXY :
        //This is the rotation order commonly used in all joints of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
-       //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY); 
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity); 
+       //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY);
+       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity);
      break;
-     case ROTATION_ORDER_ZYX : 
+     case ROTATION_ORDER_ZYX :
        //This is the rotation order used in the LAFAN1 dataset ( https://github.com/ubisoft/ubisoft-laforge-animation-dataset )
-       //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release ) 
-       //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX); 
+       //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
+       //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX);
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_RPY:
@@ -538,25 +547,25 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
                             degreesEulerX //heading
                            );
      break;
-     case ROTATION_ORDER_RODRIGUES : 
+     case ROTATION_ORDER_RODRIGUES :
        create4x4FMatrixFromRodriguez(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-     break; 
+     break;
      default :
        fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrderF: Error, Incorrect rotation type %u, returning Identity\n",rotationOrder);
        create4x4FIdentityMatrix(m);
      break;
-    }; 
+    };
     return;
    }
   }
-  
-  create4x4FIdentityMatrix(m); 
+
+  create4x4FIdentityMatrix(m);
   return;
 }
 
 
 
- 
+
 void create4x4FRotationMatrix(struct Matrix4x4OfFloats * m , float angle, float x, float y, float z)
 {
     float const DEG2RAD=(float) M_PI/180;
@@ -639,16 +648,16 @@ void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y
   #endif // OPTIMIZED
 }
 
- 
+
 
 void create4x4FScalingMatrix(struct Matrix4x4OfFloats * m, float scaleX, float scaleY, float scaleZ)
 {
-    if (m==0) { return ;} 
+    if (m==0) { return ;}
     create4x4FIdentityMatrix(m);
     // Scale slots.
     m->m[0] = scaleX; m->m[5] = scaleY; m->m[10] = scaleZ;
 }
- 
+
 float det4x4FMatrix(float * mat)
 {
  float * a = mat;
@@ -783,8 +792,8 @@ int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats 
 
 int transpose4x4FMatrix(float * mat)
 {
-  if (mat!=0) 
-  { 
+  if (mat!=0)
+  {
   /*       -------  TRANSPOSE ------->
       0   1   2   3           0  4  8   12
       4   5   6   7           1  5  9   13
@@ -803,15 +812,15 @@ int transpose4x4FMatrix(float * mat)
 
   return 1;
   }
-  
-  return 0;  
+
+  return 0;
 }
 
- 
+
 int transpose4x4DMatrix(double * mat)
 {
-  if (mat!=0) 
-  { 
+  if (mat!=0)
+  {
   /*       -------  TRANSPOSE ------->
       0   1   2   3           0  4  8   12
       4   5   6   7           1  5  9   13
@@ -827,18 +836,18 @@ int transpose4x4DMatrix(double * mat)
    tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
    tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
    tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
-   return 1; 
+   return 1;
   }
- 
+
   return 0;
 }
 
 
- 
-int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB) 
+
+int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 {
- if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
- {  
+ if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
+ {
 
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
@@ -883,13 +892,13 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 
 int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
 {
- if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
-  {   
-  double tmp[16]; 
+ if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
+  {
+  double tmp[16];
 
   return (
              (multiplyTwo4x4DMatrices(tmp,matrixB,matrixC)) &&
-             (multiplyTwo4x4DMatrices(result,matrixA,tmp )) 
+             (multiplyTwo4x4DMatrices(result,matrixA,tmp ))
          );
   }
   return 0;
@@ -899,8 +908,8 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 
 int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
 {
-  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
-  {  
+  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
+  {
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
   print4x4FMatrix("A", matrixA);
@@ -946,15 +955,15 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
 //https://software.intel.com/content/www/us/en/develop/articles/performance-of-classic-matrix-multiplication-algorithm-on-intel-xeon-phi-processor-system.html
 int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const float * matrixB)
 {
-   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) 
-  {  
+   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
+  {
    for(int i = 0; i < 4; i += 1 )
 	{
 		for(int j = 0; j < 4; j += 1 )
 		{
 			float sum = 0.0;
 			for(int k = 0; k < 4; k += 1 )
-			{ 
+			{
 				sum += (float)( matrixA[4*i+k] * matrixB[4*k+j] );
 			}
 			result[4*i+j] = sum;
@@ -985,7 +994,7 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 
 void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
 {
- //http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html  
+ //http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
 #if INTEL_OPTIMIZATIONS
  //Load Matrix A into registers
  __m128 matrixA_r0 = _mm_load_ps(&matrixA[0]);
@@ -1000,7 +1009,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
       matrixB[2],matrixB[6],matrixB[10],matrixB[14],
       matrixB[3],matrixB[7],matrixB[11],matrixB[15]
       };*/
-      
+
  //Load Matrix B into registers
  __m128 matrixB_r0 = _mm_load_ps(&matrixB[0]);
  __m128 matrixB_r1 = _mm_load_ps(&matrixB[4]);
@@ -1008,9 +1017,9 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  __m128 matrixB_r3 = _mm_load_ps(&matrixB[12]);
  //Transpose matrixB in registers
  _MM_TRANSPOSE4_PS(matrixB_r0,matrixB_r1,matrixB_r2,matrixB_r3);
-    
- //t0 - t4 are temporary registers 
- 
+
+ //t0 - t4 are temporary registers
+
  //First Line!
  __m128 t0  = _mm_mul_ps(matrixA_r0,matrixB_r0);
  __m128 t1  = _mm_mul_ps(matrixA_r0,matrixB_r1);
@@ -1021,7 +1030,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  __m128 t4  = _mm_hadd_ps(t0,t1);
  //------------
  _mm_store_ps(&result[0], t4);
- 
+
  //Second Line!
  t0  = _mm_mul_ps(matrixA_r1,matrixB_r0);
  t1  = _mm_mul_ps(matrixA_r1,matrixB_r1);
@@ -1032,7 +1041,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  t4  = _mm_hadd_ps(t0,t1);
  //------------
  _mm_store_ps(&result[4],t4);
- 
+
  //Third Line!
  t0  = _mm_mul_ps(matrixA_r2,matrixB_r0);
  t1  = _mm_mul_ps(matrixA_r2,matrixB_r1);
@@ -1043,7 +1052,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
  t4  = _mm_hadd_ps(t0,t1);
  //------------
  _mm_store_ps(&result[8],t4);
- 
+
  //Forth Line!
  t0  = _mm_mul_ps(matrixA_r3,matrixB_r0);
  t1  = _mm_mul_ps(matrixA_r3,matrixB_r1);
@@ -1063,17 +1072,17 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
 void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
-    //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info 
-    
+    //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info
+
     //Load all rows to registers assuming that they are allocated using the __attribute__((aligned(16)))
     //We could load them using the _mm_loadu_ps however this performs 4x worse..!
     __m128 row1 = _mm_load_ps(&matrixB[0]);
     __m128 row2 = _mm_load_ps(&matrixB[4]);
     __m128 row3 = _mm_load_ps(&matrixB[8]);
     __m128 row4 = _mm_load_ps(&matrixB[12]);
-    
+
     //First Column ------------------------
-    //Broadcast the value in all elements 
+    //Broadcast the value in all elements
     __m128 brod1 = _mm_set1_ps(matrixA[4*0 + 0]);
     __m128 brod2 = _mm_set1_ps(matrixA[4*0 + 1]);
     __m128 brod3 = _mm_set1_ps(matrixA[4*0 + 2]);
@@ -1154,7 +1163,7 @@ int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4
     multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m); //109.53 fps in the sven dataset
     ////multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m); // 107.77 fps in the sven dataset
     return 1;
-#else 
+#else
    return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
 #endif
 }
@@ -1174,9 +1183,9 @@ int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * 
 
 int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC)
 {
-  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
-  {  
-  float tmp[16]; 
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
+  {
+  float tmp[16];
 
   return (
            (multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC)) &&
@@ -1188,9 +1197,9 @@ int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * m
 
 int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
 {
-  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
-  { 
-   struct Matrix4x4OfFloats tmp; 
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
+  {
+   struct Matrix4x4OfFloats tmp;
    return (
            ( multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC)  ) &&
            ( multiplyTwo4x4FMatricesS(result,matrixA,&tmp) )
@@ -1210,29 +1219,29 @@ int multiplyThree4x4FMatricesWithIdentityHints(
                                                 int matrixCIsIdentity
                                               )
 {
-  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) ) 
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
     unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
-  
+
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
     switch (numberOfOperationsNeeded)
     {
-      case 3:   
-        return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); 
-      case 2:   
+      case 3:
+        return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC);
+      case 2:
         if (matrixAIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);  } else
         if (matrixBIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);  } else
         if (matrixCIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);  }
-      case 1:   
+      case 1:
         if (!matrixAIsIdentity)    { copy4x4FMatrix(result->m,matrixA->m); } else
         if (!matrixBIsIdentity)    { copy4x4FMatrix(result->m,matrixB->m); } else
-        if (!matrixCIsIdentity)    { copy4x4FMatrix(result->m,matrixC->m); }   
+        if (!matrixCIsIdentity)    { copy4x4FMatrix(result->m,matrixC->m); }
         return 1;
       case 0:
-      default:   
+      default:
         create4x4FIdentityMatrix(result);
-        return 1; 
+        return 1;
     };
     //----------------------------------------------------------
 
@@ -1244,14 +1253,14 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
 {
-  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (matrixD!=0) && (result!=0) ) 
-  {      
+  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (matrixD!=0) && (result!=0) )
+  {
   struct Matrix4x4OfFloats tmpA;
-  struct Matrix4x4OfFloats tmpB; 
+  struct Matrix4x4OfFloats tmpB;
   return (
             (multiplyTwo4x4FMatricesS(&tmpA,matrixC,matrixD)) &&
             (multiplyTwo4x4FMatricesS(&tmpB,matrixB,&tmpA)) &&
-            (multiplyTwo4x4FMatricesS(result,matrixA,&tmpB)) 
+            (multiplyTwo4x4FMatricesS(result,matrixA,&tmpB))
          );
   }
   return 0;
@@ -1309,20 +1318,20 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
 
 
 
- 
- 
 
-#if INTEL_OPTIMIZATIONS 
+
+
+#if INTEL_OPTIMIZATIONS
 //__attribute__((aligned(16)))
 void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,const float * point3D)
 {
-  //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info  
+  //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info
  __m128 p  = _mm_load_ps(point3D);
  __m128 row1 = _mm_load_ps(&matrixA[0]);
  __m128 row2 = _mm_load_ps(&matrixA[4]);
  __m128 row3 = _mm_load_ps(&matrixA[8]);
- __m128 row4 = _mm_load_ps(&matrixA[12]);  
- 
+ __m128 row4 = _mm_load_ps(&matrixA[12]);
+
  __m128 x = _mm_mul_ps(row1,p);
  __m128 y = _mm_mul_ps(row2,p);
  __m128 z = _mm_mul_ps(row3,p);
@@ -1330,10 +1339,10 @@ void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,con
  __m128 tmp1 = _mm_hadd_ps(x, y); // = [y2+y3, y0+y1, x2+x3, x0+x1]
  __m128 tmp2 = _mm_hadd_ps(z, w); // = [w2+w3, w0+w1, z2+z3, z0+z1]
 
- _mm_storeu_ps(result, _mm_hadd_ps(tmp1, tmp2)); // = [w0+w1+w2+w3, z0+z1+z2+z3, y0+y1+y2+y3, x0+x1+x2+x3] 
+ _mm_storeu_ps(result, _mm_hadd_ps(tmp1, tmp2)); // = [w0+w1+w2+w3, z0+z1+z2+z3, y0+y1+y2+y3, x0+x1+x2+x3]
 }
 #endif
- 
+
 
 //struct Vector4x1OfFloats
 int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D)
@@ -1376,24 +1385,24 @@ if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
      fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D->m[0],point3D->m[1],point3D->m[2],point3D->m[3]);
      fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D->m[0],resultPoint3D->m[1],resultPoint3D->m[2],resultPoint3D->m[3]);
      return 0;
-  } 
+  }
  return 1;
 #endif
- 
+
  }
 return 0;
 }
 
 int normalize3DPointFVector(float * vec)
 {
-  if ( vec[3]==1.0 ) { return 1; } 
+  if ( vec[3]==1.0 ) { return 1; }
   else
   if ( vec[3]!=0.0 )
-  { 
+  {
     vec[0]=vec[0]/vec[3];
     vec[1]=vec[1]/vec[3];
     vec[2]=vec[2]/vec[3];
-    vec[3]=1.0; // vec[3]=vec[3]/vec[3];   
+    vec[3]=1.0; // vec[3]=vec[3]/vec[3];
     return 1;
   }
 
@@ -1442,7 +1451,7 @@ void doRPYTransformationF(
                             );
 }
 
- 
+
 
 
 void create4x4FModelTransformation(
@@ -1463,11 +1472,11 @@ void create4x4FModelTransformation(
     //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
     //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
-     
+
     char numberOfOperationsNeeded=0;
-     
-     
-    //Translation matrix 
+
+
+    //Translation matrix
     //----------------------------------------------------------
     char translationSpecified;
     struct Matrix4x4OfFloats intermediateMatrixTranslation;
@@ -1488,8 +1497,8 @@ void create4x4FModelTransformation(
     //----------------------------------------------------------
 
 
-    //Rotation matrix 
-    //---------------------------------------------------------- 
+    //Rotation matrix
+    //----------------------------------------------------------
     char rotationSpecified;
     struct Matrix4x4OfFloats intermediateMatrixRotation;
     if ( (rotationX==0.0) && (rotationY==0.0) && (rotationZ==0.0) )
@@ -1497,7 +1506,7 @@ void create4x4FModelTransformation(
       //Fast path since a lot of the time the rotation component is not active
       //create4x4FIdentityMatrix(&intermediateMatrixRotation); It will get automatically skipped..!
       rotationSpecified=0;
-    } else 
+    } else
     if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
       fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
@@ -1512,9 +1521,9 @@ void create4x4FModelTransformation(
                           rotationZ,//roll,
                           rotationY,//pitch
                           rotationX//heading
-                         ); 
+                         );
      rotationSpecified=1;
-     ++numberOfOperationsNeeded; 
+     ++numberOfOperationsNeeded;
     } else
     {
      //fprintf(stderr,"Using new model transform code\n");
@@ -1526,54 +1535,54 @@ void create4x4FModelTransformation(
                                                       rotationOrder
                                                      );
      rotationSpecified=1;
-     ++numberOfOperationsNeeded;                                                  
+     ++numberOfOperationsNeeded;
     }
     //----------------------------------------------------------
-    
 
 
-    //Scale matrix 
+
+    //Scale matrix
     //----------------------------------------------------------
     char scaleSpecified;
     struct Matrix4x4OfFloats intermediateScalingMatrix;
-    if ( (scaleX==1.0) && (scaleY==1.0) && (scaleZ==1.0) ) 
+    if ( (scaleX==1.0) && (scaleY==1.0) && (scaleZ==1.0) )
       {
           scaleSpecified=0;
       } else
-      { 
+      {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
-        scaleSpecified=1; 
-        ++numberOfOperationsNeeded; 
+        scaleSpecified=1;
+        ++numberOfOperationsNeeded;
       }
-      
-      
+
+
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
     switch (numberOfOperationsNeeded)
     {
-      case 0:   
-        create4x4FIdentityMatrix(m); 
+      case 0:
+        create4x4FIdentityMatrix(m);
        return;
-      case 1:   
+      case 1:
         if (translationSpecified==0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
         if (rotationSpecified==0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
-        if (scaleSpecified==0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }  
+        if (scaleSpecified==0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
         return;
-      case 2:   
+      case 2:
         if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
         if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
-        if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  } 
+        if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }
         return;
-      case 3:   
+      case 3:
         multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
-       return; 
+       return;
     };
     //----------------------------------------------------------
 }
 
 
 
- 
+
 
 void create4x4FCameraModelViewMatrixForRendering(
                                                 struct Matrix4x4OfFloats * m ,

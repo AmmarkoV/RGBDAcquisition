@@ -119,6 +119,14 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
          free(lookupTableFromTRIToBVH);
         }
 
+        /*
+        recursiveJointHierarchyTransformer(
+                                            &model ,
+                                            0,
+                                            0,
+                                            0,0,
+                                            0
+                                          );*/
 
         applyVertexTransformation(modelOriginal,&model);
 
