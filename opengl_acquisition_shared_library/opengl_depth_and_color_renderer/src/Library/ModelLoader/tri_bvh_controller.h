@@ -108,11 +108,11 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
         }
 
 
-        int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * numberOfBones);
+        unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
         {
-          memset(lookupTableFromTRIToBVH,0,sizeof(int) * numberOfBones);
+          memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
 
           for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
            {
