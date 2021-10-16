@@ -127,7 +127,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
 
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                         bvhTransform.joint[jID].chainTransformation.m,
+                         bvhTransform.joint[jID].chainTransformation.m, //dynamicRotation dynamicTranslation
                          sizeof(float) * 16
                         );
                 }
@@ -138,7 +138,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
 
 
         struct TRI_Model modelTemporary={0};
-
+        //---------------------------------------------------------------
         doModelTransform(
                           &modelTemporary ,
                           modelOriginal ,
@@ -149,7 +149,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                           1/*Do Transforms, don't just calculate the matrices*/ ,
                           0 /*Default joint convention*/
                         );
-
+        //---------------------------------------------------------------
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
 
 
