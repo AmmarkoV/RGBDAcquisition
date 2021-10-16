@@ -708,7 +708,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                struct TRI_Model * in  ,
                                                int curBone ,
                                                float * parentTransformUntouched ,
-                                               float * jointData , unsigned int jointDataSize ,
+                                               float * joint4x4Data , unsigned int jointDataSize ,
                                                unsigned int recursionLevel
                                              )
 {
@@ -717,7 +717,19 @@ void recursiveJointHierarchyTransformerDirect(
 
    unsigned int i=0;
    float parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
-   copy4x4FMatrix(parentTransform,parentTransformUntouched);
+
+   if (parentTransformUntouched==0)
+   { //If no parent transform untouched then use an identity matrix as parentTransform..
+       float * m = parentTransformUntouched;
+       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+   } else
+   {
+      copy4x4FMatrix(parentTransform,parentTransformUntouched);
+   }
+
    copy4x4FMatrix(nodeTransformation,in->bones[curBone].info->localTransformation);
 
   if ( in->bones[curBone].info->boneWeightsNumber>0 )
@@ -727,7 +739,9 @@ void recursiveJointHierarchyTransformerDirect(
     // from being so, especially when I try to debug it....
     //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
       float newRot[16],nodeCopy[16];
-      copy4x4FMatrix(newRot,&jointData[curBone*16]);
+
+      if (joint4x4Data!=0)
+        { copy4x4FMatrix(newRot,&joint4x4Data[curBone*16]); }
       copy4x4FMatrix(nodeCopy,nodeTransformation);
       multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeCopy,newRot);
 
@@ -747,7 +761,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                  in  ,
                                                  curBoneChild ,
                                                  globalTransformation ,
-                                                 jointData , jointDataSize ,
+                                                 joint4x4Data , jointDataSize ,
                                                  recursionLevel+1
                                                 );
       }
@@ -761,7 +775,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                  in  ,
                                                  curBoneChild ,
                                                  globalTransformation ,
-                                                 jointData , jointDataSize ,
+                                                 joint4x4Data , jointDataSize ,
                                                  recursionLevel+1
                                                 );
        }
@@ -789,26 +803,46 @@ void recursiveJointHierarchyTransformer(
 
    unsigned int i=0;
    float parentLocalTransformation[16] , globalTransformation[16] , currentNodeLocalTransformation[16];
-   copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
    copy4x4FMatrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
+
+   if (parentLocalTransformationUntouched==0)
+   { //If no parent local transform untouched declared then use an identity matrix..
+       float * m = parentLocalTransformation;
+       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+   } else
+   {
+   copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
+   }
 
 
   //These prevent to recalculate nodes where there does not appear to be
   //change..
  if ( in->bones[curBone].info->boneWeightsNumber>0 )
   {
+    if (jointData==0)
+     {
+      //No joint data => don't attempt to create a new local transformation..
+     } else
     if (in->bones[curBone].info->altered)
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       //Set all matrices to identity..
       float translation[16]={0} , rotation[16]={0} , scaling[16]={0};
+
+      //Set translation to identity
       //------------------------------------------------------------------------------------------
       translation[0] = 1.0; translation[5] = 1.0; translation[10] = 1.0; translation[15] = 1.0;
+
+      //Set rotation to identity
       //------------------------------------------------------------------------------------------
       rotation[0] = 1.0;    rotation[5] = 1.0;    rotation[10] = 1.0;    rotation[15] = 1.0;
+
+      //Set scaling to identity
       //------------------------------------------------------------------------------------------
       scaling[0] = 1.0;     scaling[5] = 1.0;     scaling[10] = 1.0;     scaling[15] = 1.0;
-      //------------------------------------------------------------------------------------------
 
       copy4x4FMatrix(rotation,&jointData[curBone*16]);
 

@@ -78,6 +78,14 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
          fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
         }
 
+        unsigned int transformations4x4Size = model.header.numberOfBones * 16;
+        float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
+        if (transformations4x4==0)
+        {
+            fprintf(stderr,"Failed to allocate enough memory for bones.. \n");
+            return 0;
+        }
+
         int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * model.header.numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
@@ -109,7 +117,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
 
 
                   memcpy(
-                         model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                         &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                          bvhTransform.joint[jID].chainTransformation.m,
                          sizeof(float) * 16
                         );
@@ -119,16 +127,27 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
          free(lookupTableFromTRIToBVH);
         }
 
-        /*
-        recursiveJointHierarchyTransformer(
+
+        float initialParentTransform[16]={0};
+        float * m = initialParentTransform;
+        m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+        m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+        m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+        m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+
+           //recursiveJointHierarchyTransformer
+        recursiveJointHierarchyTransformerDirect
+        (
                                             &model ,
                                             0,
-                                            0,
-                                            0,0,
+                                            initialParentTransform,
+                                            transformations4x4,transformations4x4Size,
                                             0
-                                          );*/
+                                          );
 
         applyVertexTransformation(modelOriginal,&model);
+
+        free(transformations4x4);
 
         return 1;
      } else

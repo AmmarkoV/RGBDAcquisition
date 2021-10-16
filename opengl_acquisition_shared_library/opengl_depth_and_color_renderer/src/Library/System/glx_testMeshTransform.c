@@ -478,7 +478,6 @@ int main(int argc,const char **argv)
    }
 
 
-
    stop_glx3_stuff();
  return 0;
 }
