@@ -139,7 +139,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
 
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                         bvhTransform.joint[jID].dynamicRotation.m, //dynamicRotation dynamicTranslation
+                         bvhTransform.joint[jID].chainTransformation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
                          sizeof(float) * 16
                         );
                 }
