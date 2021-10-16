@@ -17,6 +17,17 @@
 #include <ctype.h>
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
+
 void TRIBVH_lowercase(char *a)
 {
     if (a==0)
@@ -49,9 +60,6 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
   if (modelOutput==0)   { return 0; }
   if (bvh==0)           { return 0; }
   //--------------------------
-
-  struct TRI_Model modelTemporary={0};
-  copyModelTri( &modelTemporary , modelOriginal , 1 /*We also want bone data*/);
 
   copyModelTri(modelOutput , modelOriginal , 1 /*We also want bone data*/);
 
@@ -136,6 +144,12 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
         m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
         m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 
+
+
+
+        struct TRI_Model modelTemporary={0};
+        //copyModelTri( &modelTemporary , modelOriginal , 1 /*We also want bone data*/);
+
         doModelTransform(
                           &modelTemporary ,
                           modelOriginal ,
@@ -147,11 +161,6 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                           0 /*Default joint convention*/
                         );
 
-        struct TRI_Model modelTemporary2={0};
-        copyModelTri( &modelTemporary2 , modelOriginal , 1 /*We also want bone data*/);
-
-        //applyVertexTransformation(&modelTemporary2,&modelTemporary);
-
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
 
 
@@ -160,7 +169,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
         return 1;
      } else
      {
-       fprintf(stderr,"Error: Failed executing bvh transform\n");
+       fprintf(stderr,RED "Error: Failed executing bvh transform\n" NORMAL);
      }
 
  return 0;
