@@ -96,6 +96,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
             return 0;
         }
 
+        //memset(transformations4x4,0,sizeof(float) * transformations4x4Size);
         for (unsigned int mID=0; mID<numberOfBones; mID++)
         {
             float * m = &transformations4x4[mID*16];
@@ -105,7 +106,6 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
             m[8]=0.0;  m[9]=0.0;  m[10]=1.0;  m[11]=0.0;
             m[12]=0.0; m[13]=0.0; m[14]=0.0;  m[15]=1.0;
         }
-        memset(transformations4x4,0,sizeof(float) * transformations4x4Size);
 
 
         int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * numberOfBones);

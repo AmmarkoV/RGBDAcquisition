@@ -38,9 +38,15 @@
 
 
 
-#define NORMAL  "\033[0m"
+#define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
 
 
 //Change this to change MultiRendering numbers
@@ -260,7 +266,7 @@ int doOGLDrawing(
 
 
 
-int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
+int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int renderForever)
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
@@ -341,7 +347,8 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
 
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
-	do{
+	 do
+       {
         // Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -393,7 +400,7 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel)
        //---------------------------------------------------------------
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( 1 );
+	while( renderForever );
 
 	// Cleanup VBO and shader
 	//glDeleteBuffers(1, &vertexbuffer);
@@ -442,7 +449,10 @@ int main(int argc,const char **argv)
                     }
         }
    //------------------------------------------------------
-   if (!bvh_loadBVH("merged_neutral.bvh",&mc,1.0) ) // This is the new armature that includes the head
+   //merged_neutral.bvh
+   char * defaultBVHFile = "merged_neutral.bvh";
+   //char * defaultBVHFile = "01_02.bvh";
+   if (!bvh_loadBVH(defaultBVHFile,&mc,1.0) ) // This is the new armature that includes the head
         {
           fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
           return 0;
@@ -468,13 +478,16 @@ int main(int argc,const char **argv)
 
    fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
 
-   for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
+   while (1)
    {
-     fprintf(stderr,"BVG Frame %u \n",fID);
+    for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
+    {
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
      //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
-     doDrawing(&triModel,&eyeModel);
+     doDrawing(&triModel,&eyeModel,0);
+     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
+    }
    }
 
 
