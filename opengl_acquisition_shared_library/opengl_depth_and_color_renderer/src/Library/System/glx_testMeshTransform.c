@@ -272,10 +272,10 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int ren
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
 	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
-	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
+	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); return 0; }
 
 	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebuffer.frag");
-    if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
+    if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); return 0; }
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
@@ -408,6 +408,7 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int ren
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &humanVAO);
 	glDeleteVertexArrays(1, &eyeVAO);
+	return 1;
 }
 
 
