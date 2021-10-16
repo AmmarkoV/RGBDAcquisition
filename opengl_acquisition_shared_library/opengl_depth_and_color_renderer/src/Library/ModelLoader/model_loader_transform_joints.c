@@ -708,7 +708,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                struct TRI_Model * in  ,
                                                int curBone ,
                                                float * parentTransformUntouched ,
-                                               float * joint4x4Data , unsigned int jointDataSize ,
+                                               float * joint4x4Data , unsigned int joint4x4DataSize ,
                                                unsigned int recursionLevel
                                              )
 {
@@ -761,7 +761,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                  in  ,
                                                  curBoneChild ,
                                                  globalTransformation ,
-                                                 joint4x4Data , jointDataSize ,
+                                                 joint4x4Data , joint4x4DataSize ,
                                                  recursionLevel+1
                                                 );
       }
@@ -775,7 +775,7 @@ void recursiveJointHierarchyTransformerDirect(
                                                  in  ,
                                                  curBoneChild ,
                                                  globalTransformation ,
-                                                 joint4x4Data , jointDataSize ,
+                                                 joint4x4Data , joint4x4DataSize ,
                                                  recursionLevel+1
                                                 );
        }
@@ -997,8 +997,8 @@ void printModelTransform(struct TRI_Model * in)
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
                       struct TRI_Model * triModelIn ,
-                      float * jointData ,
-                      unsigned int jointDataSize ,
+                      float * joint4x4Data ,
+                      unsigned int joint4x4DataSize ,
                       unsigned int autodetectAlteredMatrices ,
                       unsigned int directSettingOfMatrices ,
                       unsigned int performVertexTransform  ,
@@ -1010,7 +1010,7 @@ int doModelTransform(
   if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
                      { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
 
- if ( (jointData==0) || (jointDataSize==0) )
+ if ( (joint4x4Data==0) || (joint4x4DataSize==0) )
  {
    fprintf(stderr,"doModelTransform called without joints to transform , ");
    fprintf(stderr,"so it will be just returning a null transformed copy of");
@@ -1026,7 +1026,7 @@ int doModelTransform(
  unsigned int i=0;
  for (i=0; i<triModelIn->header.numberOfBones; i++)
    {
-     float * jointI = &jointData[i*16];
+     float * jointI = &joint4x4Data[i*16];
 
      if (autodetectAlteredMatrices)
      {
@@ -1040,12 +1040,9 @@ int doModelTransform(
    }
 
   float initialParentTransform[16]={0};
-  //create4x4DIdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
   float * m = initialParentTransform;
-  m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-  m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-  m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-  m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+  m[0] = 1.0;  m[5] = 1.0; m[10] = 1.0; m[15] = 1.0;
+  //create4x4DIdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
 
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
@@ -1056,8 +1053,8 @@ int doModelTransform(
                                               triModelIn ,
                                               triModelIn->header.rootBone  ,
                                               initialParentTransform ,
-                                              jointData ,
-                                              jointDataSize ,
+                                              joint4x4Data ,
+                                              joint4x4DataSize ,
                                               0 /*First call 0 recursion*/
                                              );
   } else
@@ -1066,8 +1063,8 @@ int doModelTransform(
                                         triModelIn ,
                                         triModelIn->header.rootBone  ,
                                         initialParentTransform ,
-                                        jointData ,
-                                        jointDataSize ,
+                                        joint4x4Data ,
+                                        joint4x4DataSize ,
                                         0 /*First call 0 recursion*/
                                       );
   }

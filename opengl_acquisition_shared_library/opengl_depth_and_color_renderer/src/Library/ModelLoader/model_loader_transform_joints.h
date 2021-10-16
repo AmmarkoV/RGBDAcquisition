@@ -185,8 +185,8 @@ void printModelTransform(struct TRI_Model * in);
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
                       struct TRI_Model * triModelIn ,
-                      float * jointData ,
-                      unsigned int jointDataSize ,
+                      float * joint4x4Data ,
+                      unsigned int joint4x4DataSize ,
                       unsigned int autodetectAlteredMatrices,
                       unsigned int directSettingOfMatrices ,
                       unsigned int performVertexTransform  ,

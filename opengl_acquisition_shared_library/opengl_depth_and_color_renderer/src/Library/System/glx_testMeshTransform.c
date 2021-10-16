@@ -471,8 +471,8 @@ int main(int argc,const char **argv)
    for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
    {
      fprintf(stderr,"BVG Frame %u \n",fID);
-     animateTRIModelUsingBVHArmature(&indexedTriModel,&mc,fID);
-     fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
+     animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
+     //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
      doDrawing(&triModel,&eyeModel);
      usleep(1000);
    }

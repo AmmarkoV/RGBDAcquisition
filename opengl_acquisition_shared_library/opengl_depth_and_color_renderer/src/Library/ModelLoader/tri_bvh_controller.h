@@ -43,16 +43,19 @@ int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
 
 
 
-const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struct BVH_MotionCapture * bvh,unsigned int frameID)
+const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct TRI_Model * modelOriginal,struct BVH_MotionCapture * bvh,unsigned int frameID)
 {
- if (modelOriginal==0) { return 0; }
- if (bvh==0)   { return 0; }
- //--------------------------
+  if (modelOriginal==0) { return 0; }
+  if (modelOutput==0)   { return 0; }
+  if (bvh==0)           { return 0; }
+  //--------------------------
 
- struct TRI_Model model={0};
+  struct TRI_Model modelTemporary={0};
+  copyModelTri( &modelTemporary , modelOriginal , 1 /*We also want bone data*/);
 
- copyModelTri( &model , modelOriginal , 1 /*We also want bone data*/);
+  copyModelTri(modelOutput , modelOriginal , 1 /*We also want bone data*/);
 
+  unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
   struct BVH_Transform bvhTransform={0};
   if (
@@ -64,11 +67,11 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
                                 )
      )
      {
-        fprintf(stderr,"TRI file %s has %u bones\n",model.name,model.header.numberOfBones);
-        for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
+        fprintf(stderr,"TRI file %s has %u bones\n",modelOutput->name,numberOfBones);
+        for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
         {
-         struct TRI_Bones * bone = &model.bones[boneID];
-         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model.header.numberOfBones,bone->boneName);
+         struct TRI_Bones * bone = &modelOriginal->bones[boneID];
+         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
         }
 
         fprintf(stderr,"BVH file %s has %u joints\n",bvh->fileName,bvh->jointHierarchySize);
@@ -78,43 +81,41 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
          fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
         }
 
-        unsigned int transformations4x4Size = model.header.numberOfBones * 16;
+        unsigned int transformations4x4Size = numberOfBones * 16;
         float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
         if (transformations4x4==0)
         {
             fprintf(stderr,"Failed to allocate enough memory for bones.. \n");
             return 0;
         }
+        memset(transformations4x4,0,sizeof(float) * transformations4x4Size);
 
-        int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * model.header.numberOfBones);
+
+        int * lookupTableFromTRIToBVH = (int*) malloc(sizeof(int) * numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
         {
-          memset(lookupTableFromTRIToBVH,0,sizeof(int) * model.header.numberOfBones);
+          memset(lookupTableFromTRIToBVH,0,sizeof(int) * numberOfBones);
 
           for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
            {
-              for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
+              for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
               {
-                struct TRI_Bones * bone = &model.bones[boneID];
+                struct TRI_Bones * bone = &modelOriginal->bones[boneID];
                 if (strcmp(bone->boneName,bvh->jointHierarchy[jID].jointName)==0)
                 {
                   fprintf(stderr,"BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-                  fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,model.header.numberOfBones,bone->boneName);
+                  fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
                   lookupTableFromTRIToBVH[boneID]=jID;
                 }
               }
            }
 
-          for (unsigned int boneID=0; boneID<model.header.numberOfBones; boneID++)
+          for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
               {
                 if (lookupTableFromTRIToBVH[boneID]!=0)
                 {
                   BVHJointID jID = lookupTableFromTRIToBVH[boneID];
-
-                  //Force no alterations..
-                  model.bones[boneID].info->altered=0;
-
 
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
@@ -135,17 +136,24 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOriginal,struc
         m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
         m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 
-           //recursiveJointHierarchyTransformer
-        recursiveJointHierarchyTransformerDirect
-        (
-                                            &model ,
-                                            0,
-                                            initialParentTransform,
-                                            transformations4x4,transformations4x4Size,
-                                            0
-                                          );
+        doModelTransform(
+                          &modelTemporary ,
+                          modelOriginal ,
+                          transformations4x4 ,
+                          numberOfBones ,
+                          1/*Autodetect default matrices for speedup*/ ,
+                          1/*Direct setting of matrices*/,
+                          1/*Do Transforms, don't just calculate the matrices*/ ,
+                          0 /*Default joint convention*/
+                        );
 
-        applyVertexTransformation(modelOriginal,&model);
+        struct TRI_Model modelTemporary2={0};
+        copyModelTri( &modelTemporary2 , modelOriginal , 1 /*We also want bone data*/);
+
+        //applyVertexTransformation(&modelTemporary2,&modelTemporary);
+
+        fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
+
 
         free(transformations4x4);
 
