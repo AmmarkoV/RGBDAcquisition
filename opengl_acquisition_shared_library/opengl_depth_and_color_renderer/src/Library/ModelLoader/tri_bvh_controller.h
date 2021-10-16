@@ -137,18 +137,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
         }
 
 
-        float initialParentTransform[16]={0};
-        float * m = initialParentTransform;
-        m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-        m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-        m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-        m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
-
-
-
-
         struct TRI_Model modelTemporary={0};
-        //copyModelTri( &modelTemporary , modelOriginal , 1 /*We also want bone data*/);
 
         doModelTransform(
                           &modelTemporary ,
