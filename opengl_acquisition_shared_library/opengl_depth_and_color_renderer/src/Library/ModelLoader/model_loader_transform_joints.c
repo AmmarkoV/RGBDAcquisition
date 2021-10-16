@@ -1055,7 +1055,7 @@ int doModelTransform(
                                               initialParentTransform ,
                                               joint4x4Data ,
                                               joint4x4DataSize ,
-                                              0 /*First call 0 recursion*/
+                                              0 /*First call 0 level recursion*/
                                              );
   } else
   {
@@ -1065,7 +1065,7 @@ int doModelTransform(
                                         initialParentTransform ,
                                         joint4x4Data ,
                                         joint4x4DataSize ,
-                                        0 /*First call 0 recursion*/
+                                        0 /*First call 0 level recursion*/
                                       );
   }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
