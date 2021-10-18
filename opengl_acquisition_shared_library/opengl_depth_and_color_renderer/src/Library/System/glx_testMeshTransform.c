@@ -431,7 +431,13 @@ int doOGLDrawing(
   return 1;
 }
 
-int loadShaders(GLuint * programID,GLuint * programFrameBufferID)
+int initializeOGLRenderer(
+                           GLuint * programID,
+                           GLuint * programFrameBufferID,
+                           GLuint * FramebufferName,
+                           GLuint * renderedTexture,
+                           GLuint * renderedDepth
+                         )
 {
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
@@ -456,12 +462,23 @@ int loadShaders(GLuint * programID,GLuint * programFrameBufferID)
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
+    initializeFramebuffer(FramebufferName,renderedTexture,renderedDepth,WIDTH,HEIGHT);
+
     fprintf(stderr,"Ready to start pushing geometry  ");
     return 1;
 }
 
 
-int doDrawing(GLuint programID,GLuint programFrameBufferID,struct TRI_Model * triModel , struct TRI_Model * eyeModel, int renderForever)
+int doDrawing(
+                GLuint programID,
+                GLuint programFrameBufferID,
+                GLuint FramebufferName,
+                GLuint renderedTexture,
+                GLuint renderedDepth,
+                struct TRI_Model * triModel,
+                struct TRI_Model * eyeModel,
+                int renderForever
+             )
 {
    fprintf(stderr," doDrawing \n");
 
@@ -501,10 +518,6 @@ int doDrawing(GLuint programID,GLuint programFrameBufferID,struct TRI_Model * tr
                            );
     fprintf(stderr,"Ready to render: ");
 
-     GLuint FramebufferName = 0;
-     GLuint renderedTexture;
-     GLuint renderedDepth;
-     initializeFramebuffer(&FramebufferName,&renderedTexture,&renderedDepth,WIDTH,HEIGHT);
 
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
@@ -598,7 +611,11 @@ int main(int argc,const char **argv)
 
   GLuint programID=0;
   GLuint programFrameBufferID=0;
-  if (!loadShaders(&programID,&programFrameBufferID))
+  GLuint FramebufferName = 0;
+  GLuint renderedTexture=0;
+  GLuint renderedDepth=0;
+
+  if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth))
   {
 		fprintf(stderr, "Failed to initialize Shaders\n");
 	 	return 1;
@@ -667,7 +684,16 @@ int main(int argc,const char **argv)
     {
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
      //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
-     doDrawing(programID,programFrameBufferID,&triModel,&eyeModel,0);
+     doDrawing(
+                programID,
+                programFrameBufferID,
+                FramebufferName,
+                renderedTexture,
+                renderedDepth,
+                &triModel,
+                &eyeModel,
+                0
+              );
      deallocInternalsOfModelTri(&triModel);
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
