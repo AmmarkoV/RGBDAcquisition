@@ -62,7 +62,7 @@ void TRIBVH_removeunderscore(char *a)
 int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
   for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
-  {...
+  {
     char * boneName = triModel->bones[boneID].boneName;
     unsigned int l = strlen(triModel->bones[boneID].boneName);
     if (strcmp(triModel->bones[boneID].boneName,"Hips")==0)         { snprintf(boneName,l,"hip"); }      else
@@ -207,13 +207,14 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                           modelOriginal ,
                           transformations4x4 ,
                           numberOfBones ,
-                          0/*Autodetect default matrices for speedup*/ ,
+                          1/*Autodetect default matrices for speedup*/ ,
                           1/*Direct setting of matrices*/,
                           1/*Do Transforms, don't just calculate the matrices*/ ,
                           0 /*Default joint convention*/
                         );
         //---------------------------------------------------------------
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
+        deallocInternalsOfModelTri(&modelTemporary);
 
         free(transformations4x4);
 

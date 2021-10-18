@@ -659,6 +659,7 @@ int main(int argc,const char **argv)
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
      //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
      doDrawing(&triModel,&eyeModel,0);
+     deallocInternalsOfModelTri(&triModel);
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
     }
