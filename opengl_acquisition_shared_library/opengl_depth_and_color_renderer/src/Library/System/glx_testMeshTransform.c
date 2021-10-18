@@ -431,13 +431,8 @@ int doOGLDrawing(
   return 1;
 }
 
-
-
-
-
-int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int renderForever)
+int loadShaders(GLuint * programID,GLuint * programFrameBufferID)
 {
-   fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
 	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
@@ -446,14 +441,11 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int ren
 	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebuffer.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); return 0; }
 
-    GLuint programID = sho->ProgramObject;
-    GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
-
- 	// Get a handle for our "MVP" uniform
-	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+    *programID = sho->ProgramObject;
+    *programFrameBufferID = textureFramebuffer->ProgramObject;
 
 	// Use our shader
-	glUseProgram(programID);
+	glUseProgram(*programID);
 
 	// Black background
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -465,6 +457,16 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int ren
 	glDepthFunc(GL_LESS);
 
     fprintf(stderr,"Ready to start pushing geometry  ");
+    return 1;
+}
+
+
+int doDrawing(GLuint programID,GLuint programFrameBufferID,struct TRI_Model * triModel , struct TRI_Model * eyeModel, int renderForever)
+{
+   fprintf(stderr," doDrawing \n");
+
+ 	// Get a handle for our "MVP" uniform
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
     GLuint eyeVAO;
     GLuint eyeArrayBuffer;
@@ -572,9 +574,8 @@ int doDrawing(struct TRI_Model * triModel , struct TRI_Model * eyeModel, int ren
 	while( renderForever );
 
 	// Cleanup VBO and shader
-	//glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &quad_vertexbuffer);
 	//glDeleteBuffers(1, &colorbuffer);
-	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &humanVAO);
 	glDeleteVertexArrays(1, &eyeVAO);
 	return 1;
@@ -594,6 +595,14 @@ int main(int argc,const char **argv)
 		fprintf(stderr, "Failed to initialize GLEW\n");
 	 	return 1;
    }
+
+  GLuint programID=0;
+  GLuint programFrameBufferID=0;
+  if (!loadShaders(&programID,&programFrameBufferID))
+  {
+		fprintf(stderr, "Failed to initialize Shaders\n");
+	 	return 1;
+  }
 
    #define defaultModelToLoad "makehuman.tri"
    const char * modelToLoad = defaultModelToLoad;
@@ -658,13 +667,14 @@ int main(int argc,const char **argv)
     {
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
      //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
-     doDrawing(&triModel,&eyeModel,0);
+     doDrawing(programID,programFrameBufferID,&triModel,&eyeModel,0);
      deallocInternalsOfModelTri(&triModel);
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
     }
    }
 
+   glDeleteProgram(programID);
 
    stop_glx3_stuff();
  return 0;

@@ -85,11 +85,8 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
     if (strcmp(triModel->bones[boneID].boneName,"LeftLeg")==0)      { snprintf(boneName,l,"lShin"); }    else
     if (strcmp(triModel->bones[boneID].boneName,"LeftFoot")==0)     { snprintf(boneName,l,"lFoot"); }
 
-
     TRIBVH_lowercase(triModel->bones[boneID].boneName);
     TRIBVH_removeunderscore(triModel->bones[boneID].boneName);
-
-
   }
  return 0;
 }
@@ -109,7 +106,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
   unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
   printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-  bvh_printBVH(bvh);
+  //bvh_printBVH(bvh);
 
   struct BVH_Transform bvhTransform={0};
   if (
@@ -190,7 +187,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                          sizeof(float) * 16
                         );*/
 
-                  print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
+                  //print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
 
                 }
               }

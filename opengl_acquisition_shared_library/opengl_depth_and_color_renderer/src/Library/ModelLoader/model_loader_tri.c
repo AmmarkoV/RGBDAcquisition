@@ -63,7 +63,8 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
  unsigned int k=0, i=0 , parent , child ;
    for (i=0; i<triModel->header.numberOfBones; i++)
    {
-     fprintf(stderr,"Bone %u : %s \n",i,triModel->bones[i].boneName);
+     fprintf(stderr,"Bone %u : ",i);
+     fprintf(stderr,GREEN "%s \n" NORMAL,triModel->bones[i].boneName);
      if (triModel->bones[i].info!=0)
      {
       fprintf(stderr," Weights Number %u \n",triModel->bones[i].info->boneWeightsNumber);
