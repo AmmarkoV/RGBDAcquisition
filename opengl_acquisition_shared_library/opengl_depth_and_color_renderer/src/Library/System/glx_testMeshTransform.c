@@ -672,6 +672,7 @@ int main(int argc,const char **argv)
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
     }
+     fprintf(stderr,CYAN "\nLooping Dataset\n\n" NORMAL);
    }
 
    glDeleteProgram(programID);
