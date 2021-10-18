@@ -644,8 +644,8 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
 
-   makeAllTRIBoneNamesLowerCase(&indexedTriModel);
-   makeAllTRIBoneNamesLowerCase(&indexedEyeModel);
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedTriModel);
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
 
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
