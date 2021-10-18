@@ -64,6 +64,9 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
 
   unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
+  printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+  bvh_printBVH(bvh);
+
   struct BVH_Transform bvhTransform={0};
   if (
        bvh_loadTransformForFrame(
@@ -74,21 +77,6 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                                 )
      )
      {
-         /*
-        fprintf(stderr,"TRI file %s has %u bones\n",modelOutput->name,numberOfBones);
-        for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
-        {
-         struct TRI_Bones * bone = &modelOriginal->bones[boneID];
-         fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
-        }
-
-        fprintf(stderr,"BVH file %s has %u joints\n",bvh->fileName,bvh->jointHierarchySize);
-        for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
-        {
-          //bvhTransform->joint[jID].
-         fprintf(stderr,"BVH Joint %u/%u = %s \n",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-        }*/
-
         unsigned int transformations4x4Size = numberOfBones * 16;
         float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
         if (transformations4x4==0)
@@ -136,16 +124,34 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                 if (lookupTableFromTRIToBVH[boneID]!=0)
                 {
                   BVHJointID jID = lookupTableFromTRIToBVH[boneID];
+                  //-----------------------------------------------
 
+                  memcpy(
+                         &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                         bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
+                         sizeof(float) * 16
+                        );
+
+                        /*
+                  multiplyTwo4x4FMatrices_Naive(
+                                                 &transformations4x4[boneID*16],
+                                                 bvhTransform.joint[jID].dynamicRotation.m,
+                                                 bvhTransform.joint[jID].dynamicTranslation.m
+                                               );*/
+
+                  /*
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                          bvhTransform.joint[jID].chainTransformation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
                          sizeof(float) * 16
-                        );
+                        );*/
+
+                  print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
+
                 }
               }
 
-         free(lookupTableFromTRIToBVH);
+          free(lookupTableFromTRIToBVH);
         }
 
         fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
@@ -157,7 +163,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                           modelOriginal ,
                           transformations4x4 ,
                           numberOfBones ,
-                          1/*Autodetect default matrices for speedup*/ ,
+                          0/*Autodetect default matrices for speedup*/ ,
                           1/*Direct setting of matrices*/,
                           1/*Do Transforms, don't just calculate the matrices*/ ,
                           0 /*Default joint convention*/
