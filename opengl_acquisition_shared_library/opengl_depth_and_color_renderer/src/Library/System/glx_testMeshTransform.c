@@ -227,6 +227,15 @@ static const char * OpenCOLLADANames[]=
  "_toe5-3_L", // 495 "toe5-3.L" <- This does not currently exist in the makehuman model
  };
 
+ struct pose6D
+ {
+     float x;
+     float y;
+     float z;
+     float roll;
+     float pitch;
+     float yaw;
+ };
 
 unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
 unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
@@ -630,8 +639,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    struct TRI_Model indexedEyeModel={0};
    struct TRI_Model eyeModel={0};
+   struct pose6D eyePose={0};
    struct TRI_Model indexedTriModel={0};
    struct TRI_Model triModel={0};
+   struct pose6D humanPose={0};
    //------------------------------------------------------
 
    //------------------------------------------------------
@@ -677,14 +688,15 @@ int main(int argc,const char **argv)
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 
-   fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
+   //fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
 
    while (1)
    {
     for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
     {
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
-     //fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
+     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
+
      doDrawing(
                 programID,
                 programFrameBufferID,
@@ -695,7 +707,9 @@ int main(int argc,const char **argv)
                 &eyeModel,
                 0
               );
+
      deallocInternalsOfModelTri(&triModel);
+     deallocInternalsOfModelTri(&eyeModel);
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
     }
