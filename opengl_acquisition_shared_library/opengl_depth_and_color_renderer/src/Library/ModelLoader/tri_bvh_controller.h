@@ -105,8 +105,8 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
 
   unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
-  printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-  bvh_printBVH(bvh);
+  //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+  //bvh_printBVH(bvh);
 
   struct BVH_Transform bvhTransform={0};
   if (

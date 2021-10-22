@@ -726,14 +726,23 @@ int main(int argc,const char **argv)
         )
      {
          BVHJointID headJoint;
-         if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) )
+         if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
          {
-          eyePose.x = bvhTransform.joint[headJoint].pos3D[0];
-          eyePose.y = bvhTransform.joint[headJoint].pos3D[1];
-          eyePose.z = bvhTransform.joint[headJoint].pos3D[2];
+          //humanPose.x humanPose.y humanPose.z
+          eyePose.x =  0;// + bvhTransform.joint[headJoint].pos3D[0] - bvhTransform.joint[mc.rootJointID].pos3D[0];
+          eyePose.y =  0;// + bvhTransform.joint[headJoint].pos3D[1] - bvhTransform.joint[mc.rootJointID].pos3D[1];
+          eyePose.z =  0;// + bvhTransform.joint[headJoint].pos3D[2] - bvhTransform.joint[mc.rootJointID].pos3D[2];
+          eyePose.x =  humanPose.x;
+          eyePose.y =  humanPose.y + 0.05;
+          eyePose.z =  humanPose.z + 0.8;
+
+          fprintf(stderr,"Eye X %f, Y %f, Z %f \n",eyePose.x,eyePose.y,eyePose.z);
+          eyePose.roll  = humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
+          eyePose.pitch = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
+          eyePose.yaw   = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
+          fprintf(stderr,"Eye roll %f, pitch %f, yaw %f \n",eyePose.roll,eyePose.pitch,eyePose.yaw);
          }
      }
-
 
      animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
      animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
