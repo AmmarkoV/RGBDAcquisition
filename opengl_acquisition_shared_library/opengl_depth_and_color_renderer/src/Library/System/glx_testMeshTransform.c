@@ -690,10 +690,34 @@ int main(int argc,const char **argv)
 
    //fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
 
+
    while (1)
    {
     for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
     {
+     //-------------------------------------------
+     struct BVH_Transform bvhTransform={0};
+     if (
+          bvh_loadTransformForFrame(
+                                    &mc,
+                                    fID,
+                                    &bvhTransform,
+                                  0
+                                )
+        )
+     {
+         BVHJointID headJoint;
+         if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) )
+         {
+          eyePose.x = bvhTransform.joint[headJoint].pos3D[0];
+          eyePose.y = bvhTransform.joint[headJoint].pos3D[1];
+          eyePose.z = bvhTransform.joint[headJoint].pos3D[2];
+
+
+         }
+     }
+
+
      animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
      animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
 
