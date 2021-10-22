@@ -340,15 +340,17 @@ int drawObjectAT(GLuint programID,
 
 
 int doOGLDrawing(
-                   int programID,
-                   GLuint MVPMatrixID ,
-                   GLuint eyeVao,
-                   unsigned int eyeTriangleCount,
-                   GLuint humanVao,
-                   unsigned int humanTriangleCount,
-                   unsigned int width,
-                   unsigned int height
-                   )
+                 int programID,
+                 GLuint MVPMatrixID ,
+                 struct pose6D * eyePose,
+                 GLuint eyeVao,
+                 unsigned int eyeTriangleCount,
+                 struct pose6D * humanPose,
+                 GLuint humanVao,
+                 unsigned int humanTriangleCount,
+                 unsigned int width,
+                 unsigned int height
+                )
 {
   struct Matrix4x4OfFloats projectionMatrix;
   struct Matrix4x4OfFloats viewportMatrix;
@@ -401,13 +403,14 @@ int doOGLDrawing(
                   eyeVao,
                   MVPMatrixID,
                   eyeTriangleCount,
-                  x,
-                  y+0.05,
-                  z+0.8,
-                  roll,
-                  pitch,
-                  yaw,
-
+                  //-------------
+                  eyePose->x,
+                  eyePose->y, //+0.05,
+                  eyePose->z, //+0.8,
+                  eyePose->roll,
+                  eyePose->pitch,
+                  eyePose->yaw,
+                  //-------------
                   &projectionMatrix,
                   &viewportMatrix,
                   &viewMatrix
@@ -420,13 +423,14 @@ int doOGLDrawing(
                   humanVao,
                   MVPMatrixID,
                   humanTriangleCount,
-                  x,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
+                  //-------------
+                  humanPose->x,
+                  humanPose->y,
+                  humanPose->z,
+                  humanPose->roll,
+                  humanPose->pitch,
+                  humanPose->yaw,
+                  //-------------
                   &projectionMatrix,
                   &viewportMatrix,
                   &viewMatrix
@@ -558,8 +562,10 @@ int doDrawing(
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
+                     eyePose,
                      eyeVAO,
                      eyeTriangleCount,
+                     humanPose,
                      humanVAO,
                      humanTriangleCount,
                      WIDTH,
@@ -646,6 +652,17 @@ int main(int argc,const char **argv)
    struct TRI_Model humanModel={0};
    struct pose6D humanPose={0};
    //------------------------------------------------------
+
+
+  //-------------------------------------------------------------------
+   humanPose.roll=180.0;//(float)  (rand()%90);
+   humanPose.pitch=0.0;//(float) (rand()%90);
+   humanPose.yaw=0.0;//(float)   (rand()%90);
+
+   humanPose.x=0.0f;//(float)  (1000-rand()%2000);
+   humanPose.y=-8.976f;//(float) (100-rand()%200);
+   humanPose.z=26.99735f;//(float)  (700+rand()%1000);
+  //-------------------------------------------------------------------
 
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
