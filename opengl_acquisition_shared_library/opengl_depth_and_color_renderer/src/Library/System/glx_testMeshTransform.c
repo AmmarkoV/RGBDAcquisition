@@ -484,7 +484,9 @@ int doDrawing(
                 GLuint FramebufferName,
                 GLuint renderedTexture,
                 GLuint renderedDepth,
+                struct pose6D * humanPose,
                 struct TRI_Model * triModel,
+                struct pose6D * eyePose,
                 struct TRI_Model * eyeModel,
                 int renderForever
              )
@@ -640,8 +642,8 @@ int main(int argc,const char **argv)
    struct TRI_Model indexedEyeModel={0};
    struct TRI_Model eyeModel={0};
    struct pose6D eyePose={0};
-   struct TRI_Model indexedTriModel={0};
-   struct TRI_Model triModel={0};
+   struct TRI_Model indexedHumanModel={0};
+   struct TRI_Model humanModel={0};
    struct pose6D humanPose={0};
    //------------------------------------------------------
 
@@ -666,7 +668,7 @@ int main(int argc,const char **argv)
           return 0;
         }
    //------------------------------------------------------
-   if (!loadModelTri(modelToLoad, &indexedTriModel ) )
+   if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
    {
      fprintf(stderr,"Please : \n");
      fprintf(stderr,"wget http://ammar.gr/mocapnet/makehuman.tri\n");
@@ -682,7 +684,7 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
 
-   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedTriModel);
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
 
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
@@ -702,8 +704,8 @@ int main(int argc,const char **argv)
                                     &mc,
                                     fID,
                                     &bvhTransform,
-                                  0
-                                )
+                                    0
+                                   )
         )
      {
          BVHJointID headJoint;
@@ -712,13 +714,11 @@ int main(int argc,const char **argv)
           eyePose.x = bvhTransform.joint[headJoint].pos3D[0];
           eyePose.y = bvhTransform.joint[headJoint].pos3D[1];
           eyePose.z = bvhTransform.joint[headJoint].pos3D[2];
-
-
          }
      }
 
 
-     animateTRIModelUsingBVHArmature(&triModel,&indexedTriModel,&mc,fID);
+     animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
      animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
 
      doDrawing(
@@ -727,12 +727,14 @@ int main(int argc,const char **argv)
                 FramebufferName,
                 renderedTexture,
                 renderedDepth,
-                &triModel,
+                &humanPose,
+                &humanModel,
+                &eyePose,
                 &eyeModel,
                 0
               );
 
-     deallocInternalsOfModelTri(&triModel);
+     deallocInternalsOfModelTri(&humanModel);
      deallocInternalsOfModelTri(&eyeModel);
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      usleep(1000);
