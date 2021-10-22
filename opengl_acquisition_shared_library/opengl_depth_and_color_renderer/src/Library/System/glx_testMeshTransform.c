@@ -485,7 +485,7 @@ int doDrawing(
                 GLuint renderedTexture,
                 GLuint renderedDepth,
                 struct pose6D * humanPose,
-                struct TRI_Model * triModel,
+                struct TRI_Model * humanModel,
                 struct pose6D * eyePose,
                 struct TRI_Model * eyeModel,
                 int renderForever
@@ -514,17 +514,17 @@ int doDrawing(
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
-    unsigned int humanTriangleCount  =  (unsigned int)  triModel->header.numberOfVertices/3;
+    unsigned int humanTriangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
                              programID  ,
-                             triModel->vertices  ,  triModel->header.numberOfVertices * sizeof(float) ,
-                             triModel->normal    ,  triModel->header.numberOfNormals  * sizeof(float),
+                             humanModel->vertices  ,  humanModel->header.numberOfVertices * sizeof(float) ,
+                             humanModel->normal    ,  humanModel->header.numberOfNormals  * sizeof(float),
                              0,0,
-                             //triModel.textureCoords  ,  triModel.header.numberOfTextureCoords ,
-                             triModel->colors  ,  triModel->header.numberOfColors  * sizeof(float) ,
+                             //humanModel.textureCoords  ,  humanModel.header.numberOfTextureCoords ,
+                             humanModel->colors  ,  humanModel->header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
     fprintf(stderr,"Ready to render: ");
