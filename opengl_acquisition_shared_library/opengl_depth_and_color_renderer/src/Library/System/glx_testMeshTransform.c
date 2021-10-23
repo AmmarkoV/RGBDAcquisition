@@ -57,8 +57,6 @@
 #define shrinkingFactor 1
 //--------------------------------------------
 
-
-
  struct pose6D
  {
      float x;
@@ -67,6 +65,9 @@
      float roll;
      float pitch;
      float yaw;
+
+     char useMatrix;
+     struct Matrix4x4OfFloats m;
  };
 
 unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
@@ -722,15 +723,12 @@ int main(int argc,const char **argv)
    }
    //------------------------------------------------------
 
-
-   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
 
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
-
    //fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
-
 
    while (1)
    {
