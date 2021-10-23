@@ -157,7 +157,7 @@ int initializeFramebuffer(
 	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 	// Always check that our framebuffer is ok
-	return checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..", FramebufferName);
+	return checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..",*FramebufferName);
 
   #else
    return 0;
@@ -244,16 +244,16 @@ int drawFramebufferTexToTex(
                            )
 {
  return drawFramebufferFromTexture(
-                                            FramebufferName,
-                                            renderedTexture,
-                                            programFrameBufferID,
-                                            quad_vertexbuffer,
-                                            texID,
-                                            timeID,
-                                            resolutionID,
-                                            width,
-                                            height
-                                          );
+                                   FramebufferName,
+                                   renderedTexture,
+                                   programFrameBufferID,
+                                   quad_vertexbuffer,
+                                   texID,
+                                   timeID,
+                                   resolutionID,
+                                   width,
+                                   height
+                                  );
 }
 
 int drawFramebufferToScreen(
