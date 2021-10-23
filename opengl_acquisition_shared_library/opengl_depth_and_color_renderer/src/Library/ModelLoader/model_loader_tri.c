@@ -96,7 +96,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 {
     if ( (triModel==0) || (indexed==0) )
     {
-      fprintf(stderr,"\n\nerror : Cannot flatten with null models\n");
+      fprintf(stderr,RED "\nerror : Cannot flatten with null models..\n" NORMAL);
       return 0;
     }
     //===================================================================
@@ -120,7 +120,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
     triModel->header.numberOfIndices       = 0;
     triModel->header.numberOfBones         = 0; //indexed->header.numberOfBones;
 
-    fprintf(stderr,"\n\nwarning : Flattening a model loses its bone structure for now .. \n");
+    fprintf(stderr,YELLOW "\nwarning : Flattening a model loses its bone structure for now..\n" NORMAL);
 
 
     triModel->name = (char * ) malloc( (triModel->header.nameSize+1)  * sizeof(char));

@@ -152,8 +152,8 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                 struct TRI_Bones * bone = &modelOriginal->bones[boneID];
                 if (strcmp(bone->boneName,bvh->jointHierarchy[jID].jointName)==0)
                 {
-                  fprintf(stderr,"Resolved BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-                  fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
+                  //fprintf(stderr,"Resolved BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
+                  //fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
                   lookupTableFromTRIToBVH[boneID]=jID;
                   resolvedJoints+=1;
                 }
@@ -195,7 +195,7 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
           free(lookupTableFromTRIToBVH);
         }
 
-        fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
+        //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
 
         struct TRI_Model modelTemporary={0};
         //---------------------------------------------------------------

@@ -621,7 +621,6 @@ int doDrawing(
        //---------------------------------------------------------------
         ++framesRendered;
        //---------------------------------------------------------------
-
 	} // Check if the ESC key was pressed or the window was closed
     while( renderForever );
 
@@ -652,7 +651,7 @@ int main(int argc,const char **argv)
 
   GLuint programID=0;
   GLuint programFrameBufferID=0;
-  GLuint FramebufferName = 0;
+  GLuint FramebufferName=0;
   GLuint renderedTexture=0;
   GLuint renderedDepth=0;
 
@@ -668,24 +667,26 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    struct BVH_MotionCapture mc = {0};
    //------------------------------------------------------
-   struct TRI_Model indexedEyeModel={0};
-   struct TRI_Model eyeModel={0};
    struct pose6D eyePose={0};
-   struct TRI_Model indexedHumanModel={0};
-   struct TRI_Model humanModel={0};
+   struct TRI_Model eyeModel={0};
+   struct TRI_Model indexedEyeModel={0};
+   //------------------------------------------------------
    struct pose6D humanPose={0};
+   struct TRI_Model humanModel={0};
+   struct TRI_Model indexedHumanModel={0};
    //------------------------------------------------------
 
 
-  //-------------------------------------------------------------------
+   //Set human pose to somewhere visible..
+   //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
    humanPose.pitch=0.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
-  //-------------------------------------------------------------------
+   //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
    humanPose.y=-8.976f;//(float) (100-rand()%200);
    humanPose.z=26.99735f;//(float)  (700+rand()%1000);
-  //-------------------------------------------------------------------
+   //-------------------------------------------------------------------
 
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
@@ -710,15 +711,13 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
    {
-     fprintf(stderr,"Please : \n");
-     fprintf(stderr,"wget http://ammar.gr/mocapnet/makehuman.tri\n");
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/makehuman.tri\n");
      return 0;
    }
    //------------------------------------------------------
    if (!loadModelTri("eyes.tri", &indexedEyeModel ) )
    {
-     fprintf(stderr,"Please : \n");
-     fprintf(stderr,"wget http://ammar.gr/mocapnet/eyes.tri\n");
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyes.tri\n");
      return 0;
    }
    //------------------------------------------------------
@@ -737,6 +736,7 @@ int main(int argc,const char **argv)
    {
     for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
     {
+     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      //-------------------------------------------
      struct BVH_Transform bvhTransform={0};
      if (
@@ -759,11 +759,11 @@ int main(int argc,const char **argv)
           eyePose.y =  humanPose.y + 0.05;
           eyePose.z =  humanPose.z + 0.8;
 
-          fprintf(stderr,"Eye X %f, Y %f, Z %f \n",eyePose.x,eyePose.y,eyePose.z);
+          fprintf(stderr,"Eye X %f, Y %f, Z %f\n",eyePose.x,eyePose.y,eyePose.z);
           eyePose.roll  = humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
           eyePose.pitch = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
           eyePose.yaw   = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
-          fprintf(stderr,"Eye roll %f, pitch %f, yaw %f \n",eyePose.roll,eyePose.pitch,eyePose.yaw);
+          fprintf(stderr,"Eye roll %f, pitch %f, yaw %f\n",eyePose.roll,eyePose.pitch,eyePose.yaw);
          }
      }
 
@@ -785,10 +785,9 @@ int main(int argc,const char **argv)
 
      deallocInternalsOfModelTri(&humanModel);
      deallocInternalsOfModelTri(&eyeModel);
-     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n\n\n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
-     usleep(1000);
+     usleep(10);
     }
-     fprintf(stderr,CYAN "\nLooping Dataset\n\n" NORMAL);
+     fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL);
    }
 
    glDeleteProgram(programID);
