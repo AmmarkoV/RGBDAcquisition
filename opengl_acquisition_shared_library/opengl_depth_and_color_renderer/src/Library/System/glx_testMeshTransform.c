@@ -37,7 +37,7 @@
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
 
 
-
+//Colored console output..
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -49,7 +49,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-//Change this to change MultiRendering numbers
+//Change this to change MultiRendering numbers..
 #define originalWIDTH 1080
 #define originalHEIGHT 1080
 #define tilesToDoX 1
@@ -259,21 +259,24 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
 
-int drawObjectAT(GLuint programID,
+int drawObjectAT(
+                 GLuint programID,
                  GLuint vao,
                  GLuint MatrixID,
                  unsigned int triangleCount,
-
+                 //-----------------------------------------
                  float x,
                  float y,
                  float z,
                  float roll,
                  float pitch,
                  float yaw,
-
+                 //-----------------------------------------
                  struct Matrix4x4OfFloats * projectionMatrix,
                  struct Matrix4x4OfFloats * viewportMatrix,
-                 struct Matrix4x4OfFloats * viewMatrix
+                 struct Matrix4x4OfFloats * viewMatrix,
+                 //-----------------------------------------
+                 char renderWireframe
                  )
 {
        //Select Shader to render with
@@ -323,9 +326,9 @@ int drawObjectAT(GLuint programID,
         glEnable(GL_CULL_FACE);
 
          //-------------------------------------------------
-         //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
-         //               glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-         // checkOpenGLError(__FILE__, __LINE__);
+         if (renderWireframe) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); } else
+                              { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+           checkOpenGLError(__FILE__, __LINE__);
          //-------------------------------------------------
 
 
@@ -373,16 +376,15 @@ int doOGLDrawing(
 
   unsigned int viewportWidth = (unsigned int) width;
   unsigned int viewportHeight = (unsigned int) height;
+  glViewport(0,0,viewportWidth,viewportHeight);
 
-  glViewport(0,0, viewportWidth , viewportHeight );
-
-  float newViewport[4]={0,0, viewportWidth , viewportHeight};
+  float newViewport[4]={0,0,viewportWidth,viewportHeight};
   float projectionMatrixViewportCorrected[16];
   correctProjectionMatrixForDifferentViewport(
-                                                  projectionMatrixViewportCorrected,
-                                                  projectionMatrix.m,
-                                                  viewportMatrix.m,
-                                                  newViewport
+                                               projectionMatrixViewportCorrected,
+                                               projectionMatrix.m,
+                                               viewportMatrix.m,
+                                               newViewport
                                              );
      //-------------------------------
      //-------------------------------
@@ -403,7 +405,8 @@ int doOGLDrawing(
                   //-------------
                   &projectionMatrix,
                   &viewportMatrix,
-                  &viewMatrix
+                  &viewMatrix,
+                  0 //Wireframe
                  );
      //-------------------------------
      //-------------------------------
@@ -423,13 +426,14 @@ int doOGLDrawing(
                   //-------------
                   &projectionMatrix,
                   &viewportMatrix,
-                  &viewMatrix
+                  &viewMatrix,
+                  0 //Wireframe
                  );
      //-------------------------------
      //-------------------------------
      //-------------------------------
 
-      viewMatrix.m[3]+=1.0;
+     viewMatrix.m[3]+=1.0;
 
   return 1;
 }
