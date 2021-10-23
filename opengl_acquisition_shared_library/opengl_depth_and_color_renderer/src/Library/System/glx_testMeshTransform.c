@@ -57,6 +57,7 @@
 #define shrinkingFactor 1
 //--------------------------------------------
 
+/*
 static const char * OpenCOLLADANames[]=
 {
 "Hips", // 0 "hip",
@@ -225,7 +226,7 @@ static const char * OpenCOLLADANames[]=
  "_toe5-1_L", // 489 "toe5-1.L", <- This does not currently exist in the makehuman model
  "_toe5-2_L", // 492 "toe5-2.L", <- This does not currently exist in the makehuman model
  "_toe5-3_L", // 495 "toe5-3.L" <- This does not currently exist in the makehuman model
- };
+ };*/
 
  struct pose6D
  {
@@ -258,19 +259,13 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
 
-
-int drawObjectAT(
+int drawObjectAT4x4(
                  GLuint programID,
                  GLuint vao,
                  GLuint MatrixID,
                  unsigned int triangleCount,
                  //-----------------------------------------
-                 float x,
-                 float y,
-                 float z,
-                 float roll,
-                 float pitch,
-                 float yaw,
+                 struct Matrix4x4OfFloats * modelMatrix,
                  //-----------------------------------------
                  struct Matrix4x4OfFloats * projectionMatrix,
                  struct Matrix4x4OfFloats * viewportMatrix,
@@ -287,29 +282,9 @@ int drawObjectAT(
 
        //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
-
-       struct Matrix4x4OfFloats modelMatrix;
-       create4x4FModelTransformation(
-                                    &modelMatrix,
-                                    //Rotation Component
-                                    roll,//roll
-                                    pitch ,//pitch
-                                    yaw ,//yaw
-                                    ROTATION_ORDER_RPY,
-
-                                    //Translation Component (XYZ)
-                                    (float) x,
-                                    (float) y,
-                                    (float) z,
-
-                                    1.0,//scaleX,
-                                    1.0,//scaleY,
-                                    1.0//scaleZ
-                                   );
-
       //-------------------------------------------------------------------
        struct Matrix4x4OfFloats MVP;
-       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,&modelMatrix);
+       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,modelMatrix);
        transpose4x4FMatrix(MVP.m);
       //-------------------------------------------------------------------
 
@@ -338,6 +313,63 @@ int drawObjectAT(
        glPopAttrib();
        glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
        return 1;
+}
+
+
+
+int drawObjectAT(
+                 GLuint programID,
+                 GLuint vao,
+                 GLuint MatrixID,
+                 unsigned int triangleCount,
+                 //-----------------------------------------
+                 float x,
+                 float y,
+                 float z,
+                 float roll,
+                 float pitch,
+                 float yaw,
+                 //-----------------------------------------
+                 struct Matrix4x4OfFloats * projectionMatrix,
+                 struct Matrix4x4OfFloats * viewportMatrix,
+                 struct Matrix4x4OfFloats * viewMatrix,
+                 //-----------------------------------------
+                 char renderWireframe
+                 )
+{
+       struct Matrix4x4OfFloats modelMatrix;
+       create4x4FModelTransformation(
+                                    &modelMatrix,
+                                    //Rotation Component
+                                    roll,//roll
+                                    pitch ,//pitch
+                                    yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
+                                    //-----------------------------------------
+                                    //Translation Component (XYZ)
+                                    (float) x,
+                                    (float) y,
+                                    (float) z,
+                                    //-----------------------------------------
+                                    1.0,//scaleX,
+                                    1.0,//scaleY,
+                                    1.0//scaleZ
+                                   );
+
+       return drawObjectAT4x4(
+                              programID,
+                              vao,
+                              MatrixID,
+                              triangleCount,
+                              //-----------------------------------------
+                              &modelMatrix,
+                              //-----------------------------------------
+                              projectionMatrix,
+                              viewportMatrix,
+                              viewMatrix,
+                              //-----------------------------------------
+                              renderWireframe
+                             );
 }
 
 
@@ -650,7 +682,7 @@ int main(int argc,const char **argv)
    humanPose.roll=180.0;//(float)  (rand()%90);
    humanPose.pitch=0.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
-
+  //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
    humanPose.y=-8.976f;//(float) (100-rand()%200);
    humanPose.z=26.99735f;//(float)  (700+rand()%1000);
