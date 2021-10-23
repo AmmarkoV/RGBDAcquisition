@@ -523,8 +523,6 @@ int doDrawing(
                 int renderForever
              )
 {
-   fprintf(stderr," doDrawing \n");
-
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -538,10 +536,10 @@ int doDrawing(
                              programID,
                              eyeModel->vertices       ,  eyeModel->header.numberOfVertices      * sizeof(float),
                              eyeModel->normal         ,  eyeModel->header.numberOfNormals       * sizeof(float),
-                             eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords * sizeof(float), //0 ,  0, //No Texture
+                             eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              eyeModel->colors         ,  eyeModel->header.numberOfColors        * sizeof(float),
-                             humanModel->indices      ,  humanModel->header.numberOfIndices     * sizeof(unsigned int)//0, 0 //Not Indexed
-                           );
+                             humanModel->indices      ,  humanModel->header.numberOfIndices     * sizeof(unsigned int)//0,0 //Not Indexed
+                          );
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
@@ -553,11 +551,10 @@ int doDrawing(
                              programID,
                              humanModel->vertices       ,  humanModel->header.numberOfVertices      * sizeof(float),
                              humanModel->normal         ,  humanModel->header.numberOfNormals       * sizeof(float),
-                             humanModel->textureCoords  ,  humanModel->header.numberOfTextureCoords * sizeof(float), //0,0, //No Texture
+                             humanModel->textureCoords  ,  humanModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              humanModel->colors         ,  humanModel->header.numberOfColors        * sizeof(float),
-                             humanModel->indices        ,  humanModel->header.numberOfIndices       * sizeof(unsigned int)//0, 0 //Not Indexed
+                             humanModel->indices        ,  humanModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
-    fprintf(stderr,"Ready to render: ");
 
 
 	 GLuint quad_vertexbuffer;
@@ -573,7 +570,7 @@ int doDrawing(
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 	 do
-       {
+     {
         // Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -627,7 +624,8 @@ int doDrawing(
        //---------------------------------------------------------------
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( renderForever );
+    while( renderForever );
+
 
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);

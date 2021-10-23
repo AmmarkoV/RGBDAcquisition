@@ -70,7 +70,7 @@ pushObjectToBufferData(
     //Pass vPosition to shader
     if ((vertices!=0) && (sizeOfVertices!=0) )
     {
-     GLuint vPosition = glGetAttribLocation( programID, "vPosition" );               checkOpenGLError(__FILE__, __LINE__);
+     GLuint vPosition = glGetAttribLocation( programID, "vPosition" );                checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vPosition)
      {
       glEnableVertexAttribArray( vPosition );                                         checkOpenGLError(__FILE__, __LINE__);
@@ -85,19 +85,19 @@ pushObjectToBufferData(
      GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vNormal)
      {
-      glEnableVertexAttribArray(vNormal );                                                    checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vNormal, 3,GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(sizeOfVertices));  checkOpenGLError(__FILE__, __LINE__);
+      glEnableVertexAttribArray(vNormal);                                                    checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(sizeOfVertices));    checkOpenGLError(__FILE__, __LINE__);
      }
     }
 
     if ( (colors!=0) && (sizeOfColors!=0) )
     {
      //Pass vColor to shader
-     GLuint vColor = glGetAttribLocation( programID, "vColor" );
+     GLuint vColor = glGetAttribLocation( programID, "vColor" );                                      checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vColor)
      {
-      glEnableVertexAttribArray( vColor );                                                                     checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( sizeOfColors + sizeOfNormals ) ); checkOpenGLError(__FILE__, __LINE__);
+      glEnableVertexAttribArray(vColor);                                                              checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(sizeOfColors+sizeOfNormals));  checkOpenGLError(__FILE__, __LINE__);
      }
     }
 
@@ -106,7 +106,7 @@ pushObjectToBufferData(
     if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
     {
      //Pass vTexture to shader
-     GLuint vTexture = glGetAttribLocation( programID, "vTexture" );
+     GLuint vTexture = glGetAttribLocation( programID, "vTexture" );                                                             checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vTexture )
      {
       glEnableVertexAttribArray( vTexture );                                                                                     checkOpenGLError(__FILE__, __LINE__);
