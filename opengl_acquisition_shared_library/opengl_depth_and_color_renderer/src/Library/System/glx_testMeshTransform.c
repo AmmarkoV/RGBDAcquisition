@@ -59,14 +59,10 @@
 
  struct pose6D
  {
-     float x;
-     float y;
-     float z;
-     float roll;
-     float pitch;
-     float yaw;
+     float x,y,z;
+     float roll,pitch,yaw;
 
-     char useMatrix;
+     char usePoseMatrixDirectly;
      struct Matrix4x4OfFloats m;
  };
 
@@ -425,6 +421,25 @@ int doOGLDrawing(
      //-------------------------------
      //-------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
+
+
+     if (eyePose->usePoseMatrixDirectly)
+     {
+      drawObjectAT4x4(
+                      programID,
+                      eyeVao,
+                      MVPMatrixID,
+                      eyeTriangleCount,
+                      //-------------
+                      &eyePose->m,
+                      //-------------
+                      &projectionMatrix,
+                      &viewportMatrix,
+                      &viewMatrix,
+                      0 //Wireframe
+                     );
+     } else
+     {
      drawObjectAT(
                   programID,
                   eyeVao,
@@ -443,6 +458,9 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                  );
+     }
+
+
      //-------------------------------
      //-------------------------------
      //-------------------------------
