@@ -57,6 +57,37 @@
 #define shrinkingFactor 1
 //--------------------------------------------
 
+
+
+ struct pose6D
+ {
+     float x;
+     float y;
+     float z;
+     float roll;
+     float pitch;
+     float yaw;
+ };
+
+unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
+unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
+
+float lastFramerate = 60;
+unsigned long lastRenderingTime = 0;
+unsigned int framesRendered = 0;
+
+
+int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
+{
+    return 0;
+}
+
+int handleUserInput(char key,int state,unsigned int x, unsigned int y)
+{
+    return 0;
+}
+
+
 /*
 static const char * OpenCOLLADANames[]=
 {
@@ -227,35 +258,6 @@ static const char * OpenCOLLADANames[]=
  "_toe5-2_L", // 492 "toe5-2.L", <- This does not currently exist in the makehuman model
  "_toe5-3_L", // 495 "toe5-3.L" <- This does not currently exist in the makehuman model
  };*/
-
- struct pose6D
- {
-     float x;
-     float y;
-     float z;
-     float roll;
-     float pitch;
-     float yaw;
- };
-
-unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
-unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
-
-float lastFramerate = 60;
-unsigned long lastRenderingTime = 0;
-unsigned int framesRendered=0;
-
-
-int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
-{
-    return 0;
-}
-
-int handleUserInput(char key,int state,unsigned int x, unsigned int y)
-{
-    return 0;
-}
-
 
 
 
