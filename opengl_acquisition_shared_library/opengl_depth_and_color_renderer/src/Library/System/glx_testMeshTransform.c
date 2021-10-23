@@ -774,12 +774,27 @@ int main(int argc,const char **argv)
           eyePose.x =  humanPose.x;
           eyePose.y =  humanPose.y + 0.05;
           eyePose.z =  humanPose.z + 0.8;
+          //-----------------------------------
 
+          //-----------------------------------
           fprintf(stderr,"Eye X %f, Y %f, Z %f\n",eyePose.x,eyePose.y,eyePose.z);
           eyePose.roll  = humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
           eyePose.pitch = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
           eyePose.yaw   = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
           fprintf(stderr,"Eye roll %f, pitch %f, yaw %f\n",eyePose.roll,eyePose.pitch,eyePose.yaw);
+          //-----------------------------------
+
+          //-----------------------------------
+          eyePose.usePoseMatrixDirectly=0;
+          memcpy(
+                 &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                 bvhTransform.joint[headJoint].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
+                 sizeof(float) * 16
+                );
+          eyePose.m.m[3]  = humanPose.x;
+          eyePose.m.m[7]  = humanPose.y + 0.05;
+          eyePose.m.m[11] = humanPose.z + 0.8;
+          //-----------------------------------
          }
      }
 
