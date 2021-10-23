@@ -44,13 +44,12 @@ pushObjectToBufferData(
 
     unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
     fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n",numVertices,sizeOfVertices);
-    fprintf(stderr,
-             "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) as our object \n"  ,
-             (unsigned long) sizeOfVertices/sizeof(float),
-             sizeOfVertices,
-             sizeOfNormals/sizeof(float),
-             sizeOfNormals
-            );
+    fprintf(stderr,"Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) as our object \n"  ,
+            (unsigned long) sizeOfVertices/sizeof(float),
+            sizeOfVertices,
+            sizeOfNormals/sizeof(float),
+            sizeOfNormals
+           );
 
     //If no data given, zero their size..
     if (vertices==0)      { sizeOfVertices=0;      }
