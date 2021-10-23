@@ -104,7 +104,8 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
     //Get rid of old data..
     deallocInternalsOfModelTri(triModel);
 
-
+    //Write header..
+    //===================================================================
     triModel->header.triType = TRI_LOADER_VERSION;
     triModel->header.floatSize = sizeof(float);
     triModel->header.nameSize = indexed->header.nameSize;
@@ -142,16 +143,15 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 		unsigned int faceTriA = indexed->indices[(i*3)+0];
 		unsigned int faceTriB = indexed->indices[(i*3)+1];
 		unsigned int faceTriC = indexed->indices[(i*3)+2];
-
-
+        //------------------------------------------------
         unsigned int faceTriA_X = (faceTriA*3)+0;
         unsigned int faceTriA_Y = (faceTriA*3)+1;
         unsigned int faceTriA_Z = (faceTriA*3)+2;
-
+        //---------------------------------------
         unsigned int faceTriB_X = (faceTriB*3)+0;
         unsigned int faceTriB_Y = (faceTriB*3)+1;
         unsigned int faceTriB_Z = (faceTriB*3)+2;
-
+        //---------------------------------------
         unsigned int faceTriC_X = (faceTriC*3)+0;
         unsigned int faceTriC_Y = (faceTriC*3)+1;
         unsigned int faceTriC_Z = (faceTriC*3)+2;
@@ -161,60 +161,56 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_X];
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_Y];
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_Z];
-
+        //-----------------------------------------------------
 	    triModel->vertices[o++] = indexed->vertices[faceTriB_X];
 	    triModel->vertices[o++] = indexed->vertices[faceTriB_Y];
 	    triModel->vertices[o++] = indexed->vertices[faceTriB_Z];
-
+        //-----------------------------------------------------
 	    triModel->vertices[o++] = indexed->vertices[faceTriC_X];
 	    triModel->vertices[o++] = indexed->vertices[faceTriC_Y];
 	    triModel->vertices[o++] = indexed->vertices[faceTriC_Z];
-
 
       if (indexed->normal)
         {
 			triModel->normal[n++] = indexed->normal[faceTriA_X];
 			triModel->normal[n++] = indexed->normal[faceTriA_Y];
 			triModel->normal[n++] = indexed->normal[faceTriA_Z];
-
+            //-------------------------------------------------
 			triModel->normal[n++] = indexed->normal[faceTriB_X];
 			triModel->normal[n++] = indexed->normal[faceTriB_Y];
 			triModel->normal[n++] = indexed->normal[faceTriB_Z];
-
+            //-------------------------------------------------
 			triModel->normal[n++] = indexed->normal[faceTriC_X];
 			triModel->normal[n++] = indexed->normal[faceTriC_Y];
 			triModel->normal[n++] = indexed->normal[faceTriC_Z];
 		}
 
-
       if ( indexed->textureCoords)
         {
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+0];
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+1];
-
+            //-------------------------------------------------------------------
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+0];
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+1];
-
+            //-------------------------------------------------------------------
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+0];
 			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+1];
 		}
 
-
-          if ( indexed->colors )
+      if ( indexed->colors )
          {
           triModel->colors[c++] = indexed->colors[faceTriA_X];
           triModel->colors[c++] = indexed->colors[faceTriA_Y];
           triModel->colors[c++] = indexed->colors[faceTriA_Z];
-
+            //-----------------------------------------------
           triModel->colors[c++] = indexed->colors[faceTriB_X];
           triModel->colors[c++] = indexed->colors[faceTriB_Y];
           triModel->colors[c++] = indexed->colors[faceTriB_Z];
-
+            //-----------------------------------------------
           triModel->colors[c++] = indexed->colors[faceTriC_X];
           triModel->colors[c++] = indexed->colors[faceTriC_Y];
           triModel->colors[c++] = indexed->colors[faceTriC_Z];
         }
-
 
 	}
  return 1;
