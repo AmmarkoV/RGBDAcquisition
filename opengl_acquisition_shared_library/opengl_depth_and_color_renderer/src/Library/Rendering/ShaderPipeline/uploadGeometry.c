@@ -45,7 +45,7 @@ pushObjectToBufferData(
     unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
     fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n",numVertices,sizeOfVertices);
     fprintf(stderr,
-             "Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,
+             "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) as our object \n"  ,
              (unsigned long) sizeOfVertices/sizeof(float),
              sizeOfVertices,
              sizeOfNormals/sizeof(float),
@@ -60,7 +60,9 @@ pushObjectToBufferData(
     if (indices==0)       { sizeOfIndices=0;       }
 
     GLintptr memoryOffset=0;
-    glBufferData(GL_ARRAY_BUFFER,sizeOfVertices+sizeOfNormals+sizeOfColors+sizeOfTextureCoords,NULL,GL_STATIC_DRAW);    checkOpenGLError(__FILE__, __LINE__);
+    GLsizeiptr totalBufferDataSize=sizeOfVertices+sizeOfNormals+sizeOfColors+sizeOfTextureCoords;
+    //----------------------------------------------------------------------------------------------------------------------------
+    glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                   checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
     if ((vertices!=0) && (sizeOfVertices!=0) )
     {
