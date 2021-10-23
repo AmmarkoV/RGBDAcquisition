@@ -371,16 +371,6 @@ int doOGLDrawing(
                               &viewportMatrix
                          );
 
-  //-------------------------------------------------------------------
-  float roll=180.0;//(float)  (rand()%90);
-  float pitch=0.0;//(float) (rand()%90);
-  float yaw=0.0;//(float)   (rand()%90);
-
-  float x=0.0f;//(float)  (1000-rand()%2000);
-  float y=-8.976f;//(float) (100-rand()%200);
-  float z=26.99735f;//(float)  (700+rand()%1000);
-  //-------------------------------------------------------------------
-
   unsigned int viewportWidth = (unsigned int) width;
   unsigned int viewportHeight = (unsigned int) height;
 
@@ -507,13 +497,12 @@ int doDrawing(
                              1,
                              &eyeVAO,
                              &eyeArrayBuffer,
-                             programID  ,
-                             eyeModel->vertices  ,  eyeModel->header.numberOfVertices * sizeof(float) ,
-                             eyeModel->normal    ,  eyeModel->header.numberOfNormals  * sizeof(float),
-                             0 ,  0, //No Texture
-                             //eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords ,
-                             eyeModel->colors  ,  eyeModel->header.numberOfColors  * sizeof(float) ,
-                             0, 0 //Not Indexed..
+                             programID,
+                             eyeModel->vertices       ,  eyeModel->header.numberOfVertices      * sizeof(float),
+                             eyeModel->normal         ,  eyeModel->header.numberOfNormals       * sizeof(float),
+                             eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords * sizeof(float), //0 ,  0, //No Texture
+                             eyeModel->colors         ,  eyeModel->header.numberOfColors        * sizeof(float),
+                             humanModel->indices      ,  humanModel->header.numberOfIndices     * sizeof(unsigned int)//0, 0 //Not Indexed
                            );
 
     GLuint humanVAO;
@@ -523,14 +512,13 @@ int doDrawing(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
-                             programID  ,
-                             humanModel->vertices  ,  humanModel->header.numberOfVertices * sizeof(float) ,
-                             humanModel->normal    ,  humanModel->header.numberOfNormals  * sizeof(float),
-                             0,0,
-                             //humanModel.textureCoords  ,  humanModel.header.numberOfTextureCoords ,
-                             humanModel->colors  ,  humanModel->header.numberOfColors  * sizeof(float) ,
-                             0, 0 //Not Indexed..
-                           );
+                             programID,
+                             humanModel->vertices       ,  humanModel->header.numberOfVertices      * sizeof(float),
+                             humanModel->normal         ,  humanModel->header.numberOfNormals       * sizeof(float),
+                             humanModel->textureCoords  ,  humanModel->header.numberOfTextureCoords * sizeof(float), //0,0, //No Texture
+                             humanModel->colors         ,  humanModel->header.numberOfColors        * sizeof(float),
+                             humanModel->indices        ,  humanModel->header.numberOfIndices       * sizeof(unsigned int)//0, 0 //Not Indexed
+                          );
     fprintf(stderr,"Ready to render: ");
 
 
