@@ -1,7 +1,7 @@
 #version 130
 
 in vec4 color;
-out  vec4  colorOUT;
+out vec4 colorOUT;
 
 void main() 
 { 

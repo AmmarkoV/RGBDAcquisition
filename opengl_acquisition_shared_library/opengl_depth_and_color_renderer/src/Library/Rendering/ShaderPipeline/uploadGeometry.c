@@ -43,8 +43,8 @@ pushObjectToBufferData(
     glBindBuffer( GL_ARRAY_BUFFER, *arrayBuffer );    checkOpenGLError(__FILE__, __LINE__);
 
     unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
-    fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n",numVertices,sizeOfVertices);
-    fprintf(stderr,"Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) as our object \n"  ,
+    fprintf(stderr,"DrawArray(GL_TRIANGLES,0,%u) ",numVertices);
+    fprintf(stderr,"%lu vertices (%u bytes) and %lu normals (%u bytes)\n"  ,
             (unsigned long) sizeOfVertices/sizeof(float),
             sizeOfVertices,
             sizeOfNormals/sizeof(float),
@@ -58,7 +58,8 @@ pushObjectToBufferData(
     if (colors==0)        { sizeOfColors=0;        }
     if (indices==0)       { sizeOfIndices=0;       }
 
-    GLintptr memoryOffset=0;
+    //Create buffer data..
+    GLintptr   memoryOffset=0;
     GLsizeiptr totalBufferDataSize=sizeOfVertices+sizeOfNormals+sizeOfColors+sizeOfTextureCoords;
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                   checkOpenGLError(__FILE__, __LINE__);
@@ -94,7 +95,7 @@ pushObjectToBufferData(
     if ((vertices!=0) && (sizeOfVertices!=0))
     {
      //Pass vPosition to shader
-     GLuint vPosition = glGetAttribLocation(programID, "vPosition" );                       checkOpenGLError(__FILE__, __LINE__);
+     GLuint vPosition = glGetAttribLocation(programID, "vPosition" );                        checkOpenGLError(__FILE__, __LINE__);
      if ( (GL_INVALID_OPERATION!=vPosition) && (vPosition!=-1) )
      {
       glEnableVertexAttribArray(vPosition);                                                  checkOpenGLError(__FILE__, __LINE__);
