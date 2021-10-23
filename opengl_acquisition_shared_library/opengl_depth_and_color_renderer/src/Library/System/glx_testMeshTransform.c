@@ -599,7 +599,6 @@ int doDrawing(
         drawFramebufferToScreen(
                                 programFrameBufferID,
                                 quad_vertexbuffer,
-                                //renderedDepth,
                                 renderedTexture,
                                 texID,
                                 timeID,

@@ -6,6 +6,7 @@ uniform mat4 MVP;
 in  vec3 vPosition;
 in  vec3 vColor;   
 in  vec3 vNormal;   
+in  vec2 vTexture;   
  
 out vec4 color;
  
