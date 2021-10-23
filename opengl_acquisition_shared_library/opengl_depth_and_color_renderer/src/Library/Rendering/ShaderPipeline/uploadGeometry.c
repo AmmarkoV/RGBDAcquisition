@@ -55,7 +55,14 @@ pushObjectToBufferData(
 
     glBufferData( GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals  + sizeOfColors  ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
     glBufferSubData( GL_ARRAY_BUFFER, 0                                      , sizeOfVertices , vertices );   checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, sizeOfVertices                         , sizeOfNormals  , normals );    checkOpenGLError(__FILE__, __LINE__);
+    //glBufferSubData( GL_ARRAY_BUFFER, sizeOfVertices                         , sizeOfNormals  , normals );    checkOpenGLError(__FILE__, __LINE__);
+
+
+
+    if ( (normals!=0) && (sizeOfNormals!=0) )
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, sizeOfVertices                         , sizeOfNormals  , normals );                checkOpenGLError(__FILE__, __LINE__);
+    }
 
     if ( (colors!=0) && (sizeOfColors!=0) )
     {
@@ -74,7 +81,7 @@ pushObjectToBufferData(
      if (GL_INVALID_OPERATION != vPosition)
      {
       glEnableVertexAttribArray(vPosition);                                         checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
      }
     }
 
