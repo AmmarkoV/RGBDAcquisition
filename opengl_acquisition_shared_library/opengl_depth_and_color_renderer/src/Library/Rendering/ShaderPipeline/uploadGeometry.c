@@ -53,10 +53,12 @@ pushObjectToBufferData(
              sizeOfNormals
             );
 
-    glBufferData( GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals  + sizeOfColors  ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , sizeOfVertices , vertices );   checkOpenGLError(__FILE__, __LINE__);
-    //glBufferSubData( GL_ARRAY_BUFFER, sizeOfVertices                         , sizeOfNormals  , normals );    checkOpenGLError(__FILE__, __LINE__);
+    glBufferData( GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals  + sizeOfColors + sizeOfTextureCoords ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
 
+    if ((vertices!=0) && (sizeOfVertices!=0) )
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, 0                                      , sizeOfVertices , vertices );                        checkOpenGLError(__FILE__, __LINE__);
+    }
 
 
     if ( (normals!=0) && (sizeOfNormals!=0) )
@@ -74,9 +76,9 @@ pushObjectToBufferData(
      glBufferSubData( GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals + sizeOfColors, sizeOfTextureCoords , textureCoords );       checkOpenGLError(__FILE__, __LINE__);
     }
 
-    //Pass vPosition to shader
     if ((vertices!=0) && (sizeOfVertices!=0) )
     {
+     //Pass vPosition to shader
      GLuint vPosition = glGetAttribLocation( programID, "vPosition" );                checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vPosition)
      {
@@ -85,10 +87,9 @@ pushObjectToBufferData(
      }
     }
 
-
-    //Pass vNormal to shader
     if ((normals!=0) && (sizeOfNormals!=0) )
     {
+     //Pass vNormal to shader
      GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);
      if (GL_INVALID_OPERATION != vNormal)
      {
@@ -107,7 +108,6 @@ pushObjectToBufferData(
       glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(sizeOfColors+sizeOfNormals));  checkOpenGLError(__FILE__, __LINE__);
      }
     }
-
 
     //GLuint textureStrengthLocation = glGetUniformLocation(programID, "textureStrength");  checkOpenGLError(__FILE__, __LINE__);
     if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
