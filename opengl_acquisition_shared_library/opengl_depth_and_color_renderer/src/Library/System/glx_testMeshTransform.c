@@ -737,17 +737,26 @@ int main(int argc,const char **argv)
 
           //-----------------------------------
 
-          unsigned int headBoneID = 6;
 
+          unsigned int headBoneID = 36;
+          if ( findTRIBoneWithName(&indexedHumanModel,"head",&headBoneID) )
+          {
           fprintf(stderr,"Head / %u = %s \n",headBoneID,indexedHumanModel.bones[headBoneID].boneName);
-
           eyePose.usePoseMatrixDirectly=1;
+        /*
           struct Matrix4x4OfFloats takeEyesToRoot;
           create4x4FTranslationMatrix(&takeEyesToRoot,0,-0.05,-0.8);
           struct Matrix4x4OfFloats takeEyesToFinalLocation;
           create4x4FTranslationMatrix(&takeEyesToRoot,humanPose.x,humanPose.y + 0.05,humanPose.z + 0.8);
 
           multiplyThree4x4FMatrices(&eyePose.m,&takeEyesToRoot,&bvhTransform.joint[headJoint].dynamicRotation,&takeEyesToFinalLocation);
+          */
+          memcpy(
+                 &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                 indexedHumanModel.bones[headBoneID].info->finalVertexTransformation, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
+                 sizeof(float) * 16
+                );
+
           /*
           memcpy(
                  &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
@@ -757,6 +766,7 @@ int main(int argc,const char **argv)
           eyePose.m.m[3]  = humanPose.x;
           eyePose.m.m[7]  = humanPose.y + 0.05;
           eyePose.m.m[11] = humanPose.z + 0.8;*/
+          }
           //-----------------------------------
          }
      }
