@@ -32,6 +32,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-std=gnu++0x" />
+			<Add option="-DUSE_JPG_FILES" />
+			<Add option="-DENABLE_JPG" />
+			<Add option="-DUSE_PNG_FILES" />
+			<Add option="-DENABLE_PNG" />
 		</Compiler>
 		<Linker>
 			<Add option="-lpng" />
