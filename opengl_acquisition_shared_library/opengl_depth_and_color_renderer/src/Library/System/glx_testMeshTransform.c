@@ -709,8 +709,7 @@ int main(int argc,const char **argv)
                                    )
         )
      {
-         animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
-
+         animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
 
          BVHJointID headJoint;
          if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
@@ -739,7 +738,7 @@ int main(int argc,const char **argv)
      triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
 
      //The eyes model should now have correct bone structure..
-     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
+     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,1);
 
      doDrawing(
                 programID,

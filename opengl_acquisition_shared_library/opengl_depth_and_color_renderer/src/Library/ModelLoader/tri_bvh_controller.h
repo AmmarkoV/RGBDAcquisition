@@ -118,7 +118,13 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 
 
 
-const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct TRI_Model * modelOriginal,struct BVH_MotionCapture * bvh,unsigned int frameID)
+const int animateTRIModelUsingBVHArmature(
+                                           struct TRI_Model * modelOutput,
+                                           struct TRI_Model * modelOriginal,
+                                           struct BVH_MotionCapture * bvh,
+                                           unsigned int frameID,
+                                           int printDebugMessages
+                                         )
 {
   if (modelOriginal==0) { return 0; }
   if (modelOutput==0)   { return 0; }
@@ -161,27 +167,44 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
         }
 
 
-        unsigned int resolvedJoints=0;
         unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
         {
+          unsigned int resolvedJoints=0;
           memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
+
+          if (printDebugMessages)
+                  {
+                      fprintf(stderr,CYAN "SETUP\n" NORMAL);
+                  }
 
           for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
            {
-              for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
+              TRIBoneID boneID=0;
+              if ( findTRIBoneWithName(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
               {
                 struct TRI_Bones * bone = &modelOriginal->bones[boneID];
-                if (strcmp(bone->boneName,bvh->jointHierarchy[jID].jointName)==0)
-                {
-                  //fprintf(stderr,"Resolved BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-                  //fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
-                  lookupTableFromTRIToBVH[boneID]=jID;
-                  resolvedJoints+=1;
-                }
+                if (printDebugMessages)
+                  {
+                   fprintf(stderr,"Resolved BVH Joint %u/%u = %s  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
+                   fprintf(stderr,"TRI Bone %u/%u = %s \n",boneID,numberOfBones,bone->boneName);
+                  }
+                lookupTableFromTRIToBVH[boneID]=jID;
+                ++resolvedJoints;
+              } else
+              {
+                if (printDebugMessages)
+                  { fprintf(stderr,RED "Could not resolve %s\n"NORMAL,bvh->jointHierarchy[jID].jointName); }
               }
            }
+
+          if (resolvedJoints)
+          {
+            printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+            bvh_printBVH(bvh);
+            fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
+          }
 
           for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
               {
@@ -215,10 +238,13 @@ const int animateTRIModelUsingBVHArmature(struct TRI_Model * modelOutput,struct 
                 }
               }
 
+          //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
           free(lookupTableFromTRIToBVH);
+        } else
+        {
+         fprintf(stderr,RED "Error: Could not allocate a lookup table from TRI To BVH\n" NORMAL);
         }
 
-        //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
 
         struct TRI_Model modelTemporary={0};
         //---------------------------------------------------------------

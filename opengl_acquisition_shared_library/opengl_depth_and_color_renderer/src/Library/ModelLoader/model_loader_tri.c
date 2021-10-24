@@ -371,10 +371,10 @@ int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Mo
  for (TRIBoneID targetBoneID=0; targetBoneID<source->header.numberOfBones; targetBoneID++)
  {
    TRIBoneID sourceBoneID=targetBoneID;
-   fprintf(stderr,"Want data for %s(%u) : ",source->bones[targetBoneID].boneName,targetBoneID);
-          if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
+   //fprintf(stderr,"Want data for %s(%u) : ",source->bones[targetBoneID].boneName,targetBoneID);
+   if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
           {
-            fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
+            //fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
             triDoBoneDeepCopy(target,source,targetBoneID,sourceBoneID);
           } else
           {
