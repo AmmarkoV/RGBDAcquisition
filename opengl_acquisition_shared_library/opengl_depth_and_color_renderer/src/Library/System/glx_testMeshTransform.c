@@ -258,62 +258,6 @@ static const char * OpenCOLLADANames[]=
 
 
 
-int drawObjectAT4x4(
-                 GLuint programID,
-                 GLuint vao,
-                 GLuint MatrixID,
-                 unsigned int triangleCount,
-                 //-----------------------------------------
-                 struct Matrix4x4OfFloats * modelMatrix,
-                 //-----------------------------------------
-                 struct Matrix4x4OfFloats * projectionMatrix,
-                 struct Matrix4x4OfFloats * viewportMatrix,
-                 struct Matrix4x4OfFloats * viewMatrix,
-                 //-----------------------------------------
-                 char renderWireframe
-                 )
-{
-       //Select Shader to render with
-       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
-
-       //Select Vertex Array Object To Render
-       glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
-
-       //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
-
-      //-------------------------------------------------------------------
-       struct Matrix4x4OfFloats MVP;
-       getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,modelMatrix);
-       transpose4x4FMatrix(MVP.m);
-      //-------------------------------------------------------------------
-
-
-
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
-
-
-
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        //Our flipped view needs front culling..
-        glCullFace(GL_FRONT);
-        glEnable(GL_CULL_FACE);
-
-         //-------------------------------------------------
-         if (renderWireframe) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); } else
-                              { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-           checkOpenGLError(__FILE__, __LINE__);
-         //-------------------------------------------------
-
-
-         glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
-
-
-       glPopAttrib();
-       glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
-       return 1;
-}
-
 
 
 int drawObjectAT(
@@ -338,37 +282,37 @@ int drawObjectAT(
 {
        struct Matrix4x4OfFloats modelMatrix;
        create4x4FModelTransformation(
-                                    &modelMatrix,
-                                    //Rotation Component
-                                    roll,//roll
-                                    pitch ,//pitch
-                                    yaw ,//yaw
-                                    ROTATION_ORDER_RPY,
-                                    //-----------------------------------------
-                                    //Translation Component (XYZ)
-                                    (float) x,
-                                    (float) y,
-                                    (float) z,
-                                    //-----------------------------------------
-                                    1.0,//scaleX,
-                                    1.0,//scaleY,
-                                    1.0//scaleZ
-                                   );
+                                     &modelMatrix,
+                                     //Rotation Component
+                                     roll,//roll
+                                     pitch ,//pitch
+                                     yaw ,//yaw
+                                     ROTATION_ORDER_RPY,
+                                     //-----------------------------------------
+                                     //Translation Component (XYZ)
+                                     (float) x,
+                                     (float) y,
+                                     (float) z,
+                                     //-----------------------------------------
+                                     1.0,//scaleX,
+                                     1.0,//scaleY,
+                                     1.0//scaleZ
+                                    );
 
-       return drawObjectAT4x4(
-                              programID,
-                              vao,
-                              MatrixID,
-                              triangleCount,
-                              //-----------------------------------------
-                              &modelMatrix,
-                              //-----------------------------------------
-                              projectionMatrix,
-                              viewportMatrix,
-                              viewMatrix,
-                              //-----------------------------------------
-                              renderWireframe
-                             );
+       return drawVertexArrayWithMVPMatrices(
+                                             programID,
+                                             vao,
+                                             MatrixID,
+                                             triangleCount,
+                                             //-----------------------------------------
+                                             &modelMatrix,
+                                             //-----------------------------------------
+                                             projectionMatrix,
+                                             viewportMatrix,
+                                             viewMatrix,
+                                             //-----------------------------------------
+                                             renderWireframe
+                                            );
 }
 
 
@@ -425,7 +369,7 @@ int doOGLDrawing(
 
      if (eyePose->usePoseMatrixDirectly)
      {
-      drawObjectAT4x4(
+      drawVertexArrayWithMVPMatrices(
                       programID,
                       eyeVao,
                       MVPMatrixID,

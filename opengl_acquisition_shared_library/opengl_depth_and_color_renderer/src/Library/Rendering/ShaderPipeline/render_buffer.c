@@ -280,3 +280,64 @@ int drawFramebufferToScreen(
                                   );
 }
 
+
+
+
+int drawVertexArrayWithMVPMatrices(
+                                   GLuint programID,
+                                   GLuint vao,
+                                   GLuint MatrixID,
+                                   unsigned int triangleCount,
+                                   //-----------------------------------------
+                                   struct Matrix4x4OfFloats * modelMatrix,
+                                   //-----------------------------------------
+                                   struct Matrix4x4OfFloats * projectionMatrix,
+                                   struct Matrix4x4OfFloats * viewportMatrix,
+                                   struct Matrix4x4OfFloats * viewMatrix,
+                                   //-----------------------------------------
+                                   char renderWireframe
+                                  )
+{
+  //Select Shader to render with
+  glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+
+  //Select Vertex Array Object To Render
+  glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
+
+  //-------------------------------------------------------------------
+  struct Matrix4x4OfFloats MVP;
+  getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,modelMatrix);
+  transpose4x4FMatrix(MVP.m);
+  //-------------------------------------------------------------------
+
+
+
+  // Send our transformation to the currently bound shader, in the "MVP" uniform
+  glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
+
+
+
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  //Our flipped view needs front culling..
+  glCullFace(GL_FRONT);
+  glEnable(GL_CULL_FACE);
+
+  //-------------------------------------------------
+  if (renderWireframe) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); checkOpenGLError(__FILE__, __LINE__); } else
+                       { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); checkOpenGLError(__FILE__, __LINE__); }
+  //-------------------------------------------------
+
+
+  glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
+
+
+  glPopAttrib();
+  glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
+  return 1;
+}
+
+
+
+
+
+
