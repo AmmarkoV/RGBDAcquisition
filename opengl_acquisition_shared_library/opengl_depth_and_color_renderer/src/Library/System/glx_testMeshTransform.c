@@ -257,9 +257,6 @@ static const char * OpenCOLLADANames[]=
  };*/
 
 
-
-
-
 int drawObjectAT(
                  GLuint programID,
                  GLuint vao,
@@ -690,6 +687,10 @@ int main(int argc,const char **argv)
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
 
+   printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
+   bvh_printBVH(&mc);
+
+
    //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
    //fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
@@ -710,6 +711,10 @@ int main(int argc,const char **argv)
                                    )
         )
      {
+         animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
+         animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
+
+
          BVHJointID headJoint;
          if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
          {
@@ -731,7 +736,19 @@ int main(int argc,const char **argv)
           //-----------------------------------
 
           //-----------------------------------
-          eyePose.usePoseMatrixDirectly=0;
+
+          unsigned int headBoneID = 6;
+
+          fprintf(stderr,"Head / %u = %s \n",headBoneID,indexedHumanModel.bones[headBoneID].boneName);
+
+          eyePose.usePoseMatrixDirectly=1;
+          struct Matrix4x4OfFloats takeEyesToRoot;
+          create4x4FTranslationMatrix(&takeEyesToRoot,0,-0.05,-0.8);
+          struct Matrix4x4OfFloats takeEyesToFinalLocation;
+          create4x4FTranslationMatrix(&takeEyesToRoot,humanPose.x,humanPose.y + 0.05,humanPose.z + 0.8);
+
+          multiplyThree4x4FMatrices(&eyePose.m,&takeEyesToRoot,&bvhTransform.joint[headJoint].dynamicRotation,&takeEyesToFinalLocation);
+          /*
           memcpy(
                  &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                  bvhTransform.joint[headJoint].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
@@ -739,13 +756,10 @@ int main(int argc,const char **argv)
                 );
           eyePose.m.m[3]  = humanPose.x;
           eyePose.m.m[7]  = humanPose.y + 0.05;
-          eyePose.m.m[11] = humanPose.z + 0.8;
+          eyePose.m.m[11] = humanPose.z + 0.8;*/
           //-----------------------------------
          }
      }
-
-     animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
-     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
 
      doDrawing(
                 programID,
