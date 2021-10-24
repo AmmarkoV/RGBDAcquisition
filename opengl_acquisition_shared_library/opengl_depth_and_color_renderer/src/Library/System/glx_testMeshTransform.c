@@ -370,18 +370,18 @@ int doOGLDrawing(
      if (eyePose->usePoseMatrixDirectly)
      {
       drawVertexArrayWithMVPMatrices(
-                      programID,
-                      eyeVao,
-                      MVPMatrixID,
-                      eyeTriangleCount,
-                      //-------------
-                      &eyePose->m,
-                      //-------------
-                      &projectionMatrix,
-                      &viewportMatrix,
-                      &viewMatrix,
-                      0 //Wireframe
-                     );
+                                     programID,
+                                     eyeVao,
+                                     MVPMatrixID,
+                                     eyeTriangleCount,
+                                     //-------------
+                                     &eyePose->m,
+                                     //-------------
+                                     &projectionMatrix,
+                                     &viewportMatrix,
+                                     &viewMatrix,
+                                     0 //Wireframe
+                                    );
      } else
      {
      drawObjectAT(
@@ -571,21 +571,23 @@ int doDrawing(
 
 		// Swap buffers
         glx3_endRedraw();
-       // usleep(1);
+
 
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
       //---------------------------------------------------------------
-      unsigned long now=GetTickCountMilliseconds();
-      unsigned long elapsedTime=now-lastRenderingTime;
-      if (elapsedTime==0) { elapsedTime=1; }
+       unsigned long now=GetTickCountMilliseconds();
+       unsigned long elapsedTime=now-lastRenderingTime;
+       if (elapsedTime==0) { elapsedTime=1; }
        lastFramerate = (float) 1000/(elapsedTime);
        lastRenderingTime = now;
-       //---------------------------------------------------------------
+      //---------------------------------------------------------------
         ++framesRendered;
-       //---------------------------------------------------------------
+      //---------------------------------------------------------------
+
+      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
 	} // Check if the ESC key was pressed or the window was closed
-    while( renderForever );
+    while(renderForever);
 
 
 	// Cleanup VBO and shader
