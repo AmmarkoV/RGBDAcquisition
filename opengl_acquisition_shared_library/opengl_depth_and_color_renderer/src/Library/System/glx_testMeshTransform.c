@@ -683,6 +683,8 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
+   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_");
+
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);

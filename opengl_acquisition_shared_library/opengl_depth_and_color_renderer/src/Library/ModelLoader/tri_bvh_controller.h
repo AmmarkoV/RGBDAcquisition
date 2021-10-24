@@ -59,6 +59,36 @@ void TRIBVH_removeunderscore(char *a)
     }
 }
 
+
+int removePrefixFromAllTRIBoneNames(struct TRI_Model * triModel,const char * prefix)
+{
+  if (triModel==0) { return 0; }
+  if (prefix==0)   { return 0; }
+  //----------------------------------------
+  unsigned int prefixLength = strlen(prefix);
+
+  for (TRIBoneID boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+  {
+    char * boneName = triModel->bones[boneID].boneName;
+    unsigned int fullBoneNameLength = strlen(boneName);
+
+    if ( triModel->bones[boneID].boneName ==0 )
+        {
+            fprintf(stderr,"Invalid bone name encountered %u \n",boneID);
+        } else
+        {
+          char * result = strstr(triModel->bones[boneID].boneName,prefix);
+          if (result!=0)
+          {
+            snprintf(result,fullBoneNameLength,"%s",boneName+prefixLength);
+          }
+        }
+   }
+
+ return 1;
+}
+
+
 int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
   for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
@@ -199,7 +229,7 @@ const int animateTRIModelUsingBVHArmature(
               }
            }
 
-          if (resolvedJoints)
+          if (resolvedJoints==0)
           {
             if (printDebugMessages)
                   {
@@ -207,7 +237,8 @@ const int animateTRIModelUsingBVHArmature(
                    bvh_printBVH(bvh);
                   }
             fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
-          }
+          } else
+          {
 
           for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
               {
@@ -239,6 +270,7 @@ const int animateTRIModelUsingBVHArmature(
                   //print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
                 }
               }
+          } //have resolved joints
 
           //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
           free(lookupTableFromTRIToBVH);
