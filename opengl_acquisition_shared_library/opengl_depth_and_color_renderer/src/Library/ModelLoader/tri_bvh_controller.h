@@ -201,8 +201,11 @@ const int animateTRIModelUsingBVHArmature(
 
           if (resolvedJoints)
           {
-            printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-            bvh_printBVH(bvh);
+            if (printDebugMessages)
+                  {
+                   printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+                   bvh_printBVH(bvh);
+                  }
             fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
           }
 
@@ -234,7 +237,6 @@ const int animateTRIModelUsingBVHArmature(
                         );*/
 
                   //print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
-
                 }
               }
 

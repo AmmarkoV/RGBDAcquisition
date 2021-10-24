@@ -694,7 +694,8 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
             }
      }
   }
-  fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
+
+  //fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
  return 0;
 }
 
