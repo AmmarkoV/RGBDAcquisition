@@ -34,8 +34,46 @@
 			<Add option="-std=gnu++0x" />
 		</Compiler>
 		<Linker>
+			<Add option="-lpng" />
+			<Add option="-ljpeg" />
 			<Add library="assimp" />
 		</Linker>
+		<Unit filename="../../../../tools/Codecs/asciiInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/asciiInput.h" />
+		<Unit filename="../../../../tools/Codecs/bmpInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/bmpInput.h" />
+		<Unit filename="../../../../tools/Codecs/codecs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/codecs.h" />
+		<Unit filename="../../../../tools/Codecs/jpgExifexternal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/jpgExifexternal.h" />
+		<Unit filename="../../../../tools/Codecs/jpgExiforient_embed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/jpgExiforient_embed.h" />
+		<Unit filename="../../../../tools/Codecs/jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/jpgInput.h" />
+		<Unit filename="../../../../tools/Codecs/pfmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/pfmInput.h" />
+		<Unit filename="../../../../tools/Codecs/pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/pngInput.h" />
+		<Unit filename="../../../../tools/Codecs/ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/Codecs/ppmInput.h" />
 		<Unit filename="../../src/Library/ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -46,9 +84,6 @@
 		<Unit filename="assimp_loader.h" />
 		<Unit filename="assimp_main.cpp" />
 		<Extensions>
-			<envvars />
-			<code_completion />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>

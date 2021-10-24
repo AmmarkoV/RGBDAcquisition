@@ -718,7 +718,6 @@ int main(int argc,const char **argv)
          BVHJointID headJoint;
          if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
          {
-          //humanPose.x humanPose.y humanPose.z
           eyePose.x =  humanPose.x;
           eyePose.y =  humanPose.y + 0.05;
           eyePose.z =  humanPose.z + 0.8;

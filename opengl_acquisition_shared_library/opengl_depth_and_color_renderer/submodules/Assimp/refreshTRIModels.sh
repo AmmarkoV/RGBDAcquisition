@@ -3,11 +3,16 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
-./assimpTester --convert eyes.dae eyes.tri #--applytexture brown_eye.png
+
+./assimpTester --mesh 0 --convert makehuman.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
+./assimpTester --mesh 1 --convert makehuman.dae hair.tri --applytexture braid01_diffuse_mahogany.png
+./assimpTester --mesh 2 --convert makehuman.dae eyes.tri --applytexture brown_eye.png 
 
 exit 0
 
+./assimpTester --convert eyes.dae eyes.tri #--applytexture brown_eye.png
+
+./assimpTester --convert makehumanexports/newmodel.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
 
 ./assimpTester --convert ../../ScannedModels/Ammar/AmmarRigged.dae AmmarO.tri
 ./assimpTester --convert ../../ScannedModels/Elina/ElinaRigged.dae ElinaO.tri
