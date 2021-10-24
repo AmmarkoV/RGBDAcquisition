@@ -293,6 +293,19 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel);
 */
 int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName,TRIBoneID * boneIDResult);
 
+
+
+
+/**
+* @brief This function is designed to copy the values ( bone state ) from one TRI Model to another (potentially different) one..
+*        This way
+* @ingroup TRI
+* @param  output TRI model that will contain our fresh deep copy (  allocate with allocateModelTri )
+* @param  input TRI model
+* @param  switch to control copying bones
+*/
+int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source);
+
 /**
 * @brief One pretty standard operations that is needed often is copying models around to edit them without destroying the original
          This function does exactly that , with or without the bone structure.

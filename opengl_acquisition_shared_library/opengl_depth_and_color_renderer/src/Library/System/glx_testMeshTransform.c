@@ -597,30 +597,6 @@ int doDrawing(
 }
 
 
-int triCopyBoneSetup(struct TRI_Model * target, struct TRI_Model  * source)
-{
- if ( (source==0) || (target==0) ) { return 0; }
-
- unsigned int unresolvedBones = 0;
- for (TRIBoneID targetBoneID=0; targetBoneID<source->header.numberOfBones; targetBoneID++)
- {
-   TRIBoneID sourceBoneID=targetBoneID;
-   fprintf(stderr,"Want data for %s(%u) : ",source->bones[targetBoneID].boneName,targetBoneID);
-          if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
-          {
-            fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
-
-          } else
-          {
-              fprintf(stderr,RED "Could not resolve %s(%u) \n"NORMAL,source->bones[targetBoneID].boneName,targetBoneID);
-              ++unresolvedBones;
-          }
- }
-
- return (unresolvedBones==0);
-}
-
-
 
 int main(int argc,const char **argv)
 {
@@ -750,49 +726,17 @@ int main(int argc,const char **argv)
 
           //-----------------------------------
           fprintf(stderr,"Eye X %f, Y %f, Z %f\n",eyePose.x,eyePose.y,eyePose.z);
-          eyePose.roll  = humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
-          eyePose.pitch = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
-          eyePose.yaw   = bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
+          eyePose.roll  = humanPose.roll;  // humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
+          eyePose.pitch = humanPose.pitch; // bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
+          eyePose.yaw   = humanPose.yaw;   // bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
           fprintf(stderr,"Eye roll %f, pitch %f, yaw %f\n",eyePose.roll,eyePose.pitch,eyePose.yaw);
           //-----------------------------------
 
           //-----------------------------------
-
-
-          unsigned int headBoneID = 36;
-          if ( findTRIBoneWithName(&indexedHumanModel,"head",&headBoneID) )
-          {
-          fprintf(stderr,"Head / %u = %s \n",headBoneID,indexedHumanModel.bones[headBoneID].boneName);
-          eyePose.usePoseMatrixDirectly=1;
-        /*
-          struct Matrix4x4OfFloats takeEyesToRoot;
-          create4x4FTranslationMatrix(&takeEyesToRoot,0,-0.05,-0.8);
-          struct Matrix4x4OfFloats takeEyesToFinalLocation;
-          create4x4FTranslationMatrix(&takeEyesToRoot,humanPose.x,humanPose.y + 0.05,humanPose.z + 0.8);
-
-          multiplyThree4x4FMatrices(&eyePose.m,&takeEyesToRoot,&bvhTransform.joint[headJoint].dynamicRotation,&takeEyesToFinalLocation);
-          */
-          memcpy(
-                 &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                 indexedHumanModel.bones[headBoneID].info->finalVertexTransformation, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                 sizeof(float) * 16
-                );
-
-          /*
-          memcpy(
-                 &eyePose.m, //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                 bvhTransform.joint[headJoint].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                 sizeof(float) * 16
-                );
-          eyePose.m.m[3]  = humanPose.x;
-          eyePose.m.m[7]  = humanPose.y + 0.05;
-          eyePose.m.m[11] = humanPose.z + 0.8;*/
-          }
-          //-----------------------------------
          }
      }
 
-     triCopyBoneSetup(&indexedEyeModel,&indexedHumanModel);
+     triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
 
      //The eyes model should now have correct bone structure..
      animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
