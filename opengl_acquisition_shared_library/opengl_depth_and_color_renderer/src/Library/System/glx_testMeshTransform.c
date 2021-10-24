@@ -683,9 +683,11 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
-   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_");
+   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
+   //------------------------------------------------------
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
+   //------------------------------------------------------
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
@@ -717,12 +719,12 @@ int main(int argc,const char **argv)
          if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
          {
           //humanPose.x humanPose.y humanPose.z
-          eyePose.x =  0;// + bvhTransform.joint[headJoint].pos3D[0] - bvhTransform.joint[mc.rootJointID].pos3D[0];
-          eyePose.y =  0;// + bvhTransform.joint[headJoint].pos3D[1] - bvhTransform.joint[mc.rootJointID].pos3D[1];
-          eyePose.z =  0;// + bvhTransform.joint[headJoint].pos3D[2] - bvhTransform.joint[mc.rootJointID].pos3D[2];
           eyePose.x =  humanPose.x;
           eyePose.y =  humanPose.y + 0.05;
           eyePose.z =  humanPose.z + 0.8;
+          eyePose.x =  0;//humanPose.x;// + bvhTransform.joint[headJoint].pos3D[0] - bvhTransform.joint[mc.rootJointID].pos3D[0];
+          eyePose.y =  humanPose.y;// + bvhTransform.joint[headJoint].pos3D[1] - bvhTransform.joint[mc.rootJointID].pos3D[1];
+          eyePose.z =  humanPose.z;// + bvhTransform.joint[headJoint].pos3D[2] - bvhTransform.joint[mc.rootJointID].pos3D[2];
           //-----------------------------------
 
           //-----------------------------------
@@ -733,6 +735,8 @@ int main(int argc,const char **argv)
           fprintf(stderr,"Eye roll %f, pitch %f, yaw %f\n",eyePose.roll,eyePose.pitch,eyePose.yaw);
           //-----------------------------------
 
+          //eyePose.usePoseMatrixDirectly=1;
+          //create4x4FIdentityMatrix(&eyePose.m);
           //-----------------------------------
          }
      }
@@ -740,7 +744,7 @@ int main(int argc,const char **argv)
      triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
 
      //The eyes model should now have correct bone structure..
-     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,1);
+     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
 
      doDrawing(
                 programID,

@@ -91,6 +91,8 @@ int removePrefixFromAllTRIBoneNames(struct TRI_Model * triModel,const char * pre
 
 int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
+  if (triModel==0) { return 0; }
+  //----------------------------------------
   for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
   {
     char * boneName = triModel->bones[boneID].boneName;
@@ -141,7 +143,7 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
     TRIBVH_lowercase(triModel->bones[boneID].boneName);
     TRIBVH_removeunderscore(triModel->bones[boneID].boneName);
   }
- return 0;
+ return 1;
 }
 
 
