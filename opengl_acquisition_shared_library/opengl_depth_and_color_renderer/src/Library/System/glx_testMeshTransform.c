@@ -478,7 +478,6 @@ int doDrawing(
                 GLuint renderedDepth,
                 struct pose6D * humanPose,
                 struct TRI_Model * humanModel,
-                struct pose6D * eyePose,
                 struct TRI_Model * eyeModel,
                 int renderForever
              )
@@ -545,7 +544,7 @@ int doDrawing(
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
-                     eyePose,
+                     humanPose,
                      eyeVAO,
                      eyeTriangleCount,
                      humanPose,
@@ -645,7 +644,7 @@ int main(int argc,const char **argv)
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
    humanPose.y=-8.976f;//(float) (100-rand()%200);
-   humanPose.z=26.99735f;//(float)  (700+rand()%1000);
+   humanPose.z=27.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
 
    //------------------------------------------------------
@@ -692,55 +691,16 @@ int main(int argc,const char **argv)
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
 
-
-   //copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
-   //int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
-   //fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
-
    while (1)
    {
     for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
     {
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      //-------------------------------------------
-     struct BVH_Transform bvhTransform={0};
-     if (
-          bvh_loadTransformForFrame(
-                                    &mc,
-                                    fID,
-                                    &bvhTransform,
-                                    0
-                                   )
-        )
-     {
-         animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
 
-         BVHJointID headJoint;
-         if ( bvh_getJointIDFromJointNameNocase(&mc,"head",&headJoint) ) //"head"
-         {
-          eyePose.x =  humanPose.x;
-          eyePose.y =  humanPose.y + 0.05;
-          eyePose.z =  humanPose.z + 0.8;
-          eyePose.x =  0;//humanPose.x;// + bvhTransform.joint[headJoint].pos3D[0] - bvhTransform.joint[mc.rootJointID].pos3D[0];
-          eyePose.y =  humanPose.y;// + bvhTransform.joint[headJoint].pos3D[1] - bvhTransform.joint[mc.rootJointID].pos3D[1];
-          eyePose.z =  humanPose.z;// + bvhTransform.joint[headJoint].pos3D[2] - bvhTransform.joint[mc.rootJointID].pos3D[2];
-          //-----------------------------------
-
-          //-----------------------------------
-          fprintf(stderr,"Eye X %f, Y %f, Z %f\n",eyePose.x,eyePose.y,eyePose.z);
-          eyePose.roll  = humanPose.roll;  // humanPose.roll + bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Z);
-          eyePose.pitch = humanPose.pitch; // bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_X);
-          eyePose.yaw   = humanPose.yaw;   // bvh_getJointChannelAtFrame(&mc,headJoint,fID,BVH_ROTATION_Y);
-          fprintf(stderr,"Eye roll %f, pitch %f, yaw %f\n",eyePose.roll,eyePose.pitch,eyePose.yaw);
-          //-----------------------------------
-
-          //eyePose.usePoseMatrixDirectly=1;
-          //create4x4FIdentityMatrix(&eyePose.m);
-          //-----------------------------------
-         }
-     }
-
-     triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
+     //First animate the tri model using the bvh armature
+     animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
+     //triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
 
      //The eyes model should now have correct bone structure..
      animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
@@ -753,7 +713,6 @@ int main(int argc,const char **argv)
                 renderedDepth,
                 &humanPose,
                 &humanModel,
-                &eyePose,
                 &eyeModel,
                 0
               );
