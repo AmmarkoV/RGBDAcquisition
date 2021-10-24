@@ -597,6 +597,28 @@ int doDrawing(
 }
 
 
+int triCopyBoneSetup(struct TRI_Model * target, struct TRI_Model  * source)
+{
+ if ( (source==0) || (target==0) ) { return 0; }
+
+ unsigned int unresolvedBones = 0;
+ for (TRIBoneID targetBoneID=0; targetBoneID<source->header.numberOfBones; targetBoneID++)
+ {
+   TRIBoneID sourceBoneID=targetBoneID;
+   fprintf(stderr,"Want data for %s(%u) : ",source->bones[targetBoneID].boneName,targetBoneID);
+          if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
+          {
+            fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
+
+          } else
+          {
+              fprintf(stderr,RED "Could not resolve %s(%u) \n"NORMAL,source->bones[targetBoneID].boneName,targetBoneID);
+              ++unresolvedBones;
+          }
+ }
+
+ return (unresolvedBones==0);
+}
 
 
 
@@ -712,7 +734,6 @@ int main(int argc,const char **argv)
         )
      {
          animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID);
-         animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
 
 
          BVHJointID headJoint;
@@ -770,6 +791,11 @@ int main(int argc,const char **argv)
           //-----------------------------------
          }
      }
+
+     triCopyBoneSetup(&indexedEyeModel,&indexedHumanModel);
+
+     //The eyes model should now have correct bone structure..
+     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID);
 
      doDrawing(
                 programID,

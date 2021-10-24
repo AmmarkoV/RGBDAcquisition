@@ -36,6 +36,7 @@ extern "C"
 
 
 
+typedef unsigned int TRIBoneID;
 
 
 
@@ -148,8 +149,10 @@ struct TRI_Model
 };
 
 
-
-
+/**
+* @brief The TRI Container Header..
+* @ingroup TRI
+*/
 struct TRI_Container_Header
 {
      char TRIMagic[5]; // TRI3D
@@ -168,8 +171,6 @@ struct TRI_Container_Header
      unsigned int notUsed5;
      // - - - - - - - - - -
 };
-
-
 
 /**
 * @brief A TRI Container that might contain multiple meshes..!
@@ -201,7 +202,7 @@ void print4x4FMatrixTRI(const char * str , float * matrix4x4);
 * @param  input TRI structure with the loaded model we want a printout of
 * @param  switch to control printout of matrices
 */
-void printTRIBoneStructure(struct TRI_Model * triModel,int alsoPrintMatrices);
+void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices);
 
 /**
 * @brief This function can flatten out an indexed TRI_Model , so it becomes literally an array of triangles with no indexing.
@@ -211,7 +212,7 @@ void printTRIBoneStructure(struct TRI_Model * triModel,int alsoPrintMatrices);
 * @param  input TRI structure with the loaded index model we want to process
 * @retval 0=Failure,1=Success
 */
-int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
+int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel, struct TRI_Model * indexed);
 
 /**
 * @brief Allocate the space for a TRI model ( possibly to build a model from scratch ) , typically you don't want to do this , just use loadModelTri instead..!
@@ -290,7 +291,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel);
 * @param  output boneID if we found one
 * @retval 0=Bone Does not exist , 1=Bone found
 */
-int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName , unsigned int * boneIDResult);
+int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName,TRIBoneID * boneIDResult);
 
 /**
 * @brief One pretty standard operations that is needed often is copying models around to edit them without destroying the original
@@ -300,7 +301,7 @@ int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName , u
 * @param  input TRI model
 * @param  switch to control copying bones
 */
-void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN,int copyBoneStructures);
 
 /**
 * @brief If INCLUDE_OPENGL_CODE is declared ( so we have an openGL context )  we can use the fixed graphics pipeline and do the rendering of the file on the spot.
