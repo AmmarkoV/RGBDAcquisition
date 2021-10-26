@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>   
+    <node name="camera_broadcast" pkg="camera_broadcast" type="run_it.sh" output="screen" cwd="node" respawn="true">
+      <param name="name" value="camera_broadcast" /> 
+      <param name="fromRGBTopic" value="/camera/color/image_raw" /> 
+      <param name="fromRGBTopicInfo" value="/camera/color/camera_info" />
+
+      <param name="tfRoot" value="map" /> 
+      <param name="tfTargetBVHFilename" value="dataset/headerWithHeadAndOneMotion.bvh" />
+    </node>   
+</launch>
