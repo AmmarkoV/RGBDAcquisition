@@ -1,12 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "tools.h"
 #include "network.h"
 #include "protocol.h"
 
 #include "AmmClient.h"
+
+char * AmmClient_ReadFileToMemory(const char * filename,unsigned int *length)
+{
+    *length = 0;
+    FILE * pFile = fopen ( filename , "rb" );
+
+    if (pFile==0)
+    {
+        fprintf(stderr, "AmmServer_ReadFileToMemory failed\n");
+        fprintf(stderr, "Could not read file %s \n",filename);
+        return 0;
+    }
+
+    // obtain file size:
+    fseek (pFile , 0 , SEEK_END);
+    unsigned long lSize = ftell (pFile);
+    rewind (pFile);
+
+    // allocate memory to contain the whole file:
+    unsigned long bufferSize = sizeof(char)*(lSize+1);
+    char * buffer = (char*) malloc (bufferSize);
+    if (buffer == 0 )
+    {
+        fprintf(stderr,"Could not allocate enough memory for file %s \n",filename);
+        fclose(pFile);
+        return 0;
+    }
+
+    // copy the file into the buffer:
+    size_t result = fread (buffer,1,lSize,pFile);
+    if (result != lSize)
+    {
+        free(buffer);
+        fprintf(stderr,"Could not read the whole file onto memory %s \n",filename);
+        fclose(pFile);
+        return 0;
+    }
+
+    /* the whole file is now loaded in the memory buffer. */
+
+    // terminate
+    fclose (pFile);
+
+    buffer[lSize]=0; //Null Terminate Buffer!
+    *length = (unsigned int) lSize;
+    return buffer;
+}
+
 
 unsigned long AmmClient_GetTickCountMicroseconds()
 {

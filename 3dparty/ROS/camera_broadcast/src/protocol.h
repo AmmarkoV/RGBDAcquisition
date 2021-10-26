@@ -1,6 +1,11 @@
 #ifndef PROTOCOL_H_INCLUDED
 #define PROTOCOL_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "AmmClient.h"
 
 int AmmClient_SendFileInternal(
@@ -24,5 +29,8 @@ int AmmClient_RecvFileInternal(
                        int reallyFastImplementation
                       );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PROTOCOL_H_INCLUDED

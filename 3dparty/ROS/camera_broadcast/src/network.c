@@ -190,11 +190,14 @@ int AmmClient_SendInternal(struct AmmClient_Instance * instance,
                       AmmClient_CheckConnectionInternal(instance);
                     } else
                     {
-                      //fprintf(stderr,GREEN "Try %u : "NORMAL,tries);
-                      //fprintf(stderr,GREEN "Sent %u/%u bytes\n" NORMAL,result,requestSize);
+                      if (tries>1)
+                      {
+                       fprintf(stderr,YELLOW "Try %u : "NORMAL,tries);
+                       fprintf(stderr,YELLOW "Sent %u/%u bytes\n" NORMAL,result,requestSize);
+                      }
+
                       break;
                     }
-
    }
 
    if (result < 0 ) { return 0; }

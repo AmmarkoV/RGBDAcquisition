@@ -12,6 +12,8 @@ extern "C"
 {
 #endif
 
+static const char AmmClientVersion[] = "0.55";
+
 /** @brief An instance of AmmClient, this holds the connection state and a pointer that gets automatically allocated with internals that include the sockets etc*/
 struct AmmClient_Instance
 {
@@ -28,6 +30,8 @@ struct AmmClient_Instance
   void * internals;
 };
 
+
+char * AmmClient_ReadFileToMemory(const char * filename,unsigned int *length);
 
 /** @brief Get back a monotnic "uptime" value in the form of microseconds, a useful call to count how much time elapsed during file transfers etc*/
 unsigned long AmmClient_GetTickCountMicroseconds();

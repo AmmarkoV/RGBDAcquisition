@@ -1,6 +1,11 @@
 #ifndef NETWORK_H_INCLUDED
 #define NETWORK_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "AmmClient.h"
 
 int AmmClient_ReconnectInternal(
@@ -30,5 +35,10 @@ struct AmmClient_Instance * AmmClient_InitializeInternal(
                                                 );
 
 int AmmClient_CloseInternal(struct AmmClient_Instance * instance);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // NETWORK_H_INCLUDED
