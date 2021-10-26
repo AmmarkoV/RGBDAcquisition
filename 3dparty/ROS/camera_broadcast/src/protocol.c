@@ -100,6 +100,7 @@ int AmmClient_SendFileInternal(
   char bufferBeforeFile[BUFFERSIZE+1]={0};
   bufferBeforeSize = snprintf(bufferBeforeFile,BUFFERSIZE,"Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: %s\r\n\r\n",formname,filename,contentType);
 
+
   unsigned int bufferAfterSize=0;
   char bufferAfterFile[BUFFERSIZE+1]={0};
   bufferAfterSize = snprintf(bufferAfterFile,BUFFERSIZE,"Content-Disposition: form-data; name=\"submit\"\r\n\r\n1");
@@ -111,6 +112,7 @@ int AmmClient_SendFileInternal(
   char header[BUFFERSIZE+1]={0};
   //Send the header Connection: keep-alive\r\nTransfer-Encoding: chunked\r\n
   int headerSize = snprintf(header,BUFFERSIZE,"POST %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: AmmClient/%s\r\nAccept: */*\r\nContent-Length: %u\r\nContent-Type: multipart/form-data; boundary=%s\r\n\r\n",URI,instance->ip,AmmClientVersion,contentLength,boundary);
+  //fprintf(stderr,"%s",header);
 
   //Send everything..
   ++steps; success+=AmmClient_SendInternal(instance,header,headerSize,keepAlive);

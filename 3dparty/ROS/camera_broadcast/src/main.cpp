@@ -30,15 +30,24 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
 
 struct AmmClient_Instance * connection = 0;
 
 #define USE_CURL 0
 
-unsigned long maxCompressedJPEGFile = 1024* 1024 * 2; //2MB
+unsigned long maxCompressedJPEGFile = 1024* 1024 * 1; //2MB
 unsigned long currentCompressedJPEGFile = 0;
 char * compressedJPEGFile = 0;
-
 
 unsigned int frameID=0;
 
@@ -215,7 +224,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
             if (
                 AmmClient_SendFile(
                     connection,
-                    "stream/upload.php",
+                    "/stream/upload.php",
                     "fileToUpload",
                     "image.jpg",
                     "image/jpeg",
@@ -226,24 +235,24 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
             )
             {
                 fprintf(stderr,"* %lu",currentCompressedJPEGFile);
-                usleep(10000);
-                char buf[2048]= {0};
-                unsigned int recvdSize=2047;
+                //usleep(100000);
+                char buf[4098]= {0};
+                unsigned int recvdSize=4098;
 
                 if (!AmmClient_Recv(connection,buf,&recvdSize) )
                 {
-                    fprintf(stderr,"Failed to recv.. \n");
+                    fprintf(stderr,RED "Failed to recv.. \n" NORMAL);
                 }
 
                 fprintf(stderr,"Response = `%s`\n",buf);
             } else
             {
-                fprintf(stderr,"Unable to do HTTP transmission \n");
+                fprintf(stderr,RED "Unable to do HTTP transmission \n" NORMAL);
             }
 
         } else
         {
-            fprintf(stderr,"Unable to do JPEG compression \n");
+            fprintf(stderr, RED "Unable to do JPEG compression \n" NORMAL);
         }
     }
 #endif
@@ -273,7 +282,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    connection = AmmClient_Initialize("139.91.185.16",80,30/*sec*/);
+    connection = AmmClient_Initialize("139.91.185.16",80,10/*sec*/);
 
 
     ROS_INFO("Initializing MocapNET ROS Wrapper");
