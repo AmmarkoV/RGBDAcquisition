@@ -33,7 +33,7 @@
 
 struct AmmClient_Instance * connection = 0;
 
-#define USE_CURL 1
+#define USE_CURL 0
 
 unsigned long maxCompressedJPEGFile = 1024* 1024 * 2; //2MB
 unsigned long currentCompressedJPEGFile = 0;
@@ -41,7 +41,7 @@ char * compressedJPEGFile = 0;
 
 
 unsigned int frameID=0;
-  
+
 struct calibration
 {
     /* CAMERA INTRINSIC PARAMETERS */
@@ -61,9 +61,9 @@ unsigned int width=640;
 unsigned int height=480;
 
 int useSimpleBroadcaster=0;
-    
+
 //Configuration
-char tfRoot[512]={DEFAULT_TF_ROOT}; //This is the string of the root node on the TF tree
+char tfRoot[512]= {DEFAULT_TF_ROOT}; //This is the string of the root node on the TF tree
 
 int publishCameraTF=1;
 float cameraXPosition=0.0,cameraYPosition=0.0,cameraZPosition=0.0;
@@ -120,21 +120,21 @@ bool terminate(std_srvs::Empty::Request& request,std_srvs::Empty::Response& resp
 
 float * mallocVectorR(std::vector<float> bvhFrame)
 {
-   if (bvhFrame.size()==0)
-   {
-       fprintf(stderr,"mallocVector given an empty vector..\n");
-       //Empty bvh frame means no vector 
-       return 0;
-   }
-   
+    if (bvhFrame.size()==0)
+    {
+        fprintf(stderr,"mallocVector given an empty vector..\n");
+        //Empty bvh frame means no vector
+        return 0;
+    }
+
     float * newVector = (float*) malloc(sizeof(float) * bvhFrame.size());
     if (newVector!=0)
+    {
+        for (int i=0; i<bvhFrame.size(); i++)
         {
-            for (int i=0; i<bvhFrame.size(); i++)
-                {
-                    newVector[i]=(float) bvhFrame[i];
-                }
+            newVector[i]=(float) bvhFrame[i];
         }
+    }
     return newVector;
 }
 
@@ -145,7 +145,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
 {
     ++frameID;
     struct calibration intrinsics= {0};
-     
+
     //ROS_INFO("New frame received..");
     //Using Intrinsic camera matrix for the raw (distorted) input images.
 
@@ -189,8 +189,8 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     cv::Mat bgrMat,rgbMat(height,width,CV_8UC3,rgbTmp.data,3*width);
     cv::cvtColor(rgbMat,bgrMat, cv::COLOR_RGB2BGR);// opencv expects the image in BGR format
     cv::imshow("RGB input",bgrMat);
-    
-    struct Image pic={0};
+
+    struct Image pic= {0};
     pic.pixels = rgb.data ;
     pic.width  = rgb.size().width;
     pic.height = rgb.size().height;
@@ -198,80 +198,83 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     pic.bitsperpixel = 24;
     pic.image_size =pic.width * pic.height *pic.channels ;
 
-    #if USE_CURL
-     if (frameID%10==0)
-     {
-      fprintf(stderr,"flushing to disk\n"); 
-      WriteJPEGFile(&pic,"/home/dji/catkin_ws/src/camera_broadcast/src/image.jpg");
-      int i=system("curl -F \"submit=1\" -F \"fileToUpload=@/home/dji/catkin_ws/src/camera_broadcast/src/image.jpg\" ammar.gr/stream/upload.php");
-      usleep(10000);
-     }
-    #else  
+#if USE_CURL
+    if (frameID%10==0)
+    {
+        fprintf(stderr,"flushing to disk\n");
+        WriteJPEGFile(&pic,"/home/dji/catkin_ws/src/camera_broadcast/src/image.jpg");
+        int i=system("curl -F \"submit=1\" -F \"fileToUpload=@/home/dji/catkin_ws/src/camera_broadcast/src/image.jpg\" ammar.gr/stream/upload.php");
+        usleep(10000);
+    }
+#else
     if (connection)
-     {
-       currentCompressedJPEGFile = maxCompressedJPEGFile;
-       if ( WriteJPEGMemory(&pic,compressedJPEGFile,&currentCompressedJPEGFile) )
-         {
-           if (  
-               AmmClient_SendFile(
-                                  connection,
-                                  "stream/upload.php",
-                                  "fileToUpload",
-                                  "image.jpg",
-                                  "image/jpeg",
-                                  compressedJPEGFile,
-                                  (unsigned int) currentCompressedJPEGFile,
-                                  1
-                                )
-              )
-         { 
-          fprintf(stderr,"* %lu",currentCompressedJPEGFile); 
-          usleep(100000);
-          char buf[2048]={0};
-          unsigned int recvdSize=2047;
+    {
+        currentCompressedJPEGFile = maxCompressedJPEGFile;
+        if ( WriteJPEGMemory(&pic,compressedJPEGFile,&currentCompressedJPEGFile) )
+        {
+            if (
+                AmmClient_SendFile(
+                    connection,
+                    "stream/upload.php",
+                    "fileToUpload",
+                    "image.jpg",
+                    "image/jpeg",
+                    compressedJPEGFile,
+                    (unsigned int) currentCompressedJPEGFile,
+                    1
+                )
+            )
+            {
+                fprintf(stderr,"* %lu",currentCompressedJPEGFile);
+                usleep(10000);
+                char buf[2048]= {0};
+                unsigned int recvdSize=2047;
 
-          if (!AmmClient_Recv(connection,buf,&recvdSize) )
-             {
-               fprintf(stderr,"Failed to recv.. \n");
-             }
+                if (!AmmClient_Recv(connection,buf,&recvdSize) )
+                {
+                    fprintf(stderr,"Failed to recv.. \n");
+                }
 
-          fprintf(stderr,"Response = `%s`\n",buf); 
-         } else
-         { fprintf(stderr,"Unable to do HTTP transmission \n"); }
+                fprintf(stderr,"Response = `%s`\n",buf);
+            } else
+            {
+                fprintf(stderr,"Unable to do HTTP transmission \n");
+            }
 
-         } else
-         { fprintf(stderr,"Unable to do JPEG compression \n"); }
-     }
-    #endif
+        } else
+        {
+            fprintf(stderr,"Unable to do JPEG compression \n");
+        }
+    }
+#endif
 
-    
+
     cv::waitKey(1);
 
     return;
 }
-  
-  
-  
-  
+
+
+
+
 int main(int argc, char **argv)
-{    
+{
     //https://github.com/AmmarkoV/RGBDAcquisition/tree/master/3dparty/ROS/rgbd_acquisition
     //==================================================================================================================================
     //roslaunch rgbd_acquisition rgb_acquisition.launch deviceID:=sven.mp4-data moduleID:=TEMPLATE width:=1920 height:=1080 framerate:=1
-    //roslaunch mocapnet_rosnode mocapnet_rosnode.launch
-    //rviz
+    //roslaunch camera_broadcast camera_broadcast.launch
     //==================================================================================================================================
 
- 
+
     compressedJPEGFile =  (char*) malloc(sizeof(char)* maxCompressedJPEGFile);
     if (compressedJPEGFile==0)
-        {
-          ROS_INFO("Could not allocate memory..!");
-          exit(1);
-        }
+    {
+        ROS_INFO("Could not allocate memory..!");
+        exit(1);
+    }
 
-    connection = AmmClient_Initialize("139.91.185.16",80,30/*sec*/);   
- 
+    connection = AmmClient_Initialize("139.91.185.16",80,30/*sec*/);
+
 
     ROS_INFO("Initializing MocapNET ROS Wrapper");
     try
@@ -282,7 +285,7 @@ int main(int argc, char **argv)
         ros::NodeHandle nh;
         ros::NodeHandle private_node_handle("~");
         nhPtr = &nh;
- 
+
         float rate = 30;
         std::string joint2DEstimatorName;
         std::string name;
@@ -292,24 +295,24 @@ int main(int argc, char **argv)
         std::string tfTargetBVHFilename;
 
         ROS_INFO("Initializing Parameters..");
-        
+
         private_node_handle.param("tfTargetBVHFilename", tfTargetBVHFilename, std::string("dataset/headerWithHeadAndOneMotion.bvh"));
         private_node_handle.param("fromRGBTopic", fromRGBTopic, std::string(camRGBRaw));
         private_node_handle.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string(camRGBInfo));
         private_node_handle.param("name", name, std::string("camera_broadcast"));
         private_node_handle.param("rate",rate);
-        
-        
+
+
         private_node_handle.param("tfRoot",tfRootName, std::string(DEFAULT_TF_ROOT));
         snprintf(tfRoot,510,"%s",tfRootName.c_str());
         fprintf(stderr,"TFRoot Name = %s ",tfRoot);
-        
-        
+
+
         rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
         rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
-        message_filters::Synchronizer<RgbSyncPolicy> *sync = new message_filters::Synchronizer<RgbSyncPolicy>(RgbSyncPolicy(1), *rgb_img_sub,*rgb_cam_info_sub);
+        message_filters::Synchronizer<RgbSyncPolicy> *sync = new message_filters::Synchronizer<RgbSyncPolicy>(RgbSyncPolicy(10), *rgb_img_sub,*rgb_cam_info_sub);
         //rosrun rqt_graph rqt_graph to test out what is going on
- 
+
         ros::ServiceServer visualizeAnglesService    = nh.advertiseService(name + "/visualize_angles",&visualizeAngles);
         ros::ServiceServer visualizeMainService      = nh.advertiseService(name + "/visualize_main",&visualizeMain);
         ros::ServiceServer visualizeOverlayService   = nh.advertiseService(name + "/visualize_overlay",&visualizeOverlay);
@@ -319,51 +322,54 @@ int main(int argc, char **argv)
         //registerResultCallback((void*) sampleResultingSynergies);
         //registerUpdateLoopCallback((void *) loopEvent);
         //registerROSSpinner( (void *) frameSpinner );
-        
- 
+
+
         ROS_INFO("Done with ROS initialization!");
 
 
-    
-    
-    ROS_INFO("Initializing 2D joint estimator");
-    if ( 1 )
+
+
+        ROS_INFO("Initializing 2D joint estimator");
+        if ( 1 )
         {
             ROS_INFO("Initializing Camera Broadcast");
             if ( 1 )
+            {
+                //Last check for inconsistencies..
+                //Since the tfTargetBVHFilename can load a different BVH file than the internal model
+                //We need to check that the two BVH armatures have joint parity..
+                //A stricter test could also make sure joint names are the same, however someone can essencially alter the Frame names using this file
+                //so we will only check for the number of joints..!
+
+
+                sync->registerCallback(rgbCallback);
+                ROS_INFO("Registered ROS services, we should be able to process incoming messages now!");
+
+                //Lets go..
+                //////////////////////////////////////////////////////////////////////////
+                unsigned long i = 0;
+                // startTime=cvGetTickCount();
+                while ( ( key!='q' ) && (ros::ok()) )
                 {
-                   //Last check for inconsistencies..
-                   //Since the tfTargetBVHFilename can load a different BVH file than the internal model
-                   //We need to check that the two BVH armatures have joint parity..
-                   //A stricter test could also make sure joint names are the same, however someone can essencially alter the Frame names using this file
-                   //so we will only check for the number of joints..!
+                    ros::spinOnce();
 
-    
-                  sync->registerCallback(rgbCallback);
-                  ROS_INFO("Registered ROS services, we should be able to process incoming messages now!");
-                  
-                  //Lets go..
-                  //////////////////////////////////////////////////////////////////////////
-                  unsigned long i = 0;
-                  // startTime=cvGetTickCount();
-                  while ( ( key!='q' ) && (ros::ok()) )
-                  {
-                      ros::spinOnce();
-                        
-                      if (i%1000==0)
-                         {
-                           fprintf(stderr,".");
-                           //loopEvent(); //<- this keeps our ros node messages handled up until synergies take control of the main thread
-                         }
-                      ++i;
+                    if (i%1000==0)
+                    {
+                        fprintf(stderr,".");
+                    }
+                    ++i;
 
-                      usleep(1000);
-                  } 
-                 //////////////////////////////////////////////////////////////////////////
-                }else
-                { ROS_ERROR("Failed to initialize MocapNET 3D pose estimation.."); }
+                    usleep(1000);
+                }
+                //////////////////////////////////////////////////////////////////////////
+            } else
+            {
+                ROS_ERROR("Failed to initialize MocapNET 3D pose estimation..");
+            }
         } else
-        { ROS_ERROR("Failed to initialize MocapNET built-in 2D joint estimation.."); }
+        {
+            ROS_ERROR("Failed to initialize MocapNET built-in 2D joint estimation..");
+        }
 
     }
     catch(std::exception &e) {
@@ -376,7 +382,7 @@ int main(int argc, char **argv)
     }
 
     AmmClient_Close(connection);
- 
+
     ROS_INFO("Shutdown complete");
     return 0;
 }
