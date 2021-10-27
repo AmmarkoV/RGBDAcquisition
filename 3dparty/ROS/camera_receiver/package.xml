@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package>
+  <name>camera_receiver</name>
+  <version>0.0.0</version>
+  <description>
+    A HTTP Streaming Camera Receiver for ROS </description>
+  <maintainer email="ammarkov@gmail.com">Ammar Qammaz</maintainer>
+  <author email="ammarkov@gmail.com">Ammar Qammaz</author>
+  <license>BSD</license>
+  <url type="website">http://ammar.gr/</url>  
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend> 
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>geometry_msgs</run_depend> 
+  <run_depend>roslib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>image_transport</run_depend>
+
+  <run_depend>tf</run_depend>
+ 
+</package>
