@@ -503,9 +503,6 @@ int main(int argc, char **argv)
      pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/rgb/camera_info",1);
      std::cout<<"ROS RGB Topic name : "<<camera<<"/rgb/image_rect_color"<<std::endl;
 
-     pubDepth = it.advertise(camera+"/depth_registered/image_rect", 1);
-     pubDepthInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/depth_registered/camera_info",1);
-     std::cout<<"ROS Depth Topic name : "<<camera<<"/depth_registered/image_rect"<<std::endl;
 
       //---------------------------------------------------------------------------------------------------
       //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
