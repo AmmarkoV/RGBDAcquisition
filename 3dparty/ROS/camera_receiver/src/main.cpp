@@ -270,7 +270,6 @@ int getKeyPressed()
 
 
 bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsigned int colorHeight ,
-                          unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight ,
                            struct calibration  * calib
                          )
 {
@@ -280,11 +279,6 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    out_RGB_msg.encoding = sensor_msgs::image_encodings::RGB8; // Or whatever
    out_RGB_msg.header.frame_id= tfRoot;
    out_RGB_msg.header.stamp= sampleTime;
-
-  cv_bridge::CvImage out_Depth_msg;
-   out_Depth_msg.header.frame_id= tfRoot;
-   out_Depth_msg.header.stamp= sampleTime;
-   out_Depth_msg.encoding = sensor_msgs::image_encodings::TYPE_16UC1; // Or whatever
 
 
   //convert & publish RGB Stream - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -297,14 +291,6 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     pubRGB.publish(out_RGB_msg.toImageMsg());
 
 
-  //convert & publish Depth Stream - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  //IplImage *imageDepth = cvCreateImageHeader( cvSize(depthWidth,depthHeight), IPL_DEPTH_16U ,1);
-  //imageDepth->imageData = (char *) depth;
-  //out_Depth_msg.image    = imageDepth; // Your cv::Mat
-
-   cv::Mat imageDepthMat(cv::Size(depthWidth, depthHeight), CV_16UC1, (char *) depth , cv::Mat::AUTO_STEP);
-   out_Depth_msg.image    = imageDepthMat;
-   pubDepth.publish(out_Depth_msg.toImageMsg());
 
 
    //---------------------------------------------------------------------------------------------------
@@ -346,8 +332,6 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
     cal.P[10]=1.0;
 
     pubRGBInfo.publish(cal);
-    cal.width=depthWidth; cal.height=depthHeight;
-    pubDepthInfo.publish(cal);
    }
    #endif
    //---------------------------------------------------------------------------------------------------
@@ -365,50 +349,9 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    return true;
 }
 
-int scaleDepthFrame(unsigned short * depthFrame , unsigned int width , unsigned int height , float scalingFactor)
-{
-  if (depthFrame==0) { return 0; }
-
-  unsigned short * depthFramePtr = depthFrame;
-  unsigned short * depthFrameLimit =  depthFrame + width * height; //Is a *2 needed here ( dont think so :P )
-
-
-  float curValue=0.0;
-  while (depthFramePtr<depthFrameLimit)
-  {
-    curValue=(float) *depthFramePtr;
-    curValue=curValue * scalingFactor;
-    *depthFramePtr = (unsigned short) curValue;
-
-    ++depthFramePtr;
-  }
- return 1;
-}
-
 
 int publishImages()
 {
-   struct calibration rgbCalibration;
-   acquisitionGetColorCalibration(moduleID,devID,&rgbCalibration);
-
-   unsigned short * depthOriginal = acquisitionGetDepthFrame(moduleID,devID);
-   unsigned short * depthUsed = depthOriginal;
-   if ( scaleDepth!=1.0)
-   {
-     depthUsed = (unsigned short* ) malloc( colorWidth * colorHeight * sizeof(unsigned short) * 1 );
-     if (depthUsed==0)
-     {
-       fprintf(stderr,"Failed to allocate scaled Depth , falling back to original\n");
-       depthUsed=depthOriginal;
-     } else
-     {
-         memcpy(depthUsed,depthOriginal, depthWidth * depthHeight * sizeof(unsigned short) * 1);
-         if (!scaleDepthFrame(depthUsed, depthWidth , depthHeight , scaleDepth) )
-         {
-           fprintf(stderr,"Failed to scale depth..\n");
-         }
-     }
-   }
 
 
    int retres = publishImagesFrames(acquisitionGetColorFrame(moduleID,devID), colorWidth , colorHeight ,
