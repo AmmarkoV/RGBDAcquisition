@@ -10,10 +10,22 @@ cd uploads/
 UPLOAD_DIR=`pwd`
 
 
-echo "Please add to your /etc/fstab"
-sudo mount -t tmpfs -o size=64m tmpfs $UPLOAD_DIR
+cd /mnt
+sudo mkdir stream
+sudo chmod 777 stream
+
+rm -rf uploads
+cd $DIR 
+ln -s /mnt/stream/ uploads
+sudo chmod 777 uploads
+
 
 echo "Please add to your /etc/fstab"
-echo "$UPLOAD_DIR tmpfs   nodev,nosuid,noexec,nodiratime,size=64M   0 0"
+sudo mount -t tmpfs -o size=64m tmpfs /mnt/stream
+
+echo "Please add to your /etc/fstab"
+echo "/mnt/stream tmpfs   nodev,nosuid,noexec,nodiratime,size=64M   0 0"
+
+$UPLOAD_DIR
 
 exit 0
