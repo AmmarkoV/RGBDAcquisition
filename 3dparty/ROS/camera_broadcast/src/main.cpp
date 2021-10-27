@@ -235,7 +235,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
             )
             {
                 fprintf(stderr,"* %lu",currentCompressedJPEGFile);
-                //usleep(100000);
+                //usleep(1000000);
                 char buf[4098]= {0};
                 unsigned int recvdSize=4098;
 
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
         ros::NodeHandle private_node_handle("~");
         nhPtr = &nh;
 
-        float rate = 30;
+        float rate = 5;
         std::string joint2DEstimatorName;
         std::string name;
         std::string fromRGBTopic;
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
 
         rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
         rgb_cam_info_sub = new message_filters::Subscriber<sensor_msgs::CameraInfo>(nh,fromRGBTopicInfo,1);
-        message_filters::Synchronizer<RgbSyncPolicy> *sync = new message_filters::Synchronizer<RgbSyncPolicy>(RgbSyncPolicy(10), *rgb_img_sub,*rgb_cam_info_sub);
+        message_filters::Synchronizer<RgbSyncPolicy> *sync = new message_filters::Synchronizer<RgbSyncPolicy>(RgbSyncPolicy(1), *rgb_img_sub,*rgb_cam_info_sub);
         //rosrun rqt_graph rqt_graph to test out what is going on
 
         ros::ServiceServer visualizeAnglesService    = nh.advertiseService(name + "/visualize_angles",&visualizeAngles);
@@ -336,7 +336,7 @@ int main(int argc, char **argv)
         ROS_INFO("Done with ROS initialization!");
 
 
-
+        ros::Rate rosrate(rate);
 
         ROS_INFO("Initializing 2D joint estimator");
         if ( 1 )
@@ -360,7 +360,6 @@ int main(int argc, char **argv)
                 // startTime=cvGetTickCount();
                 while ( ( key!='q' ) && (ros::ok()) )
                 {
-                    ros::spinOnce();
 
                     if (i%1000==0)
                     {
@@ -368,7 +367,9 @@ int main(int argc, char **argv)
                     }
                     ++i;
 
-                    usleep(1000);
+                    //usleep(1000);
+                    ros::spinOnce();
+                    rosrate.sleep();
                 }
                 //////////////////////////////////////////////////////////////////////////
             } else
