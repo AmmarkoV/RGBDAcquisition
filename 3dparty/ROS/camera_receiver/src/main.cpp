@@ -86,8 +86,8 @@ unsigned int draw_out = 0;
 unsigned int counter = 0;
 
 unsigned int colorWidth, colorHeight , colorChannels , colorBitsperpixel;
-char filecontent[1024 * 1024 * 1]={0}
-unsigned int* filecontentMaxSize=1024 * 1024 * 1;
+char filecontent[1024 * 1024 * 1]={0};
+unsigned int filecontentMaxSize=1024 * 1024 * 1;
 
 
 struct AmmClient_Instance * connection=0;
@@ -159,24 +159,6 @@ bool setHighFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Respon
     return true;
 }
 
-
-
-bool saveROSCalibrationFile(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-  struct calibration calib;
-  acquisitionGetColorCalibration(moduleID,devID,&calib);
-
-    char cwd[1024];
-   if (getcwd(cwd, sizeof(cwd)) != NULL)
-       fprintf(stdout, "Current working dir: %s\n", cwd);
-   else
-    {   
-      perror("getcwd() error");
-      return true;
-    }
-  WriteCalibrationROS("calibration.yaml",&calib);
-  return true;
-}
 
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
@@ -256,9 +238,8 @@ int doDrawOutFrame( unsigned char * rgbFrame , unsigned int rgbWidth , unsigned 
 
 int doDrawOut(  )
 {
-
-   return doDrawOutFrame(acquisitionGetColorFrame(moduleID,devID),colorWidth,colorHeight,
-                          acquisitionGetDepthFrame(moduleID,devID),depthWidth,depthHeight);
+  // return doDrawOutFrame(acquisitionGetColorFrame(moduleID,devID),colorWidth,colorHeight,acquisitionGetDepthFrame(moduleID,devID),depthWidth,depthHeight);
+  return 0;
 }
 
 
@@ -285,8 +266,8 @@ bool publishImagesFrames(cv::Mat & matImg)
   //imageRGB->imageData = (char *) color;
   //out_RGB_msg.header   = in_msg->header; // Same timestamp and tf frame as input image
 
-    cv::Mat imageRGBMat(cv::Size(colorWidth, colorHeight), CV_8UC3, (char *) color, cv::Mat::AUTO_STEP);
-    out_RGB_msg.image = imageRGBMat; // Your cv::Mat
+    //cv::Mat imageRGBMat(cv::Size(colorWidth, colorHeight), CV_8UC3, (char *) color, cv::Mat::AUTO_STEP);
+    out_RGB_msg.image = matImg; // Your cv::Mat
     pubRGB.publish(out_RGB_msg.toImageMsg());
 
 
@@ -348,7 +329,7 @@ bool publishImagesFrames(cv::Mat & matImg)
    return true;
 }
 
- 
+
 
 //----------------------------------------------------------
 
@@ -358,7 +339,7 @@ void loopEvent()
   //ROS_INFO("Loop Event started");
   //We spin from this thread to keep thread synchronization problems at bay
   ros::spinOnce();
- 
+
   unsigned int filecontentSize = filecontentMaxSize;
   if (
        AmmClient_RecvFile(
@@ -367,22 +348,25 @@ void loopEvent()
                           filecontent ,
                           &filecontentSize,
                           1,// int keepAlive,
-                          1,//int reallyFastImplementation
-                         ) 
+                          1//int reallyFastImplementation
+                         )
     )
   {
    if (framerateState!=STOPPED_FRAMERATE)
     {
-      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, filecontent), CV_LOAD_IMAGE_UNCHANGED);
+      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, filecontent),cv::IMREAD_UNCHANGED);
 
-      publishImagesFrames(matImg); 
+      publishImagesFrames(matImg);
+
+      cv::Mat bgrMat;
+      cv::cvtColor(matImg,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+      cv::imshow("RGB",bgrMat);
     }
 
    // if we got a depth and rgb frames , lets go
    key=getKeyPressed(); //Post our geometry to ROS
    //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
 
-    doDrawOut();  // <- end of we have depth and rgb code 
   }
 }
 
@@ -390,7 +374,7 @@ void loopEvent()
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
- 
+
 
    try
 	{
@@ -401,15 +385,10 @@ int main(int argc, char **argv)
      ros::NodeHandle nh;
      nhPtr = &nh;
 
-     int disableColorStream=0;
-     int disableDepthStream=0;
-
-     std::string from;
-     std::string module;
      std::string name;
      std::string camera;
-     std::string frame; 
-     std::string server; 
+     std::string frame;
+     std::string server;
      int highRate,midRate,lowRate,port,timeout;
 
      ros::NodeHandle private_node_handle_("~");
@@ -420,22 +399,15 @@ int main(int argc, char **argv)
      private_node_handle_.param("port", port, int(80));
      private_node_handle_.param("timeout", timeout, int(10));
 
-
+/*
      private_node_handle_.param("width", width, int(640));
      private_node_handle_.param("height", height, int(480));
-     private_node_handle_.param("framerate", framerate , int(30)); 
+     private_node_handle_.param("framerate", framerate , int(30)); */
      private_node_handle_.param("highRate", highRate, int(30));
      private_node_handle_.param("midRate", midRate, int(15));
      private_node_handle_.param("lowRate", lowRate, int(5));
      highRate=framerate;
      //private_node_handle_.param("scaleDepth", scaleDepth, float(1.0));
-
-     private_node_handle_.param("deviceID", from, std::string(""));
-     private_node_handle_.param("moduleID", module, std::string(""));
-     private_node_handle_.param("virtual_baseline", virtual_baseline, 0.0);
-
-     private_node_handle_.param("disableColorStream",disableColorStream,0);
-     private_node_handle_.param("disableDepthStream",disableDepthStream,0);
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
@@ -447,10 +419,10 @@ int main(int argc, char **argv)
      if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }*/
 
 
-     connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/); 
+     connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/);
      fprintf(stderr,"Initialized..\n");
 
-     std::cout<<"RGBDAcquisition Starting settings ----------------"<<std::endl;
+     std::cout<<"camera_receiver starting settings ----------------"<<std::endl;
 
      char cwd[1024];
      if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -465,8 +437,8 @@ int main(int argc, char **argv)
      std::cout<<"Mid Rate : "<<midRate<<std::endl;
      std::cout<<"Low Rate : "<<lowRate<<std::endl;
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
-     std::cout<<"Module_id : "<<module<<" length "<<module.length()<<"  devID : "<<moduleID<<std::endl;
-     std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
+     //std::cout<<"Module_id : "<<module<<" length "<<module.length()<<"  devID : "<<moduleID<<std::endl;
+     //std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
      std::cout<<"--------------------------------------------------"<<std::endl;
 
 
@@ -476,7 +448,7 @@ int main(int argc, char **argv)
      framerateState=HIGH_FRAMERATE; //By default we go to medium!
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer saveROSCalibrationService  = nh.advertiseService(name+"/saveROSCalibration", saveROSCalibrationFile);
+     //ros::ServiceServer saveROSCalibrationService  = nh.advertiseService(name+"/saveROSCalibration", saveROSCalibrationFile);
      ros::ServiceServer visualizeOnService         = nh.advertiseService(name+"/visualize_on", visualizeOn);
      ros::ServiceServer visualizeOffService        = nh.advertiseService(name+"/visualize_off", visualizeOff);
      ros::ServiceServer terminateService           = nh.advertiseService(name+"/terminate", terminate);
