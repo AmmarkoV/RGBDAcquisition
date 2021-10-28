@@ -7,6 +7,7 @@
     <node name="camera_receiver" pkg="camera_receiver" type="run_it.sh" required="true" output="screen" cwd="node"> 
       <param name="server" value="139.91.185.16" /> 
       <param name="port" value="80" />
+      <param name="URI" value="/stream/uploads/image.jpg" /> 
       <param name="highRate" value="50" /> 
       <param name="midRate" value="15" /> 
       <param name="lowRate" value="5" />  
