@@ -1,6 +1,6 @@
 <launch>   
     <!-- name of the "camera" -->
-    <arg name="camera" value="camera"/> 
+    <arg name="camera" value="camera/rgb/"/> 
     <!-- name of the root frame -->
     <arg name="frame" value="camera_pose"/>  
   

@@ -1,8 +1,9 @@
-ROS Node wrapper for RGBDAcquisition
+ROS Node wrapper for camera_receiver
 -------------------------------------
 
-To stream your webcam @ 640x480 and 30fps use :
+To change settings please see the launch file and make your own:
 
 ```
-roslaunch rgbd_acquisition rgb_acquisition.launch moduleID:=V4L2 deviceID:=/dev/video0 width:=640 height:=480 framerate:=30
+roslaunch camera_receiver camera_receiver.launch
+
 ```

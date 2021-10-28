@@ -114,7 +114,6 @@ void switchDrawOutTo(unsigned int newVal)
 {
     if ( (draw_out==1) && (newVal==0) )
     {
-        cv::destroyWindow("Depth");
         cv::destroyWindow("RGB");
 
         cv::destroyAllWindows();
@@ -407,7 +406,7 @@ int main(int argc, char **argv)
 
         ros::NodeHandle private_node_handle_("~");
         private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
-        private_node_handle_.param("camera", camera, std::string("camera"));
+        private_node_handle_.param("camera", camera, std::string("camera/rgb/"));
         private_node_handle_.param("frame", frame, std::string("frame"));
         private_node_handle_.param("server", server, std::string("139.91.185.16"));
         private_node_handle_.param("URI",URI, std::string("/stream/uploads/image.jpg"));
@@ -461,9 +460,9 @@ int main(int argc, char **argv)
         //Output RGB Image
         image_transport::ImageTransport it(nh);
 
-        pubRGB = it.advertise(camera+"/rgb/image_rect_color", 1);
-        pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"/rgb/camera_info",1);
-        std::cout<<"ROS RGB Topic name : "<<camera<<"/rgb/image_rect_color"<<std::endl;
+        pubRGB = it.advertise(camera+"image_rect_color", 1);
+        pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"camera_info",1);
+        std::cout<<"ROS RGB Topic name : "<<camera<<"image_rect_color"<<std::endl;
 
 
         //---------------------------------------------------------------------------------------------------
