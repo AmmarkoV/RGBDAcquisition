@@ -1,10 +1,3 @@
-
-
-#define EMMIT_CALIBRATION 1
-#define USE_CALIBRATION 1
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,7 +35,14 @@
 #include <unistd.h>
 
 
-#define NODE_NAME "rgbd_acquisition"
+#define NODE_NAME "camera_receiver"
+
+
+
+#define EMMIT_CALIBRATION 0
+#define USE_CALIBRATION 0
+
+
 
 
 
@@ -86,7 +86,8 @@ unsigned int draw_out = 0;
 unsigned int counter = 0;
 
 unsigned int colorWidth, colorHeight , colorChannels , colorBitsperpixel;
-unsigned int depthWidth, depthHeight , depthChannels , depthBitsperpixel;
+char filecontent[1024 * 1024 * 1]={0}
+unsigned int* filecontentMaxSize=1024 * 1024 * 1;
 
 
 struct AmmClient_Instance * connection=0;
@@ -269,9 +270,7 @@ int getKeyPressed()
 
 
 
-bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsigned int colorHeight ,
-                           struct calibration  * calib
-                         )
+bool publishImagesFrames(cv::Mat & matImg)
 {
   //We want to populate this
   ros::Time sampleTime = ros::Time::now();
@@ -349,23 +348,7 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    return true;
 }
 
-
-int publishImages()
-{
-
-
-   int retres = publishImagesFrames(acquisitionGetColorFrame(moduleID,devID), colorWidth , colorHeight ,
-                                    depthUsed, depthWidth , depthHeight , &rgbCalibration );
-
-
-   if (depthUsed!=depthOriginal)
-   {
-     free(depthUsed);
-   }
-
-   return retres;
-}
-
+ 
 
 //----------------------------------------------------------
 
@@ -375,31 +358,39 @@ void loopEvent()
   //ROS_INFO("Loop Event started");
   //We spin from this thread to keep thread synchronization problems at bay
   ros::spinOnce();
+ 
+  unsigned int filecontentSize = filecontentMaxSize;
+  if (
+       AmmClient_RecvFile(
+                          connection,
+                          "/stream/uploads/image.jpg",
+                          filecontent ,
+                          &filecontentSize,
+                          1,// int keepAlive,
+                          1,//int reallyFastImplementation
+                         ) 
+    )
+  {
+   if (framerateState!=STOPPED_FRAMERATE)
+    {
+      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, filecontent), CV_LOAD_IMAGE_UNCHANGED);
 
-  acquisitionSnapFrames(moduleID,devID);
-  acquisitionGetColorFrameDimensions(moduleID , devID , &colorWidth, &colorHeight , &colorChannels , &colorBitsperpixel);
-  acquisitionGetDepthFrameDimensions(moduleID , devID , &depthWidth, &depthHeight , &depthChannels , &depthBitsperpixel);
-
-
-  if (framerateState!=STOPPED_FRAMERATE)
-   {
-      publishImages();
-   }
+      publishImagesFrames(matImg); 
+    }
 
    // if we got a depth and rgb frames , lets go
    key=getKeyPressed(); //Post our geometry to ROS
    //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
 
-    doDrawOut();  // <- end of we have depth and rgb code
+    doDrawOut();  // <- end of we have depth and rgb code 
+  }
 }
 
 
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
-
-   int i=system("./downloadDependencies.sh");
-   if (i!=0 ) { ROS_INFO("Could not check for missing dependencies of rgbd_acquisition"); }
+ 
 
    try
 	{
@@ -418,12 +409,17 @@ int main(int argc, char **argv)
      std::string name;
      std::string camera;
      std::string frame; 
-     int highRate,midRate,lowRate;
+     std::string server; 
+     int highRate,midRate,lowRate,port,timeout;
 
      ros::NodeHandle private_node_handle_("~");
      private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
+     private_node_handle_.param("server", server, std::string("139.91.185.16"));
+     private_node_handle_.param("port", port, int(80));
+     private_node_handle_.param("timeout", timeout, int(10));
+
 
      private_node_handle_.param("width", width, int(640));
      private_node_handle_.param("height", height, int(480));
@@ -451,8 +447,8 @@ int main(int argc, char **argv)
      if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }*/
 
 
- connection = AmmClient_Initialize("139.91.185.16",80,10/*sec*/); 
- fprintf(stderr,"Initialized..\n");
+     connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/); 
+     fprintf(stderr,"Initialized..\n");
 
      std::cout<<"RGBDAcquisition Starting settings ----------------"<<std::endl;
 
