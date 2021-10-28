@@ -193,23 +193,6 @@ bool resume(std_srvs::Empty::Request& request, std_srvs::Empty::Response& respon
 }
 
 
-
-bool setScale( rgbd_acquisition::SetScale::Request  &request,
-                  rgbd_acquisition::SetScale::Response &response )
-{
-   scaleDepth =  request.factor;
-   fprintf(stderr,"depth scale is now %0.2f \n",scaleDepth);
-
-   if ( scaleDepth==1.0 ) { fprintf(stderr,"scaling is now deactivated\n"); }
-   response.ok=1;
-
-   return true ;
-}
-
-
-
-
-
 int doDrawOutFrame( unsigned char * rgbFrame , unsigned int rgbWidth , unsigned int rgbHeight ,
                      unsigned short * depthFrame , unsigned int depthWidth , unsigned int depthHeight )
 {
@@ -348,7 +331,7 @@ void loopEvent()
                           filecontent ,
                           &filecontentSize,
                           1,// int keepAlive,
-                          1//int reallyFastImplementation
+                          0//int reallyFastImplementation
                          )
     )
   {
@@ -366,7 +349,9 @@ void loopEvent()
    // if we got a depth and rgb frames , lets go
    key=getKeyPressed(); //Post our geometry to ROS
    //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
-
+  } else
+  {
+      std::cerr<<"Failed receiving new image \n";
   }
 }
 
@@ -419,7 +404,7 @@ int main(int argc, char **argv)
      if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }*/
 
 
-     connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/);
+
      fprintf(stderr,"Initialized..\n");
 
      std::cout<<"camera_receiver starting settings ----------------"<<std::endl;
@@ -428,6 +413,8 @@ int main(int argc, char **argv)
      if (getcwd(cwd, sizeof(cwd)) != NULL)
       std::cout<<"Current working dir : " << cwd << std::endl;
 
+     std::cout<<"Server : "<<server<<std::endl;
+     std::cout<<"Port : "<<port<<std::endl;
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
@@ -454,7 +441,7 @@ int main(int argc, char **argv)
      ros::ServiceServer terminateService           = nh.advertiseService(name+"/terminate", terminate);
      ros::ServiceServer pauseService               = nh.advertiseService(name+"/pause", pause);
      ros::ServiceServer resumeService              = nh.advertiseService(name+"/resume", resume);
-     ros::ServiceServer setScaleService            = nh.advertiseService(name+"/setScale", setScale);
+     //ros::ServiceServer setScaleService            = nh.advertiseService(name+"/setScale", setScale);
 
      //Framerate switches
      ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
@@ -478,11 +465,16 @@ int main(int argc, char **argv)
       //---------------------------------------------------------------------------------------------------
 
 
-
-
   std::cout<<"Trying to open capture device.."<<std::endl;
   ROS_INFO("Trying to open capture device..");
 
+     connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/);
+
+     if(connection==0)
+     {
+        std::cerr<<"Could not establish connection to "<<server<<":"<<port<<std::endl;
+        return 0;
+     }
 
 	 ROS_INFO("Done Initializing RGBDAcqusition , now entering grab loop..");
 	  while ( ( key!='q' ) && (ros::ok()) )
@@ -498,12 +490,9 @@ int main(int argc, char **argv)
                            low_loop_rate.sleep();
                     break;
                   }
-
-
 		}
 
       switchDrawOutTo(0);
-
 	}
 	catch(std::exception &e) { ROS_ERROR("Exception: %s", e.what()); return 1; }
 	catch(...)               { ROS_ERROR("Unknown Error"); return 1; }
