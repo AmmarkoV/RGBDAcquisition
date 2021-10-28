@@ -100,7 +100,6 @@ int AmmClient_SendFileInternal(
   char bufferBeforeFile[BUFFERSIZE+1]={0};
   bufferBeforeSize = snprintf(bufferBeforeFile,BUFFERSIZE,"Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: %s\r\n\r\n",formname,filename,contentType);
 
-
   unsigned int bufferAfterSize=0;
   char bufferAfterFile[BUFFERSIZE+1]={0};
   bufferAfterSize = snprintf(bufferAfterFile,BUFFERSIZE,"Content-Disposition: form-data; name=\"submit\"\r\n\r\n1");
@@ -112,7 +111,6 @@ int AmmClient_SendFileInternal(
   char header[BUFFERSIZE+1]={0};
   //Send the header Connection: keep-alive\r\nTransfer-Encoding: chunked\r\n
   int headerSize = snprintf(header,BUFFERSIZE,"POST %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: AmmClient/%s\r\nAccept: */*\r\nContent-Length: %u\r\nContent-Type: multipart/form-data; boundary=%s\r\n\r\n",URI,instance->ip,AmmClientVersion,contentLength,boundary);
-  //fprintf(stderr,"%s",header);
 
   //Send everything..
   ++steps; success+=AmmClient_SendInternal(instance,header,headerSize,keepAlive);
@@ -132,30 +130,32 @@ int AmmClient_SendFileInternal(
 
 int isFileDownloadComplete(const char * content,unsigned int contentSize)
 {
- //fprintf(stderr," Content (%u bytes) : %s \n" ,contentSize , content);
-  char * contentLengthStr=strstr(content,"Content-length:");
+ fprintf(stderr," Content (%u bytes) : %s \n" ,contentSize , content);
+  char * contentLengthStr=strstr(content,"Content-Length:");
   if (contentLengthStr!=0)
   {
       contentLengthStr+=16;
       unsigned int contentLength = atoi(contentLengthStr);
-      //fprintf(stderr,YELLOW " Content Length = %u  \n" NORMAL , contentLength );
+      fprintf(stderr,YELLOW " Content Length = %u  \n" NORMAL , contentLength );
       if (contentLength!=0)
       {
         unsigned int headerSize = contentLengthStr - content;
 
         if (headerSize+contentLength <= contentSize)
               {
-                //fprintf(stderr,GREEN " File fully downloaded ( %u header + %u content = %u we have )\n" NORMAL , headerSize , contentLength , contentSize);
+                fprintf(stderr,GREEN " File fully downloaded ( %u header + %u content = %u we have )\n" NORMAL , headerSize , contentLength , contentSize);
                 return 1;
               }
       }
   }
-  //fprintf(stderr,RED " File not fully downloaded\n" NORMAL );
+  fprintf(stderr,RED " File not fully downloaded\n" NORMAL );
  return 0;
 }
 
 
 
+//nc -l 0.0.0.0 8080
+//curl http://127.0.0.1:8080/stream/uploads/image.jpg -o downloaded.jpg
 int AmmClient_RecvFileInternalClean(
                        struct AmmClient_Instance * instance,
                        const char * URI ,
@@ -164,7 +164,7 @@ int AmmClient_RecvFileInternalClean(
                        int keepAlive
                       )
 {
- snprintf(filecontent,*filecontentSize,"GET /%s HTTP/1.1\r\nConnection: keep-alive\r\n\r\n",URI);
+ snprintf(filecontent,*filecontentSize,"GET %s HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: keep-alive\r\n\r\n",URI,instance->ip);
 
  unsigned int bytesReceived=0;
 
@@ -196,8 +196,7 @@ int AmmClient_RecvFileInternalClean(
                          }
 
        if (bytesReceived>=*filecontentSize) { doneReceiving=1;}
-       if (isFileDownloadComplete(filecontent,bytesReceived))
-                         {  *filecontentSize = bytesReceived; return 1; }
+       if (isFileDownloadComplete(filecontent,bytesReceived)) {  *filecontentSize = bytesReceived; return 1; }
 
      }
  }
@@ -221,7 +220,7 @@ int AmmClient_RecvFileInternalFast(
                        int keepAlive
                       )
 {
- snprintf(filecontent,*filecontentSize,"GET /%s HTTP/1.1\nConnection: keep-alive\n\n",URI);
+ snprintf(filecontent,*filecontentSize,"GET %s HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: keep-alive\r\n\r\n",URI,instance->ip);
 
  unsigned int bytesReceived=0;
 

@@ -327,7 +327,7 @@ void loopEvent()
   if (
        AmmClient_RecvFile(
                           connection,
-                          "stream/uploads/image.jpg",
+                          "/stream/uploads/image.jpg",
                           filecontent ,
                           &filecontentSize,
                           1,// int keepAlive,
@@ -335,10 +335,11 @@ void loopEvent()
                          )
     )
   {
-      usleep(100000);
+   usleep(100000);
    if (framerateState!=STOPPED_FRAMERATE)
     {
-      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, filecontent),cv::IMREAD_UNCHANGED);
+      char * jpegFile = AmmClient_seekEndOfHeader(filecontent,&filecontentSize);
+      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, jpegFile),cv::IMREAD_UNCHANGED);
 
       publishImagesFrames(matImg);
 

@@ -9,6 +9,57 @@
 
 #include "AmmClient.h"
 
+
+char * AmmClient_seekEndOfHeader(const char * buffer,unsigned int * bufferSize)
+{
+ char * startOfFile = strstr(buffer,"\r\n\r\n");
+
+ if (startOfFile!=0)
+ {
+   startOfFile+=4;
+   *bufferSize = *bufferSize - (startOfFile - buffer);
+ }
+
+ return startOfFile;
+}
+
+int AmmClient_WriteFileFromMemory(const char * filename,const char * memory , unsigned int memoryLength)
+{
+    if (memory==0)
+    {
+        fprintf(stderr,"astringWriteFileFromMemory: Cannot write null memory buffer\n");
+        return 0 ;
+    }
+    if (memoryLength==0)
+    {
+        fprintf(stderr,"astringWriteFileFromMemory: Cannot write empty memory buffer\n");
+        return 0 ;
+    }
+
+    FILE * pFile=0;
+    size_t result;
+
+    pFile = fopen ( filename , "wb" );
+    if (pFile==0)
+    {
+        fprintf(stderr,"astringWriteFileFromMemory: Could not write file %s \n",filename);
+        return 0;
+    }
+
+    result = fwrite (memory,sizeof(char),memoryLength,pFile);
+    if (result != memoryLength)
+    {
+        fprintf(stderr,"astringWriteFileFromMemory: Could not write the whole file onto disk %s \n",filename);
+        fprintf(stderr,"We wrote %zu / %u  \n",result,memoryLength);
+        fclose(pFile);
+        return 0;
+    }
+
+    // terminate
+    fclose (pFile);
+    return 1;
+}
+
 char * AmmClient_ReadFileToMemory(const char * filename,unsigned int *length)
 {
     *length = 0;
