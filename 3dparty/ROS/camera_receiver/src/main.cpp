@@ -228,7 +228,7 @@ int doDrawOut(  )
 
 int getKeyPressed()
 {
-   if  (draw_out==1) { return cv::waitKey(3)&0x000000FF; }
+   return cv::waitKey(3)&0x000000FF;
    return ' '; /*No Windows -> No keys :P */
 }
 
@@ -339,17 +339,26 @@ void loopEvent()
    if (framerateState!=STOPPED_FRAMERATE)
     {
       char * jpegFile = AmmClient_seekEndOfHeader(filecontent,&filecontentSize);
-      cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, jpegFile),cv::IMREAD_UNCHANGED);
+      if (jpegFile!=0)
+      {
+        cv::Mat matImg  = cv::imdecode(cv::Mat(1, filecontentSize, CV_8UC1, jpegFile),cv::IMREAD_UNCHANGED);
 
-      publishImagesFrames(matImg);
+        publishImagesFrames(matImg);
 
-      cv::Mat bgrMat;
-      cv::cvtColor(matImg,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
-      cv::imshow("RGB",bgrMat);
+        cv::Mat bgrMat;
+        cv::cvtColor(matImg,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+
+        cv::imshow("RGB",bgrMat);
+        key=getKeyPressed(); //Post our geometry to ROS
+
+
+      } else
+      {
+        std::cerr<<"Received something but not an image\n";
+      }
     }
 
    // if we got a depth and rgb frames , lets go
-   key=getKeyPressed(); //Post our geometry to ROS
    //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
   } else
   {
@@ -398,14 +407,6 @@ int main(int argc, char **argv)
 
      //Pass root frame for TF poses
      strcpy(tfRoot,frame.c_str());
-
-
-     //Decide on devID
-/*
-     if (from.length()==0) { } else
-     if (from.length()<=2) { devID=atoi( from.c_str() ); from.clear(); ROS_INFO("Using OpenNI2 Serializer to get device"); }*/
-
-
 
      fprintf(stderr,"Initialized..\n");
 

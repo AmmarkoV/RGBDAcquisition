@@ -130,25 +130,25 @@ int AmmClient_SendFileInternal(
 
 int isFileDownloadComplete(const char * content,unsigned int contentSize)
 {
- fprintf(stderr," Content (%u bytes) : %s \n" ,contentSize , content);
+ //fprintf(stderr," Content (%u bytes) : %s \n" ,contentSize , content);
   char * contentLengthStr=strstr(content,"Content-Length:");
   if (contentLengthStr!=0)
   {
       contentLengthStr+=16;
       unsigned int contentLength = atoi(contentLengthStr);
-      fprintf(stderr,YELLOW " Content Length = %u  \n" NORMAL , contentLength );
+      //fprintf(stderr,YELLOW " Content Length = %u  \n" NORMAL , contentLength );
       if (contentLength!=0)
       {
         unsigned int headerSize = contentLengthStr - content;
 
         if (headerSize+contentLength <= contentSize)
               {
-                fprintf(stderr,GREEN " File fully downloaded ( %u header + %u content = %u we have )\n" NORMAL , headerSize , contentLength , contentSize);
+                //fprintf(stderr,GREEN " File fully downloaded ( %u header + %u content = %u we have )\n" NORMAL , headerSize , contentLength , contentSize);
                 return 1;
               }
       }
   }
-  fprintf(stderr,RED " File not fully downloaded\n" NORMAL );
+  //fprintf(stderr,RED " File not fully downloaded\n" NORMAL );
  return 0;
 }
 
