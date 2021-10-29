@@ -647,8 +647,8 @@ int main(int argc,const char **argv)
 
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=180.0;//(float)  (rand()%90);
-   humanPose.pitch=0.0;//(float) (rand()%90);
+   humanPose.roll=120.0;//(float)  (rand()%90);
+   humanPose.pitch=20.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
