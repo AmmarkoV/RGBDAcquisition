@@ -362,8 +362,6 @@ int doOGLDrawing(
      //-------------------------------
      //-------------------------------
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
-
-
      if (eyePose->usePoseMatrixDirectly)
      {
       drawVertexArrayWithMVPMatrices(
@@ -400,11 +398,26 @@ int doOGLDrawing(
                   0 //Wireframe
                  );
      }
-
-
      //-------------------------------
      //-------------------------------
      //-------------------------------
+     if (humanPose->usePoseMatrixDirectly)
+     {
+      drawVertexArrayWithMVPMatrices(
+                                     programID,
+                                     humanVao,
+                                     MVPMatrixID,
+                                     humanTriangleCount,
+                                     //-------------
+                                     &humanPose->m,
+                                     //-------------
+                                     &projectionMatrix,
+                                     &viewportMatrix,
+                                     &viewMatrix,
+                                     0 //Wireframe
+                                    );
+     } else
+     {
      drawObjectAT(
                   programID,
                   humanVao,
@@ -423,6 +436,7 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                  );
+     }
      //-------------------------------
      //-------------------------------
      //-------------------------------
