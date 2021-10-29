@@ -206,11 +206,6 @@ const int animateTRIModelUsingBVHArmature(
           unsigned int resolvedJoints=0;
           memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
 
-          if (printDebugMessages)
-                  {
-                      fprintf(stderr,CYAN "SETUP\n" NORMAL);
-                  }
-
           for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
            {
               TRIBoneID boneID=0;
@@ -297,7 +292,7 @@ const int animateTRIModelUsingBVHArmature(
         //---------------------------------------------------------------
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
         deallocInternalsOfModelTri(&modelTemporary);
-
+        //---------------------------------------------------------------
         free(transformations4x4);
 
         return 1;

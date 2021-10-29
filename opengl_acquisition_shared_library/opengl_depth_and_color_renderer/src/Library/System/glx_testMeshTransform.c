@@ -361,7 +361,6 @@ int doOGLDrawing(
      //-------------------------------
      //-------------------------------
      //-------------------------------
-     //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      if (eyePose->usePoseMatrixDirectly)
      {
       drawVertexArrayWithMVPMatrices(
@@ -441,8 +440,6 @@ int doOGLDrawing(
      //-------------------------------
      //-------------------------------
 
-     viewMatrix.m[3]+=1.0;
-
   return 1;
 }
 
@@ -498,7 +495,7 @@ int doDrawing(
 {
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
-
+    //------------------------------------------------------------------------------------
     GLuint eyeVAO;
     GLuint eyeArrayBuffer;
     unsigned int eyeTriangleCount  =  (unsigned int)  eyeModel->header.numberOfVertices/3;
@@ -513,7 +510,7 @@ int doDrawing(
                              eyeModel->colors         ,  eyeModel->header.numberOfColors        * sizeof(float),
                              humanModel->indices      ,  humanModel->header.numberOfIndices     * sizeof(unsigned int)//0,0 //Not Indexed
                           );
-
+    //------------------------------------------------------------------------------------
     GLuint humanVAO;
     GLuint humanArrayBuffer;
     unsigned int humanTriangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
@@ -528,8 +525,7 @@ int doDrawing(
                              humanModel->colors         ,  humanModel->header.numberOfColors        * sizeof(float),
                              humanModel->indices        ,  humanModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
-
-
+    //------------------------------------------------------------------------------------
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
 	 glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
@@ -640,7 +636,6 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    struct BVH_MotionCapture mc = {0};
    //------------------------------------------------------
-   struct pose6D eyePose={0};
    struct TRI_Model eyeModel={0};
    struct TRI_Model indexedEyeModel={0};
    //------------------------------------------------------
