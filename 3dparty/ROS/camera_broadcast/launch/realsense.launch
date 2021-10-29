@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
-<launch>   
+<launch>
     <node name="camera_broadcast" pkg="camera_broadcast" type="run_it.sh" output="screen" cwd="node" respawn="true">
-      <param name="name" value="camera_broadcast" /> 
-      <param name="fromRGBTopic" value="/camera/color/image_raw" /> 
+      <param name="name" value="camera_broadcast" />
+      <param name="server" value="139.91.185.16" /> 
+      <param name="port" value="80" />
+      <param name="timeout" value="10" />
+      <param name="URI" value="/stream/upload.php" />
+      <param name="imageFilename" value="image.jpg" />
+      <param name="fromRGBTopic" value="/camera/color/image_raw" />
       <param name="fromRGBTopicInfo" value="/camera/color/camera_info" />
       <param name="rate" value="5"/>
-      <param name="tfRoot" value="map" /> 
+      <param name="tfRoot" value="map" />
       <param name="tfTargetBVHFilename" value="dataset/headerWithHeadAndOneMotion.bvh" />
     </node>   
 </launch>

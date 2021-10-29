@@ -473,8 +473,7 @@ int main(int argc, char **argv)
 
         std::cout<<"Trying to open capture device.."<<std::endl;
         ROS_INFO("Trying to open capture device..");
-        connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/);
-
+        connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/); 
         if(connection==0)
         {
             std::cerr<<"Could not establish connection to "<<server<<":"<<port<<std::endl;

@@ -79,6 +79,8 @@ float cameraXPosition=0.0,cameraYPosition=0.0,cameraZPosition=0.0;
 float cameraRoll=90.0, cameraPitch=0.0, cameraYaw=0.0;
 unsigned int startTime=0, currentTime=0;
 
+std::string URI;
+std::string imageFilename;
 
 sensor_msgs::CameraInfo camInfo;
 
@@ -217,16 +219,16 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     }
 #else
     if (connection)
-    {
+    { 
         currentCompressedJPEGFile = maxCompressedJPEGFile;
         if ( WriteJPEGMemory(&pic,compressedJPEGFile,&currentCompressedJPEGFile) )
         {
             if (
                 AmmClient_SendFile(
                     connection,
-                    "/stream/upload.php",
+                    URI.c_str(),
                     "fileToUpload",
-                    "image.jpg",
+                    imageFilename.c_str(),
                     "image/jpeg",
                     compressedJPEGFile,
                     (unsigned int) currentCompressedJPEGFile,
@@ -282,7 +284,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    connection = AmmClient_Initialize("139.91.185.16",80,10/*sec*/);
 
 
     ROS_INFO("Initializing MocapNET ROS Wrapper");
@@ -302,19 +303,27 @@ int main(int argc, char **argv)
         std::string fromRGBTopicInfo;
         std::string tfRootName;
         std::string tfTargetBVHFilename;
+        std::string server;
+        int port,timeout;
 
         ROS_INFO("Initializing Parameters..");
-
+        //---------------------------------------------------------------------------------------------------------------------------
+        private_node_handle.param("URI", URI, std::string("/stream/upload.php"));
+        private_node_handle.param("imageFilename", imageFilename, std::string("image.jpg"));
+        private_node_handle.param("server", server, std::string("139.91.185.16")); 
+        private_node_handle.param("port", port, int(80));
+        private_node_handle.param("timeout", timeout, int(10));
+        //---------------------------------------------------------------------------------------------------------------------------
         private_node_handle.param("tfTargetBVHFilename", tfTargetBVHFilename, std::string("dataset/headerWithHeadAndOneMotion.bvh"));
         private_node_handle.param("fromRGBTopic", fromRGBTopic, std::string(camRGBRaw));
         private_node_handle.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string(camRGBInfo));
         private_node_handle.param("name", name, std::string("camera_broadcast"));
         private_node_handle.param("rate",rate);
-
-
+        //---------------------------------------------------------------------------------------------------------------------------
         private_node_handle.param("tfRoot",tfRootName, std::string(DEFAULT_TF_ROOT));
         snprintf(tfRoot,510,"%s",tfRootName.c_str());
         fprintf(stderr,"TFRoot Name = %s ",tfRoot);
+        //---------------------------------------------------------------------------------------------------------------------------
 
 
         rgb_img_sub = new  message_filters::Subscriber<sensor_msgs::Image>(nh,fromRGBTopic, 1);
@@ -334,6 +343,14 @@ int main(int argc, char **argv)
 
 
         ROS_INFO("Done with ROS initialization!");
+
+        ROS_INFO("Trying to open server..");
+        connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/); 
+        if(connection==0)
+        {
+            std::cerr<<"Could not establish connection to "<<server<<":"<<port<<std::endl;
+            return 0;
+        }
 
 
         ros::Rate rosrate(rate);
