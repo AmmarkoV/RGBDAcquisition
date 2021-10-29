@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 
         ros::NodeHandle private_node_handle_("~");
         private_node_handle_.param("name", name, std::string("camera_receiver"));
-        private_node_handle_.param("camera", camera, std::string("camera/rgb/"));
+        private_node_handle_.param("camera", camera, std::string("camera/color/"));
         private_node_handle_.param("frame", frame, std::string("frame"));
         private_node_handle_.param("server", server, std::string("139.91.185.16"));
         private_node_handle_.param("URI",URI, std::string("/stream/uploads/image.jpg"));
