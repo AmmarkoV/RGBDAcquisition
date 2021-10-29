@@ -30,8 +30,7 @@
 #include "AmmClient.h"
 
 
-
-#include "rgbd_acquisition/SetScale.h"
+ 
 #include <unistd.h>
 
 
@@ -405,7 +404,7 @@ int main(int argc, char **argv)
         int rate,port,timeout;
 
         ros::NodeHandle private_node_handle_("~");
-        private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
+        private_node_handle_.param("name", name, std::string("camera_receiver"));
         private_node_handle_.param("camera", camera, std::string("camera/rgb/"));
         private_node_handle_.param("frame", frame, std::string("frame"));
         private_node_handle_.param("server", server, std::string("139.91.185.16"));
