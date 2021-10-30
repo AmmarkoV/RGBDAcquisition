@@ -630,6 +630,10 @@ int main(int argc,const char **argv)
 	 	return 1;
    }
 
+  unsigned char * rgb = (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3);
+
+
+
   GLuint programID=0;
   GLuint programFrameBufferID=0;
   GLuint FramebufferName=0;
@@ -659,7 +663,7 @@ int main(int argc,const char **argv)
 
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=120.0;//(float)  (rand()%90);
+   humanPose.roll=170.0;//(float)  (rand()%90);
    humanPose.pitch=20.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
@@ -760,11 +764,26 @@ int main(int argc,const char **argv)
      deallocInternalsOfModelTri(&humanModel);
      deallocInternalsOfModelTri(&eyeModel);
      usleep(10);
+
+
+
+     if ( (rgb!=0) && (fID==10) )
+     {
+       if (downloadOpenGLColor(rgb,0,0,WIDTH,HEIGHT))
+       {
+        saveRawImageToFileOGLR("snapshot.pnm",rgb,WIDTH,HEIGHT,3,8);
+       }
+     }
+
     }
      fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL);
    }
 
    glDeleteProgram(programID);
+
+   if (rgb!=0)
+     { free(rgb); }
+
 
    stop_glx3_stuff();
  return 0;
