@@ -719,12 +719,9 @@ void recursiveJointHierarchyTransformerDirect(
    float parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
 
    if (parentTransformUntouched==0)
-   { //If no parent transform untouched then use an identity matrix as parentTransform..
-       float * m = parentTransformUntouched;
-       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+   {
+      //If no parent transform untouched then use an identity matrix as parentTransform..
+      create4x4FIdentityMatrixDirect((float*) &parentTransform);
    } else
    {
       copy4x4FMatrix(parentTransform,parentTransformUntouched);
@@ -806,12 +803,9 @@ void recursiveJointHierarchyTransformer(
    copy4x4FMatrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
 
    if (parentLocalTransformationUntouched==0)
-   { //If no parent local transform untouched declared then use an identity matrix..
-       float * m = parentLocalTransformation;
-       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+   {
+      //If no parent transform untouched then use an identity matrix as parentTransform..
+      create4x4FIdentityMatrixDirect((float*) &parentLocalTransformation);
    } else
    {
     copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);

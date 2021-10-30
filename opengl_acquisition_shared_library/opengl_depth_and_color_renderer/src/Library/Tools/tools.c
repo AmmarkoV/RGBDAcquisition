@@ -68,7 +68,7 @@ int checkOpenGLError(char * file , int  line)
   int err=glGetError();
   if (err !=  GL_NO_ERROR /*0*/ )
     {
-      fprintf(stderr,RED "OpenGL Error (%u) : %s %u \n ", err , file ,line );
+      fprintf(stderr,RED "OpenGL Error (%d) : %s %d \n ", err , file ,line );
       printOpenGLError(err);
       fprintf(stderr,"\n" NORMAL);
       return 1;

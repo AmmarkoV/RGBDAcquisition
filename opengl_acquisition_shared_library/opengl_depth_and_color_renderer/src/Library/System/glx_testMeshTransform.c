@@ -621,7 +621,7 @@ void wipeTRITransform(struct TRI_Model * model,const char * boneName)
 
 int main(int argc,const char **argv)
 {
-  fprintf(stderr,"Attempting to setup a %dx%d glx3 context\n",WIDTH,HEIGHT);
+  fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
   if (glewInit() != GLEW_OK)

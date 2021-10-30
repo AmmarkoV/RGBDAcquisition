@@ -67,7 +67,7 @@ int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , 
             return 1;
         }
 
-        fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperchannel)-1);
+        fprintf(fd, "%u %u\n%u\n", width, height , simplePow(2 ,bitsperchannel)-1);
 
         float tmp_n = (float) bitsperchannel/ 8;
         tmp_n = tmp_n *  width * height * channels ;
