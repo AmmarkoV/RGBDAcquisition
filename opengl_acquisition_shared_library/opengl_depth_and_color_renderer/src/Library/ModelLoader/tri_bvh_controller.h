@@ -97,7 +97,6 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
   {
     char * boneName = triModel->bones[boneID].boneName;
     unsigned int l = strlen(triModel->bones[boneID].boneName);
-    unsigned int newStr = strlen(triModel->bones[boneID].boneName);
 
     //These 3 joints need a larget joint name to accommodate the bigger string
     if ( triModel->bones[boneID].boneName ==0 )                     { fprintf(stderr,"Invalid bone name encountered %u \n",boneID);   } else

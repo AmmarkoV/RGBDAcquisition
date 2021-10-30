@@ -35,6 +35,7 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
+#include "../Rendering/downloadFromRenderer.h"
 
 
 //Colored console output..
@@ -631,7 +632,7 @@ int main(int argc,const char **argv)
    #define defaulBVHToLoad "01_02.bvh" //merged_neutral.bvh
    #define defaultModelToLoad "makehuman.tri"
 
-   char * bvhToLoad = defaulBVHToLoad;
+   const char * bvhToLoad = defaulBVHToLoad;
    const char * modelToLoad = defaultModelToLoad;
 
    //------------------------------------------------------
@@ -741,7 +742,8 @@ int main(int argc,const char **argv)
        maxFrames = mc.numberOfFrames;
    }
 
-   do {
+   do
+    {
     for (BVHFrameID fID=0; fID<maxFrames; fID++)
     {
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (BVH has %u frames total) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
