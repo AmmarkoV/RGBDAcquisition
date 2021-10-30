@@ -605,20 +605,6 @@ int doDrawing(
 	return 1;
 }
 
-
-void wipeTRITransform(struct TRI_Model * model,const char * boneName)
-{
-   TRIBoneID boneIDToWipe=0;
-   if ( findTRIBoneWithName(model,boneName,&boneIDToWipe) )
-       {
-         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
-         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->localTransformation);
-         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->finalVertexTransformation);
-       }
-       else { fprintf(stderr,RED "Unable to find bone `%s` in %s\n" NORMAL,boneName,model->name); }
-}
-
-
 int main(int argc,const char **argv)
 {
   fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
@@ -629,9 +615,6 @@ int main(int argc,const char **argv)
 		fprintf(stderr, "Failed to initialize GLEW\n");
 	 	return 1;
    }
-
-
-
 
   GLuint programID=0;
   GLuint programFrameBufferID=0;
@@ -754,7 +737,7 @@ int main(int argc,const char **argv)
    do {
     for (BVHFrameID fID=0; fID<maxFrames; fID++)
     {
-     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (%u) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
+     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (BVH has %u frames total) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
      //-------------------------------------------
 
      if (!staticRendering)
@@ -770,7 +753,6 @@ int main(int argc,const char **argv)
        fillFlatModelTriFromIndexedModelTri(&humanModel,&indexedHumanModel);
        fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
      }
-
 
      doDrawing(
                 programID,
@@ -814,7 +796,7 @@ int main(int argc,const char **argv)
         free(rgb);
 
         char command[512]={0};
-        snprintf(command,512,"ffmpeg -framerate 30 -i colorFrame_0_%%05u.pnm -s %ux%u -y -r 30 -pix_fmt yuv420p -threads 8 lastRun3DHiRes.mp4",WIDTH,HEIGHT);
+        snprintf(command,512,"ffmpeg -framerate 30 -i colorFrame_0_%%05d.pnm -s %ux%u -y -r 30 -pix_fmt yuv420p -threads 8 lastRun3DHiRes.mp4",WIDTH,HEIGHT);
         int i=system(command);
 
         if(i==0)
