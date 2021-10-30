@@ -50,14 +50,14 @@ enum ROTATION_ORDER
 struct Matrix4x4OfFloats
 {
   /*A Matrix 4x4 aligned to allow for SSE optimized calculations.
-   * 
-   * Items are stored on the m array using this ordering 
+   *
+   * Items are stored on the m array using this ordering
      0   1   2   3
      4   5   6   7
      8   9   10  11
      12  13  14  15
-     
-     IRC => Item Row/Column => 
+
+     IRC => Item Row/Column =>
      I11     , I12 , I13 , I14 ,
      I21     , I22 , I23 , I24 ,
      I31     , I32 , I33 , I34 ,
@@ -70,11 +70,11 @@ struct Matrix4x4OfFloats
 struct Vector4x1OfFloats
 {
   /*A Matrix 4x1 aligned to allow for SSE optimized calculations.
-   * 
-   * Items are stored on the m array using this ordering 
-     0   1   2   3 
-     
-     IRC => Item Row/Column => 
+   *
+   * Items are stored on the m array using this ordering
+     0   1   2   3
+
+     IRC => Item Row/Column =>
      I11, I12, I13, I14
     */
   float __attribute__((aligned(16))) m[4];
@@ -136,11 +136,15 @@ void copy4x4FMatrixTo4x4D(double * out,float * in);
 */
 void copy4x4DMatrixTo4x4F(float * dest, double * m );
 
+
+
+void create4x4FIdentityMatrixDirect(float * m);
+
 /**
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
 * @ingroup AmMatrix
 * @param  Input/Output Matrix
-*/  
+*/
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
 
 
@@ -183,7 +187,7 @@ void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y
 * @param  Scaling on the Y
 * @param  Scaling on the Z
 * @retval 0=Failure,1=Success
-*/ 
+*/
 void create4x4FScalingMatrix(struct Matrix4x4OfFloats * matrix , float scaleX, float scaleY, float scaleZ);
 
 /**
@@ -274,7 +278,7 @@ int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats 
 * @retval 0=Failure,1=Success
 */
 int transpose4x4FMatrix(float * mat);
-  
+
 
 
 /**
@@ -351,7 +355,7 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
- 
+
 
 
 /**
@@ -372,7 +376,7 @@ int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoin
 * @param  Input 4x4 Matrix A
 * @param  Input Vector 4x1 V where W coordinate should be 0
 * @retval 0=failure,1=success
-*/ 
+*/
 int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,float * point3D);
 
 
@@ -400,7 +404,7 @@ void doRPYTransformationF(
 */
 
 
- 
+
 
 /**
 * @brief Produce a rotation and translation that will bring the scene to the coordinate frame of the camera in order to properly

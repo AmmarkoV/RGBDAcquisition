@@ -340,7 +340,7 @@ int doOGLDrawing(
                               (float) originalWIDTH,      //Window Width
                               (float) originalHEIGHT,     //Window Height
                               1.0,        //Near
-                              255.0,      //Far
+                              1000.0,      //Far
                               &projectionMatrix,
                               &viewMatrix,
                               &viewportMatrix
@@ -652,8 +652,8 @@ int main(int argc,const char **argv)
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
-   humanPose.y=-8.976f;//(float) (100-rand()%200);
-   humanPose.z=27.99735f;//(float)  (700+rand()%1000);
+   humanPose.y=-78.976f;//(float) (100-rand()%200);
+   humanPose.z=270.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
 
    //------------------------------------------------------
@@ -689,6 +689,15 @@ int main(int argc,const char **argv)
      return 0;
    }
    //------------------------------------------------------
+
+
+    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
+    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->localTransformation);
+    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->finalVertexTransformation);
+    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
+    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->localTransformation);
+    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->finalVertexTransformation);
+
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..

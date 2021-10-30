@@ -814,7 +814,7 @@ void recursiveJointHierarchyTransformer(
        m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
    } else
    {
-   copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
+    copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
    }
 
 

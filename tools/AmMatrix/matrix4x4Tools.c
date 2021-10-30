@@ -172,6 +172,19 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
 
 
 
+
+void create4x4FIdentityMatrixDirect(float * m)
+{
+    if (m!=0)
+    {
+     memset(m,0,16*sizeof(float));
+     m[0] = 1.0;
+     m[5] = 1.0;
+     m[10] = 1.0;
+     m[15] = 1.0;
+    }
+}
+
 void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 {
    /*#if INTEL_OPTIMIZATIONS
