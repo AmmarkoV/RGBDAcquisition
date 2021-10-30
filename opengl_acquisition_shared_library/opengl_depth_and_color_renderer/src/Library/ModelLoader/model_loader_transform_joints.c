@@ -712,6 +712,11 @@ void recursiveJointHierarchyTransformerDirect(
                                                unsigned int recursionLevel
                                              )
 {
+  //Sanity check..
+  //-----------------------------
+  if (in==0) { return; }
+  if (joint4x4Data==0) { return; }
+  //-----------------------------
   if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT (%u/%u)\n_____________________\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
 
@@ -729,8 +734,7 @@ void recursiveJointHierarchyTransformerDirect(
 
    copy4x4FMatrix(nodeTransformation,in->bones[curBone].info->localTransformation);
 
-  if ( in->bones[curBone].info->boneWeightsNumber>0 )
-  {
+
     //////////////////
     //NO, WRONG!! in->bones[curBone].info->altered is set by an arbitrary rot==identity (in the calling function) but nothing prevent it
     // from being so, especially when I try to debug it....
@@ -762,21 +766,6 @@ void recursiveJointHierarchyTransformerDirect(
                                                  recursionLevel+1
                                                 );
       }
-    } else
-    {
-      multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
-      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
-       {
-        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHierarchyTransformerDirect(
-                                                 in  ,
-                                                 curBoneChild ,
-                                                 globalTransformation ,
-                                                 joint4x4Data , joint4x4DataSize ,
-                                                 recursionLevel+1
-                                                );
-       }
-    }
 }
 
 
@@ -794,6 +783,11 @@ void recursiveJointHierarchyTransformer(
                                          unsigned int recursionLevel
                                        )
 {
+  //Sanity check..
+  //-----------------------------
+  if (in==0) { return; }
+  if (jointData==0) { return; }
+  //-----------------------------
   if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
 
@@ -814,12 +808,6 @@ void recursiveJointHierarchyTransformer(
 
   //These prevent to recalculate nodes where there does not appear to be
   //change..
- if ( in->bones[curBone].info->boneWeightsNumber>0 )
-  {
-    if (jointData==0)
-     {
-      //No joint data => don't attempt to create a new local transformation..
-     } else
     if (in->bones[curBone].info->altered)
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
@@ -871,21 +859,7 @@ void recursiveJointHierarchyTransformer(
                                            recursionLevel+1
                                           );
       }
-    } else
-    {
-      multiplyTwo4x4FMatrices_Naive(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
-      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
-       {
-        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHierarchyTransformer(
-                                           in  ,
-                                           curBoneChild ,
-                                           globalTransformation ,
-                                           jointData , jointDataSize ,
-                                           recursionLevel+1
-                                          );
-       }
-    }
+
 }
 
 
