@@ -245,8 +245,8 @@ const int animateTRIModelUsingBVHArmature(
                         );
 
                  float * m = &transformations4x4[boneID*16];
-                 m[3] = bvhTransform.joint[jID].dynamicTranslation.m[3];
-                 m[7] = bvhTransform.joint[jID].dynamicTranslation.m[7];
+                 m[3]  = bvhTransform.joint[jID].dynamicTranslation.m[3];
+                 m[7]  = bvhTransform.joint[jID].dynamicTranslation.m[7];
                  m[11] = bvhTransform.joint[jID].dynamicTranslation.m[11];
 
                         /*
