@@ -664,8 +664,8 @@ int main(int argc,const char **argv)
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
-   humanPose.y=-78.976f;//(float) (100-rand()%200);
-   humanPose.z=270.99735f;//(float)  (700+rand()%1000);
+   humanPose.y=-7.976f;//(float) (100-rand()%200);
+   humanPose.z=27.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
 
    //------------------------------------------------------
@@ -711,12 +711,17 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
 
-    //Wipe scene transformations
-    wipeTRITransform(&indexedHumanModel,"scene");
-    wipeTRITransform(&indexedEyeModel,"scene");
+   //Wipe scene transformations
+   //wipeTRITransform(&indexedHumanModel,"scene");
+   //wipeTRITransform(&indexedEyeModel,"scene");
+
+   //indexedHumanModel.header.rootBone=0;
+   //indexedEyeModel.header.rootBone=0;
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
+
+   const int staticRendering = 0;
 
    while (1)
    {
@@ -725,12 +730,20 @@ int main(int argc,const char **argv)
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
      //-------------------------------------------
 
-     //First animate the tri model using the bvh armature
-     animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
-     //triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
+     if (!staticRendering)
+     {
+       //First animate the tri model using the bvh armature
+       animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
+       //triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
 
-     //The eyes model should now have correct bone structure..
-     animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
+       //The eyes model should now have correct bone structure..
+       animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
+     } else
+     {
+       fillFlatModelTriFromIndexedModelTri(&humanModel,&indexedHumanModel);
+       fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
+     }
+
 
      doDrawing(
                 programID,
