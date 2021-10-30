@@ -806,8 +806,7 @@ void recursiveJointHierarchyTransformer(
    }
 
 
-  //These prevent to recalculate nodes where there does not appear to be
-  //change..
+  //These prevent to recalculate nodes where there does not appear to be change..
     if (in->bones[curBone].info->altered)
      {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
@@ -859,7 +858,6 @@ void recursiveJointHierarchyTransformer(
                                            recursionLevel+1
                                           );
       }
-
 }
 
 
@@ -886,10 +884,12 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
        //create4x4DIdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
        float * m = triModelIn->bones[k].info->finalVertexTransformation;
+       create4x4FIdentityMatrixDirect(m);
+       /*
        m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
        m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
        m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;*/
      }
 
 
