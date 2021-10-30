@@ -659,7 +659,7 @@ int main(int argc,const char **argv)
    struct TRI_Model humanModel={0};
    struct TRI_Model indexedHumanModel={0};
    //------------------------------------------------------
-
+   int destroyColors=0;
 
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
@@ -675,6 +675,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--nocolor")==0)
+                    {
+                      destroyColors=1;
+                    } else
            if (strcmp(argv[i],"--from")==0)
                     {
                         if (argc>i+1)
@@ -704,6 +708,12 @@ int main(int argc,const char **argv)
      fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyes.tri\n");
      return 0;
    }
+
+   if (destroyColors)
+   {
+      paintTRI(&indexedHumanModel,123,123,123);
+      paintTRI(&indexedEyeModel,123,123,123);
+   }
    //------------------------------------------------------
 
 
@@ -715,12 +725,6 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
 
-   //Wipe scene transformations
-   //wipeTRITransform(&indexedHumanModel,"scene");
-   //wipeTRITransform(&indexedEyeModel,"scene");
-
-   //indexedHumanModel.header.rootBone=0;
-   //indexedEyeModel.header.rootBone=0;
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
