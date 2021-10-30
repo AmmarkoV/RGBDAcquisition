@@ -630,7 +630,6 @@ int main(int argc,const char **argv)
 	 	return 1;
    }
 
-  unsigned char * rgb = (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3);
 
 
 
@@ -660,6 +659,8 @@ int main(int argc,const char **argv)
    struct TRI_Model indexedHumanModel={0};
    //------------------------------------------------------
    int destroyColors=0;
+   int dumpVideo = 0;
+   unsigned int maxFrames=0;
 
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
@@ -675,6 +676,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--dumpvideo")==0)
+                    {
+                      dumpVideo=1;
+                    } else
            if (strcmp(argv[i],"--nocolor")==0)
                     {
                       destroyColors=1;
@@ -684,6 +689,13 @@ int main(int argc,const char **argv)
                         if (argc>i+1)
                             {
                                 modelToLoad = argv[i+1];
+                            }
+                    } else
+           if (strcmp(argv[i],"--maxFrames")==0)
+                    {
+                        if (argc>i+1)
+                            {
+                                maxFrames = atoi(argv[i+1]);
                             }
                     }
         }
@@ -716,6 +728,9 @@ int main(int argc,const char **argv)
    }
    //------------------------------------------------------
 
+   unsigned char * rgb = 0;
+   if(dumpVideo)
+      { rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3); }
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
@@ -731,11 +746,15 @@ int main(int argc,const char **argv)
 
    const int staticRendering = 0;
 
-   while (1)
+   if (maxFrames==0)
    {
-    for (BVHFrameID fID=0; fID<mc.numberOfFrames; fID++)
+       maxFrames = mc.numberOfFrames;
+   }
+
+   do {
+    for (BVHFrameID fID=0; fID<maxFrames; fID++)
     {
-     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u \n" NORMAL,mc.fileName,fID,mc.numberOfFrames);
+     fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (%u) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
      //-------------------------------------------
 
      if (!staticRendering)
@@ -770,23 +789,40 @@ int main(int argc,const char **argv)
      usleep(10);
 
 
-
-     if ( (rgb!=0) && (fID==10) )
+     if  (rgb!=0)
      {
        if (downloadOpenGLColor(rgb,0,0,WIDTH,HEIGHT))
        {
-        saveRawImageToFileOGLR("snapshot.pnm",rgb,WIDTH,HEIGHT,3,8);
+           char filename[512]={0};
+           snprintf(filename,512,"colorFrame_0_%05u.pnm",fID);
+           saveRawImageToFileOGLR(filename,rgb,WIDTH,HEIGHT,3,8);
        }
      }
 
     }
      fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL);
    }
+   while (dumpVideo==0); //If dump video is not enabled loop forever
+
 
    glDeleteProgram(programID);
 
+   //If we dumped images now lets convert them to video
    if (rgb!=0)
-     { free(rgb); }
+     {
+        //Also deallocate our snapshot buffer..
+        free(rgb);
+
+        char command[512]={0};
+        snprintf(command,512,"ffmpeg -framerate 30 -i colorFrame_0_%%05u.pnm -s %ux%u -y -r 30 -pix_fmt yuv420p -threads 8 lastRun3DHiRes.mp4",WIDTH,HEIGHT);
+        int i=system(command);
+
+        if(i==0)
+        {
+          i=system("rm *.pnm");
+        }
+
+     }
 
 
    stop_glx3_stuff();
