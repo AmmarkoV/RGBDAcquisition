@@ -628,11 +628,10 @@ int main(int argc,const char **argv)
 	 	return 1;
   }
 
-   //merged_neutral.bvh
-  // char * defaultBVHFile = "merged_neutral.bvh";
-   char * defaultBVHFile = "01_02.bvh";
-
+   #define defaulBVHToLoad "01_02.bvh" //merged_neutral.bvh
    #define defaultModelToLoad "makehuman.tri"
+
+   char * bvhToLoad = defaulBVHToLoad;
    const char * modelToLoad = defaultModelToLoad;
 
    //------------------------------------------------------
@@ -675,7 +674,7 @@ int main(int argc,const char **argv)
                     {
                         if (argc>i+1)
                             {
-                                defaultBVHFile = argv[i+1];
+                                bvhToLoad = argv[i+1];
                             }
                     } else
            if (strcmp(argv[i],"--from")==0)
@@ -694,7 +693,7 @@ int main(int argc,const char **argv)
                     }
         }
    //------------------------------------------------------
-   if (!bvh_loadBVH(defaultBVHFile,&mc,1.0) ) // This is the new armature that includes the head
+   if (!bvh_loadBVH(bvhToLoad,&mc,1.0) ) // This is the new armature that includes the head
         {
           fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
           return 0;
