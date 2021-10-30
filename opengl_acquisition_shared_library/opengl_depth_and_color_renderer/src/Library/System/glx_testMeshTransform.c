@@ -606,6 +606,18 @@ int doDrawing(
 }
 
 
+void wipeTRITransform(struct TRI_Model * model,const char * boneName)
+{
+   TRIBoneID boneIDToWipe=0;
+   if ( findTRIBoneWithName(model,boneName,&boneIDToWipe) )
+       {
+         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
+         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->localTransformation);
+         create4x4FIdentityMatrixDirect(&model->bones[boneIDToWipe].info->finalVertexTransformation);
+       }
+       else { fprintf(stderr,RED "Unable to find bone `%s` in %s\n" NORMAL,boneName,model->name); }
+}
+
 
 int main(int argc,const char **argv)
 {
@@ -691,20 +703,17 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
 
-    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
-    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->localTransformation);
-    create4x4FIdentityMatrixDirect(&indexedHumanModel.bones[0].info->finalVertexTransformation);
-    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
-    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->localTransformation);
-    create4x4FIdentityMatrixDirect(&indexedEyeModel.bones[0].info->finalVertexTransformation);
-
-
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
    //------------------------------------------------------
 
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
    //------------------------------------------------------
+
+
+    //Wipe scene transformations
+    wipeTRITransform(&indexedHumanModel,"scene");
+    wipeTRITransform(&indexedEyeModel,"scene");
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);

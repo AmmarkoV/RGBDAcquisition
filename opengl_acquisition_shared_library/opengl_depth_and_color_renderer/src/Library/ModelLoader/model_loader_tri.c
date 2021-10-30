@@ -679,6 +679,7 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
      if (strcmp(searchName,triModel->bones[*boneIDResult].boneName)==0)
             {
               //Fast Path, we knew the answer all along..
+              //This might happen on subsequent calls to this function..
               return 1;
             }
    }
@@ -692,6 +693,7 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
               *boneIDResult=boneNum;
               return 1;
             }
+            // else { fprintf(stderr,RED "bone %s != %s\n" NORMAL,searchName,triModel->bones[boneNum].boneName); }
      }
   }
 
