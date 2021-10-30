@@ -245,19 +245,17 @@ const int animateTRIModelUsingBVHArmature(
                          sizeof(float) * 16
                         );
 
+                 float * m = &transformations4x4[boneID*16];
+                 m[3] = bvhTransform.joint[jID].dynamicTranslation.m[3];
+                 m[7] = bvhTransform.joint[jID].dynamicTranslation.m[7];
+                 m[11] = bvhTransform.joint[jID].dynamicTranslation.m[11];
+
                         /*
                   multiplyTwo4x4FMatrices_Naive(
                                                  &transformations4x4[boneID*16],
                                                  bvhTransform.joint[jID].dynamicRotation.m,
                                                  bvhTransform.joint[jID].dynamicTranslation.m
                                                );*/
-
-                  /*
-                  memcpy(
-                         &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                         bvhTransform.joint[jID].chainTransformation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                         sizeof(float) * 16
-                        );*/
 
                   //print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
                 }
