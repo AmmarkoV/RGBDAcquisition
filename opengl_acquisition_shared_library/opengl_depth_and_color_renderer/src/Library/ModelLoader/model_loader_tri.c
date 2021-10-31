@@ -867,6 +867,87 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
 
 
+
+struct pakHeader
+{
+  char id[4];
+  int offset;
+  int size;
+};
+
+struct pakFile
+{
+  char name[56];
+  int offset;
+  int size;
+};
+
+// Based on the code here :  https://quakewiki.org/wiki/.pak
+/* pak_filename : the os filename of the .pak file */
+/* filename     : the name of the file you're trying to load from the .pak file (remember to use forward slashes for the path) */
+/* out_filesize : if not null, the loaded file's size will be returned here */
+/* returns a malloced buffer containing the file contents (remember to free it later), or NULL if any error occurred */
+void *pak_load_file(const char *pak_filename, const char *filename, int *out_filesize)
+{
+  FILE *fp;
+  struct pakHeader pak_header;
+  int num_files;
+  int i;
+  struct pakFile pak_file;
+  void *buffer;
+
+  fp = fopen(pak_filename, "rb");
+  if (!fp)
+    return NULL;
+
+  if (!fread(&pak_header, sizeof(pak_header), 1, fp)) { fclose(fp); return 0; }
+
+  if (memcmp(pak_header.id, "PACK", 4) != 0)          { fclose(fp); return 0; }
+
+  //Do conversion from little endian
+  //pak_header.offset = LittleLong(pak_header.offset);
+  //pak_header.size = LittleLong(pak_header.size);
+
+  num_files = pak_header.size / sizeof(struct pakFile);
+
+  if (fseek(fp, pak_header.offset, SEEK_SET) != 0)    { fclose(fp); return 0; }
+
+  for (i = 0; i < num_files; i++)
+  {
+    if (!fread(&pak_file, sizeof(struct pakFile), 1, fp)) { fclose(fp); return 0; }
+
+    if (!strcmp(pak_file.name, filename))
+    {
+      //Do conversion from little endian
+      //pak_file.offset = LittleLong(pak_file.offset);
+      //pak_file.size = LittleLong(pak_file.size);
+
+      if (fseek(fp, pak_file.offset, SEEK_SET) != 0) { fclose(fp); return 0; }
+
+      buffer = malloc(pak_file.size);
+      if (!buffer) { return 0; }
+
+      if (!fread(buffer, pak_file.size, 1, fp))
+      {
+        free(buffer);
+        fclose(fp);
+        return 0;
+      }
+
+      if (out_filesize)
+        { *out_filesize = pak_file.size; }
+      return buffer;
+    }
+  }
+
+  fclose(fp);
+  return 0;
+}
+
+
+
+
+
 //#define INCLUDE_OPENGL_CODE 1
 void doTriDrawCalllist(struct TRI_Model * tri )
 {
