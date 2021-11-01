@@ -238,6 +238,7 @@ const int animateTRIModelUsingBVHArmature(
                   BVHJointID jID = lookupTableFromTRIToBVH[boneID];
                   //-----------------------------------------------
 
+
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                          bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
@@ -245,18 +246,17 @@ const int animateTRIModelUsingBVHArmature(
                         );
 
                  float * m = &transformations4x4[boneID*16];
-                 m[3]  = bvhTransform.joint[jID].dynamicTranslation.m[3];
-                 m[7]  = bvhTransform.joint[jID].dynamicTranslation.m[7];
-                 m[11] = bvhTransform.joint[jID].dynamicTranslation.m[11];
+                 m[3]  =  bvhTransform.joint[jID].dynamicTranslation.m[3] / 100 ;
+                 m[7]  =  bvhTransform.joint[jID].dynamicTranslation.m[7]  / 100 ;
+                 m[11] =  bvhTransform.joint[jID].dynamicTranslation.m[11]  / 100;
 
-                        /*
+
+                 /*
                   multiplyTwo4x4FMatrices_Naive(
                                                  &transformations4x4[boneID*16],
                                                  bvhTransform.joint[jID].dynamicRotation.m,
                                                  bvhTransform.joint[jID].dynamicTranslation.m
                                                );*/
-
-                  //print4x4FMatrix(modelOriginal->bones[boneID].boneName,&transformations4x4[boneID*16],1);
                 }
               }
           } //have resolved joints

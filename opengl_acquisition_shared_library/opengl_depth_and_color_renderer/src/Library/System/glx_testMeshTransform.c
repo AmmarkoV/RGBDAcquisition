@@ -649,6 +649,8 @@ int main(int argc,const char **argv)
    int dumpVideo = 0;
    unsigned int maxFrames=0;
 
+   int staticRendering = 0;
+
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
@@ -663,6 +665,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--static")==0)
+                    {
+                      staticRendering=1;
+                    } else
            if (strcmp(argv[i],"--face")==0)
                     {
                        //  ./gl3MeshTransform --face --bvh merged_neutral.bvh
@@ -742,7 +748,6 @@ int main(int argc,const char **argv)
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
 
-   const int staticRendering = 0;
 
    if (maxFrames==0)
    {
