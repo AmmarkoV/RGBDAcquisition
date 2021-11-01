@@ -651,8 +651,8 @@ int main(int argc,const char **argv)
 
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=170.0;//(float)  (rand()%90);
-   humanPose.pitch=20.0;//(float) (rand()%90);
+   humanPose.roll=180.0;//(float)  (rand()%90);
+   humanPose.pitch=0.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
@@ -663,6 +663,12 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--face")==0)
+                    {
+                       humanPose.x=0.0f;//(float)  (1000-rand()%2000);
+                       humanPose.y=-14.976f;//(float) (100-rand()%200);
+                       humanPose.z=7.99735f;//(float)  (700+rand()%1000);
+                    } else
            if (strcmp(argv[i],"--dumpvideo")==0)
                     {
                       dumpVideo=1;
