@@ -237,7 +237,7 @@ const int animateTRIModelUsingBVHArmature(
                 {
                   BVHJointID jID = lookupTableFromTRIToBVH[boneID];
                   //-----------------------------------------------
-
+                  //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
 
                   memcpy(
                          &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
