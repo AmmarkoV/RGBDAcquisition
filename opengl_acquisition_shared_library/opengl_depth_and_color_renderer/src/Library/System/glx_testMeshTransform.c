@@ -665,6 +665,7 @@ int main(int argc,const char **argv)
         {
            if (strcmp(argv[i],"--face")==0)
                     {
+                       //  ./gl3MeshTransform --face --bvh merged_neutral.bvh
                        humanPose.x=0.0f;//(float)  (1000-rand()%2000);
                        humanPose.y=-14.976f;//(float) (100-rand()%200);
                        humanPose.z=7.99735f;//(float)  (700+rand()%1000);
