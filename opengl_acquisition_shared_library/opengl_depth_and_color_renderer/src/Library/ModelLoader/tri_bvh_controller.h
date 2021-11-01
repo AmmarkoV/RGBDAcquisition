@@ -245,11 +245,14 @@ const int animateTRIModelUsingBVHArmature(
                          sizeof(float) * 16
                         );
 
-                 float * m = &transformations4x4[boneID*16];
-                 m[3]  =  bvhTransform.joint[jID].dynamicTranslation.m[3] / 100 ;
-                 m[7]  =  bvhTransform.joint[jID].dynamicTranslation.m[7]  / 100 ;
-                 m[11] =  bvhTransform.joint[jID].dynamicTranslation.m[11]  / 100;
-
+                 if (bvh->jointHierarchy[jID].hasPositionalChannels)
+                 {
+                  //This is one of the new joints with positional channels..
+                  float * m = &transformations4x4[boneID*16];
+                  m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
+                  m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
+                  m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
+                 }
 
                  /*
                   multiplyTwo4x4FMatrices_Naive(
