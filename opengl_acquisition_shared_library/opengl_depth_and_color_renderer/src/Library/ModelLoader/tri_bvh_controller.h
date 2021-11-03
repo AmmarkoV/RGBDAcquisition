@@ -249,17 +249,25 @@ const int animateTRIModelUsingBVHArmature(
                  {
                   //This is one of the new joints with positional channels..
                   float * m = &transformations4x4[boneID*16];
-                  m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
-                  m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
-                  m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
-                 }
+                  //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
+                  //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
+                  //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
 
-                 /*
+                  struct Matrix4x4OfFloats mergedTranslation;
+                  create4x4FTranslationMatrix(
+                                              &mergedTranslation,
+                                              (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
+                                              (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
+                                              (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
+                                             );
+
                   multiplyTwo4x4FMatrices_Naive(
                                                  &transformations4x4[boneID*16],
                                                  bvhTransform.joint[jID].dynamicRotation.m,
-                                                 bvhTransform.joint[jID].dynamicTranslation.m
-                                               );*/
+                                                 mergedTranslation.m
+                                               );
+                 }
+
                 }
               }
           } //have resolved joints
