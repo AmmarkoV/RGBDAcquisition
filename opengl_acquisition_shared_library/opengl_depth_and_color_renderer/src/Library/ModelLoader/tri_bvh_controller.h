@@ -98,23 +98,25 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
     char * boneName = triModel->bones[boneID].boneName;
     unsigned int l = strlen(triModel->bones[boneID].boneName);
 
+    TRIBVH_lowercase(triModel->bones[boneID].boneName);
+
     //These 3 joints need a larget joint name to accommodate the bigger string
     if ( triModel->bones[boneID].boneName ==0 )                     { fprintf(stderr,"Invalid bone name encountered %u \n",boneID);   } else
-    if (strcmp(triModel->bones[boneID].boneName,"Spine")==0)        {
+    if (strcmp(triModel->bones[boneID].boneName,"spine")==0)        {
                                                                       //Allocate enough space for the bone string , read it  , and null terminate it
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 8; // 7 + null terminator
                                                                       triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"abdomen");
                                                                     }  else
-    if (strcmp(triModel->bones[boneID].boneName,"RightArm")==0)     {
+    if (strcmp(triModel->bones[boneID].boneName,"rightarm")==0)     {
                                                                       //Allocate enough space for the bone string , read it  , and null terminate it
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
                                                                       triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"rshoulder");
                                                                     }   else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftArm")==0)      {
+    if (strcmp(triModel->bones[boneID].boneName,"leftarm")==0)      {
                                                                       //Allocate enough space for the bone string , read it  , and null terminate it
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
@@ -122,22 +124,22 @@ int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"lshoulder");
                                                                     }   else
     //------------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"Hips")==0)         { snprintf(boneName,l,"hip"); }      else
-    if (strcmp(triModel->bones[boneID].boneName,"Spine1")==0)       { snprintf(boneName,l,"chest"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"RightShoulder")==0){ snprintf(boneName,l,"rCollar"); }  else
-    if (strcmp(triModel->bones[boneID].boneName,"RightForeArm")==0) { snprintf(boneName,l,"relbow"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"RightHand")==0)    { snprintf(boneName,l,"rHand"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftShoulder")==0) { snprintf(boneName,l,"lCollar"); }  else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftForeArm")==0)  { snprintf(boneName,l,"lelbow"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftHand")==0)     { snprintf(boneName,l,"lHand"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"RHipJoint")==0)    { snprintf(boneName,l,"rButtock"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"RightUpLeg")==0)   { snprintf(boneName,l,"rhip"); }   else
-    if (strcmp(triModel->bones[boneID].boneName,"RightLeg")==0)     { snprintf(boneName,l,"rknee"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"RightFoot")==0)    { snprintf(boneName,l,"rFoot"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"LHipJoint")==0)    { snprintf(boneName,l,"lButtock"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftUpLeg")==0)    { snprintf(boneName,l,"lhip"); }   else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftLeg")==0)      { snprintf(boneName,l,"lknee"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"LeftFoot")==0)     { snprintf(boneName,l,"lFoot"); }
+    if (strcmp(triModel->bones[boneID].boneName,"hips")==0)         { snprintf(boneName,l,"hip"); }      else
+    if (strcmp(triModel->bones[boneID].boneName,"spine1")==0)       { snprintf(boneName,l,"chest"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"rightshoulder")==0){ snprintf(boneName,l,"rCollar"); }  else
+    if (strcmp(triModel->bones[boneID].boneName,"rightforearm")==0) { snprintf(boneName,l,"relbow"); } else
+    if (strcmp(triModel->bones[boneID].boneName,"righthand")==0)    { snprintf(boneName,l,"rHand"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"leftshoulder")==0) { snprintf(boneName,l,"lCollar"); }  else
+    if (strcmp(triModel->bones[boneID].boneName,"leftforearm")==0)  { snprintf(boneName,l,"lelbow"); } else
+    if (strcmp(triModel->bones[boneID].boneName,"lefthand")==0)     { snprintf(boneName,l,"lHand"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"rhipjoint")==0)    { snprintf(boneName,l,"rButtock"); } else
+    if (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0)   { snprintf(boneName,l,"rhip"); }   else
+    if (strcmp(triModel->bones[boneID].boneName,"rightleg")==0)     { snprintf(boneName,l,"rknee"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"rightfoot")==0)    { snprintf(boneName,l,"rFoot"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"lhipjoint")==0)    { snprintf(boneName,l,"lButtock"); } else
+    if (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0)    { snprintf(boneName,l,"lhip"); }   else
+    if (strcmp(triModel->bones[boneID].boneName,"leftleg")==0)      { snprintf(boneName,l,"lknee"); }    else
+    if (strcmp(triModel->bones[boneID].boneName,"leftfoot")==0)     { snprintf(boneName,l,"lFoot"); }
 
     TRIBVH_lowercase(triModel->bones[boneID].boneName);
     TRIBVH_removeunderscore(triModel->bones[boneID].boneName);

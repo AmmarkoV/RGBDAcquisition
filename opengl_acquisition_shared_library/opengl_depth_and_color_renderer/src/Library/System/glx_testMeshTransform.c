@@ -663,18 +663,18 @@ int main(int argc,const char **argv)
    //-------------------------------------------------------------------
 
 
-
+/*
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=0.0;//(float)  (rand()%90);
+   humanPose.roll=90.0;//(float)  (rand()%90);
    humanPose.pitch=0.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
-   humanPose.y=0.976f;//(float) (100-rand()%200);
-   humanPose.z=5.99735f;//(float)  (700+rand()%1000);
+   humanPose.y=-0.976f;//(float) (100-rand()%200);
+   humanPose.z=2.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
-
+*/
 
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
@@ -753,8 +753,8 @@ int main(int argc,const char **argv)
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
    //------------------------------------------------------
-
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
+   removePrefixFromAllTRIBoneNames(&indexedHumanModel,"test_"); //Eyes have a test_ prefix on bone names..
    //------------------------------------------------------
 
 
