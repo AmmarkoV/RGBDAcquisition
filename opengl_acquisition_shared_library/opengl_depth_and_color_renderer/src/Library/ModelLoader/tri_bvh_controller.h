@@ -47,7 +47,6 @@ const static void TRIBVH_lowercase(char * str)
 const static void TRIBVH_removeunderscore(char * str)
 {
  char * a = str;
-
  if (a!=0)
   {
     unsigned int l = strlen(str);
@@ -95,14 +94,11 @@ const static int removePrefixFromAllTRIBoneNames(struct TRI_Model * triModel,con
 
 const static int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
 {
-    return 0;
   if (triModel==0) { return 0; }
   //----------------------------------------
   for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
   {
-    fprintf(stderr,"Bone %u from %s ",boneID,triModel->bones[boneID].boneName);
     TRIBVH_lowercase(triModel->bones[boneID].boneName);
-    fprintf(stderr,"to %s\n",boneID,triModel->bones[boneID].boneName);
   }
 
   return 1;
@@ -126,6 +122,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 8; // 7 + null terminator
                                                                       triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+                                                                      boneName = triModel->bones[boneID].boneName;
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"abdomen");
                                                                     }  else
     if (strcmp(triModel->bones[boneID].boneName,"rightarm")==0)     {
@@ -133,6 +130,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
                                                                       triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+                                                                      boneName = triModel->bones[boneID].boneName;
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"rshoulder");
                                                                     }   else
     if (strcmp(triModel->bones[boneID].boneName,"leftarm")==0)      {
@@ -140,6 +138,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
                                                                       triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+                                                                      boneName = triModel->bones[boneID].boneName;
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"lshoulder");
                                                                     }   else
     //------------------------------------------------------------------------------------------------------------

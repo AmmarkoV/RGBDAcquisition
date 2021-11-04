@@ -8,31 +8,43 @@
 #include <string.h>
 #include <ctype.h>
 
-void lowercase(char *a)
+void lowercase(char *str)
 {
-    if (a==0)
-        {
-            return;
-        }
-    while (*a!=0)
-        {
+  char * a = str;
+  if (a!=0)
+     {
+         while (*a!=0)
+           {
             *a = tolower(*a);
             ++a;
-        }
+           }
+     }
+
+  return;
 }
 
-void uppercase(char *a)
+void uppercase(char * str)
 {
-    if (a==0)
+  char * a = str;
+  if (a!=0)
         {
-            return;
-        }
-    while (*a!=0)
-        {
+          while (*a!=0)
+            {
             *a = toupper(*a);
             ++a;
+            }
         }
+ return;
 }
+
+
+
+
+
+
+
+
+
 
 void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
 {

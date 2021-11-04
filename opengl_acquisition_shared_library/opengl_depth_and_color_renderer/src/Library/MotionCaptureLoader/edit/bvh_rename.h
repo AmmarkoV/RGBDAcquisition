@@ -9,9 +9,9 @@ extern "C"
 {
 #endif
 
-void lowercase(char *a);
+void lowercase(char *str);
 
-void uppercase(char *a);
+void uppercase(char *str);
 
 
 unsigned long hashFunctionJoints(const char *str);
