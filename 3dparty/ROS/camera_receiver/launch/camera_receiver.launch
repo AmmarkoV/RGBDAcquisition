@@ -1,6 +1,6 @@
 <launch>
     <node name="camera_receiver" pkg="camera_receiver" type="run_it.sh" required="true" output="screen" cwd="node"> 
-      <param name="camera" value="camera/rgb/" /> 
+      <param name="camera" value="camera/color/" /> 
       <param name="frame" value="camera_pose" /> 
       <param name="server" value="139.91.185.16" /> 
       <param name="port" value="80" />

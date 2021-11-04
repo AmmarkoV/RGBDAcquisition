@@ -459,9 +459,9 @@ int main(int argc, char **argv)
         //Output RGB Image
         image_transport::ImageTransport it(nh);
 
-        pubRGB = it.advertise(camera+"image_rect_color", 1);
+        pubRGB = it.advertise(camera+"image_raw", 1);
         pubRGBInfo = nh.advertise<sensor_msgs::CameraInfo>(camera+"camera_info",1);
-        std::cout<<"ROS RGB Topic name : "<<camera<<"image_rect_color"<<std::endl;
+        std::cout<<"ROS RGB Topic name : "<<camera<<"image_raw"<<std::endl;
 
 
         //---------------------------------------------------------------------------------------------------
