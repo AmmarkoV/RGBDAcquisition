@@ -1491,12 +1491,9 @@ void create4x4FModelTransformation(
 
     //Translation matrix
     //----------------------------------------------------------
-    char translationSpecified;
+    char translationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixTranslation;
-    if ( (x==0.0) && (y==0.0) && (z==0.0) )
-    {
-        translationSpecified=0;
-    } else
+    if ( (x!=0.0) || (y!=0.0) || (z==0.0) )
     {
      create4x4FTranslationMatrix(
                                  &intermediateMatrixTranslation,
@@ -1512,56 +1509,49 @@ void create4x4FModelTransformation(
 
     //Rotation matrix
     //----------------------------------------------------------
-    char rotationSpecified;
+    char rotationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixRotation;
-    if ( (rotationX==0.0) && (rotationY==0.0) && (rotationZ==0.0) )
+    if ( (rotationX!=0.0) || (rotationY!=0.0) || (rotationZ==0.0) )
     {
-      //Fast path since a lot of the time the rotation component is not active
-      //create4x4FIdentityMatrix(&intermediateMatrixRotation); It will get automatically skipped..!
-      rotationSpecified=0;
-    } else
-    if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
-    {
-      fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
-      //create4x4FIdentityMatrix(&intermediateMatrixRotation);  It will get automatically skipped..!
-      rotationSpecified=0;
-    } else
-    if (rotationOrder==ROTATION_ORDER_RPY)
-    {
-     //This is the old way to do this rotation
-     doRPYTransformationF(
-                          &intermediateMatrixRotation,
-                          rotationZ,//roll,
-                          rotationY,//pitch
-                          rotationX//heading
-                         );
-     rotationSpecified=1;
-     ++numberOfOperationsNeeded;
-    } else
-    {
-     //fprintf(stderr,"Using new model transform code\n");
-     create4x4FMatrixFromEulerAnglesWithRotationOrder(
-                                                      &intermediateMatrixRotation ,
-                                                      rotationX,
-                                                      rotationY,
-                                                      rotationZ,
-                                                      rotationOrder
-                                                     );
-     rotationSpecified=1;
-     ++numberOfOperationsNeeded;
+      if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
+        {
+          fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
+          //create4x4FIdentityMatrix(&intermediateMatrixRotation);  It will get automatically skipped..!
+          rotationSpecified=0;
+        } else
+      if (rotationOrder==ROTATION_ORDER_RPY)
+        {
+          //This is the old way to do this rotation
+          doRPYTransformationF(
+                                &intermediateMatrixRotation,
+                                rotationZ,//roll,
+                                rotationY,//pitch
+                                rotationX//heading
+                              );
+          rotationSpecified=1;
+          ++numberOfOperationsNeeded;
+        } else
+        {
+          //fprintf(stderr,"Using new model transform code\n");
+          create4x4FMatrixFromEulerAnglesWithRotationOrder(
+                                                           &intermediateMatrixRotation ,
+                                                           rotationX,
+                                                           rotationY,
+                                                           rotationZ,
+                                                           rotationOrder
+                                                          );
+          rotationSpecified=1;
+          ++numberOfOperationsNeeded;
+         }
     }
     //----------------------------------------------------------
 
 
-
     //Scale matrix
     //----------------------------------------------------------
-    char scaleSpecified;
+    char scaleSpecified=0;
     struct Matrix4x4OfFloats intermediateScalingMatrix;
-    if ( (scaleX==1.0) && (scaleY==1.0) && (scaleZ==1.0) )
-      {
-          scaleSpecified=0;
-      } else
+    if ( (scaleX!=1.0) || (scaleY==1.0) || (scaleZ!=1.0) )
       {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
         scaleSpecified=1;
