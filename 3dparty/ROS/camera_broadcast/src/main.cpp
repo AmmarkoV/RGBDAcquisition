@@ -199,7 +199,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     //Take care of drawing stuff as visual output
     cv::Mat bgrMat,rgbMat(height,width,CV_8UC3,rgbTmp.data,3*width);
     cv::cvtColor(rgbMat,bgrMat, cv::COLOR_RGB2BGR);// opencv expects the image in BGR format
-    cv::imshow("RGB input",bgrMat);
+    //cv::imshow("RGB input",bgrMat);
 
     struct Image pic= {0};
     pic.pixels = rgb.data ;
