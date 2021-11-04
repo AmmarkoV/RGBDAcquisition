@@ -52,7 +52,7 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
             return ;
         }
 
-    unsigned int jID;
+    BVHJointID jID;
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
             unsigned int pJID=bvhMotion->jointHierarchy[jID].parentJoint;
@@ -120,7 +120,7 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
 
 void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
 {
-    unsigned int jID;
+    BVHJointID jID;
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
             char * jN = bvhMotion->jointHierarchy[jID].jointName;
@@ -180,8 +180,7 @@ unsigned long hashFunctionJoints(const char *str)
 
 void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
 {
-    unsigned int jID=0;
-
+    BVHJointID jID=0;
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
             strncpy(bvhMotion->jointHierarchy[jID].jointNameLowercase,bvhMotion->jointHierarchy[jID].jointName,MAX_BVH_JOINT_NAME);
@@ -190,6 +189,16 @@ void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
             bvhMotion->jointHierarchy[jID].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jID].jointNameLowercase);
         }
 
+}
+
+void bvh_renameJointsToLowercase(struct BVH_MotionCapture * bvhMotion)
+{
+   BVHJointID jID=0;
+   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+        {
+            lowercase(bvhMotion->jointHierarchy[jID].jointName);
+        }
+   bvh_updateJointNameHashes(bvhMotion);
 }
 
 
@@ -210,11 +219,11 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
             fprintf(stderr,"Cannot rename joints of empty bvh hierarchy\n");
             return ;
         }
-    
+
     unsigned int totalChangesPerformed = 0;
-    unsigned int jID=0;
-     
-     
+    BVHJointID jID=0;
+
+
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
             char * jOr = bvhMotion->jointHierarchy[jID].jointName;
@@ -223,8 +232,8 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                 {
                     //This is already lowercase
                     //lowercase(jN);
-                    
-                    
+
+
                     int changedSomething = 0;
 
                     //-------------------------------------------------------------------------------------------------
@@ -233,7 +242,7 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
                     if  ( (strcmp(jN,"hip")==0) || (strcmp(jN,"hips")==0) )
                         {
                             snprintf(jN,MAX_BVH_JOINT_NAME,"hip");
-                            snprintf(jOr,MAX_BVH_JOINT_NAME,"hip"); 
+                            snprintf(jOr,MAX_BVH_JOINT_NAME,"hip");
                             changedSomething=1;
                             ++totalChangesPerformed;
                         }
@@ -430,7 +439,7 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 
   if (totalChangesPerformed>0)
   {
-    fprintf(stderr,"Renamed %u joints for easier compatibility with different armature names..\n",totalChangesPerformed); 
+    fprintf(stderr,"Renamed %u joints for easier compatibility with different armature names..\n",totalChangesPerformed);
   }
 
     bvh_setLimbFlags(bvhMotion);

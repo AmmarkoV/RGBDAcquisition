@@ -26,6 +26,7 @@
 #include "../ModelLoader/tri_bvh_controller.h"
 
 #include "../MotionCaptureLoader/bvh_loader.h"
+#include "../MotionCaptureLoader/edit/bvh_rename.h"
 
 #include "glx3.h"
 
@@ -651,6 +652,8 @@ int main(int argc,const char **argv)
 
    int staticRendering = 0;
 
+
+   /*
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
@@ -661,20 +664,20 @@ int main(int argc,const char **argv)
    humanPose.y=-7.976f;//(float) (100-rand()%200);
    humanPose.z=27.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
+*/
 
 
-/*
    //Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=90.0;//(float)  (rand()%90);
-   humanPose.pitch=0.0;//(float) (rand()%90);
+   humanPose.roll=180.0;//(float)  (rand()%90);
+   humanPose.pitch=-90.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
    humanPose.y=-0.976f;//(float) (100-rand()%200);
    humanPose.z=2.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
-*/
+
 
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
@@ -726,6 +729,7 @@ int main(int argc,const char **argv)
           fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
           return 0;
         }
+   bvh_renameJointsToLowercase(&mc);
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
    {
@@ -750,11 +754,18 @@ int main(int argc,const char **argv)
    if(dumpVideo)
       { rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3); }
 
-   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
-   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
    //------------------------------------------------------
-   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
+   fprintf(stderr,"Preprocessing human model.. ");
+   makeAllTRIBoneNamesLowerCase(&indexedHumanModel);
    removePrefixFromAllTRIBoneNames(&indexedHumanModel,"test_"); //Eyes have a test_ prefix on bone names..
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
+   fprintf(stderr,GREEN "OK\n" NORMAL);
+   //------------------------------------------------------
+   fprintf(stderr,"Preprocessing eye model.. ");
+   makeAllTRIBoneNamesLowerCase(&indexedEyeModel);
+   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
+   fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
 
 

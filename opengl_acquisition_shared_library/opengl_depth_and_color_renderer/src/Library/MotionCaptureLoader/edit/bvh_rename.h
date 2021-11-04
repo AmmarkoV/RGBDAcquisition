@@ -18,6 +18,16 @@ unsigned long hashFunctionJoints(const char *str);
 
 void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion);
 
+
+
+/**
+* @brief Force all joint names to be lowercase
+* @ingroup BVH
+* @param  BVH Structure
+*/
+void bvh_renameJointsToLowercase(struct BVH_MotionCapture * bvhMotion);
+
+
 /**
 * @brief Different motion capture systems produce different types of joint names. For example lhip can be named lefthip,leftupleg,lthigh,leftupperLeg etc.
 *        This call renames them in order to ensure better compatibility with various different motion capture files..
