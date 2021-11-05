@@ -182,7 +182,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     cv::Mat rgb = cv::Mat::zeros(width,height,CV_8UC3);
     //A new pair of frames has arrived , copy and convert them so that they are ready
     cv_bridge::CvImageConstPtr orig_rgb_img;
-    cv_bridge::CvImageConstPtr orig_depth_img;
+    cv::cvtColor(rgb,rgb, cv::COLOR_RGB2BGR);// opencv expects the image in BGR format
     orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
     orig_rgb_img->image.copyTo(rgb);
 
@@ -195,10 +195,10 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
 
 
 
-    cv::Mat rgbTmp = rgb.clone();
+    //cv::Mat rgbTmp = rgb.clone();
     //Take care of drawing stuff as visual output
-    cv::Mat bgrMat,rgbMat(height,width,CV_8UC3,rgbTmp.data,3*width);
-    cv::cvtColor(rgbMat,bgrMat, cv::COLOR_RGB2BGR);// opencv expects the image in BGR format
+    //cv::Mat bgrMat,rgbMat(height,width,CV_8UC3,rgbTmp.data,3*width);
+    //cv::cvtColor(rgbMat,bgrMat, cv::COLOR_RGB2BGR);// opencv expects the image in BGR format
     //cv::imshow("RGB input",bgrMat);
 
     struct Image pic= {0};
