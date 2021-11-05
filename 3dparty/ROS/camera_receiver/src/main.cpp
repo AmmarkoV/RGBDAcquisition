@@ -235,7 +235,7 @@ bool publishImagesFrames(cv::Mat & matImg)
     //We want to populate this
     ros::Time sampleTime = ros::Time::now();
     cv_bridge::CvImage out_RGB_msg;
-    out_RGB_msg.encoding = sensor_msgs::image_encodings::RGB8; // Or whatever
+    out_RGB_msg.encoding = sensor_msgs::image_encodings::BGR8; // Or whatever
     out_RGB_msg.header.frame_id= tfRoot;
     out_RGB_msg.header.stamp= sampleTime;
 
