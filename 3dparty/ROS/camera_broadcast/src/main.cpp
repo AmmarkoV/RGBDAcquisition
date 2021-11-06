@@ -84,6 +84,8 @@ std::string imageFilename;
 
 sensor_msgs::CameraInfo camInfo;
 
+int jpegQuality = 75;
+
 volatile bool startTrackingSwitch = false;
 volatile bool stopTrackingSwitch = false;
 volatile int  key=0;
@@ -221,7 +223,7 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
     if (connection)
     { 
         currentCompressedJPEGFile = maxCompressedJPEGFile;
-        if ( WriteJPEGMemory(&pic,compressedJPEGFile,&currentCompressedJPEGFile) )
+        if ( WriteJPEGMemory(&pic,compressedJPEGFile,&currentCompressedJPEGFile,jpegQuality) )
         {
             if (
                 AmmClient_SendFile(
@@ -313,6 +315,7 @@ int main(int argc, char **argv)
         private_node_handle.param("server", server, std::string("139.91.185.16")); 
         private_node_handle.param("port", port, int(80));
         private_node_handle.param("timeout", timeout, int(10));
+        private_node_handle.param("jpegQuality", jpegQuality, int(75));
         //---------------------------------------------------------------------------------------------------------------------------
         private_node_handle.param("tfTargetBVHFilename", tfTargetBVHFilename, std::string("dataset/headerWithHeadAndOneMotion.bvh"));
         private_node_handle.param("fromRGBTopic", fromRGBTopic, std::string(camRGBRaw));

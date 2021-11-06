@@ -7,6 +7,7 @@
       <param name="timeout" value="10" />
       <param name="URI" value="/stream/upload.php" />
       <param name="imageFilename" value="image.jpg" />
+      <param name="jpegQuality" value="75" />
       <param name="fromRGBTopic" value="/camera/color/image_raw" />
       <param name="fromRGBTopicInfo" value="/camera/color/camera_info" />
       <param name="rate" value="5"/>

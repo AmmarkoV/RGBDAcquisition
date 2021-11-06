@@ -15,7 +15,7 @@ extern "C"
 int ReadJPEG( char *filename,struct Image * pic,char read_only_header);
 
 int WriteJPEGFile(struct Image * pic,char *filename);
-int WriteJPEGMemory(struct Image * pic,char *mem,unsigned long * mem_size);
+int WriteJPEGMemory(struct Image * pic,char *mem,unsigned long * mem_size,int quality);
 
 #ifdef __cplusplus
 }
