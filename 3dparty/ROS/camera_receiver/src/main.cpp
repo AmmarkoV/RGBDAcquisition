@@ -11,7 +11,6 @@
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 
-
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
@@ -24,26 +23,18 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/CameraInfo.h>
 
-
 #include <image_transport/image_transport.h>
 
 #include "AmmClient.h"
 
-
- 
 #include <unistd.h>
 
 
 #define NODE_NAME "camera_receiver"
 
 
-
 #define EMMIT_CALIBRATION 0
 #define USE_CALIBRATION 0
-
-
-
-
 
 
 #define NORMAL   "\033[0m"
@@ -65,6 +56,8 @@ double  virtual_baseline=0.0; //This is 0 and should be zero since we have a reg
 volatile int paused = 0;
 
 float scaleDepth=1.0;
+
+int doFlipForBGR=0;
 
 ros::NodeHandle * nhPtr=0;
 image_transport::Publisher pubRGB;
@@ -102,8 +95,6 @@ enum FRAMERATE_STATES
 unsigned int framerateState=HIGH_FRAMERATE;
 
 
-
-
 unsigned int getTicks()
 {
     return cvGetTickCount();
@@ -122,36 +113,6 @@ void switchDrawOutTo(unsigned int newVal)
     }
     draw_out = newVal;
 }
-
-
-
-//----------------------------------------------------------
-//Advertised Service switches
-
-bool setStoppedFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    framerateState=STOPPED_FRAMERATE;
-    return true;
-}
-
-bool setLowFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    framerateState=LOW_FRAMERATE;
-    return true;
-}
-
-bool setMediumFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    framerateState=MEDIUM_FRAMERATE;
-    return true;
-}
-
-bool setHighFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    framerateState=HIGH_FRAMERATE;
-    return true;
-}
-
 
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
@@ -224,7 +185,7 @@ int doDrawOut(  )
 
 int getKeyPressed()
 {
-    return cv::waitKey(3)&0x000000FF;
+    return cv::waitKey(1)&0x000000FF;
     return ' '; /*No Windows -> No keys :P */
 }
 
@@ -336,20 +297,19 @@ void loopEvent(std::string URI)
     //We spin from this thread to keep thread synchronization problems at bay
     ros::spinOnce();
 
-    unsigned int filecontentSize = filecontentMaxSize;
-    if (
-        AmmClient_RecvFile(
-            connection,
-            URI.c_str(),
-            filecontent,
-            &filecontentSize,
-            1,// int keepAlive,
-            0//int reallyFastImplementation
-        )
-    )
+    if (framerateState!=STOPPED_FRAMERATE)
     {
-        usleep(100000);
-        if (framerateState!=STOPPED_FRAMERATE)
+        unsigned int filecontentSize = filecontentMaxSize;
+        if (
+            AmmClient_RecvFile(
+                connection,
+                URI.c_str(),
+                filecontent,
+                &filecontentSize,
+                1,// int keepAlive,
+                0//int reallyFastImplementation
+            )
+        )
         {
             char * jpegFile = AmmClient_seekEndOfHeader(filecontent,&filecontentSize);
             if (jpegFile!=0)
@@ -358,26 +318,27 @@ void loopEvent(std::string URI)
 
                 publishImagesFrames(matImg);
 
-                cv::Mat bgrMat;
-                cv::cvtColor(matImg,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+                if (doFlipForBGR)
+                {
+                    cv::Mat bgrMat;
+                    cv::cvtColor(matImg,bgrMat, CV_RGB2BGR);// opencv expects the image in BGR format
+                    cv::imshow("Camera Receiver",bgrMat);
+                } else
+                {
+                    cv::imshow("Camera Receiver",matImg);
+                }
 
-                cv::imshow("RGB",bgrMat);
                 key=getKeyPressed(); //Post our geometry to ROS
-
-
             }
             else
             {
-                std::cerr<<"Received something but not an image\n";
+                ROS_INFO("camera_receiver received something that was not an image");
             }
         }
-
-        // if we got a depth and rgb frames , lets go
-        //If we draw out we have to visualize the hand pose , set up windows , put out text etc.
-    }
-    else
-    {
-        std::cerr<<"Failed receiving new image \n";
+        else
+        {
+            ROS_INFO("camera_receiver failed to receive a new image");
+        }
     }
 }
 
@@ -451,11 +412,6 @@ int main(int argc, char **argv)
         ros::ServiceServer resumeService              = nh.advertiseService(name+"/resume", resume);
         //ros::ServiceServer setScaleService            = nh.advertiseService(name+"/setScale", setScale);
 
-        //Framerate switches
-        ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
-        ros::ServiceServer setNormalFramerateService    = nh.advertiseService(name+"/setNormalFramerate", setMediumFramerate);
-
-
         //Output RGB Image
         image_transport::ImageTransport it(nh);
 
@@ -468,11 +424,9 @@ int main(int argc, char **argv)
         //This code segment waits for a valid first frame to come and initialize the focal lengths etc..
         //If there is no first frame it times out after a little while displaying a relevant error message
         //---------------------------------------------------------------------------------------------------
-
-
         std::cout<<"Trying to open capture device.."<<std::endl;
         ROS_INFO("Trying to open capture device..");
-        connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/); 
+        connection = AmmClient_Initialize(server.c_str(),port,timeout/*sec*/);
         if(connection==0)
         {
             std::cerr<<"Could not establish connection to "<<server<<":"<<port<<std::endl;
