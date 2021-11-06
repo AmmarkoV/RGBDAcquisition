@@ -445,7 +445,7 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
    {
      #if USE_JPG_FILES
       case JPG_CODEC :
-       return WriteJPEGMemory(pic,mem,mem_size);
+       return WriteJPEGMemory(pic,mem,mem_size,75);
      #endif // USE_JPG_FILES
 
       default :

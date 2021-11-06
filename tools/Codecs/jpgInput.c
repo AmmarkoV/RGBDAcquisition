@@ -158,7 +158,7 @@ int ReadJPEG( char *filename,struct Image * pic,char read_only_header)
  * \param *filename char string specifying the file name to save to
  *
  */
-int WriteJPEGInternal( char *filename,struct Image * pic,char *mem,unsigned long * mem_size)
+int WriteJPEGInternal( char *filename,struct Image * pic,char *mem,unsigned long * mem_size,int quality)
 {
     //debug where things get loaded using next line..
     //fprintf(stderr,"WriteJPEG(%s,%p,%p,%p); called \n",filename,pic,mem,mem_size);
@@ -264,13 +264,14 @@ int WriteJPEGInternal( char *filename,struct Image * pic,char *mem,unsigned long
 
 int WriteJPEGFile(struct Image * pic,char *filename)
 {
-    return WriteJPEGInternal(filename,pic,0,0);
+    int quality = 75; // 1 - 100 range
+    return WriteJPEGInternal(filename,pic,0,0,quality);
 }
 
 
-int WriteJPEGMemory(struct Image * pic,char *mem,unsigned long * mem_size)
+int WriteJPEGMemory(struct Image * pic,char *mem,unsigned long * mem_size,int quality)
 {
-    return WriteJPEGInternal(0,pic,mem,mem_size);
+    return WriteJPEGInternal(0,pic,mem,mem_size,quality);
 }
 
 
