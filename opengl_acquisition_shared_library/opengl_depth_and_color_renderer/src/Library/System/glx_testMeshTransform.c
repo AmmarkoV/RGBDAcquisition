@@ -660,7 +660,7 @@ int main(int argc,const char **argv)
 
 
    /*
-   //Set human pose to somewhere visible..
+   //DAE output Set human pose to somewhere visible..
    //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
    humanPose.pitch=0.0;//(float) (rand()%90);
@@ -673,7 +673,7 @@ int main(int argc,const char **argv)
 */
 
 
-   //Set human pose to somewhere visible..
+   //MHX2 Set human pose to somewhere visible..
    //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
    humanPose.pitch=-90.0;//(float) (rand()%90);
@@ -775,7 +775,8 @@ int main(int argc,const char **argv)
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
 
-
+   flipAllTRIBones(&indexedHumanModel);
+   flipAllTRIBones(&indexedEyeModel);
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);

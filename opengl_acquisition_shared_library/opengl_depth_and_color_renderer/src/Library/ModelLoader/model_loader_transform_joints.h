@@ -118,6 +118,13 @@ int setTRIModelBoneInitialPosition(struct TRI_Model * in);
 */
 void colorCodeBones(struct TRI_Model * in);
 
+
+
+
+void flipAllTRIBones(struct TRI_Model * in);
+
+
+
 /**
 * @brief Transform a TRI Joint using just 3 Euler Angles using ZYX order..!
 * @ingroup TRI

@@ -266,8 +266,6 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
 
 
 
-
-
 const static int animateTRIModelUsingBVHArmature(
     struct TRI_Model * modelOutput,
     struct TRI_Model * modelOriginal,

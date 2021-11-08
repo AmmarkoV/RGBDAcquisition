@@ -611,7 +611,35 @@ int getTRIJointRotationOrder(
 
 
 
+void flipAllTRIBones(struct TRI_Model * in)
+{
+  return;
 
+  if (in!=0)
+  {
+
+    float m[16]={0};
+    /*
+    m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+    m[4] = 0.0;  m[5] = 0.0;  m[6] = 1.0;   m[7] = 0.0;
+    m[8] = 0.0;  m[9] = 1.0;  m[10] = 0.0;  m[11] =0.0;
+    m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;*/
+
+    m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+    m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+    m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+    m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+
+
+    for (unsigned int boneID=0; boneID<in->header.numberOfBones; boneID++)
+     {
+       float local[16]={0};
+       copy4x4FMatrix(local,in->bones[boneID].info->localTransformation);
+
+       multiplyTwo4x4FMatrices_Naive(in->bones[boneID].info->localTransformation,local,m);
+     }
+  }
+}
 
 
 
