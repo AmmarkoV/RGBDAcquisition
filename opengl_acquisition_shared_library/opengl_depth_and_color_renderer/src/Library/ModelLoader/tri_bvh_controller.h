@@ -30,173 +30,229 @@
 
 const static void TRIBVH_lowercase(char * str)
 {
-  char * a = str;
-  if (a!=0)
-     {
-         while (*a!=0)
-           {
+    char * a = str;
+    if (a!=0)
+    {
+        while (*a!=0)
+        {
             *a = tolower(*a);
             ++a;
-           }
-     }
+        }
+    }
 
-  return;
+    return;
 }
 
 
 const static void TRIBVH_removeunderscore(char * str)
 {
- char * a = str;
- if (a!=0)
-  {
-    unsigned int l = strlen(str);
-    if (l-2>0)
+    char * a = str;
+    if (a!=0)
     {
-      if (a[l-2]=='_')
-      {
-        a[l-2]='.';
-      }
+        unsigned int l = strlen(str);
+        if (l-2>0)
+        {
+            if (a[l-2]=='_')
+            {
+                a[l-2]='.';
+            }
+        }
     }
-  }
 
-  return;
+    return;
 }
 
 
 const static int removePrefixFromAllTRIBoneNames(struct TRI_Model * triModel,const char * prefix)
 {
-  if (triModel==0) { return 0; }
-  if (prefix==0)   { return 0; }
-  //----------------------------------------
-  unsigned int prefixLength = strlen(prefix);
+    if (triModel==0)
+    {
+        return 0;
+    }
+    if (prefix==0)
+    {
+        return 0;
+    }
+    //----------------------------------------
+    unsigned int prefixLength = strlen(prefix);
 
-  for (TRIBoneID boneID=0; boneID<triModel->header.numberOfBones; boneID++)
-  {
-    char * boneName = triModel->bones[boneID].boneName;
-    unsigned int fullBoneNameLength = strlen(boneName);
+    for (TRIBoneID boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+    {
+        char * boneName = triModel->bones[boneID].boneName;
+        unsigned int fullBoneNameLength = strlen(boneName);
 
-    if ( triModel->bones[boneID].boneName ==0 )
+        if ( triModel->bones[boneID].boneName ==0 )
         {
             fprintf(stderr,"Invalid bone name encountered %u \n",boneID);
-        } else
-        {
-          char * result = strstr(triModel->bones[boneID].boneName,prefix);
-          if (result!=0)
-          {
-            snprintf(result,fullBoneNameLength,"%s",boneName+prefixLength);
-          }
         }
-   }
+        else
+        {
+            char * result = strstr(triModel->bones[boneID].boneName,prefix);
+            if (result!=0)
+            {
+                snprintf(result,fullBoneNameLength,"%s",boneName+prefixLength);
+            }
+        }
+    }
 
- return 1;
+    return 1;
 }
 
 
 const static int makeAllTRIBoneNamesLowerCase(struct TRI_Model * triModel)
 {
-  if (triModel==0) { return 0; }
-  //----------------------------------------
-  for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
-  {
-    TRIBVH_lowercase(triModel->bones[boneID].boneName);
-  }
+    if (triModel==0)
+    {
+        return 0;
+    }
+    //----------------------------------------
+    for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+    {
+        TRIBVH_lowercase(triModel->bones[boneID].boneName);
+    }
 
-  return 1;
+    return 1;
 }
 
 const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
-  if (triModel==0) { return 0; }
-  //----------------------------------------
-  for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
-  {
-    char * boneName = triModel->bones[boneID].boneName;
-    unsigned int l = strlen(triModel->bones[boneID].boneName);
+    if (triModel==0)
+    {
+        return 0;
+    }
+    //----------------------------------------
+    for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+    {
+        char * boneName = triModel->bones[boneID].boneName;
+        unsigned int l = strlen(triModel->bones[boneID].boneName);
 
-    TRIBVH_lowercase(triModel->bones[boneID].boneName);
+        TRIBVH_lowercase(triModel->bones[boneID].boneName);
 
-    //These 3 joints need a larget joint name to accommodate the bigger string
-    if ( triModel->bones[boneID].boneName ==0 )                     { fprintf(stderr,"Invalid bone name encountered %u \n",boneID);   } else
-    if (strcmp(triModel->bones[boneID].boneName,"spine")==0)        {
-                                                                      //Allocate enough space for the bone string , read it  , and null terminate it
-                                                                      free(triModel->bones[boneID].boneName);
-                                                                      triModel->bones[boneID].info->boneNameSize = 8; // 7 + null terminator
-                                                                      triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
-                                                                      boneName = triModel->bones[boneID].boneName;
-                                                                      snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"abdomen");
-                                                                    }  else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"rightarm")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"rshldr")==0)
-       )                                                            {
-                                                                      //Allocate enough space for the bone string , read it  , and null terminate it
-                                                                      free(triModel->bones[boneID].boneName);
-                                                                      triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
-                                                                      triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
-                                                                      boneName = triModel->bones[boneID].boneName;
-                                                                      snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"rshoulder");
-                                                                    }   else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"leftarm")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"lshldr")==0)
-       )
-                                                                    {
-                                                                      //Allocate enough space for the bone string , read it  , and null terminate it
-                                                                      free(triModel->bones[boneID].boneName);
-                                                                      triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
-                                                                      triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
-                                                                      boneName = triModel->bones[boneID].boneName;
-                                                                      snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"lshoulder");
-                                                                    }   else
-    //------------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"hips")==0)         { snprintf(boneName,l,"hip"); }      else
-    if (strcmp(triModel->bones[boneID].boneName,"spine1")==0)       { snprintf(boneName,l,"chest"); }    else
-    //-------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"rightshoulder")==0){ snprintf(boneName,l,"rcollar"); }  else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"rightforearm")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"rforearm")==0)
-       )
-        { snprintf(boneName,l,"relbow"); }   else
-    if (strcmp(triModel->bones[boneID].boneName,"righthand")==0)    { snprintf(boneName,l,"rhand"); }    else
-    //-------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"leftshoulder")==0) { snprintf(boneName,l,"lcollar"); }  else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"leftforearm")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"lforearm")==0)
-       )
-         { snprintf(boneName,l,"lelbow"); }   else
-    if (strcmp(triModel->bones[boneID].boneName,"lefthand")==0)     { snprintf(boneName,l,"lhand"); }    else
-    //-------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"rhipjoint")==0)    { snprintf(boneName,l,"rbuttock"); } else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"rshin")==0)
-       )
-         { snprintf(boneName,l,"rhip"); }     else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"rightleg")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"rthigh")==0)
-       )
-         { snprintf(boneName,l,"rknee"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"rightfoot")==0)    { snprintf(boneName,l,"rfoot"); }    else
-    //-------------------------------------------------------------------------------------------------------
-    if (strcmp(triModel->bones[boneID].boneName,"lhipjoint")==0)    { snprintf(boneName,l,"lbuttock"); } else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"lshin")==0)
-       )
-        { snprintf(boneName,l,"lhip"); }     else
-    if (
-         (strcmp(triModel->bones[boneID].boneName,"leftleg")==0) ||
-         (strcmp(triModel->bones[boneID].boneName,"lthigh")==0)
-       )
-        { snprintf(boneName,l,"lknee"); }    else
-    if (strcmp(triModel->bones[boneID].boneName,"leftfoot")==0)     { snprintf(boneName,l,"lfoot"); }
+        //These 3 joints need a larget joint name to accommodate the bigger string
+        if ( triModel->bones[boneID].boneName ==0 )
+        {
+            fprintf(stderr,"Invalid bone name encountered %u \n",boneID);
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"spine")==0)
+        {
+            //Allocate enough space for the bone string , read it  , and null terminate it
+            free(triModel->bones[boneID].boneName);
+            triModel->bones[boneID].info->boneNameSize = 8; // 7 + null terminator
+            triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+            boneName = triModel->bones[boneID].boneName;
+            snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"abdomen");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"rightarm")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"rshldr")==0)
+        )
+        {
+            //Allocate enough space for the bone string , read it  , and null terminate it
+            free(triModel->bones[boneID].boneName);
+            triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
+            triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+            boneName = triModel->bones[boneID].boneName;
+            snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"rshoulder");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"leftarm")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"lshldr")==0)
+        )
+        {
+            //Allocate enough space for the bone string , read it  , and null terminate it
+            free(triModel->bones[boneID].boneName);
+            triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
+            triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneID].info->boneNameSize+1) );
+            boneName = triModel->bones[boneID].boneName;
+            snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"lshoulder");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"hips")==0)
+        {
+            snprintf(boneName,l,"hip");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"spine1")==0)
+        {
+            snprintf(boneName,l,"chest");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"rightshoulder")==0)
+        {
+            snprintf(boneName,l,"rcollar");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"rightforearm")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"rforearm")==0)
+        )
+        {
+            snprintf(boneName,l,"relbow");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"righthand")==0)
+        {
+            snprintf(boneName,l,"rhand");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"leftshoulder")==0)
+        {
+            snprintf(boneName,l,"lcollar");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"leftforearm")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"lforearm")==0)
+        )
+        {
+            snprintf(boneName,l,"lelbow");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"lefthand")==0)
+        {
+            snprintf(boneName,l,"lhand");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"rhipjoint")==0)
+        {
+            snprintf(boneName,l,"rbuttock");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"rshin")==0)
+        )
+        {
+            snprintf(boneName,l,"rhip");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"rightleg")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"rthigh")==0)
+        )
+        {
+            snprintf(boneName,l,"rknee");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"rightfoot")==0)
+        {
+            snprintf(boneName,l,"rfoot");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"lhipjoint")==0)
+        {
+            snprintf(boneName,l,"lbuttock");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"lshin")==0)
+        )
+        {
+            snprintf(boneName,l,"lhip");
+        }
+        else if (
+            (strcmp(triModel->bones[boneID].boneName,"leftleg")==0) ||
+            (strcmp(triModel->bones[boneID].boneName,"lthigh")==0)
+        )
+        {
+            snprintf(boneName,l,"lknee");
+        }
+        else if (strcmp(triModel->bones[boneID].boneName,"leftfoot")==0)
+        {
+            snprintf(boneName,l,"lfoot");
+        }
+        //-------------------------------------------------------------------------------------------------------
 
-    TRIBVH_removeunderscore(triModel->bones[boneID].boneName);
-  }
- return 1;
+        TRIBVH_removeunderscore(triModel->bones[boneID].boneName);
+    }
+    return 1;
 }
 
 
@@ -204,34 +260,43 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
 
 
 const static int animateTRIModelUsingBVHArmature(
-                                           struct TRI_Model * modelOutput,
-                                           struct TRI_Model * modelOriginal,
-                                           struct BVH_MotionCapture * bvh,
-                                           unsigned int frameID,
-                                           int printDebugMessages
-                                         )
+    struct TRI_Model * modelOutput,
+    struct TRI_Model * modelOriginal,
+    struct BVH_MotionCapture * bvh,
+    unsigned int frameID,
+    int printDebugMessages
+)
 {
-  if (modelOriginal==0) { return 0; }
-  if (modelOutput==0)   { return 0; }
-  if (bvh==0)           { return 0; }
-  //----------------------------------
-  copyModelTri(modelOutput , modelOriginal , 1 /*We also want bone data*/);
+    if (modelOriginal==0)
+    {
+        return 0;
+    }
+    if (modelOutput==0)
+    {
+        return 0;
+    }
+    if (bvh==0)
+    {
+        return 0;
+    }
+    //----------------------------------
+    copyModelTri(modelOutput, modelOriginal, 1 /*We also want bone data*/);
 
-  unsigned int numberOfBones = modelOriginal->header.numberOfBones;
+    unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
-  //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-  //bvh_printBVH(bvh);
+    //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+    //bvh_printBVH(bvh);
 
-  struct BVH_Transform bvhTransform={0};
-  if (
-       bvh_loadTransformForFrame(
-                                  bvh,
-                                  frameID,
-                                  &bvhTransform,
-                                  0
-                                )
-     )
-     {
+    struct BVH_Transform bvhTransform= {0};
+    if (
+        bvh_loadTransformForFrame(
+            bvh,
+            frameID,
+            &bvhTransform,
+            0
+        )
+    )
+    {
         unsigned int transformations4x4Size = numberOfBones * 16;
         float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
         if (transformations4x4==0)
@@ -251,101 +316,106 @@ const static int animateTRIModelUsingBVHArmature(
 
         if (lookupTableFromTRIToBVH!=0)
         {
-          unsigned int resolvedJoints=0;
-          memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
+            unsigned int resolvedJoints=0;
+            memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
 
-          for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
-           {
-              TRIBoneID boneID=0;
-              if ( findTRIBoneWithName(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
-              {
-                struct TRI_Bones * bone = &modelOriginal->bones[boneID];
-                if (printDebugMessages)
-                  {
-                   fprintf(stderr,GREEN "Resolved BVH Joint %u/%u = `%s`  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-                   fprintf(stderr,"TRI Bone %u/%u = `%s` \n" NORMAL,boneID,numberOfBones,bone->boneName);
-                  }
-                lookupTableFromTRIToBVH[boneID]=jID;
-                ++resolvedJoints;
-              } else
-              {
-                if (printDebugMessages)
-                  { fprintf(stderr,RED "Could not resolve `%s`\n"NORMAL,bvh->jointHierarchy[jID].jointName); }
-              }
-           }
-
-          if (resolvedJoints==0)
-          {
-            if (printDebugMessages)
-                  {
-                   printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-                   bvh_printBVH(bvh);
-                  }
-            fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
-          } else
-          {
-
-          for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
-              {
-                if (lookupTableFromTRIToBVH[boneID]!=0)
+            for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+            {
+                TRIBoneID boneID=0;
+                if ( findTRIBoneWithName(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
                 {
-                  BVHJointID jID = lookupTableFromTRIToBVH[boneID];
-                  //-----------------------------------------------
-                  //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
+                    struct TRI_Bones * bone = &modelOriginal->bones[boneID];
+                    if (printDebugMessages)
+                    {
+                        fprintf(stderr,GREEN "Resolved BVH Joint %u/%u = `%s`  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
+                        fprintf(stderr,"TRI Bone %u/%u = `%s` \n" NORMAL,boneID,numberOfBones,bone->boneName);
+                    }
+                    lookupTableFromTRIToBVH[boneID]=jID;
+                    ++resolvedJoints;
+                }
+                else
+                {
+                    if (printDebugMessages)
+                    {
+                        fprintf(stderr,RED "Could not resolve `%s`\n"NORMAL,bvh->jointHierarchy[jID].jointName);
+                    }
+                }
+            }
 
-                  memcpy(
-                         &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                         bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                         sizeof(float) * 16
+            if (resolvedJoints==0)
+            {
+                if (printDebugMessages)
+                {
+                    printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
+                    bvh_printBVH(bvh);
+                }
+                fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
+            }
+            else
+            {
+
+                for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
+                {
+                    if (lookupTableFromTRIToBVH[boneID]!=0)
+                    {
+                        BVHJointID jID = lookupTableFromTRIToBVH[boneID];
+                        //-----------------------------------------------
+                        //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
+
+                        memcpy(
+                            &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                            bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
+                            sizeof(float) * 16
                         );
 
-                 if (bvh->jointHierarchy[jID].hasPositionalChannels)
-                 {
-                  //This is one of the new joints with positional channels..
-                  float * m = &transformations4x4[boneID*16];
-                  //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
-                  //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
-                  //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
+                        if (bvh->jointHierarchy[jID].hasPositionalChannels)
+                        {
+                            //This is one of the new joints with positional channels..
+                            float * m = &transformations4x4[boneID*16];
+                            //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
+                            //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
+                            //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
 
-                  struct Matrix4x4OfFloats mergedTranslation;
-                  create4x4FTranslationMatrix(
-                                              &mergedTranslation,
-                                              (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
-                                              (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
-                                              (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
-                                             );
+                            struct Matrix4x4OfFloats mergedTranslation;
+                            create4x4FTranslationMatrix(
+                                &mergedTranslation,
+                                (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
+                                (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
+                                (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
+                            );
 
-                  multiplyTwo4x4FMatrices_Naive(
-                                                 &transformations4x4[boneID*16],
-                                                 bvhTransform.joint[jID].dynamicRotation.m,
-                                                 mergedTranslation.m
-                                               );
-                 }
+                            multiplyTwo4x4FMatrices_Naive(
+                                &transformations4x4[boneID*16],
+                                bvhTransform.joint[jID].dynamicRotation.m,
+                                mergedTranslation.m
+                            );
+                        }
 
+                    }
                 }
-              }
-          } //have resolved joints
+            } //have resolved joints
 
-          //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
-          free(lookupTableFromTRIToBVH);
-        } else
+            //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
+            free(lookupTableFromTRIToBVH);
+        }
+        else
         {
-         fprintf(stderr,RED "Error: Could not allocate a lookup table from TRI To BVH\n" NORMAL);
+            fprintf(stderr,RED "Error: Could not allocate a lookup table from TRI To BVH\n" NORMAL);
         }
 
 
-        struct TRI_Model modelTemporary={0};
+        struct TRI_Model modelTemporary= {0};
         //---------------------------------------------------------------
         doModelTransform(
-                          &modelTemporary ,
-                          modelOriginal ,
-                          transformations4x4 ,
-                          numberOfBones ,
-                          1/*Autodetect default matrices for speedup*/ ,
-                          1/*Direct setting of matrices*/,
-                          1/*Do Transforms, don't just calculate the matrices*/ ,
-                          0 /*Default joint convention*/
-                        );
+            &modelTemporary,
+            modelOriginal,
+            transformations4x4,
+            numberOfBones,
+            1/*Autodetect default matrices for speedup*/,
+            1/*Direct setting of matrices*/,
+            1/*Do Transforms, don't just calculate the matrices*/,
+            0 /*Default joint convention*/
+        );
         //---------------------------------------------------------------
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
         deallocInternalsOfModelTri(&modelTemporary);
@@ -353,12 +423,13 @@ const static int animateTRIModelUsingBVHArmature(
         free(transformations4x4);
 
         return 1;
-     } else
-     {
-       fprintf(stderr,RED "Error: Failed executing bvh transform\n" NORMAL);
-     }
+    }
+    else
+    {
+        fprintf(stderr,RED "Error: Failed executing bvh transform\n" NORMAL);
+    }
 
- return 0;
+    return 0;
 }
 
 
