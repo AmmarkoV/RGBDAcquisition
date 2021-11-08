@@ -630,13 +630,12 @@ void flipAllTRIBones(struct TRI_Model * in)
     m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
     m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 
-
     for (unsigned int boneID=0; boneID<in->header.numberOfBones; boneID++)
      {
        float local[16]={0};
        copy4x4FMatrix(local,in->bones[boneID].info->localTransformation);
 
-       multiplyTwo4x4FMatrices_Naive(in->bones[boneID].info->localTransformation,local,m);
+       multiplyTwo4x4FMatrices_Naive(in->bones[boneID].info->localTransformation,m,local);
      }
   }
 }
