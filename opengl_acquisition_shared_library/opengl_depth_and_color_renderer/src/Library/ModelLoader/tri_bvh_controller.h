@@ -294,6 +294,8 @@ const static int animateTRIModelUsingBVHArmature(
     //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
     //bvh_printBVH(bvh);
 
+
+    //TODO: Add a flag here to flip rotation axis..!
     struct BVH_Transform bvhTransform= {0};
     if (
         bvh_loadTransformForFrame(
