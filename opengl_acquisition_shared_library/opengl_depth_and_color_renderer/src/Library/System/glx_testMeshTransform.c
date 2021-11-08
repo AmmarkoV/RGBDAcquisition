@@ -775,9 +775,6 @@ int main(int argc,const char **argv)
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
 
-   flipAllTRIBones(&indexedHumanModel);
-   flipAllTRIBones(&indexedEyeModel);
-
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
 
