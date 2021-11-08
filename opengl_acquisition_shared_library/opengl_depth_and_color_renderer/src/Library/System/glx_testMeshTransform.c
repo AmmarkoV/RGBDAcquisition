@@ -59,6 +59,10 @@
 #define shrinkingFactor 1
 //--------------------------------------------
 
+float lastFramerate = 60;
+unsigned long lastRenderingTime = 0;
+unsigned int framesRendered = 0;
+
  struct pose6D
  {
      float x,y,z;
@@ -67,14 +71,6 @@
      char usePoseMatrixDirectly;
      struct Matrix4x4OfFloats m;
  };
-
-unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
-unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
-
-float lastFramerate = 60;
-unsigned long lastRenderingTime = 0;
-unsigned int framesRendered = 0;
-
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
@@ -387,8 +383,8 @@ int doOGLDrawing(
                   eyeTriangleCount,
                   //-------------
                   eyePose->x,
-                  eyePose->y, //+0.05,
-                  eyePose->z, //+0.8,
+                  eyePose->y,
+                  eyePose->z,
                   eyePose->roll,
                   eyePose->pitch,
                   eyePose->yaw,
@@ -450,7 +446,9 @@ int initializeOGLRenderer(
                            GLuint * programFrameBufferID,
                            GLuint * FramebufferName,
                            GLuint * renderedTexture,
-                           GLuint * renderedDepth
+                           GLuint * renderedDepth,
+                           unsigned int WIDTH,
+                           unsigned int HEIGHT
                          )
 {
 	// Create and compile our GLSL program from the shaders
@@ -492,6 +490,8 @@ int doDrawing(
                 struct pose6D * humanPose,
                 struct TRI_Model * humanModel,
                 struct TRI_Model * eyeModel,
+                unsigned int WIDTH,
+                unsigned int HEIGHT,
                 int renderForever
              )
 {
@@ -609,6 +609,12 @@ int doDrawing(
 
 int main(int argc,const char **argv)
 {
+
+  unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
+  unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
+
+
+
   fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
@@ -624,7 +630,7 @@ int main(int argc,const char **argv)
   GLuint renderedTexture=0;
   GLuint renderedDepth=0;
 
-  if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth))
+  if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth,WIDTH,HEIGHT))
   {
 		fprintf(stderr, "Failed to initialize Shaders\n");
 	 	return 1;
@@ -810,6 +816,8 @@ int main(int argc,const char **argv)
                 &humanPose,
                 &humanModel,
                 &eyeModel,
+                WIDTH,
+                HEIGHT,
                 0
               );
 
