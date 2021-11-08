@@ -238,25 +238,24 @@ void rgbCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,const sensor_msg
                 )
             )
             {
-                fprintf(stderr,"* %lu",currentCompressedJPEGFile);
-                //usleep(1000000);
+                fprintf(stderr,"* %lu",currentCompressedJPEGFile); 
                 char buf[4098]= {0};
                 unsigned int recvdSize=4098;
 
                 if (!AmmClient_Recv(connection,buf,&recvdSize) )
                 {
-                    fprintf(stderr,RED "Failed to recv.. \n" NORMAL);
+                   ROS_INFO("Failed to receive");
                 }
 
                 fprintf(stderr,"Response = `%s`\n",buf);
             } else
             {
-                fprintf(stderr,RED "Unable to do HTTP transmission \n" NORMAL);
+              ROS_INFO("Unable to do HTTP transmission");
             }
 
         } else
         {
-            fprintf(stderr, RED "Unable to do JPEG compression \n" NORMAL);
+            ROS_INFO("Unable to do JPEG compression");
         }
     }
 #endif

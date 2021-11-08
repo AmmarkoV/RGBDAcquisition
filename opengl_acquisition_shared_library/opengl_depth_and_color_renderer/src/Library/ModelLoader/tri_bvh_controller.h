@@ -125,7 +125,10 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
                                                                       boneName = triModel->bones[boneID].boneName;
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"abdomen");
                                                                     }  else
-    if (strcmp(triModel->bones[boneID].boneName,"rightarm")==0)     {
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"rightarm")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"rshldr")==0)
+       )                                                            {
                                                                       //Allocate enough space for the bone string , read it  , and null terminate it
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
@@ -133,7 +136,11 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
                                                                       boneName = triModel->bones[boneID].boneName;
                                                                       snprintf(boneName,triModel->bones[boneID].info->boneNameSize,"rshoulder");
                                                                     }   else
-    if (strcmp(triModel->bones[boneID].boneName,"leftarm")==0)      {
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"leftarm")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"lshldr")==0)
+       )
+                                                                    {
                                                                       //Allocate enough space for the bone string , read it  , and null terminate it
                                                                       free(triModel->bones[boneID].boneName);
                                                                       triModel->bones[boneID].info->boneNameSize = 10; // 9 + null terminator
@@ -144,19 +151,47 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
     //------------------------------------------------------------------------------------------------------------
     if (strcmp(triModel->bones[boneID].boneName,"hips")==0)         { snprintf(boneName,l,"hip"); }      else
     if (strcmp(triModel->bones[boneID].boneName,"spine1")==0)       { snprintf(boneName,l,"chest"); }    else
+    //-------------------------------------------------------------------------------------------------------
     if (strcmp(triModel->bones[boneID].boneName,"rightshoulder")==0){ snprintf(boneName,l,"rcollar"); }  else
-    if (strcmp(triModel->bones[boneID].boneName,"rightforearm")==0) { snprintf(boneName,l,"relbow"); }   else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"rightforearm")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"rforearm")==0)
+       )
+        { snprintf(boneName,l,"relbow"); }   else
     if (strcmp(triModel->bones[boneID].boneName,"righthand")==0)    { snprintf(boneName,l,"rhand"); }    else
+    //-------------------------------------------------------------------------------------------------------
     if (strcmp(triModel->bones[boneID].boneName,"leftshoulder")==0) { snprintf(boneName,l,"lcollar"); }  else
-    if (strcmp(triModel->bones[boneID].boneName,"leftforearm")==0)  { snprintf(boneName,l,"lelbow"); }   else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"leftforearm")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"lforearm")==0)
+       )
+         { snprintf(boneName,l,"lelbow"); }   else
     if (strcmp(triModel->bones[boneID].boneName,"lefthand")==0)     { snprintf(boneName,l,"lhand"); }    else
+    //-------------------------------------------------------------------------------------------------------
     if (strcmp(triModel->bones[boneID].boneName,"rhipjoint")==0)    { snprintf(boneName,l,"rbuttock"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0)   { snprintf(boneName,l,"rhip"); }     else
-    if (strcmp(triModel->bones[boneID].boneName,"rightleg")==0)     { snprintf(boneName,l,"rknee"); }    else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"rshin")==0)
+       )
+         { snprintf(boneName,l,"rhip"); }     else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"rightleg")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"rthigh")==0)
+       )
+         { snprintf(boneName,l,"rknee"); }    else
     if (strcmp(triModel->bones[boneID].boneName,"rightfoot")==0)    { snprintf(boneName,l,"rfoot"); }    else
+    //-------------------------------------------------------------------------------------------------------
     if (strcmp(triModel->bones[boneID].boneName,"lhipjoint")==0)    { snprintf(boneName,l,"lbuttock"); } else
-    if (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0)    { snprintf(boneName,l,"lhip"); }     else
-    if (strcmp(triModel->bones[boneID].boneName,"leftleg")==0)      { snprintf(boneName,l,"lknee"); }    else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"lshin")==0)
+       )
+        { snprintf(boneName,l,"lhip"); }     else
+    if (
+         (strcmp(triModel->bones[boneID].boneName,"leftleg")==0) ||
+         (strcmp(triModel->bones[boneID].boneName,"lthigh")==0)
+       )
+        { snprintf(boneName,l,"lknee"); }    else
     if (strcmp(triModel->bones[boneID].boneName,"leftfoot")==0)     { snprintf(boneName,l,"lfoot"); }
 
     TRIBVH_removeunderscore(triModel->bones[boneID].boneName);

@@ -758,6 +758,7 @@ int main(int argc,const char **argv)
    fprintf(stderr,"Preprocessing human model.. ");
    makeAllTRIBoneNamesLowerCase(&indexedHumanModel);
    removePrefixFromAllTRIBoneNames(&indexedHumanModel,"test_"); //Eyes have a test_ prefix on bone names..
+   removePrefixFromAllTRIBoneNames(&indexedHumanModel,"f_"); //Fingers have a f_ prefix on bone names..
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
