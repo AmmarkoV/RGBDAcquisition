@@ -377,7 +377,7 @@ int bvh_markAllJointsAsUsefullInTransform(
 
 
 int bvh_markAllJointsAsUselessInTransform(
-                                          struct BVH_MotionCapture * bvhMotion ,
+                                          struct BVH_MotionCapture * bvhMotion,
                                           struct BVH_Transform * bvhTransform
                                          )
 {
@@ -406,7 +406,7 @@ int bvh_markAllJointsAsUselessInTransform(
 
 
 int bvh_markJointAndParentsAsUsefulInTransform(
-                                                struct BVH_MotionCapture * bvhMotion ,
+                                                struct BVH_MotionCapture * bvhMotion,
                                                 struct BVH_Transform * bvhTransform,
                                                 BVHJointID jID
                                               )
@@ -442,7 +442,7 @@ int bvh_markJointAndParentsAsUsefulInTransform(
 
 
 int bvh_markJointAndParentsAsUselessInTransform(
-                                                struct BVH_MotionCapture * bvhMotion ,
+                                                struct BVH_MotionCapture * bvhMotion,
                                                 struct BVH_Transform * bvhTransform,
                                                 BVHJointID jID
                                               )
@@ -478,7 +478,7 @@ int bvh_markJointAndParentsAsUselessInTransform(
 
 
 int bvh_markJointAsUsefulAndParentsAsUselessInTransform(
-                                                        struct BVH_MotionCapture * bvhMotion ,
+                                                        struct BVH_MotionCapture * bvhMotion,
                                                         struct BVH_Transform * bvhTransform,
                                                         BVHJointID jID
                                                        )
