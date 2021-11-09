@@ -593,7 +593,7 @@ static inline void bvh_prepareMatricesForTransform(
 
 
 
-
+/*
 static inline void bvh_performActualTransformSTABLE(
                                               struct BVH_MotionCapture * bvhMotion,
                                               float * motionBuffer,
@@ -603,7 +603,6 @@ static inline void bvh_performActualTransformSTABLE(
 {
      //This will get populated either way..
      //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
-
      if (bhv_jointHasParent(bvhMotion,jID))
       {
         //If joint is not Root joint
@@ -616,7 +615,6 @@ static inline void bvh_performActualTransformSTABLE(
          bvhTransform->joint[parentID].isChainTrasformationComputed=1;
          create4x4FIdentityMatrix(&bvhTransform->joint[parentID].chainTransformation);
         }
-
 
         multiplyTwo4x4FMatricesS(
                                 //Output AxB
@@ -633,6 +631,7 @@ static inline void bvh_performActualTransformSTABLE(
        //If there is no parent we will only set our position and copy to the final transform
         #if FAST_OFFSET_TRANSLATION
          //Skip the matrix multiplication..
+         //There is no parent since we are Root!
          create4x4FTranslationMatrix(
                                      &bvhTransform->joint[jID].localToWorldTransformation,
                                      bvhMotion->jointHierarchy[jID].staticTransformation.m[3]  + bvhTransform->joint[jID].dynamicTranslation.m[3],
@@ -688,8 +687,7 @@ static inline void bvh_performActualTransformSTABLE(
    bvhTransform->joint[jID].pos3D[3] = resultPoint.m[3];
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
   #endif // FAST_OFFSET_TRANSLATION
-
-}
+}*/
 
 
 
@@ -700,7 +698,7 @@ static inline void bvh_performActualTransform(
                                               unsigned int jID
                                              )
 {
-     if (bhv_jointHasParent(bvhMotion,jID))
+  if (bhv_jointHasParent(bvhMotion,jID))
       {
         //If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
@@ -736,18 +734,18 @@ static inline void bvh_performActualTransform(
                                  );
         }
       } else
-      if ( bvhMotion->jointHierarchy[jID].isRoot)
+  if ( bvhMotion->jointHierarchy[jID].isRoot)
       {
        //If we are the root node there is no parent so we skip the multiplication with the "Identity" chainTransformation..
        //If there is no parent we will only set our position and copy to the final transform
 
        //Skip the matrix multiplication..
-         create4x4FTranslationMatrix(
+       create4x4FTranslationMatrix(
                                      &bvhTransform->joint[jID].localToWorldTransformation,
                                      bvhMotion->jointHierarchy[jID].staticTransformation.m[3]  + bvhTransform->joint[jID].dynamicTranslation.m[3],
                                      bvhMotion->jointHierarchy[jID].staticTransformation.m[7]  + bvhTransform->joint[jID].dynamicTranslation.m[7],
                                      bvhMotion->jointHierarchy[jID].staticTransformation.m[11] + bvhTransform->joint[jID].dynamicTranslation.m[11]
-                                    );
+                                  );
       } else
       {
         //Weird case where joint is not root and doesnt have parents(?)
@@ -755,7 +753,8 @@ static inline void bvh_performActualTransform(
         fprintf(stderr,"Joint is not root, but also doesn't have parents?\n");
       }
 
-    bvhTransform->joint[jID].isChainTrasformationComputed=1;
+    //Calculate chain transformation for this jID
+    //------------------------------------------------------
     multiplyTwo4x4FMatricesS(
                              //Output AxB
                              &bvhTransform->joint[jID].chainTransformation,
@@ -764,9 +763,11 @@ static inline void bvh_performActualTransform(
                              //B
                              &bvhTransform->joint[jID].dynamicRotation
                             );
+    bvhTransform->joint[jID].isChainTrasformationComputed=1;
 
 
-   //Also do 3D position calculation..
+   //Also do 3D position output calculation..
+   //------------------------------------------------------
    bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].localToWorldTransformation.m[3];
    bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].localToWorldTransformation.m[7];
    bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].localToWorldTransformation.m[11];
