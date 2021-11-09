@@ -10,7 +10,6 @@
 //We can skip the matrix multiplication by just grabbing the last column..
 #define FAST_OFFSET_TRANSLATION 1
 
-
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -22,12 +21,12 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-
 float max(float a,float b)
 {
   if (a>b) {return a;}
   return b;
 }
+
 
 float min(float a,float b)
 {
@@ -236,7 +235,6 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
        fprintf(stderr,"bvh_printBVHTransform, no bvhTransform..!\n");
        return;
    }
-
 
    fprintf(stderr,"bvh_printBVHTransform for %s\n",label);
    fprintf(stderr,"jointHierarchySize=%u\n",bvhMotion->jointHierarchySize);
@@ -590,104 +588,6 @@ static inline void bvh_prepareMatricesForTransform(
       create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
      }
 }
-
-
-
-/*
-static inline void bvh_performActualTransformSTABLE(
-                                              struct BVH_MotionCapture * bvhMotion,
-                                              float * motionBuffer,
-                                              struct BVH_Transform * bvhTransform,
-                                              unsigned int jID
-                                             )
-{
-     //This will get populated either way..
-     //create4x4FIdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
-     if (bhv_jointHasParent(bvhMotion,jID))
-      {
-        //If joint is not Root joint
-        unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
-
-
-        if (!bvhTransform->joint[parentID].isChainTrasformationComputed)
-        {
-         //This is needed because we access the chain transform of our parent so at some point this will get used..
-         bvhTransform->joint[parentID].isChainTrasformationComputed=1;
-         create4x4FIdentityMatrix(&bvhTransform->joint[parentID].chainTransformation);
-        }
-
-        multiplyTwo4x4FMatricesS(
-                                //Output AxB
-                                &bvhTransform->joint[jID].localToWorldTransformation ,
-                                //Parent Output A
-                                &bvhTransform->joint[parentID].chainTransformation,
-                                //This Transform B
-                                &bvhMotion->jointHierarchy[jID].staticTransformation
-                              );
-      } else
-      if ( bvhMotion->jointHierarchy[jID].isRoot)
-      {
-       //If we are the root node there is no parent..
-       //If there is no parent we will only set our position and copy to the final transform
-        #if FAST_OFFSET_TRANSLATION
-         //Skip the matrix multiplication..
-         //There is no parent since we are Root!
-         create4x4FTranslationMatrix(
-                                     &bvhTransform->joint[jID].localToWorldTransformation,
-                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[3]  + bvhTransform->joint[jID].dynamicTranslation.m[3],
-                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[7]  + bvhTransform->joint[jID].dynamicTranslation.m[7],
-                                     bvhMotion->jointHierarchy[jID].staticTransformation.m[11] + bvhTransform->joint[jID].dynamicTranslation.m[11]
-                                    );
-        #else
-         //We can do the matrix multipliaction to calculate the offset..
-         multiplyTwo4x4FMatrices(
-                                //Output AxB
-                                bvhTransform->joint[jID].localToWorldTransformation ,
-                                //A
-                                bvhMotion->jointHierarchy[jID].staticTransformation,
-                                //B
-                                bvhTransform->joint[jID].dynamicTranslation
-                              );
-        #endif // FAST_OFFSET_TRANSLATION
-      } else
-      {
-        //Weird case where joint is not root and doesnt have parents(?)
-        create4x4FIdentityMatrix(&bvhTransform->joint[jID].localToWorldTransformation);
-        fprintf(stderr,"Joint is not root, but also doesn't have parents?\n");
-      }
-
-    bvhTransform->joint[jID].isChainTrasformationComputed=1;
-    multiplyTwo4x4FMatricesS(
-                           //Output AxB
-                           &bvhTransform->joint[jID].chainTransformation ,
-                           //A
-                           &bvhTransform->joint[jID].localToWorldTransformation,
-                           //B
-                           &bvhTransform->joint[jID].dynamicRotation
-                          );
-
-  #if FAST_OFFSET_TRANSLATION
-   bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].localToWorldTransformation.m[3];
-   bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].localToWorldTransformation.m[7];
-   bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].localToWorldTransformation.m[11];
-   bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].localToWorldTransformation.m[15];
-   normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
-  #else
-   struct Vector4x1OfFloats resultPoint={0};
-   struct Vector4x1OfFloats centerPoint3D={0};
-   centerPoint3D.m[3]=1.0;
-   transform3DPointFVectorUsing4x4FMatrix(
-                                          &resultPoint,
-                                          bvhTransform->joint[jID].localToWorldTransformation,
-                                          &centerPoint
-                                         );
-   bvhTransform->joint[jID].pos3D[0] = resultPoint.m[0];
-   bvhTransform->joint[jID].pos3D[1] = resultPoint.m[1];
-   bvhTransform->joint[jID].pos3D[2] = resultPoint.m[2];
-   bvhTransform->joint[jID].pos3D[3] = resultPoint.m[3];
-   normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
-  #endif // FAST_OFFSET_TRANSLATION
-}*/
 
 
 
