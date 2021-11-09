@@ -633,11 +633,8 @@ int main(int argc,const char **argv)
 
      if (!staticRendering)
      {
-       //First animate the tri model using the bvh armature
        animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
        //triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
-
-       //The eyes model should now have correct bone structure..
        animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
      } else
      {
