@@ -371,6 +371,7 @@ const static int animateTRIModelUsingBVHArmature(
                         //-----------------------------------------------
                         //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
                         //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L1395
+                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/core/transformations.py#L317
 
                         memcpy(
                                 &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
@@ -427,15 +428,15 @@ const static int animateTRIModelUsingBVHArmature(
         struct TRI_Model modelTemporary= {0};
         //---------------------------------------------------------------
         doModelTransform(
-            &modelTemporary,
-            modelOriginal,
-            transformations4x4,
-            numberOfBones,
-            1/*Autodetect default matrices for speedup*/,
-            1/*Direct setting of matrices*/,
-            1/*Do Transforms, don't just calculate the matrices*/,
-            0 /*Default joint convention*/
-        );
+                         &modelTemporary,
+                         modelOriginal,
+                         transformations4x4,
+                         numberOfBones,
+                         1,//Autodetect default matrices for speedup
+                         1,//Direct setting of matrices
+                         1,//Do Transforms, don't just calculate the matrices
+                         0 //Default joint convention
+                        );
         //---------------------------------------------------------------
         fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
         deallocInternalsOfModelTri(&modelTemporary);
