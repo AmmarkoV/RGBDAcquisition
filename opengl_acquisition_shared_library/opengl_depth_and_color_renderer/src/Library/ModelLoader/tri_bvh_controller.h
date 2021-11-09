@@ -370,12 +370,23 @@ const static int animateTRIModelUsingBVHArmature(
                         BVHJointID jID = lookupTableFromTRIToBVH[boneID];
                         //-----------------------------------------------
                         //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
+                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L1395
 
                         memcpy(
-                            &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                            bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                            sizeof(float) * 16
-                        );
+                                &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
+                                bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
+                                sizeof(float) * 16
+                              );
+
+/*
+                        float YZRotation[]={1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,0,0,1};
+                        float ZYRotation[]={1,0,0,0, 0,0,-1,0, 0,1,0,0, 0,0,0,1};
+                        multiplyTwo4x4FMatrices_Naive(
+                                &transformations4x4[boneID*16],
+                                YZRotation,
+                                bvhTransform.joint[jID].dynamicRotation.m
+                            );
+                        transpose4x4FMatrix(&transformations4x4[boneID*16]);*/
 
                         if (bvh->jointHierarchy[jID].hasPositionalChannels)
                         {

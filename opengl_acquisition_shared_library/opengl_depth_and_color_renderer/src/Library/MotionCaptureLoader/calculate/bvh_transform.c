@@ -580,7 +580,6 @@ static inline void bvh_prepareMatricesForTransform(
               }
        }
 
-
      } else
      {
       fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
