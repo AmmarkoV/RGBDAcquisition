@@ -1482,11 +1482,10 @@ void create4x4FModelTransformation(
 {
     if (m==0) {return;}
 
-    //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
-    //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
-    //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
+    fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f) ",rotationZ,rotationY,rotationX);
+    fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f) ",x,y,z);
+    fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
-    int numberOfOperationsNeeded=0;
 
 
     //Translation matrix
@@ -1502,7 +1501,6 @@ void create4x4FModelTransformation(
                                  z
                                );
       translationSpecified=1;
-      numberOfOperationsNeeded+=1;
     }
     //----------------------------------------------------------
 
@@ -1529,7 +1527,6 @@ void create4x4FModelTransformation(
                                 rotationX//heading
                               );
           rotationSpecified=1;
-          numberOfOperationsNeeded+=1;
         } else
         {
           //fprintf(stderr,"Using new model transform code\n");
@@ -1541,7 +1538,6 @@ void create4x4FModelTransformation(
                                                            rotationOrder
                                                           );
           rotationSpecified=1;
-          numberOfOperationsNeeded+=1;
          }
     }
     //----------------------------------------------------------
@@ -1555,30 +1551,33 @@ void create4x4FModelTransformation(
       {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
         scaleSpecified=1;
-        numberOfOperationsNeeded+=1;
       }
 
 
+    //Count number of matrix multiplications needed..!
+    int numberOfOperationsNeeded = translationSpecified + rotationSpecified + scaleSpecified;
+
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
+    fprintf(stderr,"Number Of Multiplications needed %u\n",numberOfOperationsNeeded);
     switch (numberOfOperationsNeeded)
     {
       case 0:
-        create4x4FIdentityMatrix(m);
-       return;
+         create4x4FIdentityMatrix(m);
+        return;
       case 1:
-        if (translationSpecified==1) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
-        if (rotationSpecified==1)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
-        if (scaleSpecified==1)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
+         if (translationSpecified==1) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
+         if (rotationSpecified==1)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
+         if (scaleSpecified==1)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
         return;
       case 2:
-        if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
-        if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
-        if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }
+         if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
+         if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
+         if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }
         return;
       case 3:
-        multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
-       return;
+         multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
+        return;
     };
     //----------------------------------------------------------
 }

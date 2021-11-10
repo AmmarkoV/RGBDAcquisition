@@ -469,6 +469,7 @@ int doSkeletonDraw(
                              axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
                              axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
+                             //0 ,0
                              axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                            );
     } else
@@ -725,7 +726,7 @@ int main(int argc,const char **argv)
      struct TRI_Model axisModelIndexed={0};
      if (!loadModelTri("axis.tri", &axisModelIndexed ) )
      {
-      fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
+       fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
        return 0;
      }
 
@@ -808,9 +809,9 @@ int main(int argc,const char **argv)
       humanPose.pitch=0.0;//(float) (rand()%90);
       humanPose.yaw=0.0;//(float)   (rand()%90);
       //-------------------------------------------------------------------
-      humanPose.x=0.1f;//(float)  (1000-rand()%2000);
+      humanPose.x=0.01f;//(float)  (1000-rand()%2000);
       humanPose.y=0.0f;//(float) (100-rand()%200);
-      humanPose.z=11.4f;//(float)  (700+rand()%1000);
+      humanPose.z=2.4f;//(float)  (700+rand()%1000);
 
      //Do axis rendering
      doSkeletonDraw(
