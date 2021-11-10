@@ -307,7 +307,7 @@ int drawVertexArrayWithMVPMatrices(
   //-------------------------------------------------------------------
   struct Matrix4x4OfFloats MVP;
   getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,modelMatrix);
-  transpose4x4FMatrix(MVP.m);
+  transpose4x4FMatrix(MVP.m); //OpenGL needs a column-major/row-major flip..
   //-------------------------------------------------------------------
 
 

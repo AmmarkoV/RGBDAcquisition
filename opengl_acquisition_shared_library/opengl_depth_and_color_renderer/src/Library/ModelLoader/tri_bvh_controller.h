@@ -274,18 +274,9 @@ const static int animateTRIModelUsingBVHArmature(
     int printDebugMessages
 )
 {
-    if (modelOriginal==0)
-    {
-        return 0;
-    }
-    if (modelOutput==0)
-    {
-        return 0;
-    }
-    if (bvh==0)
-    {
-        return 0;
-    }
+    if (modelOriginal==0)  { return 0; }
+    if (modelOutput==0)    { return 0; }
+    if (bvh==0)            { return 0; }
     //----------------------------------
     copyModelTri(modelOutput, modelOriginal, 1 /*We also want bone data*/);
 
@@ -379,6 +370,7 @@ const static int animateTRIModelUsingBVHArmature(
                                 sizeof(float) * 16
                               );
 
+                        //invert4x4FMatrix(&transformations4x4[boneID*16],bvhTransform.joint[jID].dynamicRotation.m);
 /*
                         float YZRotation[]={1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,0,0,1};
                         float ZYRotation[]={1,0,0,0, 0,0,-1,0, 0,1,0,0, 0,0,0,1};
