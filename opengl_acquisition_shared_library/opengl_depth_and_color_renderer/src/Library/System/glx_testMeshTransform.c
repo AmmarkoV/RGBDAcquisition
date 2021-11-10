@@ -538,7 +538,7 @@ int doSkeletonDraw(
     GLuint axisArrayBuffer;
     unsigned int axisTriangleCount=0;
 
-    int usePrimitive = 0;
+    int usePrimitive = 1;
 
     if (!usePrimitive)
     {
