@@ -453,9 +453,14 @@ int doSkeletonDraw(
     //------------------------------------------------------------------------------------
     GLuint axisVAO;
     GLuint axisArrayBuffer;
-    /*
-    unsigned int axisTriangleCount  =  (unsigned int)  axisModel->header.numberOfVertices/3;
-    pushObjectToBufferData(
+    unsigned int axisTriangleCount;
+
+    int usePrimitive = 1;
+
+    if (!usePrimitive)
+    {
+     axisTriangleCount  =  (unsigned int)  axisModel->header.numberOfVertices/3;
+     pushObjectToBufferData(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
@@ -465,21 +470,22 @@ int doSkeletonDraw(
                              axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
                              axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );*/
-
-    unsigned int axisTriangleCount  = pyramidTriangleCount;
-    pushObjectToBufferData(
+                           );
+    } else
+    {
+     axisTriangleCount  = pyramidTriangleCount;
+     pushObjectToBufferData(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
                              programID,
-                             pyramidCoords     ,  pyramidTriangleCount      * sizeof(float),
-                             pyramidNormals    ,  sizeof( axisModel->header.numberOfNormals),
-                             pyramidTexCoords  ,  sizeof(axisModel->header.numberOfTextureCoords ),      //0,0 //No Texture
-                             cubeColors        ,  sizeof(axisModel->header.numberOfColors),
+                             pyramidCoords     ,  sizeof(pyramidCoords),
+                             pyramidNormals    ,  sizeof(pyramidNormals),
+                             pyramidTexCoords  ,  sizeof(pyramidTexCoords),      //0,0 //No Texture
+                             cubeColors        ,  sizeof(cubeColors),
                              0        ,  0//0,0 //Not Indexed
                           );
-
+    }
     //------------------------------------------------------------------------------------
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
