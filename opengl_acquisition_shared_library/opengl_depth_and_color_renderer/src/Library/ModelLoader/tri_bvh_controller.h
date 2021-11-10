@@ -265,6 +265,24 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
 }
 
 
+/*
+
+
+r = rotate reference about tail by roll
+z = cross(r, tail)
+x = cross(tail, z)
+
+Yielding this complete matrix:
+
+/ x.x  tail.x   z.x  head.x \
+| x.y  tail.y   z.y  head.y |
+| x.z  tail.z   z.z  head.z |
+\ 0    0        0    1      /
+
+
+*/
+
+
 
 const static int animateTRIModelUsingBVHArmature(
     struct TRI_Model * modelOutput,
@@ -363,6 +381,8 @@ const static int animateTRIModelUsingBVHArmature(
                         //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
                         //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L1395
                         //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/core/transformations.py#L317
+                        //svn.blender.org/svnroot/bf-blender/branches/blender-2.47/source/blender/blenkernel/intern/armature.c
+                        //https://developer.blender.org/T39470
 
                         memcpy(
                                 &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
@@ -417,7 +437,7 @@ const static int animateTRIModelUsingBVHArmature(
         }
 
 
-        struct TRI_Model modelTemporary= {0};
+        struct TRI_Model modelTemporary = {0};
         //---------------------------------------------------------------
         doModelTransform(
                          &modelTemporary,

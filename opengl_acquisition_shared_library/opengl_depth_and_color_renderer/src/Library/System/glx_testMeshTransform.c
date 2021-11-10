@@ -139,8 +139,7 @@ int drawObjectAT(
 
 int doOGLDrawing(
                  int programID,
-                 GLuint MVPMatrixID ,
-                 struct pose6D * eyePose,
+                 GLuint MVPMatrixID,
                  GLuint eyeVao,
                  unsigned int eyeTriangleCount,
                  struct pose6D * humanPose,
@@ -181,10 +180,10 @@ int doOGLDrawing(
                                                viewportMatrix.m,
                                                newViewport
                                              );
-     //-------------------------------
-     //-------------------------------
-     //-------------------------------
-     if (eyePose->usePoseMatrixDirectly)
+  //-------------------------------
+  //-------------------------------
+  //-------------------------------
+  if (humanPose->usePoseMatrixDirectly)
      {
       drawVertexArrayWithMVPMatrices(
                                      programID,
@@ -192,39 +191,13 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      eyeTriangleCount,
                                      //-------------
-                                     &eyePose->m,
+                                     &humanPose->m,
                                      //-------------
                                      &projectionMatrix,
                                      &viewportMatrix,
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
-     } else
-     {
-     drawObjectAT(
-                  programID,
-                  eyeVao,
-                  MVPMatrixID,
-                  eyeTriangleCount,
-                  //-------------
-                  eyePose->x,
-                  eyePose->y,
-                  eyePose->z,
-                  eyePose->roll,
-                  eyePose->pitch,
-                  eyePose->yaw,
-                  //-------------
-                  &projectionMatrix,
-                  &viewportMatrix,
-                  &viewMatrix,
-                  0 //Wireframe
-                 );
-     }
-     //-------------------------------
-     //-------------------------------
-     //-------------------------------
-     if (humanPose->usePoseMatrixDirectly)
-     {
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      humanVao,
@@ -240,6 +213,24 @@ int doOGLDrawing(
                                     );
      } else
      {
+     drawObjectAT(
+                  programID,
+                  eyeVao,
+                  MVPMatrixID,
+                  eyeTriangleCount,
+                  //-------------
+                  humanPose->x,
+                  humanPose->y,
+                  humanPose->z,
+                  humanPose->roll,
+                  humanPose->pitch,
+                  humanPose->yaw,
+                  //-------------
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix,
+                  0 //Wireframe
+                 );
      drawObjectAT(
                   programID,
                   humanVao,
@@ -259,9 +250,9 @@ int doOGLDrawing(
                   0 //Wireframe
                  );
      }
-     //-------------------------------
-     //-------------------------------
-     //-------------------------------
+  //-------------------------------
+  //-------------------------------
+  //-------------------------------
 
   return 1;
 }
@@ -381,7 +372,6 @@ int doDrawing(
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
-                     humanPose,
                      eyeVAO,
                      eyeTriangleCount,
                      humanPose,
@@ -434,11 +424,8 @@ int doDrawing(
 
 int main(int argc,const char **argv)
 {
-
   unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
   unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
-
-
 
   fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
@@ -469,6 +456,8 @@ int main(int argc,const char **argv)
 
    //------------------------------------------------------
    struct BVH_MotionCapture mc = {0};
+   //------------------------------------------------------
+   struct TRI_Model axisModel={0};
    //------------------------------------------------------
    struct TRI_Model eyeModel={0};
    struct TRI_Model indexedEyeModel={0};
@@ -576,6 +565,13 @@ int main(int argc,const char **argv)
    }
 */
 
+
+   //------------------------------------------------------
+   if (!loadModelTri("axis.tri", &axisModel ) )
+   {
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
+     //return 0;
+   }
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
    {
