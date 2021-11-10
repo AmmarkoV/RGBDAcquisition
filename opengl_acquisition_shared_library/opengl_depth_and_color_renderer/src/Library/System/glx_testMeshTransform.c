@@ -36,7 +36,6 @@
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
 #include "../Rendering/downloadFromRenderer.h"
 
-
 //Colored console output..
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -48,7 +47,6 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
 //Change this to change MultiRendering numbers..
 #define originalWIDTH 1080
 #define originalHEIGHT 1080
@@ -56,14 +54,6 @@
 #define tilesToDoY 1
 #define shrinkingFactor 1
 //--------------------------------------------
-
-
-
-
-
-
-
-
 
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
@@ -469,7 +459,6 @@ int doSkeletonDraw(
                              axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
                              axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
-                             //0 ,0
                              axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                            );
     } else
@@ -805,13 +794,16 @@ int main(int argc,const char **argv)
       //for (int i=0; i<axisModel.header.numberOfVertices; i++)
       // { fprintf(stderr,"%0.2f ",axisModel.vertices[i]); }
 
+      //humanPose.roll+=1.0;//(float)  (rand()%90);
+      //humanPose.pitch+=1.0;//(float) (rand()%90);
+      //humanPose.yaw+=1.0;//(float)   (rand()%90);
       humanPose.roll=0.0;//(float)  (rand()%90);
       humanPose.pitch=0.0;//(float) (rand()%90);
       humanPose.yaw=0.0;//(float)   (rand()%90);
       //-------------------------------------------------------------------
-      humanPose.x=0.01f;//(float)  (1000-rand()%2000);
+      humanPose.x=0.0f;//(float)  (1000-rand()%2000);
       humanPose.y=0.0f;//(float) (100-rand()%200);
-      humanPose.z=2.4f;//(float)  (700+rand()%1000);
+      humanPose.z=3.4f;//(float)  (700+rand()%1000);
 
      //Do axis rendering
      doSkeletonDraw(
