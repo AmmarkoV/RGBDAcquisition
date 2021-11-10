@@ -326,7 +326,7 @@ int doDrawing(
                              eyeModel->normal         ,  eyeModel->header.numberOfNormals       * sizeof(float),
                              eyeModel->textureCoords  ,  eyeModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              eyeModel->colors         ,  eyeModel->header.numberOfColors        * sizeof(float),
-                             humanModel->indices      ,  humanModel->header.numberOfIndices     * sizeof(unsigned int)//0,0 //Not Indexed
+                             eyeModel->indices        ,  eyeModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
     GLuint humanVAO;
@@ -422,6 +422,130 @@ int doDrawing(
 	return 1;
 }
 
+
+
+
+
+int doSkeletonDraw(
+                   GLuint programID,
+                   GLuint programFrameBufferID,
+                   GLuint FramebufferName,
+                   GLuint renderedTexture,
+                   GLuint renderedDepth,
+                   struct pose6D * humanPose,
+                   struct TRI_Model * humanModel,
+                   struct TRI_Model * axisModel,
+                   unsigned int WIDTH,
+                   unsigned int HEIGHT,
+                   int renderForever
+                  )
+{
+ 	// Get a handle for our "MVP" uniform
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+    //------------------------------------------------------------------------------------
+    GLuint axisVAO;
+    GLuint axisArrayBuffer;
+    unsigned int axisTriangleCount  =  (unsigned int)  axisModel->header.numberOfVertices/3;
+    pushObjectToBufferData(
+                             1,
+                             &axisVAO,
+                             &axisArrayBuffer,
+                             programID,
+                             axisModel->vertices       ,  axisModel->header.numberOfVertices      * sizeof(float),
+                             axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
+                             axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
+                             axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
+                             axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                          );
+    //------------------------------------------------------------------------------------
+	 GLuint quad_vertexbuffer;
+	 glGenBuffers(1, &quad_vertexbuffer);
+	 glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
+
+	 // Create and compile our GLSL program from the shaders
+	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 // Create and compile our GLSL program from the shaders
+	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
+
+	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
+
+	 do
+     {
+        // Render to our framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
+       //-----------------------------------------------
+        if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
+       //-----------------------------------------------
+
+        glClearColor( 0, 0.0, 0, 1 );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+
+
+        doOGLDrawing(
+                     programID,
+                     MVPMatrixID,
+                     axisVAO,
+                     axisTriangleCount,
+                     humanPose,
+                     axisVAO,
+                     axisTriangleCount,
+                     WIDTH,
+                     HEIGHT
+                    );
+
+        //We have accumulated all data on the framebuffer and will now draw it back..
+        drawFramebufferToScreen(
+                                programFrameBufferID,
+                                quad_vertexbuffer,
+                                renderedTexture,
+                                texID,
+                                timeID,
+                                resolutionID,
+                                WIDTH,HEIGHT
+                               );
+
+		// Swap buffers
+        glx3_endRedraw();
+
+
+      //---------------------------------------------------------------
+      //------------------- Calculate Framerate -----------------------
+      //---------------------------------------------------------------
+       unsigned long now=GetTickCountMilliseconds();
+       unsigned long elapsedTime=now-lastRenderingTime;
+       if (elapsedTime==0) { elapsedTime=1; }
+       lastFramerate = (float) 1000/(elapsedTime);
+       lastRenderingTime = now;
+      //---------------------------------------------------------------
+        ++framesRendered;
+      //---------------------------------------------------------------
+
+      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
+	} // Check if the ESC key was pressed or the window was closed
+    while(renderForever);
+
+
+	// Cleanup VBO and shader
+	glDeleteBuffers(1, &quad_vertexbuffer);
+	glDeleteBuffers(1, &axisArrayBuffer);
+	glDeleteVertexArrays(1, &axisVAO);
+	return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 int main(int argc,const char **argv)
 {
   unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
@@ -470,6 +594,7 @@ int main(int argc,const char **argv)
    int dumpVideo = 0;
    unsigned int maxFrames=0;
 
+   int axisRendering = 0;
    int staticRendering = 0;
 
 
@@ -502,6 +627,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--axis")==0)
+                    {
+                      axisRendering=1;
+                    } else
            if (strcmp(argv[i],"--static")==0)
                     {
                       staticRendering=1;
@@ -550,8 +679,7 @@ int main(int argc,const char **argv)
           return 0;
         }
    bvh_renameJointsToLowercase(&mc);
-/*
-   BVHJointID jID;
+/* BVHJointID jID;
    if ( bvh_getJointIDFromJointName(&mc,"rknee",&jID) )
    {
        mc.jointHierarchy[jID].channelRotationOrder = BVH_ROTATION_ORDER_YZX;
@@ -562,10 +690,7 @@ int main(int argc,const char **argv)
     //BVH_ROTATION_ORDER_YZX,
     //BVH_ROTATION_ORDER_ZXY,
     //BVH_ROTATION_ORDER_ZYX,
-   }
-*/
-
-
+   } */
    //------------------------------------------------------
    if (!loadModelTri("axis.tri", &axisModel ) )
    {
@@ -638,6 +763,24 @@ int main(int argc,const char **argv)
        fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
      }
 
+
+    if (axisRendering)
+    { //Do axis rendering
+     doSkeletonDraw(
+                programID,
+                programFrameBufferID,
+                FramebufferName,
+                renderedTexture,
+                renderedDepth,
+                &humanPose,
+                &humanModel,
+                &axisModel,
+                WIDTH,
+                HEIGHT,
+                0
+              );
+    } else
+    { //Do regular skinned model rendering
      doDrawing(
                 programID,
                 programFrameBufferID,
@@ -651,6 +794,10 @@ int main(int argc,const char **argv)
                 HEIGHT,
                 0
               );
+    }
+
+
+
 
      deallocInternalsOfModelTri(&humanModel);
      deallocInternalsOfModelTri(&eyeModel);
