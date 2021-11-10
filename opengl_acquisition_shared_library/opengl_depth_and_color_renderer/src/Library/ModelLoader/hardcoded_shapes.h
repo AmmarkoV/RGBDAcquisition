@@ -88,6 +88,7 @@ static const float cubeCoords[]=
  U,-U, U
  };
 
+static unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
 
 static const float cubeNormals[]={ //X  Y  Z  W
                       -1.0f,-0.0f,-0.0f,
@@ -253,6 +254,8 @@ static const float pyramidCoords[]={ //X  Y  Z       W
                      -U, -U, -U, //1.0,  // bottom left
                       U, -U, -U  //, 1.0 // bottom right
                     };
+
+static unsigned int pyramidTriangleCount  =  (unsigned int )  sizeof(pyramidCoords)/(3*sizeof(float));
 
 static const float pyramidNormals[]={ //X  Y  Z  W
                       0.0,0.4472,-0.8944,

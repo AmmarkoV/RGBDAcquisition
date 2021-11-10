@@ -57,6 +57,14 @@
 #define shrinkingFactor 1
 //--------------------------------------------
 
+
+
+
+
+
+
+
+
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
@@ -693,11 +701,14 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    if (axisRendering)
    {
-     if (!loadModelTri("axis.tri", &axisModel ) )
+     struct TRI_Model axisModelIndexed={0};
+     if (!loadModelTri("axis.tri", &axisModelIndexed ) )
      {
       fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
        return 0;
      }
+
+     fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
@@ -768,8 +779,7 @@ int main(int argc,const char **argv)
 
     if (axisRendering)
     {
-      printTRIModel(&axisModel);
-
+      //printTRIModel(&axisModel);
       //for (int i=0; i<axisModel.header.numberOfVertices; i++)
       // { fprintf(stderr,"%0.2f ",axisModel.vertices[i]); }
 
