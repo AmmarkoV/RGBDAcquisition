@@ -1482,17 +1482,15 @@ void create4x4FModelTransformation(
 {
     if (m==0) {return;}
 
-    fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f) ",rotationZ,rotationY,rotationX);
-    fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f) ",x,y,z);
-    fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
-
-
+    //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f) ",rotationZ,rotationY,rotationX);
+    //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f) ",x,y,z);
+    //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
     //Translation matrix
     //----------------------------------------------------------
     int translationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixTranslation;
-    if ( (x!=0.0) || (y!=0.0) || (z==0.0) )
+    if ( (x!=0.0) || (y!=0.0) || (z!=0.0) )
     {
      create4x4FTranslationMatrix(
                                  &intermediateMatrixTranslation,
@@ -1509,7 +1507,7 @@ void create4x4FModelTransformation(
     //----------------------------------------------------------
     int rotationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixRotation;
-    if ( (rotationX!=0.0) || (rotationY!=0.0) || (rotationZ==0.0) )
+    if ( (rotationX!=0.0) || (rotationY!=0.0) || (rotationZ!=0.0) )
     {
       if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
         {
@@ -1547,7 +1545,7 @@ void create4x4FModelTransformation(
     //----------------------------------------------------------
     int scaleSpecified=0;
     struct Matrix4x4OfFloats intermediateScalingMatrix;
-    if ( (scaleX!=1.0) || (scaleY==1.0) || (scaleZ!=1.0) )
+    if ( (scaleX!=1.0) || (scaleY!=1.0) || (scaleZ!=1.0) )
       {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
         scaleSpecified=1;
@@ -1559,7 +1557,7 @@ void create4x4FModelTransformation(
 
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
-    fprintf(stderr,"Number Of Multiplications needed %u\n",numberOfOperationsNeeded);
+    //fprintf(stderr,"Number Of Multiplications needed %u\n",numberOfOperationsNeeded);
     switch (numberOfOperationsNeeded)
     {
       case 0:
