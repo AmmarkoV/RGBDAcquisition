@@ -768,29 +768,33 @@ int main(int argc,const char **argv)
 
     if (axisRendering)
     {
+      printTRIModel(&axisModel);
 
-   humanPose.roll=180.0;//(float)  (rand()%90);
-   humanPose.pitch=-90.0;//(float) (rand()%90);
-   humanPose.yaw=0.0;//(float)   (rand()%90);
-   //-------------------------------------------------------------------
-   humanPose.x=-0.1f;//(float)  (1000-rand()%2000);
-   humanPose.y=-0.1f;//(float) (100-rand()%200);
-   humanPose.z=0.1f;//(float)  (700+rand()%1000);
+      //for (int i=0; i<axisModel.header.numberOfVertices; i++)
+      // { fprintf(stderr,"%0.2f ",axisModel.vertices[i]); }
+
+      humanPose.roll=0.0;//(float)  (rand()%90);
+      humanPose.pitch=0.0;//(float) (rand()%90);
+      humanPose.yaw=0.0;//(float)   (rand()%90);
+      //-------------------------------------------------------------------
+      humanPose.x=-0.3f;//(float)  (1000-rand()%2000);
+      humanPose.y=-0.3f;//(float) (100-rand()%200);
+      humanPose.z=1.4f;//(float)  (700+rand()%1000);
 
      //Do axis rendering
      doSkeletonDraw(
-                programID,
-                programFrameBufferID,
-                FramebufferName,
-                renderedTexture,
-                renderedDepth,
-                &humanPose,
-                &humanModel,
-                &axisModel,
-                WIDTH,
-                HEIGHT,
-                0
-              );
+                     programID,
+                     programFrameBufferID,
+                     FramebufferName,
+                     renderedTexture,
+                     renderedDepth,
+                     &humanPose,
+                     &humanModel,
+                     &axisModel,
+                     WIDTH,
+                     HEIGHT,
+                     0
+                   );
     } else
     { //Do regular skinned model rendering
      doDrawing(
