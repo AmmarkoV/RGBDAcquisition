@@ -483,7 +483,6 @@ int doSkeletonDraw(
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
-
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
@@ -692,10 +691,13 @@ int main(int argc,const char **argv)
     //BVH_ROTATION_ORDER_ZYX,
    } */
    //------------------------------------------------------
-   if (!loadModelTri("axis.tri", &axisModel ) )
+   if (axisRendering)
    {
-     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
-     //return 0;
+     if (!loadModelTri("axis.tri", &axisModel ) )
+     {
+      fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
+       return 0;
+     }
    }
    //------------------------------------------------------
    if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
@@ -765,7 +767,17 @@ int main(int argc,const char **argv)
 
 
     if (axisRendering)
-    { //Do axis rendering
+    {
+
+   humanPose.roll=180.0;//(float)  (rand()%90);
+   humanPose.pitch=-90.0;//(float) (rand()%90);
+   humanPose.yaw=0.0;//(float)   (rand()%90);
+   //-------------------------------------------------------------------
+   humanPose.x=-0.1f;//(float)  (1000-rand()%2000);
+   humanPose.y=-0.1f;//(float) (100-rand()%200);
+   humanPose.z=0.1f;//(float)  (700+rand()%1000);
+
+     //Do axis rendering
      doSkeletonDraw(
                 programID,
                 programFrameBufferID,
