@@ -221,7 +221,7 @@ int doOGLDrawing(
                                     );
      } else
      {
-     drawObjectAT(
+      drawObjectAT(
                   programID,
                   eyeVao,
                   MVPMatrixID,
@@ -238,8 +238,8 @@ int doOGLDrawing(
                   &viewportMatrix,
                   &viewMatrix,
                   0 //Wireframe
-                 );
-     drawObjectAT(
+                  );
+      drawObjectAT(
                   programID,
                   humanVao,
                   MVPMatrixID,
@@ -256,7 +256,7 @@ int doOGLDrawing(
                   &viewportMatrix,
                   &viewMatrix,
                   0 //Wireframe
-                 );
+                  );
      }
   //-------------------------------
   //-------------------------------
@@ -453,6 +453,7 @@ int doSkeletonDraw(
     //------------------------------------------------------------------------------------
     GLuint axisVAO;
     GLuint axisArrayBuffer;
+    /*
     unsigned int axisTriangleCount  =  (unsigned int)  axisModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -464,7 +465,21 @@ int doSkeletonDraw(
                              axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
                              axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                          );*/
+
+    unsigned int axisTriangleCount  = pyramidTriangleCount;
+    pushObjectToBufferData(
+                             1,
+                             &axisVAO,
+                             &axisArrayBuffer,
+                             programID,
+                             pyramidCoords     ,  pyramidTriangleCount      * sizeof(float),
+                             pyramidNormals    ,  sizeof( axisModel->header.numberOfNormals),
+                             pyramidTexCoords  ,  sizeof(axisModel->header.numberOfTextureCoords ),      //0,0 //No Texture
+                             cubeColors        ,  sizeof(axisModel->header.numberOfColors),
+                             0        ,  0//0,0 //Not Indexed
                           );
+
     //------------------------------------------------------------------------------------
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
@@ -787,9 +802,9 @@ int main(int argc,const char **argv)
       humanPose.pitch=0.0;//(float) (rand()%90);
       humanPose.yaw=0.0;//(float)   (rand()%90);
       //-------------------------------------------------------------------
-      humanPose.x=-0.3f;//(float)  (1000-rand()%2000);
-      humanPose.y=-0.3f;//(float) (100-rand()%200);
-      humanPose.z=1.4f;//(float)  (700+rand()%1000);
+      humanPose.x=0.1f;//(float)  (1000-rand()%2000);
+      humanPose.y=0.0f;//(float) (100-rand()%200);
+      humanPose.z=11.4f;//(float)  (700+rand()%1000);
 
      //Do axis rendering
      doSkeletonDraw(

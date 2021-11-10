@@ -1486,12 +1486,12 @@ void create4x4FModelTransformation(
     //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
-    char numberOfOperationsNeeded=0;
+    int numberOfOperationsNeeded=0;
 
 
     //Translation matrix
     //----------------------------------------------------------
-    char translationSpecified=0;
+    int translationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixTranslation;
     if ( (x!=0.0) || (y!=0.0) || (z==0.0) )
     {
@@ -1502,14 +1502,14 @@ void create4x4FModelTransformation(
                                  z
                                );
       translationSpecified=1;
-      ++numberOfOperationsNeeded;
+      numberOfOperationsNeeded+=1;
     }
     //----------------------------------------------------------
 
 
     //Rotation matrix
     //----------------------------------------------------------
-    char rotationSpecified=0;
+    int rotationSpecified=0;
     struct Matrix4x4OfFloats intermediateMatrixRotation;
     if ( (rotationX!=0.0) || (rotationY!=0.0) || (rotationZ==0.0) )
     {
@@ -1529,7 +1529,7 @@ void create4x4FModelTransformation(
                                 rotationX//heading
                               );
           rotationSpecified=1;
-          ++numberOfOperationsNeeded;
+          numberOfOperationsNeeded+=1;
         } else
         {
           //fprintf(stderr,"Using new model transform code\n");
@@ -1541,7 +1541,7 @@ void create4x4FModelTransformation(
                                                            rotationOrder
                                                           );
           rotationSpecified=1;
-          ++numberOfOperationsNeeded;
+          numberOfOperationsNeeded+=1;
          }
     }
     //----------------------------------------------------------
@@ -1549,13 +1549,13 @@ void create4x4FModelTransformation(
 
     //Scale matrix
     //----------------------------------------------------------
-    char scaleSpecified=0;
+    int scaleSpecified=0;
     struct Matrix4x4OfFloats intermediateScalingMatrix;
     if ( (scaleX!=1.0) || (scaleY==1.0) || (scaleZ!=1.0) )
       {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
         scaleSpecified=1;
-        ++numberOfOperationsNeeded;
+        numberOfOperationsNeeded+=1;
       }
 
 
@@ -1567,9 +1567,9 @@ void create4x4FModelTransformation(
         create4x4FIdentityMatrix(m);
        return;
       case 1:
-        if (translationSpecified==0) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
-        if (rotationSpecified==0)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
-        if (scaleSpecified==0)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
+        if (translationSpecified==1) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
+        if (rotationSpecified==1)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
+        if (scaleSpecified==1)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
         return;
       case 2:
         if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
