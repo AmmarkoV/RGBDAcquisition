@@ -59,7 +59,7 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
- struct pose6D
+struct pose6D
  {
      float x,y,z;
      float roll,pitch,yaw;
@@ -135,6 +135,99 @@ int drawObjectAT(
 
 
 
+
+int doOGLSingleDrawing(
+                        int programID,
+                        GLuint MVPMatrixID,
+                        struct pose6D * pose,
+                        GLuint VAO,
+                        unsigned int triangleCount,
+                        unsigned int width,
+                        unsigned int height
+                      )
+{
+  struct Matrix4x4OfFloats projectionMatrix;
+  struct Matrix4x4OfFloats viewportMatrix;
+  struct Matrix4x4OfFloats viewMatrix;
+
+  prepareRenderingMatrices(
+                              1235.423889, //fx
+                              1233.48468,  //fy
+                              0.0,        //skew
+                              (float) width/2,    //cx
+                              (float) height/2,   //cy
+                              (float) width,      //Window Width
+                              (float) height,     //Window Height
+                              0.1,        //Near
+                              1000.0,      //Far
+                              &projectionMatrix,
+                              &viewMatrix,
+                              &viewportMatrix
+                         );
+
+  unsigned int viewportWidth = (unsigned int) width;
+  unsigned int viewportHeight = (unsigned int) height;
+  glViewport(0,0,viewportWidth,viewportHeight);
+
+  float newViewport[4]={0,0,viewportWidth,viewportHeight};
+  float projectionMatrixViewportCorrected[16];
+  correctProjectionMatrixForDifferentViewport(
+                                               projectionMatrixViewportCorrected,
+                                               projectionMatrix.m,
+                                               viewportMatrix.m,
+                                               newViewport
+                                             );
+  //-------------------------------
+  //-------------------------------
+  //-------------------------------
+  if (pose->usePoseMatrixDirectly)
+     {
+      drawVertexArrayWithMVPMatrices(
+                                     programID,
+                                     VAO,
+                                     MVPMatrixID,
+                                     triangleCount,
+                                     //-------------
+                                     &pose->m,
+                                     //-------------
+                                     &projectionMatrix,
+                                     &viewportMatrix,
+                                     &viewMatrix,
+                                     0 //Wireframe
+                                    );
+     } else
+     {
+      drawObjectAT(
+                  programID,
+                  VAO,
+                  MVPMatrixID,
+                  triangleCount,
+                  //-------------
+                  pose->x,
+                  pose->y,
+                  pose->z,
+                  pose->roll,
+                  pose->pitch,
+                  pose->yaw,
+                  //-------------
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix,
+                  0 //Wireframe
+                  );
+     }
+  //-------------------------------
+  //-------------------------------
+  //-------------------------------
+
+  return 1;
+}
+
+
+
+
+
+
 int doOGLDrawing(
                  int programID,
                  GLuint MVPMatrixID,
@@ -155,11 +248,11 @@ int doOGLDrawing(
                               1235.423889, //fx
                               1233.48468,  //fy
                               0.0,        //skew
-                              (float) originalWIDTH/2,    //cx
-                              (float) originalHEIGHT/2,   //cy
-                              (float) originalWIDTH,      //Window Width
-                              (float) originalHEIGHT,     //Window Height
-                              1.0,        //Near
+                              (float) width/2,    //cx
+                              (float) height/2,   //cy
+                              (float) width,      //Window Width
+                              (float) height,     //Window Height
+                              0.1,        //Near
                               1000.0,      //Far
                               &projectionMatrix,
                               &viewMatrix,
@@ -443,9 +536,9 @@ int doSkeletonDraw(
     //------------------------------------------------------------------------------------
     GLuint axisVAO;
     GLuint axisArrayBuffer;
-    unsigned int axisTriangleCount;
+    unsigned int axisTriangleCount=0;
 
-    int usePrimitive = 1;
+    int usePrimitive = 0;
 
     if (!usePrimitive)
     {
@@ -502,17 +595,16 @@ int doSkeletonDraw(
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
-        doOGLDrawing(
-                     programID,
-                     MVPMatrixID,
-                     axisVAO,
-                     axisTriangleCount,
-                     humanPose,
-                     axisVAO,
-                     axisTriangleCount,
-                     WIDTH,
-                     HEIGHT
-                    );
+
+        doOGLSingleDrawing(
+                            programID,
+                            MVPMatrixID,
+                            humanPose,
+                            axisVAO,
+                            axisTriangleCount,
+                            WIDTH,
+                            HEIGHT
+                          );
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebufferToScreen(
@@ -803,7 +895,7 @@ int main(int argc,const char **argv)
       //-------------------------------------------------------------------
       humanPose.x=0.0f;//(float)  (1000-rand()%2000);
       humanPose.y=0.0f;//(float) (100-rand()%200);
-      humanPose.z=3.4f;//(float)  (700+rand()%1000);
+      humanPose.z=13.4f;//(float)  (700+rand()%1000);
 
      //Do axis rendering
      doSkeletonDraw(
@@ -841,7 +933,7 @@ int main(int argc,const char **argv)
 
      deallocInternalsOfModelTri(&humanModel);
      deallocInternalsOfModelTri(&eyeModel);
-     usleep(10);
+     usleep(1);
 
 
      if  (rgb!=0)
