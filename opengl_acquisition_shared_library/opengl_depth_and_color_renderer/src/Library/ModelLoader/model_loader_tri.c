@@ -841,8 +841,8 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
           //fprintf(stderr,"%u\n",boneNum);
 
           if (triModel->bones[boneNum].info!=0)
-           { fwrite ( triModel->bones[boneNum].info        , sizeof(struct TRI_Bones_Header) , 1 , fd); } else
-           { fwrite ( &emptyBonesHeader                    , sizeof(struct TRI_Bones_Header) , 1 , fd); }
+           { fwrite ( triModel->bones[boneNum].info     , sizeof(struct TRI_Bones_Header) , 1 , fd); } else
+           { fwrite ( &emptyBonesHeader                 , sizeof(struct TRI_Bones_Header) , 1 , fd); }
 
           fwrite ( triModel->bones[boneNum].boneName    , sizeof(char)                    , triModel->bones[boneNum].info->boneNameSize      , fd);
 
@@ -887,9 +887,102 @@ int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Contai
         triModel->header.numberOfBones = 0;
         for (unsigned int meshID = 0; meshID < container->header.numberOfMeshes; meshID++ )
         {
-
+          triModel->header.numberOfVertices      += container->mesh[meshID].header.numberOfVertices;
+          triModel->header.numberOfNormals       += container->mesh[meshID].header.numberOfNormals;
+          triModel->header.numberOfTextureCoords += container->mesh[meshID].header.numberOfTextureCoords;
+          triModel->header.numberOfColors        += container->mesh[meshID].header.numberOfColors;
+          triModel->header.numberOfIndices       += container->mesh[meshID].header.numberOfIndices;
+          //Ignore Bones..
         }
-    return 0;
+
+
+        unsigned int itemSize=0 , count=0;
+        //------------------------------------------------------------------
+        if (triModel->header.numberOfVertices)
+        {
+         itemSize=sizeof(float); count=triModel->header.numberOfVertices;
+         fprintf(stderr,"Allocating %u bytes of vertex data\n", itemSize * count );
+         triModel->vertices = ( float * ) malloc ( itemSize * count );
+        }
+
+        if (triModel->header.numberOfNormals)
+        {
+         itemSize=sizeof(float); count=triModel->header.numberOfNormals;
+         fprintf(stderr,"Allocating %u bytes of normal data\n", itemSize * count );
+         triModel->normal = ( float * ) malloc ( itemSize * count );
+        }
+
+        if (triModel->header.numberOfTextureCoords)
+        {
+         itemSize=sizeof(float); count=triModel->header.numberOfTextureCoords;
+         fprintf(stderr,"Allocating %u bytes of texture data\n",itemSize * count);
+         triModel->textureCoords = ( float * ) malloc ( itemSize * count );
+        }
+
+        if (triModel->header.numberOfColors)
+        {
+         itemSize=sizeof(float); count=triModel->header.numberOfColors;
+         fprintf(stderr,"Allocating %u bytes of colors\n",itemSize * count);
+         triModel->colors = ( float * ) malloc ( itemSize * count );
+        }
+
+        if (triModel->header.numberOfIndices)
+        {
+         itemSize=sizeof(unsigned int); count=triModel->header.numberOfIndices;
+         fprintf(stderr,"Allocating %u bytes of indices\n",itemSize * count);
+         triModel->indices = ( unsigned int * ) malloc ( itemSize * count );
+        }
+        //------------------------------------------------------------------
+
+        unsigned int numberOfVertices = 0;
+        unsigned int numberOfNormals = 0;
+        unsigned int numberOfTextureCoords = 0;
+        unsigned int numberOfColors = 0;
+        unsigned int numberOfIndices = 0;
+        //unsigned int numberOfBones = 0;
+        for (unsigned int meshID = 0; meshID < container->header.numberOfMeshes; meshID++ )
+        {
+          //Append Vertices..
+          if (container->mesh[meshID].vertices!=0)
+          {
+           memcpy( triModel->vertices + numberOfVertices , container->mesh[meshID].vertices , container->mesh[meshID].header.numberOfVertices * sizeof(float) );
+           numberOfVertices+=container->mesh[meshID].header.numberOfVertices;
+          }
+
+          //Append Normals..
+          if (container->mesh[meshID].normal!=0)
+          {
+           memcpy( triModel->normal + numberOfNormals , container->mesh[meshID].normal , container->mesh[meshID].header.numberOfNormals * sizeof(float) );
+           numberOfNormals+=container->mesh[meshID].header.numberOfNormals;
+          }
+
+          //Append Texture Coords..
+          if (container->mesh[meshID].textureCoords!=0)
+          {
+           memcpy( triModel->textureCoords + numberOfTextureCoords , container->mesh[meshID].textureCoords , container->mesh[meshID].header.numberOfTextureCoords * sizeof(float) );
+           numberOfTextureCoords+=container->mesh[meshID].header.numberOfTextureCoords;
+          }
+
+          //Append Colors..
+          if (container->mesh[meshID].colors!=0)
+          {
+           memcpy( triModel->colors + numberOfColors , container->mesh[meshID].colors , container->mesh[meshID].header.numberOfColors * sizeof(float) );
+           numberOfColors+=container->mesh[meshID].header.numberOfColors;
+          }
+
+          //Append Indices..
+          if (container->mesh[meshID].indices!=0)
+          {
+           memcpy( triModel->indices + numberOfIndices , container->mesh[meshID].indices , container->mesh[meshID].header.numberOfIndices * sizeof(unsigned int) );
+           numberOfIndices+=container->mesh[meshID].header.numberOfIndices;
+          }
+          //Ignore Bones..
+        }
+
+
+
+
+    return 1;
 }
 
 
