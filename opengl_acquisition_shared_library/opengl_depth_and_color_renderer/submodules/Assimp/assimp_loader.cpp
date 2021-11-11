@@ -306,8 +306,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);
 
-
-
     fprintf(stderr,"%u color sets",AI_MAX_NUMBER_OF_COLOR_SETS);
     unsigned int colourSet = 0;
         for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
@@ -481,9 +479,6 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
      }
     }
 
-
-
-
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene, selectMesh ,  originalModel );
 
@@ -519,27 +514,32 @@ void prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * tri
   triContainer->header.TRIMagic[2] = 'I';
   triContainer->header.TRIMagic[3] = 'C';
   triContainer->header.TRIMagic[4] = 'O';
+  //---------------------------------------------
+  triContainer->header.floatSize = sizeof(float);
+  //---------------------------------------------
+  triContainer->header.notUsed1 = 0;
+  triContainer->header.notUsed2 = 0;
+  triContainer->header.notUsed3 = 0;
+  triContainer->header.notUsed4 = 0;
+  triContainer->header.notUsed5 = 0;
 
-  unsigned int numberOfMeshes=scene->mNumMeshes;
-  unsigned int selectedMesh=0;
+  triContainer->header.numberOfMeshes = scene->mNumMeshes;
+  triContainer->mesh = (struct TRI_Model *) malloc(sizeof(struct TRI_Model) * triContainer->header.numberOfMeshes);
 
-  struct TRI_Model * meshList = (struct TRI_Model *) malloc(sizeof(struct TRI_Model) * numberOfMeshes);
 
-  if (meshList!=0)
+  if (triContainer->mesh!=0)
   {
-   for (selectedMesh=0; selectedMesh<numberOfMeshes; selectedMesh++)
+   for (unsigned int selectedMesh=0; selectedMesh < triContainer->header.numberOfMeshes; selectedMesh++)
      {
-      struct aiMesh * mesh = scene->mMeshes[selectedMesh];
-      fprintf(stderr,"Mesh #%u (%s)   \n",selectedMesh , mesh->mName.data);
-      fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
-      fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
-      fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
-      fprintf(stderr,"  %d or %d bones\n",mesh->mNumBones,countNumberOfNodes(scene,mesh));
+       struct aiMesh * mesh = scene->mMeshes[selectedMesh];
+       fprintf(stderr,"Mesh #%u (%s)   \n",selectedMesh , mesh->mName.data);
+       fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
+       fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
+       fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
+       fprintf(stderr,"  %d or %d bones\n",mesh->mNumBones,countNumberOfNodes(scene,mesh));
 
-
-
-      fprintf(stderr,"Reading mesh from collada \n");
-      prepareMesh(scene,selectedMesh,&meshList[selectedMesh] );
+       fprintf(stderr,"Reading mesh from collada \n");
+       prepareMesh(scene,selectedMesh,&triContainer->mesh[selectedMesh] );
      }
    }
 

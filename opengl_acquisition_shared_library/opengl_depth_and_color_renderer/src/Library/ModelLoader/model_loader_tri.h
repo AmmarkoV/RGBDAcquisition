@@ -157,7 +157,6 @@ struct TRI_Container_Header
 {
      char TRIMagic[5]; // TRI3D
      unsigned int triType;
-     unsigned int nameSize;
      unsigned int floatSize;
      //These first values guarantee that there is compatibility between machines/versions etc
 
@@ -179,9 +178,6 @@ struct TRI_Container_Header
 struct TRI_Container
 {
    struct TRI_Container_Header header;
-   char *  name;
-
-   float * meshTransformation;
    struct TRI_Model * mesh;
 };
 

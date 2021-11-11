@@ -538,7 +538,7 @@ int doSkeletonDraw(
     GLuint axisArrayBuffer;
     unsigned int axisTriangleCount=0;
 
-    int usePrimitive = 1;
+    int usePrimitive = 0;
 
     if (!usePrimitive)
     {
@@ -811,6 +811,7 @@ int main(int argc,const char **argv)
        return 0;
      }
 
+     paintTRI(&axisModelIndexed,123,123,123);
      fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
