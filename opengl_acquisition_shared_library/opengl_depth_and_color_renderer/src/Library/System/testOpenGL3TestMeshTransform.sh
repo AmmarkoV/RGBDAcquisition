@@ -19,6 +19,13 @@ else
  wget http://ammar.gr/mocapnet/mnet4/eyes.tri
 fi 
 
+if [ -e axis.tri ]
+then 
+ echo "Axis Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/axis.tri
+fi 
 
 if [ -e 01_02.bvh ]
 then 

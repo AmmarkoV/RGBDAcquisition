@@ -82,7 +82,7 @@ int main (int argc, char *argv[])
                 {
                     for (unsigned int meshID=0; meshID<triContainer.header.numberOfMeshes; meshID++)
                     {
-                        fprintf(stderr,"Flattening mesh %u / %u \n",meshID,triContainer.header.numberOfMeshes);
+                        fprintf(stderr,"Flattening mesh %u / %u \n",meshID+1,triContainer.header.numberOfMeshes);
                         fillFlatModelTriFromIndexedModelTri(&triContainer.mesh[meshID],&triContainer.mesh[meshID]);
                     }
 
@@ -92,13 +92,6 @@ int main (int argc, char *argv[])
                         return 1;
                     }
                 }
-            }
-             else
-            if (strstr(argv[2],".bvh")!=0)
-            {
-               doBVHConversion(argv[2]);
-               fprintf(stderr,GREEN "Halting after BVH conversion\n" NORMAL);
-               return 0;
             }
         }
         else if (strcmp(argv[i],"--convert")==0)

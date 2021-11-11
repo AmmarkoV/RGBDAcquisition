@@ -3,8 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-#./assimpTester --convert axis.obj axis.tri
-./assimpTester --merge axis.obj axis.tri
+./assimpTester --merge axis.dae axis.tri
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 

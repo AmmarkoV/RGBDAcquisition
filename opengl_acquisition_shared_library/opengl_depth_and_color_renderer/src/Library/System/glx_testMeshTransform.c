@@ -811,7 +811,7 @@ int main(int argc,const char **argv)
        return 0;
      }
 
-     paintTRI(&axisModelIndexed,255,255,255);
+     //paintTRI(&axisModelIndexed,123,123,123);
      fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
@@ -885,14 +885,14 @@ int main(int argc,const char **argv)
     {
       //printTRIModel(&axisModel);
       //for (int i=0; i<axisModel.header.numberOfVertices; i++)
-      // { fprintf(stderr,"%0.2f ",axisModel.vertices[i]); }
+      // {
+      //   fprintf(stderr,"%0.2f ",axisModel.vertices[i]);
+      //   if (i%3==0) { fprintf(stderr,", "); }
+      // }
 
-      //humanPose.roll+=1.0;//(float)  (rand()%90);
-      //humanPose.pitch+=1.0;//(float) (rand()%90);
-      //humanPose.yaw+=1.0;//(float)   (rand()%90);
-      humanPose.roll=0.0;//(float)  (rand()%90);
-      humanPose.pitch=0.0;//(float) (rand()%90);
-      humanPose.yaw=0.0;//(float)   (rand()%90);
+      humanPose.roll+=1.0;//(float)  (rand()%90);
+      humanPose.pitch+=1.0;//(float) (rand()%90);
+      humanPose.yaw+=1.0;//(float)   (rand()%90);
       //-------------------------------------------------------------------
       humanPose.x=0.0f;//(float)  (1000-rand()%2000);
       humanPose.y=0.0f;//(float) (100-rand()%200);
