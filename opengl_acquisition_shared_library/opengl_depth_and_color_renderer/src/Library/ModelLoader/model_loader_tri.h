@@ -279,6 +279,10 @@ int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
 */
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
+
+
+int triSimpleMergeOfTRIInContainer(struct TRI_Model * mergedTRIModel,struct TRI_Container * container);
+
 /**
 * @brief  Search inside the bone tree of a TRI Model and get back a specific boneID
 * @ingroup TRI

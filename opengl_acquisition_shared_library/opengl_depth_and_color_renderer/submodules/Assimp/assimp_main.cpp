@@ -70,7 +70,31 @@ int main (int argc, char *argv[])
 
     for (int i=0; i<argc; i++)
     {
-        if (strcmp(argv[i],"--convert")==0)
+        if (strcmp(argv[i],"--multi")==0)
+        {
+            inputFile  = argv[i+1];
+            outputFile = argv[i+2];
+            fprintf(stderr,GREEN "Multi Input Conversion from input(%s) to output(%s)\n" NORMAL,inputFile,outputFile);
+            if ( (strstr(inputFile,".dae")!=0) || (strstr(inputFile,".obj")!=0) )
+            {
+                struct TRI_Container triContainer={0};
+                if ( convertAssimpToTRIContainer(inputFile,&triContainer) )
+                {
+                    if (!triSimpleMergeOfTRIInContainer(originalModel,&triContainer))
+                    {
+                        fprintf(stderr,RED "Error merging multiple input in a single file..\n" NORMAL);
+                    }
+                }
+            }
+             else
+            if (strstr(argv[2],".bvh")!=0)
+            {
+               doBVHConversion(argv[2]);
+               fprintf(stderr,GREEN "Halting after BVH conversion\n" NORMAL);
+               return 0;
+            }
+        }
+        else if (strcmp(argv[i],"--convert")==0)
         {
             inputFile  = argv[i+1];
             outputFile = argv[i+2];

@@ -866,6 +866,11 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
+int triSimpleMergeOfTRIInContainer(struct TRI_Model * mergedTRIModel,struct TRI_Container * container)
+{
+
+}
+
 
 
 struct pakHeader

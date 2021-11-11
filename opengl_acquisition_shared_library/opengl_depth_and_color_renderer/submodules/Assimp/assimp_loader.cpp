@@ -505,7 +505,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 
 
 
-void prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triContainer)
+int prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triContainer)
 {
   triContainer->header.triType = TRI_LOADER_VERSION;
   triContainer->header.floatSize = sizeof(float);
@@ -541,14 +541,44 @@ void prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * tri
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene,selectedMesh,&triContainer->mesh[selectedMesh] );
      }
+
+    return 1;
    }
 
 
-  return ;
+  return 0;
 }
 
 
 
+
+int convertAssimpToTRIContainer(const char * filename  , struct TRI_Container * triContainer)
+{
+    int flags = aiProcess_Triangulate;
+		flags |= aiProcess_JoinIdenticalVertices;
+		flags |= aiProcess_GenSmoothNormals;
+		flags |= aiProcess_GenUVCoords;
+		flags |= aiProcess_TransformUVCoords;
+		flags |= aiProcess_RemoveComponent;
+
+		g_scene = (struct aiScene*) aiImportFile( filename, flags);
+		if (g_scene)
+        {
+            //m_GlobalInverseTransform = g_scene->mRootNode->mTransformation;
+            //m_GlobalInverseTransform.Inverse();
+
+            prepareTRIContainerScene(g_scene,triContainer);
+
+            aiReleaseImport(g_scene);
+            return 1;
+		} else
+		{
+			fprintf(stderr, "Assimp Cannot import scene: '%s'\n", filename);
+			fprintf(stderr, " error '%s'\n", aiGetErrorString());
+		}
+
+  return 0;
+}
 
 
 
