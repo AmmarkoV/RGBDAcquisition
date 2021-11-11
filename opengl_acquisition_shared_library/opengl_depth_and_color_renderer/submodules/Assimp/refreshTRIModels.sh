@@ -3,7 +3,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-./assimpTester --convert axis.obj axis.tri
+#./assimpTester --convert axis.obj axis.tri
+./assimpTester --merge axis.obj axis.tri
 
 
 #Mesh import from MHX2 intermediate format..

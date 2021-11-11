@@ -70,16 +70,22 @@ int main (int argc, char *argv[])
 
     for (int i=0; i<argc; i++)
     {
-        if (strcmp(argv[i],"--multi")==0)
+        if (strcmp(argv[i],"--merge")==0)
         {
             inputFile  = argv[i+1];
             outputFile = argv[i+2];
-            fprintf(stderr,GREEN "Multi Input Conversion from input(%s) to output(%s)\n" NORMAL,inputFile,outputFile);
+            fprintf(stderr,GREEN "Merge multi Input Conversion from input(%s) to output(%s)\n" NORMAL,inputFile,outputFile);
             if ( (strstr(inputFile,".dae")!=0) || (strstr(inputFile,".obj")!=0) )
             {
                 struct TRI_Container triContainer={0};
                 if ( convertAssimpToTRIContainer(inputFile,&triContainer) )
                 {
+                    for (unsigned int meshID=0; meshID<triContainer.header.numberOfMeshes; meshID++)
+                    {
+                        fprintf(stderr,"Flattening mesh %u / %u \n",meshID,triContainer.header.numberOfMeshes);
+                        fillFlatModelTriFromIndexedModelTri(&triContainer.mesh[meshID],&triContainer.mesh[meshID]);
+                    }
+
                     if (!triSimpleMergeOfTRIInContainer(originalModel,&triContainer))
                     {
                         fprintf(stderr,RED "Error merging multiple input in a single file..\n" NORMAL);

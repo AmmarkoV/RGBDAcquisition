@@ -34,8 +34,6 @@
  #include <GL/glx.h>    /* this includes the necessary X headers */
 #endif // INCLUDE_OPENGL_CODE
 
-
-
 void print4x4FMatrixTRI(const char * str , float * matrix4x4)
 {
   fprintf( stderr, "  %s \n",str);
@@ -92,16 +90,40 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
    }
 }
 
-int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed)
+int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_Model * indexed)
 {
     if ( (triModel==0) || (indexed==0) )
     {
       fprintf(stderr,RED "\nerror : Cannot flatten with null models..\n" NORMAL);
       return 0;
     }
-    //===================================================================
+
+    if (indexed->indices==0)
+    {
+      fprintf(stderr,RED "\nerror : Supposedly indexed model is not indexed..!\n" NORMAL);
+      copyModelTri(triModel,indexed,1);
+      return 1;
+    }
+
+
+    if (triModel==indexed)
+    {
+      //User requested to do flattening providing the same source and target..!
+      //Do our own temporary stack allocation and go on with this call..
+      struct TRI_Model * temporary = allocateModelTri();
+      if (temporary!=0)
+      {
+       copyModelTri(temporary,indexed,1);
+       int result = fillFlatModelTriFromIndexedModelTri(triModel,temporary);
+       freeModelTri(temporary);
+       temporary=0;
+       return result;
+      }
+      return 0;
+    }
 
     //Get rid of old data..
+    //===================================================================
     deallocInternalsOfModelTri(triModel);
 
     //Write header..
@@ -125,11 +147,15 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 
 
     triModel->name = (char * ) malloc( (triModel->header.nameSize+1)  * sizeof(char));
-    memcpy(triModel->name , indexed->name , triModel->header.nameSize);
-    triModel->name[triModel->header.nameSize]=0;
+    if (triModel->name!=0)
+    {
+      memcpy(triModel->name , indexed->name , triModel->header.nameSize);
+      triModel->name[triModel->header.nameSize]=0;
+    }
 
 
     //Allocate space for new data..
+    //===================================================================
 	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices      *3 *3     * sizeof(float));
 	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals       *3 *3     * sizeof(float));
 	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2     * sizeof(float));
@@ -216,8 +242,6 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
  return 1;
 }
 
-
-
 struct TRI_Model * allocateModelTri()
 {
   struct TRI_Model * newModel = (struct TRI_Model * ) malloc(sizeof(struct TRI_Model));
@@ -225,7 +249,6 @@ struct TRI_Model * allocateModelTri()
         { memset(newModel,0,sizeof(struct TRI_Model)); }
   return (struct TRI_Model * ) newModel;
 }
-
 
 void deallocInternalsOfModelTri(struct TRI_Model * triModel)
 {
@@ -290,7 +313,6 @@ int freeModelTri(struct TRI_Model * triModel)
  return 1;
 }
 
-
 void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
   //fprintf(stderr,"Cleaning output model..\n");
@@ -300,7 +322,6 @@ void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triM
 
  return;
 }
-
 
 int triDoBoneDeepCopy(
                        struct TRI_Model * triModelOUT,
@@ -390,10 +411,11 @@ int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Mo
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
 {
   //fprintf(stderr,MAGENTA "copyModelTri ..\n" NORMAL);
-  if (triModelOUT==0) { return; }
-  if (triModelIN==0)  { return; }
-  copyModelTriHeader( triModelOUT ,  triModelIN );
+  if (triModelOUT==0)           { return; }
+  if (triModelIN==0)            { return; }
+  if (triModelOUT==triModelIN)  { return; }
 
+  copyModelTriHeader( triModelOUT ,  triModelIN );
 
   unsigned int itemSize , count , allocationSize;
 
