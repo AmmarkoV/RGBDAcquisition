@@ -83,6 +83,7 @@ int main (int argc, char *argv[])
                     if (!triSimpleMergeOfTRIInContainer(originalModel,&triContainer))
                     {
                         fprintf(stderr,RED "Error merging multiple input in a single file..\n" NORMAL);
+                        return 1;
                     }
                 }
             }

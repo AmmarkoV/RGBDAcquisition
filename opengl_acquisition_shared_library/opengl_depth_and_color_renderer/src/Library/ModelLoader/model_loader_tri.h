@@ -281,7 +281,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
 
 
-int triSimpleMergeOfTRIInContainer(struct TRI_Model * mergedTRIModel,struct TRI_Container * container);
+int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container);
 
 /**
 * @brief  Search inside the bone tree of a TRI Model and get back a specific boneID

@@ -866,9 +866,30 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
-int triSimpleMergeOfTRIInContainer(struct TRI_Model * mergedTRIModel,struct TRI_Container * container)
+int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container)
 {
+        triModel->header.nameSize=7;
+        triModel->header.triType = TRI_LOADER_VERSION;
+        triModel->header.floatSize =(unsigned int ) sizeof(float);
+        triModel->header.TRIMagic[0] = 'T';
+        triModel->header.TRIMagic[1] = 'R';
+        triModel->header.TRIMagic[2] = 'I';
+        triModel->header.TRIMagic[3] = '3';
+        triModel->header.TRIMagic[4] = 'D';
+        triModel->name = (char * ) malloc(sizeof(char) * (triModel->header.nameSize+1));
+        snprintf(triModel->name,triModel->header.nameSize,"merged");
 
+        triModel->header.numberOfVertices = 0;
+        triModel->header.numberOfNormals = 0;
+        triModel->header.numberOfTextureCoords = 0;
+        triModel->header.numberOfColors = 0;
+        triModel->header.numberOfIndices = 0;
+        triModel->header.numberOfBones = 0;
+        for (unsigned int meshID = 0; meshID < container->header.numberOfMeshes; meshID++ )
+        {
+
+        }
+    return 0;
 }
 
 
