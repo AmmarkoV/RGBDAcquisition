@@ -6,6 +6,7 @@ cd "$DIR"
 #./assimpTester --convert axis.obj axis.tri
 ./assimpTester --merge axis.obj axis.tri
 
+#valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 
 #Mesh import from MHX2 intermediate format..
 ./assimpTester --mesh 0 --convert makehuman2ThroughMHX2.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 

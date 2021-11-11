@@ -92,13 +92,14 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_Model * indexed)
 {
+    //fprintf(stderr,YELLOW "fillFlatModelTriFromIndexedModelTri(%p,%p)..!\n" NORMAL,triModel,indexed);
     if ( (triModel==0) || (indexed==0) )
     {
       fprintf(stderr,RED "\nerror : Cannot flatten with null models..\n" NORMAL);
       return 0;
     }
 
-    if (indexed->indices==0)
+    if ( (indexed->indices==0) || (indexed->header.numberOfIndices==0) )
     {
       fprintf(stderr,RED "\nerror : Supposedly indexed model is not indexed..!\n" NORMAL);
       copyModelTri(triModel,indexed,1);
@@ -255,51 +256,51 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel)
   if (triModel==0) { return ; }
 
   triModel->header.numberOfVertices = 0;
-  if (triModel->vertices!=0) { free(triModel->vertices); }
+  if (triModel->vertices!=0) { free(triModel->vertices); triModel->vertices=0; }
 
   triModel->header.nameSize = 0;
-  if (triModel->name!=0) { free(triModel->name); }
+  if (triModel->name!=0) { free(triModel->name); triModel->name=0; }
 
   triModel->header.numberOfNormals = 0;
-  if (triModel->normal!=0) { free(triModel->normal); }
+  if (triModel->normal!=0) { free(triModel->normal); triModel->normal=0; }
 
   triModel->header.numberOfColors = 0;
-  if (triModel->colors!=0) { free(triModel->colors); }
+  if (triModel->colors!=0) { free(triModel->colors); triModel->colors=0; }
 
   triModel->header.numberOfTextureCoords = 0;
-  if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
+  if (triModel->textureCoords!=0) { free(triModel->textureCoords); triModel->textureCoords=0; }
 
   triModel->header.numberOfIndices = 0;
-  if (triModel->indices!=0) { free(triModel->indices); }
+  if (triModel->indices!=0) { free(triModel->indices); triModel->indices=0; }
 
-   if (
+   if  (
            (triModel->header.numberOfBones>0) &&
            (triModel->bones!=0)
-          )
+       )
       {
         unsigned int boneNum =0;
         for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
         {
-
           if (triModel->bones[boneNum].boneChild!=0)
-           { free(triModel->bones[boneNum].boneChild); }
+           { free(triModel->bones[boneNum].boneChild); triModel->bones[boneNum].boneChild=0; }
 
           if (triModel->bones[boneNum].info!=0)
-            { free(triModel->bones[boneNum].info); }
+           { free(triModel->bones[boneNum].info); triModel->bones[boneNum].info=0; }
 
           if (triModel->bones[boneNum].boneName!=0)
-          { free(triModel->bones[boneNum].boneName); }
+           { free(triModel->bones[boneNum].boneName); triModel->bones[boneNum].boneName=0; }
 
           if (triModel->bones[boneNum].weightValue!=0)
-          { free(triModel->bones[boneNum].weightValue); }
+           { free(triModel->bones[boneNum].weightValue); triModel->bones[boneNum].weightValue=0; }
 
           if (triModel->bones[boneNum].weightIndex!=0)
-          { free(triModel->bones[boneNum].weightIndex); }
+           { free(triModel->bones[boneNum].weightIndex); triModel->bones[boneNum].weightIndex=0; }
         }
       }
 
-   if (triModel->bones!=0)         { free(triModel->bones); }
+   if (triModel->bones!=0)         { free(triModel->bones); triModel->bones=0; }
 
+   //Make sure everything is wiped clean..
    memset(triModel,0,sizeof(struct TRI_Model));
 }
 
@@ -315,6 +316,8 @@ int freeModelTri(struct TRI_Model * triModel)
 
 void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
+  if (triModelOUT==0) { return; }
+  if (triModelIN==0)  { return; }
   //fprintf(stderr,"Cleaning output model..\n");
   memset(triModelOUT,0,sizeof(struct TRI_Model));
   //fprintf(stderr,"Copying header..\n");

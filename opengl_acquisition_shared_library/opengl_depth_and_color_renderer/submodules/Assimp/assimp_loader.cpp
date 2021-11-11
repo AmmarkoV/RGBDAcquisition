@@ -526,10 +526,9 @@ int prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triC
   triContainer->header.numberOfMeshes = scene->mNumMeshes;
   triContainer->mesh = (struct TRI_Model *) malloc(sizeof(struct TRI_Model) * triContainer->header.numberOfMeshes);
 
-
   if (triContainer->mesh!=0)
   {
-   for (unsigned int selectedMesh=0; selectedMesh < triContainer->header.numberOfMeshes; selectedMesh++)
+   for (unsigned int selectedMesh=0; selectedMesh<triContainer->header.numberOfMeshes; selectedMesh++)
      {
        struct aiMesh * mesh = scene->mMeshes[selectedMesh];
        fprintf(stderr,"Mesh #%u (%s)   \n",selectedMesh , mesh->mName.data);
@@ -540,6 +539,11 @@ int prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triC
 
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene,selectedMesh,&triContainer->mesh[selectedMesh] );
+
+       triContainer->mesh[selectedMesh].header.nameSize = strlen(mesh->mName.data);
+       triContainer->mesh[selectedMesh].name = (char * ) malloc( (triContainer->mesh[selectedMesh].header.nameSize+1) * sizeof(char) );
+       if (triContainer->mesh[selectedMesh].name!=0)
+          { snprintf(triContainer->mesh[selectedMesh].name,triContainer->mesh[selectedMesh].header.nameSize,"%s",mesh->mName.data); }
      }
 
     return 1;

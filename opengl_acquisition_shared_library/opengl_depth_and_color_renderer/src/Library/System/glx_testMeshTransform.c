@@ -811,7 +811,7 @@ int main(int argc,const char **argv)
        return 0;
      }
 
-     paintTRI(&axisModelIndexed,123,123,123);
+     paintTRI(&axisModelIndexed,255,255,255);
      fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
