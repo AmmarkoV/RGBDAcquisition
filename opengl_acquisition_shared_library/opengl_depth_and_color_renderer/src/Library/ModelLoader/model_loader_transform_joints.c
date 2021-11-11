@@ -863,9 +863,8 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
   //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   struct Vector4x1OfFloats transformedPosition={0},transformedNormal={0},position={0},normal={0};
 
-  //float transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
   unsigned int i,k;
- //We NEED to clear the vertices and normals since they are added uppon , not having
+  //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));

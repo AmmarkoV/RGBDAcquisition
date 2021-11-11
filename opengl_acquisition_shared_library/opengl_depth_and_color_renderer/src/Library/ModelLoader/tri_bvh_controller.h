@@ -411,19 +411,18 @@ const static int animateTRIModelUsingBVHArmature(
 
                             struct Matrix4x4OfFloats mergedTranslation;
                             create4x4FTranslationMatrix(
-                                &mergedTranslation,
-                                (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
-                                (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
-                                (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
-                            );
+                                                         &mergedTranslation,
+                                                         (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
+                                                         (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
+                                                         (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
+                                                       );
 
                             multiplyTwo4x4FMatrices_Naive(
-                                &transformations4x4[boneID*16],
-                                bvhTransform.joint[jID].dynamicRotation.m,
-                                mergedTranslation.m
-                            );
+                                                           &transformations4x4[boneID*16],
+                                                           bvhTransform.joint[jID].dynamicRotation.m,
+                                                           mergedTranslation.m
+                                                         );
                         }
-
                     }
                 }
             } //have resolved joints

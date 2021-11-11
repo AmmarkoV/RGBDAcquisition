@@ -596,7 +596,13 @@ int doSkeletonDraw(
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-        doOGLSingleDrawing(
+        //fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
+        //for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
+        {
+         //humanPose->x = humanModel->bones[boneID].info->x;
+         //humanPose->y = humanModel->bones[boneID].info->y;
+         //humanPose->z = humanModel->bones[boneID].info->z;
+         doOGLSingleDrawing(
                             programID,
                             MVPMatrixID,
                             humanPose,
@@ -605,6 +611,9 @@ int doSkeletonDraw(
                             WIDTH,
                             HEIGHT
                           );
+
+        }
+
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebufferToScreen(
@@ -721,7 +730,6 @@ int main(int argc,const char **argv)
    //-------------------------------------------------------------------
 */
 
-
    //MHX2 Set human pose to somewhere visible..
    //-------------------------------------------------------------------
    humanPose.roll=180.0;//(float)  (rand()%90);
@@ -732,7 +740,6 @@ int main(int argc,const char **argv)
    humanPose.y=-0.976f;//(float) (100-rand()%200);
    humanPose.z=2.99735f;//(float)  (700+rand()%1000);
    //-------------------------------------------------------------------
-
 
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
