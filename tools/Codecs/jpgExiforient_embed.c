@@ -92,9 +92,8 @@ unsigned int GetJPGOrientationOfFile(char * filename)
 
 
 
-   set_flag = 0;
+  set_flag = 0;
 
-  i = 1;
   myfile = fopen(filename, "rb");
     if ( myfile == 0)
     {

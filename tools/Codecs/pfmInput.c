@@ -23,19 +23,18 @@ float * ReadPFMRaw(float * buffer , char * filename, unsigned int *width , unsig
         char buf[PPMREADBUFLEN]={0};
         char *t;
         unsigned int w=0, h=0, d=0;
-        int r=0 , z=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if (t == 0) { return buffer; }
+        if (t == 0) { fclose(pf); return buffer; }
 
         if ( strncmp(buf,"PF\n", 3) == 0 ) { *channels=3; } else
         if ( strncmp(buf,"Pf\n", 3) == 0 ) { *channels=1; } else
                                            { fprintf(stderr,"Could not understand/Not supported file format\n"); fclose(pf); return buffer; }
-        z = sscanf(buf, "%u %u", &w, &h);
+        int z = sscanf(buf, "%u %u", &w, &h);
         if ( z < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return buffer; }
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
-        r = fscanf(pf, "%u\n", &d);
+        fscanf(pf, "%u\n", &d);
 
         *bytesPerPixel=1; // This is fixed
 

@@ -117,16 +117,16 @@ int refreshImage(struct Image * img)
 unsigned int guessFilenameTypeStupid(char * filename)
 {
   fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
-  if (strcasestr(filename,".BMP")!=0)   { return BMP_CODEC; } else
-  if (strcasestr(filename,".RLE")!=0)   { return BMP_CODEC; } else
-  if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
-  if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
-  if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
+  if (strcasestr(filename,".BMP")!=0)   { return BMP_CODEC; }            else
+  if (strcasestr(filename,".RLE")!=0)   { return BMP_CODEC; }            else
+  if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; }            else
+  if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; }            else
+  if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; }            else
   if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC; } else
-  if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
-  if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
-  if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
-  if (strcasestr(filename,".TEXT")!=0)  { return ASCII_CODEC; } else
+  if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; }            else
+  if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; }            else
+  if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; }          else
+  if (strcasestr(filename,".TEXT")!=0)  { return ASCII_CODEC; }          else
   if (strcasestr(filename,".TXT")!=0)   { return ASCII_CODEC; }
 
  return  NO_CODEC;
@@ -311,19 +311,18 @@ int swapImageEndianness(struct Image * img)
   if (img==0) { return 0; }
   if (img->pixels==0) { return 0; }
   unsigned char * traverser=(unsigned char * ) img->pixels;
-  unsigned char * traverserSwap1=(unsigned char * ) img->pixels;
-  unsigned char * traverserSwap2=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap1;//=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap2;//=(unsigned char * ) img->pixels;
 
   unsigned int bytesperpixel = (img->bitsperpixel/8);
   unsigned char * endOfMem = traverser + img->width * img->height * img->channels * bytesperpixel;
 
-  unsigned char tmp ;
   while ( ( traverser < endOfMem)  )
   {
     traverserSwap1 = traverser;
     traverserSwap2 = traverser+1;
 
-    tmp = *traverserSwap1;
+    unsigned char tmp = *traverserSwap1;
     *traverserSwap1 = *traverserSwap2;
     *traverserSwap2 = tmp;
 
@@ -394,7 +393,7 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
       case PNG_CODEC :
        if (!WritePNG(filename,pic)) { free(pic); pic=0; }
         #if DEBUG_READING_IMAGES
-         char ppmfilename[513]={0}; 
+         char ppmfilename[513]={0};
          snprintf(ppmfilename,512,"%s.png",filename);
          //strcpy(ppmfilename,filename);
          //strcat(ppmfilename,".png");
@@ -604,7 +603,7 @@ int destroyImage(struct Image * img)
 {
     if (img==0) {return 0; }
     if (img->pixels!=0) { free(img->pixels); img->pixels=0; }
-    if (img!=0) { free(img); img=0; }
+    if (img!=0) { free(img); /*img=0;*/ }
     return 1;
 }
 

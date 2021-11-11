@@ -190,18 +190,18 @@ if (!fp) { abort_("[write_png_file] File %s could not be opened for writing", fi
 
 /* initialize stuff */
 png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-if (!png_ptr) { abort_("[write_png_file] png_create_write_struct failed"); return 0; }
+if (!png_ptr) { abort_("[write_png_file] png_create_write_struct failed"); fclose(fp); return 0; }
 
 info_ptr = png_create_info_struct(png_ptr);
-if (!info_ptr) { abort_("[write_png_file] png_create_info_struct failed"); return 0; }
+if (!info_ptr) { abort_("[write_png_file] png_create_info_struct failed"); fclose(fp); return 0; }
 
-if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during init_io"); return 0; }
+if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during init_io"); fclose(fp); return 0; }
 
 png_init_io(png_ptr, fp);
 
 
 /* write header */
-if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing header"); return 0; }
+if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing header"); fclose(fp); return 0; }
 
 
 int i = PNG_COLOR_TYPE_RGB;
@@ -213,9 +213,9 @@ png_write_info(png_ptr, info_ptr);
 
 
 /* write bytes */
-if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing bytes"); return 0; }
+if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing bytes"); fclose(fp); return 0; }
 row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * pic->height);
-if (row_pointers==0) { abort_("Could not allocate enough memory to hold the image \n"); return 0; }
+if (row_pointers==0) { abort_("Could not allocate enough memory to hold the image \n"); fclose(fp);  return 0; }
 char * raw_pixels=(char*) pic->pixels;
 
 unsigned int y;
@@ -229,7 +229,7 @@ for (y=0; y<pic->height; y++)
 
 
  /* end write */
- if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during end of write"); return 0; }
+ if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during end of write"); fclose(fp); return 0; }
 
  png_write_end(png_ptr, NULL);
 

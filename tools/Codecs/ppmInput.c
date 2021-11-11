@@ -17,19 +17,18 @@ int swapDepthEndianness(struct Image * img)
   if (img->bitsperpixel!=16) { fprintf(stderr,"Only 16bit PNM files need swapping ( we have a %u bit x %u channels file )..\n",img->bitsperpixel , img->channels); return 0; }
 
   unsigned char * traverser=(unsigned char * ) img->pixels;
-  unsigned char * traverserSwap1=(unsigned char * ) img->pixels;
-  unsigned char * traverserSwap2=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap1;//=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap2;//=(unsigned char * ) img->pixels;
 
   unsigned int bytesperpixel = (img->bitsperpixel/8);
   unsigned char * endOfMem = traverser + img->width * img->height * img->channels * bytesperpixel;
 
-  unsigned char tmp ;
   while ( ( traverser < endOfMem)  )
   {
     traverserSwap1 = traverser;
     traverserSwap2 = traverser+1;
 
-    tmp = *traverserSwap1;
+    unsigned char tmp = *traverserSwap1;
     *traverserSwap1 = *traverserSwap2;
     *traverserSwap2 = tmp;
 
@@ -60,7 +59,7 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
         int r=0 , z=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if (t == 0) { return buffer; }
+        if (t == 0) { fclose(pf); return buffer; }
 
         if ( strncmp(buf,"P6\n", 3) == 0 ) { *channels=3; } else
         if ( strncmp(buf,"P5\n", 3) == 0 ) { *channels=1; } else

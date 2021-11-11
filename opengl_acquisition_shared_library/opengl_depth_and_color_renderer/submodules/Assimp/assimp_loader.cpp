@@ -273,7 +273,6 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   parentNodeID=nodeNum; //We are the parent now..!
   (*numberOfNodes)++;   //We are going to the next node..!
-  unsigned int i=0;
 
   //fprintf(stderr,"Node has %u children , including them ",node->mNumChildren);
   triModel->bones[nodeNum].info->allocatedNumberOfBoneChildren = node->mNumChildren;
@@ -286,7 +285,7 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
 
   //fprintf(stderr,"Allocated @ %p  \n",triModel->bones[nodeNum].info->boneChild);
 
-   for ( i = 0 ; i < node->mNumChildren ; i++)
+   for (unsigned int i = 0 ; i < node->mNumChildren ; i++)
         {
           fillInNodeAndBoneData(node->mChildren[i] ,  mesh , numberOfNodes , parentNodeID  , triModel);
         }

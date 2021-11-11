@@ -160,6 +160,7 @@ int ReadJPEG( char *filename,struct Image * pic,char read_only_header)
  */
 int WriteJPEGInternal( char *filename,struct Image * pic,char *mem,unsigned long * mem_size,int quality)
 {
+    if (filename==0) { return 0; }
     //debug where things get loaded using next line..
     //fprintf(stderr,"WriteJPEG(%s,%p,%p,%p); called \n",filename,pic,mem,mem_size);
 

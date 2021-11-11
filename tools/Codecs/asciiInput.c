@@ -24,14 +24,13 @@ unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned i
           if (pixels==0)
             {  pixels= (unsigned char*) malloc((*width)*(*height)*8*3*sizeof(char)); }
 
-        unsigned int i=0,x=0,y=0,value=0;
         if (packed)
         {
 
         }  else
         {
-
-          char * pixelsPtr = pixels;
+          unsigned int i,x,y,value=0;
+          unsigned char * pixelsPtr = pixels;
 
           for (i=0; i<3; i++)
           {
@@ -88,7 +87,7 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
 
       fprintf(fd, "%u %u\n",pic->height,pic->width);
 
-      char * ptr = pic->pixels ;
+      unsigned char * ptr = pic->pixels ;
       unsigned int x , y;
 
         if (packed)
