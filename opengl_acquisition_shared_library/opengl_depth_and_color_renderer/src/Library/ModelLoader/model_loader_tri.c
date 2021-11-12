@@ -34,6 +34,14 @@
  #include <GL/glx.h>    /* this includes the necessary X headers */
 #endif // INCLUDE_OPENGL_CODE
 
+
+
+int tri_warnIncompleteReads(const char * msg,unsigned int expected,unsigned int recvd)
+{
+   if (expected!=recvd) { fprintf(stderr,YELLOW "Incomplete read of %s ( %u/%u ) \n" NORMAL , msg,recvd,expected); return 1; }
+   return 0;
+}
+
 void print4x4FMatrixTRI(const char * str , float * matrix4x4)
 {
   fprintf( stderr, "  %s \n",str);
@@ -88,6 +96,108 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
         }
      }
    }
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+struct TRI_Model * allocateModelTri()
+{
+  struct TRI_Model * newModel = (struct TRI_Model * ) malloc(sizeof(struct TRI_Model));
+  if (newModel!=0) // Clear new model if it was allocated..
+        { memset(newModel,0,sizeof(struct TRI_Model)); }
+  return (struct TRI_Model * ) newModel;
+}
+
+void deallocInternalsOfModelTri(struct TRI_Model * triModel)
+{
+  if (triModel==0) { return ; }
+
+  triModel->header.numberOfVertices = 0;
+  if (triModel->vertices!=0) { free(triModel->vertices); triModel->vertices=0; }
+
+  triModel->header.nameSize = 0;
+  if (triModel->name!=0) { free(triModel->name); triModel->name=0; }
+
+  triModel->header.numberOfNormals = 0;
+  if (triModel->normal!=0) { free(triModel->normal); triModel->normal=0; }
+
+  triModel->header.numberOfColors = 0;
+  if (triModel->colors!=0) { free(triModel->colors); triModel->colors=0; }
+
+  triModel->header.numberOfTextureCoords = 0;
+  if (triModel->textureCoords!=0) { free(triModel->textureCoords); triModel->textureCoords=0; }
+
+  triModel->header.numberOfIndices = 0;
+  if (triModel->indices!=0) { free(triModel->indices); triModel->indices=0; }
+
+   if  (
+           (triModel->header.numberOfBones>0) &&
+           (triModel->bones!=0)
+       )
+      {
+        unsigned int boneNum =0;
+        for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+        {
+          if (triModel->bones[boneNum].boneChild!=0)
+           { free(triModel->bones[boneNum].boneChild); triModel->bones[boneNum].boneChild=0; }
+
+          if (triModel->bones[boneNum].info!=0)
+           { free(triModel->bones[boneNum].info); triModel->bones[boneNum].info=0; }
+
+          if (triModel->bones[boneNum].boneName!=0)
+           { free(triModel->bones[boneNum].boneName); triModel->bones[boneNum].boneName=0; }
+
+          if (triModel->bones[boneNum].weightValue!=0)
+           { free(triModel->bones[boneNum].weightValue); triModel->bones[boneNum].weightValue=0; }
+
+          if (triModel->bones[boneNum].weightIndex!=0)
+           { free(triModel->bones[boneNum].weightIndex); triModel->bones[boneNum].weightIndex=0; }
+        }
+      }
+
+   if (triModel->bones!=0)         { free(triModel->bones); triModel->bones=0; }
+
+   //Make sure everything is wiped clean..
+   memset(triModel,0,sizeof(struct TRI_Model));
+}
+
+int freeModelTri(struct TRI_Model * triModel)
+{
+  if (triModel!=0)
+  {
+   deallocInternalsOfModelTri(triModel);
+   free(triModel);
+  }
+ return 1;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+
+void tri_wipeModel(struct TRI_Model * triModel)
+{
+  if (triModel==0)  { return; }
+  //TODO deallocate stuff
+  memset(triModel,0,sizeof(struct TRI_Model));
+}
+
+
+
+void tri_copyModelHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
+{
+  if (triModelOUT==0) { return; }
+  if (triModelIN==0)  { return; }
+  //fprintf(stderr,"Cleaning output model..\n");
+  //memset(triModelOUT,0,sizeof(struct TRI_Model));
+  //fprintf(stderr,"Copying header..\n");
+  memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
+
+ return;
 }
 
 
@@ -150,6 +260,29 @@ int triDoBoneDeepCopy(
 
   return 1;
 }
+
+
+void tri_copyBones(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN)
+{
+  if ( (triModelIN->bones!=0) && (triModelIN->header.numberOfBones>0) )
+  {
+     triModelOUT->header.numberOfBones = triModelIN->header.numberOfBones;
+     triModelOUT->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
+     memset(triModelOUT->bones, 0 , sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
+
+     TRIBoneID boneNum=0;
+     for (boneNum=0; boneNum<triModelIN->header.numberOfBones; boneNum++)
+        {
+          triDoBoneDeepCopy(
+                             triModelOUT,
+                             triModelIN,
+                             boneNum,
+                             boneNum
+                           );
+        }
+  }
+}
+
 
 int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source)
 {
@@ -238,7 +371,6 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
       triModel->name[triModel->header.nameSize]=0;
     }
 
-
     //Allocate space for new data..
     //===================================================================
 	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices      *3 *3     * sizeof(float));
@@ -324,113 +456,13 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
         }
 	}
 
-
-
-  if ( (indexed->bones!=0) && (indexed->header.numberOfBones>0) )
-  {
-     triModel->header.numberOfBones         =  indexed->header.numberOfBones;
-     triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * indexed->header.numberOfBones);
-     memset(triModel->bones, 0 , sizeof(struct TRI_Bones) * indexed->header.numberOfBones);
-
-     TRIBoneID boneNum=0;
-     for (boneNum=0; boneNum<indexed->header.numberOfBones; boneNum++)
-        {
-          triDoBoneDeepCopy(
-                             triModel,
-                             indexed,
-                             boneNum, //Copy to same target bone
-                             boneNum  //Copy from same source bone
-                           );
-        }
-  }
-
-
+  //Also copy bone structures..
+  tri_copyBones(triModel,indexed);
 
  return 1;
 }
 
-struct TRI_Model * allocateModelTri()
-{
-  struct TRI_Model * newModel = (struct TRI_Model * ) malloc(sizeof(struct TRI_Model));
-  if (newModel!=0) // Clear new model if it was allocated..
-        { memset(newModel,0,sizeof(struct TRI_Model)); }
-  return (struct TRI_Model * ) newModel;
-}
 
-void deallocInternalsOfModelTri(struct TRI_Model * triModel)
-{
-  if (triModel==0) { return ; }
-
-  triModel->header.numberOfVertices = 0;
-  if (triModel->vertices!=0) { free(triModel->vertices); triModel->vertices=0; }
-
-  triModel->header.nameSize = 0;
-  if (triModel->name!=0) { free(triModel->name); triModel->name=0; }
-
-  triModel->header.numberOfNormals = 0;
-  if (triModel->normal!=0) { free(triModel->normal); triModel->normal=0; }
-
-  triModel->header.numberOfColors = 0;
-  if (triModel->colors!=0) { free(triModel->colors); triModel->colors=0; }
-
-  triModel->header.numberOfTextureCoords = 0;
-  if (triModel->textureCoords!=0) { free(triModel->textureCoords); triModel->textureCoords=0; }
-
-  triModel->header.numberOfIndices = 0;
-  if (triModel->indices!=0) { free(triModel->indices); triModel->indices=0; }
-
-   if  (
-           (triModel->header.numberOfBones>0) &&
-           (triModel->bones!=0)
-       )
-      {
-        unsigned int boneNum =0;
-        for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
-        {
-          if (triModel->bones[boneNum].boneChild!=0)
-           { free(triModel->bones[boneNum].boneChild); triModel->bones[boneNum].boneChild=0; }
-
-          if (triModel->bones[boneNum].info!=0)
-           { free(triModel->bones[boneNum].info); triModel->bones[boneNum].info=0; }
-
-          if (triModel->bones[boneNum].boneName!=0)
-           { free(triModel->bones[boneNum].boneName); triModel->bones[boneNum].boneName=0; }
-
-          if (triModel->bones[boneNum].weightValue!=0)
-           { free(triModel->bones[boneNum].weightValue); triModel->bones[boneNum].weightValue=0; }
-
-          if (triModel->bones[boneNum].weightIndex!=0)
-           { free(triModel->bones[boneNum].weightIndex); triModel->bones[boneNum].weightIndex=0; }
-        }
-      }
-
-   if (triModel->bones!=0)         { free(triModel->bones); triModel->bones=0; }
-
-   //Make sure everything is wiped clean..
-   memset(triModel,0,sizeof(struct TRI_Model));
-}
-
-int freeModelTri(struct TRI_Model * triModel)
-{
-  if (triModel!=0)
-  {
-   deallocInternalsOfModelTri(triModel);
-   free(triModel);
-  }
- return 1;
-}
-
-void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
-{
-  if (triModelOUT==0) { return; }
-  if (triModelIN==0)  { return; }
-  //fprintf(stderr,"Cleaning output model..\n");
-  memset(triModelOUT,0,sizeof(struct TRI_Model));
-  //fprintf(stderr,"Copying header..\n");
-  memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
-
- return;
-}
 
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
@@ -440,7 +472,7 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
   if (triModelIN==0)            { return; }
   if (triModelOUT==triModelIN)  { return; }
 
-  copyModelTriHeader( triModelOUT ,  triModelIN );
+  tri_copyModelHeader( triModelOUT ,  triModelIN );
 
   unsigned int itemSize , count , allocationSize;
 
@@ -487,22 +519,9 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
   if (triModelOUT->bones!=0)  { free(triModelOUT->bones); triModelOUT->bones=0; }
 
 
-  if ( (copyBoneStructures) && (triModelIN->header.numberOfBones>0) )
+  if (copyBoneStructures)
   {
-    //fprintf(stderr,GREEN "copyModelTri copying bone structures..\n" NORMAL);
-     triModelOUT->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
-     memset(triModelOUT->bones, 0 , sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
-
-     TRIBoneID boneNum=0;
-     for (boneNum=0; boneNum<triModelIN->header.numberOfBones; boneNum++)
-        {
-          triDoBoneDeepCopy(
-                             triModelOUT,
-                             triModelIN,
-                             boneNum,
-                             boneNum
-                           );
-        }
+     tri_copyBones(triModelOUT,triModelIN);
   } else
   {
     fprintf(stderr,RED "copyModelTri NOT copying bone structures..\n" NORMAL);
@@ -514,12 +533,6 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 }
 
 
-
-int warnIncompleteReads(const char * msg,unsigned int expected,unsigned int recvd)
-{
-   if (expected!=recvd) { fprintf(stderr,YELLOW "Incomplete read of %s ( %u/%u ) \n" NORMAL , msg,recvd,expected); return 1; }
-   return 0;
-}
 
 int loadModelTri(const char * filename , struct TRI_Model * triModel)
 {
@@ -601,7 +614,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of vertex\n", itemSize * count );
          triModel->vertices = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->vertices , itemSize , count , fd);
-         warnIncompleteReads("vertices",count,n);
+         tri_warnIncompleteReads("vertices",count,n);
         } else {  fprintf(stderr,"No vertices specified \n"); }
 
         if (triModel->header.numberOfNormals)
@@ -610,7 +623,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of normal\n", itemSize * count );
          triModel->normal = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->normal , itemSize , count , fd);
-         warnIncompleteReads("normals",count,n);
+         tri_warnIncompleteReads("normals",count,n);
         } else {  fprintf(stderr,"No normals specified \n"); }
 
 
@@ -620,7 +633,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of textures\n",itemSize * count);
          triModel->textureCoords = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->textureCoords , itemSize , count , fd);
-         warnIncompleteReads("textures",count,n);
+         tri_warnIncompleteReads("textures",count,n);
         }  else {  fprintf(stderr,"No texture coords specified \n"); }
 
         if (triModel->header.numberOfColors)
@@ -629,7 +642,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of colors\n",itemSize * count);
          triModel->colors = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->colors ,  itemSize , count , fd);
-         warnIncompleteReads("colors",count,n);
+         tri_warnIncompleteReads("colors",count,n);
         } else {  fprintf(stderr,"No colors specified \n"); }
 
         if (triModel->header.numberOfIndices)
@@ -638,7 +651,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of indices\n",itemSize * count);
          triModel->indices = ( unsigned int * ) malloc ( itemSize * count );
          n = fread(triModel->indices , itemSize , count , fd);
-         warnIncompleteReads("indices",count,n);
+         tri_warnIncompleteReads("indices",count,n);
         } else {  fprintf(stderr,"No indices specified \n"); }
 
         if (triModel->header.numberOfBones)
@@ -659,7 +672,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
           memset( triModel->bones[boneNum].info , 0 , sizeof(struct TRI_Bones_Header) );
           n = fread(triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
-          warnIncompleteReads("bone header",count,n);
+          tri_warnIncompleteReads("bone header",count,n);
 
           //Check value
           //fprintf(stderr,"Bone %u \n",boneNum);
@@ -670,7 +683,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].boneName = ( char * ) malloc ( (itemSize+2)*count );
           memset( triModel->bones[boneNum].boneName , 0 , (itemSize+2)*count );
           n = fread(triModel->bones[boneNum].boneName , itemSize , count , fd);
-          warnIncompleteReads("bone names",count,n);
+          tri_warnIncompleteReads("bone names",count,n);
 
 
           //Allocate enough space for the weight values , and read them
@@ -678,14 +691,14 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].weightValue = ( float * ) malloc ( itemSize * count );
           memset( triModel->bones[boneNum].weightValue , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightValue , itemSize , count , fd);
-          warnIncompleteReads("bone weights",count,n);
+          tri_warnIncompleteReads("bone weights",count,n);
 
           //Allocate enough space for the weight indexes , and read them
           itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info->boneWeightsNumber;
           triModel->bones[boneNum].weightIndex = ( unsigned int * ) malloc ( itemSize * count );
           memset( triModel->bones[boneNum].weightIndex , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightIndex , itemSize , count , fd);
-          warnIncompleteReads("bone weight indices",count,n);
+          tri_warnIncompleteReads("bone weight indices",count,n);
 
 
           if (triModel->bones[boneNum].info->numberOfBoneChildren == 0 )
