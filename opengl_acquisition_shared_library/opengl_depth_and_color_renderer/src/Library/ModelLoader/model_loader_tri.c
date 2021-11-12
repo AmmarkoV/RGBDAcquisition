@@ -226,7 +226,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
     triModel->header.numberOfTextureCoords = indexed->header.numberOfIndices*2;
     triModel->header.numberOfColors        = indexed->header.numberOfIndices*3;
     triModel->header.numberOfIndices       = 0;
-    triModel->header.numberOfBones         = 0; //indexed->header.numberOfBones;
+    triModel->header.numberOfBones         = 0; //This will get filled in later
 
     //fprintf(stderr,YELLOW "\nwarning : Flattening a model loses its bone structure for now..\n" NORMAL);
 
@@ -326,9 +326,9 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
 
 
 
-  if (indexed->header.numberOfBones>0)
+  if ( (indexed->bones!=0) && (indexed->header.numberOfBones>0) )
   {
-    //fprintf(stderr,GREEN "copyModelTri copying bone structures..\n" NORMAL);
+     triModel->header.numberOfBones         =  indexed->header.numberOfBones;
      triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * indexed->header.numberOfBones);
      memset(triModel->bones, 0 , sizeof(struct TRI_Bones) * indexed->header.numberOfBones);
 
@@ -338,8 +338,8 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
           triDoBoneDeepCopy(
                              triModel,
                              indexed,
-                             boneNum,
-                             boneNum
+                             boneNum, //Copy to same target bone
+                             boneNum  //Copy from same source bone
                            );
         }
   }

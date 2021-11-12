@@ -596,12 +596,13 @@ int doSkeletonDraw(
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-        //fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
-        //for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
+        fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
+        for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
-         //humanPose->x = humanModel->bones[boneID].info->x;
-         //humanPose->y = humanModel->bones[boneID].info->y;
-         //humanPose->z = humanModel->bones[boneID].info->z;
+         fprintf(stderr,"BoneID %u  \n",boneID);
+         humanPose->x = humanModel->bones[boneID].info->x;
+         humanPose->y = humanModel->bones[boneID].info->y;
+         humanPose->z = humanModel->bones[boneID].info->z;
          doOGLSingleDrawing(
                             programID,
                             MVPMatrixID,
