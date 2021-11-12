@@ -210,6 +210,36 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices);
 */
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel, struct TRI_Model * indexed);
 
+
+
+
+/**
+* @brief This function can flatten out an indexed TRI_Model , so it becomes literally an array of triangles with no indexing.
+*        Of course this will result in a bigger chunk of memory required , but it might be useful
+* @ingroup TRI
+* @param  output TRI structure with the resulting flat model , should be allocated via allocateModelTri
+* @param  input TRI structure with the loaded index model we want to process
+* @retval 0=Failure,1=Success
+*/
+int tri_flattenIndexedModel(struct TRI_Model * flatOutput,struct TRI_Model * indexedInput);
+
+
+/**
+* @brief This function has the same functionality as  tri_flattenIndexedModel however it operates in place
+*        it will flatten out an indexed TRI_Model , so it becomes literally an array of triangles with no indexing.
+*        Of course this will result in a bigger chunk of memory required , but it might be useful
+* @ingroup TRI
+* @param  output TRI structure with the resulting flat model , should be allocated via allocateModelTri
+* @param  input TRI structure with the loaded index model we want to process
+* @retval 0=Failure,1=Success
+*/
+int tri_flattenIndexedModelInPlace(struct TRI_Model * indexedInputThatWillBecomeFlatOutput);
+
+
+
+
+
+
 /**
 * @brief Allocate the space for a TRI model ( possibly to build a model from scratch ) , typically you don't want to do this , just use loadModelTri instead..!
 * @ingroup TRI
@@ -232,6 +262,14 @@ int freeModelTri(struct TRI_Model * triModel);
 * @param  input TRI structure with the loaded model we want its internals freed
 */
 void deallocInternalsOfModelTri(struct TRI_Model * triModel);
+
+
+/**
+* @brief After being done with the model we can deallocate its internal structures , this doesn't do the final free(triModel) call..! , see freeModelTri call for a call that does this plus the final free call
+* @ingroup TRI
+* @param  input TRI structure with the loaded model we want its internals freed
+*/
+void tri_deallocModelInternals(struct TRI_Model * triModel);
 
 
 /**
@@ -279,9 +317,14 @@ int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
 */
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
-
-
-int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container);
+/**
+* @brief  Merge all meshes in a TRI_Container structure to a single TRI_Model losing bone data..!
+* @ingroup TRI
+* @param  Output merged TRI_Model
+* @param  Input TRI_Container with many models
+* @retval 0=Failure,1=Success
+*/
+int tri_simpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container);
 
 /**
 * @brief  Search inside the bone tree of a TRI Model and get back a specific boneID
@@ -293,9 +336,6 @@ int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Contai
 */
 int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName,TRIBoneID * boneIDResult);
 
-
-
-
 /**
 * @brief This function is designed to copy the values ( bone state ) from one TRI Model to another (potentially different) one..
 *        This way
@@ -304,7 +344,7 @@ int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName,TRI
 * @param  input TRI model
 * @param  switch to control copying bones
 */
-int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source);
+int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source);
 
 /**
 * @brief One pretty standard operations that is needed often is copying models around to edit them without destroying the original

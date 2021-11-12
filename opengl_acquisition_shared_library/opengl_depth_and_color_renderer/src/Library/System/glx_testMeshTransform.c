@@ -884,8 +884,8 @@ int main(int argc,const char **argv)
        animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
      } else
      {
-       fillFlatModelTriFromIndexedModelTri(&humanModel,&indexedHumanModel);
-       fillFlatModelTriFromIndexedModelTri(&eyeModel,&indexedEyeModel);
+       tri_flattenIndexedModel(&humanModel,&indexedHumanModel);
+       tri_flattenIndexedModel(&eyeModel,&indexedEyeModel);
      }
 
 

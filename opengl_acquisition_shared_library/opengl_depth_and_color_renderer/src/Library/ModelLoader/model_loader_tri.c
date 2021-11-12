@@ -34,8 +34,6 @@
  #include <GL/glx.h>    /* this includes the necessary X headers */
 #endif // INCLUDE_OPENGL_CODE
 
-
-
 int tri_warnIncompleteReads(const char * msg,unsigned int expected,unsigned int recvd)
 {
    if (expected!=recvd) { fprintf(stderr,YELLOW "Incomplete read of %s ( %u/%u ) \n" NORMAL , msg,recvd,expected); return 1; }
@@ -110,7 +108,7 @@ struct TRI_Model * allocateModelTri()
   return (struct TRI_Model * ) newModel;
 }
 
-void deallocInternalsOfModelTri(struct TRI_Model * triModel)
+void tri_deallocModelInternals(struct TRI_Model * triModel)
 {
   if (triModel==0) { return ; }
 
@@ -163,7 +161,14 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel)
    memset(triModel,0,sizeof(struct TRI_Model));
 }
 
-int freeModelTri(struct TRI_Model * triModel)
+
+void deallocInternalsOfModelTri(struct TRI_Model * triModel)
+{
+    //Deprecated call..
+    return tri_deallocModelInternals(triModel);
+}
+
+int tri_freeModel(struct TRI_Model * triModel)
 {
   if (triModel!=0)
   {
@@ -171,6 +176,12 @@ int freeModelTri(struct TRI_Model * triModel)
    free(triModel);
   }
  return 1;
+}
+
+int freeModelTri(struct TRI_Model * triModel)
+{
+  //Deprecated call..
+  return tri_freeModel(triModel);
 }
 
 
@@ -202,12 +213,12 @@ void tri_copyModelHeader(struct TRI_Model * triModelOUT , struct TRI_Model * tri
 
 
 
-int triDoBoneDeepCopy(
+int tri_doBoneDeepCopy(
                        struct TRI_Model * triModelOUT,
                        struct TRI_Model * triModelIN,
                        TRIBoneID boneOut,
                        TRIBoneID boneIn
-                     )
+                      )
 {
   if (triModelOUT==0) { return 0; }
   if (triModelIN==0)  { return 0; }
@@ -273,7 +284,7 @@ void tri_copyBones(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
      TRIBoneID boneNum=0;
      for (boneNum=0; boneNum<triModelIN->header.numberOfBones; boneNum++)
         {
-          triDoBoneDeepCopy(
+          tri_doBoneDeepCopy(
                              triModelOUT,
                              triModelIN,
                              boneNum,
@@ -284,7 +295,7 @@ void tri_copyBones(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
 }
 
 
-int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source)
+int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source)
 {
  if ( (source==0) || (target==0) ) { return 0; }
 
@@ -296,7 +307,7 @@ int triDeepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Mo
    if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
           {
             //fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
-            triDoBoneDeepCopy(target,source,targetBoneID,sourceBoneID);
+            tri_doBoneDeepCopy(target,source,targetBoneID,sourceBoneID);
           } else
           {
               fprintf(stderr,RED "Could not resolve %s(%u) \n"NORMAL,source->bones[targetBoneID].boneName,targetBoneID);
@@ -463,6 +474,16 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
 }
 
 
+
+int tri_flattenIndexedModel(struct TRI_Model * flatOutput,struct TRI_Model * indexedInput)
+{
+   return fillFlatModelTriFromIndexedModelTri(flatOutput,indexedInput);
+}
+
+int tri_flattenIndexedModelInPlace(struct TRI_Model * indexedInputThatWillBecomeFlatOutput)
+{
+   return fillFlatModelTriFromIndexedModelTri(indexedInputThatWillBecomeFlatOutput,indexedInputThatWillBecomeFlatOutput);
+}
 
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
@@ -926,7 +947,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
-int triSimpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container)
+int tri_simpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container)
 {
         triModel->header.nameSize=7;
         triModel->header.triType = TRI_LOADER_VERSION;

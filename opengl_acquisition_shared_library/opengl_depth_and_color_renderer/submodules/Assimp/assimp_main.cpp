@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
                         fillFlatModelTriFromIndexedModelTri(&triContainer.mesh[meshID],&triContainer.mesh[meshID]);
                     }
 
-                    if (!triSimpleMergeOfTRIInContainer(originalModel,&triContainer))
+                    if (!tri_simpleMergeOfTRIInContainer(originalModel,&triContainer))
                     {
                         fprintf(stderr,RED "Error merging multiple input in a single file..\n" NORMAL);
                         return 1;
