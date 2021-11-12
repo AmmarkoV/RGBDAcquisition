@@ -371,6 +371,8 @@ const static int animateTRIModelUsingBVHArmature(
             }
             else
             {
+                struct Matrix4x4OfFloats boneRollCorrection;
+                create4x4FIdentityMatrix(&boneRollCorrection);
 
                 for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
                 {
@@ -390,11 +392,38 @@ const static int animateTRIModelUsingBVHArmature(
                         //struct Matrix4x4OfFloats localBoneInverted;
                         //invert4x4FMatrix(&localBoneInverted,&localBone);
 
+/*
+_Identity = np.identity(4, float)
+_RotX = tm.rotation_matrix(math.pi/2, (1,0,0))
+_RotY = tm.rotation_matrix(math.pi/2, (0,1,0))
+_RotNegX = tm.rotation_matrix(-math.pi/2, (1,0,0))
+_RotZ = tm.rotation_matrix(math.pi/2, (0,0,1))
+_RotZUpFaceX = np.dot(_RotZ, _RotX)
+_RotXY = np.dot(_RotNegX, _RotY)*/
 
+                        #define M_PI 3.14159265358979323846
 
-                        multiplyTwo4x4FMatrices_Naive(
+                        if (
+                             (strcmp("relbow",modelOriginal->bones[boneID].boneName)==0) ||
+                             (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
+                           )
+                        {
+                           fprintf(stderr,"Special Bone %s \n",modelOriginal->bones[boneID].boneName);
+                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 1.0, 0.0, 0.0); //ROT X
+                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 1.0, 0.0); //ROT Y
+                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 0.0, 1.0); //ROT Z
+                          //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 1.0, 0.0, 0.0); //ROT NEG X
+                          create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 1.0, 0.0); //ROT NEG Y
+                          //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 0.0, 1.0); //ROT NEG Z
+                        } else
+                        {
+                          create4x4FIdentityMatrix(&boneRollCorrection);
+                        }
+
+                        multiplyThree4x4FMatrices_Naive(
                                                         &transformations4x4[boneID*16],
                                                         bvhTransform.joint[jID].dynamicRotation.m,
+                                                        boneRollCorrection.m,
                                                         bvhTransform.joint[jID].dynamicTranslation.m
                                                         //localBone.m
                                                        );
