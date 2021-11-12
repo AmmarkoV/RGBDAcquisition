@@ -607,9 +607,8 @@ int doSkeletonDraw(
         {
          if (humanPose->x = humanModel->bones[boneID].info!=0)
          {
+          //fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
           struct pose6D axisPose={0};
-          fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
-
           axisPose.x = humanPose->x + humanModel->bones[boneID].info->finalVertexTransformation[3];
           axisPose.y = humanPose->y + humanModel->bones[boneID].info->finalVertexTransformation[7];
           axisPose.z = humanPose->z + humanModel->bones[boneID].info->finalVertexTransformation[11];

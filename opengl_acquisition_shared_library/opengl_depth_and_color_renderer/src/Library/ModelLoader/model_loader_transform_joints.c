@@ -863,7 +863,6 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
   //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   struct Vector4x1OfFloats transformedPosition={0},transformedNormal={0},position={0},normal={0};
 
-  unsigned int i,k;
   //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
@@ -871,25 +870,17 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
   struct  Matrix4x4OfFloats alignedMatrixHolder;
 
-   for (k=0; k<triModelIn->header.numberOfBones; k++ )
+  for (unsigned int k=0; k<triModelIn->header.numberOfBones; k++ )
    {
      if ( is4x4FZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
      {
        fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
-       //create4x4DIdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
        float * m = triModelIn->bones[k].info->finalVertexTransformation;
        create4x4FIdentityMatrixDirect(m);
-       /*
-       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;*/
      }
 
-     for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
+     for (unsigned int i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
-       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[k].info->finalVertexTransformation);
-
        //V is the vertice we will be working in this loop
        unsigned int v = triModelIn->bones[k].weightIndex[i];
        //W is the weight that we have for the specific bone
@@ -901,6 +892,9 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        position.m[1] = triModelIn->vertices[v*3+1];
        position.m[2] = triModelIn->vertices[v*3+2];
        position.m[3] = 1.0;
+
+       //Keep a copy of our matrix
+       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[k].info->finalVertexTransformation);
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
        transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&alignedMatrixHolder,&position);
