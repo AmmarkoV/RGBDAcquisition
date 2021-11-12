@@ -360,10 +360,8 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
      z=joints[i*3+2];
 
      if (
-          (x!=x) ||
-          (y!=y) ||
-          (z!=z)
-         )
+          (x!=x) || (y!=y) || (z!=z)
+        )
      {
        //IGNORE NAN VALUE
      } else
@@ -430,9 +428,6 @@ int setTRIModelBoneInitialPosition(struct TRI_Model * in)
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
-
-
-
 void colorCodeBones(struct TRI_Model * in)
 {
    if (in->bones==0)
@@ -440,7 +435,6 @@ void colorCodeBones(struct TRI_Model * in)
      fprintf(stderr,"No bones to colorcode \n");
      return;
    }
-
 
   struct TRI_Bones_Per_Vertex * bpv = allocTransformTRIBonesToVertexBoneFormat(in);
   if (bpv!=0)
@@ -492,11 +486,7 @@ void colorCodeBones(struct TRI_Model * in)
    }
    freeTransformTRIBonesToVertexBoneFormat(bpv);
   }
-
 }
-
-
-
 
 int setTRIJointRotationOrder(
                              struct TRI_Model * in ,
@@ -524,8 +514,6 @@ int setTRIJointRotationOrder(
  return 0;
 }
 
-
-
 int getTRIJointRotationOrder(
                               struct TRI_Model * in ,
                               unsigned int jointToChange ,
@@ -539,12 +527,6 @@ int getTRIJointRotationOrder(
 
   return (int) val;
 }
-
-
-
-
-
-
 
 void transformTRIJoint(
                         struct TRI_Model * in ,
@@ -568,9 +550,6 @@ void transformTRIJoint(
   _triTrans_create4x4MatrixFromEulerAnglesZYX(mat,rotEulerX,rotEulerY,rotEulerZ);
 }
 
-
-
-
 float * mallocModelTransformJoints(
                                     struct TRI_Model * triModelInput ,
                                     unsigned int * jointDataSizeOutput
@@ -593,7 +572,6 @@ float * mallocModelTransformJoints(
   }
   return returnMat;
 }
-
 
 float * mallocModelTransformJointsEulerAnglesDegrees(
                                                       struct TRI_Model * triModelInput ,
@@ -627,9 +605,6 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
   return returnMat;
 }
 
-
-
-
 void printModelTransform(struct TRI_Model * in)
 {
   unsigned int i=0,z=0;
@@ -648,7 +623,6 @@ void printModelTransform(struct TRI_Model * in)
       }
     }
 }
-
 
 /* This is direct setting of the joint data , overwriting default values */
 void recursiveJointHierarchyTransformerDirect(
@@ -717,7 +691,6 @@ void recursiveJointHierarchyTransformerDirect(
                                                 );
       }
 }
-
 
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
@@ -794,13 +767,6 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
    }
  return 1;
 }
-
-
-
-
-
-
-
 
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
