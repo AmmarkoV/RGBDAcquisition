@@ -20,8 +20,6 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-
-
 static float _triTrans_degrees_to_rad(float degrees)
 {
     return degrees * (M_PI /180.0 );
@@ -33,7 +31,6 @@ static void _triTrans_create4x4MatrixFromEulerAnglesZYX(float * m ,float eulX, f
     float x = _triTrans_degrees_to_rad(eulX);
     float y = _triTrans_degrees_to_rad(eulY);
     float z = _triTrans_degrees_to_rad(eulZ);
-
 
 	float cr = cos(z);
 	float sr = sin(z);
@@ -67,7 +64,6 @@ static void _triTrans_create4x4MatrixFromEulerAnglesZYX(float * m ,float eulX, f
 	m[15]= 1.0;
 }
 
-
 /// Clamp a value to 0-255
 int Clamp(int i)
 {
@@ -75,7 +71,6 @@ int Clamp(int i)
   if (i > 255) return 255;
   return i;
 }
-
 
 /// h is from 0-360
 /// s,v values are 0-1
@@ -107,64 +102,25 @@ void HsvToRgb(float h,float S,float V, float * r, float * g, float * b)
     float tv = V * (1 - S * (1 - f));
     switch (i)
     {
-
       // Red is the dominant color
-
-      case 0:
-        R = V;
-        G = tv;
-        B = pv;
-        break;
+      case 0:  R = V;  G = tv; B = pv; break;
 
       // Green is the dominant color
-
-      case 1:
-        R = qv;
-        G = V;
-        B = pv;
-        break;
-      case 2:
-        R = pv;
-        G = V;
-        B = tv;
-        break;
+      case 1:  R = qv; G = V;  B = pv; break;
+      case 2:  R = pv; G = V;  B = tv; break;
 
       // Blue is the dominant color
-
-      case 3:
-        R = pv;
-        G = qv;
-        B = V;
-        break;
-      case 4:
-        R = tv;
-        G = pv;
-        B = V;
-        break;
+      case 3:  R = pv; G = qv; B = V; break;
+      case 4:  R = tv; G = pv; B = V; break;
 
       // Red is the dominant color
-
-      case 5:
-        R = V;
-        G = pv;
-        B = qv;
-        break;
+      case 5:  R = V; G = pv; B = qv; break;
 
       // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
-
-      case 6:
-        R = V;
-        G = tv;
-        B = pv;
-        break;
-      case -1:
-        R = V;
-        G = pv;
-        B = qv;
-        break;
+      case 6:  R = V; G = tv; B = pv; break;
+      case -1: R = V; G = pv; B = qv; break;
 
       // The color is not defined, we should throw an error.
-
       default:
         //LFATAL("i Value error in Pixel conversion, Value is %d", i);
         R = G = B = V; // Just pretend its black/white
@@ -176,7 +132,6 @@ void HsvToRgb(float h,float S,float V, float * r, float * g, float * b)
   *b = (float) Clamp((int)(B * 255.0));
 }
 
-
 void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *oG,float *oB)
 {
   unsigned int sCoef=10;
@@ -186,7 +141,6 @@ void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *
   unsigned int sStep = (unsigned int) sCoef/maxID;
   unsigned int vStep = (unsigned int) vCoef/maxID;
 
-
   // assumes hue [0, 360), saturation [0, 100), lightness [0, 100)
   float h = id * hStep ;
   float s = (100-sCoef) + ( (sStep-sCoef) * sStep );
@@ -194,12 +148,10 @@ void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *
 
   HsvToRgb(h, (float) s/100, (float) v/100 , oR , oG , oB);
 
-
   *oR = (float) *oR / 255;
   *oG = (float) *oG / 255;
   *oB = (float) *oB / 255;
 }
-
 
 float * generatePalette(struct TRI_Model * in)
 {
@@ -224,16 +176,10 @@ float * generatePalette(struct TRI_Model * in)
 
  return gp;
 }
-
-
-
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
-
-
-
 struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in)
 {
   struct TRI_Bones_Per_Vertex * out = (struct TRI_Bones_Per_Vertex *) malloc(sizeof(struct TRI_Bones_Per_Vertex));
@@ -276,10 +222,6 @@ struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TR
  return out;
 }
 
-
-
-
-
 void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
  {
    if (in!=0)
@@ -291,7 +233,6 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
     free(in);
    }
  }
-
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
@@ -361,12 +302,10 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
       unsigned int indxID=bone->indicesOfThisVertex[b];
       unsigned int boneID=bone->boneIDOfThisVertex[b];
 
-
       if (boneID>in->header.numberOfVertices)
       {
          fprintf(stderr,"Error bug detected \n"); boneID=0;
       }
-
 
       ++outputNumberSamples[boneID];
       outputJoints[boneID*3+0]+=in->vertices[indxID*3+0];
@@ -400,8 +339,6 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
  }
  return outputJoints;
 }
-
-
 
 unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * joints , unsigned int numberOfJoints)
 {
@@ -465,12 +402,6 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
   }
  return outputPositions;
 }
-
-
-
-
-
-
 
 int setTRIModelBoneInitialPosition(struct TRI_Model * in)
 {
@@ -635,7 +566,6 @@ void transformTRIJoint(
   float * mat = &jointData[16*jointToChange];
 
   _triTrans_create4x4MatrixFromEulerAnglesZYX(mat,rotEulerX,rotEulerY,rotEulerZ);
-  //_triTrans_create4x4MatrixFromEulerAnglesXYZ(mat,rotEulerX,rotEulerY,rotEulerZ);
 }
 
 
@@ -655,7 +585,6 @@ float * mallocModelTransformJoints(
      {
        float * m = &returnMat[16*i];
        create4x4FIdentityMatrixDirect(m);
-       //create4x4FIdentityMatrix(mat);
        //m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
        //m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
        //m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
