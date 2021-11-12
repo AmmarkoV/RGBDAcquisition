@@ -359,9 +359,7 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
      y=joints[i*3+1];
      z=joints[i*3+2];
 
-     if (
-          (x!=x) || (y!=y) || (z!=z)
-        )
+     if ( (x!=x) || (y!=y) || (z!=z) )
      {
        //IGNORE NAN VALUE
      } else
@@ -607,15 +605,13 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
 
 void printModelTransform(struct TRI_Model * in)
 {
-  unsigned int i=0,z=0;
-
-  for (i=0; i<in->header.numberOfBones; i++)
+  for (unsigned int i=0; i<in->header.numberOfBones; i++)
     {
       if (in->bones[i].info->altered)
       {
         fprintf(stderr,"POSE4x4(this,0,%s",in->bones[i].boneName);
 
-        for (z=0; z<16; z++)
+        for (unsigned int z=0; z<16; z++)
         {
           fprintf(stderr,",%0.3f",in->bones[i].info->finalVertexTransformation[z]);
         }
@@ -641,7 +637,7 @@ void recursiveJointHierarchyTransformerDirect(
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
   //-----------------------------
 
-  float emptyParentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+  float emptyParentTransform[16],globalTransformation[16],nodeTransformation[16];
   float * parentTransform = parentTransformUntouched;
 
   if (parentTransformUntouched==0)
@@ -668,6 +664,10 @@ void recursiveJointHierarchyTransformerDirect(
 
   //We calculate the globalTransformation of the node by chaining it to its parent..!
   multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
+
+  struct Vector4x1OfFloats boneCenter={0}; boneCenter.m[3]=1.0;
+  transform3DPointFVectorUsing4x4FMatrix_Naive(boneCenter.m,globalTransformation,boneCenter.m);
+
 
   //We calculate the finalVertexTransformation for all vertices that are influenced for this bone
   //by chaining the global transformation with the bone's global inverse transform and and rest/bind pose transform
@@ -704,18 +704,18 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
   //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
-  memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
+  memset(triModelOut->vertices,0,triModelOut->header.numberOfVertices * sizeof(float));
 
   //Clean normal output before repopulating it..
   if (triModelIn->normal!=0)
        {
-         memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
+         memset(triModelOut->normal,0,triModelOut->header.numberOfNormals * sizeof(float));
        }
 
   //We will need a Matrix4x4OfFloats since it is aligned to give SSE speedups..
   struct  Matrix4x4OfFloats alignedMatrixHolder;
 
-  for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++ )
+  for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++)
    {
      if ( is4x4FZeroMatrix(triModelIn->bones[boneID].info->finalVertexTransformation) )
      {
@@ -830,7 +830,6 @@ int doModelTransform(
     return 0;
   }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   if (performVertexTransform)
   {
     //Past checks..

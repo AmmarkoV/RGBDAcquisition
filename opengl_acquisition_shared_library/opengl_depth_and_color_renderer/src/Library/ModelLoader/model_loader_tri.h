@@ -78,7 +78,6 @@ struct TRI_Bones_Header
   unsigned int  numberOfBoneChildren;
 //-------------------------------------------
 
-
  //In order not to break this file format ever again
  unsigned char notUsed1;
  unsigned char notUsed2;

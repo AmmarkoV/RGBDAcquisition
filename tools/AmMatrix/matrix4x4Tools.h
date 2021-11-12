@@ -367,6 +367,17 @@ int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4
 * @param  Input Vector 4x1 V
 * @retval 0=failure,1=success
 */
+int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * transformation4x4,float * point3D);
+
+
+/**
+* @brief Multiply a 4x4 matrix of floats with a float Vector (3D Point)  A*V
+* @ingroup AmMatrix
+* @param  Output Vector ( should be already allocated )
+* @param  Input 4x4 Matrix A
+* @param  Input Vector 4x1 V
+* @retval 0=failure,1=success
+*/
 int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D);
 
 /**

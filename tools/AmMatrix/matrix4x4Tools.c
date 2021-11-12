@@ -1357,14 +1357,11 @@ void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,con
 #endif
 
 
-//struct Vector4x1OfFloats
-int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D)
+
+int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * transformation4x4,float * point3D)
 {
-if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
+ if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
  {
-#if INTEL_OPTIMIZATIONS
-  multiplyVectorWith4x4FMatrix_SSE(resultPoint3D->m,transformation4x4->m,point3D->m);
-#else
   // What we want to do ( in mathematica )
   // { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
 
@@ -1376,30 +1373,45 @@ if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
   //  {e11 W + e8 X + e9 Y + e10 Z},
   //  {e15 W + e12 X + e13 Y + e14 Z}
   //}
-  float * m = transformation4x4->m;
-  register float X=point3D->m[0],Y=point3D->m[1],Z=point3D->m[2],W=point3D->m[3];
+  float * m = transformation4x4;
+  register float X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
 
-  resultPoint3D->m[0] = m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
-  resultPoint3D->m[1] = m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
-  resultPoint3D->m[2] = m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
-  resultPoint3D->m[3] = m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
+  resultPoint3D[0] = m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
+  resultPoint3D[1] = m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
+  resultPoint3D[2] = m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
+  resultPoint3D[3] = m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
-  if (resultPoint3D->m[3]!=0.0)
+  if (resultPoint3D[3]!=0.0)
   {
-   resultPoint3D->m[0]/=resultPoint3D->m[3];
-   resultPoint3D->m[1]/=resultPoint3D->m[3];
-   resultPoint3D->m[2]/=resultPoint3D->m[3];
-   resultPoint3D->m[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
+   resultPoint3D[0]/=resultPoint3D[3];
+   resultPoint3D[1]/=resultPoint3D[3];
+   resultPoint3D[2]/=resultPoint3D[3];
+   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
    return 1;
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
-     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D->m[0],point3D->m[1],point3D->m[2],point3D->m[3]);
-     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D->m[0],resultPoint3D->m[1],resultPoint3D->m[2],resultPoint3D->m[3]);
+     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
+     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
      return 0;
   }
- return 1;
+  return 1;
+ }
+ return 0;
+}
+
+
+//struct Vector4x1OfFloats
+int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoint3D,struct Matrix4x4OfFloats * transformation4x4,struct Vector4x1OfFloats * point3D)
+{
+if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
+ {
+#if INTEL_OPTIMIZATIONS
+  multiplyVectorWith4x4FMatrix_SSE(resultPoint3D->m,transformation4x4->m,point3D->m);
+#else
+  //Use naive implementation
+  return transform3DPointFVectorUsing4x4FMatrix_Naive(resultPoint3D->m,transformation4x4->m,point3D->m);
 #endif
 
  }

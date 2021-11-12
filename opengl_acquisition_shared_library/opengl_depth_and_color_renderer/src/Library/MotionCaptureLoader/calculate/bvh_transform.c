@@ -20,20 +20,17 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
 float max(float a,float b)
 {
   if (a>b) {return a;}
   return b;
 }
 
-
 float min(float a,float b)
 {
   if (a<b) {return a;}
   return b;
 }
-
 
 int bvh_populateTorso3DFromTransform(
                                       struct BVH_MotionCapture * mc ,

@@ -609,9 +609,9 @@ int doSkeletonDraw(
          {
           //fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
           struct pose6D axisPose={0};
-          axisPose.x = humanPose->x + humanModel->bones[boneID].info->finalVertexTransformation[3];
-          axisPose.y = humanPose->y + humanModel->bones[boneID].info->finalVertexTransformation[7];
-          axisPose.z = humanPose->z + humanModel->bones[boneID].info->finalVertexTransformation[11];
+          axisPose.x = humanPose->x + humanModel->bones[boneID].info->x; //humanModel->bones[boneID].info->finalVertexTransformation[3];
+          axisPose.y = humanPose->y + humanModel->bones[boneID].info->y; //humanModel->bones[boneID].info->finalVertexTransformation[7];
+          axisPose.z = humanPose->z + humanModel->bones[boneID].info->z; //humanModel->bones[boneID].info->finalVertexTransformation[11];
 
           axisPose.usePoseMatrixDirectly = 1;
           for (unsigned int i=0; i<16; i++)
