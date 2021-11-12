@@ -803,12 +803,12 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        create4x4FIdentityMatrixDirect(m);
      }
 
-     for (unsigned int i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
+     for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[k].info->boneWeightsNumber; boneWeightID++)
      {
        //V is the vertice we will be working in this loop
-       unsigned int v = triModelIn->bones[k].weightIndex[i];
+       unsigned int v = triModelIn->bones[k].weightIndex[boneWeightID];
        //W is the weight that we have for the specific bone
-       float w = triModelIn->bones[k].weightValue[i];
+       float w = triModelIn->bones[k].weightValue[boneWeightID];
 
        //Vertice transformation ----------------------------------------------
        //We load our input into position/normal
