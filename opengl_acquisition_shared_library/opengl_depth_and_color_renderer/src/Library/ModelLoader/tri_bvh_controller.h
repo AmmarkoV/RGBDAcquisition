@@ -296,7 +296,7 @@ const static int animateTRIModelUsingBVHArmature(
     if (modelOutput==0)    { return 0; }
     if (bvh==0)            { return 0; }
     //----------------------------------
-    copyModelTri(modelOutput, modelOriginal, 1 /*We also want bone data*/);
+    tri_copyModel(modelOutput, modelOriginal, 1 /*We also want bone data*/);
 
     unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
@@ -340,7 +340,7 @@ const static int animateTRIModelUsingBVHArmature(
             for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
             {
                 TRIBoneID boneID=0;
-                if ( findTRIBoneWithName(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
+                if ( tri_findBone(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
                 {
                     struct TRI_Bones * bone = &modelOriginal->bones[boneID];
                     if (printDebugMessages)

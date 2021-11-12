@@ -312,7 +312,7 @@ int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_M
  {
    TRIBoneID sourceBoneID=targetBoneID;
    //fprintf(stderr,"Want data for %s(%u) : ",source->bones[targetBoneID].boneName,targetBoneID);
-   if ( findTRIBoneWithName(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
+   if ( tri_findBone(source,source->bones[targetBoneID].boneName,&sourceBoneID) )
           {
             //fprintf(stderr,"Will copy from source (%u) \n",sourceBoneID);
             tri_doBoneDeepCopy(target,source,targetBoneID,sourceBoneID);
@@ -326,7 +326,7 @@ int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_M
  return (unresolvedBones==0);
 }
 
-int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_Model * indexed)
+int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * indexed)
 {
     //fprintf(stderr,YELLOW "fillFlatModelTriFromIndexedModelTri(%p,%p)..!\n" NORMAL,triModel,indexed);
     if ( (triModel==0) || (indexed==0) )
@@ -338,7 +338,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
     if ( (indexed->indices==0) || (indexed->header.numberOfIndices==0) )
     {
       fprintf(stderr,RED "\nerror : Supposedly indexed model is not indexed..!\n" NORMAL);
-      copyModelTri(triModel,indexed,1);
+      tri_copyModel(triModel,indexed,1);
       return 1;
     }
 
@@ -350,7 +350,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
       struct TRI_Model * temporary = allocateModelTri();
       if (temporary!=0)
       {
-       copyModelTri(temporary,indexed,1);
+       tri_copyModel(temporary,indexed,1);
        int result = fillFlatModelTriFromIndexedModelTri(triModel,temporary);
        freeModelTri(temporary);
        temporary=0;
@@ -481,22 +481,21 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
  return 1;
 }
 
-
-
-int tri_flattenIndexedModel(struct TRI_Model * flatOutput,struct TRI_Model * indexedInput)
-{
-   return fillFlatModelTriFromIndexedModelTri(flatOutput,indexedInput);
-}
-
 int tri_flattenIndexedModelInPlace(struct TRI_Model * indexedInputThatWillBecomeFlatOutput)
 {
-   return fillFlatModelTriFromIndexedModelTri(indexedInputThatWillBecomeFlatOutput,indexedInputThatWillBecomeFlatOutput);
+   return tri_flattenIndexedModel(indexedInputThatWillBecomeFlatOutput,indexedInputThatWillBecomeFlatOutput);
+}
+
+int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * flatOutput,struct TRI_Model * indexedInput)
+{
+   return tri_flattenIndexedModel(flatOutput,indexedInput);
 }
 
 
-void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
+
+void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
 {
-  //fprintf(stderr,MAGENTA "copyModelTri ..\n" NORMAL);
+  //fprintf(stderr,MAGENTA "tri_copyModel ..\n" NORMAL);
   if (triModelOUT==0)           { return; }
   if (triModelIN==0)            { return; }
   if (triModelOUT==triModelIN)  { return; }
@@ -553,7 +552,7 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
      tri_copyBones(triModelOUT,triModelIN);
   } else
   {
-    fprintf(stderr,RED "copyModelTri NOT copying bone structures..\n" NORMAL);
+    fprintf(stderr,RED "tri_copyModel NOT copying bone structures..\n" NORMAL);
     if (triModelOUT->bones!=0)  { free(triModelOUT->bones); triModelOUT->bones=0; }
     triModelOUT->header.numberOfBones=0;
   }
@@ -561,6 +560,11 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
  return ;
 }
 
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
+{
+  fprintf(stderr,YELLOW "copyModelTri is deprecated\n" NORMAL);
+  tri_copyModel(triModelOUT,triModelIN,copyBoneStructures);
+}
 
 
 int tri_loadModel(const char * filename , struct TRI_Model * triModel)
@@ -764,7 +768,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
     return tri_loadModel(filename,triModel);
 }
 
-int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult)
+int tri_findBone(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult)
 {
 if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=0) )
   {
@@ -795,6 +799,13 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
 
   //fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
  return 0;
+}
+
+
+int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult)
+{
+    fprintf(stderr,YELLOW "findTRIBoneWithName is deprecated \n" NORMAL );
+    return tri_findBone(triModel,searchName,boneIDResult);
 }
 
 

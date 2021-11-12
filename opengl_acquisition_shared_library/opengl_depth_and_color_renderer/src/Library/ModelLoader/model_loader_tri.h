@@ -360,8 +360,21 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel);
 */
 int tri_simpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Container * container);
 
+
+
+
 /**
 * @brief  Search inside the bone tree of a TRI Model and get back a specific boneID
+* @ingroup TRI
+* @param  input TRI structure with the bones we want to search
+* @param  string with the name of the bone we are looking for
+* @param  output boneID if we found one
+* @retval 0=Bone Does not exist , 1=Bone found
+*/
+int tri_findBone(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult);
+
+/**
+* @brief  Deprecated call, use tri_findBone instead..
 * @ingroup TRI
 * @param  input TRI structure with the bones we want to search
 * @param  string with the name of the bone we are looking for
@@ -380,9 +393,19 @@ int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName,TRI
 */
 int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_Model  * source);
 
+
 /**
 * @brief One pretty standard operations that is needed often is copying models around to edit them without destroying the original
          This function does exactly that , with or without the bone structure.
+* @ingroup TRI
+* @param  output TRI model that will contain our fresh deep copy (  allocate with allocateModelTri )
+* @param  input TRI model
+* @param  switch to control copying bones
+*/
+void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);
+
+/**
+* @brief Deprecated function, use tri_copyModel instead..
 * @ingroup TRI
 * @param  output TRI model that will contain our fresh deep copy (  allocate with allocateModelTri )
 * @param  input TRI model

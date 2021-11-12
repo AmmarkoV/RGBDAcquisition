@@ -1032,7 +1032,7 @@ int doModelTransform(
   if (performVertexTransform)
   {
     //Past checks..
-   copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
+   tri_copyModel( triModelOut , triModelIn , 1 ); //Last 1 means we also want bone data
    applyVertexTransformation( triModelOut ,  triModelIn );
   }
 
