@@ -616,15 +616,15 @@ int getTRIJointRotationOrder(
 
 
 void transformTRIJoint(
-                                 struct TRI_Model * in ,
-                                 float * jointData ,
-                                 unsigned int jointDataSize ,
+                        struct TRI_Model * in ,
+                        float * jointData ,
+                        unsigned int jointDataSize ,
 
-                                 unsigned int jointToChange ,
-                                 float rotEulerX , //Roll
-                                 float rotEulerY , //Pitch
-                                 float rotEulerZ   //Yaw
-                               )
+                        unsigned int jointToChange ,
+                        float rotEulerX , //Roll
+                        float rotEulerY , //Pitch
+                        float rotEulerZ   //Yaw
+                      )
 {
   //This is needed for meta reasons
   in->bones[jointToChange].info->rotX = rotEulerX;
@@ -767,99 +767,14 @@ void recursiveJointHierarchyTransformerDirect(
 }
 
 
-
-
-
-
-
-
-void recursiveJointHierarchyTransformer(
-                                         struct TRI_Model * in  ,
-                                         int curBone ,
-                                         float * parentLocalTransformationUntouched ,
-                                         float * jointData , unsigned int jointDataSize ,
-                                         unsigned int recursionLevel
-                                       )
-{
-  //Sanity check..
-  //-----------------------------
-  if (in==0) { return; }
-  if (jointData==0) { return; }
-  //-----------------------------
-  if (recursionLevel>=in->header.numberOfBones+1)
-        { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
-
-
-  float parentLocalTransformation[16] , globalTransformation[16] , currentNodeLocalTransformation[16];
-  copy4x4FMatrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
-
-  if (parentLocalTransformationUntouched==0)
-   {
-      //If no parent transform untouched then use an identity matrix as parentTransform..
-      create4x4FIdentityMatrixDirect((float*) &parentLocalTransformation);
-   } else
-   {
-    copy4x4FMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
-   }
-
-
-  //These prevent to recalculate nodes where there does not appear to be change..
-  if (in->bones[curBone].info->altered)
-     {
-      //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
-      //Set all matrices to identity ------------------------------------------------------------
-      float translation[16]={0} , rotation[16]={0} , scaling[16]={0};
-
-      //Set translation to identity -------------------------------------------------------------
-      translation[0] = 1.0; translation[5] = 1.0; translation[10] = 1.0; translation[15] = 1.0;
-
-      //Set rotation to identity ----------------------------------------------------------------
-      rotation[0] = 1.0;    rotation[5] = 1.0;    rotation[10] = 1.0;    rotation[15] = 1.0;
-
-      //Set scaling to identity -----------------------------------------------------------------
-      scaling[0] = 1.0;     scaling[5] = 1.0;     scaling[10] = 1.0;     scaling[15] = 1.0;
-
-      copy4x4FMatrix(rotation,&jointData[curBone*16]);
-
-      //Get Translation
-      translation[3] =in->bones[curBone].info->localTransformation[3];
-      translation[7] =in->bones[curBone].info->localTransformation[7];
-      translation[11]=in->bones[curBone].info->localTransformation[11];
-
-      multiplyThree4x4FMatrices_Naive(currentNodeLocalTransformation,translation,rotation,scaling);
-      //print4x4DMatrixTRI("Translation was .. ",translation);
-      //print4x4DMatrixTRI("Scaling was .. ",scaling);
-      //print4x4DMatrixTRI("Rotation was .. ",rotation);
-      //print4x4DMatrixTRI("Node Transformation is now.. \n",currentNodeLocalTransformation);
-      }
-
-      multiplyTwo4x4FMatrices_Naive(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
-      multiplyThree4x4FMatrices_Naive(
-                                      in->bones[curBone].info->finalVertexTransformation ,
-                                      in->header.boneGlobalInverseTransform ,
-                                      globalTransformation,
-                                      in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
-                                     );
-
-     unsigned int i=0;
-     for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
-      {
-        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHierarchyTransformer(
-                                           in,
-                                           curBoneChild,
-                                           globalTransformation,
-                                           jointData,jointDataSize,
-                                           recursionLevel+1
-                                          );
-      }
-}
-
-
-
-
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
+   if ( (triModelIn->vertices==0) && (triModelIn->normal==0) )
+       {
+         fprintf(stderr,YELLOW "Cannot apply vertex transformation with no vertices or normals.. \n" NORMAL);
+         return 0;
+       }
+
   //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   struct Vector4x1OfFloats transformedPosition={0},transformedNormal={0},position={0},normal={0};
 
@@ -976,7 +891,7 @@ int doModelTransform(
    fprintf(stderr,"doModelTransform called without joints to transform , ");
    fprintf(stderr,"so it will be just returning a null transformed copy of");
    fprintf(stderr,"the input mesh , hope this is what you intended..\n");
-   return 1;
+   return 0;
  }
 
  if (!autodetectAlteredMatrices)
@@ -1020,14 +935,8 @@ int doModelTransform(
                                              );
   } else
   {
-    recursiveJointHierarchyTransformer(
-                                        triModelIn ,
-                                        triModelIn->header.rootBone  ,
-                                        initialParentTransform ,
-                                        joint4x4Data ,
-                                        joint4x4DataSize ,
-                                        0 /*First call 0 level recursion*/
-                                      );
+    fprintf(stderr,"Indirect transforms no longer supported..!\n");
+    return 0;
   }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
