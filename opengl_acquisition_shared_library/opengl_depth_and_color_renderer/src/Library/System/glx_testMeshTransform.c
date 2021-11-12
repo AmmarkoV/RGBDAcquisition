@@ -596,22 +596,34 @@ int doSkeletonDraw(
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
+        if (humanModel->bones==0)
+        {
+            fprintf(stderr,"doSkeletonDraw called with no bones!\n");
+            return 0;
+        }
+
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
         for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
-         fprintf(stderr,"BoneID %u  \n",boneID);
-         humanPose->x = humanModel->bones[boneID].info->x;
-         humanPose->y = humanModel->bones[boneID].info->y;
-         humanPose->z = humanModel->bones[boneID].info->z;
-         doOGLSingleDrawing(
-                            programID,
-                            MVPMatrixID,
-                            humanPose,
-                            axisVAO,
-                            axisTriangleCount,
-                            WIDTH,
-                            HEIGHT
-                          );
+         if (humanPose->x = humanModel->bones[boneID].info!=0)
+         {
+          fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
+          humanPose->x = humanModel->bones[boneID].info->x;
+          humanPose->y = humanModel->bones[boneID].info->y;
+          humanPose->z = humanModel->bones[boneID].info->z;
+          doOGLSingleDrawing(
+                             programID,
+                             MVPMatrixID,
+                             humanPose,
+                             axisVAO,
+                             axisTriangleCount,
+                             WIDTH,
+                             HEIGHT
+                           );
+         } else
+         {
+           fprintf(stderr,RED "BoneID %u empty! \n" NORMAL,boneID);
+         }
 
         }
 
@@ -820,7 +832,7 @@ int main(int argc,const char **argv)
      }
 
      //paintTRI(&axisModelIndexed,123,123,123);
-     fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
+     tri_flattenIndexedModel(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
    if (!tri_loadModel(modelToLoad, &indexedHumanModel ) )
