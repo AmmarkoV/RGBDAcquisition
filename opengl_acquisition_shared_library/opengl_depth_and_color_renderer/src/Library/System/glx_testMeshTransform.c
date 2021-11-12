@@ -607,14 +607,24 @@ int doSkeletonDraw(
         {
          if (humanPose->x = humanModel->bones[boneID].info!=0)
          {
+          struct pose6D axisPose={0};
           fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
-          humanPose->x = humanModel->bones[boneID].info->x;
-          humanPose->y = humanModel->bones[boneID].info->y;
-          humanPose->z = humanModel->bones[boneID].info->z;
+
+          axisPose.x = humanPose->x + humanModel->bones[boneID].info->finalVertexTransformation[3];
+          axisPose.y = humanPose->y + humanModel->bones[boneID].info->finalVertexTransformation[7];
+          axisPose.z = humanPose->z + humanModel->bones[boneID].info->finalVertexTransformation[11];
+
+          axisPose.usePoseMatrixDirectly = 1;
+          for (unsigned int i=0; i<16; i++)
+          {
+            axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
+          }
+          axisPose.m.m[11] += 5; //Send rendering 5 units away..
+
           doOGLSingleDrawing(
                              programID,
                              MVPMatrixID,
-                             humanPose,
+                             &axisPose,
                              axisVAO,
                              axisTriangleCount,
                              WIDTH,
@@ -926,7 +936,7 @@ int main(int argc,const char **argv)
                      renderedTexture,
                      renderedDepth,
                      &humanPose,
-                     &humanModel,
+                     &indexedHumanModel,
                      &axisModel,
                      WIDTH,
                      HEIGHT,
