@@ -813,7 +813,7 @@ int main(int argc,const char **argv)
    if (axisRendering)
    {
      struct TRI_Model axisModelIndexed={0};
-     if (!loadModelTri("axis.tri", &axisModelIndexed ) )
+     if (!tri_loadModel("axis.tri", &axisModelIndexed ) )
      {
        fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
        return 0;
@@ -823,13 +823,13 @@ int main(int argc,const char **argv)
      fillFlatModelTriFromIndexedModelTri(&axisModel,&axisModelIndexed);
    }
    //------------------------------------------------------
-   if (!loadModelTri(modelToLoad, &indexedHumanModel ) )
+   if (!tri_loadModel(modelToLoad, &indexedHumanModel ) )
    {
      fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/makehuman.tri\n");
      return 0;
    }
    //------------------------------------------------------
-   if (!loadModelTri("eyes.tri", &indexedEyeModel ) )
+   if (!tri_loadModel("eyes.tri", &indexedEyeModel ) )
    {
      fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyes.tri\n");
      return 0;
@@ -837,8 +837,8 @@ int main(int argc,const char **argv)
 
    if (destroyColors)
    {
-      paintTRI(&indexedHumanModel,123,123,123);
-      paintTRI(&indexedEyeModel,123,123,123);
+      tri_paintModel(&indexedHumanModel,123,123,123);
+      tri_paintModel(&indexedEyeModel,123,123,123);
    }
    //------------------------------------------------------
 
@@ -940,8 +940,8 @@ int main(int argc,const char **argv)
 
 
 
-     deallocInternalsOfModelTri(&humanModel);
-     deallocInternalsOfModelTri(&eyeModel);
+     tri_deallocModelInternals(&humanModel);
+     tri_deallocModelInternals(&eyeModel);
      usleep(1);
 
 

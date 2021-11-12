@@ -35,7 +35,7 @@ int textureLoadAndPaint(struct TRI_Model * model,char * filename)
     if (image!=0)
     {
         fprintf(stderr,"Loaded %s => width:%u / height:%u \n",filename,image->width,image->height);
-        if ( paintTRIUsingTexture(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
+        if ( tri_paintModelUsingTexture(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
         {
             fprintf(stderr,"Successfully painted TRI model using %s texture\n",filename);
             success=1;
@@ -127,7 +127,7 @@ int main (int argc, char *argv[])
             int b = atoi(argv[i+3]);
 
             fprintf(stderr,"Will paint mesh (RGB) (%u/%u/%u) \n",r,g,b);
-            paintTRI(
+            tri_paintModel(
                 originalModel,
                 r,
                 g,

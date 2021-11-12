@@ -110,6 +110,7 @@ struct TRI_Model * tri_allocateModel()
 
 struct TRI_Model * allocateModelTri()
 {
+    fprintf(stderr,YELLOW " allocateModelTri is deprecated \n" NORMAL);
     return tri_allocateModel();
 }
 
@@ -169,6 +170,7 @@ void tri_deallocModelInternals(struct TRI_Model * triModel)
 
 void deallocInternalsOfModelTri(struct TRI_Model * triModel)
 {
+    fprintf(stderr,YELLOW " deallocInternalsOfModelTri is deprecated \n" NORMAL);
     //Deprecated call..
     return tri_deallocModelInternals(triModel);
 }
@@ -177,7 +179,7 @@ int tri_freeModel(struct TRI_Model * triModel)
 {
   if (triModel!=0)
   {
-   deallocInternalsOfModelTri(triModel);
+   tri_deallocModelInternals(triModel);
    free(triModel);
   }
  return 1;
@@ -185,6 +187,7 @@ int tri_freeModel(struct TRI_Model * triModel)
 
 int freeModelTri(struct TRI_Model * triModel)
 {
+    fprintf(stderr,YELLOW " freeModelTri is deprecated \n" NORMAL);
   //Deprecated call..
   return tri_freeModel(triModel);
 }
@@ -358,7 +361,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel,struct TRI_M
 
     //Get rid of old data..
     //===================================================================
-    deallocInternalsOfModelTri(triModel);
+    tri_deallocModelInternals(triModel);
 
     //Write header..
     //===================================================================
@@ -560,7 +563,7 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 
 
 
-int loadModelTri(const char * filename , struct TRI_Model * triModel)
+int tri_loadModel(const char * filename , struct TRI_Model * triModel)
 {
   fprintf(stderr,"Reading TRI model -> %s \n",filename );
   FILE *fd=0;
@@ -754,6 +757,13 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
+
+int loadModelTri(const char * filename , struct TRI_Model * triModel)
+{
+    fprintf(stderr,YELLOW " loadModelTri is deprecated \n" NORMAL);
+    return tri_loadModel(filename,triModel);
+}
+
 int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult)
 {
 if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=0) )
@@ -788,7 +798,7 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
 }
 
 
-int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
+int tri_paintModelUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
 {
   if (triModel!=0)
   {
@@ -829,7 +839,7 @@ int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , un
 }
 
 
-int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
+int tri_paintModel(struct TRI_Model * triModel,char r, char g, char b)
 {
   if (triModel!=0)
   {
@@ -858,7 +868,7 @@ int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
   return 0;
 }
 
-int saveModelTri(const char * filename , struct TRI_Model * triModel)
+int tri_saveModel(const char * filename , struct TRI_Model * triModel)
 {
   fprintf(stderr,"Writing TRI model -> %s \n",filename );
   unsigned int itemSize=0 , count=0;
@@ -949,6 +959,13 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
         return 1;
     }
   return 0;
+}
+
+
+int saveModelTri(const char * filename , struct TRI_Model * triModel)
+{
+    fprintf(stderr,YELLOW "Deprecated call saveModelTri \n");
+    return tri_saveModel(filename,triModel);
 }
 
 

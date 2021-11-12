@@ -449,8 +449,8 @@ const static int animateTRIModelUsingBVHArmature(
                          0 //Default joint convention
                         );
         //---------------------------------------------------------------
-        fillFlatModelTriFromIndexedModelTri(modelOutput,&modelTemporary);
-        deallocInternalsOfModelTri(&modelTemporary);
+        tri_flattenIndexedModel(modelOutput,&modelTemporary);
+        tri_deallocModelInternals(&modelTemporary);
         //---------------------------------------------------------------
         free(transformations4x4);
 

@@ -256,6 +256,14 @@ struct TRI_Model * allocateModelTri();
 * @param  input TRI structure with the loaded model we want freed
 * @retval 0=Failure,1=Success
 */
+int tri_freeModel(struct TRI_Model * triModel);
+
+/**
+* @brief Deprecated, use tri_freeModel instead
+* @ingroup TRI
+* @param  input TRI structure with the loaded model we want freed
+* @retval 0=Failure,1=Success
+*/
 int freeModelTri(struct TRI_Model * triModel);
 
 
@@ -274,8 +282,20 @@ void tri_deallocModelInternals(struct TRI_Model * triModel);
 void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 
 
+
+
 /**
 * @brief  Load TRI model from a file
+* @ingroup TRI
+* @param  String with the filename we want to load from
+* @param  output structure to hold the TRI Model ( allocate with allocateModelTri )
+* @retval 0=Failure,1=Success
+*/
+int tri_loadModel(const char * filename , struct TRI_Model * triModel);
+
+
+/**
+* @brief  Deprecated, use tri_loadModel instead..
 * @ingroup TRI
 * @param  String with the filename we want to load from
 * @param  output structure to hold the TRI Model ( allocate with allocateModelTri )
@@ -296,7 +316,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel);
 * @param  channels of image
 * @retval 0=Failure,1=Success
 */
-int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels);
+int tri_paintModelUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels);
 
 
 /**
@@ -308,10 +328,22 @@ int paintTRIUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , un
 * @param  B channel value ( 0-255 )
 * @retval 0=Failure,1=Success
 */
-int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
+int tri_paintModel(struct TRI_Model * triModel,char r, char g, char b);
+
+
+
 
 /**
 * @brief  Save TRI model to a file
+* @ingroup TRI
+* @param  String with the filename we want to load from
+* @param  input structure that hold the TRI Model we want to save
+* @retval 0=Failure,1=Success
+*/
+int tri_saveModel(const char * filename , struct TRI_Model * triModel);
+
+/**
+* @brief  Deprecated, use tri_saveModel instead..
 * @ingroup TRI
 * @param  String with the filename we want to load from
 * @param  input structure that hold the TRI Model we want to save
