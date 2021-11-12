@@ -866,7 +866,12 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
   //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
-  memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
+
+  //Clean normal output before repopulating it..
+  if (triModelIn->normal!=0)
+       {
+         memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
+       }
 
   struct  Matrix4x4OfFloats alignedMatrixHolder;
 
@@ -904,16 +909,19 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        //----------------------------------------------------------------------
 
        //Normal transformation ----------------------------------------------
-       normal.m[0]   = triModelIn->normal[v*3+0];
-       normal.m[1]   = triModelIn->normal[v*3+1];
-       normal.m[2]   = triModelIn->normal[v*3+2];
-       normal.m[3]   = 0.0;
+       if (triModelIn->normal!=0)
+       {
+        normal.m[0]   = triModelIn->normal[v*3+0];
+        normal.m[1]   = triModelIn->normal[v*3+1];
+        normal.m[2]   = triModelIn->normal[v*3+2];
+        normal.m[3]   = 0.0;
 
-       //We transform input (initial) normal with the transform we computed to get transformedNormal
-       transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&alignedMatrixHolder,normal.m);
-       triModelOut->normal[v*3+0] += (float) transformedNormal.m[0] * w;
-       triModelOut->normal[v*3+1] += (float) transformedNormal.m[1] * w;
-       triModelOut->normal[v*3+2] += (float) transformedNormal.m[2] * w;
+        //We transform input (initial) normal with the transform we computed to get transformedNormal
+        transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&alignedMatrixHolder,normal.m);
+        triModelOut->normal[v*3+0] += (float) transformedNormal.m[0] * w;
+        triModelOut->normal[v*3+1] += (float) transformedNormal.m[1] * w;
+        triModelOut->normal[v*3+2] += (float) transformedNormal.m[2] * w;
+       }
        //----------------------------------------------------------------------
      }
    }
