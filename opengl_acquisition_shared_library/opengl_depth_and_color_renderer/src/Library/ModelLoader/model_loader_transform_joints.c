@@ -794,21 +794,21 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
   //We will need a Matrix4x4OfFloats since it is aligned to give SSE speedups..
   struct  Matrix4x4OfFloats alignedMatrixHolder;
 
-  for (unsigned int k=0; k<triModelIn->header.numberOfBones; k++ )
+  for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++ )
    {
-     if ( is4x4FZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
+     if ( is4x4FZeroMatrix(triModelIn->bones[boneID].info->finalVertexTransformation) )
      {
-       fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
-       float * m = triModelIn->bones[k].info->finalVertexTransformation;
+       fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[boneID].boneName , boneID );
+       float * m = triModelIn->bones[boneID].info->finalVertexTransformation;
        create4x4FIdentityMatrixDirect(m);
      }
 
-     for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[k].info->boneWeightsNumber; boneWeightID++)
+     for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[boneID].info->boneWeightsNumber; boneWeightID++)
      {
        //V is the vertice we will be working in this loop
-       unsigned int v = triModelIn->bones[k].weightIndex[boneWeightID];
+       unsigned int v = triModelIn->bones[boneID].weightIndex[boneWeightID];
        //W is the weight that we have for the specific bone
-       float w = triModelIn->bones[k].weightValue[boneWeightID];
+       float w = triModelIn->bones[boneID].weightValue[boneWeightID];
 
        //Vertice transformation ----------------------------------------------
        //We load our input into position/normal
@@ -817,8 +817,8 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        position.m[2] = triModelIn->vertices[v*3+2];
        position.m[3] = 1.0;
 
-       //Keep a copy of our matrix
-       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[k].info->finalVertexTransformation);
+       //Keep a copy of our matrix on our SSE aligned Matrix4x4OfFloats structure
+       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[boneID].info->finalVertexTransformation);
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
        transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&alignedMatrixHolder,&position);
