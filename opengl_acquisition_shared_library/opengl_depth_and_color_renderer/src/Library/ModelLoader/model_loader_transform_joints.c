@@ -641,10 +641,10 @@ void recursiveJointHierarchyTransformerDirect(
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
   //-----------------------------
 
-   float emptyParentTransform[16] , globalTransformation[16] , nodeTransformation[16];
-   float * parentTransform = parentTransformUntouched;
+  float emptyParentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+  float * parentTransform = parentTransformUntouched;
 
-   if (parentTransformUntouched==0)
+  if (parentTransformUntouched==0)
    {
       //If parentTransformUntouched is empty then use an identity matrix locally allocated in our emptyParentTransform
       //as a parentTransform, in any case we do not touch parentTransformUntouched..!
@@ -652,13 +652,13 @@ void recursiveJointHierarchyTransformerDirect(
       parentTransform = emptyParentTransform;
    }
 
-   //We use nodeLocalTransformation as shorthand so that we don't have to access the bone structure every time
-   float * nodeLocalTransformation = in->bones[curBone].info->localTransformation;
+  //We use nodeLocalTransformation as shorthand so that we don't have to access the bone structure every time
+  float * nodeLocalTransformation = in->bones[curBone].info->localTransformation;
 
-   if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
+  if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
      {
-      //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
-      multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
+       //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
+       multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
      } else
      {
        //If there is no 4x4 transform to use then just copy our local transformation
@@ -666,13 +666,13 @@ void recursiveJointHierarchyTransformerDirect(
        copy4x4FMatrix(nodeTransformation,nodeLocalTransformation);
      }
 
-   //We calculate the globalTransformation of the node by chaining it to its parent..!
-   multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
+  //We calculate the globalTransformation of the node by chaining it to its parent..!
+  multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
 
-   //We calculate the finalVertexTransformation for all vertices that are influenced for this bone
-   //by chaining the global transformation with the bone's global inverse transform and and rest/bind pose transform
-   //Apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
-   multiplyThree4x4FMatrices_Naive(
+  //We calculate the finalVertexTransformation for all vertices that are influenced for this bone
+  //by chaining the global transformation with the bone's global inverse transform and and rest/bind pose transform
+  //Apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
+  multiplyThree4x4FMatrices_Naive(
                                    in->bones[curBone].info->finalVertexTransformation ,
                                    in->header.boneGlobalInverseTransform ,
                                    globalTransformation,
@@ -680,7 +680,7 @@ void recursiveJointHierarchyTransformerDirect(
                                   );
 
    //Each bone might have multiple children, we recursively execute the same transform for all children of this node..!
-   for (unsigned int childID = 0; childID < in->bones[curBone].info->numberOfBoneChildren; childID++)
+  for (unsigned int childID = 0; childID < in->bones[curBone].info->numberOfBoneChildren; childID++)
       {
         recursiveJointHierarchyTransformerDirect(
                                                  in,
