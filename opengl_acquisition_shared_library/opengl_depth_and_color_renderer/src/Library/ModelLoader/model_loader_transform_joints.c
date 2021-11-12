@@ -714,7 +714,6 @@ void recursiveJointHierarchyTransformerDirect(
   //Sanity check..
   //-----------------------------
   if (in==0) { return; }
-  if (joint4x4Data==0) { return; }
   //-----------------------------
   if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
@@ -725,7 +724,7 @@ void recursiveJointHierarchyTransformerDirect(
 
    if (parentTransformUntouched==0)
    {
-      //If no parent transform untouched then use an identity matrix allocated in our emptyParentTransform
+      //If parentTransformUntouched is empty then use an identity matrix locally allocated in our emptyParentTransform
       //as a parentTransform, in any case we do not touch parentTransformUntouched..!
       create4x4FIdentityMatrixDirect((float*) &emptyParentTransform);
       parentTransform = emptyParentTransform;
@@ -734,13 +733,14 @@ void recursiveJointHierarchyTransformerDirect(
    //We use nodeLocalTransformation as shorthand so that we don't have to access the bone structure every time
    float * nodeLocalTransformation = in->bones[curBone].info->localTransformation;
 
-   if (joint4x4Data!=0)
+   if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
      {
       //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
       multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
      } else
      {
        //If there is no 4x4 transform to use then just copy our local transformation
+       fprintf(stderr,YELLOW "Bone %u has no joint transform.. \n" NORMAL,curBone);
        copy4x4FMatrix(nodeTransformation,nodeLocalTransformation);
      }
 
@@ -779,7 +779,6 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
          return 0;
        }
 
-  //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   struct Vector4x1OfFloats transformedPosition={0},transformedNormal={0},position={0},normal={0};
 
   //We NEED to clear the vertices and normals since they are added uppon , not having
@@ -792,6 +791,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
          memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
        }
 
+  //We will need a Matrix4x4OfFloats since it is aligned to give SSE speedups..
   struct  Matrix4x4OfFloats alignedMatrixHolder;
 
   for (unsigned int k=0; k<triModelIn->header.numberOfBones; k++ )
@@ -884,10 +884,10 @@ int doModelTransform(
                       unsigned int jointAxisConvention
                     )
 {
-  if (triModelIn==0)
+ if (triModelIn==0)
                      { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
 
-  if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
+ if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
                      { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
 
  if ( (joint4x4Data==0) || (joint4x4DataSize==0) )
@@ -898,32 +898,24 @@ int doModelTransform(
    return 0;
  }
 
- if (!autodetectAlteredMatrices)
-     {
-       // fprintf(stderr,"disabled autodetection of altered matrices might result in strange transformations being executed.. \n");
-     }
-
- unsigned int i=0;
- for (i=0; i<triModelIn->header.numberOfBones; i++)
+ for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++)
    {
-     float * jointI = &joint4x4Data[i*16];
+     float * joint4x4Transform = &joint4x4Data[boneID*16];
 
      if (autodetectAlteredMatrices)
      {
-       if (!is4x4FIdentityMatrix(jointI))  { triModelIn->bones[i].info->altered=1; } else
-                                           { triModelIn->bones[i].info->altered=0; }
+       if (!is4x4FIdentityMatrix(joint4x4Transform))  { triModelIn->bones[boneID].info->altered=1; } else
+                                                      { triModelIn->bones[boneID].info->altered=0; }
      } else
      {
        //All matrices considered altered
-       triModelIn->bones[i].info->altered=1;
+       triModelIn->bones[boneID].info->altered=1;
      }
    }
 
   float initialParentTransform[16]={0};
-  float * m = initialParentTransform;
-  m[0] = 1.0;  m[5] = 1.0; m[10] = 1.0; m[15] = 1.0;
-  //create4x4FIdentityMatrix(&initialParentTransform) ; //Initial "parent" transform is Identity
-
+  //The initial parent transform is an identity matrix..!
+  create4x4FIdentityMatrixDirect((float*) &initialParentTransform);
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -947,7 +939,7 @@ int doModelTransform(
   if (performVertexTransform)
   {
     //Past checks..
-   tri_copyModel( triModelOut , triModelIn , 1 ); //Last 1 means we also want bone data
+   tri_copyModel(triModelOut,triModelIn,1); //Last 1 means we also want bone data
    applyVertexTransformation( triModelOut ,  triModelIn );
   }
 

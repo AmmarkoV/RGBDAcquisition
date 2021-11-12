@@ -691,7 +691,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
                               &triModelOut ,
                               triModelIn ,
                               joints ,
-                              numberOfBones ,
+                              numberOfBones * 16 * sizeof(float) , //Each "joints" matrix is 4x4 and consists of floats 
                               1/*Autodetect default matrices for speedup*/ ,
                               1/*Direct setting of matrices*/,
                               1/*Do Transforms, don't just calculate the matrices*/ ,

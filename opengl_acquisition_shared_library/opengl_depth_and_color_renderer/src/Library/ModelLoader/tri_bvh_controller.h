@@ -442,7 +442,7 @@ const static int animateTRIModelUsingBVHArmature(
                          &modelTemporary,
                          modelOriginal,
                          transformations4x4,
-                         numberOfBones,
+                         numberOfBones * 16 * sizeof(float), //Each transform has a 4x4 matrix of floats..!
                          1,//Autodetect default matrices for speedup
                          1,//Direct setting of matrices
                          1,//Do Transforms, don't just calculate the matrices
