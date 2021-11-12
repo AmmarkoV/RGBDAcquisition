@@ -100,12 +100,17 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
-struct TRI_Model * allocateModelTri()
+struct TRI_Model * tri_allocateModel()
 {
   struct TRI_Model * newModel = (struct TRI_Model * ) malloc(sizeof(struct TRI_Model));
   if (newModel!=0) // Clear new model if it was allocated..
         { memset(newModel,0,sizeof(struct TRI_Model)); }
   return (struct TRI_Model * ) newModel;
+}
+
+struct TRI_Model * allocateModelTri()
+{
+    return tri_allocateModel();
 }
 
 void tri_deallocModelInternals(struct TRI_Model * triModel)

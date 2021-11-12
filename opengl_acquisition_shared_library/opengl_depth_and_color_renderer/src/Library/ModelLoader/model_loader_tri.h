@@ -236,14 +236,16 @@ int tri_flattenIndexedModel(struct TRI_Model * flatOutput,struct TRI_Model * ind
 int tri_flattenIndexedModelInPlace(struct TRI_Model * indexedInputThatWillBecomeFlatOutput);
 
 
-
-
-
-
 /**
 * @brief Allocate the space for a TRI model ( possibly to build a model from scratch ) , typically you don't want to do this , just use loadModelTri instead..!
 * @ingroup TRI
-* @param  input TRI structure with the loaded model we want freed
+* @retval 0=Failure or else a pointer to a newly allocated TRI_Model
+*/
+struct TRI_Model * tri_allocateModel();
+
+/**
+* @brief Deprecated, use tri_allocate instead
+* @ingroup TRI
 * @retval 0=Failure or else a pointer to a newly allocated TRI_Model
 */
 struct TRI_Model * allocateModelTri();
@@ -256,13 +258,6 @@ struct TRI_Model * allocateModelTri();
 */
 int freeModelTri(struct TRI_Model * triModel);
 
-/**
-* @brief After being done with the model we can deallocate its internal structures , this doesn't do the final free(triModel) call..! , see freeModelTri call for a call that does this plus the final free call
-* @ingroup TRI
-* @param  input TRI structure with the loaded model we want its internals freed
-*/
-void deallocInternalsOfModelTri(struct TRI_Model * triModel);
-
 
 /**
 * @brief After being done with the model we can deallocate its internal structures , this doesn't do the final free(triModel) call..! , see freeModelTri call for a call that does this plus the final free call
@@ -270,6 +265,13 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 * @param  input TRI structure with the loaded model we want its internals freed
 */
 void tri_deallocModelInternals(struct TRI_Model * triModel);
+
+/**
+* @brief  Deprecated, use tri_deallocModelInternals instead
+* @ingroup TRI
+* @param  input TRI structure with the loaded model we want its internals freed
+*/
+void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 
 
 /**
