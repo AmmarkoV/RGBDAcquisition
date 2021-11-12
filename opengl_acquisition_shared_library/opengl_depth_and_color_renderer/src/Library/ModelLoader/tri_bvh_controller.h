@@ -384,11 +384,26 @@ const static int animateTRIModelUsingBVHArmature(
                         //svn.blender.org/svnroot/bf-blender/branches/blender-2.47/source/blender/blenkernel/intern/armature.c
                         //https://developer.blender.org/T39470
 
+
+                        //struct Matrix4x4OfFloats localBone;
+                        //copy4x4FMatrix(localBone.m,modelOriginal->bones[boneID].info->localTransformation);
+                        //struct Matrix4x4OfFloats localBoneInverted;
+                        //invert4x4FMatrix(&localBoneInverted,&localBone);
+
+
+
+                        multiplyTwo4x4FMatrices_Naive(
+                                                        &transformations4x4[boneID*16],
+                                                        bvhTransform.joint[jID].dynamicRotation.m,
+                                                        bvhTransform.joint[jID].dynamicTranslation.m
+                                                        //localBone.m
+                                                       );
+                        /*
                         memcpy(
                                 &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                                 bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
                                 sizeof(float) * 16
-                              );
+                              );*/
 
                         //invert4x4FMatrix(&transformations4x4[boneID*16],bvhTransform.joint[jID].dynamicRotation.m);
 /*
