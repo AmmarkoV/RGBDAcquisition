@@ -654,11 +654,12 @@ float * mallocModelTransformJoints(
      for (i=0; i<(*jointDataSizeOutput); i++)
      {
        float * m = &returnMat[16*i];
+       create4x4FIdentityMatrixDirect(m);
        //create4x4FIdentityMatrix(mat);
-       m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-       m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-       m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-       m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+       //m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+       //m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+       //m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+       //m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
      }
   }
   return returnMat;
@@ -717,48 +718,51 @@ void recursiveJointHierarchyTransformerDirect(
   //-----------------------------
   if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
+  //-----------------------------
 
-   float parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+   float emptyParentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+   float * parentTransform = parentTransformUntouched;
 
    if (parentTransformUntouched==0)
    {
-      //If no parent transform untouched then use an identity matrix as parentTransform..
-      create4x4FIdentityMatrixDirect((float*) &parentTransform);
-   } else
-   {
-      copy4x4FMatrix(parentTransform,parentTransformUntouched);
+      //If no parent transform untouched then use an identity matrix allocated in our emptyParentTransform
+      //as a parentTransform, in any case we do not touch parentTransformUntouched..!
+      create4x4FIdentityMatrixDirect((float*) &emptyParentTransform);
+      parentTransform = emptyParentTransform;
    }
 
-   copy4x4FMatrix(nodeTransformation,in->bones[curBone].info->localTransformation);
+   //We use nodeLocalTransformation as shorthand so that we don't have to access the bone structure every time
+   float * nodeLocalTransformation = in->bones[curBone].info->localTransformation;
 
+   if (joint4x4Data!=0)
+     {
+      //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
+      multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
+     } else
+     {
+       //If there is no 4x4 transform to use then just copy our local transformation
+       copy4x4FMatrix(nodeTransformation,nodeLocalTransformation);
+     }
 
-   //////////////////
-   //NO, WRONG!! in->bones[curBone].info->altered is set by an arbitrary rot==identity (in the calling function) but nothing prevent it
-   // from being so, especially when I try to debug it....
-   //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
-   float newRot[16],nodeCopy[16];
-
-   if (joint4x4Data!=0) { copy4x4FMatrix(newRot,&joint4x4Data[curBone*16]); }
-
-   copy4x4FMatrix(nodeCopy,nodeTransformation);
-   multiplyTwo4x4FMatrices_Naive(nodeTransformation,nodeCopy,newRot);
-
-
+   //We calculate the globalTransformation of the node by chaining it to its parent..!
    multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
+
+   //We calculate the finalVertexTransformation for all vertices that are influenced for this bone
+   //by chaining the global transformation with the bone's global inverse transform and and rest/bind pose transform
+   //Apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
    multiplyThree4x4FMatrices_Naive(
-                                      in->bones[curBone].info->finalVertexTransformation ,
-                                      in->header.boneGlobalInverseTransform ,
-                                      globalTransformation,
-                                      in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
+                                   in->bones[curBone].info->finalVertexTransformation ,
+                                   in->header.boneGlobalInverseTransform ,
+                                   globalTransformation,
+                                   in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
                                   );
 
-   unsigned int i=0;
-   for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
+   //Each bone might have multiple children, we recursively execute the same transform for all children of this node..!
+   for (unsigned int childID = 0; childID < in->bones[curBone].info->numberOfBoneChildren; childID++)
       {
-        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHierarchyTransformerDirect(
                                                  in,
-                                                 curBoneChild,
+                                                 in->bones[curBone].boneChild[childID], //recursively execute on this bone's child
                                                  globalTransformation,
                                                  joint4x4Data,joint4x4DataSize,
                                                  recursionLevel+1
