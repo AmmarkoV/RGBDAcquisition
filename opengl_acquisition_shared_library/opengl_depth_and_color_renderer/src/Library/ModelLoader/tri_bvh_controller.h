@@ -391,14 +391,14 @@ const static int animateTRIModelUsingBVHArmature(
                         //struct Matrix4x4OfFloats localBoneInverted;
                         //invert4x4FMatrix(&localBoneInverted,&localBone);
 
-/*
-_Identity = np.identity(4, float)
-_RotX = tm.rotation_matrix(math.pi/2, (1,0,0))
-_RotY = tm.rotation_matrix(math.pi/2, (0,1,0))
-_RotNegX = tm.rotation_matrix(-math.pi/2, (1,0,0))
-_RotZ = tm.rotation_matrix(math.pi/2, (0,0,1))
-_RotZUpFaceX = np.dot(_RotZ, _RotX)
-_RotXY = np.dot(_RotNegX, _RotY)*/
+                        /*
+                           _Identity = np.identity(4, float)
+                           _RotX = tm.rotation_matrix(math.pi/2, (1,0,0))
+                           _RotY = tm.rotation_matrix(math.pi/2, (0,1,0))
+                           _RotNegX = tm.rotation_matrix(-math.pi/2, (1,0,0))
+                           _RotZ = tm.rotation_matrix(math.pi/2, (0,0,1))
+                           _RotZUpFaceX = np.dot(_RotZ, _RotX)
+                           _RotXY = np.dot(_RotNegX, _RotY)*/
 
                         #define M_PI 3.14159265358979323846
 
@@ -427,15 +427,19 @@ _RotXY = np.dot(_RotNegX, _RotY)*/
                                                         bvhTransform.joint[jID].dynamicTranslation.m
                                                         //localBone.m
                                                        );
-                        /*
+
+
+
+
+                        //invert4x4FMatrix(&transformations4x4[boneID*16],bvhTransform.joint[jID].dynamicRotation.m);
+/*
+
                         memcpy(
                                 &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
                                 bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
                                 sizeof(float) * 16
-                              );*/
+                              );
 
-                        //invert4x4FMatrix(&transformations4x4[boneID*16],bvhTransform.joint[jID].dynamicRotation.m);
-/*
                         float YZRotation[]={1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,0,0,1};
                         float ZYRotation[]={1,0,0,0, 0,0,-1,0, 0,1,0,0, 0,0,0,1};
                         multiplyTwo4x4FMatrices_Naive(

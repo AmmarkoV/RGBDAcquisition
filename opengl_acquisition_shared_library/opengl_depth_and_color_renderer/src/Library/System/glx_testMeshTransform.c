@@ -795,16 +795,15 @@ int doBVHDraw(
                  struct Matrix4x4OfFloats localToWorldTransformation;
                  struct Matrix4x4OfFloats chainTransformation;
                  struct Matrix4x4OfFloats dynamicTranslation;
-                 struct Matrix4x4OfFloats dynamicRotation;
-               */
+                 struct Matrix4x4OfFloats dynamicRotation; */
                axisPose.usePoseMatrixDirectly = 1;
                for (unsigned int i=0; i<16; i++)
                  {
                    axisPose.m.m[i] = bvhTransform.joint[jID].localToWorldTransformation.m[i];
                  }
-               axisPose.m.m[3] = axisPose.m.m[3]/10;
-               axisPose.m.m[7] = axisPose.m.m[7]/10;
-               axisPose.m.m[11]= 50 + axisPose.m.m[11]/10 ; //Send rendering 50 units away..
+               axisPose.m.m[3]  = axisPose.m.m[3]/10;
+               axisPose.m.m[7]  = axisPose.m.m[7]/10;
+               axisPose.m.m[11] = 50 + axisPose.m.m[11]/10 ; //Send rendering 50 units away..
 
                doOGLSingleDrawing(
                                    programID,
