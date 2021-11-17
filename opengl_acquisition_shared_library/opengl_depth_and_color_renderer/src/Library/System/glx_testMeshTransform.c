@@ -694,6 +694,156 @@ int doSkeletonDraw(
 
 
 
+int doBVHDraw(
+               GLuint programID,
+               GLuint programFrameBufferID,
+               GLuint FramebufferName,
+               GLuint renderedTexture,
+               GLuint renderedDepth,
+               struct pose6D * humanPose,
+               struct BVH_MotionCapture * bvh,
+               unsigned int frameID,
+               struct TRI_Model * axisModel,
+               unsigned int WIDTH,
+               unsigned int HEIGHT,
+               int renderForever
+             )
+{
+ 	// Get a handle for our "MVP" uniform
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+    //------------------------------------------------------------------------------------
+    GLuint axisVAO;
+    GLuint axisArrayBuffer;
+    unsigned int axisTriangleCount=0;
+
+    int usePrimitive = 0;
+
+    if (!usePrimitive)
+    {
+     axisTriangleCount  =  (unsigned int)  axisModel->header.numberOfVertices/3;
+     pushObjectToBufferData(
+                             1,
+                             &axisVAO,
+                             &axisArrayBuffer,
+                             programID,
+                             axisModel->vertices       ,  axisModel->header.numberOfVertices      * sizeof(float),
+                             axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
+                             axisModel->textureCoords  ,  axisModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
+                             axisModel->colors         ,  axisModel->header.numberOfColors        * sizeof(float),
+                             axisModel->indices        ,  axisModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                           );
+    } else
+    {
+     axisTriangleCount  = pyramidTriangleCount;
+     pushObjectToBufferData(
+                             1,
+                             &axisVAO,
+                             &axisArrayBuffer,
+                             programID,
+                             pyramidCoords     ,  sizeof(pyramidCoords),
+                             pyramidNormals    ,  sizeof(pyramidNormals),
+                             pyramidTexCoords  ,  sizeof(pyramidTexCoords),      //0,0 //No Texture
+                             cubeColors        ,  sizeof(cubeColors),
+                             0        ,  0//0,0 //Not Indexed
+                          );
+    }
+    //------------------------------------------------------------------------------------
+	 GLuint quad_vertexbuffer;
+	 glGenBuffers(1, &quad_vertexbuffer);
+	 glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
+
+	 // Create and compile our GLSL program from the shaders
+	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 // Create and compile our GLSL program from the shaders
+	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
+
+	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
+
+	 do
+     {
+        // Render to our framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
+       //-----------------------------------------------
+        if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
+       //-----------------------------------------------
+
+        glClearColor( 0, 0.0, 0, 1 );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+
+
+        struct BVH_Transform bvhTransform= {0};
+        if (
+                bvh_loadTransformForFrame(
+                                           bvh,
+                                           frameID,
+                                           &bvhTransform,
+                                           0
+                                         )
+             )
+          {
+           for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+            {
+               struct pose6D axisPose={0};
+               axisPose.x = bvhTransform.joint[jID].pos3D[0]/10;
+               axisPose.y = bvhTransform.joint[jID].pos3D[1]/10;
+               axisPose.z = 50+bvhTransform.joint[jID].pos3D[2]/10;
+
+               doOGLSingleDrawing(
+                                   programID,
+                                   MVPMatrixID,
+                                   &axisPose,
+                                   axisVAO,
+                                   axisTriangleCount,
+                                   WIDTH,
+                                   HEIGHT
+                                 );
+            }
+          }
+
+        //We have accumulated all data on the framebuffer and will now draw it back..
+        drawFramebufferToScreen(
+                                programFrameBufferID,
+                                quad_vertexbuffer,
+                                renderedTexture,
+                                texID,
+                                timeID,
+                                resolutionID,
+                                WIDTH,HEIGHT
+                               );
+
+		// Swap buffers
+        glx3_endRedraw();
+
+
+      //---------------------------------------------------------------
+      //------------------- Calculate Framerate -----------------------
+      //---------------------------------------------------------------
+       unsigned long now=GetTickCountMilliseconds();
+       unsigned long elapsedTime=now-lastRenderingTime;
+       if (elapsedTime==0) { elapsedTime=1; }
+       lastFramerate = (float) 1000/(elapsedTime);
+       lastRenderingTime = now;
+      //---------------------------------------------------------------
+        ++framesRendered;
+      //---------------------------------------------------------------
+
+      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
+	} // Check if the ESC key was pressed or the window was closed
+    while(renderForever);
+
+
+	// Cleanup VBO and shader
+	glDeleteBuffers(1, &quad_vertexbuffer);
+	glDeleteBuffers(1, &axisArrayBuffer);
+	glDeleteVertexArrays(1, &axisVAO);
+	return 1;
+}
+
+
+
 
 
 
@@ -783,6 +933,10 @@ int main(int argc,const char **argv)
                     {
                       axisRendering=1;
                     } else
+           if (strcmp(argv[i],"--bvhaxis")==0)
+                    {
+                      axisRendering=2;
+                    } else
            if (strcmp(argv[i],"--static")==0)
                     {
                       staticRendering=1;
@@ -852,7 +1006,6 @@ int main(int argc,const char **argv)
        fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/axis.tri\n");
        return 0;
      }
-
      //paintTRI(&axisModelIndexed,123,123,123);
      tri_flattenIndexedModel(&axisModel,&axisModelIndexed);
    }
@@ -923,7 +1076,7 @@ int main(int argc,const char **argv)
      }
 
 
-    if (axisRendering)
+    if (axisRendering == 1)
     {
       //printTRIModel(&axisModel);
       //for (int i=0; i<axisModel.header.numberOfVertices; i++)
@@ -954,6 +1107,30 @@ int main(int argc,const char **argv)
                      HEIGHT,
                      0
                    );
+    } else
+    if (axisRendering == 2)
+    {
+      humanPose.roll+=1.0;//(float)  (rand()%90);
+      humanPose.pitch+=1.0;//(float) (rand()%90);
+      humanPose.yaw+=1.0;//(float)   (rand()%90);
+      //-------------------------------------------------------------------
+      humanPose.x=0.0f;//(float)  (1000-rand()%2000);
+      humanPose.y=0.0f;//(float) (100-rand()%200);
+      humanPose.z=13.4f;//(float)  (700+rand()%1000);
+      doBVHDraw(
+                 programID,
+                 programFrameBufferID,
+                 FramebufferName,
+                 renderedTexture,
+                 renderedDepth,
+                 &humanPose,
+                 &mc,
+                 fID,
+                 &axisModel,
+                 WIDTH,
+                 HEIGHT,
+                 0
+               );
     } else
     { //Do regular skinned model rendering
      doDrawing(

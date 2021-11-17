@@ -329,7 +329,6 @@ const static int animateTRIModelUsingBVHArmature(
             create4x4FIdentityMatrixDirect(&transformations4x4[mID*16]);
         }
 
-
         unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
