@@ -15,6 +15,9 @@ cd "$DIR"
 
 exit 0
 
+scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
+
+
 #Stable mesh
 ./assimpTester --mesh 0 --convert makehuman2.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
 ./assimpTester --mesh 1 --convert makehuman2.dae hair.tri --applytexture braid01_diffuse_mahogany.png
