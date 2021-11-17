@@ -409,6 +409,7 @@ _RotXY = np.dot(_RotNegX, _RotY)*/
                            )
                         {
                            fprintf(stderr,"Special Bone %s \n",modelOriginal->bones[boneID].boneName);
+                           //https://math.stackexchange.com/questions/363652/understanding-rotation-matrices
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 1.0, 0.0, 0.0); //ROT X
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 1.0, 0.0); //ROT Y
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 0.0, 1.0); //ROT Z

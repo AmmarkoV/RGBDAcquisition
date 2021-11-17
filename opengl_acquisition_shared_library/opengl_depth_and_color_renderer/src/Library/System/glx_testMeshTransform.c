@@ -112,9 +112,9 @@ int drawObjectAT(
                                      (float) y,
                                      (float) z,
                                      //-----------------------------------------
-                                     1.0,//scaleX,
+                                     -1.0,//scaleX,
                                      1.0,//scaleY,
-                                     1.0//scaleZ
+                                     -1.0//scaleZ
                                     );
 
        return drawVertexArrayWithMVPMatrices(
@@ -602,6 +602,19 @@ int doSkeletonDraw(
             return 0;
         }
 
+          struct pose6D axisPose={0};
+          axisPose.z=10;
+          doOGLSingleDrawing(
+                             programID,
+                             MVPMatrixID,
+                             &axisPose,
+                             axisVAO,
+                             axisTriangleCount,
+                             WIDTH,
+                             HEIGHT
+                           );
+
+/*
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
         for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
@@ -633,8 +646,8 @@ int doSkeletonDraw(
          {
            fprintf(stderr,RED "BoneID %u empty! \n" NORMAL,boneID);
          }
-
         }
+        */
 
 
         //We have accumulated all data on the framebuffer and will now draw it back..
@@ -754,8 +767,8 @@ int main(int argc,const char **argv)
 
    //MHX2 Set human pose to somewhere visible..
    //-------------------------------------------------------------------
-   humanPose.roll=180.0;//(float)  (rand()%90);
-   humanPose.pitch=-90.0;//(float) (rand()%90);
+   humanPose.roll=0.0;//180.0;//(float)  (rand()%90);
+   humanPose.pitch=90.0;//-90.0;//(float) (rand()%90);
    humanPose.yaw=0.0;//(float)   (rand()%90);
    //-------------------------------------------------------------------
    humanPose.x=0.0f;//(float)  (1000-rand()%2000);
