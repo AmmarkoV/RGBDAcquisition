@@ -385,7 +385,7 @@ const static int animateTRIModelUsingBVHArmature(
                         //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/core/transformations.py#L317
                         //svn.blender.org/svnroot/bf-blender/branches/blender-2.47/source/blender/blenkernel/intern/armature.c
                         //https://developer.blender.org/T39470
-
+                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L959
 
                         //struct Matrix4x4OfFloats localBone;
                         //copy4x4FMatrix(localBone.m,modelOriginal->bones[boneID].info->localTransformation);
