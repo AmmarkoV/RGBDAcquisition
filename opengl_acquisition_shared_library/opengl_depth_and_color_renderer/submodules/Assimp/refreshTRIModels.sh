@@ -3,6 +3,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+
+
 ./assimpTester --merge axis.dae axis.tri
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
@@ -18,13 +20,13 @@ exit 0
 scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
 
 
+
 #Stable mesh
 ./assimpTester --mesh 0 --convert makehuman2.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
 ./assimpTester --mesh 1 --convert makehuman2.dae hair.tri --applytexture braid01_diffuse_mahogany.png
 ./assimpTester --mesh 2 --convert makehuman2.dae eyes.tri --applytexture brown_eye.png
 
 exit 0
-
 
 
 ./assimpTester --convert eyes.dae eyes.tri #--applytexture brown_eye.png

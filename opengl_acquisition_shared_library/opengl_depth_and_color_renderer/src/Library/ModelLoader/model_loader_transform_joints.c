@@ -667,6 +667,9 @@ void recursiveJointHierarchyTransformerDirect(
 
   struct Vector4x1OfFloats boneCenter={0}; boneCenter.m[3]=1.0;
   transform3DPointFVectorUsing4x4FMatrix_Naive(boneCenter.m,globalTransformation,boneCenter.m);
+  in->bones[curBone].info->x = boneCenter.m[0];
+  in->bones[curBone].info->y = boneCenter.m[1];
+  in->bones[curBone].info->z = boneCenter.m[2];
 
 
   //We calculate the finalVertexTransformation for all vertices that are influenced for this bone

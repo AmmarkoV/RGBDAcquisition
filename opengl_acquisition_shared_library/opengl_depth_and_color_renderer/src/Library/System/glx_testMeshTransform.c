@@ -614,7 +614,7 @@ int doSkeletonDraw(
                              HEIGHT
                            );
 
-/*
+
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
         for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
@@ -629,6 +629,7 @@ int doSkeletonDraw(
           axisPose.usePoseMatrixDirectly = 1;
           for (unsigned int i=0; i<16; i++)
           {
+            //axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
             axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
           }
           axisPose.m.m[11] += 5; //Send rendering 5 units away..
@@ -647,7 +648,7 @@ int doSkeletonDraw(
            fprintf(stderr,RED "BoneID %u empty! \n" NORMAL,boneID);
          }
         }
-        */
+
 
 
         //We have accumulated all data on the framebuffer and will now draw it back..
