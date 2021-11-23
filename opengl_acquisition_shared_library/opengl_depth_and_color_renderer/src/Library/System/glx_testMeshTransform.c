@@ -1068,6 +1068,8 @@ int main(int argc,const char **argv)
 
 
    //------------------------------------------------------
+   //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow y 90
+   //  ./gl3MeshTransform  --set relbow z 90 --set hip y 180 --set lelbow x 90
    for (int i=0; i<argc; i++)
         {
            if (strcmp(argv[i],"--set")==0)
