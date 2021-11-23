@@ -1096,6 +1096,7 @@ int main(int argc,const char **argv)
                       mc.numberOfFrames=1;
                     }
         }
+   //------------------------------------------------------
 
 
    if (maxFrames==0)
@@ -1156,13 +1157,6 @@ int main(int argc,const char **argv)
     } else
     if (axisRendering == 2)
     {
-      humanPose.roll+=1.0;//(float)  (rand()%90);
-      humanPose.pitch+=1.0;//(float) (rand()%90);
-      humanPose.yaw+=1.0;//(float)   (rand()%90);
-      //-------------------------------------------------------------------
-      humanPose.x=0.0f;//(float)  (1000-rand()%2000);
-      humanPose.y=0.0f;//(float) (100-rand()%200);
-      humanPose.z=13.4f;//(float)  (700+rand()%1000);
       doBVHDraw(
                  programID,
                  programFrameBufferID,
