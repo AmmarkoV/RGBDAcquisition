@@ -618,7 +618,7 @@ int doSkeletonDraw(
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
         for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
-         if (humanPose->x = humanModel->bones[boneID].info!=0)
+         if (humanModel->bones[boneID].info!=0) //humanPose->x =
          {
           //fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
           struct pose6D axisPose={0};
@@ -1065,6 +1065,37 @@ int main(int argc,const char **argv)
 
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
+
+
+   //------------------------------------------------------
+   for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--set")==0)
+                    {
+                      char * jointName = argv[i+1];
+                      char * jointAxis = argv[i+2];
+                      float  jointValue = atof(argv[i+3]);
+                      BVHJointID jID;
+
+                      if (bvh_getJointIDFromJointNameNocase(&mc,jointName,&jID))
+                      {
+                          if (strcmp("x",jointAxis)==0)
+                          {
+                              bvh_setJointRotationXAtFrame(&mc,jID,0,jointValue);
+                          } else
+                          if (strcmp("y",jointAxis)==0)
+                          {
+                              bvh_setJointRotationYAtFrame(&mc,jID,0,jointValue);
+                          } else
+                          if (strcmp("z",jointAxis)==0)
+                          {
+                              bvh_setJointRotationZAtFrame(&mc,jID,0,jointValue);
+                          }
+                      }
+
+                      mc.numberOfFrames=1;
+                    }
+        }
 
 
    if (maxFrames==0)
