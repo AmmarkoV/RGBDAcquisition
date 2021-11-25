@@ -965,7 +965,7 @@ int bvh_loadTransformForFrame(
                                                     );
            }
          freeMotionBuffer(&frameMotionBuffer);
-      }
+       }
     } else
     {
         fprintf(stderr,"Could not allocate memory for BVH Transform\n");
