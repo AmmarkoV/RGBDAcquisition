@@ -1000,19 +1000,6 @@ int main(int argc,const char **argv)
           return 0;
         }
    bvh_renameJointsToLowercase(&mc);
-   //bvh_swapJointRotationAxis(&mc,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-/* BVHJointID jID;
-   if ( bvh_getJointIDFromJointName(&mc,"rknee",&jID) )
-   {
-       mc.jointHierarchy[jID].channelRotationOrder = BVH_ROTATION_ORDER_YZX;
-
-    //BVH_ROTATION_ORDER_XYZ
-    //BVH_ROTATION_ORDER_XZY,
-    //BVH_ROTATION_ORDER_YXZ,
-    //BVH_ROTATION_ORDER_YZX,
-    //BVH_ROTATION_ORDER_ZXY,
-    //BVH_ROTATION_ORDER_ZYX,
-   } */
    //------------------------------------------------------
    if (axisRendering)
    {
