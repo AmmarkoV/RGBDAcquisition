@@ -12,6 +12,7 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation);
 
 float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation);
 
+int bvh_swapJointRotationAxis(struct BVH_MotionCapture * bvh,char inputRotationOrder,char swappedRotationOrder);
 
 #ifdef __cplusplus
 }

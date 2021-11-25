@@ -11,6 +11,7 @@
 #include "model_loader_transform_joints.h"
 #include "../MotionCaptureLoader/bvh_loader.h"
 #include "../MotionCaptureLoader/calculate/bvh_transform.h"
+#include "../MotionCaptureLoader/edit/bvh_remapangles.h"
 
 
 //For lowercase
@@ -304,17 +305,21 @@ const static int animateTRIModelUsingBVHArmature(
     //bvh_printBVH(bvh);
 
 
+
+    bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //TODO: Add a flag here to flip rotation axis..!
     struct BVH_Transform bvhTransform= {0};
     if (
         bvh_loadTransformForFrame(
-            bvh,
-            frameID,
-            &bvhTransform,
-            0
-        )
-    )
+                                  bvh,
+                                  frameID,
+                                  &bvhTransform,
+                                  0
+                                 )
+       )
     {
+        bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+
         unsigned int transformations4x4Size = numberOfBones * 16;
         float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
         if (transformations4x4==0)
@@ -414,19 +419,14 @@ const static int animateTRIModelUsingBVHArmature(
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 0.0, 1.0); //ROT Z
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 1.0, 0.0, 0.0); //ROT NEG X
                           create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 1.0, 0.0); //ROT NEG Y
+
+                          create4x4FIdentityMatrix(&boneRollCorrection);
                           //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 0.0, 1.0); //ROT NEG Z
                         } else
                         {
                           create4x4FIdentityMatrix(&boneRollCorrection);
                         }
 
-                        multiplyThree4x4FMatrices_Naive(
-                                                        &transformations4x4[boneID*16],
-                                                        bvhTransform.joint[jID].dynamicRotation.m,
-                                                        boneRollCorrection.m,
-                                                        bvhTransform.joint[jID].dynamicTranslation.m
-                                                        //localBone.m
-                                                       );
 
 
 
@@ -470,6 +470,16 @@ const static int animateTRIModelUsingBVHArmature(
                                                            bvhTransform.joint[jID].dynamicRotation.m,
                                                            mergedTranslation.m
                                                          );
+                        } else
+                        {
+                         multiplyThree4x4FMatrices_Naive(
+                                                         &transformations4x4[boneID*16],
+                                                         bvhTransform.joint[jID].dynamicRotation.m,
+                                                         boneRollCorrection.m,
+                                                         bvhTransform.joint[jID].dynamicTranslation.m
+                                                         //localBone.m
+                                                        );
+
                         }
                     }
                 }

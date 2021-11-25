@@ -81,3 +81,26 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
    fprintf(stderr,"bvh_RemapAngleCentered0: Did not change angle using deprecated code..\n");
   return angle;
 }
+
+
+
+int bvh_swapJointRotationAxis(struct BVH_MotionCapture * bvh,char inputRotationOrder,char swappedRotationOrder)
+{
+  if ( (bvh!=0) && (bvh->jointHierarchy!=0) )
+  {
+    for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+    {
+        if (bvh->jointHierarchy[jID].channelRotationOrder == inputRotationOrder)
+        {
+          bvh->jointHierarchy[jID].channelRotationOrder = swappedRotationOrder;
+          //fprintf(stderr,"swapping jID %u (%s) from %u to %u\n",jID,bvh->jointHierarchy[jID].jointName,inputRotationOrder,swappedRotationOrder);
+        }
+    }
+
+    return 1;
+  }
+
+ return 0;
+}
+
+
