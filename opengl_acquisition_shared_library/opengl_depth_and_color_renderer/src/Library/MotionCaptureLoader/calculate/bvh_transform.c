@@ -521,7 +521,7 @@ static inline void bvh_prepareMatricesForTransform(
                                   );
 
 
-      if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)  )
+      if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder!=BVH_ROTATION_ORDER_NONE) )
        {
           if(bvhMotion->jointHierarchy[jID].hasRodriguesRotation)
           {
@@ -536,8 +536,7 @@ static inline void bvh_prepareMatricesForTransform(
           } else
           if(bvhMotion->jointHierarchy[jID].hasQuaternionRotation)
           {
-            //BVH Quaternion
-            //Handle quaternion rotation here..
+            //BVH Quaternion..
             float quaternion[4]={
                                     data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_W],
                                     data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
@@ -556,6 +555,7 @@ static inline void bvh_prepareMatricesForTransform(
           } else
           { //Generic rotation case..
             unsigned int channelRotationOrder = (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder;
+            //fprintf(stderr,"jID %u / %u - ES %u ",jID,channelRotationOrder,bvhMotion->jointHierarchy[jID].isEndSite);
             create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                              &bvhTransform->joint[jID].dynamicRotation,
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
