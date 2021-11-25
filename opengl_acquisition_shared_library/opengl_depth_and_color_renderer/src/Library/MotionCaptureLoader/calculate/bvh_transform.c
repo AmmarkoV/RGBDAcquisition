@@ -876,10 +876,13 @@ int bvh_loadTransformForMotionBuffer(
   #endif
 
 
-   for (unsigned int jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   if (bvhTransform->useOptimizations)
    {
-    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+    //Two
+    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
     {
+     if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+     {
       //Since we are passing through make sure we avoid a second
       //"expensive" call to the bvh_shouldJointBeTransformedGivenOurOptimizations
       //this is also very important for the IK code..
@@ -889,11 +892,8 @@ int bvh_loadTransformForMotionBuffer(
       //------------------------------------------------------
 
       bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
+     }
     }
-   }
-
-
-
 
   //We will now apply all dynamic transformations across the BVH chains
   //-----------------------------------------------------------------------
@@ -901,7 +901,7 @@ int bvh_loadTransformForMotionBuffer(
    //so we will only process those..
    for (unsigned int hID=0; hID<bvhTransform->lengthOfListOfJointIDsToTransform; hID++)
     {
-      unsigned int jID = bvhTransform->listOfJointIDsToTransform[hID];
+      BVHJointID jID = bvhTransform->listOfJointIDsToTransform[hID];
       if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
       {
        bvh_performActualTransform(
@@ -912,6 +912,26 @@ int bvh_loadTransformForMotionBuffer(
                                  );
       }
     }
+   } else
+   {
+      //If we don't want any optimizations just prepare all matrices
+      for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+       {
+         bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
+       }
+
+      //And then perform all transforms
+      for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+       {
+         bvh_performActualTransform(
+                                  bvhMotion,
+                                  motionBuffer,
+                                  bvhTransform,
+                                  jID
+                                 );
+       }
+   }
+
 
 
   bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
@@ -932,8 +952,6 @@ int bvh_loadTransformForMotionBuffer(
      }
     return 1;
   }
-
-
  }
 
  return 0;
