@@ -555,7 +555,6 @@ static inline void bvh_prepareMatricesForTransform(
           } else
           { //Generic rotation case..
             unsigned int channelRotationOrder = (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder;
-            //fprintf(stderr,"jID %u / %u - ES %u ",jID,channelRotationOrder,bvhMotion->jointHierarchy[jID].isEndSite);
             create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                              &bvhTransform->joint[jID].dynamicRotation,
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
