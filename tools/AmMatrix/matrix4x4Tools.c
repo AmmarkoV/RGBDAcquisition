@@ -497,18 +497,6 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
 
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
    {
-    /* //THIS WAS WRONG..!
-    if (rotationOrder==ROTATION_ORDER_ZYX)
-    {
-        create4x4FMatrixFromEulerAnglesZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-        return;
-    }  else
-    if (rotationOrder==ROTATION_ORDER_ZXY)
-    {
-        create4x4FMatrixFromEulerAnglesZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-        return ;
-    } */
-
     //Assuming the rotation axis are correct
     //rX,rY,rZ should hold our 4x4 rotation matrices
     struct Matrix4x4OfFloats rX;

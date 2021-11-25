@@ -268,7 +268,6 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
 
 /*
 
-
 r = rotate reference about tail by roll
 z = cross(r, tail)
 x = cross(tail, z)
@@ -279,7 +278,6 @@ Yielding this complete matrix:
 | x.y  tail.y   z.y  head.y |
 | x.z  tail.z   z.z  head.z |
 \ 0    0        0    1      /
-
 
 */
 
@@ -408,6 +406,7 @@ const static int animateTRIModelUsingBVHArmature(
 
                         #define M_PI 3.14159265358979323846
 
+                        /*
                         if (
                              (strcmp("relbow",modelOriginal->bones[boneID].boneName)==0) ||
                              (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
@@ -426,8 +425,7 @@ const static int animateTRIModelUsingBVHArmature(
                         } else
                         {
                           create4x4FIdentityMatrix(&boneRollCorrection);
-                        }
-
+                        } */
 
 
 
@@ -452,25 +450,25 @@ const static int animateTRIModelUsingBVHArmature(
 
                         if (bvh->jointHierarchy[jID].hasPositionalChannels)
                         {
-                            //This is one of the new joints with positional channels..
-                            //float * m = &transformations4x4[boneID*16];
-                            //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
-                            //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
-                            //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
+                         //This is one of the new joints with positional channels..
+                         //float * m = &transformations4x4[boneID*16];
+                         //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
+                         //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
+                         //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
 
-                            struct Matrix4x4OfFloats mergedTranslation;
-                            create4x4FTranslationMatrix(
-                                                         &mergedTranslation,
-                                                         (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
-                                                         (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
-                                                         (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
-                                                       );
+                         struct Matrix4x4OfFloats mergedTranslation;
+                         create4x4FTranslationMatrix(
+                                                     &mergedTranslation,
+                                                     (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
+                                                     (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
+                                                     (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
+                                                    );
 
-                            multiplyTwo4x4FMatrices_Naive(
-                                                           &transformations4x4[boneID*16],
-                                                           bvhTransform.joint[jID].dynamicRotation.m,
-                                                           mergedTranslation.m
-                                                         );
+                         multiplyTwo4x4FMatrices_Naive(
+                                                       &transformations4x4[boneID*16],
+                                                       bvhTransform.joint[jID].dynamicRotation.m,
+                                                       mergedTranslation.m
+                                                      );
                         } else
                         {
                          multiplyThree4x4FMatrices_Naive(

@@ -506,7 +506,6 @@ static inline void bvh_prepareMatricesForTransform(
                                                    unsigned int jID
                                                   )
 {
-
   //data is the buffer where we will retrieve the values
   float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
   //----------------------------------------------------
@@ -553,15 +552,16 @@ static inline void bvh_prepareMatricesForTransform(
                                     bvhTransform->joint[jID].dynamicRotation.m,
                                     quaternion,
                                     qWqXqYqZ
-                                 );
+                                );
           } else
           { //Generic rotation case..
+            unsigned int channelRotationOrder = (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder;
             create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                              &bvhTransform->joint[jID].dynamicRotation,
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                            (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                            channelRotationOrder
                                                            );
           }
        } else
@@ -583,6 +583,7 @@ static inline void bvh_prepareMatricesForTransform(
       create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicTranslation);
       create4x4FIdentityMatrix(&bvhTransform->joint[jID].dynamicRotation);
      }
+  return;
 }
 
 
@@ -895,8 +896,8 @@ int bvh_loadTransformForMotionBuffer(
      }
     }
 
-  //We will now apply all dynamic transformations across the BVH chains
-  //-----------------------------------------------------------------------
+   //We will now apply all dynamic transformations across the BVH chains
+   //-----------------------------------------------------------------------
    //We used our buffer to cache only the joints that need processing during the first path
    //so we will only process those..
    for (unsigned int hID=0; hID<bvhTransform->lengthOfListOfJointIDsToTransform; hID++)
@@ -917,18 +918,23 @@ int bvh_loadTransformForMotionBuffer(
       //If we don't want any optimizations just prepare all matrices
       for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
        {
-         bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
+         bvh_prepareMatricesForTransform(
+                                          bvhMotion,
+                                          motionBuffer,
+                                          bvhTransform,
+                                          jID
+                                        );
        }
 
       //And then perform all transforms
       for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
        {
          bvh_performActualTransform(
-                                  bvhMotion,
-                                  motionBuffer,
-                                  bvhTransform,
-                                  jID
-                                 );
+                                    bvhMotion,
+                                    motionBuffer,
+                                    bvhTransform,
+                                    jID
+                                   );
        }
    }
 
