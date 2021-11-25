@@ -491,14 +491,12 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
 {
   if (rotationOrder!=0)
   {
-   char rXisIdentity=(degreesEulerX==0.0);
-   char rYisIdentity=(degreesEulerY==0.0);
-   char rZisIdentity=(degreesEulerZ==0.0);
+   char rXisIdentity = (degreesEulerX==0.0);
+   char rYisIdentity = (degreesEulerY==0.0);
+   char rZisIdentity = (degreesEulerZ==0.0);
 
    if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
    {
-
-
     /* //THIS WAS WRONG..!
     if (rotationOrder==ROTATION_ORDER_ZYX)
     {
@@ -544,12 +542,14 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
      case ROTATION_ORDER_ZXY :
        //This is the rotation order commonly used in all joints of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
        //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY);
+       //fprintf(stderr,"ZXY ");
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity);
      break;
      case ROTATION_ORDER_ZYX :
        //This is the rotation order used in the LAFAN1 dataset ( https://github.com/ubisoft/ubisoft-laforge-animation-dataset )
        //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
        //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX);
+       //fprintf(stderr,"ZYX ");
        multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_RPY:

@@ -890,7 +890,7 @@ int bvh_loadTransformForMotionBuffer(
 
       bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
     }
-  }
+   }
 
 
 
@@ -911,7 +911,7 @@ int bvh_loadTransformForMotionBuffer(
                                   jID
                                  );
       }
-  }
+    }
 
 
   bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
@@ -927,7 +927,8 @@ int bvh_loadTransformForMotionBuffer(
   {
    if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
      {
-     //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
+       //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
+       return 0;
      }
     return 1;
   }

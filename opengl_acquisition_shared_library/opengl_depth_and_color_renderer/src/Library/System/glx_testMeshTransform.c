@@ -1000,6 +1000,7 @@ int main(int argc,const char **argv)
           return 0;
         }
    bvh_renameJointsToLowercase(&mc);
+   //bvh_swapJointRotationAxis(&mc,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
 /* BVHJointID jID;
    if ( bvh_getJointIDFromJointName(&mc,"rknee",&jID) )
    {

@@ -308,7 +308,8 @@ const static int animateTRIModelUsingBVHArmature(
 
     bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //TODO: Add a flag here to flip rotation axis..!
-    struct BVH_Transform bvhTransform= {0};
+    struct BVH_Transform bvhTransform = {0};
+    bvhTransform.useOptimizations=0;
     if (
         bvh_loadTransformForFrame(
                                   bvh,
