@@ -282,6 +282,45 @@ Yielding this complete matrix:
 */
 
 
+/*
+
+#
+#   M_b = global bone matrix, relative world (PoseBone.matrix)
+#   L_b = local bone matrix, relative parent and rest (PoseBone.matrix_local)
+#   R_b = bone rest matrix, relative armature (Bone.matrix_local)
+#   T_b = global T-pose marix, relative world
+#
+#   M_b = M_p R_p^-1 R_b L_b
+#   M_b = A_b M'_b
+#   T_b = A_b T'_b
+#   A_b = T_b T'^-1_b
+#   B_b = R^-1_b R_p
+#
+#   L_b = R^-1_b R_p M^-1_p A_b M'_b
+#   L_b = B_b M^-1_p A_b M'_b
+#
+
+
+
+def getRollMat(mat):
+    quat = mat.to_3x3().to_quaternion()
+    if abs(quat.w) < 1e-4:
+        roll = pi
+    else:
+        roll = -2*math.atan(quat.y/quat.w)
+    return roll
+
+
+
+def getHeadTailDir(pb):
+    mat = pb.bone.matrix_local
+    mat = pb.matrix
+    head = Vector(mat.col[3][:3])
+    vec = Vector(mat.col[1][:3])
+    tail = head + pb.bone.length * vec
+    return head, tail, vec
+*/
+
 
 const static int animateTRIModelUsingBVHArmature(
     struct TRI_Model * modelOutput,
