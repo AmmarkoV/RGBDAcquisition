@@ -104,3 +104,24 @@ int bvh_swapJointRotationAxis(struct BVH_MotionCapture * bvh,char inputRotationO
 }
 
 
+int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jointName,char inputRotationOrder,char swappedRotationOrder)
+{
+  if ( (bvh!=0) && (bvh->jointHierarchy!=0) )
+  {
+    BVHJointID jID=0;
+
+    if ( bvh_getJointIDFromJointName(bvh,jointName,&jID) )
+    {
+      if (bvh->jointHierarchy[jID].channelRotationOrder == inputRotationOrder)
+        {
+          bvh->jointHierarchy[jID].channelRotationOrder = swappedRotationOrder;
+          //fprintf(stderr,"swapping jID %u (%s) from %u to %u\n",jID,bvh->jointHierarchy[jID].jointName,inputRotationOrder,swappedRotationOrder);
+          return 1;
+        }
+    }
+  }
+
+ return 0;
+}
+
+
