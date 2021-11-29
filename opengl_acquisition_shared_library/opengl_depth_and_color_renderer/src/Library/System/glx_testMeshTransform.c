@@ -1057,8 +1057,8 @@ int main(int argc,const char **argv)
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
 
-   printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
    bvh_printBVH(&mc);
+   printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
 
 
    //------------------------------------------------------
