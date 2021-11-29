@@ -10,9 +10,9 @@
  #warning "USE_GLEW not defined , shader code is useless.."
 #include <GL/gl.h>
 #include <GL/glx.h>
-#include <GL/glext.h> 
+#include <GL/glext.h>
 #endif // USE_GLEW
- 
+
 
 #include "shader_loader.h"
 #include "../../Tools/tools.h"
@@ -78,6 +78,7 @@ char * loadShaderFileToMem(char * filename,unsigned long * file_length)
 int useShader(struct shaderObject * shader)
 {
  // return glUseProgramObjectARB(shader->ProgramObject);
+ return 0;
 }
 
 struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderChar)

@@ -164,7 +164,7 @@ void euler2Quaternions(float * quaternions,float * euler,int quaternionConventio
     float sinY2 = sin((float) eY/2); //sin(θ/2);
     float cosZ2 = cos((float) eZ/2); //cos(ψ/2);
     float sinZ2 = sin((float) eZ/2); //sin(ψ/2);
- 
+
     float qX = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
     float qY = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
     float qZ = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
@@ -302,11 +302,11 @@ void quaternion2Matrix4x4(float * matrix4x4,float * quaternions,int quaternionCo
     handleQuaternionUnpackConvention(quaternions,&qX,&qY,&qZ,&qW,quaternionConvention);
 
     float * m = matrix4x4;
-    
+
     float qYqY= qY*qY;
     float qZqZ= qZ*qZ;
     float qXqX= qX*qX;
-    
+
     //-------------------------------------------------------------------------------------------------------------------------------------------
     m[0]=1.0 -(2.0*qYqY) - (2.0*qZqZ);   /*|*/  m[1]=(2.0*qX*qY) - (2.0*qW*qZ);      /*|*/ m[2]=(2.0*qX*qZ) + (2.0*qW*qY);      /*|*/ m[3]=0.0;
     m[4]=(2.0*qX*qY) + (2.0*qW*qZ);      /*|*/  m[5]=1.0 - (2.0*qXqX) - (2.0*qZqZ);  /*|*/ m[6]=(2.0*qY*qZ) - (2.0*qX*qW);      /*|*/ m[7]=0.0;
@@ -325,8 +325,8 @@ void matrix4x42Quaternion(float * quaternions,int quaternionConvention,float * m
     float m[4][4];
     m[0][0] = matrix4x4[m0_0];    m[0][1] = matrix4x4[m0_1];    m[0][2] = matrix4x4[m0_2];    m[0][3] = matrix4x4[m0_3];
     m[1][0] = matrix4x4[m1_0];    m[1][1] = matrix4x4[m1_1];    m[1][2] = matrix4x4[m1_2];    m[1][3] = matrix4x4[m1_3];
-    m[2][0] = matrix4x4[m2_0];    m[0][1] = matrix4x4[m2_1];    m[0][2] = matrix4x4[m2_2];    m[0][3] = matrix4x4[m2_3];
-    m[3][0] = matrix4x4[m3_0];    m[0][1] = matrix4x4[m3_1];    m[0][2] = matrix4x4[m3_2];    m[0][3] = matrix4x4[m3_3];
+    m[2][0] = matrix4x4[m2_0];    m[2][1] = matrix4x4[m2_1];    m[2][2] = matrix4x4[m2_2];    m[2][3] = matrix4x4[m2_3];
+    m[3][0] = matrix4x4[m3_0];    m[3][1] = matrix4x4[m3_1];    m[3][2] = matrix4x4[m3_2];    m[3][3] = matrix4x4[m3_3];
 
     float  tr, s, q[4];
     int nxt[3] = {1, 2, 0};
@@ -402,16 +402,16 @@ void axisAngle2Quaternion(float * quaternionOutput,float xx,float yy,float zz,fl
 /*
 void fromAnyEulerRotationOrderToQuaternion()
  * {
- * 
+ *
                    rX = tf2::Quaternion(tf2::Vector3(-1,0,0),degreesToRadians(-xRotation));
                    rY = tf2::Quaternion(tf2::Vector3(0,-1,0),degreesToRadians(-yRotation));
-                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation)); 
+                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation));
                    qXYZW = rZ * rY * rX;
-            or 
-                   
+            or
+
                    rX = tf2::Quaternion(tf2::Vector3(-1,0,0),degreesToRadians(-xRotation));
                    rY = tf2::Quaternion(tf2::Vector3(0,-1,0),degreesToRadians(-yRotation));
-                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation)); 
+                   rZ = tf2::Quaternion(tf2::Vector3(0,0,-1),degreesToRadians(-zRotation));
                    qXYZW = rZ * rX * rY;
  * }
 */
@@ -457,15 +457,15 @@ void generateRandomQuaternion(float * quaternionOutput)
      float u = ((float) rand() / (RAND_MAX));
      float v = ((float) rand() / (RAND_MAX));
      float w = ((float) rand() / (RAND_MAX));
-     
+
      quaternionOutput[0] = sqrt(1-u) * sin(2 * PI * v );
      quaternionOutput[1] = sqrt(1-u) * cos(2 * PI * v );
      quaternionOutput[2] = sqrt(u)   * sin(2 * PI * w );
      quaternionOutput[3] = sqrt(u)   * sin(2 * PI * w );
-     
+
      //Be 100% sure that the quaternion is normalized..
      normalizeQuaternions(&quaternionOutput[0],&quaternionOutput[1],&quaternionOutput[2],&quaternionOutput[3]);
- }  
+ }
 }
 
 void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutput,float * quaternionInput,int quaternionConvention,float angleDistance)
@@ -479,13 +479,13 @@ void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutpu
         quaternionOutput[3]=quaternionInput[3];
         return;
     }
-    
+
     //This is a stochastic call, if your angle distance is very small good luck..!
     float qIX=0.0,qIY=0.0,qIZ=0.0,qIW=1.0;
     handleQuaternionPackConvention(qIX,qIY,qIZ,qIW ,quaternionInput,quaternionConvention);
-    
+
     float thisDistance;
-    do 
+    do
     {
      generateRandomQuaternion(quaternionOutput);
      float qOX=0.0,qOY=0.0,qOZ=0.0,qOW=1.0;
@@ -496,5 +496,5 @@ void stochasticRandomQuaternionWithLessThanAngleDistance(float * quaternionOutpu
                                             );
     }
     while (thisDistance>angleDistance);
-    
+
 }

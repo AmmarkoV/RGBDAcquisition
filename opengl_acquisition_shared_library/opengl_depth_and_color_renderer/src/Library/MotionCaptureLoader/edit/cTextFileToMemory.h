@@ -1,9 +1,9 @@
 /** @file cTextFileToMemory.h
- *  @brief  A header only library that can help parsing text files 
+ *  @brief  A header only library that can help parsing text files
  *  https://github.com/AmmarkoV/CTextFileToMemory
  *  @author Ammar Qammaz (AmmarkoV)
  */
- 
+
 #ifndef BVH_INVERSEKINEMATICS_H_INCLUDED
 #define BVH_INVERSEKINEMATICS_H_INCLUDED
 
@@ -26,11 +26,11 @@ struct cTextFileToMemory
   char * ptr;
   char * buffer;
   unsigned long   bufferSize;
-  
+
   unsigned int populatedStrings;
   unsigned int allocatedStrings;
   unsigned long   numberOfLines;
-  
+
   char ** strings;
 };
 
@@ -49,7 +49,7 @@ static unsigned char * ctftm_readFileToMemory(const char * filename,unsigned lon
 
     // allocate memory to contain the whole file:
     unsigned long bufferSize = sizeof(char)*(lSize+1);
-    char * buffer = (char*) malloc (bufferSize);
+    unsigned char * buffer = (unsigned char*) malloc (bufferSize);
     if (buffer == 0 ) { errno = ENOMEM; fclose(pFile); return 0; }
 
     // copy the file into the buffer:
@@ -76,20 +76,20 @@ static int ctftm_countNumberOfLines(struct cTextFileToMemory * ctftm)
 {
     char * ptr = ctftm->buffer;
     char * limit = ptr + ctftm->bufferSize;
-    
+
     ctftm->numberOfLines=0;
-    
+
     while (ptr<limit)
     {
         switch (*ptr)
         {
           case 0   :                            break;
           case 10  :  ctftm->numberOfLines+=1;  break;
-          case 13  :  ctftm->numberOfLines+=1;  break;  
+          case 13  :  ctftm->numberOfLines+=1;  break;
           case EOF :                            break;
         };
-        
-        ++ptr; 
+
+        ++ptr;
     }
   return ctftm->numberOfLines;
 }
@@ -98,20 +98,20 @@ static int ctftm_countNumberOfLines(struct cTextFileToMemory * ctftm)
 
 
 static unsigned int ctftm_parselines(struct cTextFileToMemory * ctftm)
-{ 
-    if (ctftm == NULL) 
+{
+    if (ctftm == NULL)
     {
         errno = EINVAL;
         return -1;
     }
-     
-    char done = 0;
+
+    //char done = 0;
     char * ptrStart = ctftm->ptr;
-    
+
     char *previousString = ptrStart;
     char * limit = ctftm->buffer + ctftm->bufferSize;
-    
-    
+
+
     //fprintf(stderr," ctftm_parselines Allocated strings %u ...\n",ctftm->allocatedStrings);
     //fprintf(stderr," ctftm_parselines Populated strings %u ...\n",ctftm->populatedStrings);
     if  ( (ctftm->allocatedStrings!=0) && (ctftm->populatedStrings==0) )
@@ -124,9 +124,9 @@ static unsigned int ctftm_parselines(struct cTextFileToMemory * ctftm)
           case 10  :
           case 13  :
           case EOF :
-           *ctftm->ptr=0; 
+           *ctftm->ptr=0;
             ctftm->strings[ctftm->populatedStrings]=previousString;
-            ctftm->populatedStrings+=1; 
+            ctftm->populatedStrings+=1;
             previousString=ctftm->ptr+1;
           break;
         };
@@ -136,8 +136,8 @@ static unsigned int ctftm_parselines(struct cTextFileToMemory * ctftm)
     {
         fprintf(stderr,"ctftm_parselines: No scanning done..\n");
     }
-    
-    
+
+
   return ctftm->ptr - ptrStart;
 }
 
@@ -148,7 +148,7 @@ static int ctftm_loadTextFileToMemory(struct cTextFileToMemory * ctftm, const ch
     if (ctftm==0)    { return 0; }
     if (filename==0) { return 0; }
     //----------------------------
-    
+
     ctftm->buffer = ctftm_readFileToMemory(filename,&ctftm->bufferSize);
     ctftm->ptr    = ctftm->buffer;
 
@@ -157,20 +157,20 @@ static int ctftm_loadTextFileToMemory(struct cTextFileToMemory * ctftm, const ch
     {
         ctftm_countNumberOfLines(ctftm);
         //fprintf(stderr," Number of lines in file %lu ...\n",ctftm->numberOfLines);
-        
-        ctftm->strings = (char **) malloc(ctftm->numberOfLines * sizeof(char **)); 
+
+        ctftm->strings = (char **) malloc(ctftm->numberOfLines * sizeof(char **));
         ctftm->allocatedStrings = ctftm->numberOfLines;
         ctftm->populatedStrings = 0;
         //fprintf(stderr," ctftm_loadTextFileToMemory Allocated strings %u ...\n",ctftm->allocatedStrings);
         //fprintf(stderr," ctftm_loadTextFileToMemory Populated strings %u ...\n",ctftm->populatedStrings);
-        
+
         if (ctftm->strings!=0)
         {
          ssize_t read = ctftm_parselines(ctftm);
          return (read>0);
         }
     }
-    
+
     return 0;
 }
 
@@ -178,12 +178,12 @@ static int ctftm_loadTextFileToMemory(struct cTextFileToMemory * ctftm, const ch
 
 static unsigned int ctftm_getNumberOfRecords(struct cTextFileToMemory * ctftm)
 {
-   return ctftm->numberOfLines; 
+   return ctftm->numberOfLines;
 }
 
 static char * ctftm_getRecords(struct cTextFileToMemory * ctftm,unsigned int record)
 {
-   return ctftm->strings[record]; 
+   return ctftm->strings[record];
 }
 
 #ifdef __cplusplus

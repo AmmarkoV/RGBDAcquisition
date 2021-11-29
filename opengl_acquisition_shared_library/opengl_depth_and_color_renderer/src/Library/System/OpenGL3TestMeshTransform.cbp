@@ -30,6 +30,8 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-Wunused-function" />
+			<Add option="-Wunused-variable" />
 			<Add option="-DUSE_GLEW" />
 		</Compiler>
 		<Linker>
