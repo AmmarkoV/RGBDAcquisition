@@ -2,13 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "model_loader_tri.h"
+#include "model_loader_transform_joints.h"
+
+
 void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN)
 {
   fprintf(stderr,"compressTRIModelToJointOnly does not work correctly yet.. \n");
 
-  copyModelTri(triModelOUT,triModelIN,1);
+  tri_copyModel(triModelOUT,triModelIN,1);
 
-  unsigned int outputNumberOfJoints;
+  unsigned int outputNumberOfJoints=0;
   float * triJoints = convertTRIBonesToJointPositions(triModelOUT,&outputNumberOfJoints);
   if (triJoints!=0)
   {

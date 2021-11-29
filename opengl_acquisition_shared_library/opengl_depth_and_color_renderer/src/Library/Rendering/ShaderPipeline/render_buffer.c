@@ -2,6 +2,8 @@
 #if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#else
+ #warning "Please use the -DUSE_GLEW define for the GL shader code.."
 #endif // USE_GLEW
 
 #include "render_buffer.h"
@@ -96,69 +98,69 @@ int initializeFramebuffer(
 {
     #if USE_GLEW
     // ---------------------------------------------
-	// Render to Texture - specific code begins here
-	// ---------------------------------------------
+    // Render to Texture - specific code begins here
+    // ---------------------------------------------
     //fprintf(stderr," initializeFramebuffer running.. \n");
 
-	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, FramebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, *FramebufferName);
+    // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+    glGenFramebuffers(1, FramebufferName);
+    glBindFramebuffer(GL_FRAMEBUFFER, *FramebufferName);
 
 
     //fprintf(stderr," glGenTextures.. \n");
-	// The texture we're going to render to
-	glGenTextures(1, renderedTexture);
+    // The texture we're going to render to
+    glGenTextures(1, renderedTexture);
 
     //fprintf(stderr," glBindTexture.. \n");
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, *renderedTexture);
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, *renderedTexture);
 
     //fprintf(stderr," glTexImage2D.. \n");
-	// Give an empty image to OpenGL ( the last "0" means "empty" )
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+    // Give an empty image to OpenGL ( the last "0" means "empty" )
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
 
-	// Poor filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // Poor filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     //fprintf(stderr," glFramebufferTexture.. \n");
-	// Set "renderedTexture" as our colour attachement #0
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, *renderedTexture, 0);
+    // Set "renderedTexture" as our colour attachement #0
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, *renderedTexture, 0);
 
-	//// Alternative : Depth texture. Slower, but you can sample it later in your shader
+    //// Alternative : Depth texture. Slower, but you can sample it later in your shader
     if (depthTexture!=0)
     {
-	 // The depth buffer
-	 GLuint depthrenderbuffer;
-	 glGenRenderbuffers(1, &depthrenderbuffer);
-	 glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-	 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	 glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+     // The depth buffer
+     GLuint depthrenderbuffer;
+     glGenRenderbuffers(1, &depthrenderbuffer);
+     glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 
-	 glGenTextures(1, depthTexture);
-	 glBindTexture(GL_TEXTURE_2D, *depthTexture);
-	 glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, width, height, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0); //GL_UNSIGNED_BYTE
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+     glGenTextures(1, depthTexture);
+     glBindTexture(GL_TEXTURE_2D, *depthTexture);
+     glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, width, height, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0); //GL_UNSIGNED_BYTE
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	 //// Depth texture alternative :
-	 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D, *depthTexture, 0);
+     //// Depth texture alternative :
+     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D, *depthTexture, 0);
     }
 
 
     //fprintf(stderr," ready to pass draw buffer..\n");
 
 
-	// Set the list of draw buffers.
-	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+    // Set the list of draw buffers.
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
-	// Always check that our framebuffer is ok
-	return checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..",*FramebufferName);
+    // Always check that our framebuffer is ok
+    return checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..",*FramebufferName);
 
   #else
    return 0;
@@ -182,48 +184,48 @@ int drawFramebufferFromTexture(
                               )
 {
     #if USE_GLEW
-		// Render to the screen
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	    glViewport(0,0,width,height); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+        // Render to the screen
+        glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+        glViewport(0,0,width,height); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
         glClearColor( 0, 0.0, 0, 1 );
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear the screen
 
-		checkIfFrameBufferIsOk("drawFramebufferFromTexture framebuffer error:",FramebufferName);
+        checkIfFrameBufferIsOk("drawFramebufferFromTexture framebuffer error:",FramebufferName);
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-		// Clear the screen
+        // Clear the screen
 
-		// Use our shader
-		glUseProgram(programFrameBufferID);
+        // Use our shader
+        glUseProgram(programFrameBufferID);
 
-		// Bind our texture in Texture Unit 0
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureToDraw);
-		// Set our "renderedTexture" sampler to use Texture Unit 0
-		glUniform1i(texID, 0);
+        // Bind our texture in Texture Unit 0
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureToDraw);
+        // Set our "renderedTexture" sampler to use Texture Unit 0
+        glUniform1i(texID, 0);
 
 
 
-		glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
-		glUniform3f(resolutionID, width, height , 1);
+        glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
+        glUniform3f(resolutionID, width, height , 1);
 
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-		glVertexAttribPointer(
-			                  0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			                  3,                  // size
-			                  GL_FLOAT,           // type
-			                  GL_FALSE,           // normalized?
-			                  0,                  // stride
-			                  (void*)0            // array buffer offset
-		                     );
+        // 1rst attribute buffer : vertices
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+        glVertexAttribPointer(
+                              0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+                              3,                  // size
+                              GL_FLOAT,           // type
+                              GL_FALSE,           // normalized?
+                              0,                  // stride
+                              (void*)0            // array buffer offset
+                             );
 
-		// Draw the triangles !
-		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+        // Draw the triangles !
+        glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 
-		glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(0);
   return 1;
   #else
    return 0;
