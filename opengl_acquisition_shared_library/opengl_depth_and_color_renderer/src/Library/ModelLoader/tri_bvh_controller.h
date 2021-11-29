@@ -28,10 +28,9 @@
 
 const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
-    if (triModel==0)
-    {
-        return 0;
-    }
+    if (triModel==0) { return 0; }
+    //----------------------------------------
+    //----------------------------------------
     //----------------------------------------
     for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
     {
@@ -44,9 +43,42 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
             fprintf(stderr,"Invalid bone name encountered %u \n",boneID);
         } else
         //-------------------------------------------------------------------
-        if (strcmp(triModel->bones[boneID].boneName,"spine")==0)
+        if (
+             (strcmp(triModel->bones[boneID].boneName,"root")==0) ||
+             (strcmp(triModel->bones[boneID].boneName,"hips")==0)
+           )
+        {
+            tri_updateBoneName(triModel,boneID,"hip");
+        } else
+        //-------------------------------------------------------------------
+        if (
+             (strcmp(triModel->bones[boneID].boneName,"spine1")==0) ||
+             (strcmp(triModel->bones[boneID].boneName,"spine01")==0)
+           )
+        {
+            tri_updateBoneName(triModel,boneID,"chest");
+        } else
+        //-------------------------------------------------------------------
+        if (
+             (strcmp(triModel->bones[boneID].boneName,"spine")==0) ||
+             (strcmp(triModel->bones[boneID].boneName,"spine02")==0)
+           )
         {
             tri_updateBoneName(triModel,boneID,"abdomen");
+        } else
+        //-------------------------------------------------------------------
+        if (
+             (strcmp(triModel->bones[boneID].boneName,"neck01")==0)
+           )
+        {
+            tri_updateBoneName(triModel,boneID,"neck");
+        } else
+        //-------------------------------------------------------------------
+        if (
+             (strcmp(triModel->bones[boneID].boneName,"neck02")==0)
+           )
+        {
+            tri_updateBoneName(triModel,boneID,"neck1");
         } else
         //-------------------------------------------------------------------
         if (
@@ -65,19 +97,6 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
            )
         {
             tri_updateBoneName(triModel,boneID,"lshoulder");
-        } else
-        //-------------------------------------------------------------------
-        if (
-             (strcmp(triModel->bones[boneID].boneName,"root")==0) ||
-             (strcmp(triModel->bones[boneID].boneName,"hips")==0)
-           )
-        {
-            tri_updateBoneName(triModel,boneID,"hip");
-        } else
-        //-------------------------------------------------------------------
-        if (strcmp(triModel->bones[boneID].boneName,"spine1")==0)
-        {
-            tri_updateBoneName(triModel,boneID,"chest");
         } else
         //-------------------------------------------------------------------
         if (
