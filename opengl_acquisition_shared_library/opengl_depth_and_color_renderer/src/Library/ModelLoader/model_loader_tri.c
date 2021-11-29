@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//For lowercase
+#include <ctype.h>
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -800,6 +802,81 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
   //fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
  return 0;
 }
+
+
+void tri_lowercase(char * str)
+{
+    char * a = str;
+    if (a!=0)
+    {
+        while (*a!=0)
+        {
+            *a = tolower(*a);
+            ++a;
+        }
+    }
+
+    return;
+}
+
+void tri_removeunderscore(char * str)
+{
+    char * a = str;
+    if (a!=0)
+    {
+        unsigned int l = strlen(str);
+        if (l-2>0)
+        {
+            if (a[l-2]=='_')
+            {
+                a[l-2]='.';
+            }
+        }
+    }
+}
+
+
+
+int tri_makeAllBoneNamesLowerCase(struct TRI_Model * triModel)
+{
+    if (triModel==0)
+    {
+        return 0;
+    }
+    //----------------------------------------
+    for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+    {
+        tri_lowercase(triModel->bones[boneID].boneName);
+    }
+
+    return 1;
+}
+
+
+int tri_updateBoneName(struct TRI_Model * triModel,unsigned int boneID,const char * newBoneName)
+{
+    if (triModel == 0) { return 0; }
+    if (newBoneName == 0) { return 0; }
+
+    unsigned int newBoneNameSize = strlen(newBoneName);
+
+    if (triModel->bones[boneID].info->boneNameSize+1 <= newBoneNameSize )
+    {
+      //We need more space to update the bone name!
+      free(triModel->bones[boneID].boneName);
+      triModel->bones[boneID].info->boneNameSize = newBoneNameSize+1; // + null terminator
+      triModel->bones[boneID].boneName = ( char * ) malloc ( sizeof(char) * (newBoneNameSize+1) );
+      snprintf(triModel->bones[boneID].boneName,triModel->bones[boneID].info->boneNameSize,"%s",newBoneName);
+    } else
+    {
+      //The bone name size is large enough to accomodate our new joint name..!
+      snprintf(triModel->bones[boneID].boneName,triModel->bones[boneID].info->boneNameSize,"%s",newBoneName);
+    }
+
+    return 1;
+}
+
+
 
 int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * prefix)
 {

@@ -1044,15 +1044,15 @@ int main(int argc,const char **argv)
 
    //------------------------------------------------------
    fprintf(stderr,"Preprocessing human model.. ");
-   makeAllTRIBoneNamesLowerCase(&indexedHumanModel);
-   removePrefixFromAllTRIBoneNames(&indexedHumanModel,"test_"); //Eyes have a test_ prefix on bone names..
-   removePrefixFromAllTRIBoneNames(&indexedHumanModel,"f_"); //Fingers have a f_ prefix on bone names..
+   tri_makeAllBoneNamesLowerCase(&indexedHumanModel);
+   tri_removePrefixFromAllBoneNames(&indexedHumanModel,"test_"); //Eyes have a test_ prefix on bone names..
+   tri_removePrefixFromAllBoneNames(&indexedHumanModel,"f_"); //Fingers have a f_ prefix on bone names..
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedHumanModel);
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
    fprintf(stderr,"Preprocessing eye model.. ");
-   makeAllTRIBoneNamesLowerCase(&indexedEyeModel);
-   removePrefixFromAllTRIBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
+   tri_makeAllBoneNamesLowerCase(&indexedEyeModel);
+   tri_removePrefixFromAllBoneNames(&indexedEyeModel,"test_"); //Eyes have a test_ prefix on bone names..
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyeModel);
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------

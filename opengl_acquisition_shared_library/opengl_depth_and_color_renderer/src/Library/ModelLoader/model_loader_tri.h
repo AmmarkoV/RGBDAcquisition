@@ -373,6 +373,21 @@ int tri_simpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Conta
 int tri_findBone(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult);
 
 
+
+
+
+void tri_removeunderscore(char * str);
+void tri_lowercase(char * str);
+
+
+int tri_updateBoneName(struct TRI_Model * triModel,unsigned int boneID,const char * newBoneName);
+int tri_makeAllBoneNamesLowerCase(struct TRI_Model * triModel);
+
+
+
+
+
+
 /**
 * @brief  Bone exports on MHX2 blender imports have prefixes, this call can easily remove them
 * @ingroup TRI
