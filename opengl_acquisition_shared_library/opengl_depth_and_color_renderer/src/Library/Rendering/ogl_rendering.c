@@ -46,7 +46,7 @@ int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilena
 
   rendererOptions.useShaders=1;
 
-  #warning "Decide startOGLShaderPipeline or startShaderOGLRendering"
+ // #warning "Decide startOGLShaderPipeline or startShaderOGLRendering"
   startOGLShaderPipeline(&rendererOptions);
   //TODO: startShaderOGLRendering
 

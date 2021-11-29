@@ -41,7 +41,7 @@ int _ogl_swapEndiannessPNM(void * pixels , unsigned int width , unsigned int hei
  return 1;
 }
 
-int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperchannel)
+int saveRawImageToFileOGLR(const char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperchannel)
 {
     if(pixels==0) { fprintf(stderr,"saveRawImageToFileOGLR(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     FILE *fd=0;

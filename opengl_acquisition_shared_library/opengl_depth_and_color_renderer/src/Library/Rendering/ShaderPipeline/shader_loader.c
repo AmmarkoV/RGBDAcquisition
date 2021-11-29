@@ -156,7 +156,7 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
      fprintf(stderr,"Could not link shaders\n");
 
       GLchar info[1024]; GLsizei length;
-      glGetProgramInfoLog(sh->ProgramObject, 1024  , &length , &info);
+      glGetProgramInfoLog(sh->ProgramObject, 1024  , &length , info);
       fprintf(stderr,"Shader error : %s \n",info);
 
       glDetachShader(sh->ProgramObject, sh->vertexShaderObject);

@@ -98,6 +98,10 @@ int getRGBPixel(unsigned char * ptrRGB  , unsigned int RGBwidth , unsigned int R
 unsigned short getDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y);
 int setDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y , unsigned short depthValue);
 
+
+void setDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d , unsigned int value );
+unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d );
+
 int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold);
 
 

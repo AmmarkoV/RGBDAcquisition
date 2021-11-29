@@ -7,6 +7,8 @@
 #include <math.h>
 
 #include "ogl_fixed_pipeline_renderer.h"
+#include "../../Scene/scene.h"
+#include "../../Tools/tools.h"
 
 #define boneSphere 0.05
 
@@ -15,7 +17,7 @@
 
 int  fixedOGLLighting(struct rendererConfiguration * config)
 { 
-  #warning "GL_COLOR does not even exist"
+  //#warning "GL_COLOR does not even exist"
   //glEnable(GL_COLOR);
   //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
   glEnable(GL_COLOR_MATERIAL);

@@ -10,6 +10,7 @@
 #include <GL/glu.h>
 
 #include "../Tools/tools.h"
+#include "../Tools/save_to_file.h"
 
 #define OPTIMIZE_DEPTH_EXTRACTION 1
 #define FLIP_OPEN_GL_IMAGES 1
@@ -75,7 +76,7 @@ int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,un
    return 1;
 }
 
-#warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
+//#warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
 
 int downloadOpenGLZBuffer(unsigned short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
 {

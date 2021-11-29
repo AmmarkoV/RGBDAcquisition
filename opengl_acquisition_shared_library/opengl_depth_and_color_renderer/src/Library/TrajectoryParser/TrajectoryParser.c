@@ -782,10 +782,10 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 int appendVirtualStreamFromFile(struct VirtualStream * newstream , struct ModelList * modelStorage,const char * filename)
 {
-  #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
-  #warning "This should probably be split down to some primitives and also support things like including a file from another file"
-  #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
-  #warning "parser declerations like arrowsX or objX"
+  #warning "Code of readVirtualStream should be rewritten..! :P"
+  //#warning "This should probably be split down to some primitives and also support things like including a file from another file"
+  //#warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
+  //#warning "parser declerations like arrowsX or objX"
 
   #if USE_FILE_INPUT
   //Our stack variables ..
