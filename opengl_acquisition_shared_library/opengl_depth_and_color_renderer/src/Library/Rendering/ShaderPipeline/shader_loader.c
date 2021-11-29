@@ -120,7 +120,7 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
       fprintf(stderr,"Could not compile shader %s \n",vertexShaderChar);
 
       GLchar info[1024]; GLsizei length;
-      glGetShaderInfoLog(sh->vertexShaderObject,1024, &length,&info);
+      glGetShaderInfoLog(sh->vertexShaderObject,1024, &length,info);
       fprintf(stderr,"Shader error : %s \n",info);
 
       glDeleteProgram(sh->ProgramObject);
@@ -135,7 +135,7 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
       fprintf(stderr,"Could not compile shader %s \n",fragmentShaderChar);
 
       GLchar info[1024]; GLsizei length;
-      glGetShaderInfoLog(sh->fragmentShaderObject,1024, &length,&info);
+      glGetShaderInfoLog(sh->fragmentShaderObject,1024, &length,info);
       fprintf(stderr,"Shader error : %s \n",info);
 
       glDeleteShader(sh->vertexShaderObject); //(because since we are here it means that vertexShader was ok)  :(
