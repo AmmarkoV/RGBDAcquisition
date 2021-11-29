@@ -36,6 +36,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
     for (unsigned int boneID=0; boneID<triModel->header.numberOfBones; boneID++)
     {
         tri_lowercase(triModel->bones[boneID].boneName);
+        tri_removeunderscore(triModel->bones[boneID].boneName);
 
         //These 3 joints need a larget joint name to accommodate the bigger string
         if ( triModel->bones[boneID].boneName == 0 )
@@ -137,7 +138,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
         if (
             (strcmp(triModel->bones[boneID].boneName,"rightupleg")==0) ||
             (strcmp(triModel->bones[boneID].boneName,"rshin")==0) ||
-            (strcmp(triModel->bones[boneID].boneName,"upperleg02.r")==0)
+            (strcmp(triModel->bones[boneID].boneName,"upperleg01.r")==0)
            )
         {
             tri_updateBoneName(triModel,boneID,"rhip");
@@ -168,7 +169,7 @@ const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model 
         if (
             (strcmp(triModel->bones[boneID].boneName,"leftupleg")==0) ||
             (strcmp(triModel->bones[boneID].boneName,"lshin")==0) ||
-            (strcmp(triModel->bones[boneID].boneName,"upperleg02.l")==0)
+            (strcmp(triModel->bones[boneID].boneName,"upperleg01.l")==0)
            )
         {
             tri_updateBoneName(triModel,boneID,"lhip");
