@@ -122,6 +122,7 @@ int main (int argc, char *argv[])
         }
         else if (strcmp(argv[i],"--removeprefix")==0)
         {
+            fprintf(stderr,GREEN "Remove Prefix %s\n" NORMAL,argv[i+1]);
             tri_removePrefixFromAllBoneNames(originalModel,argv[i+1]);
         }
         else if (strcmp(argv[i],"--paint")==0)

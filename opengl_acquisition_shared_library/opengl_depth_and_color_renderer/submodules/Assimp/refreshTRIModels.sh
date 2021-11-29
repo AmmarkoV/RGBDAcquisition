@@ -7,7 +7,7 @@ cd "$DIR"
 MHX2MODEL="makehuman2ThroughMHX2.dae"
 PREFIX="Test_"
 MHX2MODEL="makehuman2ThroughMHX2Default.dae"
-PREFIX="Test_"
+PREFIX="Testexp_"
 
 ./assimpTester --merge axis.dae axis.tri
 

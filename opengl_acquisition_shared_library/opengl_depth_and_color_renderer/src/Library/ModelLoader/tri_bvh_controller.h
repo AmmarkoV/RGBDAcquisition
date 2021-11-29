@@ -25,41 +25,6 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-const static void TRIBVH_lowercase(char * str)
-{
-    char * a = str;
-    if (a!=0)
-    {
-        while (*a!=0)
-        {
-            *a = tolower(*a);
-            ++a;
-        }
-    }
-
-    return;
-}
-
-const static void TRIBVH_removeunderscore(char * str)
-{
-    char * a = str;
-    if (a!=0)
-    {
-        unsigned int l = strlen(str);
-        if (l-2>0)
-        {
-            if (a[l-2]=='_')
-            {
-                a[l-2]='.';
-            }
-        }
-    }
-
-    return;
-}
-
-
-
 
 const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
