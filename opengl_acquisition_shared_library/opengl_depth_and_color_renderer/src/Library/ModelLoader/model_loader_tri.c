@@ -352,7 +352,7 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
       {
        tri_copyModel(temporary,indexed,1);
        int result = fillFlatModelTriFromIndexedModelTri(triModel,temporary);
-       freeModelTri(temporary);
+       tri_freeModel(temporary);
        temporary=0;
        return result;
       }
@@ -799,6 +799,41 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) && (boneIDResult!=
 
   //fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
  return 0;
+}
+
+int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * prefix)
+{
+    if (triModel==0)
+    {
+        return 0;
+    }
+    if (prefix==0)
+    {
+        return 0;
+    }
+    //----------------------------------------
+    unsigned int prefixLength = strlen(prefix);
+
+    for (TRIBoneID boneID=0; boneID<triModel->header.numberOfBones; boneID++)
+    {
+        char * boneName = triModel->bones[boneID].boneName;
+        unsigned int fullBoneNameLength = strlen(boneName);
+
+        if ( triModel->bones[boneID].boneName ==0 )
+        {
+            fprintf(stderr,"Invalid bone name encountered %u \n",boneID);
+        }
+        else
+        {
+            char * result = strstr(triModel->bones[boneID].boneName,prefix);
+            if (result!=0)
+            {
+                snprintf(result,fullBoneNameLength,"%s",boneName+prefixLength);
+            }
+        }
+    }
+
+    return 1;
 }
 
 

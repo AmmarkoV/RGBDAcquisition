@@ -4,15 +4,17 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 
+MHX2MODEL="makehuman2ThroughMHX2.dae"
+MHX2MODEL="makehuman2ThroughMHX2Default.dae"
 
 ./assimpTester --merge axis.dae axis.tri
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 
 #Mesh import from MHX2 intermediate format..
-./assimpTester --mesh 0 --convert makehuman2ThroughMHX2.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
-./assimpTester --mesh 1 --convert makehuman2ThroughMHX2.dae hair.tri --applytexture braid01_diffuse_mahogany.png
-./assimpTester --mesh 2 --convert makehuman2ThroughMHX2.dae eyes.tri --applytexture brown_eye.png
+./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
+./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --applytexture braid01_diffuse_mahogany.png
+./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --applytexture brown_eye.png
 
 
 exit 0

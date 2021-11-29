@@ -372,6 +372,17 @@ int tri_simpleMergeOfTRIInContainer(struct TRI_Model * triModel,struct TRI_Conta
 */
 int tri_findBone(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult);
 
+
+/**
+* @brief  Bone exports on MHX2 blender imports have prefixes, this call can easily remove them
+* @ingroup TRI
+* @param  input TRI structure with the bones we want to search
+* @param  string with the name of the prefix we want to remove frin bone names
+* @retval 0=Bone Does not exist , 1=Bone found
+*/
+int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * prefix);
+
+
 /**
 * @brief  Deprecated call, use tri_findBone instead..
 * @ingroup TRI

@@ -120,6 +120,10 @@ int main (int argc, char *argv[])
         {
             textureLoadAndPaint(originalModel,argv[i+1]);
         }
+        else if (strcmp(argv[i],"--removeprefix")==0)
+        {
+            tri_removePrefixFromAllBoneNames(originalModel,argv[i+1]);
+        }
         else if (strcmp(argv[i],"--paint")==0)
         {
             int r = atoi(argv[i+1]);
@@ -138,7 +142,7 @@ int main (int argc, char *argv[])
 
     if (outputFile!=0)
     {
-        saveModelTri(outputFile, originalModel);
+        tri_saveModel(outputFile, originalModel);
     }
 
 
@@ -147,15 +151,15 @@ int main (int argc, char *argv[])
         if (strcmp(argv[1],"--test")==0)
         {
             struct TRI_Model *reloadedModel=  allocateModelTri();
-            loadModelTri( outputFile, reloadedModel);
-            saveModelTri( "resave.tri", reloadedModel);
+            tri_loadModel( outputFile, reloadedModel);
+            tri_saveModel( "resave.tri", reloadedModel);
 
-            freeModelTri(reloadedModel);
+            tri_freeModel(reloadedModel);
         }
     }
 
-    freeModelTri(flatModel);
-    freeModelTri(originalModel);
+    tri_freeModel(flatModel);
+    tri_freeModel(originalModel);
 
 
 

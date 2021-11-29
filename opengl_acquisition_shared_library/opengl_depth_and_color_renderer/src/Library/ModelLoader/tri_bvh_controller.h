@@ -3,7 +3,6 @@
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
-
 #ifndef TRI_BVH_CONTROLLER_H_INCLUDED
 #define TRI_BVH_CONTROLLER_H_INCLUDED
 
@@ -13,10 +12,8 @@
 #include "../MotionCaptureLoader/calculate/bvh_transform.h"
 #include "../MotionCaptureLoader/edit/bvh_remapangles.h"
 
-
 //For lowercase
 #include <ctype.h>
-
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -27,7 +24,6 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
-
 
 const static void TRIBVH_lowercase(char * str)
 {
@@ -43,7 +39,6 @@ const static void TRIBVH_lowercase(char * str)
 
     return;
 }
-
 
 const static void TRIBVH_removeunderscore(char * str)
 {
@@ -343,7 +338,7 @@ const static int animateTRIModelUsingBVHArmature(
 
 
 
-    bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
+    //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //TODO: Add a flag here to flip rotation axis..!
     struct BVH_Transform bvhTransform = {0};
     bvhTransform.useOptimizations=0;
@@ -356,7 +351,7 @@ const static int animateTRIModelUsingBVHArmature(
                                  )
        )
     {
-        bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+        //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
 
         unsigned int transformations4x4Size = numberOfBones * 16;
         float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
