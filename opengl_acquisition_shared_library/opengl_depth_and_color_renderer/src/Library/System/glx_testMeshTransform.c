@@ -1203,7 +1203,9 @@ int main(int argc,const char **argv)
      }
 
     }
-     fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL);
+
+      if (maxFrames>1)
+        { fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL); }
    }
    while (dumpVideo==0); //If dump video is not enabled loop forever
 
