@@ -293,10 +293,10 @@ const static int animateTRIModelUsingBVHArmature(
     //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
     //bvh_printBVH(bvh);
 
-    bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
+    //bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
+    //bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
+    //bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
+    //bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
 
     //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //TODO: Add a flag here to flip rotation axis..!
@@ -311,10 +311,10 @@ const static int animateTRIModelUsingBVHArmature(
                                  )
        )
     {
-        bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+        //bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+        //bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+        //bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
+        //bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
         //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
 
         unsigned int transformations4x4Size = numberOfBones * 16;
@@ -446,6 +446,7 @@ const static int animateTRIModelUsingBVHArmature(
                             );
                         transpose4x4FMatrix(&transformations4x4[boneID*16]);*/
 
+
                         if (bvh->jointHierarchy[jID].hasPositionalChannels)
                         {
                          //This is one of the new joints with positional channels..
@@ -469,6 +470,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                       );
                         } else
                         {
+                         //transpose4x4FMatrix(&bvhTransform.joint[jID].dynamicRotation.m);
 
                          multiplyTwo4x4FMatrices_Naive(
                                                          &transformations4x4[boneID*16],

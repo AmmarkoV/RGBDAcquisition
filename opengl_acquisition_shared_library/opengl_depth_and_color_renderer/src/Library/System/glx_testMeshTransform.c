@@ -25,6 +25,7 @@
 
 #include "../MotionCaptureLoader/bvh_loader.h"
 #include "../MotionCaptureLoader/edit/bvh_rename.h"
+#include "../MotionCaptureLoader/edit/bvh_randomize.h"
 
 #include "glx3.h"
 
@@ -634,9 +635,9 @@ int doSkeletonDraw(
          {
           //fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
           struct pose6D axisPose={0};
-          axisPose.x = humanPose->x + humanModel->bones[boneID].info->x; //humanModel->bones[boneID].info->finalVertexTransformation[3];
-          axisPose.y = humanPose->y + humanModel->bones[boneID].info->y; //humanModel->bones[boneID].info->finalVertexTransformation[7];
-          axisPose.z = humanPose->z + humanModel->bones[boneID].info->z; //humanModel->bones[boneID].info->finalVertexTransformation[11];
+          axisPose.x = humanPose->x + humanModel->bones[boneID].info->x;
+          axisPose.y = humanPose->y + humanModel->bones[boneID].info->y;
+          axisPose.z = humanPose->z + humanModel->bones[boneID].info->z;
 
           axisPose.usePoseMatrixDirectly = 1;
           for (unsigned int i=0; i<16; i++)
@@ -675,8 +676,6 @@ int doSkeletonDraw(
            fprintf(stderr,RED "BoneID %u empty! \n" NORMAL,boneID);
          }
         }
-
-
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebufferToScreen(
@@ -887,6 +886,193 @@ int doBVHDraw(
 
 
 
+ /*
+ location&rotation
+ oculi01.l/r
+ risorius03.l/r
+ levator06.l/r
+ oris03.l/r
+ oris05
+ levator05.l/r
+ oris07.l/r
+ oris01
+
+ rotation
+ orbicularis03.l/r
+ orbicularis04.l/r
+ eye.l/r */
+void randomizeHead(struct BVH_MotionCapture * mc)
+{
+   BVHJointID jIDLeft;
+   BVHJointID jIDRight;
+   float r = 0.0;
+
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"neck",&jIDLeft))
+      )
+    {
+      r = randomFloatA(-60,60);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+    }
+
+
+   //                            ROTATION ONLY
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"orbicularis03.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"orbicularis03.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"orbicularis04.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"orbicularis04.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"eye.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"eye.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationXAtFrame(mc,jIDRight,0,r);
+    }
+
+
+
+
+   //                         LOCATION &  ROTATION ONLY
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"oculi01.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"oculi01.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationYAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"risorius03.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"risorius03.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-50,50);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"levator06.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"levator06.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-20,20);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationXAtFrame(mc,jIDRight,0,r);
+      r = randomFloatA(-10,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,-r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"oris03.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"oris03.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationYAtFrame(mc,jIDRight,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationXAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"oris05",&jIDLeft))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"oris01",&jIDLeft))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationXAtFrame(mc,jIDLeft,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"levator05.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"levator05.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-60,60);
+      bvh_setJointRotationYAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationYAtFrame(mc,jIDRight,0,r);
+    }
+   //===========================================================================
+   //===========================================================================
+   //===========================================================================
+   if (
+        (bvh_getJointIDFromJointNameNocase(mc,"oris07.l",&jIDLeft)) &&
+        (bvh_getJointIDFromJointNameNocase(mc,"oris07.r",&jIDRight))
+      )
+    {
+      r = randomFloatA(-30,30);
+      bvh_setJointRotationZAtFrame(mc,jIDLeft,0,r);
+      bvh_setJointRotationZAtFrame(mc,jIDRight,0,r);
+    }
+}
 
 
 
@@ -943,6 +1129,7 @@ int main(int argc,const char **argv)
    int axisRendering = 0;
    int staticRendering = 0;
 
+   int randomize=0;
 
    /*
    //DAE output Set human pose to somewhere visible..
@@ -983,9 +1170,16 @@ int main(int argc,const char **argv)
                     {
                       staticRendering=1;
                     } else
+           if (strcmp(argv[i],"--randomize")==0)
+                    {
+                       randomize=1;
+                    } else
            if (strcmp(argv[i],"--face")==0)
                     {
+                       //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20 --set orbicularis03.l x 30 --set orbicularis03.r x 30
+                       //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20
                        //  ./gl3MeshTransform --face --bvh merged_neutral.bvh
+
                        //Regular DAE align global=local
                        humanPose.x=0.0f;//(float)  (1000-rand()%2000);
                        humanPose.y=-14.976f;//(float) (100-rand()%200);
@@ -1129,6 +1323,12 @@ int main(int argc,const char **argv)
 
    do
     {
+      if (randomize)
+        {
+            randomizeHead(&mc);
+        }
+
+
     for (BVHFrameID fID=0; fID<maxFrames; fID++)
     {
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (BVH has %u frames total) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);

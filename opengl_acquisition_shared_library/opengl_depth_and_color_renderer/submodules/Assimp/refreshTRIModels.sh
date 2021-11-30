@@ -9,6 +9,9 @@ PREFIX="Test_"
 MHX2MODEL="makehuman2ThroughMHX2Default.dae"
 PREFIX="Testexp_"
 
+#Export Collada:
+#Select SL + OpenSim rigged from presets
+
 ./assimpTester --merge axis.dae axis.tri
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
@@ -18,10 +21,10 @@ PREFIX="Testexp_"
 ./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --applytexture braid01_diffuse_mahogany.png
 ./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --applytexture brown_eye.png
 
-scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
 
 exit 0
 
+scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
 
 
 

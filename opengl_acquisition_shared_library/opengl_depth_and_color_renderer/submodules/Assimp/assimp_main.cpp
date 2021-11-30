@@ -99,7 +99,7 @@ int main (int argc, char *argv[])
             inputFile  = argv[i+1];
             outputFile = argv[i+2];
             fprintf(stderr,GREEN "Converting input(%s) to output(%s)\n" NORMAL,inputFile,outputFile);
-            if ( (strstr(inputFile,".dae")!=0) || (strstr(inputFile,".obj")!=0) )
+            if ( (strstr(inputFile,".fbx")!=0) || (strstr(inputFile,".dae")!=0) || (strstr(inputFile,".obj")!=0) )
             {
                 convertAssimpToTRI(inputFile,flatModel,originalModel,selectMesh);
             }
