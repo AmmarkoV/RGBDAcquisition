@@ -1332,10 +1332,6 @@ int main(int argc,const char **argv)
                     {
                       staticRendering=1;
                     } else
-           if (strcmp(argv[i],"--randomize")==0)
-                    {
-                       randomize=1;
-                    } else
            if (strcmp(argv[i],"--face")==0)
                     {
                        //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20 --set orbicularis03.l x 30 --set orbicularis03.r x 30
@@ -1488,6 +1484,11 @@ int main(int argc,const char **argv)
    //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow y 90 --set rknee z -45 --set lshoulder x 45
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--randomize")==0)
+                    {
+                       randomize=1;
+                       mc.numberOfFrames=1;
+                    } else
            if (strcmp(argv[i],"--set")==0)
                     {
                       char * jointName = argv[i+1];
