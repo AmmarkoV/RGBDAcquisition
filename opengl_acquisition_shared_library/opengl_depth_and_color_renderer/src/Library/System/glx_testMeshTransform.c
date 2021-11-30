@@ -59,6 +59,14 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
+
+//Virtual Camera Intrinsics
+float fX = 1235.423889;
+float fY = 1233.48468;
+float nearPlane = 0.1;
+float farPlane  = 1000.0;
+
+
 struct pose6D
  {
      float x,y,z;
@@ -151,15 +159,15 @@ int doOGLSingleDrawing(
   struct Matrix4x4OfFloats viewMatrix;
 
   prepareRenderingMatrices(
-                              1235.423889, //fx
-                              1233.48468,  //fy
+                              fX, //fx
+                              fY, //fy
                               0.0,        //skew
                               (float) width/2,    //cx
                               (float) height/2,   //cy
                               (float) width,      //Window Width
                               (float) height,     //Window Height
-                              0.1,        //Near
-                              1000.0,      //Far
+                              nearPlane,     //Near
+                              farPlane,      //Far
                               &projectionMatrix,
                               &viewMatrix,
                               &viewportMatrix
@@ -245,15 +253,15 @@ int doOGLDrawing(
   struct Matrix4x4OfFloats viewMatrix;
 
   prepareRenderingMatrices(
-                              1235.423889, //fx
-                              1233.48468,  //fy
+                              fX,  //fx
+                              fY,  //fy
                               0.0,        //skew
                               (float) width/2,    //cx
                               (float) height/2,   //cy
                               (float) width,      //Window Width
                               (float) height,     //Window Height
-                              0.1,        //Near
-                              1000.0,      //Far
+                              nearPlane,     //Near
+                              farPlane,      //Far
                               &projectionMatrix,
                               &viewMatrix,
                               &viewportMatrix
@@ -602,7 +610,11 @@ int doSkeletonDraw(
             return 0;
         }
 
+
           struct pose6D axisPose={0};
+
+          /*
+          //Add an axis to help
           axisPose.z=10;
           doOGLSingleDrawing(
                              programID,
@@ -612,7 +624,7 @@ int doSkeletonDraw(
                              axisTriangleCount,
                              WIDTH,
                              HEIGHT
-                           );
+                           );*/
 
 
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
@@ -629,20 +641,35 @@ int doSkeletonDraw(
           axisPose.usePoseMatrixDirectly = 1;
           for (unsigned int i=0; i<16; i++)
           {
-            //axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
             axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
           }
-          axisPose.m.m[11] += 5; //Send rendering 5 units away..
+          axisPose.m.m[3]  = 10 *axisPose.x; //X
+          axisPose.m.m[7]  = 10 *axisPose.y; //Y
+          axisPose.m.m[11] = 10 *axisPose.z; //Z
 
-          doOGLSingleDrawing(
-                             programID,
-                             MVPMatrixID,
-                             &axisPose,
-                             axisVAO,
-                             axisTriangleCount,
-                             WIDTH,
-                             HEIGHT
-                           );
+          //axisPose.m.m[3]  = 10 *axisPose.y; //X
+          axisPose.m.m[7]  -= 10;  //Y
+          axisPose.m.m[11] -= 100; //Z
+
+          if (
+               (strcmp("scene",humanModel->bones[boneID].boneName)!=0)   &&
+               (strcmp("camera",humanModel->bones[boneID].boneName)!=0)  &&
+               (strcmp("light",humanModel->bones[boneID].boneName)!=0)   &&
+               (strcmp("testexp",humanModel->bones[boneID].boneName)!=0) &&
+               (strcmp("test",humanModel->bones[boneID].boneName)!=0)
+             )
+          {
+           //Only draw axis of parts of actual geometry
+           doOGLSingleDrawing(
+                              programID,
+                              MVPMatrixID,
+                              &axisPose,
+                              axisVAO,
+                              axisTriangleCount,
+                              WIDTH,
+                              HEIGHT
+                            );
+          }
          } else
          {
            fprintf(stderr,RED "BoneID %u empty! \n" NORMAL,boneID);
