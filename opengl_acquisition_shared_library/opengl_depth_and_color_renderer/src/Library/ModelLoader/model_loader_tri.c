@@ -510,7 +510,7 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
   {
    itemSize=sizeof(char); count=triModelIN->header.nameSize; allocationSize = itemSize * count;
    if (triModelOUT->name!=0)  { free(triModelOUT->name); triModelOUT->name=0; }
-   if ((triModelIN->name!=0) && (allocationSize>0) )  { triModelOUT->name = (char*) malloc(allocationSize+sizeof(char)); }
+   if ((triModelIN->name!=0) && (allocationSize>0))  { triModelOUT->name = (char*) malloc(allocationSize+sizeof(char)); }
    memcpy(triModelOUT->name,triModelIN->name,allocationSize);
    triModelOUT->name[count]=0; //Null terminate
   }
@@ -518,36 +518,35 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
   itemSize=sizeof(float); count=triModelIN->header.numberOfVertices; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);
   if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); triModelOUT->vertices=0; }
-  if ((triModelIN->vertices!=0) && (allocationSize>0) )  { triModelOUT->vertices = (float*) malloc(allocationSize); }
+  if ((triModelIN->vertices!=0) && (allocationSize>0))  { triModelOUT->vertices = (float*) malloc(allocationSize); }
   memcpy(triModelOUT->vertices,triModelIN->vertices,allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfNormals; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of normals ..\n", allocationSize);
   if (triModelOUT->normal!=0)  { free(triModelOUT->normal); triModelOUT->normal=0; }
-  if ((triModelIN->normal!=0) && (allocationSize>0) )  { triModelOUT->normal = (float*) malloc(allocationSize); }
+  if ((triModelIN->normal!=0) && (allocationSize>0))  { triModelOUT->normal = (float*) malloc(allocationSize); }
   memcpy(triModelOUT->normal        , triModelIN->normal        , allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfColors; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of colors ..\n", allocationSize);
   if (triModelOUT->colors!=0)  { free(triModelOUT->colors); triModelOUT->colors=0; }
-  if ((triModelIN->colors!=0) && (allocationSize>0) )  { triModelOUT->colors=(float*) malloc(allocationSize); }
+  if ((triModelIN->colors!=0) && (allocationSize>0))  { triModelOUT->colors=(float*) malloc(allocationSize); }
   memcpy(triModelOUT->colors        , triModelIN->colors        , allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfTextureCoords; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of textures ..\n", allocationSize);
   if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); triModelOUT->textureCoords=0; }
-  if ((triModelIN->textureCoords!=0) && (allocationSize>0) )  { triModelOUT->textureCoords=(float*) malloc(allocationSize); }
+  if ((triModelIN->textureCoords!=0) && (allocationSize>0))  { triModelOUT->textureCoords=(float*) malloc(allocationSize); }
   memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , allocationSize);
 
   itemSize=sizeof(unsigned int); count=triModelIN->header.numberOfIndices; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of indices ..\n", allocationSize);
   if (triModelOUT->indices!=0)  { free(triModelOUT->indices); triModelOUT->indices=0; }
-  if ((triModelIN->indices!=0) && (allocationSize>0) )  { triModelOUT->indices = (unsigned int*) malloc(allocationSize); }
+  if ((triModelIN->indices!=0) && (allocationSize>0))  { triModelOUT->indices = (unsigned int*) malloc(allocationSize); }
   memcpy(triModelOUT->indices , triModelIN->indices       , allocationSize);
 
 
   if (triModelOUT->bones!=0)  { free(triModelOUT->bones); triModelOUT->bones=0; }
-
 
   if (copyBoneStructures)
   {
@@ -558,6 +557,12 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
     if (triModelOUT->bones!=0)  { free(triModelOUT->bones); triModelOUT->bones=0; }
     triModelOUT->header.numberOfBones=0;
   }
+
+  itemSize=sizeof(char); count=triModelIN->header.textureDataChannels * triModelIN->header.textureDataWidth * triModelIN->header.textureDataHeight ; allocationSize = itemSize * count;
+  //fprintf(stderr,"Copying %u bytes of textureData ..\n", allocationSize);
+  if (triModelOUT->textureData!=0)  { free(triModelOUT->textureData); triModelOUT->textureData=0; }
+  if ((triModelIN->textureData!=0) && (allocationSize>0))  { triModelOUT->textureData = (char *) malloc(allocationSize); }
+  memcpy(triModelOUT->textureData , triModelIN->textureData , allocationSize);
 
  return ;
 }
@@ -752,6 +757,18 @@ int tri_loadModel(const char * filename , struct TRI_Model * triModel)
         } else {  fprintf(stderr,"No bones specified \n"); }
 
 
+
+        if ( triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels > 0 )
+        {
+         itemSize=sizeof(char); count = triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
+         fprintf(stderr,"Reading %u bytes of texture data\n",itemSize * count);
+         triModel->textureData = ( char * ) malloc ( itemSize * count );
+         n = fread(triModel->textureData , itemSize , count , fd);
+         tri_warnIncompleteReads("texture data",count,n);
+        } else {  fprintf(stderr,"No texture data specified \n"); }
+
+
+
         //printTRIBoneStructure(triModel, 1);
         printTRIModel(triModel);
 
@@ -921,6 +938,35 @@ int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRI
 }
 
 
+
+
+int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
+{
+  if (triModel!=0)
+  {
+
+    if (triModel->textureData!=0)
+    {
+        free(triModel->textureData);
+        triModel->textureData=0;
+    }
+
+    triModel->header.textureDataWidth = width;
+    triModel->header.textureDataHeight = height;
+    triModel->header.textureDataChannels = channels;
+
+    triModel->textureData = (char*) malloc( sizeof(char) * width * height * channels );
+
+    if (triModel->textureData!=0)
+    {
+      memcpy(triModel->textureData,pixels,sizeof(char) * width * height * channels );
+    }
+  }
+
+  return 0;
+}
+
+
 int tri_paintModelUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
 {
   if (triModel!=0)
@@ -1071,8 +1117,15 @@ int tri_saveModel(const char * filename , struct TRI_Model * triModel)
 
           if ( (triModel->bones[boneNum].info->numberOfBoneChildren>0) && (triModel->bones[boneNum].boneChild) )
            { fwrite ( triModel->bones[boneNum].boneChild , sizeof(unsigned int)     , triModel->bones[boneNum].info->numberOfBoneChildren , fd); }
-
          }
+        }
+
+
+        if ( (triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels > 0) && (triModel->textureData!=0) )
+        {
+         itemSize=sizeof(char);  count = triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
+         fprintf(stderr,"Writing %u bytes of texture data\n",itemSize*count);
+         fwrite (triModel->textureData ,itemSize , count, fd);
         }
 
 

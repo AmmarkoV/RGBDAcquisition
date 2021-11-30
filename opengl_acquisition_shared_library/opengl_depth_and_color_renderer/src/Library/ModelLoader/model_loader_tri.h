@@ -123,10 +123,10 @@ struct TRI_Header
      float boneGlobalInverseTransform[16];
 
      //In order not to break this file format ever again
-     unsigned int notUsed1;
-     unsigned int notUsed2;
-     unsigned int notUsed3;
-     unsigned int notUsed4;
+     unsigned int textureDataWidth;
+     unsigned int textureDataHeight;
+     unsigned int textureDataChannels;
+     unsigned int textureBindGLBuffer;
      unsigned int notUsed5;
 };
 
@@ -138,13 +138,14 @@ struct TRI_Header
 struct TRI_Model
 {
    struct TRI_Header header;
-   char *  name;
+   char  * name;
    float * vertices;
    float * normal;
    float * textureCoords;
    float * colors;
    struct TRI_Bones * bones;
    unsigned int * indices;
+   char * textureData;
 };
 
 
@@ -302,6 +303,9 @@ int tri_loadModel(const char * filename , struct TRI_Model * triModel);
 */
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 
+
+
+int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels);
 
 
 /**

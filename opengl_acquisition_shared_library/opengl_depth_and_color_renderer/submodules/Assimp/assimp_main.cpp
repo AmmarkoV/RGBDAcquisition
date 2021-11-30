@@ -47,6 +47,27 @@ int textureLoadAndPaint(struct TRI_Model * model,char * filename)
 
 
 
+
+
+int textureLoadAndPack(struct TRI_Model * model,char * filename)
+{
+    int success=0;
+    struct Image * image = readImage(filename,PNG_CODEC,0);
+    if (image!=0)
+    {
+        fprintf(stderr,"Loaded %s => width:%u / height:%u \n",filename,image->width,image->height);
+        if ( tri_packTextureInModel(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
+        {
+            fprintf(stderr,"Successfully packed RGB image in TRI model using %s texture\n",filename);
+            success=1;
+        }
+        destroyImage(image);
+    }
+    return success;
+}
+
+
+
 int main (int argc, char *argv[])
 {
     if (argc<4)
@@ -119,6 +140,10 @@ int main (int argc, char *argv[])
         else if (strcmp(argv[i],"--applytexture")==0)
         {
             textureLoadAndPaint(originalModel,argv[i+1]);
+        }
+        else if (strcmp(argv[i],"--packtexture")==0)
+        {
+            textureLoadAndPack(originalModel,argv[i+1]);
         }
         else if (strcmp(argv[i],"--removeprefix")==0)
         {
