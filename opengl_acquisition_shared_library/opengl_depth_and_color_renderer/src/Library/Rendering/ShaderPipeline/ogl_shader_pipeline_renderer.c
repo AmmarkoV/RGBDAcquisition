@@ -84,7 +84,7 @@ GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1
 
 int  shaderOGLLighting(struct rendererConfiguration * config)
 { 
-  #warning "GL_COLOR does not even exist"
+  //#warning "GL_COLOR does not even exist"
   //glEnable(GL_COLOR);
   //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
   glEnable(GL_COLOR_MATERIAL);
@@ -269,6 +269,15 @@ void doOGLShaderDrawCalllist(
     glBindBuffer( GL_ARRAY_BUFFER, buffer );        checkOpenGLError(__FILE__, __LINE__);
 
 
+    //Redeclare number of data as GLintptr to supress the 
+    //cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    //warning when casting to (GLVoid*) using glVertexAttribPointer
+    GLintptr numberOfVerticesCastToIntPtr      = (GLintptr) numberOfVertices;
+    GLintptr numberOfNormalsCastToIntPtr       = (GLintptr) numberOfNormals;
+    GLintptr numberOfTextureCoordsCastToIntPtr = (GLintptr) numberOfTextureCoords;
+    GLintptr numberOfColorsCastToIntPtr        = (GLintptr) numberOfColors;
+    GLintptr numberOfIndicesCastToIntPtr       = (GLintptr) numberOfIndices;
+    
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
@@ -304,14 +313,14 @@ void doOGLShaderDrawCalllist(
     vNormal = glGetAttribLocation( program, "vNormal" );                                                                                   checkOpenGLError(__FILE__, __LINE__);
     glEnableVertexAttribArray( vNormal );                                                                                                  checkOpenGLError(__FILE__, __LINE__);
     
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*) numberOfVertices );                                                 checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*) numberOfVerticesCastToIntPtr );                                     checkOpenGLError(__FILE__, __LINE__);
 
 
     if ( (colors!=0) && (numberOfColors!=0) )
     {
      vColor = glGetAttribLocation( program, "vColor" );
      glEnableVertexAttribArray( vColor );
-     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVertices + numberOfNormals ) );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVerticesCastToIntPtr + numberOfNormalsCastToIntPtr ) );
      checkOpenGLError(__FILE__, __LINE__);
     }
 
@@ -321,7 +330,7 @@ void doOGLShaderDrawCalllist(
     {
      vTexture = glGetAttribLocation( program, "vTexture" );
      glEnableVertexAttribArray( vTexture );
-     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVertices + numberOfNormals + numberOfColors) );
+     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVerticesCastToIntPtr + numberOfNormalsCastToIntPtr + numberOfColorsCastToIntPtr) );
      checkOpenGLError(__FILE__, __LINE__);
 
      //textureStrength[0]=1.0;
