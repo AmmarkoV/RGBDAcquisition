@@ -109,7 +109,10 @@ int performPointProjectionsForFrame(
         return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up
-       { bvh_cleanTransform(mc,bvhTransform); }
+       { 
+           fprintf(stderr,RED "performPointProjectionsForFrame: Could not load transform for frame %u\n" NORMAL,fID);
+           bvh_cleanTransform(mc,bvhTransform); 
+       }
    //----------------------------------------------------------
  return 0;
 }
