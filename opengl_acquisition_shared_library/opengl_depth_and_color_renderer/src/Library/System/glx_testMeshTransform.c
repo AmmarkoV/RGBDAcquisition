@@ -240,6 +240,8 @@ int doOGLSingleDrawing(
 int doOGLDrawing(
                  int programID,
                  GLuint MVPMatrixID,
+                 GLuint eyelashesVao,
+                 unsigned int eyelashesTriangleCount,
                  GLuint eyebrowsVao,
                  unsigned int eyebrowsTriangleCount,
                  GLuint hairVao,
@@ -289,6 +291,19 @@ int doOGLDrawing(
   //-------------------------------
   if (humanPose->usePoseMatrixDirectly)
      {
+      drawVertexArrayWithMVPMatrices(
+                                     programID,
+                                     eyelashesVao,
+                                     MVPMatrixID,
+                                     eyelashesTriangleCount,
+                                     //-------------
+                                     &humanPose->m,
+                                     //-------------
+                                     &projectionMatrix,
+                                     &viewportMatrix,
+                                     &viewMatrix,
+                                     0 //Wireframe
+                                    );
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyebrowsVao,
@@ -343,6 +358,24 @@ int doOGLDrawing(
                                     );
      } else
      {
+      drawObjectAT(
+                  programID,
+                  eyelashesVao,
+                  MVPMatrixID,
+                  eyelashesTriangleCount,
+                  //-------------
+                  humanPose->x,
+                  humanPose->y,
+                  humanPose->z,
+                  humanPose->roll,
+                  humanPose->pitch,
+                  humanPose->yaw,
+                  //-------------
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix,
+                  0 //Wireframe
+                  );
       drawObjectAT(
                   programID,
                   eyebrowsVao,
@@ -474,6 +507,7 @@ int doDrawing(
                 struct TRI_Model * eyeModel,
                 struct TRI_Model * hairModel,
                 struct TRI_Model * eyebrowsModel,
+                struct TRI_Model * eyelashesModel,
                 unsigned int WIDTH,
                 unsigned int HEIGHT,
                 int renderForever
@@ -481,6 +515,21 @@ int doDrawing(
 {
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+    //------------------------------------------------------------------------------------
+    GLuint eyelashesVAO;
+    GLuint eyelashesArrayBuffer;
+    unsigned int eyelashesTriangleCount  =  (unsigned int)  eyelashesModel->header.numberOfVertices/3;
+    pushObjectToBufferData(
+                             1,
+                             &eyelashesVAO,
+                             &eyelashesArrayBuffer,
+                             programID,
+                             eyelashesModel->vertices       ,  eyelashesModel->header.numberOfVertices      * sizeof(float),
+                             eyelashesModel->normal         ,  eyelashesModel->header.numberOfNormals       * sizeof(float),
+                             eyelashesModel->textureCoords  ,  eyelashesModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
+                             eyelashesModel->colors         ,  eyelashesModel->header.numberOfColors        * sizeof(float),
+                             eyelashesModel->indices        ,  eyelashesModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                          );
     //------------------------------------------------------------------------------------
     GLuint eyebrowsVAO;
     GLuint eyebrowsArrayBuffer;
@@ -570,6 +619,8 @@ int doDrawing(
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
+                     eyelashesVAO,
+                     eyelashesTriangleCount,
                      eyebrowsVAO,
                      eyebrowsTriangleCount,
                      hairVAO,
@@ -1226,6 +1277,9 @@ int main(int argc,const char **argv)
    struct TRI_Model eyebrowsModel={0};
    struct TRI_Model indexedEyebrowsModel={0};
    //------------------------------------------------------
+   struct TRI_Model eyelashesModel={0};
+   struct TRI_Model indexedEyelashesModel={0};
+   //------------------------------------------------------
    struct pose6D humanPose={0};
    struct TRI_Model humanModel={0};
    struct TRI_Model indexedHumanModel={0};
@@ -1362,13 +1416,19 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    if (!tri_loadModel("hair.tri", &indexedHairModel ) )
    {
-     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyes.tri\n");
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/hair.tri\n");
      return 0;
    }
    //------------------------------------------------------
    if (!tri_loadModel("eyebrows.tri", &indexedEyebrowsModel ) )
    {
-     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyes.tri\n");
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyebrows.tri\n");
+     return 0;
+   }
+   //------------------------------------------------------
+   if (!tri_loadModel("eyelashes.tri", &indexedEyelashesModel ) )
+   {
+     fprintf(stderr,"Please : wget http://ammar.gr/mocapnet/eyelashes.tri\n");
      return 0;
    }
 
@@ -1378,6 +1438,7 @@ int main(int argc,const char **argv)
       tri_paintModel(&indexedEyeModel,123,123,123);
       tri_paintModel(&indexedHairModel,123,123,123);
       tri_paintModel(&indexedEyebrowsModel,123,123,123);
+      tri_paintModel(&indexedEyelashesModel,123,123,123);
    }
    //------------------------------------------------------
 
@@ -1409,6 +1470,12 @@ int main(int argc,const char **argv)
    tri_makeAllBoneNamesLowerCase(&indexedEyebrowsModel);
    tri_removePrefixFromAllBoneNames(&indexedEyebrowsModel,"test_"); //Eyes have a test_ prefix on bone names..
    makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyebrowsModel);
+   fprintf(stderr,GREEN "OK\n" NORMAL);
+   //------------------------------------------------------
+   fprintf(stderr,"Preprocessing eyelashes model.. ");
+   tri_makeAllBoneNamesLowerCase(&indexedEyelashesModel);
+   tri_removePrefixFromAllBoneNames(&indexedEyelashesModel,"test_"); //Eyes have a test_ prefix on bone names..
+   makeAllTRIBoneNamesLowerCaseWithoutUnderscore(&indexedEyelashesModel);
    fprintf(stderr,GREEN "OK\n" NORMAL);
    //------------------------------------------------------
 
@@ -1476,12 +1543,14 @@ int main(int argc,const char **argv)
        animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&hairModel,&indexedHairModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&eyebrowsModel,&indexedEyebrowsModel,&mc,fID,0);
+       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,0);
      } else
      {
        tri_flattenIndexedModel(&humanModel,&indexedHumanModel);
        tri_flattenIndexedModel(&eyeModel,&indexedEyeModel);
        tri_flattenIndexedModel(&hairModel,&indexedHairModel);
        tri_flattenIndexedModel(&eyebrowsModel,&indexedEyebrowsModel);
+       tri_flattenIndexedModel(&eyelashesModel,&indexedEyelashesModel);
      }
 
 
@@ -1546,6 +1615,7 @@ int main(int argc,const char **argv)
                 &eyeModel,
                 &hairModel,
                 &eyebrowsModel,
+                &eyelashesModel,
                 WIDTH,
                 HEIGHT,
                 0
