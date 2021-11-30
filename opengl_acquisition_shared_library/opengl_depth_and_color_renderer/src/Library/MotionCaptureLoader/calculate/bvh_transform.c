@@ -943,7 +943,10 @@ int bvh_loadTransformForMotionBuffer(
   bvhTransform->centerPosition[1]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[1];
   bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
 
+  //Regardless of torso return 1!
+  return 1;
 
+/*
   if (!populateTorso)
   {
     //Fast path out of here
@@ -956,7 +959,7 @@ int bvh_loadTransformForMotionBuffer(
        return 0;
      }
     return 1;
-  }
+  }*/
  }
 
  return 0;
@@ -986,12 +989,19 @@ int bvh_loadTransformForFrame(
                                                       bvhTransform,
                                                       populateTorso
                                                     );
+           } else
+           {
+             fprintf(stderr,RED "Could copy Motion frame to buffer for frame %u \n" NORMAL,fID);
            }
+           
          freeMotionBuffer(&frameMotionBuffer);
+       } else
+       {
+        fprintf(stderr,RED "Could not allocate memory for new motion buffer\n" NORMAL);
        }
     } else
     {
-        fprintf(stderr,"Could not allocate memory for BVH Transform\n");
+        fprintf(stderr,RED "Could not allocate memory for BVH Transform\n" NORMAL);
     }
   return result;
 }
