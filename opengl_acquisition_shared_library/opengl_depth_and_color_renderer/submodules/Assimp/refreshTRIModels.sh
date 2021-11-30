@@ -20,6 +20,10 @@ PREFIX="Testexp_"
 ./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --removeprefix $PREFIX --applytexture young_lightskinned_female_diffuse3.png 
 ./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --applytexture braid01_diffuse_mahogany.png
 ./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --applytexture brown_eye.png
+./assimpTester --mesh 3 --convert $MHX2MODEL eyebrows.tri --removeprefix $PREFIX --applytexture eyebrow001.png
+./assimpTester --mesh 4 --convert $MHX2MODEL eyelashes.tri --removeprefix $PREFIX --applytexture eyelashes01.png
+./assimpTester --mesh 5 --convert $MHX2MODEL teeth.tri --removeprefix $PREFIX --applytexture teeth.png
+./assimpTester --mesh 6 --convert $MHX2MODEL tongue.tri --removeprefix $PREFIX --applytexture tongue01_diffuse.png
 
 
 exit 0
