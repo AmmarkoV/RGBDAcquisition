@@ -106,11 +106,14 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
 
   #if USE_FAILSAFE_SHADER==1
    fprintf(stderr,"Overriding %s and %s and using failsafe shaders instead!\n",vertexShaderChar,fragmentShaderChar);
-   glShaderSource(sh->vertexShaderObject, 1, &vertex_source , 0 );
-   glShaderSource(sh->fragmentShaderObject, 1, &fragment_source , 0 );
+   glShaderSource(sh->vertexShaderObject, 1,(const GLchar **) &vertex_source , 0 );
+   glShaderSource(sh->fragmentShaderObject, 1,(const GLchar **) &fragment_source , 0 );
   #else
-   glShaderSource(sh->vertexShaderObject, 1,&sh->vertMem, &sh->vertMemLength);
-   glShaderSource(sh->fragmentShaderObject, 1, &sh->fragMem, &sh->fragMemLength);
+   GLint vertMemLength = (GLint) sh->vertMemLength; //We do this cast to make sure arguments signatures match..
+   glShaderSource(sh->vertexShaderObject, 1,(const GLchar **) &sh->vertMem, &vertMemLength);
+
+   GLint fragMemLength = (GLint) sh->fragMemLength; //We do this cast to make sure arguments signatures match..
+   glShaderSource(sh->fragmentShaderObject, 1,(const GLchar **) &sh->fragMem, &fragMemLength);
   #endif
 
   glCompileShader(sh->vertexShaderObject);

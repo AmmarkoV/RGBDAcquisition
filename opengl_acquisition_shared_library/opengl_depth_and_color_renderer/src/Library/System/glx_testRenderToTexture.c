@@ -24,7 +24,6 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 0.5
-#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
 #define NORMAL   "\033[0m"
@@ -328,19 +327,19 @@ pushObjectToBufferData(
 
     GLuint vPosition = glGetAttribLocation( programID, "vPosition" );               checkOpenGLError(__FILE__, __LINE__);
     glEnableVertexAttribArray( vPosition );                                         checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*) 0);  checkOpenGLError(__FILE__, __LINE__);
 
 
     GLuint vNormal = glGetAttribLocation( programID, "vNormal" );                             checkOpenGLError(__FILE__, __LINE__);
     glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*)(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
 
 
     if ( (colors!=0) && (colorsLength!=0) )
     {
      GLuint vColor = glGetAttribLocation( programID, "vColor" );
      glEnableVertexAttribArray( vColor );
-     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength ) );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( verticesLength + normalsLength ) );
      checkOpenGLError(__FILE__, __LINE__);
     }
 

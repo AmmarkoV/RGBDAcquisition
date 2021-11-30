@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 
 
-#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
+//#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
 // Here we decide which of the two versions we want to use
@@ -51,7 +51,7 @@
 
 #include "../../Scene/scene.h" //just for updateProjectionMatrix
 
-#define NORMAL   "\033[0m"
+#define NORMAL  "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
@@ -131,8 +131,6 @@ int  shaderOGLLighting(struct rendererConfiguration * config)
 int startOGLShaderPipeline(struct rendererConfiguration * config)
 {
 #if USE_GLEW
-#warning "Using GLEW"
-
    if (glewInit() != GLEW_OK)
    {
 		fprintf(stderr, "Failed to initialize GLEW\n");
@@ -197,7 +195,7 @@ int startOGLShaderPipeline(struct rendererConfiguration * config)
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
 
- shaderOGLLighting(&config);
+  shaderOGLLighting(config);
 
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
   //Enable Culling
@@ -274,7 +272,7 @@ void doOGLShaderDrawCalllist(
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
-    fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL, (unsigned long) numberOfVertices/sizeof(float),(unsigned long) numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
+    //fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL, (unsigned long) numberOfVertices/sizeof(float),(unsigned long) numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
 
 
   int generateNewBuffer=1;
@@ -301,18 +299,19 @@ void doOGLShaderDrawCalllist(
 
     vPosition = glGetAttribLocation( program, "vPosition" );                                                                               checkOpenGLError(__FILE__, __LINE__);
     glEnableVertexAttribArray( vPosition );                                                                                                checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );                                                         checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*) 0);                                                              checkOpenGLError(__FILE__, __LINE__);
 
     vNormal = glGetAttribLocation( program, "vNormal" );                                                                                   checkOpenGLError(__FILE__, __LINE__);
     glEnableVertexAttribArray( vNormal );                                                                                                  checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );                                            checkOpenGLError(__FILE__, __LINE__);
+    
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*) numberOfVertices );                                                 checkOpenGLError(__FILE__, __LINE__);
 
 
     if ( (colors!=0) && (numberOfColors!=0) )
     {
      vColor = glGetAttribLocation( program, "vColor" );
      glEnableVertexAttribArray( vColor );
-     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals ) );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVertices + numberOfNormals ) );
      checkOpenGLError(__FILE__, __LINE__);
     }
 
@@ -322,7 +321,7 @@ void doOGLShaderDrawCalllist(
     {
      vTexture = glGetAttribLocation( program, "vTexture" );
      glEnableVertexAttribArray( vTexture );
-     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals + numberOfColors) );
+     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,(GLvoid*)( numberOfVertices + numberOfNormals + numberOfColors) );
      checkOpenGLError(__FILE__, __LINE__);
 
      //textureStrength[0]=1.0;

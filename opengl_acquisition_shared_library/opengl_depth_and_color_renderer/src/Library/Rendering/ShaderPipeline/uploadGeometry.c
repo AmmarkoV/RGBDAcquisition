@@ -14,8 +14,7 @@
 #include <GL/glu.h>
 
 #include "../../Tools/tools.h"
-
-#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
+ 
 
 GLuint
 pushObjectToBufferData(
@@ -99,7 +98,7 @@ pushObjectToBufferData(
      if ( (GL_INVALID_OPERATION!=vPosition) && (vPosition!=-1) )
      {
       glEnableVertexAttribArray(vPosition);                                                  checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(memoryOffset));    checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
       memoryOffset+=sizeOfVertices;
      }
     }
@@ -111,7 +110,7 @@ pushObjectToBufferData(
      if ( (GL_INVALID_OPERATION != vColor) && (vColor!=-1) )
      {
       glEnableVertexAttribArray(vColor);                                                     checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(memoryOffset));       checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
       memoryOffset+=sizeOfColors;
      }
     }
@@ -123,7 +122,7 @@ pushObjectToBufferData(
      if ( (GL_INVALID_OPERATION != vNormal) && (vNormal!=-1) )
      {
       glEnableVertexAttribArray(vNormal);                                                    checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(memoryOffset));      checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);      checkOpenGLError(__FILE__, __LINE__);
       memoryOffset+=sizeOfNormals;
      }
     }
@@ -136,7 +135,7 @@ pushObjectToBufferData(
      if ( (GL_INVALID_OPERATION != vTexture ) && (vTexture!=-1) )
      {
       glEnableVertexAttribArray(vTexture);                                                   checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(memoryOffset));     checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);     checkOpenGLError(__FILE__, __LINE__);
       memoryOffset+=sizeOfTextureCoords;
      }
     }
