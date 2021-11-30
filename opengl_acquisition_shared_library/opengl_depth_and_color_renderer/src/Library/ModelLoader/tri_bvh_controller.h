@@ -469,13 +469,21 @@ const static int animateTRIModelUsingBVHArmature(
                                                       );
                         } else
                         {
+
+                         multiplyTwo4x4FMatrices_Naive(
+                                                         &transformations4x4[boneID*16],
+                                                         bvhTransform.joint[jID].dynamicRotation.m,
+                                                         boneRollCorrection.m
+                                                      );
+
+                            /*
                          multiplyThree4x4FMatrices_Naive(
                                                          &transformations4x4[boneID*16],
                                                          bvhTransform.joint[jID].dynamicRotation.m,
                                                          boneRollCorrection.m,
                                                          bvhTransform.joint[jID].dynamicTranslation.m
                                                          //localBone.m
-                                                        );
+                                                        );*/
 
                         }
                     }

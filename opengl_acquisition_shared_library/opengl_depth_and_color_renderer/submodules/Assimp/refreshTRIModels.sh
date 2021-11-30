@@ -18,10 +18,10 @@ PREFIX="Testexp_"
 ./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --applytexture braid01_diffuse_mahogany.png
 ./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --applytexture brown_eye.png
 
+scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
 
 exit 0
 
-scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri ammar@ammar.gr:/home/ammar/public_html/mocapnet/mnet4/
 
 
 

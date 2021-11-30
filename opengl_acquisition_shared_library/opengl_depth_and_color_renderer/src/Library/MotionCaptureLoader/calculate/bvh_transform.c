@@ -664,10 +664,10 @@ static inline void bvh_performActualTransform(
 
    //Also do 3D position output calculation..
    //------------------------------------------------------
-   bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].localToWorldTransformation.m[3];
-   bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].localToWorldTransformation.m[7];
-   bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].localToWorldTransformation.m[11];
-   bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].localToWorldTransformation.m[15];
+   bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].chainTransformation.m[3];
+   bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].chainTransformation.m[7];
+   bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].chainTransformation.m[11];
+   bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].chainTransformation.m[15];
    normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
 
    return;
@@ -993,7 +993,7 @@ int bvh_loadTransformForFrame(
            {
              fprintf(stderr,RED "Could copy Motion frame to buffer for frame %u \n" NORMAL,fID);
            }
-           
+
          freeMotionBuffer(&frameMotionBuffer);
        } else
        {

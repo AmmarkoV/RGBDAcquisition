@@ -637,7 +637,7 @@ void recursiveJointHierarchyTransformerDirect(
         { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
   //-----------------------------
 
-  float emptyParentTransform[16],globalTransformation[16],nodeTransformation[16];
+  float emptyParentTransform[16], globalTransformation[16], nodeTransformation[16];
   float * parentTransform = parentTransformUntouched;
 
   if (parentTransformUntouched==0)
@@ -663,8 +663,13 @@ void recursiveJointHierarchyTransformerDirect(
      }
 
   //We calculate the globalTransformation of the node by chaining it to its parent..!
-  multiplyTwo4x4FMatrices_Naive(globalTransformation,parentTransform,nodeTransformation);
+  multiplyTwo4x4FMatrices_Naive(
+                                 globalTransformation,
+                                 parentTransform,
+                                 nodeTransformation
+                               );
 
+  //Since we have everything ready, let's store the bone position..
   struct Vector4x1OfFloats boneCenter={0}; boneCenter.m[3]=1.0;
   transform3DPointFVectorUsing4x4FMatrix_Naive(boneCenter.m,globalTransformation,boneCenter.m);
   in->bones[curBone].info->x = boneCenter.m[0];
@@ -693,6 +698,8 @@ void recursiveJointHierarchyTransformerDirect(
                                                  recursionLevel+1
                                                 );
       }
+
+  return;
 }
 
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
