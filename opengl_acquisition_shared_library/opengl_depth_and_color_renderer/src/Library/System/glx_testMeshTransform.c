@@ -35,6 +35,7 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
+#include "../Rendering/ShaderPipeline/uploadTextures.h"
 #include "../Rendering/downloadFromRenderer.h"
 
 //Colored console output..
@@ -1477,6 +1478,39 @@ int main(int argc,const char **argv)
 
    bvh_printBVH(&mc);
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
+
+
+   if (indexedHumanModel.textureData!=0)
+   {
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedHumanModel.header.textureBindGLBuffer,
+                                 &indexedHumanModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedHumanModel.textureData,
+                                  indexedHumanModel.header.textureDataWidth,
+                                  indexedHumanModel.header.textureDataHeight,
+                                  indexedHumanModel.header.textureDataChannels,
+                                  24
+                                );
+
+   }
+
+   if (indexedEyeModel.textureData!=0)
+   {
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedEyeModel.header.textureBindGLBuffer,
+                                 &indexedEyeModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedEyeModel.textureData,
+                                  indexedEyeModel.header.textureDataWidth,
+                                  indexedEyeModel.header.textureDataHeight,
+                                  indexedEyeModel.header.textureDataChannels,
+                                  24
+                                );
+
+   }
+
+
 
 
    //------------------------------------------------------

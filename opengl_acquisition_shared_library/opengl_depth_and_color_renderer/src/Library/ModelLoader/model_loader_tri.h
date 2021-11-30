@@ -127,7 +127,7 @@ struct TRI_Header
      unsigned int textureDataHeight;
      unsigned int textureDataChannels;
      unsigned int textureBindGLBuffer;
-     unsigned int notUsed;
+     unsigned int textureUploadedToGPU;
 };
 
 
