@@ -170,7 +170,7 @@ void tri_deallocModelInternals(struct TRI_Model * triModel)
   triModel->header.textureDataWidth = 0;
   triModel->header.textureDataHeight = 0;
   triModel->header.textureDataChannels = 0;
-  if (triModel->header.textureUploadedToGPU)
+  if ( (triModel->textureData!=0) && (triModel->header.textureUploadedToGPU) )
   {
     fprintf(stderr,"texture contains GPU pointer, not losing it..\n");
     //triModel->header.textureBindGLBuffer;
@@ -353,7 +353,7 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
     if ( (indexed->indices==0) || (indexed->header.numberOfIndices==0) )
     {
       fprintf(stderr,RED "\nerror : Supposedly indexed model is not indexed..!\n" NORMAL);
-      tri_copyModel(triModel,indexed,1);
+      tri_copyModel(triModel,indexed,1,0);
       return 1;
     }
 
@@ -365,7 +365,7 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
       struct TRI_Model * temporary = allocateModelTri();
       if (temporary!=0)
       {
-       tri_copyModel(temporary,indexed,1);
+       tri_copyModel(temporary,indexed,1,0);
        int result = fillFlatModelTriFromIndexedModelTri(triModel,temporary);
        tri_freeModel(temporary);
        temporary=0;
@@ -508,7 +508,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * flatOutput,struct TRI
 
 
 
-void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
+void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures, int copyTextureData)
 {
   //fprintf(stderr,MAGENTA "tri_copyModel ..\n" NORMAL);
   if (triModelOUT==0)           { return; }
@@ -571,11 +571,14 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
     triModelOUT->header.numberOfBones=0;
   }
 
-  itemSize=sizeof(char); count=triModelIN->header.textureDataChannels * triModelIN->header.textureDataWidth * triModelIN->header.textureDataHeight ; allocationSize = itemSize * count;
-  //fprintf(stderr,"Copying %u bytes of textureData ..\n", allocationSize);
-  if (triModelOUT->textureData!=0)  { free(triModelOUT->textureData); triModelOUT->textureData=0; }
-  if ((triModelIN->textureData!=0) && (allocationSize>0))  { triModelOUT->textureData = (char *) malloc(allocationSize); }
-  memcpy(triModelOUT->textureData , triModelIN->textureData , allocationSize);
+  if (copyTextureData)
+  {
+    itemSize=sizeof(char); count=triModelIN->header.textureDataChannels * triModelIN->header.textureDataWidth * triModelIN->header.textureDataHeight ; allocationSize = itemSize * count;
+    //fprintf(stderr,"Copying %u bytes of textureData ..\n", allocationSize);
+    if (triModelOUT->textureData!=0)  { free(triModelOUT->textureData); triModelOUT->textureData=0; }
+    if ((triModelIN->textureData!=0) && (allocationSize>0))  { triModelOUT->textureData = (char *) malloc(allocationSize); }
+    memcpy(triModelOUT->textureData , triModelIN->textureData , allocationSize);
+  }
 
  return ;
 }
@@ -583,7 +586,7 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
 {
   fprintf(stderr,YELLOW "copyModelTri is deprecated\n" NORMAL);
-  tri_copyModel(triModelOUT,triModelIN,copyBoneStructures);
+  tri_copyModel(triModelOUT,triModelIN,copyBoneStructures,0);
 }
 
 

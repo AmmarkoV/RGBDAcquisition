@@ -431,7 +431,7 @@ int tri_deepCopyBoneValuesButNotStructure(struct TRI_Model * target,struct TRI_M
 * @param  input TRI model
 * @param  switch to control copying bones
 */
-void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);
+void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures, int copyTextureData);
 
 /**
 * @brief Deprecated function, use tri_copyModel instead..

@@ -246,19 +246,29 @@ int doOGLSingleDrawing(
 int doOGLDrawing(
                  int programID,
                  GLuint MVPMatrixID,
+                 //------------------
                  GLuint eyelashesVao,
                  unsigned int eyelashesTriangleCount,
+                 GLuint eyelashesTextureID,
+                 //------------------
                  GLuint eyebrowsVao,
                  unsigned int eyebrowsTriangleCount,
+                 GLuint eyebrowsTextureID,
+                 //------------------
                  GLuint hairVao,
                  unsigned int hairTriangleCount,
+                 GLuint hairTextureID,
+                 //------------------
                  GLuint eyeVao,
                  unsigned int eyeTriangleCount,
                  GLuint eyeTextureID,
+                 //------------------
                  struct pose6D * humanPose,
+                 //------------------
                  GLuint humanVao,
                  unsigned int humanTriangleCount,
                  GLuint humanTextureID,
+                 //------------------
                  unsigned int width,
                  unsigned int height
                 )
@@ -303,7 +313,7 @@ int doOGLDrawing(
                                      programID,
                                      eyelashesVao,
                                      MVPMatrixID,
-                                     0,//TextureID
+                                     eyelashesTextureID,
                                      eyelashesTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -317,7 +327,7 @@ int doOGLDrawing(
                                      programID,
                                      eyebrowsVao,
                                      MVPMatrixID,
-                                     0,//TextureID
+                                     eyebrowsTextureID,
                                      eyebrowsTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -331,7 +341,7 @@ int doOGLDrawing(
                                      programID,
                                      hairVao,
                                      MVPMatrixID,
-                                     0,//TextureID
+                                     hairTextureID,
                                      hairTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -375,7 +385,7 @@ int doOGLDrawing(
                   programID,
                   eyelashesVao,
                   MVPMatrixID,
-                  0,//TextureID
+                  eyelashesTextureID,
                   eyelashesTriangleCount,
                   //-------------
                   humanPose->x,
@@ -394,7 +404,7 @@ int doOGLDrawing(
                   programID,
                   eyebrowsVao,
                   MVPMatrixID,
-                  0,//TextureID
+                  eyebrowsTextureID,
                   eyebrowsTriangleCount,
                   //-------------
                   humanPose->x,
@@ -413,7 +423,7 @@ int doOGLDrawing(
                   programID,
                   hairVao,
                   MVPMatrixID,
-                  0,//TextureID
+                  hairTextureID,
                   hairTriangleCount,
                   //-------------
                   humanPose->x,
@@ -637,19 +647,29 @@ int doDrawing(
         doOGLDrawing(
                      programID,
                      MVPMatrixID,
+                     //------------------------
                      eyelashesVAO,
                      eyelashesTriangleCount,
+                     eyelashesModel->header.textureBindGLBuffer,
+                     //------------------------
                      eyebrowsVAO,
                      eyebrowsTriangleCount,
+                     eyebrowsModel->header.textureBindGLBuffer,
+                     //------------------------
                      hairVAO,
                      hairTriangleCount,
+                     hairModel->header.textureBindGLBuffer,
+                     //------------------------
                      eyeVAO,
                      eyeTriangleCount,
                      eyeModel->header.textureBindGLBuffer,
+                     //------------------------
                      humanPose,
+                     //------------------------
                      humanVAO,
                      humanTriangleCount,
                      humanModel->header.textureBindGLBuffer,
+                     //------------------------
                      WIDTH,
                      HEIGHT
                     );

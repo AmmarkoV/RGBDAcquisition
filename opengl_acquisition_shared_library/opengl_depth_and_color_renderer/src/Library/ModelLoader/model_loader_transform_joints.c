@@ -843,7 +843,7 @@ int doModelTransform(
   if (performVertexTransform)
   {
     //Past checks..
-   tri_copyModel(triModelOut,triModelIn,1); //Last 1 means we also want bone data
+   tri_copyModel(triModelOut,triModelIn,1,0); //Last 1 means we also want bone data , Last 0 means we dont need to copy texture data
    applyVertexTransformation( triModelOut ,  triModelIn );
   }
 

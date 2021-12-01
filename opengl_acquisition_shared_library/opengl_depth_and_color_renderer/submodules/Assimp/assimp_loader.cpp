@@ -484,7 +484,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
        if (returnIndexedModel)
        {
         fprintf(stderr,"Giving back indexed mesh\n");
-        tri_copyModel( triModel , originalModel , 1);
+        tri_copyModel( triModel , originalModel , 1, 1);
        } else
        {
         fprintf(stderr,"Flattening mesh\n");

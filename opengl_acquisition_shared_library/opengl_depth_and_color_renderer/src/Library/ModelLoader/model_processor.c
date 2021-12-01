@@ -10,7 +10,7 @@ void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Mod
 {
   fprintf(stderr,"compressTRIModelToJointOnly does not work correctly yet.. \n");
 
-  tri_copyModel(triModelOUT,triModelIN,1);
+  tri_copyModel(triModelOUT,triModelIN,1,0);
 
   unsigned int outputNumberOfJoints=0;
   float * triJoints = convertTRIBonesToJointPositions(triModelOUT,&outputNumberOfJoints);
