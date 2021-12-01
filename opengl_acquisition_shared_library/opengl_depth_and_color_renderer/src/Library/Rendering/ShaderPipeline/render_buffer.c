@@ -314,8 +314,14 @@ int drawVertexArrayWithMVPMatrices(
   transpose4x4FMatrix(MVP.m); //OpenGL needs a column-major/row-major flip..
   //-------------------------------------------------------------------
 
+  GLint textureLocation = 0;
   if (TextureID!=0)
-    { glBindTexture(GL_TEXTURE_2D,TextureID); checkOpenGLError(__FILE__, __LINE__); }
+    {
+      glActiveTexture(GL_TEXTURE0);           checkOpenGLError(__FILE__, __LINE__);
+      glBindTexture(GL_TEXTURE_2D,TextureID); checkOpenGLError(__FILE__, __LINE__);
+      textureLocation = glGetUniformLocation(programID, "renderedTexture");
+      glUniform1i(textureLocation, 0); checkOpenGLError(__FILE__, __LINE__);
+    }
 
   // Send our transformation to the currently bound shader, in the "MVP" uniform
   glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
@@ -338,7 +344,11 @@ int drawVertexArrayWithMVPMatrices(
 
   glPopAttrib();
   if (TextureID!=0)
-    { glBindTexture(GL_TEXTURE_2D,0); checkOpenGLError(__FILE__, __LINE__); }
+    {
+      glActiveTexture(GL_TEXTURE0);    checkOpenGLError(__FILE__, __LINE__);
+      glBindTexture(GL_TEXTURE_2D,0);  checkOpenGLError(__FILE__, __LINE__);
+      glUniform1i(textureLocation, 0); checkOpenGLError(__FILE__, __LINE__);
+    }
 
   glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
   return 1;

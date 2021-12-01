@@ -708,6 +708,7 @@ int doDrawing(
 
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
+	//-------------------------------------
 	glDeleteBuffers(1, &eyelashesArrayBuffer);
 	glDeleteBuffers(1, &eyebrowsArrayBuffer);
 	glDeleteBuffers(1, &hairArrayBuffer);
