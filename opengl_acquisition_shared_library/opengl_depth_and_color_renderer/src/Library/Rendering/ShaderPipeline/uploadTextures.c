@@ -38,26 +38,25 @@ int uploadColorImageAsTexture(
     *alreadyUploaded=1;
     glBindTexture(GL_TEXTURE_2D,*textureID);
 
-      /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
-      glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
-      checkOpenGLError(__FILE__, __LINE__);
-      glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RGB,
-                    colorWidth ,
-                    colorHeight,
-                    0,
-                    GL_RGB,
-                    GL_UNSIGNED_BYTE,
-                    (const GLvoid *) colorPixels
-                  );
-      checkOpenGLError(__FILE__, __LINE__);
+    /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);                                   checkOpenGLError(__FILE__, __LINE__);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);           checkOpenGLError(__FILE__, __LINE__);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);           checkOpenGLError(__FILE__, __LINE__);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       checkOpenGLError(__FILE__, __LINE__);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       checkOpenGLError(__FILE__, __LINE__);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);            checkOpenGLError(__FILE__, __LINE__);
+    glTexImage2D(
+                 GL_TEXTURE_2D,
+                 0,
+                 GL_RGB,
+                 colorWidth ,
+                 colorHeight,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,
+                 (const GLvoid *) colorPixels
+                );
+    checkOpenGLError(__FILE__, __LINE__);
 
     glFlush();
     return 1;

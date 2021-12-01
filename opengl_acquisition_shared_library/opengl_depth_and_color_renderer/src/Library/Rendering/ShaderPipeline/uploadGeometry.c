@@ -14,7 +14,7 @@
 #include <GL/glu.h>
 
 #include "../../Tools/tools.h"
- 
+
 
 GLuint
 pushObjectToBufferData(
@@ -135,7 +135,7 @@ pushObjectToBufferData(
      if ( (GL_INVALID_OPERATION != vTexture ) && (vTexture!=-1) )
      {
       glEnableVertexAttribArray(vTexture);                                                   checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);     checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,0,(GLvoid*) memoryOffset);          checkOpenGLError(__FILE__, __LINE__);
       memoryOffset+=sizeOfTextureCoords;
      }
     }

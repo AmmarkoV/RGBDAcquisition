@@ -277,6 +277,14 @@ int doOGLDrawing(
   struct Matrix4x4OfFloats viewportMatrix;
   struct Matrix4x4OfFloats viewMatrix;
 
+  /*
+  fprintf(stderr,"eyelashesTextureID = %u \n",eyelashesTextureID);
+  fprintf(stderr,"eyebrowsTextureID = %u \n",eyebrowsTextureID);
+  fprintf(stderr,"hairTextureID = %u \n",hairTextureID);
+  fprintf(stderr,"eyeTextureID = %u \n",eyeTextureID);
+  fprintf(stderr,"humanTextureID = %u \n",humanTextureID);*/
+
+
   prepareRenderingMatrices(
                               fX,  //fx
                               fY,  //fy
@@ -1616,6 +1624,13 @@ int main(int argc,const char **argv)
    }
 
 
+
+
+  fprintf(stderr,"eyelashesTextureID = %u \n",indexedEyelashesModel.header.textureBindGLBuffer);
+  fprintf(stderr,"eyebrowsTextureID = %u \n",indexedEyebrowsModel.header.textureBindGLBuffer);
+  fprintf(stderr,"hairTextureID = %u \n",indexedHairModel.header.textureBindGLBuffer);
+  fprintf(stderr,"eyeTextureID = %u \n",indexedEyeModel.header.textureBindGLBuffer);
+  fprintf(stderr,"humanTextureID = %u \n",indexedHumanModel.header.textureBindGLBuffer);
 
 
 

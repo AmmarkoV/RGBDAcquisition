@@ -314,20 +314,6 @@ int drawVertexArrayWithMVPMatrices(
   transpose4x4FMatrix(MVP.m); //OpenGL needs a column-major/row-major flip..
   //-------------------------------------------------------------------
 
-  GLint textureLocation = 0;
-  if (TextureID!=0)
-    {
-      glActiveTexture(GL_TEXTURE0);           checkOpenGLError(__FILE__, __LINE__);
-      glBindTexture(GL_TEXTURE_2D,TextureID); checkOpenGLError(__FILE__, __LINE__);
-      textureLocation = glGetUniformLocation(programID, "renderedTexture");
-      glUniform1i(textureLocation, 0); checkOpenGLError(__FILE__, __LINE__);
-    }
-
-  // Send our transformation to the currently bound shader, in the "MVP" uniform
-  glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
-
-
-
   glPushAttrib(GL_ALL_ATTRIB_BITS);
   //Our flipped view needs front culling..
   glCullFace(GL_FRONT);
@@ -339,16 +325,32 @@ int drawVertexArrayWithMVPMatrices(
   //-------------------------------------------------
 
 
+  GLint textureLocation = 0;
+  if (TextureID!=0)
+    {
+      fprintf(stderr,"renderingTexture %u\n",TextureID);
+      glEnable(GL_TEXTURE_2D);
+      glActiveTexture(GL_TEXTURE0);                                         checkOpenGLError(__FILE__, __LINE__);
+      glBindTexture(GL_TEXTURE_2D,TextureID);                               checkOpenGLError(__FILE__, __LINE__);
+      textureLocation = glGetUniformLocation(programID, "renderedTexture"); checkOpenGLError(__FILE__, __LINE__);
+      glUniform1i(textureLocation, 0);                                      checkOpenGLError(__FILE__, __LINE__);
+    }
+
+  // Send our transformation to the currently bound shader, in the "MVP" uniform
+  glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
+
+
   glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
 
 
-  glPopAttrib();
   if (TextureID!=0)
     {
       glActiveTexture(GL_TEXTURE0);    checkOpenGLError(__FILE__, __LINE__);
       glBindTexture(GL_TEXTURE_2D,0);  checkOpenGLError(__FILE__, __LINE__);
       glUniform1i(textureLocation, 0); checkOpenGLError(__FILE__, __LINE__);
     }
+
+  glPopAttrib();
 
   glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
   return 1;

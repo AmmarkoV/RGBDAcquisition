@@ -394,6 +394,9 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
     triModel->header.numberOfColors        = indexed->header.numberOfIndices*3;
     triModel->header.numberOfIndices       = 0;
     triModel->header.numberOfBones         = 0; //This will get filled in later
+    //We don't care about anything texture related but we must propagate the GL buffer TextureID
+    triModel->header.textureBindGLBuffer   = indexed->header.textureBindGLBuffer;
+    triModel->header.textureUploadedToGPU  = indexed->header.textureUploadedToGPU;
 
     //fprintf(stderr,YELLOW "\nwarning : Flattening a model loses its bone structure for now..\n" NORMAL);
 
