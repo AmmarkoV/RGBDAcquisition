@@ -290,6 +290,7 @@ int drawVertexArrayWithMVPMatrices(
                                    GLuint programID,
                                    GLuint vao,
                                    GLuint MatrixID,
+                                   GLuint TextureID,
                                    unsigned int triangleCount,
                                    //-----------------------------------------
                                    struct Matrix4x4OfFloats * modelMatrix,
@@ -313,7 +314,8 @@ int drawVertexArrayWithMVPMatrices(
   transpose4x4FMatrix(MVP.m); //OpenGL needs a column-major/row-major flip..
   //-------------------------------------------------------------------
 
-
+  if (TextureID!=0)
+    { glBindTexture(GL_TEXTURE_2D,TextureID); checkOpenGLError(__FILE__, __LINE__); }
 
   // Send our transformation to the currently bound shader, in the "MVP" uniform
   glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
@@ -335,6 +337,9 @@ int drawVertexArrayWithMVPMatrices(
 
 
   glPopAttrib();
+  if (TextureID!=0)
+    { glBindTexture(GL_TEXTURE_2D,0); checkOpenGLError(__FILE__, __LINE__); }
+
   glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
   return 1;
 }

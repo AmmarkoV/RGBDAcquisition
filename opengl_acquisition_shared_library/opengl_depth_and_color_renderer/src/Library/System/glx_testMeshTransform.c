@@ -92,6 +92,7 @@ int drawObjectAT(
                  GLuint programID,
                  GLuint vao,
                  GLuint MatrixID,
+                 GLuint TextureID,
                  unsigned int triangleCount,
                  //-----------------------------------------
                  float x,
@@ -131,6 +132,7 @@ int drawObjectAT(
                                              programID,
                                              vao,
                                              MatrixID,
+                                             TextureID,
                                              triangleCount,
                                              //-----------------------------------------
                                              &modelMatrix,
@@ -149,6 +151,7 @@ int drawObjectAT(
 int doOGLSingleDrawing(
                         int programID,
                         GLuint MVPMatrixID,
+                        GLuint TextureID,
                         struct pose6D * pose,
                         GLuint VAO,
                         unsigned int triangleCount,
@@ -196,6 +199,7 @@ int doOGLSingleDrawing(
                                      programID,
                                      VAO,
                                      MVPMatrixID,
+                                     TextureID,
                                      triangleCount,
                                      //-------------
                                      &pose->m,
@@ -211,6 +215,7 @@ int doOGLSingleDrawing(
                   programID,
                   VAO,
                   MVPMatrixID,
+                  TextureID,
                   triangleCount,
                   //-------------
                   pose->x,
@@ -249,9 +254,11 @@ int doOGLDrawing(
                  unsigned int hairTriangleCount,
                  GLuint eyeVao,
                  unsigned int eyeTriangleCount,
+                 GLuint eyeTextureID,
                  struct pose6D * humanPose,
                  GLuint humanVao,
                  unsigned int humanTriangleCount,
+                 GLuint humanTextureID,
                  unsigned int width,
                  unsigned int height
                 )
@@ -296,6 +303,7 @@ int doOGLDrawing(
                                      programID,
                                      eyelashesVao,
                                      MVPMatrixID,
+                                     0,//TextureID
                                      eyelashesTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -309,6 +317,7 @@ int doOGLDrawing(
                                      programID,
                                      eyebrowsVao,
                                      MVPMatrixID,
+                                     0,//TextureID
                                      eyebrowsTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -322,6 +331,7 @@ int doOGLDrawing(
                                      programID,
                                      hairVao,
                                      MVPMatrixID,
+                                     0,//TextureID
                                      hairTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -335,6 +345,7 @@ int doOGLDrawing(
                                      programID,
                                      eyeVao,
                                      MVPMatrixID,
+                                     eyeTextureID,
                                      eyeTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -348,6 +359,7 @@ int doOGLDrawing(
                                      programID,
                                      humanVao,
                                      MVPMatrixID,
+                                     humanTextureID,
                                      humanTriangleCount,
                                      //-------------
                                      &humanPose->m,
@@ -363,6 +375,7 @@ int doOGLDrawing(
                   programID,
                   eyelashesVao,
                   MVPMatrixID,
+                  0,//TextureID
                   eyelashesTriangleCount,
                   //-------------
                   humanPose->x,
@@ -381,6 +394,7 @@ int doOGLDrawing(
                   programID,
                   eyebrowsVao,
                   MVPMatrixID,
+                  0,//TextureID
                   eyebrowsTriangleCount,
                   //-------------
                   humanPose->x,
@@ -399,6 +413,7 @@ int doOGLDrawing(
                   programID,
                   hairVao,
                   MVPMatrixID,
+                  0,//TextureID
                   hairTriangleCount,
                   //-------------
                   humanPose->x,
@@ -417,6 +432,7 @@ int doOGLDrawing(
                   programID,
                   eyeVao,
                   MVPMatrixID,
+                  eyeTextureID,
                   eyeTriangleCount,
                   //-------------
                   humanPose->x,
@@ -435,6 +451,7 @@ int doOGLDrawing(
                   programID,
                   humanVao,
                   MVPMatrixID,
+                  humanTextureID,
                   humanTriangleCount,
                   //-------------
                   humanPose->x,
@@ -469,7 +486,7 @@ int initializeOGLRenderer(
 {
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
+	struct shaderObject * sho = loadShader("../../../shaders/simpleWithTexture.vert", "../../../shaders/simpleWithTexture.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); return 0; }
 
 	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebuffer.frag");
@@ -628,9 +645,11 @@ int doDrawing(
                      hairTriangleCount,
                      eyeVAO,
                      eyeTriangleCount,
+                     eyeModel->header.textureBindGLBuffer,
                      humanPose,
                      humanVAO,
                      humanTriangleCount,
+                     humanModel->header.textureBindGLBuffer,
                      WIDTH,
                      HEIGHT
                     );
@@ -818,6 +837,7 @@ int doSkeletonDraw(
            doOGLSingleDrawing(
                               programID,
                               MVPMatrixID,
+                              0,
                               &axisPose,
                               axisVAO,
                               axisTriangleCount,
@@ -989,6 +1009,7 @@ int doBVHDraw(
                doOGLSingleDrawing(
                                    programID,
                                    MVPMatrixID,
+                                   0,
                                    &axisPose,
                                    axisVAO,
                                    axisTriangleCount,
@@ -1492,7 +1513,9 @@ int main(int argc,const char **argv)
                                   indexedHumanModel.header.textureDataChannels,
                                   24
                                 );
-
+      //Don't copy data around since its already on GPU
+      //free(indexedHumanModel.textureData);
+      //indexedHumanModel.textureData=0;
    }
 
    if (indexedEyeModel.textureData!=0)
@@ -1507,8 +1530,63 @@ int main(int argc,const char **argv)
                                   indexedEyeModel.header.textureDataChannels,
                                   24
                                 );
-
+      //Don't copy data around since its already on GPU
+      //free(indexedEyeModel.textureData);
+      //indexedEyeModel.textureData=0;
    }
+
+   if (indexedHairModel.textureData!=0)
+   {
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedHairModel.header.textureBindGLBuffer,
+                                 &indexedHairModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedHairModel.textureData,
+                                  indexedHairModel.header.textureDataWidth,
+                                  indexedHairModel.header.textureDataHeight,
+                                  indexedHairModel.header.textureDataChannels,
+                                  24
+                                );
+      //Don't copy data around since its already on GPU
+      //free(indexedHairModel.textureData);
+      //indexedHairModel.textureData=0;
+   }
+
+   if (indexedEyebrowsModel.textureData!=0)
+   {
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedEyebrowsModel.header.textureBindGLBuffer,
+                                 &indexedEyebrowsModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedEyebrowsModel.textureData,
+                                  indexedEyebrowsModel.header.textureDataWidth,
+                                  indexedEyebrowsModel.header.textureDataHeight,
+                                  indexedEyebrowsModel.header.textureDataChannels,
+                                  24
+                                );
+      //Don't copy data around since its already on GPU
+      //free(indexedEyebrowsModel.textureData);
+      //indexedEyebrowsModel.textureData=0;
+   }
+
+
+   if (indexedEyelashesModel.textureData!=0)
+   {
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedEyelashesModel.header.textureBindGLBuffer,
+                                 &indexedEyelashesModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedEyelashesModel.textureData,
+                                  indexedEyelashesModel.header.textureDataWidth,
+                                  indexedEyelashesModel.header.textureDataHeight,
+                                  indexedEyelashesModel.header.textureDataChannels,
+                                  24
+                                );
+      //Don't copy data around since its already on GPU
+      //free(indexedEyelashesModel.textureData);
+      //indexedEyelashesModel.textureData=0;
+   }
+
 
 
 

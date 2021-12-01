@@ -165,6 +165,19 @@ void tri_deallocModelInternals(struct TRI_Model * triModel)
 
    if (triModel->bones!=0)         { free(triModel->bones); triModel->bones=0; }
 
+
+
+  triModel->header.textureDataWidth = 0;
+  triModel->header.textureDataHeight = 0;
+  triModel->header.textureDataChannels = 0;
+  if (triModel->header.textureUploadedToGPU)
+  {
+    fprintf(stderr,"texture contains GPU pointer, not losing it..\n");
+    //triModel->header.textureBindGLBuffer;
+    //triModel->header.textureUploadedToGPU;
+  }
+  if (triModel->textureData!=0) { free(triModel->textureData); triModel->textureData=0; }
+
    //Make sure everything is wiped clean..
    memset(triModel,0,sizeof(struct TRI_Model));
 }
