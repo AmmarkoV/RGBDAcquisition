@@ -360,11 +360,11 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"  %d bytes of colors\n",colorSize);
     fprintf(stderr,"  %d bytes of indices\n",indexSize);
 
-    memset(triModel->vertices, 0 , verticesSize );
-    memset(triModel->normal, 0 , normalsSize );
+    memset(triModel->vertices,      0 , verticesSize );
+    memset(triModel->normal,        0 , normalsSize );
     memset(triModel->textureCoords, 0 , textureCoordsSize );
-    memset(triModel->colors, 0 , colorSize );
-    memset(triModel->indices, 0 , indexSize );
+    memset(triModel->colors,        0 , colorSize );
+    memset(triModel->indices,       0 , indexSize );
 
 
 
@@ -408,7 +408,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
       if (mesh->mTextureCoords[0])
         {
 		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
-		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y;
+		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y; // 1 -  y  | Why swap y?
 		}
 
         unsigned int colourSet = 0;

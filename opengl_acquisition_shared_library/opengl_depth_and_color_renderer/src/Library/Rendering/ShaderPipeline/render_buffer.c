@@ -292,6 +292,7 @@ int drawVertexArrayWithMVPMatrices(
                                    GLuint MatrixID,
                                    GLuint TextureID,
                                    unsigned int triangleCount,
+                                   unsigned int elementCount,
                                    //-----------------------------------------
                                    struct Matrix4x4OfFloats * modelMatrix,
                                    //-----------------------------------------
@@ -340,8 +341,14 @@ int drawVertexArrayWithMVPMatrices(
   glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/,MVP.m);
 
 
-  glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
 
+  if (elementCount!=0)
+  {
+    glDrawElements(GL_TRIANGLES,  elementCount ,GL_UNSIGNED_INT,(void*)0);   checkOpenGLError(__FILE__, __LINE__);
+  } else
+  {
+    glDrawArrays(GL_TRIANGLES, 0, triangleCount );                           checkOpenGLError(__FILE__, __LINE__);
+  }
 
   if (TextureID!=0)
     {

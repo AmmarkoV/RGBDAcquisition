@@ -59,6 +59,7 @@ int drawVertexArrayWithMVPMatrices(
                                    GLuint MatrixID,
                                    GLuint TextureID,
                                    unsigned int triangleCount,
+                                   unsigned int elementCount,
                                    //-----------------------------------------
                                    struct Matrix4x4OfFloats * modelMatrix,
                                    //-----------------------------------------

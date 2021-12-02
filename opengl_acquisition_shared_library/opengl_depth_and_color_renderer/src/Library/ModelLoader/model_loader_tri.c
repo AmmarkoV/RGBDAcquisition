@@ -969,15 +969,16 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
         triModel->textureData=0;
     }
 
-    triModel->header.textureDataWidth = width;
-    triModel->header.textureDataHeight = height;
+    triModel->header.textureDataWidth    = width;
+    triModel->header.textureDataHeight   = height;
     triModel->header.textureDataChannels = channels;
 
-    triModel->textureData = (char*) malloc( sizeof(char) * width * height * channels );
+    triModel->textureData = (char*) malloc(sizeof(char) * width * height * channels);
 
     if (triModel->textureData!=0)
     {
-      memcpy(triModel->textureData,pixels,sizeof(char) * width * height * channels );
+      memcpy(triModel->textureData,pixels,sizeof(char) * width * height * channels);
+      return 1;
     }
   }
 

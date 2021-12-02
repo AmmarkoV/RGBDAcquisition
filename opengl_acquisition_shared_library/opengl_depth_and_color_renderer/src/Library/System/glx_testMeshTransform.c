@@ -94,6 +94,7 @@ int drawObjectAT(
                  GLuint MatrixID,
                  GLuint TextureID,
                  unsigned int triangleCount,
+                 unsigned int elementCount,
                  //-----------------------------------------
                  float x,
                  float y,
@@ -134,6 +135,7 @@ int drawObjectAT(
                                              MatrixID,
                                              TextureID,
                                              triangleCount,
+                                             elementCount,
                                              //-----------------------------------------
                                              &modelMatrix,
                                              //-----------------------------------------
@@ -155,6 +157,7 @@ int doOGLSingleDrawing(
                         struct pose6D * pose,
                         GLuint VAO,
                         unsigned int triangleCount,
+                        unsigned int elementCount,
                         unsigned int width,
                         unsigned int height
                       )
@@ -201,6 +204,7 @@ int doOGLSingleDrawing(
                                      MVPMatrixID,
                                      TextureID,
                                      triangleCount,
+                                     elementCount,
                                      //-------------
                                      &pose->m,
                                      //-------------
@@ -217,6 +221,7 @@ int doOGLSingleDrawing(
                   MVPMatrixID,
                   TextureID,
                   triangleCount,
+                  elementCount,
                   //-------------
                   pose->x,
                   pose->y,
@@ -249,24 +254,29 @@ int doOGLDrawing(
                  //------------------
                  GLuint eyelashesVao,
                  unsigned int eyelashesTriangleCount,
+                 unsigned int eyelashesElementCount,
                  GLuint eyelashesTextureID,
                  //------------------
                  GLuint eyebrowsVao,
                  unsigned int eyebrowsTriangleCount,
+                 unsigned int eyebrowsElementCount,
                  GLuint eyebrowsTextureID,
                  //------------------
                  GLuint hairVao,
                  unsigned int hairTriangleCount,
+                 unsigned int hairElementCount,
                  GLuint hairTextureID,
                  //------------------
                  GLuint eyeVao,
                  unsigned int eyeTriangleCount,
+                 unsigned int eyeElementCount,
                  GLuint eyeTextureID,
                  //------------------
                  struct pose6D * humanPose,
                  //------------------
                  GLuint humanVao,
                  unsigned int humanTriangleCount,
+                 unsigned int humanElementCount,
                  GLuint humanTextureID,
                  //------------------
                  unsigned int width,
@@ -323,6 +333,7 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      eyelashesTextureID,
                                      eyelashesTriangleCount,
+                                     eyelashesElementCount,
                                      //-------------
                                      &humanPose->m,
                                      //-------------
@@ -337,6 +348,7 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      eyebrowsTextureID,
                                      eyebrowsTriangleCount,
+                                     eyebrowsElementCount,
                                      //-------------
                                      &humanPose->m,
                                      //-------------
@@ -351,6 +363,7 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      hairTextureID,
                                      hairTriangleCount,
+                                     hairElementCount,
                                      //-------------
                                      &humanPose->m,
                                      //-------------
@@ -365,6 +378,7 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      eyeTextureID,
                                      eyeTriangleCount,
+                                     eyeElementCount,
                                      //-------------
                                      &humanPose->m,
                                      //-------------
@@ -379,6 +393,7 @@ int doOGLDrawing(
                                      MVPMatrixID,
                                      humanTextureID,
                                      humanTriangleCount,
+                                     humanElementCount,
                                      //-------------
                                      &humanPose->m,
                                      //-------------
@@ -395,6 +410,7 @@ int doOGLDrawing(
                   MVPMatrixID,
                   eyelashesTextureID,
                   eyelashesTriangleCount,
+                  eyelashesElementCount,
                   //-------------
                   humanPose->x,
                   humanPose->y,
@@ -414,6 +430,7 @@ int doOGLDrawing(
                   MVPMatrixID,
                   eyebrowsTextureID,
                   eyebrowsTriangleCount,
+                  eyebrowsElementCount,
                   //-------------
                   humanPose->x,
                   humanPose->y,
@@ -433,6 +450,7 @@ int doOGLDrawing(
                   MVPMatrixID,
                   hairTextureID,
                   hairTriangleCount,
+                  hairElementCount,
                   //-------------
                   humanPose->x,
                   humanPose->y,
@@ -452,6 +470,7 @@ int doOGLDrawing(
                   MVPMatrixID,
                   eyeTextureID,
                   eyeTriangleCount,
+                  eyeElementCount,
                   //-------------
                   humanPose->x,
                   humanPose->y,
@@ -471,6 +490,7 @@ int doOGLDrawing(
                   MVPMatrixID,
                   humanTextureID,
                   humanTriangleCount,
+                  humanElementCount,
                   //-------------
                   humanPose->x,
                   humanPose->y,
@@ -668,24 +688,29 @@ int doDrawing(
                      //------------------------
                      eyelashesVAO,
                      eyelashesTriangleCount,
+                     eyelashesModel->header.numberOfIndices,
                      eyelashesModel->header.textureBindGLBuffer,
                      //------------------------
                      eyebrowsVAO,
                      eyebrowsTriangleCount,
+                     eyebrowsModel->header.numberOfIndices,
                      eyebrowsModel->header.textureBindGLBuffer,
                      //------------------------
                      hairVAO,
                      hairTriangleCount,
+                     hairModel->header.numberOfIndices,
                      hairModel->header.textureBindGLBuffer,
                      //------------------------
                      eyeVAO,
                      eyeTriangleCount,
+                     eyeModel->header.numberOfIndices,
                      eyeModel->header.textureBindGLBuffer,
                      //------------------------
                      humanPose,
                      //------------------------
                      humanVAO,
                      humanTriangleCount,
+                     humanModel->header.numberOfIndices,
                      humanModel->header.textureBindGLBuffer,
                      //------------------------
                      WIDTH,
@@ -896,6 +921,7 @@ int doSkeletonDraw(
                               &axisPose,
                               axisVAO,
                               axisTriangleCount,
+                              0,
                               WIDTH,
                               HEIGHT
                             );
@@ -1072,6 +1098,7 @@ int doBVHDraw(
                                    &axisPose,
                                    axisVAO,
                                    axisTriangleCount,
+                                   0,
                                    WIDTH,
                                    HEIGHT
                                  );
