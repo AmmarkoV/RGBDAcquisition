@@ -7,11 +7,11 @@
 
 #include "uploadTextures.h"
 #include "../../Tools/tools.h"
+//#include "../../Tools/save_to_file.h" for debug save
 
 //#include <GL/gl.h>  //Also on header..
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/glu.h>
-
 
 
 int uploadColorImageAsTexture(
@@ -45,20 +45,40 @@ int uploadColorImageAsTexture(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       checkOpenGLError(__FILE__, __LINE__);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       checkOpenGLError(__FILE__, __LINE__);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);            checkOpenGLError(__FILE__, __LINE__);
+
+    GLuint dataFormat = GL_RGBA;
+    GLuint internalFormat = GL_RGBA;
+    if ( colorChannels==3 )
+    {
+        dataFormat = GL_RGB;
+        internalFormat = GL_RGB;
+    }
+
+    //https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
     glTexImage2D(
                  GL_TEXTURE_2D,
                  0,
-                 GL_RGB,
+                 dataFormat,
                  colorWidth ,
                  colorHeight,
                  0,
-                 GL_RGB,
+                 internalFormat,
                  GL_UNSIGNED_BYTE,
                  (const GLvoid *) colorPixels
                 );
     checkOpenGLError(__FILE__, __LINE__);
 
     glFlush();
+
+
+
+    //Dump to file to see output..!
+    //char filename[512];
+    //fprintf(stderr,"Uploading texture %p (%ux%ux%u / %u bits perpixel)\n",colorPixels,colorWidth,colorHeight,colorChannels,colorBitsperpixel);
+    //snprintf(filename,512,"uploadColorImageAsTexture_%u.pnm",*textureID);
+    //saveRawImageToFileOGLR(filename,(void *) colorPixels,colorWidth,colorHeight,colorChannels,colorBitsperpixel/3);
+
+
     return 1;
 }
 

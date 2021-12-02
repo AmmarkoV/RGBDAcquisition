@@ -20,7 +20,8 @@ GLuint
 pushObjectToBufferData(
                              int generateNewVao,
                              GLuint *vao ,
-                             GLuint *arrayBuffer ,
+                             GLuint *arrayBuffer,
+                             GLuint *elementBuffer,
                              GLuint programID  ,
                              const float * vertices , unsigned int sizeOfVertices ,
                              const float * normals , unsigned int sizeOfNormals ,
@@ -30,16 +31,6 @@ pushObjectToBufferData(
                            )
 {
     #if USE_GLEW
-    if (generateNewVao)
-    {
-      glGenVertexArrays(1, vao);     checkOpenGLError(__FILE__, __LINE__);
-    }
-
-    glBindVertexArray(*vao);         checkOpenGLError(__FILE__, __LINE__);
-
-    // Create and initialize a buffer object on the server side (GPU)
-    glGenBuffers( 1, arrayBuffer );                   checkOpenGLError(__FILE__, __LINE__);
-    glBindBuffer( GL_ARRAY_BUFFER, *arrayBuffer );    checkOpenGLError(__FILE__, __LINE__);
 
     unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
     fprintf(stderr,"DrawArray(GL_TRIANGLES,0,%u) ",numVertices);
@@ -56,6 +47,30 @@ pushObjectToBufferData(
     if (textureCoords==0) { sizeOfTextureCoords=0; }
     if (colors==0)        { sizeOfColors=0;        }
     if (indices==0)       { sizeOfIndices=0;       }
+
+
+    if (generateNewVao)
+      { glGenVertexArrays(1, vao);     checkOpenGLError(__FILE__, __LINE__); }
+    glBindVertexArray(*vao);         checkOpenGLError(__FILE__, __LINE__);
+    //--------------------------------------------------------------------------
+
+
+    if (indices!=0)
+    {
+      glGenBuffers(1, elementBuffer);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *elementBuffer);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeOfIndices, indices , GL_STATIC_DRAW);
+    }
+
+
+
+
+    // Create and initialize a buffer object on the server side (GPU)
+    glGenBuffers( 1, arrayBuffer );                   checkOpenGLError(__FILE__, __LINE__);
+    glBindBuffer( GL_ARRAY_BUFFER, *arrayBuffer );    checkOpenGLError(__FILE__, __LINE__);
+
+
+
 
     //Create buffer data..
     GLintptr   memoryOffset=0;

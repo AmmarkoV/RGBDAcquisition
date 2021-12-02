@@ -554,11 +554,13 @@ int doDrawing(
     //------------------------------------------------------------------------------------
     GLuint eyelashesVAO;
     GLuint eyelashesArrayBuffer;
+    GLuint eyelashesElementBuffer;
     unsigned int eyelashesTriangleCount  =  (unsigned int)  eyelashesModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &eyelashesVAO,
                              &eyelashesArrayBuffer,
+                             &eyelashesElementBuffer,
                              programID,
                              eyelashesModel->vertices       ,  eyelashesModel->header.numberOfVertices      * sizeof(float),
                              eyelashesModel->normal         ,  eyelashesModel->header.numberOfNormals       * sizeof(float),
@@ -569,11 +571,13 @@ int doDrawing(
     //------------------------------------------------------------------------------------
     GLuint eyebrowsVAO;
     GLuint eyebrowsArrayBuffer;
+    GLuint eyebrowsElementBuffer;
     unsigned int eyebrowsTriangleCount  =  (unsigned int)  eyebrowsModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &eyebrowsVAO,
                              &eyebrowsArrayBuffer,
+                             &eyebrowsElementBuffer,
                              programID,
                              eyebrowsModel->vertices       ,  eyebrowsModel->header.numberOfVertices      * sizeof(float),
                              eyebrowsModel->normal         ,  eyebrowsModel->header.numberOfNormals       * sizeof(float),
@@ -584,11 +588,13 @@ int doDrawing(
     //------------------------------------------------------------------------------------
     GLuint hairVAO;
     GLuint hairArrayBuffer;
+    GLuint hairElementBuffer;
     unsigned int hairTriangleCount  =  (unsigned int)  hairModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &hairVAO,
                              &hairArrayBuffer,
+                             &hairElementBuffer,
                              programID,
                              hairModel->vertices       ,  hairModel->header.numberOfVertices      * sizeof(float),
                              hairModel->normal         ,  hairModel->header.numberOfNormals       * sizeof(float),
@@ -599,11 +605,13 @@ int doDrawing(
     //------------------------------------------------------------------------------------
     GLuint eyeVAO;
     GLuint eyeArrayBuffer;
+    GLuint eyeElementBuffer;
     unsigned int eyeTriangleCount  =  (unsigned int)  eyeModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &eyeVAO,
                              &eyeArrayBuffer,
+                             &eyeElementBuffer,
                              programID,
                              eyeModel->vertices       ,  eyeModel->header.numberOfVertices      * sizeof(float),
                              eyeModel->normal         ,  eyeModel->header.numberOfNormals       * sizeof(float),
@@ -614,11 +622,13 @@ int doDrawing(
     //------------------------------------------------------------------------------------
     GLuint humanVAO;
     GLuint humanArrayBuffer;
+    GLuint humanElementBuffer;
     unsigned int humanTriangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
+                             &humanElementBuffer,
                              programID,
                              humanModel->vertices       ,  humanModel->header.numberOfVertices      * sizeof(float),
                              humanModel->normal         ,  humanModel->header.numberOfNormals       * sizeof(float),
@@ -723,6 +733,12 @@ int doDrawing(
 	glDeleteBuffers(1, &humanArrayBuffer);
 	glDeleteBuffers(1, &eyeArrayBuffer);
 	//-------------------------------------
+	glDeleteBuffers(1, &eyelashesElementBuffer);
+	glDeleteBuffers(1, &eyebrowsElementBuffer);
+	glDeleteBuffers(1, &hairElementBuffer);
+	glDeleteBuffers(1, &humanElementBuffer);
+	glDeleteBuffers(1, &eyeElementBuffer);
+	//-------------------------------------
 	glDeleteVertexArrays(1, &eyelashesVAO);
 	glDeleteVertexArrays(1, &eyebrowsVAO);
 	glDeleteVertexArrays(1, &hairVAO);
@@ -754,6 +770,7 @@ int doSkeletonDraw(
     //------------------------------------------------------------------------------------
     GLuint axisVAO;
     GLuint axisArrayBuffer;
+    GLuint axisElementBuffer;
     unsigned int axisTriangleCount=0;
 
     int usePrimitive = 0;
@@ -765,6 +782,7 @@ int doSkeletonDraw(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
+                             &axisElementBuffer,
                              programID,
                              axisModel->vertices       ,  axisModel->header.numberOfVertices      * sizeof(float),
                              axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
@@ -779,6 +797,7 @@ int doSkeletonDraw(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
+                             &axisElementBuffer,
                              programID,
                              pyramidCoords     ,  sizeof(pyramidCoords),
                              pyramidNormals    ,  sizeof(pyramidNormals),
@@ -922,6 +941,7 @@ int doSkeletonDraw(
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	glDeleteBuffers(1, &axisArrayBuffer);
+	glDeleteBuffers(1, &axisElementBuffer);
 	glDeleteVertexArrays(1, &axisVAO);
 	return 1;
 }
@@ -951,6 +971,7 @@ int doBVHDraw(
     //------------------------------------------------------------------------------------
     GLuint axisVAO;
     GLuint axisArrayBuffer;
+    GLuint axisElementBuffer;
     unsigned int axisTriangleCount=0;
 
     int usePrimitive = 0;
@@ -962,6 +983,7 @@ int doBVHDraw(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
+                             &axisElementBuffer,
                              programID,
                              axisModel->vertices       ,  axisModel->header.numberOfVertices      * sizeof(float),
                              axisModel->normal         ,  axisModel->header.numberOfNormals       * sizeof(float),
@@ -976,6 +998,7 @@ int doBVHDraw(
                              1,
                              &axisVAO,
                              &axisArrayBuffer,
+                             &axisElementBuffer,
                              programID,
                              pyramidCoords     ,  sizeof(pyramidCoords),
                              pyramidNormals    ,  sizeof(pyramidNormals),
@@ -1090,6 +1113,7 @@ int doBVHDraw(
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	glDeleteBuffers(1, &axisArrayBuffer);
+	glDeleteBuffers(1, &axisElementBuffer);
 	glDeleteVertexArrays(1, &axisVAO);
 	return 1;
 }

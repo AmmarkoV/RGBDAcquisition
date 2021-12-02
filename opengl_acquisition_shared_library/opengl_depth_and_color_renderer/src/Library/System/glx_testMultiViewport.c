@@ -119,7 +119,7 @@ int drawObjectAT(GLuint programID,
                                     10.0//scaleZ
                                    );
 
-      //------------------------------------------------------------------- 
+      //-------------------------------------------------------------------
        struct Matrix4x4OfFloats MVP;
        getModelViewProjectionMatrixFromMatrices(&MVP,projectionMatrix,viewMatrix,&modelMatrix);
        transpose4x4FMatrix(MVP.m);
@@ -228,7 +228,7 @@ int doTiledDrawing(
                   z,
                   roll,
                   pitch,
-                  yaw, 
+                  yaw,
                   &projectionMatrix,
                   &viewportMatrix,
                   &viewMatrix
@@ -376,11 +376,13 @@ int doDrawing()
 
     GLuint cubeVAO;
     GLuint cubeArrayBuffer;
+    GLuint cubeElementBuffer;
     unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
     pushObjectToBufferData(
                              1,
                              &cubeVAO,
                              &cubeArrayBuffer,
+                             &cubeElementBuffer,
                              programID  ,
                              cubeCoords  ,  sizeof(cubeCoords) ,
                              cubeNormals ,  sizeof(cubeNormals) ,
@@ -392,11 +394,13 @@ int doDrawing()
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
+    GLuint humanElementBuffer;
     unsigned int humanTriangleCount  =  (unsigned int)  triModel.header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
+                             &humanElementBuffer,
                              programID  ,
                              triModel.vertices  ,  triModel.header.numberOfVertices * sizeof(float) ,
                              triModel.normal    ,  triModel.header.numberOfNormals  * sizeof(float),
@@ -524,9 +528,9 @@ int main(int argc,const char **argv)
 	 	return 1;
    }
 
-   #define defaultModelToLoad "../../../Models/Ammar.tri" 
+   #define defaultModelToLoad "../../../Models/Ammar.tri"
    const char * modelToLoad = defaultModelToLoad;
-   
+
 
     for (int i=0; i<argc; i++)
         {
@@ -538,8 +542,8 @@ int main(int argc,const char **argv)
                             }
                     }
 
-        }  
-   
+        }
+
 
 
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )

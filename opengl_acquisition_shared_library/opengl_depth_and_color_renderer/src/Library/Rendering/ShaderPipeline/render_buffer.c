@@ -328,7 +328,7 @@ int drawVertexArrayWithMVPMatrices(
   GLint textureLocation = 0;
   if (TextureID!=0)
     {
-      fprintf(stderr,"renderingTexture %u\n",TextureID);
+      //fprintf(stderr,"renderingTexture %u\n",TextureID);
       glEnable(GL_TEXTURE_2D);
       glActiveTexture(GL_TEXTURE0);                                         checkOpenGLError(__FILE__, __LINE__);
       glBindTexture(GL_TEXTURE_2D,TextureID);                               checkOpenGLError(__FILE__, __LINE__);
