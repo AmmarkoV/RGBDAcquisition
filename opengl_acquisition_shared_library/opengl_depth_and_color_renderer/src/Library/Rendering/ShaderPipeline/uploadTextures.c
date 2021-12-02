@@ -57,11 +57,11 @@ int uploadColorImageAsTexture(
     //https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
     glTexImage2D(
                  GL_TEXTURE_2D,
-                 0,
+                 0, // level
                  dataFormat,
                  colorWidth ,
                  colorHeight,
-                 0,
+                 0, // border must be 0
                  internalFormat,
                  GL_UNSIGNED_BYTE,
                  (const GLvoid *) colorPixels

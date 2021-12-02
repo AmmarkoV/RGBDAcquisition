@@ -761,15 +761,15 @@ int tri_loadModel(const char * filename , struct TRI_Model * triModel)
 
 
           if (triModel->bones[boneNum].info->numberOfBoneChildren == 0 )
-          {
-           triModel->bones[boneNum].boneChild  = 0;
-          } else
-          {
-           itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info->numberOfBoneChildren;
-           triModel->bones[boneNum].boneChild  = ( unsigned int * ) malloc ( itemSize * count );
-           memset( triModel->bones[boneNum].boneChild , 0 , itemSize * count );
-           n = fread( triModel->bones[boneNum].boneChild  , itemSize , count , fd);
-          }
+           {
+            triModel->bones[boneNum].boneChild  = 0;
+           } else
+           {
+            itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info->numberOfBoneChildren;
+            triModel->bones[boneNum].boneChild  = ( unsigned int * ) malloc ( itemSize * count );
+            memset( triModel->bones[boneNum].boneChild , 0 , itemSize * count );
+            n = fread( triModel->bones[boneNum].boneChild  , itemSize , count , fd);
+           }
 
           }
          }
@@ -963,7 +963,6 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
 {
   if (triModel!=0)
   {
-
     if (triModel->textureData!=0)
     {
         free(triModel->textureData);

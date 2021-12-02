@@ -26,15 +26,13 @@
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
-
-
 int textureLoadAndPaint(struct TRI_Model * model,char * filename)
 {
     int success=0;
     struct Image * image = readImage(filename,PNG_CODEC,0);
     if (image!=0)
     {
-        fprintf(stderr,"Loaded %s => width:%u / height:%u \n",filename,image->width,image->height);
+        fprintf(stderr,"Loaded %s => width:%u / height:%u / channels:%u / bitsperpixel:%u \n",filename,image->width,image->height,image->channels,image->bitsperpixel);
         if ( tri_paintModelUsingTexture(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
         {
             fprintf(stderr,"Successfully painted TRI model using %s texture\n",filename);
@@ -45,17 +43,13 @@ int textureLoadAndPaint(struct TRI_Model * model,char * filename)
     return success;
 }
 
-
-
-
-
 int textureLoadAndPack(struct TRI_Model * model,char * filename)
 {
     int success=0;
     struct Image * image = readImage(filename,PNG_CODEC,0);
     if (image!=0)
     {
-        fprintf(stderr,"Loaded %s => width:%u / height:%u \n",filename,image->width,image->height);
+        fprintf(stderr,"Loaded %s => width:%u / height:%u / channels:%u / bitsperpixel:%u \n",filename,image->width,image->height,image->channels,image->bitsperpixel);
         if ( tri_packTextureInModel(model,image->pixels,image->width,image->height,image->bitsperpixel,image->channels) )
         {
             fprintf(stderr,"Successfully packed RGB image in TRI model using %s texture\n",filename);
@@ -65,8 +59,6 @@ int textureLoadAndPack(struct TRI_Model * model,char * filename)
     }
     return success;
 }
-
-
 
 int main (int argc, char *argv[])
 {

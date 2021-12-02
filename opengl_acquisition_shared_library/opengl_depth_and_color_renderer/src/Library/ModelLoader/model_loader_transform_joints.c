@@ -702,6 +702,8 @@ void recursiveJointHierarchyTransformerDirect(
   return;
 }
 
+
+
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
    if ( (triModelIn->vertices==0) && (triModelIn->normal==0) )
@@ -777,6 +779,13 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
    }
  return 1;
 }
+
+
+
+
+
+
+
 
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
