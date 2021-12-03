@@ -417,27 +417,27 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
     triModel->indices        = 0; //Flat tri models dont have indices
     triModel->bones          = 0; //Bones will get filled in later
 
-    unsigned int i=0,o=0,n=0,t=0,c=0;
-	for (i = 0; i < indexed->header.numberOfIndices/3; i++)
+    unsigned int o=0,n=0,t=0,c=0;
+    //---------------------------
+	for (unsigned int indexID=0; indexID<indexed->header.numberOfIndices/3; indexID++)
     {
-		unsigned int faceTriA = indexed->indices[(i*3)+0];
-		unsigned int faceTriB = indexed->indices[(i*3)+1];
-		unsigned int faceTriC = indexed->indices[(i*3)+2];
+		unsigned int faceTriA_ID = indexed->indices[(indexID*3)+0];
+		unsigned int faceTriB_ID = indexed->indices[(indexID*3)+1];
+		unsigned int faceTriC_ID = indexed->indices[(indexID*3)+2];
         //------------------------------------------------
-        unsigned int faceTriA_X = (faceTriA*3)+0;
-        unsigned int faceTriA_Y = (faceTriA*3)+1;
-        unsigned int faceTriA_Z = (faceTriA*3)+2;
+        unsigned int faceTriA_X = (faceTriA_ID*3)+0;
+        unsigned int faceTriA_Y = (faceTriA_ID*3)+1;
+        unsigned int faceTriA_Z = (faceTriA_ID*3)+2;
         //---------------------------------------
-        unsigned int faceTriB_X = (faceTriB*3)+0;
-        unsigned int faceTriB_Y = (faceTriB*3)+1;
-        unsigned int faceTriB_Z = (faceTriB*3)+2;
+        unsigned int faceTriB_X = (faceTriB_ID*3)+0;
+        unsigned int faceTriB_Y = (faceTriB_ID*3)+1;
+        unsigned int faceTriB_Z = (faceTriB_ID*3)+2;
         //---------------------------------------
-        unsigned int faceTriC_X = (faceTriC*3)+0;
-        unsigned int faceTriC_Y = (faceTriC*3)+1;
-        unsigned int faceTriC_Z = (faceTriC*3)+2;
+        unsigned int faceTriC_X = (faceTriC_ID*3)+0;
+        unsigned int faceTriC_Y = (faceTriC_ID*3)+1;
+        unsigned int faceTriC_Z = (faceTriC_ID*3)+2;
 
 		//fprintf(stderr,"%u / %u \n" , o , triModel->header.numberOfVertices * 3 );
-
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_X];
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_Y];
 	    triModel->vertices[o++] = indexed->vertices[faceTriA_Z];
@@ -467,15 +467,14 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
 
       if ( indexed->textureCoords)
         {
-            //TODO : There is a problem here :
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+1];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA_ID*2)+0];
+			triModel->textureCoords[t++] = 1-indexed->textureCoords[(faceTriA_ID*2)+1];
             //-------------------------------------------------------------------
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+1];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB_ID*2)+0];
+			triModel->textureCoords[t++] = 1-indexed->textureCoords[(faceTriB_ID*2)+1];
             //-------------------------------------------------------------------
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+1];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC_ID*2)+0];
+			triModel->textureCoords[t++] = 1-indexed->textureCoords[(faceTriC_ID*2)+1];
 		}
 
       if ( indexed->colors )
@@ -970,11 +969,11 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
         triModel->textureData=0;
     }
 
-    triModel->header.textureDataWidth    = width;
-    triModel->header.textureDataHeight   = height;
-    triModel->header.textureDataChannels = channels;
-    triModel->header.textureUploadedToGPU= 0;
-    triModel->header.textureBindGLBuffer = 0;
+    triModel->header.textureDataWidth     = width;
+    triModel->header.textureDataHeight    = height;
+    triModel->header.textureDataChannels  = channels;
+    triModel->header.textureUploadedToGPU = 0;
+    triModel->header.textureBindGLBuffer  = 0;
 
     triModel->textureData = (char*) malloc(sizeof(char) * width * height * channels);
 
@@ -1166,9 +1165,7 @@ int tri_saveModel(const char * filename , struct TRI_Model * triModel)
            { fwrite ( &emptyBonesHeader                 , sizeof(struct TRI_Bones_Header) , 1 , fd); }
 
           fwrite ( triModel->bones[boneNum].boneName    , sizeof(char)                    , triModel->bones[boneNum].info->boneNameSize      , fd);
-
           fwrite ( triModel->bones[boneNum].weightValue , sizeof(float)                   , triModel->bones[boneNum].info->boneWeightsNumber , fd);
-
           fwrite ( triModel->bones[boneNum].weightIndex , sizeof(unsigned int)            , triModel->bones[boneNum].info->boneWeightsNumber , fd);
 
           if ( (triModel->bones[boneNum].info->numberOfBoneChildren>0) && (triModel->bones[boneNum].boneChild) )
