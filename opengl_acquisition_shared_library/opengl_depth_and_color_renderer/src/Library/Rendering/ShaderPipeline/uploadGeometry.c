@@ -75,7 +75,7 @@ pushObjectToBufferData(
     //Create buffer data..
     GLsizei    stride = 0;
     GLintptr   memoryOffset=0;
-    GLsizeiptr totalBufferDataSize=sizeOfVertices+sizeOfNormals+sizeOfColors+sizeOfTextureCoords;
+    GLsizeiptr totalBufferDataSize=sizeOfVertices+sizeOfTextureCoords+sizeOfColors+sizeOfNormals;
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                   checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
