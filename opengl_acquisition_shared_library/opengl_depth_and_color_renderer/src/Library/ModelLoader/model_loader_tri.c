@@ -973,6 +973,8 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
     triModel->header.textureDataWidth    = width;
     triModel->header.textureDataHeight   = height;
     triModel->header.textureDataChannels = channels;
+    triModel->header.textureUploadedToGPU= 0;
+    triModel->header.textureBindGLBuffer = 0;
 
     triModel->textureData = (char*) malloc(sizeof(char) * width * height * channels);
 
@@ -980,6 +982,12 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
     {
       memcpy(triModel->textureData,pixels,sizeof(char) * width * height * channels);
       return 1;
+    } else
+    {
+     //Roll back texture settings since we failed packing it in..
+     triModel->header.textureDataWidth    = 0;
+     triModel->header.textureDataHeight   = 0;
+     triModel->header.textureDataChannels = 0;
     }
   }
 

@@ -365,9 +365,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     memset(triModel->indices,       0 , indexSize );
 
 
-
-    unsigned int i=0;
-
     #define DO_COLOR_RANGE_CHECK 0
 
     #if DO_COLOR_RANGE_CHECK
@@ -391,24 +388,25 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     //-----------------------------------------------------------------------------------------
     #endif // DO_COLOR_RANGE_CHECK
 
-	for (i = 0; i < mesh->mNumVertices; i++)
+	for (unsigned int vertexID = 0; vertexID < mesh->mNumVertices; vertexID++)
     {
-	    triModel->vertices[(i*3)+0] = mesh->mVertices[i].x;
-	    triModel->vertices[(i*3)+1] = mesh->mVertices[i].y;
-	    triModel->vertices[(i*3)+2] = mesh->mVertices[i].z;
+	  triModel->vertices[(vertexID*3)+0] = mesh->mVertices[vertexID].x;
+	  triModel->vertices[(vertexID*3)+1] = mesh->mVertices[vertexID].y;
+	  triModel->vertices[(vertexID*3)+2] = mesh->mVertices[vertexID].z;
+
       if (mesh->mNormals)
         {
-		 triModel->normal[(i*3)+0] = mesh->mNormals[i].x;
-		 triModel->normal[(i*3)+1] = mesh->mNormals[i].y;
-		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
+		 triModel->normal[(vertexID*3)+0] = mesh->mNormals[vertexID].x;
+		 triModel->normal[(vertexID*3)+1] = mesh->mNormals[vertexID].y;
+		 triModel->normal[(vertexID*3)+2] = mesh->mNormals[vertexID].z;
         }
 
       for (unsigned int uvChannel=0; uvChannel<mesh->GetNumUVChannels(); uvChannel++)
       {
        if (mesh->mTextureCoords[uvChannel])
         {
-		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[uvChannel][i].x;
-		 triModel->textureCoords[(i*2)+1] = mesh->mTextureCoords[uvChannel][i].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
+		 triModel->textureCoords[(vertexID*2)+0] = mesh->mTextureCoords[uvChannel][vertexID].x;
+		 triModel->textureCoords[(vertexID*2)+1] = mesh->mTextureCoords[uvChannel][vertexID].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
 		}
       }
 
@@ -417,9 +415,9 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
         {
          if(mesh->HasVertexColors(colourSet))
          {
-          triModel->colors[(i*3)+0] = mesh->mColors[colourSet][i].r;
-          triModel->colors[(i*3)+1] = mesh->mColors[colourSet][i].g;
-          triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
+          triModel->colors[(vertexID*3)+0] = mesh->mColors[colourSet][vertexID].r;
+          triModel->colors[(vertexID*3)+1] = mesh->mColors[colourSet][vertexID].g;
+          triModel->colors[(vertexID*3)+2] = mesh->mColors[colourSet][vertexID].b;
          }
        }
 	}
@@ -440,15 +438,15 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 					glVertex3fv(&mesh->mVertices[vertexIndex].x);
 			}*/
 
-   for (i = 0; i < mesh->mNumFaces; i++)
+   for (unsigned int faceID = 0; faceID < mesh->mNumFaces; faceID++)
     {
-		struct aiFace *face = mesh->mFaces + i;
+		struct aiFace *face = mesh->mFaces + faceID;
 
         if (face->mNumIndices==3)
 		 {
-		  triModel->indices[(i*3)+0] = face->mIndices[0];
-		  triModel->indices[(i*3)+1] = face->mIndices[1];
-		  triModel->indices[(i*3)+2] = face->mIndices[2];
+		  triModel->indices[(faceID*3)+0] = face->mIndices[0];
+		  triModel->indices[(faceID*3)+1] = face->mIndices[1];
+		  triModel->indices[(faceID*3)+2] = face->mIndices[2];
          } else
          {
             fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices);
