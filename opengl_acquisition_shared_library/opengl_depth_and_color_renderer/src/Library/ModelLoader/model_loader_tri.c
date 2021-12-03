@@ -467,14 +467,15 @@ int tri_flattenIndexedModel(struct TRI_Model * triModel,struct TRI_Model * index
 
       if ( indexed->textureCoords)
         {
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*2)+1];
+            //TODO : There is a problem here :
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*3)+0];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriA*3)+1];
             //-------------------------------------------------------------------
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*2)+1];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*3)+0];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriB*3)+1];
             //-------------------------------------------------------------------
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+0];
-			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*2)+1];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*3)+0];
+			triModel->textureCoords[t++] = indexed->textureCoords[(faceTriC*3)+1];
 		}
 
       if ( indexed->colors )
