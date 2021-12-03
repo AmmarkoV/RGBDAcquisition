@@ -353,6 +353,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     triModel->indices       = (unsigned int*)     malloc( indexSize );
 
 
+    fprintf(stderr,"Model has %u UV Channels\n",mesh->GetNumUVChannels());
     fprintf(stderr,"Allocating :   \n");
     fprintf(stderr,"  %u bytes of vertices \n",verticesSize);
     fprintf(stderr,"  %u bytes of normals \n",normalsSize);
@@ -405,14 +406,16 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
         }
 
-      if (mesh->mTextureCoords[0])
+      for (int uvChannel=0; uvChannel<mesh->GetNumUVChannels(); uvChannel++)
+      {
+       if (mesh->mTextureCoords[uvChannel])
         {
-		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
-		 triModel->textureCoords[(i*2)+1] = mesh->mTextureCoords[0][i].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
+		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[uvChannel][i].x;
+		 triModel->textureCoords[(i*2)+1] = mesh->mTextureCoords[uvChannel][i].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
 		}
 
-        unsigned int colourSet = 0;
-        //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
+       unsigned int colourSet = 0;
+       //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
         {
          if(mesh->HasVertexColors(colourSet))
          {
@@ -421,6 +424,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
           triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
          }
        }
+      }
 	}
 
    for (i = 0; i < mesh->mNumFaces; i++)
