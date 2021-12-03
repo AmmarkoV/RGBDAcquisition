@@ -986,6 +986,34 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
 }
 
 
+int tri_flipTexture(struct TRI_Model * triModel,char flipX,char flipY)
+{
+  if (triModel!=0)
+  {
+       if ( (triModel->textureCoords!=0) && (triModel->header.numberOfTextureCoords>0) )
+       {
+          float * t = triModel->textureCoords;
+          float * tLimit = triModel->textureCoords + triModel->header.numberOfTextureCoords;
+
+          while (t<tLimit)
+          {
+           float *u = t; ++t;
+           float *v = t; ++t;
+
+           if (flipX)
+              { *u = 1.0 - *u; }
+           if (flipY)
+              { *v = 1.0 - *v; }
+          }
+
+          return 1;
+       }
+  }
+ return 0;
+}
+
+
+
 int tri_paintModelUsingTexture(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
 {
   if (triModel!=0)

@@ -1,6 +1,7 @@
 #version 130
 
 uniform sampler2D renderedTexture; 
+
 in vec4 color;
 in vec2 UV;
 
@@ -8,8 +9,8 @@ out vec4 colorOUT;
 
 void main() 
 { 
-    colorOUT = color;
-    //colorOUT = vec4(0.0,1.0,0.0,1.0);
+    //colorOUT = color;
+    //colorOUT = vec4(0.5,0.5,0.5,1.0);
     colorOUT = texture(renderedTexture,UV);
 } 
 

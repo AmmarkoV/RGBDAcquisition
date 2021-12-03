@@ -408,7 +408,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
       if (mesh->mTextureCoords[0])
         {
 		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
-		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y; // 1 -  y  | Why swap y?
+		 triModel->textureCoords[(i*2)+1] = mesh->mTextureCoords[0][i].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
 		}
 
         unsigned int colourSet = 0;
@@ -592,6 +592,7 @@ int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , st
     int flags = aiProcess_Triangulate;
 		flags |= aiProcess_JoinIdenticalVertices;
 		flags |= aiProcess_GenSmoothNormals;
+		flags |= aiProcess_FlipUVs; //So that I don't need to manually flip UV
 		flags |= aiProcess_GenUVCoords;
 		flags |= aiProcess_TransformUVCoords;
 		flags |= aiProcess_RemoveComponent;

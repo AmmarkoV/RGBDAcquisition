@@ -305,6 +305,9 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel);
 
 
 
+int tri_flipTexture(struct TRI_Model * triModel,char flipX,char flipY);
+
+
 int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels);
 
 

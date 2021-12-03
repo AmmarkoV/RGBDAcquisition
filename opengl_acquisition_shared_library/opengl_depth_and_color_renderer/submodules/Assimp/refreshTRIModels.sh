@@ -17,7 +17,7 @@ PREFIX="Testexp_"
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 
 #Mesh import from MHX2 intermediate format..
-./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --removeprefix $PREFIX --packtexture young_lightskinned_female_diffuse3.png  --applytexture young_lightskinned_female_diffuse3.png 
+./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --removeprefix $PREFIX --packtexture young_lightskinned_female_diffuse3.png  --applytexture young_lightskinned_female_diffuse3.png
 ./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --packtexture braid01_diffuse_mahogany.png --applytexture braid01_diffuse_mahogany.png
 ./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --packtexture brown_eye.png --applytexture brown_eye.png
 ./assimpTester --mesh 3 --convert $MHX2MODEL eyebrows.tri --removeprefix $PREFIX --packtexture eyebrow001.png --applytexture eyebrow001.png
