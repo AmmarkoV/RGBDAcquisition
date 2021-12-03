@@ -343,15 +343,12 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     gm[8]=m_GlobalInverseTransform.c1;  gm[9]=m_GlobalInverseTransform.c2;  gm[10]=m_GlobalInverseTransform.c3; gm[11]=m_GlobalInverseTransform.c4;
     gm[12]=m_GlobalInverseTransform.d1; gm[13]=m_GlobalInverseTransform.d2; gm[14]=m_GlobalInverseTransform.d3; gm[15]=m_GlobalInverseTransform.d4;
 
-
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
-
 	triModel->vertices      = (float*)            malloc( verticesSize );
 	triModel->normal        = (float*)            malloc( normalsSize );
 	triModel->textureCoords = (float*)            malloc( textureCoordsSize );
     triModel->colors        = (float*)            malloc( colorSize );
     triModel->indices       = (unsigned int*)     malloc( indexSize );
-
 
     fprintf(stderr,"Model has %u UV Channels\n",mesh->GetNumUVChannels());
     fprintf(stderr,"Allocating :   \n");
@@ -406,13 +403,14 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
         }
 
-      for (int uvChannel=0; uvChannel<mesh->GetNumUVChannels(); uvChannel++)
+      for (unsigned int uvChannel=0; uvChannel<mesh->GetNumUVChannels(); uvChannel++)
       {
        if (mesh->mTextureCoords[uvChannel])
         {
 		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[uvChannel][i].x;
 		 triModel->textureCoords[(i*2)+1] = mesh->mTextureCoords[uvChannel][i].y; // aiProcess_FlipUVs does the flip here now .. | 1 -  y
 		}
+      }
 
        unsigned int colourSet = 0;
        //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
@@ -424,8 +422,23 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
           triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
          }
        }
-      }
 	}
+
+/*   for(i = 0; i < face->mNumIndices; i++)		// go through all vertices in face
+			{
+				int vertexIndex = face->mIndices[i];	// get group index for current index
+				if(mesh->mColors[0] != nullptr)
+					Color4f(&mesh->mColors[0][vertexIndex]);
+				if(mesh->mNormals != nullptr)
+
+					if(mesh->HasTextureCoords(0))		//HasTextureCoords(texture_coordinates_set)
+					{
+						glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, 1 - mesh->mTextureCoords[0][vertexIndex].y); //mTextureCoords[channel][vertex]
+					}
+
+					glNormal3fv(&mesh->mNormals[vertexIndex].x);
+					glVertex3fv(&mesh->mVertices[vertexIndex].x);
+			}*/
 
    for (i = 0; i < mesh->mNumFaces; i++)
     {
@@ -437,8 +450,10 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 		  triModel->indices[(i*3)+1] = face->mIndices[1];
 		  triModel->indices[(i*3)+2] = face->mIndices[2];
          } else
-         { fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices); }
-
+         {
+            fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices);
+            return;
+         }
     }
 
    triModel->header.rootBone=0; //Initial bone is always the root bone..!
