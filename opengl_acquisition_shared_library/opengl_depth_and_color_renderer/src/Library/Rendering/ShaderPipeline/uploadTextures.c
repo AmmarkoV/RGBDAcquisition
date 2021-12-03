@@ -25,6 +25,25 @@ int uploadColorImageAsTexture(
                                unsigned int colorBitsperpixel
                               )
 {
+    GLuint dataFormat = 0;
+    GLuint internalFormat = 0;
+    //---------------------------
+    if ( colorChannels==3 )
+    {
+        dataFormat = GL_RGB;
+        internalFormat = GL_RGB;
+    } else
+    if ( colorChannels==4 )
+    {
+        dataFormat = GL_RGBA;
+        internalFormat = GL_RGBA;
+    } else
+    {
+       fprintf(stderr,"");
+    }
+
+
+
   glUseProgram(programID);
 
     if (*alreadyUploaded)
@@ -46,20 +65,13 @@ int uploadColorImageAsTexture(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       checkOpenGLError(__FILE__, __LINE__);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);            checkOpenGLError(__FILE__, __LINE__);
 
-    GLuint dataFormat = GL_RGBA;
-    GLuint internalFormat = GL_RGBA;
-    if ( colorChannels==3 )
-    {
-        dataFormat = GL_RGB;
-        internalFormat = GL_RGB;
-    }
 
     //https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
     glTexImage2D(
                  GL_TEXTURE_2D,
                  0, // level
                  dataFormat,
-                 colorWidth ,
+                 colorWidth,
                  colorHeight,
                  0, // border must be 0
                  internalFormat,

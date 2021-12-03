@@ -9,7 +9,7 @@ out vec4 colorOUT;
 
 void main() 
 { 
-    //colorOUT = color;
+    colorOUT = color;
     //colorOUT = vec4(0.5,0.5,0.5,1.0);
     colorOUT = texture(renderedTexture,UV);
 } 
