@@ -679,7 +679,7 @@ int doDrawing(
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-        glClearColor( 0.2 , 0.2, 0.2, 1 );
+        glClearColor(0.0,0.0,0.0,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         doOGLDrawing(
@@ -865,10 +865,10 @@ int doSkeletonDraw(
         }
 
 
-          struct pose6D axisPose={0};
 
           /*
           //Add an axis to help
+          struct pose6D axisPose={0};
           axisPose.z=10;
           doOGLSingleDrawing(
                              programID,
@@ -1697,8 +1697,8 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--set")==0)
                     {
-                      char * jointName = argv[i+1];
-                      char * jointAxis = argv[i+2];
+                      const char * jointName = argv[i+1];
+                      const char * jointAxis = argv[i+2];
                       float  jointValue = atof(argv[i+3]);
                       BVHJointID jID;
 
