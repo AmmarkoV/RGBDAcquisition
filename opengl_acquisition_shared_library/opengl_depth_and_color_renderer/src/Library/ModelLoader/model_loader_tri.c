@@ -963,7 +963,7 @@ int tri_dropAlphaFromTexture(struct TRI_Model * triModel)
     {
         if (triModel->header.textureDataChannels==3)
         {
-          //Already dropped alph..
+          //Already dropped alpha..
           return 1;
         }
 
