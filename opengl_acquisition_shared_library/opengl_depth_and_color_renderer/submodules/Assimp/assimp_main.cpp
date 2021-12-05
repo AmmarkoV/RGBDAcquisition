@@ -129,6 +129,10 @@ int main (int argc, char *argv[])
             selectMesh = atoi(argv[i+1]);
             fprintf(stderr,GREEN "Selecting mesh %u \n" NORMAL,selectMesh);
         }
+        else if (strcmp(argv[i],"--droptexturealpha")==0)
+        {
+            tri_dropAlphaFromTexture(originalModel);
+        }
         else if (strcmp(argv[i],"--applytexture")==0)
         {
             textureLoadAndPaint(originalModel,argv[i+1]);

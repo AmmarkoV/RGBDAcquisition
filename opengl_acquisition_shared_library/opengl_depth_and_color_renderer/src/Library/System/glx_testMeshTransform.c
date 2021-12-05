@@ -61,6 +61,7 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
+char renderHair = 0;
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -357,6 +358,8 @@ int doOGLDrawing(
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
+      if (renderHair)
+      {
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      hairVao,
@@ -372,6 +375,7 @@ int doOGLDrawing(
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
+      }
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyeVao,
@@ -444,6 +448,8 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                   );
+      if (renderHair)
+      {
       drawObjectAT(
                   programID,
                   hairVao,
@@ -464,6 +470,7 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                   );
+      }
       drawObjectAT(
                   programID,
                   eyeVao,
@@ -679,7 +686,8 @@ int doDrawing(
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-        glClearColor(0.0,0.0,0.0,1);
+        //glClearColor(0.0,0.0,0.0,1);
+        glClearColor(0.2,0.2,0.2,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         doOGLDrawing(
@@ -1395,6 +1403,7 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    int destroyColors=0;
    int dumpVideo = 0;
+   int dumpSnapshot = 0;
    unsigned int maxFrames=0;
 
    int axisRendering = 0;
@@ -1455,7 +1464,11 @@ int main(int argc,const char **argv)
                        //MHX2
                        humanPose.x=0.0f;//(float)  (1000-rand()%2000);
                        humanPose.y=-1.476f;//(float) (100-rand()%200);
-                       humanPose.z=0.79735f;//(float)  (700+rand()%1000);
+                       humanPose.z=0.69735f;//(float)  (700+rand()%1000);
+                    } else
+           if (strcmp(argv[i],"--save")==0)
+                    {
+                      dumpSnapshot=1;
                     } else
            if (strcmp(argv[i],"--dumpvideo")==0)
                     {
@@ -1548,7 +1561,7 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    unsigned char * rgb = 0;
-   if(dumpVideo)
+   if ( (dumpVideo) || (dumpSnapshot) )
       { rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3); }
 
    //------------------------------------------------------
@@ -1854,7 +1867,7 @@ int main(int argc,const char **argv)
       if (maxFrames>1)
         { fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL); }
    }
-   while (dumpVideo==0); //If dump video is not enabled loop forever
+   while ( (dumpVideo==0) && (dumpSnapshot==0) ); //If dump video is not enabled loop forever
 
 
    glDeleteProgram(programID);
@@ -1864,14 +1877,21 @@ int main(int argc,const char **argv)
      {
         //Also deallocate our snapshot buffer..
         free(rgb);
+        int i=0;
 
-        char command[512]={0};
-        snprintf(command,512,"ffmpeg -framerate 30 -i colorFrame_0_%%05d.pnm -s %ux%u -y -r 30 -pix_fmt yuv420p -threads 8 lastRun3DHiRes.mp4",WIDTH,HEIGHT);
-        int i=system(command);
+        if (dumpVideo)
+         {
+           char command[512]={0};
+           snprintf(command,512,"ffmpeg -framerate 30 -i colorFrame_0_%%05d.pnm -s %ux%u -y -r 30 -pix_fmt yuv420p -threads 8 lastRun3DHiRes.mp4",WIDTH,HEIGHT);
+           i=system(command);
+         }
 
-        if(i==0)
+        if (dumpSnapshot==0)
         {
+         if(i==0)
+         {
           i=system("rm *.pnm");
+         }
         }
      }
 

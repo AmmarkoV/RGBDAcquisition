@@ -957,7 +957,43 @@ int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRI
 }
 
 
+int tri_dropAlphaFromTexture(struct TRI_Model * triModel)
+{
+    if (triModel!=0)
+    {
+        if (triModel->header.textureDataChannels==3)
+        {
+          //Already dropped alph..
+          return 1;
+        }
 
+        if (triModel->textureData!=0)
+        {
+          if (triModel->header.textureDataChannels==4)
+           {
+             char * trgPtr = triModel->textureData;
+             char * srcPtr = triModel->textureData;
+             char * srcPtrLimit = triModel->textureData + triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
+             while (srcPtr<srcPtrLimit)
+             {
+               char r = *srcPtr; ++srcPtr;
+               char g = *srcPtr; ++srcPtr;
+               char b = *srcPtr; ++srcPtr;
+               //char a = *srcPtr;
+               ++srcPtr;
+               //--------------------------
+               *trgPtr = r; ++trgPtr;
+               *trgPtr = g; ++trgPtr;
+               *trgPtr = b; ++trgPtr;
+               //Target won't have an alpha channel..!
+             }
+
+             triModel->header.textureDataChannels=3;
+           }
+        }
+    }
+    return 0;
+}
 
 int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , unsigned int width ,unsigned int height, unsigned int bitsperpixel , unsigned int channels)
 {
