@@ -61,7 +61,7 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
-char renderHair = 0;
+char renderHair = 1;
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;

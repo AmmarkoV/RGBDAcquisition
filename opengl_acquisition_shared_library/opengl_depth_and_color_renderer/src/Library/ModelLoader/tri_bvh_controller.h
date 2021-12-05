@@ -298,6 +298,23 @@ const static int animateTRIModelUsingBVHArmature(
     //bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
 
+
+    float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
+    //----------------------------------------------------
+
+    struct MotionBuffer * frameMotionBuffer  = mallocNewMotionBuffer(bvh);
+
+    if (frameMotionBuffer!=0)
+       {
+         //To Setup the dynamic transformation we must first get values from our bvhMotion structure
+          //if (bhv_retrieveDataFromMotionBuffer(bvh,jID,motionBuffer,data,sizeof(data)))
+           {
+           }
+
+         freeMotionBuffer(&frameMotionBuffer);
+       }
+
+
     //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
     //TODO: Add a flag here to flip rotation axis..!
     struct BVH_Transform bvhTransform = {0};
