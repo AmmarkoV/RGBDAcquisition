@@ -665,13 +665,17 @@ const static int animateTRIModelUsingBVHArmature(
                                  float rSignX = -1.0;
                                  float rSignY = -1.0;
                                  float rSignZ = -1.0;
-                                 int rotationOrder = ROTATION_ORDER_ZXY;
+                                 int rotationOrder = ROTATION_ORDER_YZX;
+                                 //  ./gl3MeshTransform --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
+                                 //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
+                                 fprintf(stderr,"Rot %u ",rotationOrder);
+
                                  if (
                                       (strcmp("rshoulder",modelOriginal->bones[boneID].boneName)==0) ||
                                       (strcmp("lshoulder",modelOriginal->bones[boneID].boneName)==0)
                                     )
                                     {
-                                      rotationOrder = ROTATION_ORDER_ZYX;
+                                      //rotationOrder = ROTATION_ORDER_XYZ;
                                       rSignX = -1.0;
                                       rSignY = -1.0;
                                       rSignZ = -1.0;
@@ -681,7 +685,7 @@ const static int animateTRIModelUsingBVHArmature(
                                       (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
                                     )
                                     {
-                                      rotationOrder = ROTATION_ORDER_ZYX;
+                                      //rotationOrder = ROTATION_ORDER_XYZ;
                                       rSignX = -1.0;
                                       rSignY = -1.0;
                                       rSignZ = -1.0;
@@ -720,7 +724,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                                                       rSignX * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
                                                                                       rSignY * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                                                                       rSignZ * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                                                      rotationOrder // ROTATION_ORDER_ZXY
+                                                                                      rotationOrder
                                                                                     );
                                     copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
                                    }

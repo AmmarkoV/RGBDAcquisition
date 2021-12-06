@@ -32,6 +32,7 @@ scp -P 2222 axis.tri  makehuman.tri hair.tri eyes.tri eyebrows.tri eyelashes.tri
 
 
 
+
 #Stable mesh
 ./assimpTester --mesh 0 --convert makehuman2.dae makehuman.tri --applytexture young_lightskinned_female_diffuse3.png 
 ./assimpTester --mesh 1 --convert makehuman2.dae hair.tri --applytexture braid01_diffuse_mahogany.png
