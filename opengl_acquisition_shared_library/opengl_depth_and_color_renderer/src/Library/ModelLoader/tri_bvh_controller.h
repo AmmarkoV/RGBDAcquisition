@@ -680,7 +680,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                                                      ROTATION_ORDER_ZXY
+                                                                                      ROTATION_ORDER_XYZ
                                                                                     );
 
                                     multiplyTwo4x4FMatrices_Naive(
@@ -696,7 +696,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                                                                       -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                                                      ROTATION_ORDER_ZXY
+                                                                                      ROTATION_ORDER_XYZ // ROTATION_ORDER_ZXY
                                                                                     );
                                     copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
                                    }

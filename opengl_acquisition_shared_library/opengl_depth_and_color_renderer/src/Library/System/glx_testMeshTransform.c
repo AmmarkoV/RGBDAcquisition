@@ -874,19 +874,21 @@ int doSkeletonDraw(
 
 
 
-          /*
+
           //Add an axis to help
           struct pose6D axisPose={0};
           axisPose.z=10;
           doOGLSingleDrawing(
                              programID,
                              MVPMatrixID,
+                             0,
                              &axisPose,
                              axisVAO,
                              axisTriangleCount,
+                             axisElementBuffer,
                              WIDTH,
                              HEIGHT
-                           );*/
+                           );
 
 
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
@@ -929,7 +931,7 @@ int doSkeletonDraw(
                               &axisPose,
                               axisVAO,
                               axisTriangleCount,
-                              0,
+                              axisElementBuffer,
                               WIDTH,
                               HEIGHT
                             );
@@ -1106,7 +1108,7 @@ int doBVHDraw(
                                    &axisPose,
                                    axisVAO,
                                    axisTriangleCount,
-                                   0,
+                                   axisElementBuffer,
                                    WIDTH,
                                    HEIGHT
                                  );
@@ -1776,13 +1778,6 @@ int main(int argc,const char **argv)
 
     if (axisRendering == 1)
     {
-      //printTRIModel(&axisModel);
-      //for (int i=0; i<axisModel.header.numberOfVertices; i++)
-      // {
-      //   fprintf(stderr,"%0.2f ",axisModel.vertices[i]);
-      //   if (i%3==0) { fprintf(stderr,", "); }
-      // }
-
       humanPose.roll+=1.0;//(float)  (rand()%90);
       humanPose.pitch+=1.0;//(float) (rand()%90);
       humanPose.yaw+=1.0;//(float)   (rand()%90);
