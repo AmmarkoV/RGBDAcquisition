@@ -288,14 +288,6 @@ int doOGLDrawing(
   struct Matrix4x4OfFloats viewportMatrix;
   struct Matrix4x4OfFloats viewMatrix;
 
-  /*
-  fprintf(stderr,"eyelashesTextureID = %u \n",eyelashesTextureID);
-  fprintf(stderr,"eyebrowsTextureID = %u \n",eyebrowsTextureID);
-  fprintf(stderr,"hairTextureID = %u \n",hairTextureID);
-  fprintf(stderr,"eyeTextureID = %u \n",eyeTextureID);
-  fprintf(stderr,"humanTextureID = %u \n",humanTextureID);*/
-
-
   prepareRenderingMatrices(
                               fX,  //fx
                               fY,  //fy
@@ -579,9 +571,9 @@ int doDrawing(
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
-    GLuint eyelashesVAO;
-    GLuint eyelashesArrayBuffer;
-    GLuint eyelashesElementBuffer;
+    GLuint eyelashesVAO=0;
+    GLuint eyelashesArrayBuffer=0;
+    GLuint eyelashesElementBuffer=0;
     unsigned int eyelashesTriangleCount  =  (unsigned int)  eyelashesModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -596,9 +588,9 @@ int doDrawing(
                              eyelashesModel->indices        ,  eyelashesModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    GLuint eyebrowsVAO;
-    GLuint eyebrowsArrayBuffer;
-    GLuint eyebrowsElementBuffer;
+    GLuint eyebrowsVAO=0;
+    GLuint eyebrowsArrayBuffer=0;
+    GLuint eyebrowsElementBuffer=0;
     unsigned int eyebrowsTriangleCount  =  (unsigned int)  eyebrowsModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -613,9 +605,9 @@ int doDrawing(
                              eyebrowsModel->indices        ,  eyebrowsModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    GLuint hairVAO;
-    GLuint hairArrayBuffer;
-    GLuint hairElementBuffer;
+    GLuint hairVAO=0;
+    GLuint hairArrayBuffer=0;
+    GLuint hairElementBuffer=0;
     unsigned int hairTriangleCount  =  (unsigned int)  hairModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -630,9 +622,9 @@ int doDrawing(
                              hairModel->indices        ,  hairModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    GLuint eyeVAO;
-    GLuint eyeArrayBuffer;
-    GLuint eyeElementBuffer;
+    GLuint eyeVAO=0;
+    GLuint eyeArrayBuffer=0;
+    GLuint eyeElementBuffer=0;
     unsigned int eyeTriangleCount  =  (unsigned int)  eyeModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -647,9 +639,9 @@ int doDrawing(
                              eyeModel->indices        ,  eyeModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    GLuint humanVAO;
-    GLuint humanArrayBuffer;
-    GLuint humanElementBuffer;
+    GLuint humanVAO=0;
+    GLuint humanArrayBuffer=0;
+    GLuint humanElementBuffer=0;
     unsigned int humanTriangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
@@ -664,7 +656,7 @@ int doDrawing(
                              humanModel->indices        ,  humanModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-	 GLuint quad_vertexbuffer;
+	 GLuint quad_vertexbuffer=0;
 	 glGenBuffers(1, &quad_vertexbuffer);
 	 glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
@@ -801,9 +793,9 @@ int doSkeletonDraw(
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
-    GLuint axisVAO;
-    GLuint axisArrayBuffer;
-    GLuint axisElementBuffer;
+    GLuint axisVAO=0;
+    GLuint axisArrayBuffer=0;
+    GLuint axisElementBuffer=0;
     unsigned int axisTriangleCount=0;
 
     int usePrimitive = 0;
@@ -849,7 +841,6 @@ int doSkeletonDraw(
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
 	 // Create and compile our GLSL program from the shaders
 	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
-
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 	 do
@@ -904,9 +895,9 @@ int doSkeletonDraw(
           {
             axisPose.m.m[i] = humanModel->bones[boneID].info->finalVertexTransformation[i];
           }
-          axisPose.m.m[3]  = 10 *axisPose.x; //X
-          axisPose.m.m[7]  = 10 *axisPose.y; //Y
-          axisPose.m.m[11] = 10 *axisPose.z; //Z
+          axisPose.m.m[3]  = 10 * axisPose.x; //X
+          axisPose.m.m[7]  = 10 * axisPose.y; //Y
+          axisPose.m.m[11] = 10 * axisPose.z; //Z
 
           //axisPose.m.m[3]  = 10 *axisPose.y; //X
           axisPose.m.m[7]  -= 10;  //Y
@@ -1002,9 +993,9 @@ int doBVHDraw(
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
-    GLuint axisVAO;
-    GLuint axisArrayBuffer;
-    GLuint axisElementBuffer;
+    GLuint axisVAO=0;
+    GLuint axisArrayBuffer=0;
+    GLuint axisElementBuffer=0;
     unsigned int axisTriangleCount=0;
 
     int usePrimitive = 0;
