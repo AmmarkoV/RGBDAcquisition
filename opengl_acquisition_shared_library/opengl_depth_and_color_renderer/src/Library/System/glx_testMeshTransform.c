@@ -882,7 +882,7 @@ int doSkeletonDraw(
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
         for (unsigned int boneID=0; boneID<humanModel->header.numberOfBones; boneID++)
         {
-         if (humanModel->bones[boneID].info!=0) //humanPose->x =
+         if ( (humanModel->bones[boneID].info!=0) && (humanModel->bones[boneID].boneName!=0) ) //humanPose->x =
          {
           //fprintf(stderr,GREEN "BoneID %u  \n" NORMAL,boneID);
           struct pose6D axisPose={0};
