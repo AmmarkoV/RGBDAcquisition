@@ -836,7 +836,7 @@ int doSkeletonDraw(
                              pyramidNormals    ,  sizeof(pyramidNormals),
                              pyramidTexCoords  ,  sizeof(pyramidTexCoords),      //0,0 //No Texture
                              cubeColors        ,  sizeof(cubeColors),
-                             0        ,  0//0,0 //Not Indexed
+                             0                 ,  0//0,0 //Not Indexed
                           );
     }
     //------------------------------------------------------------------------------------
@@ -872,11 +872,8 @@ int doSkeletonDraw(
             return 0;
         }
 
-
-
-
           //Add an axis to help
-          struct pose6D axisPose={0};
+          /*struct pose6D axisPose={0};
           axisPose.z=10;
           doOGLSingleDrawing(
                              programID,
@@ -888,7 +885,7 @@ int doSkeletonDraw(
                              axisElementBuffer,
                              WIDTH,
                              HEIGHT
-                           );
+                           );*/
 
 
         fprintf(stderr,"BoneID %u -> %u \n",0,humanModel->header.numberOfBones);
@@ -1838,14 +1835,11 @@ int main(int argc,const char **argv)
     }
 
 
-
-
      tri_deallocModelInternals(&humanModel);
      tri_deallocModelInternals(&eyeModel);
      tri_deallocModelInternals(&hairModel);
      tri_deallocModelInternals(&eyebrowsModel);
      usleep(1);
-
 
      if  (rgb!=0)
      {
