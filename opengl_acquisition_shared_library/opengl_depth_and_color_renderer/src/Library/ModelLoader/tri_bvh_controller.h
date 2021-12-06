@@ -662,6 +662,30 @@ const static int animateTRIModelUsingBVHArmature(
                                          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]);*/
 
+                                 float rSignX = -1.0;
+                                 float rSignY = -1.0;
+                                 float rSignZ = -1.0;
+                                 int rotationOrder = ROTATION_ORDER_ZXY;
+                                 if (
+                                      (strcmp("rshoulder",modelOriginal->bones[boneID].boneName)==0) ||
+                                      (strcmp("lshoulder",modelOriginal->bones[boneID].boneName)==0)
+                                    )
+                                    {
+                                      rotationOrder = ROTATION_ORDER_ZYX;
+                                      rSignX = -1.0;
+                                      rSignY = -1.0;
+                                      rSignZ = -1.0;
+                                    } else
+                                 if (
+                                      (strcmp("relbow",modelOriginal->bones[boneID].boneName)==0) ||
+                                      (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
+                                    )
+                                    {
+                                      rotationOrder = ROTATION_ORDER_ZYX;
+                                      rSignX = -1.0;
+                                      rSignY = -1.0;
+                                      rSignZ = -1.0;
+                                    }
 
                                  if (bvh->jointHierarchy[jID].hasPositionalChannels)
                                    {
@@ -677,10 +701,10 @@ const static int animateTRIModelUsingBVHArmature(
                                     struct Matrix4x4OfFloats dynamicRotation;
                                     create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                                                       &dynamicRotation,
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                                                      ROTATION_ORDER_XYZ
+                                                                                      rSignX * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                                                                      rSignY * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                                                                      rSignZ * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
+                                                                                      rotationOrder
                                                                                     );
 
                                     multiplyTwo4x4FMatrices_Naive(
@@ -693,10 +717,10 @@ const static int animateTRIModelUsingBVHArmature(
                                     struct Matrix4x4OfFloats dynamicRotation;
                                     create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                                                       &dynamicRotation,
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
-                                                                                      -1 * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                                                      ROTATION_ORDER_XYZ // ROTATION_ORDER_ZXY
+                                                                                      rSignX * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                                                                      rSignY * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                                                                      rSignZ * data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
+                                                                                      rotationOrder // ROTATION_ORDER_ZXY
                                                                                     );
                                     copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
                                    }
