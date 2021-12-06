@@ -1774,6 +1774,26 @@ int main(int argc,const char **argv)
       humanPose.y=0.0f;//(float) (100-rand()%200);
       humanPose.z=13.4f;//(float)  (700+rand()%1000);
 
+
+
+        struct BVH_Transform bvhTransform= {0};
+        if (
+                bvh_loadTransformForFrame(
+                                           &mc,
+                                           fID,
+                                           &bvhTransform,
+                                           0
+                                         )
+             )
+          {
+              humanPose.roll=180.0;//(float)  (rand()%90);
+              humanPose.pitch=180.0;//(float) (rand()%90);
+              humanPose.yaw=180.0;//(float)   (rand()%90);
+              humanPose.x = bvhTransform.joint[0].localToWorldTransformation.m[3]/100;
+              humanPose.y = bvhTransform.joint[0].localToWorldTransformation.m[7]/100;
+              humanPose.z = 15+ bvhTransform.joint[0].localToWorldTransformation.m[11]/100;
+          }
+
      //Do axis rendering
      doSkeletonDraw(
                      programID,
