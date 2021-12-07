@@ -691,6 +691,14 @@ const static int animateTRIModelUsingBVHArmature(
                                       rSignZ = -1.0;
                                     }
 
+
+                                 /*
+                                 float * m = modelOriginal->bones[boneID].info->localTransformation;
+                                 m[0] = 0.0; m[1] = 0.0;  m[2] = 0.0; // Retain X ;
+                                 m[4] = 0.0; m[5] = 0.0;  m[6] = 0.0; // Retain Y
+                                 m[8] = 0.0; m[9] = 0.0;  m[10] = 0.0; // Retain Z
+                                 m[12] = 0.0; m[13] = 0.0;  m[14] = 0.0; m[15] = 1.0;*/
+
                                  if (bvh->jointHierarchy[jID].hasPositionalChannels)
                                    {
                                     //This is one of the new joints with positional channels..
