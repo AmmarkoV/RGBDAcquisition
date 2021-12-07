@@ -87,7 +87,7 @@ point = np.array([
                    [1.0]
                  ])
 
-point = np.array([1.0,0.0,0.0,1.0])
+point = np.array([1.0,1.0,1.0,1.0])
 
 for rotAngleZ in range(-45,45):
  for rotAngleY in range(-45,45):
@@ -96,9 +96,10 @@ for rotAngleZ in range(-45,45):
    rY = create4x4FRotationX(rotAngleY) 
    rZ = create4x4FRotationX(rotAngleZ) 
 
-   rotMat = rX * rY * rZ
-   point = np.array([1.0,0.0,0.0,1.0])
-   pointTransformed =   point.dot(rotMat)
+   rotMat = rX.dot(rY.dot(rZ))
+   #print(rotMat)
+   point = np.array([1.0,1.0,1.0,1.0])
+   pointTransformed = point.dot(rotMat)
    print("rX = ",rotAngleX, "rY = ",rotAngleY, "rZ = ",rotAngleZ, " | ",pointTransformed[0],",",pointTransformed[1],",",pointTransformed[2],",",pointTransformed[3])
 
 z = [float(point[2]), 0]
