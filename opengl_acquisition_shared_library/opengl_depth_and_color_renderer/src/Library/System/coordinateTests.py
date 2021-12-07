@@ -47,6 +47,9 @@ def create4x4FRotationZ(degrees):
 
 
 
+def decomposeRollPitchYawtoRollYaw(limbLength,roll,pitch,yaw):
+    #TODO: add a decomposition here using numpy..!
+    return roll,yaw
 
 
 
@@ -60,22 +63,54 @@ z = np.linspace(0, 1, 100)
 x = z * np.sin(25 * z)
 y = z * np.cos(25 * z)
 
-
-z = [0, 0, 0]
-x = [1, 1, 0]
-y = [0, 0, 0]
+#---------
+z = [0, 0]
+x = [1, 0]
+y = [0, 0]
 ax.plot3D(x, y, z, 'red')
-
-z = [1, 1, 0]
-x = [0, 0, 0]
-y = [0, 0, 0]
+#---------
+z = [1, 0]
+x = [0, 0]
+y = [0, 0]
 ax.plot3D(x, y, z, 'blue')
-
- 
-z = [0, 0, 0]
-x = [0, 0, 0]
-y = [1, 1, 0]
+#---------
+z = [0, 0]
+x = [0, 0]
+y = [1, 0]
 ax.plot3D(x, y, z, 'green')
+
+
+point = np.array([ 
+                   [1.0], 
+                   [0.0], 
+                   [0.0], 
+                   [1.0]
+                 ])
+
+point = np.array([1.0,0.0,0.0,1.0])
+
+for rotAngleZ in range(-45,45):
+ for rotAngleY in range(-45,45):
+  for rotAngleX in range(-45,45):
+   rX = create4x4FRotationX(rotAngleX) 
+   rY = create4x4FRotationX(rotAngleY) 
+   rZ = create4x4FRotationX(rotAngleZ) 
+
+   rotMat = rX * rY * rZ
+   point = np.array([1.0,0.0,0.0,1.0])
+   pointTransformed =   point.dot(rotMat)
+   print("rX = ",rotAngleX, "rY = ",rotAngleY, "rZ = ",rotAngleZ, " | ",pointTransformed[0],",",pointTransformed[1],",",pointTransformed[2],",",pointTransformed[3])
+
+z = [float(point[2]), 0]
+x = [float(point[1]), 0]
+y = [float(point[0]), 0]
+ax.plot3D(x, y, z, 'gray')
+
+z = [float(pointTransformed[2]), 0]
+x = [float(pointTransformed[1]), 0]
+y = [float(pointTransformed[0]), 0]
+ax.plot3D(x, y, z, 'gray')
+
 
 # plotting
 ax.set_title('3D line plot')
