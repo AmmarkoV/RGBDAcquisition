@@ -1726,6 +1726,9 @@ int main(int argc,const char **argv)
         }
    //------------------------------------------------------
 
+   //Test
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow");
+
 
    if (maxFrames==0)
    {

@@ -532,6 +532,323 @@ const static int animateTRIModelUsingBVHArmatureOld(
 }
 
 
+struct testResult
+{
+  BVHMotionChannelID mID;
+  float value;
+  float dX;
+  float dY;
+  float dZ;
+};
+
+
+const static int alignRotationOfTRIVsBVH(
+                                          struct TRI_Model * modelOriginal,
+                                          struct BVH_MotionCapture * bvh,
+                                          const char * triJointName,
+                                          const char * bvhJointName
+                                        )
+{
+    BVHJointID childJID=0;
+    BVHJointID jID=0;
+    if (!bvh_getJointIDFromJointNameNocase(bvh,bvhJointName,&jID))
+    {
+        fprintf(stderr,"Could not resolve  BVH joint %s \n",bvhJointName);
+        return 0;
+    }
+    for (BVHJointID j=0; j<bvh->jointHierarchySize; j++)
+    {
+       if (bvh->jointHierarchy[j].parentJoint == jID)
+       {
+          childJID = j;
+          break;
+       }
+    }
+
+
+
+    struct testResult bvhResult[7]={0};
+    struct MotionBuffer * frameMotionBuffer = mallocNewMotionBuffer(bvh);
+
+    if (frameMotionBuffer!=0)
+       {
+        struct BVH_Transform bvhTransform = {0};
+        bvhTransform.useOptimizations=0;
+        if (
+             !bvh_loadTransformForMotionBuffer(
+                                                bvh,
+                                                frameMotionBuffer->motion,
+                                                &bvhTransform,
+                                                0
+                                              )
+           )
+        {
+            freeMotionBuffer(&frameMotionBuffer);
+            fprintf(stderr,"Could not do BVH Transform loading\n");
+            return 0;
+        }
+
+
+         BVHMotionChannelID mID = 0;
+
+
+         //All zeros..!
+         unsigned int testID = 0;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+
+
+         // Z
+         //-----------------------------------------------------------------------------------------------
+         mID = bvh->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_Z];
+         //mID = bvh->jointToMotionLookup[jID].jointMotionOffset;
+         ++testID;
+         frameMotionBuffer->motion[mID]=-90.0;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+
+         ++testID;
+         frameMotionBuffer->motion[mID]=+90.0;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+         frameMotionBuffer->motion[mID]=0.0;
+         //-----------------------------------------------------------------------------------------------
+
+
+         // X
+         //-----------------------------------------------------------------------------------------------
+         mID = bvh->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_X];
+         //mID = bvh->jointToMotionLookup[jID].jointMotionOffset+1;
+         ++testID;
+         frameMotionBuffer->motion[mID]=-90.0;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+
+         ++testID;
+         frameMotionBuffer->motion[mID]=+90.0;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+         frameMotionBuffer->motion[mID]=0.0;
+         //-----------------------------------------------------------------------------------------------
+
+         // Y
+         //-----------------------------------------------------------------------------------------------
+         mID = bvh->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_Y];
+         //mID = bvh->jointToMotionLookup[jID].jointMotionOffset+2;
+         ++testID;
+         frameMotionBuffer->motion[mID]=-90;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+
+         ++testID;
+         frameMotionBuffer->motion[mID]=+90;
+         bvh_loadTransformForMotionBuffer(bvh,frameMotionBuffer->motion,&bvhTransform,0);
+         bvhResult[testID].dX = (float) bvhTransform.joint[jID].pos3D[0] - bvhTransform.joint[childJID].pos3D[0];
+         bvhResult[testID].dY = (float) bvhTransform.joint[jID].pos3D[1] - bvhTransform.joint[childJID].pos3D[1];
+         bvhResult[testID].dZ = (float) bvhTransform.joint[jID].pos3D[2] - bvhTransform.joint[childJID].pos3D[2];
+         bvhResult[testID].value = frameMotionBuffer->motion[mID];
+         bvhResult[testID].mID   = mID;
+         frameMotionBuffer->motion[mID]=0.0;
+         //-----------------------------------------------------------------------------------------------
+
+
+         for (int i=0; i<7; i++)
+         {
+            fprintf(stderr,"Test %u (mID=%u set to %0.2f) ",i,bvhResult[i].mID,bvhResult[i].value);
+            if (bvhResult[i].value>0.0) { fprintf(stderr," "); }
+            fprintf(stderr," | ");
+
+            //--------------------------------------------------------------
+            if (bvhResult[i].dX>0.001)  {  fprintf(stderr,"+ "); } else
+            if (bvhResult[i].dX<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            if (bvhResult[i].dY>0.001)  {  fprintf(stderr,"+ "); } else
+            if (bvhResult[i].dY<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            if (bvhResult[i].dZ>0.001)  {  fprintf(stderr,"+ "); } else
+            if (bvhResult[i].dZ<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            fprintf(stderr,"\n");
+         }
+
+
+        freeMotionBuffer(&frameMotionBuffer);
+       }
+
+
+
+
+    struct testResult triResult[7]={0};
+
+
+
+
+    unsigned int boneChildID=0;
+    unsigned int boneID=0;
+    if (!tri_findBone(modelOriginal,triJointName,&boneID) )
+    {
+        fprintf(stderr,"Could not resolve TRI joint %s \n",bvhJointName);
+        return 0;
+    }
+    for (BVHJointID j=0; j<modelOriginal->header.numberOfBones; j++)
+    {
+       if ( modelOriginal->bones[j].info->boneParent == boneID)
+       {
+          boneChildID = j;
+          break;
+       }
+    }
+
+    fprintf(stderr," TRI joint %s ( %u ) -> child %u   \n",bvhJointName,boneID,boneChildID);
+
+    unsigned int numberOfBones = modelOriginal->header.numberOfBones;
+    unsigned int transformations4x4Size = numberOfBones * 16;
+
+    float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
+    if (transformations4x4==0)
+        {
+            fprintf(stderr,"Failed to allocate enough memory for bones.. \n");
+            return 0;
+        }
+
+    //Cleanup 4x4 matrix transformation..
+    for (unsigned int mID=0; mID<numberOfBones; mID++)
+        {
+            create4x4FIdentityMatrixDirect(&transformations4x4[mID*16]);
+        }
+
+
+
+    struct TRI_Model * mI = &modelOriginal;
+    struct TRI_Model mT = {0};
+    struct Matrix4x4OfFloats dynamicRotation;
+
+
+    if (mI->bones==0)
+    {
+         fprintf(stderr,"No bones ?\n");
+         return 0;
+    }
+
+    unsigned int testID = 0;
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+
+
+
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation, -90.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  90.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+
+
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  , -90.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  90.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+
+
+
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  0.0 , -90.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+       ++testID;
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  0.0 , 90.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
+       triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
+       triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
+       triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       //-------------------------------------------------------------------------------------------------------------
+
+
+         for (int i=0; i<7; i++)
+         {
+            fprintf(stderr,"Test %u (mID=%u set to %0.2f) ",i,triResult[i].mID,triResult[i].value);
+            if (triResult[i].value>0.0) { fprintf(stderr," "); }
+            fprintf(stderr," | ");
+
+            //--------------------------------------------------------------
+            if (triResult[i].dX>0.001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dX<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            if (triResult[i].dY>0.001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dY<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            if (triResult[i].dZ>0.001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dZ<-0.001) {  fprintf(stderr,"- "); } else
+                                        {  fprintf(stderr,"0 "); }
+            //--------------------------------------------------------------
+            fprintf(stderr,"\n");
+         }
+
+
+      tri_deallocModelInternals(&mT);
+      exit(0);
+}
+
+
 
 const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOutput,
@@ -573,6 +890,7 @@ const static int animateTRIModelUsingBVHArmature(
         if (transformations4x4==0)
         {
             fprintf(stderr,"Failed to allocate enough memory for bones.. \n");
+            freeMotionBuffer(&frameMotionBuffer);
             return 0;
         }
 
@@ -665,10 +983,10 @@ const static int animateTRIModelUsingBVHArmature(
                                  float rSignX = -1.0;
                                  float rSignY = -1.0;
                                  float rSignZ = -1.0;
-                                 int rotationOrder = ROTATION_ORDER_YZX;
+                                 int rotationOrder = ROTATION_ORDER_ZXY;
                                  //  ./gl3MeshTransform --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
                                  //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
-                                 fprintf(stderr,"Rot %u ",rotationOrder);
+                                 //fprintf(stderr,"Rot %u ",rotationOrder);
 
                                  if (
                                       (strcmp("rshoulder",modelOriginal->bones[boneID].boneName)==0) ||
@@ -692,12 +1010,6 @@ const static int animateTRIModelUsingBVHArmature(
                                     }
 
 
-                                 /*
-                                 float * m = modelOriginal->bones[boneID].info->localTransformation;
-                                 m[0] = 0.0; m[1] = 0.0;  m[2] = 0.0; // Retain X ;
-                                 m[4] = 0.0; m[5] = 0.0;  m[6] = 0.0; // Retain Y
-                                 m[8] = 0.0; m[9] = 0.0;  m[10] = 0.0; // Retain Z
-                                 m[12] = 0.0; m[13] = 0.0;  m[14] = 0.0; m[15] = 1.0;*/
 
                                  if (bvh->jointHierarchy[jID].hasPositionalChannels)
                                    {
