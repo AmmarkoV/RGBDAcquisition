@@ -714,7 +714,6 @@ const static int checkTRIRotation(
                                   const char * triJointName
                                  )
 {
-
     if (modelOriginal==0)
     {
          fprintf(stderr,"No TRI model ?\n");
@@ -827,7 +826,7 @@ const static int checkTRIRotation(
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
        triResult[testID].value = -90;
-       triResult[testID].mID   = boneID;
+       triResult[testID].mID   = boneID+1;
        //-------------------------------------------------------------------------------------------------------------
        ++testID;
        create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  90.0 , 0.0  , ROTATION_ORDER_ZXY );
@@ -837,7 +836,7 @@ const static int checkTRIRotation(
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
        triResult[testID].value = 90;
-       triResult[testID].mID   = boneID;
+       triResult[testID].mID   = boneID+1;
        //-------------------------------------------------------------------------------------------------------------
 
 
@@ -851,7 +850,7 @@ const static int checkTRIRotation(
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
        triResult[testID].value = -90;
-       triResult[testID].mID   = boneID;
+       triResult[testID].mID   = boneID+2;
        //-------------------------------------------------------------------------------------------------------------
        ++testID;
        create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  0.0 , 90.0  , ROTATION_ORDER_ZXY );
@@ -861,7 +860,7 @@ const static int checkTRIRotation(
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
        triResult[testID].value = 90;
-       triResult[testID].mID   = boneID;
+       triResult[testID].mID   = boneID+2;
        //-------------------------------------------------------------------------------------------------------------
 
 
@@ -872,16 +871,16 @@ const static int checkTRIRotation(
             fprintf(stderr," | ");
 
             //--------------------------------------------------------------
-            if (triResult[i].dX>0.001)  {  fprintf(stderr,"+ "); } else
-            if (triResult[i].dX<-0.001) {  fprintf(stderr,"- "); } else
+            if (triResult[i].dX>0.00001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dX<-0.00001) {  fprintf(stderr,"- "); } else
                                         {  fprintf(stderr,"0 "); }
             //--------------------------------------------------------------
-            if (triResult[i].dY>0.001)  {  fprintf(stderr,"+ "); } else
-            if (triResult[i].dY<-0.001) {  fprintf(stderr,"- "); } else
+            if (triResult[i].dY>0.00001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dY<-0.00001) {  fprintf(stderr,"- "); } else
                                         {  fprintf(stderr,"0 "); }
             //--------------------------------------------------------------
-            if (triResult[i].dZ>0.001)  {  fprintf(stderr,"+ "); } else
-            if (triResult[i].dZ<-0.001) {  fprintf(stderr,"- "); } else
+            if (triResult[i].dZ>0.00001)  {  fprintf(stderr,"+ "); } else
+            if (triResult[i].dZ<-0.00001) {  fprintf(stderr,"- "); } else
                                         {  fprintf(stderr,"0 "); }
             //--------------------------------------------------------------
             fprintf(stderr,"\n");
