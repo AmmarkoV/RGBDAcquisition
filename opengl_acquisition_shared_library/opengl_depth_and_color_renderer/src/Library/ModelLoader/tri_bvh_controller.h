@@ -715,6 +715,18 @@ const static int checkTRIRotation(
                                  )
 {
 
+    if (modelOriginal==0)
+    {
+         fprintf(stderr,"No TRI model ?\n");
+         return 0;
+    }
+    if (modelOriginal->bones==0)
+    {
+         fprintf(stderr,"No bones ?\n");
+         return 0;
+    }
+
+
     unsigned int boneChildID=0;
     unsigned int boneID=0;
     if (!tri_findBone(modelOriginal,triJointName,&boneID) )
@@ -751,20 +763,9 @@ const static int checkTRIRotation(
 
 
 
-    struct TRI_Model * mI = &modelOriginal;
-    struct TRI_Model mT = {0};
     struct Matrix4x4OfFloats dynamicRotation;
-
-    if (mI==0)
-    {
-         fprintf(stderr,"No TRI model ?\n");
-         return 0;
-    }
-    if ( (mI->bones==0) || (mI->bones->info==0) )
-    {
-         fprintf(stderr,"No bones ?\n");
-         return 0;
-    }
+    struct TRI_Model   mT = {0};
+    struct TRI_Model * mI = modelOriginal;
 
     if (
          (mI->header.numberOfBones <= boneID ) ||
@@ -772,6 +773,16 @@ const static int checkTRIRotation(
        )
     {
          fprintf(stderr,"Bones out of bounds?\n");
+         return 0;
+    }
+
+
+    if (
+         (mI->bones[boneID].info==0) ||
+         (mI->bones[boneChildID].info==0)
+       )
+    {
+         fprintf(stderr,"No bone infos ?\n");
          return 0;
     }
 
@@ -792,6 +803,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = -90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
        ++testID;
        create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  90.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
@@ -800,6 +813,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = 90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
 
 
@@ -811,6 +826,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = -90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
        ++testID;
        create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  90.0 , 0.0  , ROTATION_ORDER_ZXY );
@@ -819,6 +836,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = 90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
 
 
@@ -831,6 +850,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = -90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
        ++testID;
        create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  ,  0.0 , 90.0  , ROTATION_ORDER_ZXY );
@@ -839,6 +860,8 @@ const static int checkTRIRotation(
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
+       triResult[testID].value = 90;
+       triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
 
 
