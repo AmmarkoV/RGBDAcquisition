@@ -542,12 +542,14 @@ struct testResult
 };
 
 
-const static int alignRotationOfTRIVsBVH(
-                                          struct TRI_Model * modelOriginal,
-                                          struct BVH_MotionCapture * bvh,
-                                          const char * triJointName,
-                                          const char * bvhJointName
-                                        )
+
+
+
+const static int checkBVHRotation(
+                                  struct testResult * bvhResult,
+                                  struct BVH_MotionCapture * bvh,
+                                  const char * bvhJointName
+                                 )
 {
     BVHJointID childJID=0;
     BVHJointID jID=0;
@@ -566,8 +568,6 @@ const static int alignRotationOfTRIVsBVH(
     }
 
 
-
-    struct testResult bvhResult[7]={0};
     struct MotionBuffer * frameMotionBuffer = mallocNewMotionBuffer(bvh);
 
     if (frameMotionBuffer!=0)
@@ -698,21 +698,28 @@ const static int alignRotationOfTRIVsBVH(
 
 
         freeMotionBuffer(&frameMotionBuffer);
+        return 1;
        }
 
+   return 0;
+}
 
 
 
-    struct testResult triResult[7]={0};
 
 
-
+const static int checkTRIRotation(
+                                  struct testResult * triResult,
+                                  struct TRI_Model * modelOriginal,
+                                  const char * triJointName
+                                 )
+{
 
     unsigned int boneChildID=0;
     unsigned int boneID=0;
     if (!tri_findBone(modelOriginal,triJointName,&boneID) )
     {
-        fprintf(stderr,"Could not resolve TRI joint %s \n",bvhJointName);
+        fprintf(stderr,"Could not resolve TRI joint %s \n",triJointName);
         return 0;
     }
     for (BVHJointID j=0; j<modelOriginal->header.numberOfBones; j++)
@@ -724,7 +731,7 @@ const static int alignRotationOfTRIVsBVH(
        }
     }
 
-    fprintf(stderr," TRI joint %s ( %u ) -> child %u   \n",bvhJointName,boneID,boneChildID);
+    fprintf(stderr," TRI joint %s ( %u ) -> child %u   \n",triJointName,boneID,boneChildID);
 
     unsigned int numberOfBones = modelOriginal->header.numberOfBones;
     unsigned int transformations4x4Size = numberOfBones * 16;
@@ -753,7 +760,7 @@ const static int alignRotationOfTRIVsBVH(
          fprintf(stderr,"No TRI model ?\n");
          return 0;
     }
-    if (mI->bones==0)
+    if ( (mI->bones==0) || (mI->bones->info==0) )
     {
          fprintf(stderr,"No bones ?\n");
          return 0;
@@ -859,7 +866,40 @@ const static int alignRotationOfTRIVsBVH(
 
 
       tri_deallocModelInternals(&mT);
-      exit(0);
+      return 1;
+}
+
+
+
+
+
+
+
+const static int alignRotationOfTRIVsBVH(
+                                          struct TRI_Model * modelOriginal,
+                                          struct BVH_MotionCapture * bvh,
+                                          const char * triJointName,
+                                          const char * bvhJointName
+                                        )
+{
+
+    struct testResult bvhResult[7]={0};
+    checkBVHRotation(
+                      &bvhResult,
+                       bvh,
+                       bvhJointName
+                    );
+
+    struct testResult triResult[7]={0};
+    checkTRIRotation(
+                      &triResult,
+                      modelOriginal,
+                      triJointName
+                    );
+
+
+    exit(0);
+    return 0;
 }
 
 
