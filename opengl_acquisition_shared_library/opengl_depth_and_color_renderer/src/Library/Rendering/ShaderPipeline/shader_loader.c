@@ -100,8 +100,8 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
   sh->fragMem=loadShaderFileToMem(fragmentShaderChar,&sh->fragMemLength);
   if ( (sh->fragMem==0)||(sh->fragMemLength==0)) { fprintf(stderr,"Could not load fragment shader in memory..\n"); }
 
-  fprintf(stderr,"VERTEX SHADER (%lu bytes long) \n\n%s\n",sh->vertMemLength,sh->vertMem);
-  fprintf(stderr,"FRAGMENT SHADER (%lu bytes long) \n\n%s\n",sh->fragMemLength,sh->fragMem);
+  //fprintf(stderr,"VERTEX SHADER (%lu bytes long) \n\n%s\n",sh->vertMemLength,sh->vertMem);
+  //fprintf(stderr,"FRAGMENT SHADER (%lu bytes long) \n\n%s\n",sh->fragMemLength,sh->fragMem);
 
 
   #if USE_FAILSAFE_SHADER==1

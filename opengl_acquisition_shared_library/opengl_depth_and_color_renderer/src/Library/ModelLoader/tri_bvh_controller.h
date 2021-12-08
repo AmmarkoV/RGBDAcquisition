@@ -748,13 +748,27 @@ const static int alignRotationOfTRIVsBVH(
     struct TRI_Model mT = {0};
     struct Matrix4x4OfFloats dynamicRotation;
 
-
+    if (mI==0)
+    {
+         fprintf(stderr,"No TRI model ?\n");
+         return 0;
+    }
     if (mI->bones==0)
     {
          fprintf(stderr,"No bones ?\n");
          return 0;
     }
 
+    if (
+         (mI->header.numberOfBones <= boneID ) ||
+         (mI->header.numberOfBones <= boneChildID )
+       )
+    {
+         fprintf(stderr,"Bones out of bounds?\n");
+         return 0;
+    }
+
+    //valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./gl3MeshTransform 2>error.txt
     unsigned int testID = 0;
        doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
