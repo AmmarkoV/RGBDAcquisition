@@ -1727,11 +1727,11 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    //Test
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow");
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"relbow","relbow");
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lshoulder","lshoulder");
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder");
-   exit(0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"relbow","relbow",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lshoulder","lshoulder",1);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder",1);
+   //exit(0);
 
    if (maxFrames==0)
    {

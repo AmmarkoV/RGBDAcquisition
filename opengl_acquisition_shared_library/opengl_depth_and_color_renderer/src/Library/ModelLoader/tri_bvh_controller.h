@@ -711,7 +711,8 @@ const static int checkBVHRotation(
 const static int checkTRIRotation(
                                   struct testResult * triResult,
                                   struct TRI_Model * modelOriginal,
-                                  const char * triJointName
+                                  const char * triJointName,
+                                  int childOfChild
                                  )
 {
     if (modelOriginal==0)
@@ -733,6 +734,7 @@ const static int checkTRIRotation(
         fprintf(stderr,"Could not resolve TRI joint %s \n",triJointName);
         return 0;
     }
+
     for (BVHJointID j=0; j<modelOriginal->header.numberOfBones; j++)
     {
        if ( modelOriginal->bones[j].info->boneParent == boneID)
@@ -741,6 +743,19 @@ const static int checkTRIRotation(
           break;
        }
     }
+
+    if (childOfChild)
+    {
+      for (BVHJointID j=0; j<modelOriginal->header.numberOfBones; j++)
+      {
+       if ( modelOriginal->bones[j].info->boneParent == boneChildID)
+       {
+          boneChildID = j;
+          break;
+       }
+      }
+    }
+
 
     fprintf(stderr," TRI joint %s ( %u ) -> child %u   \n",triJointName,boneID,boneChildID);
 
@@ -785,8 +800,8 @@ const static int checkTRIRotation(
          return 0;
     }
 
-    //valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./gl3MeshTransform 2>error.txt
-    unsigned int testID = 0;
+       // valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./gl3MeshTransform 2>error.txt
+       unsigned int testID = 0;
        doModelTransform(&mT,modelOriginal,transformations4x4,numberOfBones * 16 * sizeof(float),1,1,1,0);
        triResult[testID].dX = (float) mI->bones[boneID].info->x - mI->bones[boneChildID].info->x;
        triResult[testID].dY = (float) mI->bones[boneID].info->y - mI->bones[boneChildID].info->y;
@@ -815,6 +830,9 @@ const static int checkTRIRotation(
        triResult[testID].value = 90;
        triResult[testID].mID   = boneID;
        //-------------------------------------------------------------------------------------------------------------
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       //-------------------------------------------------------------------------------------------------------------
 
 
        //-------------------------------------------------------------------------------------------------------------
@@ -837,6 +855,9 @@ const static int checkTRIRotation(
        triResult[testID].dZ = (float) mI->bones[boneID].info->z - mI->bones[boneChildID].info->z;
        triResult[testID].value = 90;
        triResult[testID].mID   = boneID+1;
+       //-------------------------------------------------------------------------------------------------------------
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
        //-------------------------------------------------------------------------------------------------------------
 
 
@@ -861,6 +882,9 @@ const static int checkTRIRotation(
        triResult[testID].value = 90;
        triResult[testID].mID   = boneID+2;
        //-------------------------------------------------------------------------------------------------------------
+       create4x4FMatrixFromEulerAnglesWithRotationOrder(&dynamicRotation,  0.0  , 0.0 , 0.0  , ROTATION_ORDER_ZXY );
+       copy4x4FMatrix(&transformations4x4[boneID*16],dynamicRotation.m);
+       //-------------------------------------------------------------------------------------------------------------
 
 
          for (int i=0; i<7; i++)
@@ -878,7 +902,7 @@ const static int checkTRIRotation(
             if (triResult[i].dY<0.0)  {  fprintf(stderr,"- ");   triResult[i].dY=-1.0; } else
                                       {  fprintf(stderr,"0 ");   triResult[i].dY= 0.0; }
             //--------------------------------------------------------------
-            if (triResult[i].dZ>0.0) {  fprintf(stderr,"+ ");   triResult[i].dZ= 1.0; } else
+            if (triResult[i].dZ>0.0)  {  fprintf(stderr,"+ ");   triResult[i].dZ= 1.0; } else
             if (triResult[i].dZ<0.0)  {  fprintf(stderr,"- ");   triResult[i].dZ=-1.0; } else
                                       {  fprintf(stderr,"0 ");   triResult[i].dZ= 0.0; }
             //--------------------------------------------------------------
@@ -911,7 +935,8 @@ const static int alignRotationOfTRIVsBVH(
                                           struct TRI_Model * modelOriginal,
                                           struct BVH_MotionCapture * bvh,
                                           const char * triJointName,
-                                          const char * bvhJointName
+                                          const char * bvhJointName,
+                                          int childOfTriChild
                                         )
 {
     int matched = 0;
@@ -926,7 +951,8 @@ const static int alignRotationOfTRIVsBVH(
     checkTRIRotation(
                       &triResult,
                       modelOriginal,
-                      triJointName
+                      triJointName,
+                      childOfTriChild
                     );
 
     fprintf(stderr,GREEN "BVH(%s) to TRI(%s)\n" NORMAL,triJointName,bvhJointName);
@@ -1105,9 +1131,13 @@ const static int animateTRIModelUsingBVHArmature(
                                       (strcmp("lshoulder",modelOriginal->bones[boneID].boneName)==0)
                                     )
                                     {
-                                      //rotationOrder = ROTATION_ORDER_XYZ;
+                                      // Z X Y => Y X Z
+                                      //Lshoulder TRI Y = BVH -Z
+                                      //Lshoulder TRI X = BVH X  ?
+                                      //LShoulder TRI Z = BVH -Y
+                                      rotationOrder = ROTATION_ORDER_YXZ;
                                       rSignX = -1.0;
-                                      rSignY = -1.0;
+                                      rSignY = 1.0;
                                       rSignZ = -1.0;
                                     } else
                                  if (
@@ -1115,10 +1145,11 @@ const static int animateTRIModelUsingBVHArmature(
                                       (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
                                     )
                                     {
-                                      //rotationOrder = ROTATION_ORDER_XYZ;
+                                        // Z X Y => X -Z -Y
+                                       rotationOrder = ROTATION_ORDER_XZY;
                                       rSignX = -1.0;
-                                      rSignY = -1.0;
-                                      rSignZ = -1.0;
+                                      rSignY = 1.0;
+                                      rSignZ = 1.0;
                                     }
 
 
