@@ -681,17 +681,17 @@ const static int checkBVHRotation(
             fprintf(stderr," | ");
 
             //--------------------------------------------------------------
-            if (bvhResult[i].dX>0.001)  {  fprintf(stderr,"+ ");  bvhResult[i].dX= 1.0; } else
-            if (bvhResult[i].dX<-0.001) {  fprintf(stderr,"- ");  bvhResult[i].dX=-1.0; } else
-                                        {  fprintf(stderr,"0 ");  bvhResult[i].dX= 0.0; }
+            if (bvhResult[i].dX>0.0)  {  fprintf(stderr,"+ ");  bvhResult[i].dX= 1.0; } else
+            if (bvhResult[i].dX<0.0)  {  fprintf(stderr,"- ");  bvhResult[i].dX=-1.0; } else
+                                      {  fprintf(stderr,"0 ");  bvhResult[i].dX= 0.0; }
             //--------------------------------------------------------------
-            if (bvhResult[i].dY>0.001)  {  fprintf(stderr,"+ ");  bvhResult[i].dY= 1.0; } else
-            if (bvhResult[i].dY<-0.001) {  fprintf(stderr,"- ");  bvhResult[i].dY=-1.0; } else
-                                        {  fprintf(stderr,"0 ");  bvhResult[i].dY= 0.0; }
+            if (bvhResult[i].dY>0.0)  {  fprintf(stderr,"+ ");  bvhResult[i].dY= 1.0; } else
+            if (bvhResult[i].dY<0.0)  {  fprintf(stderr,"- ");  bvhResult[i].dY=-1.0; } else
+                                      {  fprintf(stderr,"0 ");  bvhResult[i].dY= 0.0; }
             //--------------------------------------------------------------
-            if (bvhResult[i].dZ>0.001)  {  fprintf(stderr,"+ ");  bvhResult[i].dZ= 1.0; } else
-            if (bvhResult[i].dZ<-0.001) {  fprintf(stderr,"- ");  bvhResult[i].dZ=-1.0; } else
-                                        {  fprintf(stderr,"0 ");  bvhResult[i].dZ= 0.0; }
+            if (bvhResult[i].dZ>0.0)  {  fprintf(stderr,"+ ");  bvhResult[i].dZ= 1.0; } else
+            if (bvhResult[i].dZ<0.0)  {  fprintf(stderr,"- ");  bvhResult[i].dZ=-1.0; } else
+                                      {  fprintf(stderr,"0 ");  bvhResult[i].dZ= 0.0; }
             //--------------------------------------------------------------
             fprintf(stderr,"\n");
          }
@@ -870,17 +870,17 @@ const static int checkTRIRotation(
             fprintf(stderr," | ");
 
             //--------------------------------------------------------------
-            if (triResult[i].dX>0.00001)  {  fprintf(stderr,"+ ");   triResult[i].dX= 1.0; } else
-            if (triResult[i].dX<-0.00001) {  fprintf(stderr,"- ");   triResult[i].dX=-1.0; } else
-                                          {  fprintf(stderr,"0 ");   triResult[i].dX= 0.0; }
+            if (triResult[i].dX>0.0)  {  fprintf(stderr,"+ ");   triResult[i].dX= 1.0; } else
+            if (triResult[i].dX<0.0)  {  fprintf(stderr,"- ");   triResult[i].dX=-1.0; } else
+                                      {  fprintf(stderr,"0 ");   triResult[i].dX= 0.0; }
             //--------------------------------------------------------------
-            if (triResult[i].dY>0.00001)  {  fprintf(stderr,"+ ");   triResult[i].dY= 1.0; } else
-            if (triResult[i].dY<-0.00001) {  fprintf(stderr,"- ");   triResult[i].dY=-1.0; } else
-                                          {  fprintf(stderr,"0 ");   triResult[i].dY= 0.0; }
+            if (triResult[i].dY>0.0)  {  fprintf(stderr,"+ ");   triResult[i].dY= 1.0; } else
+            if (triResult[i].dY<0.0)  {  fprintf(stderr,"- ");   triResult[i].dY=-1.0; } else
+                                      {  fprintf(stderr,"0 ");   triResult[i].dY= 0.0; }
             //--------------------------------------------------------------
-            if (triResult[i].dZ>0.00001)  {  fprintf(stderr,"+ ");   triResult[i].dZ= 1.0; } else
-            if (triResult[i].dZ<-0.00001) {  fprintf(stderr,"- ");   triResult[i].dZ=-1.0; } else
-                                          {  fprintf(stderr,"0 ");   triResult[i].dZ= 0.0; }
+            if (triResult[i].dZ>0.0) {  fprintf(stderr,"+ ");   triResult[i].dZ= 1.0; } else
+            if (triResult[i].dZ<0.0)  {  fprintf(stderr,"- ");   triResult[i].dZ=-1.0; } else
+                                      {  fprintf(stderr,"0 ");   triResult[i].dZ= 0.0; }
             //--------------------------------------------------------------
             fprintf(stderr,"\n");
          }
