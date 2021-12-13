@@ -82,7 +82,7 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
 unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * joints , unsigned int numberOfJoints);
 
 
-
+int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, unsigned int width,unsigned int height);
 
 
 

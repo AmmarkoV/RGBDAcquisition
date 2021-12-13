@@ -61,7 +61,7 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
-char renderHair = 1;
+char renderHair = 0;
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -1590,6 +1590,8 @@ int main(int argc,const char **argv)
    bvh_printBVH(&mc);
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
 
+   // 2000 1400
+   tri_colorCodeTexture(&indexedHumanModel,1600,700,400,700);
 
    if (indexedHumanModel.textureData!=0)
    {
@@ -1874,6 +1876,21 @@ int main(int argc,const char **argv)
         { fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL); }
    }
    while ( (dumpVideo==0) && (dumpSnapshot==0) ); //If dump video is not enabled loop forever
+
+
+
+   if(dumpSnapshot)
+   {
+           saveRawImageToFileOGLR(
+                                   "texture.pnm",
+                                   indexedHumanModel.textureData,
+                                   indexedHumanModel.header.textureDataWidth,
+                                   indexedHumanModel.header.textureDataHeight,
+                                   indexedHumanModel.header.textureDataChannels,
+                                   8
+                                 );
+
+   }
 
 
    glDeleteProgram(programID);

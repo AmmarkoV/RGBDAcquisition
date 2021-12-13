@@ -520,16 +520,15 @@ int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, 
        {
         unsigned int thisPixel = currentColor;
         //------------------------------------
-        char thisColor = (char) thisPixel % 255;
+        char c1 = (char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        *ptr = thisColor;  ++ptr;
-        //---------------------------
-        thisColor = (char) thisPixel % 255;
+        char c2 = (char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        *ptr = thisColor;  ++ptr;
-        //---------------------------
-        thisColor = (char)  thisPixel % 255;
-        *ptr = thisColor;  ++ptr;
+        char c3 = (char)  thisPixel % 255;
+        //------------------------------------
+        *ptr = c2;  ++ptr; // R
+        *ptr = c3;  ++ptr; // G
+        *ptr = c1;  ++ptr; // B
         //---------------------------
         currentColor += colorStep;
        }
