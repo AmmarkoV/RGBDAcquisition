@@ -492,15 +492,45 @@ void colorCodeBones(struct TRI_Model * in)
 /// -----------------------------------------------------------------------------
 int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, unsigned int width,unsigned int height)
 {
+  if ( (width==0) || (height==0) ) { return 0; }
+
+  unsigned int colorStep = (255*255*255) / (width * height);
+  unsigned int currentColor = colorStep;
   if (in!=0)
   {
     if (in->textureData!=0)
     {
-      char * ptr = 0;
-      char * lineEnd = 0;
+      unsigned int imageWidth  = in->header.textureDataWidth;
+      unsigned int imageHeight = in->header.textureDataHeight;
 
+      unsigned int x1 = x;
+      unsigned int y1 = y;
+      unsigned int x2 = x + width;
+      unsigned int y2 = y + height;
 
+      char * ptr = (y1 * imageWidth * 3) + (x1 * 3);
+      char * lineEnd = ptr + (width * 3);
 
+      while (ptr<lineEnd)
+      {
+        unsigned int thisPixel = currentColor;
+        //------------------------------------
+        char thisColor = thisPixel % 255;
+        thisPixel = thisPixel / 255;
+        *ptr = thisColor;
+        ++ptr;
+        //---------------------------
+        thisColor = thisPixel % 255;
+        thisPixel = thisPixel / 255;
+        *ptr = thisColor;
+        ++ptr;
+        //---------------------------
+        thisColor = thisPixel % 255;
+        *ptr = thisColor;
+        ++ptr;
+        //---------------------------
+        currentColor += currentColor;
+      }
 
       return 1;
     }
