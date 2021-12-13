@@ -496,40 +496,48 @@ int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, 
 
   unsigned int colorStep = (255*255*255) / (width * height);
   unsigned int currentColor = colorStep;
+  //------------------------------------
   if (in!=0)
   {
     if (in->textureData!=0)
     {
       unsigned int imageWidth  = in->header.textureDataWidth;
-      unsigned int imageHeight = in->header.textureDataHeight;
+      //unsigned int imageHeight = in->header.textureDataHeight;
 
       unsigned int x1 = x;
       unsigned int y1 = y;
       unsigned int x2 = x + width;
       unsigned int y2 = y + height;
 
-      char * ptr = (y1 * imageWidth * 3) + (x1 * 3);
-      char * lineEnd = ptr + (width * 3);
+      char * ptr = in->textureData + (y1 * imageWidth * 3) + (x1 * 3);
+      char * lineStart = ptr;
+      char * lineEnd   = ptr + (width * 3);
+      char * imageEnd  = in->textureData + (y2 * imageWidth * 3) + (x2 * 3);
 
-      while (ptr<lineEnd)
+      while (ptr<imageEnd)
       {
+       while (ptr<lineEnd)
+       {
         unsigned int thisPixel = currentColor;
         //------------------------------------
-        char thisColor = thisPixel % 255;
+        char thisColor = (char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        *ptr = thisColor;
-        ++ptr;
+        *ptr = thisColor;  ++ptr;
         //---------------------------
-        thisColor = thisPixel % 255;
+        thisColor = (char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        *ptr = thisColor;
-        ++ptr;
+        *ptr = thisColor;  ++ptr;
         //---------------------------
-        thisColor = thisPixel % 255;
-        *ptr = thisColor;
-        ++ptr;
+        thisColor = (char)  thisPixel % 255;
+        *ptr = thisColor;  ++ptr;
         //---------------------------
-        currentColor += currentColor;
+        currentColor += colorStep;
+       }
+       //--------------------------
+       lineStart += imageWidth * 3;
+       lineEnd   += imageWidth * 3;
+       ptr = lineStart;
+       //--------------------------
       }
 
       return 1;
