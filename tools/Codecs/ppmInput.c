@@ -8,6 +8,18 @@
 #define PPMREADBUFLEN 256
 
 
+unsigned int simplePowPPM(unsigned int base,unsigned int exp)
+{
+    if (exp==0) return 1;
+    unsigned int retres=base;
+    unsigned int i=0;
+    for (i=0; i<exp-1; i++)
+    {
+        retres*=base;
+    }
+    return retres;
+}
+
 
 
 int swapDepthEndianness(struct Image * img)
@@ -185,7 +197,7 @@ int WritePPM(char * filename,struct Image * pic)
             return 1;
         }
 
-        fprintf(fd, "%d %d\n%u\n", pic->width, pic->height , simplePowCodecs(2 ,pic->bitsperpixel)-1);
+        fprintf(fd, "%d %d\n%u\n", pic->width, pic->height , simplePowPPM(2 ,pic->bitsperpixel)-1);
 
         float tmp_n = (float) pic->bitsperpixel/ 8;
         tmp_n = tmp_n *  pic->width * pic->height * pic->channels ;

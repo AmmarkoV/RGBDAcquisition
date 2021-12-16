@@ -60,6 +60,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.h" />
+		<Unit filename="../../../../../tools/Codecs/ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/Codecs/ppmInput.h" />
 		<Unit filename="../ModelLoader/model_loader_transform_joints.c">
 			<Option compilerVar="CC" />
 		</Unit>

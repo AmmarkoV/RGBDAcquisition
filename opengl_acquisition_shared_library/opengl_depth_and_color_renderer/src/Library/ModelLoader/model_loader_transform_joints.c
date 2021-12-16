@@ -526,8 +526,8 @@ int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, 
         thisPixel = thisPixel / 255;
         char c3 = (char)  thisPixel % 255;
         //------------------------------------
-        *ptr = c2;  ++ptr; // R
-        *ptr = c3;  ++ptr; // G
+        *ptr = c3;  ++ptr; // R
+        *ptr = c2;  ++ptr; // G
         *ptr = c1;  ++ptr; // B
         //---------------------------
         currentColor += colorStep;
