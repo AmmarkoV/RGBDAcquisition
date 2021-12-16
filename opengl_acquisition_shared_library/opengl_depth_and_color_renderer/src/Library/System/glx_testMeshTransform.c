@@ -32,6 +32,8 @@
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../../../../../tools/AmMatrix/matrixOpenGL.h"
 
+#include "../../../../../tools/Codecs/ppmInput.h"
+
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
@@ -1590,8 +1592,33 @@ int main(int argc,const char **argv)
    bvh_printBVH(&mc);
    printTRIBoneStructure(&indexedHumanModel,0 /*alsoPrintMatrices*/);
 
-   // 2000 1400
-   tri_colorCodeTexture(&indexedHumanModel,1600,700,400,700);
+
+
+     for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--colorcode")==0)
+                    {
+                        // 2000 1400
+                        tri_colorCodeTexture(&indexedHumanModel,1600,700,400,700);
+                    } else
+           if (strcmp(argv[i],"--texture")==0)
+                    {
+                        struct Image newImg={0};
+                        ReadPPM(argv[i+1],&newImg,0);
+                        if ( indexedHumanModel.textureData!=0 )
+                        {
+                            free(indexedHumanModel.textureData);
+                            indexedHumanModel.textureData = 0;
+                        }
+
+                        indexedHumanModel.textureData = newImg.pixels;
+                        indexedHumanModel.header.textureDataWidth = newImg.width;
+                        indexedHumanModel.header.textureDataHeight = newImg.height;
+                        indexedHumanModel.header.textureDataChannels = newImg.channels;
+                    }
+        }
+
+
 
    if (indexedHumanModel.textureData!=0)
    {
