@@ -11,12 +11,52 @@ else
  wget http://ammar.gr/mocapnet/mnet4/makehuman.tri
 fi 
 
+if [ -e hair.tri ]
+then 
+ echo "Hair Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/hair.tri
+fi 
+
+if [ -e teeth.tri ]
+then 
+ echo "Teeth Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/teeth.tri
+fi 
+
+if [ -e tongue.tri ]
+then 
+ echo "Tongue Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/tongue.tri
+fi 
+
 if [ -e eyes.tri ]
 then 
  echo "Eye Model exists.."
 else 
  cd "$DIR"  
  wget http://ammar.gr/mocapnet/mnet4/eyes.tri
+fi 
+
+if [ -e eyebrows.tri ]
+then 
+ echo "Eyebrows Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/eyebrows.tri
+fi 
+
+if [ -e eyelashes.tri ]
+then 
+ echo "Eyelashes Model exists.."
+else 
+ cd "$DIR"  
+ wget http://ammar.gr/mocapnet/mnet4/eyelashes.tri
 fi 
 
 if [ -e axis.tri ]
