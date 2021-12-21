@@ -1787,6 +1787,28 @@ int main(int argc,const char **argv)
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (BVH has %u frames total) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
      //-------------------------------------------
 
+
+     if (flashTexturePixels)
+     {
+      memset(
+             indexedHumanModel.textureData,
+             rand()%255,
+             sizeof(char) * indexedHumanModel.header.textureDataWidth * indexedHumanModel.header.textureDataHeight *indexedHumanModel.header.textureDataChannels
+            );
+
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedHumanModel.header.textureBindGLBuffer,
+                                 &indexedHumanModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedHumanModel.textureData,
+                                  indexedHumanModel.header.textureDataWidth,
+                                  indexedHumanModel.header.textureDataHeight,
+                                  indexedHumanModel.header.textureDataChannels,
+                                  24
+                                );
+     }
+
+
      if (!staticRendering)
      {
        animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
