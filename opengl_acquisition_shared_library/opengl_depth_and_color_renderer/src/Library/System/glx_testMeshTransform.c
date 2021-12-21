@@ -63,6 +63,8 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
+char flashTexturePixels = 0;
+
 char renderHair = 0;
 
 //Virtual Camera Intrinsics
@@ -1596,6 +1598,10 @@ int main(int argc,const char **argv)
 
      for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--flashtexture")==0)
+                    {
+                        flashTexturePixels = 1;
+                    } else
            if (strcmp(argv[i],"--colorcode")==0)
                     {
                         // 2000 1400
@@ -1886,6 +1892,27 @@ int main(int argc,const char **argv)
      tri_deallocModelInternals(&hairModel);
      tri_deallocModelInternals(&eyebrowsModel);
      usleep(1);
+
+     if (flashTexturePixels)
+     {
+      memset(
+             indexedHumanModel.textureData,
+             rand()%255,
+             sizeof(char) * indexedHumanModel.header.textureDataWidth * indexedHumanModel.header.textureDataHeight *indexedHumanModel.header.textureDataChannels
+            );
+
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &indexedHumanModel.header.textureBindGLBuffer,
+                                 &indexedHumanModel.header.textureUploadedToGPU,
+                                 (unsigned char*) indexedHumanModel.textureData,
+                                  indexedHumanModel.header.textureDataWidth,
+                                  indexedHumanModel.header.textureDataHeight,
+                                  indexedHumanModel.header.textureDataChannels,
+                                  24
+                                );
+     }
+
 
      if  (rgb!=0)
      {
