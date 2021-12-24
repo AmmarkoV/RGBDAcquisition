@@ -41,8 +41,6 @@
 			<Add option="-lGLEW" />
 			<Add option="-lm" />
 			<Add option="-pthread" />
-			<Add library="../../../../../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="../../../../../acquisition/libRGBDAcquisition.so" />
 		</Linker>
 		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
