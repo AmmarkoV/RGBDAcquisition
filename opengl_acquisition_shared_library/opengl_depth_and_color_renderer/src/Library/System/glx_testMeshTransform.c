@@ -63,6 +63,7 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered = 0;
 
+float backgroundColor[3]={0};
 char flashTexturePixels = 0;
 
 char renderHair = 0;
@@ -540,7 +541,7 @@ int initializeOGLRenderer(
 	glUseProgram(*programID);
 
 	// Black background
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -682,8 +683,10 @@ int doDrawing(
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-        //glClearColor(0.0,0.0,0.0,1);
-        glClearColor(0.2,0.2,0.2,1);
+        //This works better
+        //glClearColor(0.2,0.2,0.2,1);
+	    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],0.0f);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         doOGLDrawing(
@@ -857,7 +860,7 @@ int doSkeletonDraw(
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-        glClearColor( 0, 0.0, 0, 1 );
+	    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
@@ -1058,7 +1061,7 @@ int doBVHDraw(
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-        glClearColor( 0, 0.0, 0, 1 );
+	    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
@@ -1366,21 +1369,21 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
     unsigned char * g = ptr; ptr++;
     unsigned char * b = ptr; ptr++;
     *r = 255;
-    *g = 0;
+    *g = 255;
     *b = 0;
 
     r = ptr; ptr++;
     g = ptr; ptr++;
     b = ptr; ptr++;
     *r = 255;
-    *g = 0;
+    *g = 255;
     *b = 0;
 
     r = ptr; ptr++;
     g = ptr; ptr++;
     b = ptr; ptr++;
     *r = 255;
-    *g = 0;
+    *g = 255;
     *b = 0;
 }
 
