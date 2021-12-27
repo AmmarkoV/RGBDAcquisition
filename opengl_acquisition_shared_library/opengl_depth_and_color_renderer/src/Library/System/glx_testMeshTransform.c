@@ -1340,6 +1340,53 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 
 
 
+int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,unsigned int y)
+{
+      memset(
+             model->textureData,
+             0, //rand()%255,
+             sizeof(char) * model->header.textureDataWidth * model->header.textureDataHeight * model->header.textureDataChannels
+            );
+
+      uploadColorImageAsTexture(
+                                 programID,
+                                 (GLuint *) &model->header.textureBindGLBuffer,
+                                 &model->header.textureUploadedToGPU,
+                                 (unsigned char*) model->textureData,
+                                  model->header.textureDataWidth,
+                                  model->header.textureDataHeight,
+                                  model->header.textureDataChannels,
+                                  24
+                                );
+
+    fprintf(stderr,"X=%u,Y=%u ",x,y);
+    unsigned char * ptr = model->textureData + (y * model->header.textureDataWidth * model->header.textureDataChannels) + (x * model->header.textureDataChannels);
+
+    unsigned char * r = ptr; ptr++;
+    unsigned char * g = ptr; ptr++;
+    unsigned char * b = ptr; ptr++;
+    *r = 255;
+    *g = 0;
+    *b = 0;
+
+    r = ptr; ptr++;
+    g = ptr; ptr++;
+    b = ptr; ptr++;
+    *r = 255;
+    *g = 0;
+    *b = 0;
+
+    r = ptr; ptr++;
+    g = ptr; ptr++;
+    b = ptr; ptr++;
+    *r = 255;
+    *g = 0;
+    *b = 0;
+}
+
+
+
+
 
 
 int main(int argc,const char **argv)
@@ -1721,6 +1768,11 @@ int main(int argc,const char **argv)
   fprintf(stderr,"eyeTextureID = %u \n",indexedEyeModel.header.textureBindGLBuffer);
   fprintf(stderr,"humanTextureID = %u \n",indexedHumanModel.header.textureBindGLBuffer);
 
+  unsigned int startFlashX = 1600;
+  unsigned int startFlashY = 700;
+  unsigned int endFlashX = startFlashX + 400;
+  unsigned int endFlashY = startFlashY + 700;
+  unsigned int flashX=startFlashX,flashY=startFlashY;
 
 
    //------------------------------------------------------
@@ -1790,22 +1842,11 @@ int main(int argc,const char **argv)
 
      if (flashTexturePixels)
      {
-      memset(
-             indexedHumanModel.textureData,
-             rand()%255,
-             sizeof(char) * indexedHumanModel.header.textureDataWidth * indexedHumanModel.header.textureDataHeight *indexedHumanModel.header.textureDataChannels
-            );
+       flashX+=1;
+       if (flashX>endFlashX)  {  flashX=startFlashX; flashY+=1;            }
+       if (flashY>endFlashY)  {  flashX=startFlashX; flashY=startFlashY;   }
 
-      uploadColorImageAsTexture(
-                                 programID,
-                                 (GLuint *) &indexedHumanModel.header.textureBindGLBuffer,
-                                 &indexedHumanModel.header.textureUploadedToGPU,
-                                 (unsigned char*) indexedHumanModel.textureData,
-                                  indexedHumanModel.header.textureDataWidth,
-                                  indexedHumanModel.header.textureDataHeight,
-                                  indexedHumanModel.header.textureDataChannels,
-                                  24
-                                );
+       setTexturePixel(programID,&indexedHumanModel,flashX,flashY);
      }
 
 
@@ -1917,22 +1958,7 @@ int main(int argc,const char **argv)
 
      if (flashTexturePixels)
      {
-      memset(
-             indexedHumanModel.textureData,
-             rand()%255,
-             sizeof(char) * indexedHumanModel.header.textureDataWidth * indexedHumanModel.header.textureDataHeight *indexedHumanModel.header.textureDataChannels
-            );
-
-      uploadColorImageAsTexture(
-                                 programID,
-                                 (GLuint *) &indexedHumanModel.header.textureBindGLBuffer,
-                                 &indexedHumanModel.header.textureUploadedToGPU,
-                                 (unsigned char*) indexedHumanModel.textureData,
-                                  indexedHumanModel.header.textureDataWidth,
-                                  indexedHumanModel.header.textureDataHeight,
-                                  indexedHumanModel.header.textureDataChannels,
-                                  24
-                                );
+       //Retreive
      }
 
 
