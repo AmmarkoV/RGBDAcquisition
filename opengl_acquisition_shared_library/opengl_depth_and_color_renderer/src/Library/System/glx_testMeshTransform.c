@@ -1352,7 +1352,7 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
 {
     unsigned char * imageEnd = pixels + ( width * height * 3);
     unsigned char * ptr = pixels;
-    while (ptr<imageEnd)
+    while (ptr<imageEnd-3)
     {
         unsigned char r = *ptr; ++ptr;
         unsigned char g = *ptr; ++ptr;
@@ -1364,7 +1364,10 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
               (b==flashB)
             )
         {
-          fprintf(stderr,"HIT(%u,%u)",flashX,flashY);
+          unsigned int y = ( (ptr - pixels) / 3 ) / width;
+          unsigned int x = ( (ptr - pixels) / 3 ) % width;
+          fprintf(stderr,GREEN "HIT(%u,%u - > %u,%u)" NORMAL,x,y,flashX,flashY);
+          return 1;
         }
 
     }
@@ -1552,6 +1555,10 @@ int main(int argc,const char **argv)
                        humanPose.y=-1.476f;//(float) (100-rand()%200);
                        humanPose.z=0.69735f;//(float)  (700+rand()%1000);
                     } else
+           if (strcmp(argv[i],"--flashtexture")==0)
+                    {
+                        flashTexturePixels = 1;
+                    } else
            if (strcmp(argv[i],"--save")==0)
                     {
                       dumpSnapshot=1;
@@ -1647,7 +1654,7 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    unsigned char * rgb = 0;
-   if ( (dumpVideo) || (dumpSnapshot) )
+   if ( (dumpVideo) || (dumpSnapshot) || (flashTexturePixels) )
       { rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3); }
 
    //------------------------------------------------------
@@ -1690,10 +1697,6 @@ int main(int argc,const char **argv)
 
      for (int i=0; i<argc; i++)
         {
-           if (strcmp(argv[i],"--flashtexture")==0)
-                    {
-                        flashTexturePixels = 1;
-                    } else
            if (strcmp(argv[i],"--colorcode")==0)
                     {
                         // 2000 1400
