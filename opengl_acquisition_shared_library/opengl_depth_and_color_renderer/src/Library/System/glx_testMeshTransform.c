@@ -1347,6 +1347,32 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 
 
 
+
+int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int height,unsigned int flashX,unsigned int flashY)
+{
+    unsigned char * imageEnd = pixels + ( width * height * 3);
+    unsigned char * ptr = pixels;
+    while (ptr<imageEnd)
+    {
+        unsigned char r = *ptr; ++ptr;
+        unsigned char g = *ptr; ++ptr;
+        unsigned char b = *ptr; ++ptr;
+
+        if (
+              (r==flashR) &&
+              (g==flashG) &&
+              (b==flashB)
+            )
+        {
+          fprintf(stderr,"HIT(%u,%u)",flashX,flashY);
+        }
+
+    }
+
+    return 0;
+}
+
+
 int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,unsigned int y)
 {
       memset(
@@ -1975,12 +2001,6 @@ int main(int argc,const char **argv)
      tri_deallocModelInternals(&eyebrowsModel);
      usleep(1);
 
-     if (flashTexturePixels)
-     {
-       //Retreive
-     }
-
-
      if  (rgb!=0)
      {
        if (downloadOpenGLColor(rgb,0,0,WIDTH,HEIGHT))
@@ -1989,6 +2009,12 @@ int main(int argc,const char **argv)
            snprintf(filename,512,"colorFrame_0_%05u.pnm",fID);
            saveRawImageToFileOGLR(filename,rgb,WIDTH,HEIGHT,3,8);
        }
+     }
+
+     if (flashTexturePixels)
+     {
+       //Retreive
+       getTextureActivation(rgb,WIDTH,HEIGHT,flashX,flashY);
      }
 
     }
