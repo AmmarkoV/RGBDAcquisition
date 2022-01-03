@@ -65,6 +65,10 @@ unsigned int framesRendered = 0;
 
 float backgroundColor[3]={0};
 char flashTexturePixels = 0;
+unsigned char flashR = 255;
+unsigned char flashG = 255;
+unsigned char flashB = 0;
+
 
 char renderHair = 0;
 
@@ -1344,16 +1348,16 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 
 
 int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,unsigned int y)
-{/*
+{
       memset(
              model->textureData,
              0, //rand()%255,
              sizeof(char) * model->header.textureDataWidth * model->header.textureDataHeight * model->header.textureDataChannels
-            );*/
+            );
 
-      char aR = 0;
-      char aG = 0;
-      char aB = 0;
+    unsigned char aR = flashR;
+    unsigned char aG = flashG;
+    unsigned char aB = flashB;
 
     fprintf(stderr,"X=%u,Y=%u ",x,y);
     unsigned char * ptr = model->textureData + (y * model->header.textureDataWidth * model->header.textureDataChannels) + (x * model->header.textureDataChannels);
