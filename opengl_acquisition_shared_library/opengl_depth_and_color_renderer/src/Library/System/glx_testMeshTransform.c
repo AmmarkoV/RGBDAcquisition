@@ -1361,12 +1361,13 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
         if (
               (r==flashR) &&
               (g==flashG) &&
-              (b==flashB)
+              (b==flashB) //CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
             )
         {
           unsigned int y = ( (ptr - pixels) / 3 ) / width;
           unsigned int x = ( (ptr - pixels) / 3 ) % width;
           fprintf(stderr,GREEN "HIT(%u,%u - > %u,%u)" NORMAL,x,y,flashX,flashY);
+          exit(0);
           return 1;
         }
 
