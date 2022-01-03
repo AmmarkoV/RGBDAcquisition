@@ -1344,12 +1344,48 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 
 
 int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,unsigned int y)
-{
+{/*
       memset(
              model->textureData,
              0, //rand()%255,
              sizeof(char) * model->header.textureDataWidth * model->header.textureDataHeight * model->header.textureDataChannels
-            );
+            );*/
+
+      char aR = 0;
+      char aG = 0;
+      char aB = 0;
+
+    fprintf(stderr,"X=%u,Y=%u ",x,y);
+    unsigned char * ptr = model->textureData + (y * model->header.textureDataWidth * model->header.textureDataChannels) + (x * model->header.textureDataChannels);
+
+    unsigned char * r = ptr; ptr++;
+    unsigned char * g = ptr; ptr++;
+    unsigned char * b = ptr; ptr++;
+    *r = aR;
+    *g = aG;
+    *b = aB;
+
+    r = ptr; ptr++;
+    g = ptr; ptr++;
+    b = ptr; ptr++;
+    *r = aR;
+    *g = aG;
+    *b = aB;
+
+    r = ptr; ptr++;
+    g = ptr; ptr++;
+    b = ptr; ptr++;
+    *r = aR;
+    *g = aG;
+    *b = aB;
+
+
+    r = ptr; ptr++;
+    g = ptr; ptr++;
+    b = ptr; ptr++;
+    *r = aR;
+    *g = aG;
+    *b = aB;
 
       uploadColorImageAsTexture(
                                  programID,
@@ -1360,31 +1396,7 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
                                   model->header.textureDataHeight,
                                   model->header.textureDataChannels,
                                   24
-                                );
-
-    fprintf(stderr,"X=%u,Y=%u ",x,y);
-    unsigned char * ptr = model->textureData + (y * model->header.textureDataWidth * model->header.textureDataChannels) + (x * model->header.textureDataChannels);
-
-    unsigned char * r = ptr; ptr++;
-    unsigned char * g = ptr; ptr++;
-    unsigned char * b = ptr; ptr++;
-    *r = 255;
-    *g = 255;
-    *b = 0;
-
-    r = ptr; ptr++;
-    g = ptr; ptr++;
-    b = ptr; ptr++;
-    *r = 255;
-    *g = 255;
-    *b = 0;
-
-    r = ptr; ptr++;
-    g = ptr; ptr++;
-    b = ptr; ptr++;
-    *r = 255;
-    *g = 255;
-    *b = 0;
+                               );
 }
 
 
@@ -1772,9 +1784,9 @@ int main(int argc,const char **argv)
   fprintf(stderr,"humanTextureID = %u \n",indexedHumanModel.header.textureBindGLBuffer);
 
   unsigned int startFlashX = 1600;
-  unsigned int startFlashY = 700;
+  unsigned int startFlashY = 750;
   unsigned int endFlashX = startFlashX + 400;
-  unsigned int endFlashY = startFlashY + 700;
+  unsigned int endFlashY = startFlashY + 630;
   unsigned int flashX=startFlashX,flashY=startFlashY;
 
 
