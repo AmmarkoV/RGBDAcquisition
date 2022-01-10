@@ -329,6 +329,27 @@ int doOGLDrawing(
   //-------------------------------
   if (humanPose->usePoseMatrixDirectly)
      {
+      if (renderHair)
+      {
+      drawVertexArrayWithMVPMatrices(
+                                     programID,
+                                     hairVao,
+                                     MVPMatrixID,
+                                     hairTextureID,
+                                     hairTriangleCount,
+                                     hairElementCount,
+                                     //-------------
+                                     &humanPose->m,
+                                     //-------------
+                                     &projectionMatrix,
+                                     &viewportMatrix,
+                                     &viewMatrix,
+                                     0 //Wireframe
+                                    );
+      }
+
+      if (renderEyes)
+      {
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyelashesVao,
@@ -359,24 +380,6 @@ int doOGLDrawing(
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
-      if (renderHair)
-      {
-      drawVertexArrayWithMVPMatrices(
-                                     programID,
-                                     hairVao,
-                                     MVPMatrixID,
-                                     hairTextureID,
-                                     hairTriangleCount,
-                                     hairElementCount,
-                                     //-------------
-                                     &humanPose->m,
-                                     //-------------
-                                     &projectionMatrix,
-                                     &viewportMatrix,
-                                     &viewMatrix,
-                                     0 //Wireframe
-                                    );
-      }
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyeVao,
@@ -392,6 +395,9 @@ int doOGLDrawing(
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
+
+      }
+
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      humanVao,
@@ -409,6 +415,32 @@ int doOGLDrawing(
                                     );
      } else
      {
+      if (renderHair)
+      {
+      drawObjectAT(
+                  programID,
+                  hairVao,
+                  MVPMatrixID,
+                  hairTextureID,
+                  hairTriangleCount,
+                  hairElementCount,
+                  //-------------
+                  humanPose->x,
+                  humanPose->y,
+                  humanPose->z,
+                  humanPose->roll,
+                  humanPose->pitch,
+                  humanPose->yaw,
+                  //-------------
+                  &projectionMatrix,
+                  &viewportMatrix,
+                  &viewMatrix,
+                  0 //Wireframe
+                  );
+      }
+
+      if (renderEyes)
+      {
       drawObjectAT(
                   programID,
                   eyelashesVao,
@@ -449,29 +481,6 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                   );
-      if (renderHair)
-      {
-      drawObjectAT(
-                  programID,
-                  hairVao,
-                  MVPMatrixID,
-                  hairTextureID,
-                  hairTriangleCount,
-                  hairElementCount,
-                  //-------------
-                  humanPose->x,
-                  humanPose->y,
-                  humanPose->z,
-                  humanPose->roll,
-                  humanPose->pitch,
-                  humanPose->yaw,
-                  //-------------
-                  &projectionMatrix,
-                  &viewportMatrix,
-                  &viewMatrix,
-                  0 //Wireframe
-                  );
-      }
       drawObjectAT(
                   programID,
                   eyeVao,
@@ -492,6 +501,8 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                   );
+      }
+
       drawObjectAT(
                   programID,
                   humanVao,
@@ -1560,6 +1571,7 @@ int main(int argc,const char **argv)
                     {
                         // ./gl3MeshTransform --set hip x 0 --face --flashtexture
                         flashTexturePixels = 1;
+                        renderEyes = 0;
                     } else
            if (strcmp(argv[i],"--save")==0)
                     {
