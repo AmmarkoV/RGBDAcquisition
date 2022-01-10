@@ -1370,15 +1370,15 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
         unsigned char b = *ptr; ++ptr;
 
         if (
-              (r==flashR) &&
-              (g==flashG) &&
-              (b==flashB) //CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
+              (r!=0) ||
+              (g!=0) ||
+              (b!=0) //CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
             )
         {
           unsigned int y = ( (ptr - pixels) / 3 ) / width;
           unsigned int x = ( (ptr - pixels) / 3 ) % width;
-          fprintf(stderr,GREEN "HIT(%u,%u - > %u,%u)" NORMAL,x,y,flashX,flashY);
-          exit(0);
+          fprintf(stderr,GREEN "HIT(%u,%u->%u,%u)\n" NORMAL,x,y,flashX,flashY);
+          //exit(0);
           return 1;
         }
 
@@ -2022,9 +2022,12 @@ int main(int argc,const char **argv)
      {
        if (downloadOpenGLColor(rgb,0,0,WIDTH,HEIGHT))
        {
-           char filename[512]={0};
-           snprintf(filename,512,"colorFrame_0_%05u.pnm",fID);
-           saveRawImageToFileOGLR(filename,rgb,WIDTH,HEIGHT,3,8);
+           if ((dumpVideo) || (dumpSnapshot))
+           {
+            char filename[512]={0};
+            snprintf(filename,512,"colorFrame_0_%05u.pnm",fID);
+            saveRawImageToFileOGLR(filename,rgb,WIDTH,HEIGHT,3,8);
+           }
        }
      }
 
@@ -2032,6 +2035,12 @@ int main(int argc,const char **argv)
      {
        //Retreive
        getTextureActivation(rgb,WIDTH,HEIGHT,flashX,flashY);
+
+       if ( (flashX>=endFlashX) && (flashY>=endFlashY) )
+           {
+             fprintf(stderr,GREEN "\n\nDone flashing pixels\n\n" NORMAL);
+             break;
+           }
      }
 
     }
