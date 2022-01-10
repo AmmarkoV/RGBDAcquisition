@@ -69,7 +69,7 @@ unsigned char flashR = 255;
 unsigned char flashG = 255;
 unsigned char flashB = 0;
 
-
+char renderEyes = 1;
 char renderHair = 0;
 
 //Virtual Camera Intrinsics
@@ -1558,6 +1558,7 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
+                        // ./gl3MeshTransform --set hip x 0 --face --flashtexture
                         flashTexturePixels = 1;
                     } else
            if (strcmp(argv[i],"--save")==0)
