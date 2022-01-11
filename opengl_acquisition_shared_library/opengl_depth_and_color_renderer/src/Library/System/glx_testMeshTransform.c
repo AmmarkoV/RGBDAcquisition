@@ -105,11 +105,13 @@ void parseTextureToScreenAssociations(const char * filename)
 {
   FILE * fp = fopen(filename,"r");
 
-  struct InputParserC * ipc = InputParser_Create(8096,4);
+  struct InputParserC * ipc = InputParser_Create(8096,6);
   InputParser_SetDelimeter(ipc,0,',');
-  InputParser_SetDelimeter(ipc,1,0);
-  InputParser_SetDelimeter(ipc,2,10);
-  InputParser_SetDelimeter(ipc,3,13);
+  InputParser_SetDelimeter(ipc,1,'(');
+  InputParser_SetDelimeter(ipc,2,')');
+  InputParser_SetDelimeter(ipc,3,0);
+  InputParser_SetDelimeter(ipc,4,10);
+  InputParser_SetDelimeter(ipc,5,13);
 
   if (fp!=0)
   {
@@ -122,7 +124,11 @@ void parseTextureToScreenAssociations(const char * filename)
         {
           unsigned int numberOfFields = InputParser_SeperateWords(ipc,line,1);
           //csvLine->field[i] = InputParser_GetWordFloat(ipc,i);
-
+          float x = InputParser_GetWordFloat(ipc,1);
+          float y = InputParser_GetWordFloat(ipc,2);
+          float textureX = InputParser_GetWordFloat(ipc,3);
+          float textureY = InputParser_GetWordFloat(ipc,4);
+          fprintf(stderr,"X=%0.1f,Y=%0.1f -> tX=%0.1f,tY=%0.1f \n",x,y,textureX,textureY);
         }
 
    InputParser_Destroy(ipc);
@@ -1574,6 +1580,12 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+
+           if (strcmp(argv[i],"--parse")==0)
+                    {
+                      parseTextureToScreenAssociations(argv[i+1]);
+                      exit(0);
+                    } else
            if (strcmp(argv[i],"--axis")==0)
                     {
                       axisRendering=1;
