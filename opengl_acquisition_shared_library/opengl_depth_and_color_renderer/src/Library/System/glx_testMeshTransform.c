@@ -14,6 +14,8 @@
 #include <time.h>
 #include <string.h>
 
+#include "../TrajectoryParser/InputParser_C.h"
+
 #include "../Tools/save_to_file.h"
 #include "../Tools/tools.h"
 
@@ -96,6 +98,39 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
     return 0;
+}
+
+
+void parseTextureToScreenAssociations(const char * filename)
+{
+  FILE * fp = fopen(filename,"r");
+
+  struct InputParserC * ipc = InputParser_Create(8096,4);
+  InputParser_SetDelimeter(ipc,0,',');
+  InputParser_SetDelimeter(ipc,1,0);
+  InputParser_SetDelimeter(ipc,2,10);
+  InputParser_SetDelimeter(ipc,3,13);
+
+  if (fp!=0)
+  {
+
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, fp)) != -1)
+        {
+          unsigned int numberOfFields = InputParser_SeperateWords(ipc,line,1);
+          //csvLine->field[i] = InputParser_GetWordFloat(ipc,i);
+
+        }
+
+   InputParser_Destroy(ipc);
+   if (line!=0) { free(line); }
+
+   fclose(fp);
+  }
+
 }
 
 int drawObjectAT(
@@ -1377,7 +1412,7 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
         {
           unsigned int y = ( (ptr - pixels) / 3 ) / width;
           unsigned int x = ( (ptr - pixels) / 3 ) % width;
-          fprintf(stderr,GREEN "HIT(%u,%u->%u,%u)\n" NORMAL,x,y,flashX,flashY);
+          fprintf(stderr,"\n\nHIT(%u,%u,%u,%u)\n\n",x,y,flashX,flashY);
           //exit(0);
           return 1;
         }
