@@ -183,7 +183,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
           unsigned int y = InputParser_GetWordInt(ipc,2);
           unsigned int textureX = InputParser_GetWordInt(ipc,3);
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
-          fprintf(stderr,"X=%0.1f,Y=%0.1f -> tX=%0.1f,tY=%0.1f \n",x,y,textureX,textureY);
+          //fprintf(stderr,"X=%u,Y=%u -> tX=%u,tY=%u \n",x,y,textureX,textureY);
 
           unsigned int ptr = (y * indexedHumanModel->header.textureDataWidth) + x;
           mappingFbToTex[ptr].x = textureX;
@@ -201,8 +201,9 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
 
       unsigned int ptr = (textureY * indexedHumanModel->header.textureDataWidth) + textureX;
-      mappingFbToTex[ptr].x = textureX;
-      mappingFbToTex[ptr].y = textureY;
+      //mappingFbToTex[ptr].x = textureX;
+      //mappingFbToTex[ptr].y = textureY;
+      fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
    }
 
 
