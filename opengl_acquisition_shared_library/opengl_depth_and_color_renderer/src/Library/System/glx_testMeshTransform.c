@@ -106,9 +106,9 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 }
 
 
-float * readKeyPoint(const char * filename,unsigned int width,unsigned int height)
+unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned int height,unsigned int * outputNumberOfPoints)
 {
-  float * m = 0;
+  unsigned int  * m = 0;
   unsigned int numberOfPoints = 0;
   FILE * fp = fopen(filename,"r");
 
@@ -116,20 +116,21 @@ float * readKeyPoint(const char * filename,unsigned int width,unsigned int heigh
   {
       fscanf(fp,"%u\n",&numberOfPoints);
 
-      m = (float *) malloc(sizeof(float) * numberOfPoints * 2);
+      m = (unsigned int  *) malloc(sizeof(unsigned int ) * numberOfPoints * 2);
 
       for (int i=0; i<numberOfPoints; i++)
       {
         float x,y;
         fscanf(fp,"%f\n",&x);
         fscanf(fp,"%f\n",&y);
-        m[i*2 + 0] = x;
-        m[i*2 + 1] = y;
+        m[i*2 + 0] = (unsigned int) x * width;
+        m[i*2 + 1] = (unsigned int) y * height;
       }
 
       fclose(fp);
   }
 
+  *outputNumberOfPoints = numberOfPoints;
   return m;
 }
 
@@ -148,7 +149,9 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
   InputParser_SetDelimeter(ipc,5,13);
 
 
-  float * keypoints = readKeyPoint(faceFilename,originalWIDTH,originalHEIGHT);
+  unsigned int numberOfPoints = 0;
+  unsigned int  * keypoints = readKeyPoint(faceFilename,originalWIDTH,originalHEIGHT,&numberOfPoints);
+
   if (keypoints == 0) { return ; }
 
   if (fp!=0)
@@ -157,35 +160,51 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     size_t len = 0;
     ssize_t read;
 
-    struct textureAssociation * mapping = (struct textureAssociation *) malloc(
-                                                                                sizeof(struct textureAssociation) *
-                                                                                indexedHumanModel->header.textureDataWidth *
-                                                                                indexedHumanModel->header.textureDataHeight
-                                                                              );
+
+    /*
+    struct textureAssociation * mappingTexToFb = (struct textureAssociation *) malloc(
+                                                                                       sizeof(struct textureAssociation) *
+                                                                                       indexedHumanModel->header.textureDataWidth *
+                                                                                       indexedHumanModel->header.textureDataHeight
+                                                                                     );*/
+
+
+    struct textureAssociation * mappingFbToTex = (struct textureAssociation *) malloc(
+                                                                                       sizeof(struct textureAssociation) *
+                                                                                       originalWIDTH * originalHEIGHT
+                                                                                     );
+
 
     while ((read = getline(&line, &len, fp)) != -1)
         {
           unsigned int numberOfFields = InputParser_SeperateWords(ipc,line,1);
           //csvLine->field[i] = InputParser_GetWordFloat(ipc,i);
-          float x = InputParser_GetWordFloat(ipc,1);
-          float y = InputParser_GetWordFloat(ipc,2);
-          float textureX = InputParser_GetWordFloat(ipc,3);
-          float textureY = InputParser_GetWordFloat(ipc,4);
+          unsigned int x = InputParser_GetWordInt(ipc,1);
+          unsigned int y = InputParser_GetWordInt(ipc,2);
+          unsigned int textureX = InputParser_GetWordInt(ipc,3);
+          unsigned int textureY = InputParser_GetWordInt(ipc,4);
           fprintf(stderr,"X=%0.1f,Y=%0.1f -> tX=%0.1f,tY=%0.1f \n",x,y,textureX,textureY);
 
-          unsigned int ptr = (textureY * indexedHumanModel->header.textureDataWidth) + textureX;
-          mapping[ptr].x = x;
-          mapping[ptr].y = y;
+          unsigned int ptr = (y * indexedHumanModel->header.textureDataWidth) + x;
+          mappingFbToTex[ptr].x = textureX;
+          mappingFbToTex[ptr].y = textureY;
         }
 
    if (line!=0) { free(line); }
    fclose(fp);
 
 
+   for (int i=0; i<numberOfPoints/2; i++)
+   {
+      unsigned int x = keypoints[i*2+0];
+      unsigned int y = keypoints[i*2+1];
+
+
+      unsigned int ptr = (y * indexedHumanModel->header.textureDataWidth) + x;
+   }
 
 
    free(keypoints);
-
    InputParser_Destroy(ipc);
   }
 
