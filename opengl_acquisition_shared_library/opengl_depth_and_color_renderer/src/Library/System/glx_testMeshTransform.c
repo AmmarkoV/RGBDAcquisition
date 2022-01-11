@@ -148,7 +148,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
   InputParser_SetDelimeter(ipc,4,10);
   InputParser_SetDelimeter(ipc,5,13);
 
-
   unsigned int numberOfPoints = 0;
   unsigned int  * keypoints = readKeyPoint(faceFilename,originalWIDTH,originalHEIGHT,&numberOfPoints);
 
@@ -159,8 +158,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-
-
     /*
     struct textureAssociation * mappingTexToFb = (struct textureAssociation *) malloc(
                                                                                        sizeof(struct textureAssociation) *
@@ -178,12 +175,12 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     while ((read = getline(&line, &len, fp)) != -1)
         {
           unsigned int numberOfFields = InputParser_SeperateWords(ipc,line,1);
-          //csvLine->field[i] = InputParser_GetWordFloat(ipc,i);
-          unsigned int x = InputParser_GetWordInt(ipc,1);
-          unsigned int y = InputParser_GetWordInt(ipc,2);
+          //------------------------------------------------------------------
+          unsigned int x        = InputParser_GetWordInt(ipc,1);
+          unsigned int y        = InputParser_GetWordInt(ipc,2);
           unsigned int textureX = InputParser_GetWordInt(ipc,3);
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
-
+          //------------------------------------------------------------------
           if ( (x!=0) || (y!=0) || (textureX!=0) || (textureY!=0) )
             {
               //fprintf(stderr,"X=%u,Y=%u -> tX=%u,tY=%u \n",x,y,textureX,textureY);
