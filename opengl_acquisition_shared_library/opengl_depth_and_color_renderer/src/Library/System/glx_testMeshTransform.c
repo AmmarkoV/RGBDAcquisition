@@ -196,11 +196,13 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
    for (int i=0; i<numberOfPoints/2; i++)
    {
-      unsigned int x = keypoints[i*2+0];
-      unsigned int y = keypoints[i*2+1];
+      unsigned int textureX = keypoints[i*2+0];
+      unsigned int textureY = keypoints[i*2+1];
 
 
-      unsigned int ptr = (y * indexedHumanModel->header.textureDataWidth) + x;
+      unsigned int ptr = (textureY * indexedHumanModel->header.textureDataWidth) + textureX;
+      mappingFbToTex[ptr].x = textureX;
+      mappingFbToTex[ptr].y = textureY;
    }
 
 
