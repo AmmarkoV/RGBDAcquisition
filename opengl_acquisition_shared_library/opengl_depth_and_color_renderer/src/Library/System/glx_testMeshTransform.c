@@ -106,7 +106,36 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 }
 
 
-void parseTextureToScreenAssociations(const char * filename,struct TRI_Model * indexedHumanModel)
+float * readKeyPoint(const char * filename,unsigned int width,unsigned int height)
+{
+  float * m = 0;
+  unsigned int numberOfPoints = 0;
+  FILE * fp = fopen(filename,"r");
+
+  if (fp!=0)
+  {
+      fscanf(fp,"%u\n",&numberOfPoints);
+
+      m = (float *) malloc(sizeof(float) * numberOfPoints * 2);
+
+      for (int i=0; i<numberOfPoints; i++)
+      {
+        float x,y;
+        fscanf(fp,"%f\n",&x);
+        fscanf(fp,"%f\n",&y);
+        m[i*2 + 0] = x;
+        m[i*2 + 1] = y;
+      }
+
+      fclose(fp);
+  }
+
+  return m;
+}
+
+
+
+void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel)
 {
   FILE * fp = fopen(filename,"r");
 
@@ -118,13 +147,21 @@ void parseTextureToScreenAssociations(const char * filename,struct TRI_Model * i
   InputParser_SetDelimeter(ipc,4,10);
   InputParser_SetDelimeter(ipc,5,13);
 
+
+  float * keypoints = readKeyPoint(faceFilename,originalWIDTH,originalHEIGHT);
+  if (keypoints == 0) { return ; }
+
   if (fp!=0)
   {
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
 
-    //struct textureAssociation
+    struct textureAssociation * mapping = (struct textureAssociation *) malloc(
+                                                                                sizeof(struct textureAssociation) *
+                                                                                indexedHumanModel->header.textureDataWidth *
+                                                                                indexedHumanModel->header.textureDataHeight
+                                                                              );
 
     while ((read = getline(&line, &len, fp)) != -1)
         {
@@ -135,17 +172,21 @@ void parseTextureToScreenAssociations(const char * filename,struct TRI_Model * i
           float textureX = InputParser_GetWordFloat(ipc,3);
           float textureY = InputParser_GetWordFloat(ipc,4);
           fprintf(stderr,"X=%0.1f,Y=%0.1f -> tX=%0.1f,tY=%0.1f \n",x,y,textureX,textureY);
+
+          unsigned int ptr = (textureY * indexedHumanModel->header.textureDataWidth) + textureX;
+          mapping[ptr].x = x;
+          mapping[ptr].y = y;
         }
 
+   if (line!=0) { free(line); }
+   fclose(fp);
 
 
 
 
+   free(keypoints);
 
    InputParser_Destroy(ipc);
-   if (line!=0) { free(line); }
-
-   fclose(fp);
   }
 
 }
@@ -1765,7 +1806,8 @@ int main(int argc,const char **argv)
         {
            if (strcmp(argv[i],"--parse")==0)
                     {
-                      parseTextureToScreenAssociations(argv[i+1],&indexedHumanModel);
+                      //  ./gl3MeshTransform --parse dump2.dat face.txt
+                      parseTextureToScreenAssociations(argv[i+1],argv[i+2],&indexedHumanModel);
                       exit(0);
                     } else
            if (strcmp(argv[i],"--colorcode")==0)
