@@ -158,19 +158,8 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-    /*
-    struct textureAssociation * mappingTexToFb = (struct textureAssociation *) malloc(
-                                                                                       sizeof(struct textureAssociation) *
-                                                                                       indexedHumanModel->header.textureDataWidth *
-                                                                                       indexedHumanModel->header.textureDataHeight
-                                                                                     );*/
 
-
-    struct textureAssociation * mappingFbToTex = (struct textureAssociation *) malloc(
-                                                                                       sizeof(struct textureAssociation) *
-                                                                                       originalWIDTH * originalHEIGHT
-                                                                                     );
-
+    struct textureAssociation * mappingFbToTex = (struct textureAssociation *) malloc(sizeof(struct textureAssociation) * originalWIDTH * originalHEIGHT);
 
     while ((read = getline(&line, &len, fp)) != -1)
         {
@@ -199,7 +188,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
    {
       unsigned int textureX = keypoints[i*2+0];
       unsigned int textureY = keypoints[i*2+1];
-
+      //------------------------------------------------------------------
 
       unsigned int ptr = (textureY * originalWIDTH) + textureX;
       //mappingFbToTex[ptr].x = textureX;
