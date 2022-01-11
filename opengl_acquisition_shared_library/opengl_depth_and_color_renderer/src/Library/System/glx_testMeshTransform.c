@@ -108,7 +108,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned int height,unsigned int * outputNumberOfPoints)
 {
-  unsigned int  * m = 0;
+  unsigned int * m = 0;
   unsigned int numberOfPoints = 0;
   FILE * fp = fopen(filename,"r");
 
@@ -123,8 +123,8 @@ unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned i
         float x,y;
         fscanf(fp,"%f\n",&x);
         fscanf(fp,"%f\n",&y);
-        m[i*2 + 0] = (unsigned int) x * width;
-        m[i*2 + 1] = (unsigned int) y * height;
+        m[i*2 + 0] = (unsigned int) (x * width);
+        m[i*2 + 1] = (unsigned int) (y * height);
       }
 
       fclose(fp);
@@ -185,7 +185,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
           //fprintf(stderr,"X=%u,Y=%u -> tX=%u,tY=%u \n",x,y,textureX,textureY);
 
-          unsigned int ptr = (y * indexedHumanModel->header.textureDataWidth) + x;
+          unsigned int ptr = (y * originalWIDTH) + x;
           mappingFbToTex[ptr].x = textureX;
           mappingFbToTex[ptr].y = textureY;
         }
@@ -200,7 +200,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
       unsigned int textureY = keypoints[i*2+1];
 
 
-      unsigned int ptr = (textureY * indexedHumanModel->header.textureDataWidth) + textureX;
+      unsigned int ptr = (textureY * originalWIDTH) + textureX;
       //mappingFbToTex[ptr].x = textureX;
       //mappingFbToTex[ptr].y = textureY;
       fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
