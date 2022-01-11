@@ -80,6 +80,11 @@ float fY = 1233.48468;
 float nearPlane = 0.1;
 float farPlane  = 1000.0;
 
+struct textureAssociation
+{
+   unsigned int x;
+   unsigned int y;
+};
 
 struct pose6D
  {
@@ -101,7 +106,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 }
 
 
-void parseTextureToScreenAssociations(const char * filename)
+void parseTextureToScreenAssociations(const char * filename,struct TRI_Model * indexedHumanModel)
 {
   FILE * fp = fopen(filename,"r");
 
@@ -115,10 +120,11 @@ void parseTextureToScreenAssociations(const char * filename)
 
   if (fp!=0)
   {
-
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
+
+    //struct textureAssociation
 
     while ((read = getline(&line, &len, fp)) != -1)
         {
@@ -130,6 +136,11 @@ void parseTextureToScreenAssociations(const char * filename)
           float textureY = InputParser_GetWordFloat(ipc,4);
           fprintf(stderr,"X=%0.1f,Y=%0.1f -> tX=%0.1f,tY=%0.1f \n",x,y,textureX,textureY);
         }
+
+
+
+
+
 
    InputParser_Destroy(ipc);
    if (line!=0) { free(line); }
@@ -1580,12 +1591,6 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
-
-           if (strcmp(argv[i],"--parse")==0)
-                    {
-                      parseTextureToScreenAssociations(argv[i+1]);
-                      exit(0);
-                    } else
            if (strcmp(argv[i],"--axis")==0)
                     {
                       axisRendering=1;
@@ -1758,6 +1763,11 @@ int main(int argc,const char **argv)
 
      for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--parse")==0)
+                    {
+                      parseTextureToScreenAssociations(argv[i+1],&indexedHumanModel);
+                      exit(0);
+                    } else
            if (strcmp(argv[i],"--colorcode")==0)
                     {
                         // 2000 1400
