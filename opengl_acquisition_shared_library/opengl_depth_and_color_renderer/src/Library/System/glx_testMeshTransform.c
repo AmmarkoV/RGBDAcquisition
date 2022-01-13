@@ -1816,6 +1816,10 @@ int main(int argc,const char **argv)
 
      for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--hair")==0)
+                    {
+                      renderHair = 1;
+                    } else
            if (strcmp(argv[i],"--parse")==0)
                     {
                       //  ./gl3MeshTransform --parse dump2.dat face.txt
