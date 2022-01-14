@@ -187,7 +187,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
    unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
 
-
    for (int i=0; i<numberOfPoints/2; i++)
    {
       unsigned int textureX = keypoints[i*2+0];
@@ -199,6 +198,11 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
       //mappingFbToTex[ptr].y = textureY;
       fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
 
+      unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * mappingFbToTex[ptr].y * 3) + (mappingFbToTex[ptr].x * 3);
+      *tx=0;   tx++;
+      *tx=0;   tx++;
+      *tx=255; tx++;
+
       if (rgb!=0)
       {
        unsigned char * rgbPtr = rgb + (textureY * originalWIDTH * 3) + (textureX * 3);
@@ -207,6 +211,8 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
        *rgbPtr = 255; rgbPtr++;
       }
    }
+
+   saveRawImageToFileOGLR("occupiedTexture.pnm",indexedHumanModel->textureData,indexedHumanModel->header.textureDataWidth,indexedHumanModel->header.textureDataHeight,3,8);
 
    if (rgb!=0)
       {
