@@ -184,18 +184,35 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
    fclose(fp);
 
 
+
+   unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
+
+
    for (int i=0; i<numberOfPoints/2; i++)
    {
       unsigned int textureX = keypoints[i*2+0];
       unsigned int textureY = keypoints[i*2+1];
-      //------------------------------------------------------------------
+      //---------------------------------------
 
       unsigned int ptr = (textureY * originalWIDTH) + textureX;
       //mappingFbToTex[ptr].x = textureX;
       //mappingFbToTex[ptr].y = textureY;
       fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
+
+      if (rgb!=0)
+      {
+       unsigned char * rgbPtr = rgb + (textureY * originalWIDTH * 3) + (textureX * 3);
+       *rgbPtr = 255; rgbPtr++;
+       *rgbPtr = 255; rgbPtr++;
+       *rgbPtr = 255; rgbPtr++;
+      }
    }
 
+   if (rgb!=0)
+      {
+       saveRawImageToFileOGLR("occupation.pnm",rgb,originalWIDTH,originalHEIGHT,3,8);
+       free(rgb);
+      }
 
    free(keypoints);
    InputParser_Destroy(ipc);
