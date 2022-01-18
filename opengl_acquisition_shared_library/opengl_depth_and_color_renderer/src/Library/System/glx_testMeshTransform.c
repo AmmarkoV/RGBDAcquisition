@@ -1506,7 +1506,15 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
           unsigned int pixelsTraversed = (unsigned int) (ptr - pixels) / 3;
           unsigned int y = (unsigned int) pixelsTraversed / width;
           unsigned int x = (unsigned int) pixelsTraversed % width;
-          fprintf(stderr,"\n\nHIT(%u,%u,%u,%u)\n\n",x,y,flashX,flashY);
+          fprintf(stdout,"HIT(%u,%u,%u,%u)\n",x,y,flashX,flashY);
+
+          //Direct log to a file..!
+          FILE *fp = fopen("textureActivation.dat","a");
+          if (fp!=0)
+          {
+            fprintf(fp,"HIT(%u,%u,%u,%u)\n",x,y,flashX,flashY);
+            fclose(fp);
+          }
           //exit(0);
           return 1;
         }
@@ -1545,7 +1553,7 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
     *r = aR;
     *g = aG;
     *b = aB;
-
+/*
     r = ptr; ptr++;
     g = ptr; ptr++;
     b = ptr; ptr++;
@@ -1559,7 +1567,7 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
     b = ptr; ptr++;
     *r = aR;
     *g = aG;
-    *b = aB;
+    *b = aB;*/
 
       uploadColorImageAsTexture(
                                  programID,
@@ -1698,9 +1706,14 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
-                        // ./gl3MeshTransform --set hip x 0 --face --flashtexture
+                        // ./gl3MeshTransform --set hip x 0 --face --flashtexture | grep HIT > dumpc.dat
                         flashTexturePixels = 1;
                         renderEyes = 0;
+                        FILE *fp = fopen("textureActivation.dat","w");
+                        if (fp!=0)
+                          {
+                           fclose(fp);
+                          }
                     } else
            if (strcmp(argv[i],"--save")==0)
                     {
