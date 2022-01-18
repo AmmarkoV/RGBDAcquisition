@@ -187,7 +187,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
    unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
 
-   for (int i=0; i<numberOfPoints/2; i++)
+   for (int i=0; i<numberOfPoints; i++)
    {
       unsigned int textureX = keypoints[i*2+0];
       unsigned int textureY = keypoints[i*2+1];
@@ -1503,8 +1503,9 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
               (b!=0) //CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
             )
         {
-          unsigned int y = ( (ptr - pixels) / 3 ) / width;
-          unsigned int x = ( (ptr - pixels) / 3 ) % width;
+          unsigned int pixelsTraversed = (unsigned int) (ptr - pixels) / 3;
+          unsigned int y = (unsigned int) pixelsTraversed / width;
+          unsigned int x = (unsigned int) pixelsTraversed % width;
           fprintf(stderr,"\n\nHIT(%u,%u,%u,%u)\n\n",x,y,flashX,flashY);
           //exit(0);
           return 1;
