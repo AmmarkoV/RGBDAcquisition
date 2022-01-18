@@ -1706,7 +1706,7 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
-                        // ./gl3MeshTransform --set hip x 0 --face --flashtexture | grep HIT > dumpc.dat
+                        // ./gl3MeshTransform --set hip x 0 --face --flashtexture 2>/dev/null
                         flashTexturePixels = 1;
                         renderEyes = 0;
                         FILE *fp = fopen("textureActivation.dat","w");
