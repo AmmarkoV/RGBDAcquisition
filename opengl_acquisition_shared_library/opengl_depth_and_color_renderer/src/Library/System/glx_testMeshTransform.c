@@ -1497,11 +1497,7 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
         unsigned char g = *ptr; ++ptr;
         unsigned char b = *ptr; ++ptr;
 
-        if (
-              (r!=0) ||
-              (g!=0) ||
-              (b!=0) //CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
-            )
+        if ( (r!=0) || (g!=0) || (b!=0) )//CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
         {
           unsigned int pixelsTraversed = (unsigned int) (ptr - pixels) / 3;
           unsigned int y = (unsigned int) pixelsTraversed / width;
@@ -1859,7 +1855,7 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--parse")==0)
                     {
-                      //  ./gl3MeshTransform --parse dump2.dat face.txt
+                      //  ./gl3MeshTransform --parse dump3.dat face.txt
                       parseTextureToScreenAssociations(argv[i+1],argv[i+2],&indexedHumanModel);
                       exit(0);
                     } else
@@ -2060,6 +2056,9 @@ int main(int argc,const char **argv)
        if (flashX>endFlashX)  {  flashX=startFlashX; flashY+=1;            }
        if (flashY>endFlashY)  {  flashX=startFlashX; flashY=startFlashY;   }
 
+       //flashX = 1663; flashY = 1063; //HIT(559,423,1663,1063)
+       fprintf(stderr,GREEN "%0.2f %% flashing pixels ( %u->%u ) \n\n" NORMAL,100*(flashY-startFlashY)/(endFlashY-startFlashY),flashY,endFlashY);
+
        setTexturePixel(programID,&indexedHumanModel,flashX,flashY);
      }
 
@@ -2188,7 +2187,7 @@ int main(int argc,const char **argv)
        //Retreive
        getTextureActivation(rgb,WIDTH,HEIGHT,flashX,flashY);
 
-       if ( (flashX>=endFlashX) && (flashY>=endFlashY) )
+       if ( (flashY>=endFlashY) ) //(flashX>=endFlashX) &&
            {
              fprintf(stderr,GREEN "\n\nDone flashing pixels\n\n" NORMAL);
              break;
