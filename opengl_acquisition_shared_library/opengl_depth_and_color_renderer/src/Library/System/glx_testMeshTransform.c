@@ -169,6 +169,12 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
           unsigned int y        = InputParser_GetWordInt(ipc,2);
           unsigned int textureX = InputParser_GetWordInt(ipc,3);
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
+
+          unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * textureY * 3) + (textureX * 3);
+          *tx=0;   tx++;
+          *tx=255; tx++;
+          *tx=255; tx++;
+
           //------------------------------------------------------------------
           if ( (x!=0) || (y!=0) || (textureX!=0) || (textureY!=0) )
             {
@@ -177,7 +183,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
               mappingFbToTex[ptr].x = textureX;
               mappingFbToTex[ptr].y = textureY;
             }
-
         }
 
    if (line!=0) { free(line); }
@@ -1543,13 +1548,14 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
     *g = aG;
     *b = aB;
 
+/*
     r = ptr; ptr++;
     g = ptr; ptr++;
     b = ptr; ptr++;
     *r = aR;
     *g = aG;
     *b = aB;
-/*
+
     r = ptr; ptr++;
     g = ptr; ptr++;
     b = ptr; ptr++;
@@ -1982,7 +1988,8 @@ int main(int argc,const char **argv)
   unsigned int startFlashY = 750;
   unsigned int endFlashX = startFlashX + 400;
   unsigned int endFlashY = startFlashY + 630;
-  unsigned int flashX=startFlashX,flashY=startFlashY;
+  unsigned int flashX=startFlashX;
+  unsigned int flashY=startFlashY;
 
 
    //------------------------------------------------------
@@ -2057,7 +2064,7 @@ int main(int argc,const char **argv)
        if (flashY>endFlashY)  {  flashX=startFlashX; flashY=startFlashY;   }
 
        //flashX = 1663; flashY = 1063; //HIT(559,423,1663,1063)
-       fprintf(stderr,GREEN "%0.2f %% flashing pixels ( %u->%u ) \n\n" NORMAL,100*(flashY-startFlashY)/(endFlashY-startFlashY),flashY,endFlashY);
+       fprintf(stderr,GREEN "%0.2f %% flashing pixels (%u,%u->%u,%u) \n\n" NORMAL,(float) 100*(flashY-startFlashY)/(endFlashY-startFlashY), flashX,flashY, endFlashX,endFlashY);
 
        setTexturePixel(programID,&indexedHumanModel,flashX,flashY);
      }
