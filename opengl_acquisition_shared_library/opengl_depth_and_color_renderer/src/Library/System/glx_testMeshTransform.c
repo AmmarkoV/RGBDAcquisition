@@ -159,6 +159,9 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     size_t len = 0;
     ssize_t read;
 
+
+    unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
+
     struct textureAssociation * mappingFbToTex = (struct textureAssociation *) malloc(sizeof(struct textureAssociation) * originalWIDTH * originalHEIGHT);
 
     while ((read = getline(&line, &len, fp)) != -1)
@@ -170,10 +173,17 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
           unsigned int textureX = InputParser_GetWordInt(ipc,3);
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
 
+          //Show all active points to debug..
           unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * textureY * 3) + (textureX * 3);
           *tx=0;   tx++;
-          *tx=255; tx++;
-          *tx=255; tx++;
+          *tx=64; tx++;
+          *tx=64; tx++;
+
+
+          unsigned char * rgbPtr = rgb + (y * originalWIDTH * 3) + (x * 3);
+          *rgbPtr = 0; rgbPtr++;
+          *rgbPtr = 64; rgbPtr++;
+          *rgbPtr = 64; rgbPtr++;
 
           //------------------------------------------------------------------
           if ( (x!=0) || (y!=0) || (textureX!=0) || (textureY!=0) )
@@ -190,7 +200,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
 
 
-   unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
 
    for (int i=0; i<numberOfPoints; i++)
    {
@@ -2061,7 +2070,7 @@ int main(int argc,const char **argv)
      {
        flashX+=1;
        if (flashX>endFlashX)  {  flashX=startFlashX; flashY+=1;            }
-       if (flashY>endFlashY)  {  /*flashX=startFlashX; flashY=startFlashY;*/ break; }
+       if (flashY>=endFlashY)  {  /*flashX=startFlashX; flashY=startFlashY;*/ exit(0); break; }
        else
        {
         //flashX = 1663; flashY = 1063; //HIT(559,423,1663,1063)
