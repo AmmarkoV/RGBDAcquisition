@@ -2061,12 +2061,13 @@ int main(int argc,const char **argv)
      {
        flashX+=1;
        if (flashX>endFlashX)  {  flashX=startFlashX; flashY+=1;            }
-       if (flashY>endFlashY)  {  flashX=startFlashX; flashY=startFlashY;   }
-
-       //flashX = 1663; flashY = 1063; //HIT(559,423,1663,1063)
-       fprintf(stderr,GREEN "%0.2f %% flashing pixels (%u,%u->%u,%u) \n\n" NORMAL,(float) 100*(flashY-startFlashY)/(endFlashY-startFlashY), flashX,flashY, endFlashX,endFlashY);
-
-       setTexturePixel(programID,&indexedHumanModel,flashX,flashY);
+       if (flashY>endFlashY)  {  /*flashX=startFlashX; flashY=startFlashY;*/ break; }
+       else
+       {
+        //flashX = 1663; flashY = 1063; //HIT(559,423,1663,1063)
+        fprintf(stderr,GREEN "%0.2f %% flashing pixels (%u,%u->%u,%u) \n\n" NORMAL,(float) 100*(flashY-startFlashY)/(endFlashY-startFlashY), flashX,flashY, endFlashX,endFlashY);
+        setTexturePixel(programID,&indexedHumanModel,flashX,flashY);
+       }
      }
 
 
