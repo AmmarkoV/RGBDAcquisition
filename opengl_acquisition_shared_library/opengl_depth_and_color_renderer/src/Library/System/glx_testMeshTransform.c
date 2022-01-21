@@ -117,8 +117,6 @@ unsigned int decodeUniqueColor(unsigned int totalColors,unsigned char r,unsigned
 }
 
 
-
-
 void encodeUniqueColor(unsigned int colorNumber,unsigned int totalColors,unsigned char * r,unsigned char * g,unsigned char * b)
 {
   unsigned int colorStep = (255*255*255) / (1+totalColors);
@@ -256,6 +254,13 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
       unsigned char r,g,b;
       encodeUniqueColor(i,numberOfPoints,&r,&g,&b);
+
+      unsigned int doubleCheckedPoint = decodeUniqueColor(numberOfPoints,r,g,b);
+
+      if (i!=doubleCheckedPoint)
+      {
+          fprintf(stderr,RED "Encoding Mismatch at point %u (%u,%u,%u) decoded as %u\n" NORMAL,i,r,g,b,doubleCheckedPoint);
+      }
 
       unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * mappingFbToTex[ptr].y * 3) + (mappingFbToTex[ptr].x * 3);
       *tx=r;   tx++;
