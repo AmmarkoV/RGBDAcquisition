@@ -1602,8 +1602,26 @@ int main(int argc,const char **argv)
   unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
   unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
 
+
+  int visibleWindow = 1;
+  for (int i=0; i<argc; i++)
+        {
+             if (strcmp(argv[i],"--flashtexture")==0)
+                    {
+                       //When Doing a batch processing job like flashing texture use an invisible
+                       //window to make sure renderings happen regardless of window visibility
+		               fprintf(stderr, "Using invisible window\n");
+                       visibleWindow = 0;
+                    }
+        }
+
+
+
+
+
+
   fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
-  start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
+  start_glx3_stuff(WIDTH,HEIGHT,visibleWindow,argc,argv);
 
   if (glewInit() != GLEW_OK)
    {
@@ -1870,7 +1888,7 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--parse")==0)
                     {
-                      //  ./gl3MeshTransform --parse dump3.dat face.txt
+                      //  ./gl3MeshTransform --parse textureActivation.dat face.txt
                       parseTextureToScreenAssociations(argv[i+1],argv[i+2],&indexedHumanModel);
                       exit(0);
                     } else
