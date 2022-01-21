@@ -106,7 +106,34 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 }
 
 
-unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned int height,unsigned int * outputNumberOfPoints)
+unsigned int decodeUniqueColor(unsigned int totalColors,unsigned char r,unsigned char g,unsigned char b)
+{
+  unsigned int colorStep = (255*255*255) / (1+totalColors);
+  //------------------------------------
+  unsigned int thisColor = b + (255 * g) + ( 255 * 255 * r);
+  unsigned int pointID = thisColor / colorStep;
+  //------------------------------------
+  return pointID;
+}
+
+
+
+
+void encodeUniqueColor(unsigned int colorNumber,unsigned int totalColors,unsigned char * r,unsigned char * g,unsigned char * b)
+{
+  unsigned int colorStep = (255*255*255) / (1+totalColors);
+  unsigned int thisColor = (1+colorNumber)*colorStep;
+  //------------------------------------
+  *r = (char) thisColor % 255;
+  thisColor = thisColor / 255;
+  *g = (char) thisColor % 255;
+  thisColor = thisColor / 255;
+  *b = (char) thisColor % 255;
+  //------------------------------------
+}
+
+
+unsigned int  * readKeyPoint(const char * filename,char flipX,unsigned int width,unsigned int height,unsigned int * outputNumberOfPoints)
 {
   unsigned int * m = 0;
   unsigned int numberOfPoints = 0;
@@ -123,7 +150,13 @@ unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned i
         float x,y;
         fscanf(fp,"%f\n",&x);
         fscanf(fp,"%f\n",&y);
-        m[i*2 + 0] = (unsigned int) ((1-x) * width); //< - NOTICE X FLIP!
+
+        if (flipX)
+        {
+          x = 1 - x;
+        }
+
+        m[i*2 + 0] = (unsigned int) (x * width); //< - NOTICE X FLIP!
         m[i*2 + 1] = (unsigned int) (y * height);
       }
 
@@ -138,6 +171,8 @@ unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned i
 
 void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel)
 {
+  #define FADE_TO_BLACK 1
+
   FILE * fp = fopen(filename,"r");
 
   struct InputParserC * ipc = InputParser_Create(8096,6);
@@ -149,7 +184,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
   InputParser_SetDelimeter(ipc,5,13);
 
   unsigned int numberOfPoints = 0;
-  unsigned int  * keypoints = readKeyPoint(faceFilename,originalWIDTH,originalHEIGHT,&numberOfPoints);
+  unsigned int  * keypoints = readKeyPoint(faceFilename,1,originalWIDTH,originalHEIGHT,&numberOfPoints);
 
   if (keypoints == 0) { return ; }
 
@@ -162,6 +197,12 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
     unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
 
+    #if FADE_TO_BLACK
+      memset(indexedHumanModel->textureData,0,sizeof(char) * indexedHumanModel->header.textureDataWidth * indexedHumanModel->header.textureDataHeight * indexedHumanModel->header.textureDataChannels);
+      memset(rgb,0,sizeof(char) * originalWIDTH * originalHEIGHT * 3);
+    #endif // FADE_TO_BLACK
+
+
     struct textureAssociation * mappingFbToTex = (struct textureAssociation *) malloc(sizeof(struct textureAssociation) * originalWIDTH * originalHEIGHT);
 
     while ((read = getline(&line, &len, fp)) != -1)
@@ -173,17 +214,18 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
           unsigned int textureX = InputParser_GetWordInt(ipc,3);
           unsigned int textureY = InputParser_GetWordInt(ipc,4);
 
-          //Show all active points to debug..
-          unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * textureY * 3) + (textureX * 3);
-          *tx=0;   tx++;
-          *tx=64; tx++;
-          *tx=64; tx++;
+          #if FADE_TO_BLACK==0
+           //Show all active points to debug..
+           unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * textureY * 3) + (textureX * 3);
+           *tx=0;   tx++;
+           *tx=64; tx++;
+           *tx=64; tx++;
 
-
-          unsigned char * rgbPtr = rgb + (y * originalWIDTH * 3) + (x * 3);
-          *rgbPtr = 0; rgbPtr++;
-          *rgbPtr = 64; rgbPtr++;
-          *rgbPtr = 64; rgbPtr++;
+           unsigned char * rgbPtr = rgb + (y * originalWIDTH * 3) + (x * 3);
+           *rgbPtr = 0; rgbPtr++;
+           *rgbPtr = 64; rgbPtr++;
+           *rgbPtr = 64; rgbPtr++;
+          #endif // FADE_TO_BLACK
 
           //------------------------------------------------------------------
           if ( (x!=0) || (y!=0) || (textureX!=0) || (textureY!=0) )
@@ -212,17 +254,20 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
       //mappingFbToTex[ptr].y = textureY;
       fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
 
+      unsigned char r,g,b;
+      encodeUniqueColor(i,numberOfPoints,&r,&g,&b);
+
       unsigned char * tx = indexedHumanModel->textureData + (indexedHumanModel->header.textureDataWidth * mappingFbToTex[ptr].y * 3) + (mappingFbToTex[ptr].x * 3);
-      *tx=0;   tx++;
-      *tx=0;   tx++;
-      *tx=255; tx++;
+      *tx=r;   tx++;
+      *tx=g;   tx++;
+      *tx=b;   tx++;
 
       if (rgb!=0)
       {
        unsigned char * rgbPtr = rgb + (textureY * originalWIDTH * 3) + (textureX * 3);
-       *rgbPtr = 255; rgbPtr++;
-       *rgbPtr = 255; rgbPtr++;
-       *rgbPtr = 255; rgbPtr++;
+       *rgbPtr = r; rgbPtr++;
+       *rgbPtr = g; rgbPtr++;
+       *rgbPtr = b; rgbPtr++;
       }
    }
 
