@@ -123,7 +123,7 @@ unsigned int  * readKeyPoint(const char * filename,unsigned int width,unsigned i
         float x,y;
         fscanf(fp,"%f\n",&x);
         fscanf(fp,"%f\n",&y);
-        m[i*2 + 0] = (unsigned int) (x * width);
+        m[i*2 + 0] = (unsigned int) ((1-x) * width); //< - NOTICE X FLIP!
         m[i*2 + 1] = (unsigned int) (y * height);
       }
 
