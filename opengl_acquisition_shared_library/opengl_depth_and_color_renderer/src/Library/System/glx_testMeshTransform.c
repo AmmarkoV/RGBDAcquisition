@@ -163,6 +163,20 @@ unsigned int  * readKeyPoint(const char * filename,char flipX,unsigned int width
   return m;
 }
 
+void paintRGBPixel(unsigned char * image,unsigned int imageWidth,unsigned int imageHeight,unsigned int x,unsigned int y,unsigned char r,unsigned char g,unsigned char b)
+{
+  if (image!=0)
+  {
+    if ( (x<imageWidth) && (y<imageHeight) )
+    {
+      unsigned char * target = image + (imageWidth * y * 3) + (x * 3);
+      *target=r;   target++;
+      *target=g;   target++;
+      *target=b;   target++;
+    }
+  }
+}
+
 
 
 void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel,struct TRI_Model * indexedEyeModel)
@@ -179,8 +193,11 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
   InputParser_SetDelimeter(ipc,4,10);
   InputParser_SetDelimeter(ipc,5,13);
 
+  unsigned char r,g,b;
+
   unsigned int numberOfPoints = 0;
   unsigned int  * keypoints = readKeyPoint(faceFilename,1,originalWIDTH,originalHEIGHT,&numberOfPoints);
+  unsigned int numberOfUniqueColors = numberOfPoints + 2; // We also allocated 2 more points for l/r eyes!
 
   if (keypoints == 0) { return ; }
 
@@ -190,10 +207,30 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
     size_t len = 0;
     ssize_t read;
 
-
     unsigned char * rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * originalWIDTH * originalHEIGHT *3);
 
     #if FADE_TO_BLACK
+      memset(indexedEyeModel->textureData,0,sizeof(char) * indexedEyeModel->header.textureDataWidth * indexedEyeModel->header.textureDataHeight * indexedEyeModel->header.textureDataChannels);
+      //Hardcoded eye positions 300,726 and 726,300
+      encodeUniqueColor(numberOfPoints,numberOfUniqueColors,&r,&g,&b);
+      paintRGBPixel(
+                    indexedEyeModel->textureData,
+                    indexedEyeModel->header.textureDataWidth,
+                    indexedEyeModel->header.textureDataHeight,
+                    300,726,
+                    r,g,b
+                   );
+      encodeUniqueColor(numberOfPoints+1,numberOfUniqueColors,&r,&g,&b);
+      paintRGBPixel(
+                    indexedEyeModel->textureData,
+                    indexedEyeModel->header.textureDataWidth,
+                    indexedEyeModel->header.textureDataHeight,
+                    726,300,
+                    r,g,b
+                   );
+      //----------------------------------------------
+
+
       memset(indexedHumanModel->textureData,0,sizeof(char) * indexedHumanModel->header.textureDataWidth * indexedHumanModel->header.textureDataHeight * indexedHumanModel->header.textureDataChannels);
       memset(rgb,0,sizeof(char) * originalWIDTH * originalHEIGHT * 3);
     #endif // FADE_TO_BLACK
@@ -250,9 +287,9 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
       fprintf(stderr," tX=%u,tY=%u -> X=%u,Y=%u\n",textureX,textureY,mappingFbToTex[ptr].x,mappingFbToTex[ptr].y);
 
       unsigned char r,g,b;
-      encodeUniqueColor(i,numberOfPoints,&r,&g,&b);
+      encodeUniqueColor(i,numberOfUniqueColors,&r,&g,&b);
 
-      unsigned int doubleCheckedPoint = decodeUniqueColor(numberOfPoints,r,g,b);
+      unsigned int doubleCheckedPoint = decodeUniqueColor(numberOfUniqueColors,r,g,b);
 
       if (i!=doubleCheckedPoint)
       {
@@ -274,6 +311,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
    }
 
    saveRawImageToFileOGLR("occupiedTexture.pnm",indexedHumanModel->textureData,indexedHumanModel->header.textureDataWidth,indexedHumanModel->header.textureDataHeight,3,8);
+   saveRawImageToFileOGLR("occupiedEyesTexture.pnm",indexedEyeModel->textureData,indexedEyeModel->header.textureDataWidth,indexedEyeModel->header.textureDataHeight,3,8);
 
    if (rgb!=0)
       {
@@ -1604,39 +1642,16 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
     *g = aG;
     *b = aB;
 
-/*
-    r = ptr; ptr++;
-    g = ptr; ptr++;
-    b = ptr; ptr++;
-    *r = aR;
-    *g = aG;
-    *b = aB;
-
-    r = ptr; ptr++;
-    g = ptr; ptr++;
-    b = ptr; ptr++;
-    *r = aR;
-    *g = aG;
-    *b = aB;
-
-
-    r = ptr; ptr++;
-    g = ptr; ptr++;
-    b = ptr; ptr++;
-    *r = aR;
-    *g = aG;
-    *b = aB;*/
-
-      uploadColorImageAsTexture(
-                                 programID,
-                                 (GLuint *) &model->header.textureBindGLBuffer,
-                                 &model->header.textureUploadedToGPU,
-                                 (unsigned char*) model->textureData,
-                                  model->header.textureDataWidth,
-                                  model->header.textureDataHeight,
-                                  model->header.textureDataChannels,
-                                  24
-                               );
+    uploadColorImageAsTexture(
+                               programID,
+                               (GLuint *) &model->header.textureBindGLBuffer,
+                               &model->header.textureUploadedToGPU,
+                               (unsigned char*) model->textureData,
+                               model->header.textureDataWidth,
+                               model->header.textureDataHeight,
+                               model->header.textureDataChannels,
+                               24
+                             );
 }
 
 
