@@ -67,11 +67,13 @@ unsigned int framesRendered = 0;
 
 float backgroundColor[3]={0};
 char flashTexturePixels = 0;
+char dump2DPointOutput = 0;
 unsigned char flashR = 255;
 unsigned char flashG = 255;
 unsigned char flashB = 0;
 
 char renderEyes = 1;
+char renderEyeHair = 1;
 char renderHair = 0;
 
 //Virtual Camera Intrinsics
@@ -577,6 +579,8 @@ int doOGLDrawing(
 
       if (renderEyes)
       {
+          if (renderEyeHair)
+          {
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyelashesVao,
@@ -607,6 +611,8 @@ int doOGLDrawing(
                                      &viewMatrix,
                                      0 //Wireframe
                                     );
+          }
+
       drawVertexArrayWithMVPMatrices(
                                      programID,
                                      eyeVao,
@@ -668,6 +674,8 @@ int doOGLDrawing(
 
       if (renderEyes)
       {
+       if (renderEyeHair)
+          {
       drawObjectAT(
                   programID,
                   eyelashesVao,
@@ -708,6 +716,7 @@ int doOGLDrawing(
                   &viewMatrix,
                   0 //Wireframe
                   );
+          }
       drawObjectAT(
                   programID,
                   eyeVao,
@@ -1674,7 +1683,16 @@ int main(int argc,const char **argv)
                        //window to make sure renderings happen regardless of window visibility
 		               fprintf(stderr, "Using invisible window\n");
                        visibleWindow = 0;
+                    } else
+             if (strcmp(argv[i],"--dump2D")==0)
+                    {
+                       //When Doing a batch processing job like flashing texture use an invisible
+                       //window to make sure renderings happen regardless of window visibility
+		               fprintf(stderr, "Using invisible window\n");
+                       visibleWindow = 0;
                     }
+
+
         }
 
 
@@ -1795,6 +1813,11 @@ int main(int argc,const char **argv)
                        humanPose.y=-1.476f;//(float) (100-rand()%200);
                        humanPose.z=0.69735f;//(float)  (700+rand()%1000);
                     } else
+           if (strcmp(argv[i],"--dump2D")==0)
+                    {
+                      //./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2DPointOutput
+                      dump2DPointOutput=1;
+                    } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
                         // ./gl3MeshTransform --set hip x 0 --face --flashtexture 2>/dev/null
@@ -1817,6 +1840,10 @@ int main(int argc,const char **argv)
            if (strcmp(argv[i],"--nocolor")==0)
                     {
                       destroyColors=1;
+                    } else
+           if (strcmp(argv[i],"--noeyehair")==0)
+                    {
+                      renderEyeHair=0;
                     } else
            if (strcmp(argv[i],"--bvh")==0)
                     {
@@ -1973,6 +2000,22 @@ int main(int argc,const char **argv)
                         indexedHumanModel.header.textureDataWidth = newImg.width;
                         indexedHumanModel.header.textureDataHeight = newImg.height;
                         indexedHumanModel.header.textureDataChannels = newImg.channels;
+                    } else
+           if (strcmp(argv[i],"--eyetexture")==0)
+                    {
+                        //./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm
+                        struct Image newImg={0};
+                        ReadPPM(argv[i+1],&newImg,0);
+                        if ( indexedEyeModel.textureData!=0 )
+                        {
+                            free(indexedEyeModel.textureData);
+                            indexedEyeModel.textureData = 0;
+                        }
+
+                        indexedEyeModel.textureData = newImg.pixels;
+                        indexedEyeModel.header.textureDataWidth = newImg.width;
+                        indexedEyeModel.header.textureDataHeight = newImg.height;
+                        indexedEyeModel.header.textureDataChannels = newImg.channels;
                     }
         }
 
