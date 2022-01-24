@@ -165,7 +165,7 @@ unsigned int  * readKeyPoint(const char * filename,char flipX,unsigned int width
 
 
 
-void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel)
+void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel,struct TRI_Model * indexedEyeModel)
 {
   #define FADE_TO_BLACK 1
 
@@ -235,7 +235,6 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
    if (line!=0) { free(line); }
    fclose(fp);
-
 
 
 
@@ -1937,7 +1936,7 @@ int main(int argc,const char **argv)
            if (strcmp(argv[i],"--parse")==0)
                     {
                       //  ./gl3MeshTransform --parse textureActivation.dat face.txt
-                      parseTextureToScreenAssociations(argv[i+1],argv[i+2],&indexedHumanModel);
+                      parseTextureToScreenAssociations(argv[i+1],argv[i+2],&indexedHumanModel,&indexedEyeModel);
                       exit(0);
                     } else
            if (strcmp(argv[i],"--colorcode")==0)
