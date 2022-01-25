@@ -1598,7 +1598,7 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
 {
     if (pixels==0) { fprintf(stderr,RED "getAll2DEncodedPoints no pixels \n" NORMAL); return 0; }
     fprintf(stderr,CYAN "getAll2DEncodedPoints \n" NORMAL);
-    // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D textureActivation.dat
+    // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D face.txt
     unsigned char * imageEnd = pixels + ( width * height * 3);
     unsigned char * ptr = pixels;
     while (ptr<imageEnd-3)
@@ -1615,7 +1615,7 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
           unsigned int pixelsTraversed = (unsigned int) (ptr - pixels) / 3;
           unsigned int y = (unsigned int) pixelsTraversed / width;
           unsigned int x = (unsigned int) pixelsTraversed % width;
-          fprintf(stdout,"POINT(%u,%u=%u)\n",x,y,doubleCheckedPoint);
+          fprintf(stdout,"POINT(%u,%u=%u - %u)\n",x,y,doubleCheckedPoint,numberOfUniqueColors);
 
           //Direct log to a file..!
           FILE *fp = fopen("outpoints.dat","a");
@@ -1625,7 +1625,7 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
             fclose(fp);
           }
           //exit(0);
-          return 1;
+          //return 1;
         }
 
     }
@@ -1855,13 +1855,24 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--dump2D")==0)
                     {
-                      //./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D textureActivation.dat
+                      // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D face.txt
                       dump2DPointOutput=1;
 
                       unsigned int numberOfPoints = 0;
                       unsigned int  * keypoints = readKeyPoint(argv[i+1],1,originalWIDTH,originalHEIGHT,&numberOfPoints);
+                      if (keypoints==0)
+                      {
+                          fprintf(stderr,"Cannot read key points %s",argv[i+1]);
+                          return 0;
+                      }
                       numberOfUniqueColors = numberOfPoints + 2; // We also allocated 2 more points for l/r eyes!
                       if (keypoints!=0) { free(keypoints);}
+
+                      FILE *fp = fopen("outpoints.dat","w");
+                      if (fp!=0)
+                          {
+                           fclose(fp);
+                          }
                     } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
