@@ -1596,6 +1596,8 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 
 int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int height,unsigned int numberOfUniqueColors)
 {
+    if (pixels==0) { fprintf(stderr,RED "getAll2DEncodedPoints no pixels \n" NORMAL); return 0; }
+    fprintf(stderr,CYAN "getAll2DEncodedPoints \n" NORMAL);
     // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D textureActivation.dat
     unsigned char * imageEnd = pixels + ( width * height * 3);
     unsigned char * ptr = pixels;
@@ -1971,7 +1973,7 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
 
    unsigned char * rgb = 0;
-   if ( (dumpVideo) || (dumpSnapshot) || (flashTexturePixels) )
+   if ( (dumpVideo) || (dumpSnapshot) || (flashTexturePixels) || (dump2DPointOutput) )
       { rgb =  (unsigned char * ) malloc(sizeof(unsigned char) * WIDTH * HEIGHT *3); }
 
    //------------------------------------------------------
