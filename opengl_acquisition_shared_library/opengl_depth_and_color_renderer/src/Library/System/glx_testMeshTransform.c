@@ -68,6 +68,7 @@ unsigned int framesRendered = 0;
 float backgroundColor[3]={0};
 char flashTexturePixels = 0;
 char dump2DPointOutput = 0;
+unsigned int numberOfUniqueColors = 0;
 unsigned char flashR = 255;
 unsigned char flashG = 255;
 unsigned char flashB = 0;
@@ -199,7 +200,7 @@ void parseTextureToScreenAssociations(const char * filename,const char * faceFil
 
   unsigned int numberOfPoints = 0;
   unsigned int  * keypoints = readKeyPoint(faceFilename,1,originalWIDTH,originalHEIGHT,&numberOfPoints);
-  unsigned int numberOfUniqueColors = numberOfPoints + 2; // We also allocated 2 more points for l/r eyes!
+  numberOfUniqueColors = numberOfPoints + 2; // We also allocated 2 more points for l/r eyes!
 
   if (keypoints == 0) { return ; }
 
@@ -1593,6 +1594,43 @@ void randomizeHead(struct BVH_MotionCapture * mc)
 }
 
 
+int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int height,unsigned int numberOfUniqueColors)
+{
+    // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D textureActivation.dat
+    unsigned char * imageEnd = pixels + ( width * height * 3);
+    unsigned char * ptr = pixels;
+    while (ptr<imageEnd-3)
+    {
+        unsigned char r = *ptr; ++ptr;
+        unsigned char g = *ptr; ++ptr;
+        unsigned char b = *ptr; ++ptr;
+
+        if ( (r!=0) || (g!=0) || (b!=0) )//CAREFUL RENDERED PIXELS DONT TAKE EXACT COLOR
+        {
+        // DO Decoding here..!
+          unsigned int doubleCheckedPoint = decodeUniqueColor(numberOfUniqueColors,r,g,b);
+
+          unsigned int pixelsTraversed = (unsigned int) (ptr - pixels) / 3;
+          unsigned int y = (unsigned int) pixelsTraversed / width;
+          unsigned int x = (unsigned int) pixelsTraversed % width;
+          fprintf(stdout,"POINT(%u,%u=%u)\n",x,y,doubleCheckedPoint);
+
+          //Direct log to a file..!
+          FILE *fp = fopen("outpoints.dat","a");
+          if (fp!=0)
+          {
+            fprintf(fp,"POINT(%u,%u=%u)\n",x,y,doubleCheckedPoint);
+            fclose(fp);
+          }
+          //exit(0);
+          return 1;
+        }
+
+    }
+
+    return 0;
+}
+
 
 
 int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int height,unsigned int flashX,unsigned int flashY)
@@ -1815,8 +1853,13 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--dump2D")==0)
                     {
-                      //./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2DPointOutput
+                      //./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D textureActivation.dat
                       dump2DPointOutput=1;
+
+                      unsigned int numberOfPoints = 0;
+                      unsigned int  * keypoints = readKeyPoint(argv[i+1],1,originalWIDTH,originalHEIGHT,&numberOfPoints);
+                      numberOfUniqueColors = numberOfPoints + 2; // We also allocated 2 more points for l/r eyes!
+                      if (keypoints!=0) { free(keypoints);}
                     } else
            if (strcmp(argv[i],"--flashtexture")==0)
                     {
@@ -2320,6 +2363,11 @@ int main(int argc,const char **argv)
             saveRawImageToFileOGLR(filename,rgb,WIDTH,HEIGHT,3,8);
            }
        }
+     }
+
+     if (dump2DPointOutput)
+     {
+       getAll2DEncodedPoints(rgb,WIDTH,HEIGHT,numberOfUniqueColors);
      }
 
      if (flashTexturePixels)
