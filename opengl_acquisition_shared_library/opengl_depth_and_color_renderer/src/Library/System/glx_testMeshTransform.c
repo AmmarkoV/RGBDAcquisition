@@ -1598,6 +1598,11 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
 {
     if (pixels==0) { fprintf(stderr,RED "getAll2DEncodedPoints no pixels \n" NORMAL); return 0; }
     fprintf(stderr,CYAN "getAll2DEncodedPoints \n" NORMAL);
+
+    unsigned int * m = (unsigned int  *) malloc(sizeof(unsigned int ) * numberOfUniqueColors * 2);
+
+    if (m!=0)
+    {
     // ./gl3MeshTransform --randomize --set hip x 0 --face --texture occupiedTexture.pnm --eyetexture occupiedEyesTexture.pnm --noeyehair --dump2D face.txt
     unsigned char * imageEnd = pixels + ( width * height * 3);
     unsigned char * ptr = pixels;
@@ -1617,6 +1622,9 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
           unsigned int x = (unsigned int) pixelsTraversed % width;
           fprintf(stdout,"POINT(%u,%u=%u - %u)\n",x,y,doubleCheckedPoint,numberOfUniqueColors);
 
+          m[doubleCheckedPoint*2+0] = x;
+          m[doubleCheckedPoint*2+1] = y;
+
           //Direct log to a file..!
           FILE *fp = fopen("outpoints.dat","a");
           if (fp!=0)
@@ -1627,7 +1635,10 @@ int getAll2DEncodedPoints(unsigned char * pixels,unsigned int width,unsigned int
           //exit(0);
           //return 1;
         }
+    }
 
+
+    free(m);
     }
 
     return 0;
