@@ -1740,7 +1740,7 @@ int main(int argc,const char **argv)
                        //When Doing a batch processing job like flashing texture use an invisible
                        //window to make sure renderings happen regardless of window visibility
 		               fprintf(stderr, "Using invisible window\n");
-                       visibleWindow = 0;
+                       //visibleWindow = 0;
                     }
 
 
