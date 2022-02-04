@@ -11,6 +11,7 @@ if (OPENCL_OPTIMIZATIONS)
 add_definitions(-DOPENCL_OPTIMIZATIONS)
 endif(OPENCL_OPTIMIZATIONS)
 
+set_source_files_properties(mat_mul.cl PROPERTIES HEADER_FILE_ONLY TRUE)
 #add_library(matmul STATIC mat_mul.c)
 add_executable(matmul mat_mul.c )  
 target_link_libraries(matmul m rt OpenCL )
