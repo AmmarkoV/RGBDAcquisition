@@ -227,17 +227,31 @@ int main(int argc, char const *argv[])
     
     
     struct BVH_MotionCapture bvhMotion={0};
-    struct BVH_RendererConfiguration renderingConfiguration={0};
+    struct simpleRenderer renderer={0};
+
 
     // Emulate GoPro Hero4 @ FullHD mode by default..
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-    renderingConfiguration.width=1920;
-    renderingConfiguration.height=1080;
-    renderingConfiguration.cX=(float)renderingConfiguration.width/2;
-    renderingConfiguration.cY=(float)renderingConfiguration.height/2;
-    renderingConfiguration.fX=582.18394;
-    renderingConfiguration.fY=582.52915;
+    renderer.fx=582.18394;
+    renderer.fy=582.52915;
+    renderer.skew=1.0;
+    renderer.width=1920;
+    renderer.height=1080;
+    renderer.cx=(float)renderer.width/2;
+    renderer.cy=(float)renderer.height/2;
+    renderer.near=1.0;
+    renderer.far=10000.0;
     //640,480 , 575.57 , 575.57, //Kinect
+    
+   simpleRendererDefaults(
+                          &renderer,
+                          renderer.width,
+                          renderer.height,
+                          renderer.fx,
+                          renderer.fy
+                         );
+    
+    simpleRendererInitialize(&renderer);
     
     const char * fromBVHFile="01_08.bvh";
     //First of all we need to load the BVH file
@@ -262,6 +276,17 @@ int main(int argc, char const *argv[])
                                  )
        )
     {
+        if ( bvh_projectTo2D(
+                             &bvhMotion,
+                             &bvhTransform,
+                             &renderer,
+                             1,
+                             1
+                           )
+            )
+            {
+                
+            }
     }
           
           
