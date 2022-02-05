@@ -239,7 +239,32 @@ int main(int argc, char const *argv[])
     renderingConfiguration.fY=582.52915;
     //640,480 , 575.57 , 575.57, //Kinect
     
+    const char * fromBVHFile="01_08.bvh";
+    //First of all we need to load the BVH file
+    if (!bvh_loadBVH(fromBVHFile, &bvhMotion,1.0))
+          {
+            exit(0);
+          }
 
+          //Change joint names..
+          bvh_renameJointsForCompatibility(&bvhMotion);
+          
+          
+    struct BVH_Transform bvhTransform = {0};
+    bvhTransform.useOptimizations=0;
+    unsigned int frameID =0;
+    if (
+        bvh_loadTransformForFrame(
+                                  &bvhMotion,
+                                  frameID,
+                                  &bvhTransform,
+                                  0
+                                 )
+       )
+    {
+    }
+          
+          
     
     
     cl_platform_id platform_id;
