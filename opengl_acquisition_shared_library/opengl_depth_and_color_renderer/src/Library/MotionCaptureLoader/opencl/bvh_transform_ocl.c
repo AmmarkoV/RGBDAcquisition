@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+#include "../bvh_loader.h"
+#include "../calculate/bvh_project.h"
+#include  "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
+
 #define BUF_SIZE 2048
 #define ERROR -1
 
@@ -220,6 +224,24 @@ void printMatrix(float *arr, int n, int m)
 
 int main(int argc, char const *argv[])
 {
+    
+    
+    struct BVH_MotionCapture bvhMotion={0};
+    struct BVH_RendererConfiguration renderingConfiguration={0};
+
+    // Emulate GoPro Hero4 @ FullHD mode by default..
+    // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+    renderingConfiguration.width=1920;
+    renderingConfiguration.height=1080;
+    renderingConfiguration.cX=(float)renderingConfiguration.width/2;
+    renderingConfiguration.cY=(float)renderingConfiguration.height/2;
+    renderingConfiguration.fX=582.18394;
+    renderingConfiguration.fY=582.52915;
+    //640,480 , 575.57 , 575.57, //Kinect
+    
+
+    
+    
     cl_platform_id platform_id;
     cl_uint num_of_platforms;
     cl_device_id device_id;
