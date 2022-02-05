@@ -193,7 +193,6 @@ float meanBVH3DDistance(
     struct BVH_Transform * bvhTargetTransform
 )
 {
-
     if (targetMotionBuffer==0)
     {
         return NAN;
@@ -469,7 +468,7 @@ float calculateChainLoss(
        { fprintf(stderr,RED "Could not calculate transform for chain %u is invalid\n"NORMAL,chainID); }
        
      } else
-     { fprintf(stderr,RED "Chain %u has  too few parts ( %u ) \n" NORMAL,chainID,problem->chain[chainID].numberOfParts); }    
+     { fprintf(stderr,RED "Chain %u has too few parts ( %u ) \n" NORMAL,chainID,problem->chain[chainID].numberOfParts); }    
     } else //Have a valid chain
     { fprintf(stderr,RED "Chain %u is invalid\n"NORMAL,chainID); }
     //I have left 0/0 on purpose to cause NaNs when projection errors occur

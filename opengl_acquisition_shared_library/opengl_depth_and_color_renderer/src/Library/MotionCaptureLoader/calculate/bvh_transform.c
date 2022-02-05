@@ -820,8 +820,6 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
      }
     return 1;
   }
-
-
  }
 
  return 0;
@@ -1037,4 +1035,3 @@ int bvh_removeTranslationFromTransform(
 
   return 0;
 }
-

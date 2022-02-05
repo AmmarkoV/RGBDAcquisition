@@ -150,7 +150,7 @@ int start_glx3_stuffWindowed(int WIDTH,int HEIGHT,int argc,const char **argv)
       glXGetFBConfigAttrib( display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
       glXGetFBConfigAttrib( display, fbc[i], GLX_SAMPLES       , &samples  );
 
-      printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d, SAMPLES = %d\n", i, vi -> visualid, samp_buf, samples );
+      printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d, SAMPLES = %d\n", i, (unsigned int) vi -> visualid, samp_buf, samples );
 
       if ( best_fbc < 0 || samp_buf && samples > best_num_samp )
         best_fbc = i, best_num_samp = samples;
@@ -167,7 +167,7 @@ int start_glx3_stuffWindowed(int WIDTH,int HEIGHT,int argc,const char **argv)
 
   // Get a visual
   XVisualInfo *vi = glXGetVisualFromFBConfig( display, bestFbc );
-  printf( "Chosen visual ID = 0x%x\n", vi->visualid );
+  printf( "Chosen visual ID = 0x%x\n",(unsigned int)  vi->visualid );
 
   printf( "Creating colormap\n" );
   XSetWindowAttributes swa;
@@ -580,7 +580,7 @@ int glx3_checkEvents()
           windowSizeUpdated(event.xconfigure.width, event.xconfigure.height);
           /* fall through... */
         case Expose:
-             #warning "redraws are not handled ?"
+             //#warning "redraws are not handled ?"
              // needRedraw=GL_TRUE;
           break;
       }

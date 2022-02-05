@@ -266,6 +266,7 @@ int main(int argc, char const *argv[])
      {
      clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL,num_of_devices, devices, NULL);
      
+     printf("%u OpenCL devices\n",num_of_devices);
      
      for(int i=0; i<num_of_devices; i++) { 
                                              int err = clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(name_data), name_data, NULL);
@@ -275,7 +276,7 @@ int main(int argc, char const *argv[])
                                                          }
                                              clGetDeviceInfo(devices[i], CL_DEVICE_ADDRESS_BITS,sizeof(ext_data), &addr_data, NULL);
                                              clGetDeviceInfo(devices[i], CL_DEVICE_EXTENSIONS,sizeof(ext_data), ext_data, NULL);
-                                             printf("NAME: %s\nADDRESS_WIDTH: %u\nEXTENSIONS: %s",name_data, addr_data, ext_data);
+                                             printf("NAME: %s\nADDRESS_WIDTH: %u\nEXTENSIONS: %s\n",name_data, addr_data, ext_data);
                                          }
     free(devices); 
      }
