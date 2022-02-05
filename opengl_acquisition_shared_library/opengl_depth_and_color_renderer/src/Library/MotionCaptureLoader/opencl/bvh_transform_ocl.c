@@ -281,11 +281,11 @@ int main(int argc, char const *argv[])
                              &bvhTransform,
                              &renderer,
                              1,
-                             1
+                             0 //Direct render
                            )
             )
             {
-                
+                fprintf(stderr,"Projected..!\n");
             }
     }
           
