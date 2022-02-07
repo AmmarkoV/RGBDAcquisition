@@ -225,10 +225,11 @@ void printMatrix(float *arr, int n, int m)
 int main(int argc, char const *argv[])
 {
     
-    
+    //-----------------------------------------------------------
+    //-----------------------------------------------------------
+    //-----------------------------------------------------------
     struct BVH_MotionCapture bvhMotion={0};
     struct simpleRenderer renderer={0};
-
 
     // Emulate GoPro Hero4 @ FullHD mode by default..
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
@@ -288,9 +289,11 @@ int main(int argc, char const *argv[])
                 fprintf(stderr,"Projected..!\n");
             }
     }
-          
-          
-    
+    //-----------------------------------------------------------
+    //-----------------------------------------------------------
+    //-----------------------------------------------------------
+
+
     
     cl_platform_id platform_id;
     cl_uint num_of_platforms;
@@ -336,11 +339,10 @@ int main(int argc, char const *argv[])
      devices = (cl_device_id*)  malloc(sizeof(cl_device_id) * num_of_devices);
      if (devices!=0)
      {
-     clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL,num_of_devices, devices, NULL);
+       clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL,num_of_devices, devices, NULL);
+       printf("%u OpenCL devices\n",num_of_devices);
      
-     printf("%u OpenCL devices\n",num_of_devices);
-     
-     for(int i=0; i<num_of_devices; i++) { 
+       for(int i=0; i<num_of_devices; i++) { 
                                              int err = clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(name_data), name_data, NULL);
                                              if(err < 0) {
                                                            perror("Couldn't read extension data");
@@ -349,8 +351,8 @@ int main(int argc, char const *argv[])
                                              clGetDeviceInfo(devices[i], CL_DEVICE_ADDRESS_BITS,sizeof(ext_data), &addr_data, NULL);
                                              clGetDeviceInfo(devices[i], CL_DEVICE_EXTENSIONS,sizeof(ext_data), ext_data, NULL);
                                              printf("NAME: %s\nADDRESS_WIDTH: %u\nEXTENSIONS: %s\n",name_data, addr_data, ext_data);
-                                         }
-    free(devices); 
+                                           }
+      free(devices); 
      }
 
 

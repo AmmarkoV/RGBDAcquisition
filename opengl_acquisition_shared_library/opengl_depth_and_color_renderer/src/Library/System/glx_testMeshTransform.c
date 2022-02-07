@@ -77,6 +77,8 @@ char renderEyes = 1;
 char renderEyeHair = 1;
 char renderHair = 0;
 
+int skinnedRendering=0;
+
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
 float fY = 1233.48468;
@@ -774,13 +776,18 @@ int initializeOGLRenderer(
                            GLuint * FramebufferName,
                            GLuint * renderedTexture,
                            GLuint * renderedDepth,
+                           int skinnedRendering,
                            unsigned int WIDTH,
                            unsigned int HEIGHT
                          )
 {
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../../shaders/simpleWithTexture.vert", "../../../shaders/simpleWithTexture.frag");
+	struct shaderObject * sho = 0;
+
+	if (skinnedRendering) { sho = loadShader("../../../shaders/skeletonWithTexture.vert", "../../../shaders/skeletonWithTexture.frag"); } else
+	                      { sho = loadShader("../../../shaders/simpleWithTexture.vert"  , "../../../shaders/simpleWithTexture.frag");   }
+
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); return 0; }
 
 	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebuffer.frag");
@@ -1766,7 +1773,7 @@ int main(int argc,const char **argv)
   GLuint renderedTexture=0;
   GLuint renderedDepth=0;
 
-  if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth,WIDTH,HEIGHT))
+  if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth,skinnedRendering,WIDTH,HEIGHT))
   {
 		fprintf(stderr, "Failed to initialize Shaders\n");
 	 	return 1;
