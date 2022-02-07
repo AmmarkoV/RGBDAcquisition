@@ -851,13 +851,13 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
 
 int doModelTransform(
-                      struct TRI_Model * triModelOut ,
-                      struct TRI_Model * triModelIn ,
-                      float * joint4x4Data ,
+                      struct TRI_Model * triModelOut,
+                      struct TRI_Model * triModelIn,
+                      float * joint4x4Data,
                       unsigned int joint4x4DataSize ,
-                      unsigned int autodetectAlteredMatrices ,
-                      unsigned int directSettingOfMatrices ,
-                      unsigned int performVertexTransform  ,
+                      unsigned int autodetectAlteredMatrices,
+                      unsigned int directSettingOfMatrices,
+                      unsigned int performVertexTransform, //If you want to handle the transform on a shader set this to 0
                       unsigned int jointAxisConvention
                     )
 {
