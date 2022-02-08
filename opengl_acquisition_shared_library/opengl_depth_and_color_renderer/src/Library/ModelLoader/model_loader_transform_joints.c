@@ -788,7 +788,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        }
 
   //We will need a Matrix4x4OfFloats since it is aligned to give SSE speedups..
-  struct  Matrix4x4OfFloats alignedMatrixHolder;
+  struct  Matrix4x4OfFloats boneTransformMatrix;
 
   for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++)
    {
@@ -814,10 +814,10 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        position.m[3] = 1.0;
 
        //Keep a copy of our matrix on our SSE aligned Matrix4x4OfFloats structure
-       copy4x4FMatrix(alignedMatrixHolder.m,triModelIn->bones[boneID].info->finalVertexTransformation);
+       copy4x4FMatrix(boneTransformMatrix.m,triModelIn->bones[boneID].info->finalVertexTransformation);
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
-       transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&alignedMatrixHolder,&position);
+       transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&boneTransformMatrix,&position);
        triModelOut->vertices[v*3+0] += (float) transformedPosition.m[0] * w;
        triModelOut->vertices[v*3+1] += (float) transformedPosition.m[1] * w;
        triModelOut->vertices[v*3+2] += (float) transformedPosition.m[2] * w;
@@ -832,7 +832,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
         normal.m[3]   = 0.0;
 
         //We transform input (initial) normal with the transform we computed to get transformedNormal
-        transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&alignedMatrixHolder,normal.m);
+        transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&boneTransformMatrix,normal.m);
         triModelOut->normal[v*3+0] += (float) transformedNormal.m[0] * w;
         triModelOut->normal[v*3+1] += (float) transformedNormal.m[1] * w;
         triModelOut->normal[v*3+2] += (float) transformedNormal.m[2] * w;

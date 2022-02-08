@@ -16,6 +16,163 @@
 #include "../../Tools/tools.h"
 
 
+
+GLuint
+pushBonesToBufferData(
+                       int generateNewVao,
+                        GLuint *vao ,
+                        GLuint *arrayBuffer,
+                        GLuint *elementBuffer,
+                        GLuint programID  ,
+                        const float * vertices , unsigned int sizeOfVertices ,
+                        const float * normals , unsigned int sizeOfNormals ,
+                        const float * textureCoords ,  unsigned int sizeOfTextureCoords ,
+                        const float * colors , unsigned int sizeOfColors,
+                        const unsigned int * indices , unsigned int sizeOfIndices
+                     )
+{
+        #if USE_GLEW
+
+    unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
+    fprintf(stderr,"DrawArray(GL_TRIANGLES,0,%u) ",numVertices);
+    fprintf(stderr,"%lu vertices (%u bytes) and %lu normals (%u bytes)\n"  ,
+            (unsigned long) sizeOfVertices/sizeof(float),
+            sizeOfVertices,
+            sizeOfNormals/sizeof(float),
+            sizeOfNormals
+           );
+
+    //If no data given, zero their size..
+    if (vertices==0)      { sizeOfVertices=0;      }
+    if (normals==0)       { sizeOfNormals=0;       }
+    if (textureCoords==0) { sizeOfTextureCoords=0; }
+    if (colors==0)        { sizeOfColors=0;        }
+    if (indices==0)       { sizeOfIndices=0;       }
+
+
+    if (generateNewVao)
+      { glGenVertexArrays(1, vao);     checkOpenGLError(__FILE__, __LINE__); }
+    glBindVertexArray(*vao);           checkOpenGLError(__FILE__, __LINE__);
+    //--------------------------------------------------------------------------
+
+
+    if (indices!=0)
+    {
+      glGenBuffers(1, elementBuffer);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *elementBuffer);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeOfIndices, indices , GL_STATIC_DRAW);
+    }
+
+
+
+
+    // Create and initialize a buffer object on the server side (GPU)
+    glGenBuffers( 1, arrayBuffer );                   checkOpenGLError(__FILE__, __LINE__);
+    glBindBuffer( GL_ARRAY_BUFFER, *arrayBuffer );    checkOpenGLError(__FILE__, __LINE__);
+
+
+
+
+    //Create buffer data..
+    GLsizei    stride = 0;
+    GLintptr   memoryOffset=0;
+    GLsizeiptr totalBufferDataSize=sizeOfVertices+sizeOfTextureCoords+sizeOfColors+sizeOfNormals;
+    //----------------------------------------------------------------------------------------------------------------------------
+    glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                   checkOpenGLError(__FILE__, __LINE__);
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ((vertices!=0) && (sizeOfVertices!=0) )
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfVertices, vertices);               checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=sizeOfVertices;
+     //stride += 3 * sizeof(float);
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, sizeOfTextureCoords , textureCoords );  checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=sizeOfTextureCoords;
+     //stride += 2 * sizeof(float);
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ( (colors!=0) && (sizeOfColors!=0) )
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfColors, colors);                   checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=sizeOfColors;
+     //stride += 3 * sizeof(float);
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ( (normals!=0) && (sizeOfNormals!=0) )
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfNormals, normals);                 checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=sizeOfNormals;
+     //stride += 3 * sizeof(float);
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+
+
+    memoryOffset=0;
+
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ((vertices!=0) && (sizeOfVertices!=0))
+    {
+     //Pass vPosition to shader
+     GLuint vPosition = glGetAttribLocation(programID, "vPosition" );                        checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION!=vPosition) && (vPosition!=-1) )
+     {
+      glEnableVertexAttribArray(vPosition);                                                  checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=sizeOfVertices;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
+    {
+     //Pass vTexture to shader
+     GLuint vTexture = glGetAttribLocation(programID, "vTexture");                           checkOpenGLError(__FILE__, __LINE__);
+    //GLuint textureStrengthLocation = glGetUniformLocation(programID, "textureStrength");  checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vTexture ) && (vTexture!=-1) )
+     {
+      glEnableVertexAttribArray(vTexture);                                                   checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);     checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=sizeOfTextureCoords;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ( (colors!=0) && (sizeOfColors!=0) )
+    {
+     //Pass vColor to shader
+     GLuint vColor = glGetAttribLocation(programID, "vColor");                               checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vColor) && (vColor!=-1) )
+     {
+      glEnableVertexAttribArray(vColor);                                                     checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=sizeOfColors;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if ((normals!=0) && (sizeOfNormals!=0))
+    {
+     //Pass vNormal to shader
+     GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vNormal) && (vNormal!=-1) )
+     {
+      glEnableVertexAttribArray(vNormal);                                                    checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);      checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=sizeOfNormals;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+
+   return 1;
+  #else
+   #warning "USE_GLEW not defined, pushBonesToBufferData will not be included.."
+   return 0;
+  #endif
+}
+
+
+
+
 GLuint
 pushObjectToBufferData(
                         int generateNewVao,
@@ -160,12 +317,11 @@ pushObjectToBufferData(
       memoryOffset+=sizeOfNormals;
      }
     }
-
     //----------------------------------------------------------------------------------------------------------------------------
 
    return 1;
   #else
-   #warning "USE_GLEW not defined, uploadGeometry will not be included.."
+   #warning "USE_GLEW not defined, pushObjectToBufferData will not be included.."
    return 0;
   #endif
 }
