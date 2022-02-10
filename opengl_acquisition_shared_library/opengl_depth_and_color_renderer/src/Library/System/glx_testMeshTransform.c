@@ -851,6 +851,8 @@ int doDrawing(
                              eyelashesModel->colors         ,  eyelashesModel->header.numberOfColors        * sizeof(float),
                              eyelashesModel->indices        ,  eyelashesModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
+
+    // -> pushBonesToBufferData
     //------------------------------------------------------------------------------------
     GLuint eyebrowsVAO=0;
     GLuint eyebrowsArrayBuffer=0;
