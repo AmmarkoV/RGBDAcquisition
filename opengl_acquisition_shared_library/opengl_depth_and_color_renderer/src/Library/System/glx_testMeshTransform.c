@@ -836,6 +836,11 @@ int doDrawing(
                 struct TRI_Model * hairModel,
                 struct TRI_Model * eyebrowsModel,
                 struct TRI_Model * eyelashesModel,
+                struct GPUTriModel * gpuEyelashes,
+                struct GPUTriModel * gpuEyebrows,
+                struct GPUTriModel * gpuHair,
+                struct GPUTriModel * gpuEyes,
+                struct GPUTriModel * gpuHuman,
                 unsigned int WIDTH,
                 unsigned int HEIGHT,
                 int renderForever
@@ -847,18 +852,18 @@ int doDrawing(
     GLuint eyelashesVAO=0;
     GLuint eyelashesArrayBuffer=0;
     GLuint eyelashesElementBuffer=0;
-    unsigned int eyelashesTriangleCount  =  (unsigned int)  eyelashesModel->header.numberOfVertices/3;
+    unsigned int eyelashesTriangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &eyelashesVAO,
                              &eyelashesArrayBuffer,
                              &eyelashesElementBuffer,
                              programID,
-                             eyelashesModel->vertices       ,  eyelashesModel->header.numberOfVertices      * sizeof(float),
-                             eyelashesModel->normal         ,  eyelashesModel->header.numberOfNormals       * sizeof(float),
-                             eyelashesModel->textureCoords  ,  eyelashesModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             eyelashesModel->colors         ,  eyelashesModel->header.numberOfColors        * sizeof(float),
-                             eyelashesModel->indices        ,  eyelashesModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                             gpuEyelashes->model->vertices       ,  gpuEyelashes->model->header.numberOfVertices      * sizeof(float),
+                             gpuEyelashes->model->normal         ,  gpuEyelashes->model->header.numberOfNormals       * sizeof(float),
+                             gpuEyelashes->model->textureCoords  ,  gpuEyelashes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
+                             gpuEyelashes->model->colors         ,  gpuEyelashes->model->header.numberOfColors        * sizeof(float),
+                             gpuEyelashes->model->indices        ,  gpuEyelashes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
 
     // -> pushBonesToBufferData
@@ -866,18 +871,18 @@ int doDrawing(
     GLuint eyebrowsVAO=0;
     GLuint eyebrowsArrayBuffer=0;
     GLuint eyebrowsElementBuffer=0;
-    unsigned int eyebrowsTriangleCount  =  (unsigned int)  eyebrowsModel->header.numberOfVertices/3;
+    unsigned int eyebrowsTriangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &eyebrowsVAO,
                              &eyebrowsArrayBuffer,
                              &eyebrowsElementBuffer,
                              programID,
-                             eyebrowsModel->vertices       ,  eyebrowsModel->header.numberOfVertices      * sizeof(float),
-                             eyebrowsModel->normal         ,  eyebrowsModel->header.numberOfNormals       * sizeof(float),
-                             eyebrowsModel->textureCoords  ,  eyebrowsModel->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             eyebrowsModel->colors         ,  eyebrowsModel->header.numberOfColors        * sizeof(float),
-                             eyebrowsModel->indices        ,  eyebrowsModel->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
+                             gpuEyebrows->model->vertices       ,  gpuEyebrows->model->header.numberOfVertices      * sizeof(float),
+                             gpuEyebrows->model->normal         ,  gpuEyebrows->model->header.numberOfNormals       * sizeof(float),
+                             gpuEyebrows->model->textureCoords  ,  gpuEyebrows->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
+                             gpuEyebrows->model->colors         ,  gpuEyebrows->model->header.numberOfColors        * sizeof(float),
+                             gpuEyebrows->model->indices        ,  gpuEyebrows->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
     GLuint hairVAO=0;
@@ -2193,6 +2198,14 @@ int main(int argc,const char **argv)
    }
 
 
+  //Pass models to the GPU/Shader structure that will consume them..
+  //-------------------------------------------------------------------------------
+  struct GPUTriModel gpuEyelashes={0}; gpuEyelashes.model = &indexedEyelashesModel;
+  struct GPUTriModel gpuEyebrows={0};  gpuEyebrows.model  = &indexedEyebrowsModel;
+  struct GPUTriModel gpuHair={0};      gpuHair.model      = &indexedHairModel;
+  struct GPUTriModel gpuEyes={0};      gpuEyes.model      = &indexedEyeModel;
+  struct GPUTriModel gpuHuman={0};     gpuHuman.model     = &indexedHumanModel;
+  //-------------------------------------------------------------------------------
 
 
   fprintf(stderr,"eyelashesTextureID = %u \n",indexedEyelashesModel.header.textureBindGLBuffer);
@@ -2296,6 +2309,11 @@ int main(int argc,const char **argv)
        animateTRIModelUsingBVHArmature(&hairModel,&indexedHairModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&eyebrowsModel,&indexedEyebrowsModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,0);
+       gpuEyelashes.model = &eyelashesModel;
+       gpuEyebrows.model  = &eyebrowsModel;
+       gpuHair.model      = &hairModel;
+       gpuEyes.model      = &eyeModel;
+       gpuHuman.model     = &humanModel;
      } else
      {
        tri_flattenIndexedModel(&humanModel,&indexedHumanModel);
@@ -2303,6 +2321,11 @@ int main(int argc,const char **argv)
        tri_flattenIndexedModel(&hairModel,&indexedHairModel);
        tri_flattenIndexedModel(&eyebrowsModel,&indexedEyebrowsModel);
        tri_flattenIndexedModel(&eyelashesModel,&indexedEyelashesModel);
+       gpuEyelashes.model = &eyelashesModel;
+       gpuEyebrows.model  = &eyebrowsModel;
+       gpuHair.model      = &hairModel;
+       gpuEyes.model      = &eyeModel;
+       gpuHuman.model     = &humanModel;
      }
 
 
@@ -2381,6 +2404,13 @@ int main(int argc,const char **argv)
                 &hairModel,
                 &eyebrowsModel,
                 &eyelashesModel,
+                //-------------
+                &gpuEyelashes,
+                &gpuEyebrows,
+                &gpuHair,
+                &gpuEyes,
+                &gpuHuman,
+                //-------------
                 WIDTH,
                 HEIGHT,
                 0
