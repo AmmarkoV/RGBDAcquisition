@@ -814,6 +814,15 @@ int initializeOGLRenderer(
     return 1;
 }
 
+struct GPUTriModel
+{
+  GLuint VAO;
+  GLuint arrayBuffer;
+  GLuint elementBuffer;
+  unsigned int triangleCount;
+  struct TRI_Model * model;
+};
+
 
 int doDrawing(
                 GLuint programID,
