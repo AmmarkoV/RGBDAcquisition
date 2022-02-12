@@ -5,19 +5,19 @@
 
 #include <GL/gl.h>
 
-
 GLuint
 pushBonesToBufferData(
-                       int generateNewVao,
+                        int generateNewVao,
                         GLuint *vao ,
+                        int generateNewArrayBuffer,
                         GLuint *arrayBuffer,
+                        int generateNewElementBuffer,
                         GLuint *elementBuffer,
                         GLuint programID  ,
-                        const float * vertices , unsigned int sizeOfVertices ,
-                        const float * normals , unsigned int sizeOfNormals ,
-                        const float * textureCoords ,  unsigned int sizeOfTextureCoords ,
-                        const float * colors , unsigned int sizeOfColors,
-                        const unsigned int * indices , unsigned int sizeOfIndices
+                        unsigned int numberOfBonesPerVertex,
+                        const unsigned int * boneIndexes , unsigned int sizeOfBoneIndexes,
+                        const float * boneWeightValues , unsigned int sizeOfBoneWeightValues,
+                        const float * boneTransforms ,  unsigned int sizeOfBoneTransforms
                      );
 
 GLuint

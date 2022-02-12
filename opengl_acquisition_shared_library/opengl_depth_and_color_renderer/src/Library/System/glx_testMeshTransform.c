@@ -106,6 +106,9 @@ struct GPUTriModel
   GLuint VAO;
   GLuint arrayBuffer;
   GLuint elementBuffer;
+  //------------------------
+  GLuint programID;
+  //------------------------
   unsigned int triangleCount;
   struct TRI_Model * model;
 };
@@ -838,13 +841,30 @@ int doDrawing(
                              &gpuEyelashes->VAO,
                              &gpuEyelashes->arrayBuffer,
                              &gpuEyelashes->elementBuffer,
-                             programID,
+                             gpuEyelashes->programID,
                              gpuEyelashes->model->vertices       ,  gpuEyelashes->model->header.numberOfVertices      * sizeof(float),
                              gpuEyelashes->model->normal         ,  gpuEyelashes->model->header.numberOfNormals       * sizeof(float),
                              gpuEyelashes->model->textureCoords  ,  gpuEyelashes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              gpuEyelashes->model->colors         ,  gpuEyelashes->model->header.numberOfColors        * sizeof(float),
                              gpuEyelashes->model->indices        ,  gpuEyelashes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
+
+    if (skinnedRendering)
+    {
+    pushBonesToBufferData(
+                           0,
+                           &gpuEyelashes->VAO,
+                           0,
+                           &gpuEyelashes->arrayBuffer,
+                           0,
+                           &gpuEyelashes->elementBuffer,
+                           gpuEyelashes->programID,
+                           3,
+                           gpuEyelashes->model->bones->weightIndex,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(unsigned int),
+                           gpuEyelashes->model->bones->weightValue,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(float),
+                           gpuEyelashes->model->bones->info->finalVertexTransformation , gpuEyelashes->model->header.numberOfBones * 16 * sizeof(float)
+                         );
+    }
 
     // -> pushBonesToBufferData
     //------------------------------------------------------------------------------------
@@ -854,7 +874,7 @@ int doDrawing(
                              &gpuEyebrows->VAO,
                              &gpuEyebrows->arrayBuffer,
                              &gpuEyebrows->elementBuffer,
-                             programID,
+                             gpuEyebrows->programID,
                              gpuEyebrows->model->vertices       ,  gpuEyebrows->model->header.numberOfVertices      * sizeof(float),
                              gpuEyebrows->model->normal         ,  gpuEyebrows->model->header.numberOfNormals       * sizeof(float),
                              gpuEyebrows->model->textureCoords  ,  gpuEyebrows->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
@@ -868,7 +888,7 @@ int doDrawing(
                              &gpuHair->VAO,
                              &gpuHair->arrayBuffer,
                              &gpuHair->elementBuffer,
-                             programID,
+                             gpuHair->programID,
                              gpuHair->model->vertices       ,  gpuHair->model->header.numberOfVertices      * sizeof(float),
                              gpuHair->model->normal         ,  gpuHair->model->header.numberOfNormals       * sizeof(float),
                              gpuHair->model->textureCoords  ,  gpuHair->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
@@ -882,7 +902,7 @@ int doDrawing(
                              &gpuEyes->VAO,
                              &gpuEyes->arrayBuffer,
                              &gpuEyes->elementBuffer,
-                             programID,
+                             gpuEyes->programID,
                              gpuEyes->model->vertices       ,  gpuEyes->model->header.numberOfVertices      * sizeof(float),
                              gpuEyes->model->normal         ,  gpuEyes->model->header.numberOfNormals       * sizeof(float),
                              gpuEyes->model->textureCoords  ,  gpuEyes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
@@ -896,7 +916,7 @@ int doDrawing(
                              &gpuHuman->VAO,
                              &gpuHuman->arrayBuffer,
                              &gpuHuman->elementBuffer,
-                             programID,
+                             gpuHuman->programID,
                              gpuHuman->model->vertices       ,  gpuHuman->model->header.numberOfVertices      * sizeof(float),
                              gpuHuman->model->normal         ,  gpuHuman->model->header.numberOfNormals       * sizeof(float),
                              gpuHuman->model->textureCoords  ,  gpuHuman->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
@@ -2149,11 +2169,11 @@ int main(int argc,const char **argv)
 
   //Pass models to the GPU/Shader structure that will consume them..
   //-------------------------------------------------------------------------------
-  struct GPUTriModel gpuEyelashes={0}; gpuEyelashes.model = &indexedEyelashesModel;
-  struct GPUTriModel gpuEyebrows={0};  gpuEyebrows.model  = &indexedEyebrowsModel;
-  struct GPUTriModel gpuHair={0};      gpuHair.model      = &indexedHairModel;
-  struct GPUTriModel gpuEyes={0};      gpuEyes.model      = &indexedEyeModel;
-  struct GPUTriModel gpuHuman={0};     gpuHuman.model     = &indexedHumanModel;
+  struct GPUTriModel gpuEyelashes={0}; gpuEyelashes.model = &indexedEyelashesModel;  gpuEyelashes.programID=programID;
+  struct GPUTriModel gpuEyebrows={0};  gpuEyebrows.model  = &indexedEyebrowsModel;   gpuEyebrows.programID=programID;
+  struct GPUTriModel gpuHair={0};      gpuHair.model      = &indexedHairModel;       gpuHair.programID=programID;
+  struct GPUTriModel gpuEyes={0};      gpuEyes.model      = &indexedEyeModel;        gpuEyes.programID=programID;
+  struct GPUTriModel gpuHuman={0};     gpuHuman.model     = &indexedHumanModel;      gpuHuman.programID=programID;
   //-------------------------------------------------------------------------------
 
 
