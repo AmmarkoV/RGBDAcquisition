@@ -27,6 +27,9 @@ struct shaderModelData
   float * boneWeightValues;    unsigned int sizeOfBoneWeightValues;
   float * boneTransforms;      unsigned int sizeOfBoneTransforms;
   //-------------------------------------------------------------------
+
+  //Pointer to The (TRI) Model Structure
+  void * model;
 };
 
 

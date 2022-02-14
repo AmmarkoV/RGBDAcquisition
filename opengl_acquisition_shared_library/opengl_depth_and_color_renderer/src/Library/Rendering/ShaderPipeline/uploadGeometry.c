@@ -37,63 +37,97 @@ pushBonesToBufferData(
     }
 
     //If no data given, zero their size..
+    if (shaderData->vertices==0)         { shaderData->sizeOfVertices=0;         }
+    if (shaderData->normals==0)          { shaderData->sizeOfNormals=0;          }
+    if (shaderData->textureCoords==0)    { shaderData->sizeOfTextureCoords=0;    }
+    if (shaderData->colors==0)           { shaderData->sizeOfColors=0;           }
+    if (shaderData->indices==0)          { shaderData->sizeOfIndices=0;          }
     if (shaderData->boneIndexes==0)      { shaderData->sizeOfBoneIndexes=0;      }
     if (shaderData->boneWeightValues==0) { shaderData->sizeOfBoneWeightValues=0; }
     if (shaderData->boneTransforms==0)   { shaderData->sizeOfBoneTransforms=0;   }
 
 
+    //Take care of VAO, ElementBuffer and ArrayBuffer
+    //------------------------------------------------------------------------------------------------------------------------------------------------
     if (generateNewVao)
       { glGenVertexArrays(1,&shaderData->VAO);     checkOpenGLError(__FILE__, __LINE__); }
     glBindVertexArray(shaderData->VAO);            checkOpenGLError(__FILE__, __LINE__);
-    //--------------------------------------------------------------------------
-
+    //------------------------------------------------------------------------------------------------------------------------------------------------
     if (generateNewElementBuffer)
       { glGenBuffers(1, &shaderData->elementBuffer);            checkOpenGLError(__FILE__, __LINE__); }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shaderData->elementBuffer);                                       checkOpenGLError(__FILE__, __LINE__);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, shaderData->sizeOfIndices, shaderData->indices , GL_STATIC_DRAW); checkOpenGLError(__FILE__, __LINE__);
-
-
-
-
-
+    //------------------------------------------------------------------------------------------------------------------------------------------------
     // Create and initialize a buffer object on the server side (GPU)
     if (generateNewArrayBuffer)
      { glGenBuffers( 1, &shaderData->arrayBuffer );                   checkOpenGLError(__FILE__, __LINE__); }
     glBindBuffer( GL_ARRAY_BUFFER, shaderData->arrayBuffer );         checkOpenGLError(__FILE__, __LINE__);
+    //------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
 
-    //Create buffer data..
+    //Create buffer holder data..
     GLsizei    stride = 0;
     GLintptr   memoryOffset=0;
     GLsizeiptr totalBufferDataSize=shaderData->sizeOfBoneIndexes+shaderData->sizeOfBoneWeightValues+shaderData->sizeOfBoneTransforms;
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                  checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+    //Create sub buffers inside buffer data..
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfVertices!=0)
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfVertices, shaderData->vertices);               checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=shaderData->sizeOfVertices;
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfTextureCoords!=0)
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfTextureCoords , shaderData->textureCoords );  checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=shaderData->sizeOfTextureCoords;
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfColors!=0)
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfColors, shaderData->colors);                   checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=shaderData->sizeOfColors;
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfNormals!=0)
+    {
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfNormals, shaderData->normals);                 checkOpenGLError(__FILE__, __LINE__);
+     memoryOffset+=shaderData->sizeOfNormals;
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------------
     if  (shaderData->sizeOfBoneIndexes!=0)
     {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneIndexes, shaderData->boneIndexes);                        checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneIndexes, shaderData->boneIndexes);                         checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=shaderData->sizeOfBoneIndexes;
-     //stride += 3 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfBoneWeightValues!=0)
     {
      glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneWeightValues , shaderData->boneWeightValues );            checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=shaderData->sizeOfBoneWeightValues;
-     //stride += 2 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfBoneTransforms!=0)
     {
      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneTransforms, shaderData->boneTransforms);                   checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=shaderData->sizeOfBoneTransforms;
-     //stride += 3 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
 
+    //Restart count
     memoryOffset=0;
 
     //----------------------------------------------------------------------------------------------------------------------------
