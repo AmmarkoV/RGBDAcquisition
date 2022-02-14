@@ -81,6 +81,7 @@ pushBonesToBufferData(
 
     //Create sub buffers inside buffer data..
     //----------------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfVertices!=0)
     {
      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfVertices, shaderData->vertices);               checkOpenGLError(__FILE__, __LINE__);
@@ -106,6 +107,8 @@ pushBonesToBufferData(
     }
     //----------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------
+    //   now upload bones..
+    //----------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------
     if  (shaderData->sizeOfBoneIndexes!=0)
     {
@@ -130,6 +133,60 @@ pushBonesToBufferData(
     //Restart count
     memoryOffset=0;
 
+
+
+
+
+
+    if (shaderData->sizeOfVertices!=0)
+    {
+     //Pass vPosition to shader
+     GLuint vPosition = glGetAttribLocation(programID, "vPosition" );                        checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION!=vPosition) && (vPosition!=-1) )
+     {
+      glEnableVertexAttribArray(vPosition);                                                  checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfVertices;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfTextureCoords!=0)
+    {
+     //Pass vTexture to shader
+     GLuint vTexture = glGetAttribLocation(programID, "vTexture");                           checkOpenGLError(__FILE__, __LINE__);
+    //GLuint textureStrengthLocation = glGetUniformLocation(programID, "textureStrength");  checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vTexture ) && (vTexture!=-1) )
+     {
+      glEnableVertexAttribArray(vTexture);                                                   checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);     checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfTextureCoords;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfColors!=0)
+    {
+     //Pass vColor to shader
+     GLuint vColor = glGetAttribLocation(programID, "vColor");                               checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vColor) && (vColor!=-1) )
+     {
+      glEnableVertexAttribArray(vColor);                                                     checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfColors;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    if (shaderData->sizeOfNormals!=0)
+    {
+     //Pass vNormal to shader
+     GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION != vNormal) && (vNormal!=-1) )
+     {
+      glEnableVertexAttribArray(vNormal);                                                    checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);      checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfNormals;
+     }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfBoneIndexes!=0)
     {
