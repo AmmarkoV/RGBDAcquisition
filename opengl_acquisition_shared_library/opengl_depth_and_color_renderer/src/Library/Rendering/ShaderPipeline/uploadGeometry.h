@@ -1,23 +1,44 @@
 #ifndef UPLOADGEOMETRY_H_INCLUDED
 #define UPLOADGEOMETRY_H_INCLUDED
 
-
-
 #include <GL/gl.h>
+
+struct shaderModelData
+{
+  unsigned long timestamp;
+
+  //OpenGL descriptors
+  char   initialized;
+  GLuint VAO;
+  GLuint arrayBuffer;
+  GLuint elementBuffer;
+
+  //Base geometry
+  unsigned long lastTimestampBaseModification;
+  float * vertices;       unsigned int sizeOfVertices;
+  float * normals;        unsigned int sizeOfNormals;
+  float * textureCoords;  unsigned int sizeOfTextureCoords;
+  float * colors;         unsigned int sizeOfColors;
+  unsigned int * indices; unsigned int sizeOfIndices;
+  //-------------------------------------------------------------------
+  unsigned long lastTimestampBoneModification;
+  unsigned int numberOfBonesPerVertex;
+  unsigned int * boneIndexes;  unsigned int sizeOfBoneIndexes;
+  float * boneWeightValues;    unsigned int sizeOfBoneWeightValues;
+  float * boneTransforms;      unsigned int sizeOfBoneTransforms;
+  //-------------------------------------------------------------------
+};
+
+
 
 GLuint
 pushBonesToBufferData(
                         int generateNewVao,
-                        GLuint *vao ,
                         int generateNewArrayBuffer,
-                        GLuint *arrayBuffer,
                         int generateNewElementBuffer,
-                        GLuint *elementBuffer,
-                        GLuint programID  ,
-                        unsigned int numberOfBonesPerVertex,
-                        const unsigned int * boneIndexes , unsigned int sizeOfBoneIndexes,
-                        const float * boneWeightValues , unsigned int sizeOfBoneWeightValues,
-                        const float * boneTransforms ,  unsigned int sizeOfBoneTransforms
+                        GLuint programID,
+                        //-------------------------------------------------------------------
+                        struct shaderModelData * shaderData
                      );
 
 GLuint

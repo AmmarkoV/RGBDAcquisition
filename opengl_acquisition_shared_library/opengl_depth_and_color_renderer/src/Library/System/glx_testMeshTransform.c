@@ -105,6 +105,7 @@ struct GPUTriModel
 {
   GLuint VAO;
   GLuint arrayBuffer;
+  GLuint skinnedArrayBuffer;
   GLuint elementBuffer;
   //------------------------
   GLuint programID;
@@ -200,7 +201,6 @@ void paintRGBPixel(unsigned char * image,unsigned int imageWidth,unsigned int im
 void parseTextureToScreenAssociations(const char * filename,const char * faceFilename,struct TRI_Model * indexedHumanModel,struct TRI_Model * indexedEyeModel)
 {
   #define FADE_TO_BLACK 1
-
   FILE * fp = fopen(filename,"r");
 
   struct InputParserC * ipc = InputParser_Create(8096,6);
@@ -850,12 +850,12 @@ int doDrawing(
                           );
 
     if (skinnedRendering)
-    {
+    {/*
     pushBonesToBufferData(
                            0,
                            &gpuEyelashes->VAO,
-                           0,
-                           &gpuEyelashes->arrayBuffer,
+                           1,
+                           &gpuEyelashes->skinnedArrayBuffer,
                            0,
                            &gpuEyelashes->elementBuffer,
                            gpuEyelashes->programID,
@@ -863,10 +863,8 @@ int doDrawing(
                            gpuEyelashes->model->bones->weightIndex,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(unsigned int),
                            gpuEyelashes->model->bones->weightValue,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(float),
                            gpuEyelashes->model->bones->info->finalVertexTransformation , gpuEyelashes->model->header.numberOfBones * 16 * sizeof(float)
-                         );
+                         );*/
     }
-
-    // -> pushBonesToBufferData
     //------------------------------------------------------------------------------------
     gpuEyebrows->triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
     pushObjectToBufferData(
