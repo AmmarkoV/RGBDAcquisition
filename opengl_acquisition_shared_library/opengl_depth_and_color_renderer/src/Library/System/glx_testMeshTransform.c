@@ -110,7 +110,7 @@ struct GPUTriModel
   //------------------------
   GLuint programID;
   //------------------------
-  unsigned int triangleCount;
+  struct shaderModelData shader;
   struct TRI_Model * model;
 };
 
@@ -562,7 +562,7 @@ int doOGLDrawing(
                                      gpuHair->VAO,
                                      MVPMatrixID,
                                      gpuHair->model->header.textureBindGLBuffer,
-                                     gpuHair->triangleCount,
+                                     gpuHair->shader.triangleCount,
                                      gpuHair->model->header.numberOfIndices,
                                      //-------------
                                      &humanPose->m,
@@ -583,7 +583,7 @@ int doOGLDrawing(
                                      gpuEyelashes->VAO,
                                      MVPMatrixID,
                                      gpuEyelashes->model->header.textureBindGLBuffer,
-                                     gpuEyelashes->triangleCount,
+                                     gpuEyelashes->shader.triangleCount,
                                      gpuEyelashes->model->header.numberOfIndices,
                                      //-------------
                                      &humanPose->m,
@@ -598,7 +598,7 @@ int doOGLDrawing(
                                      gpuEyebrows->VAO,
                                      MVPMatrixID,
                                      gpuEyebrows->model->header.textureBindGLBuffer,
-                                     gpuEyelashes->triangleCount,
+                                     gpuEyelashes->shader.triangleCount,
                                      gpuEyelashes->model->header.numberOfIndices,
                                      //-------------
                                      &humanPose->m,
@@ -615,7 +615,7 @@ int doOGLDrawing(
                                      gpuEyes->VAO,
                                      MVPMatrixID,
                                      gpuEyes->model->header.textureBindGLBuffer,
-                                     gpuEyes->triangleCount,
+                                     gpuEyes->shader.triangleCount,
                                      gpuEyes->model->header.numberOfIndices,
                                      //-------------
                                      &humanPose->m,
@@ -633,7 +633,7 @@ int doOGLDrawing(
                                      gpuHuman->VAO,
                                      MVPMatrixID,
                                      gpuHuman->model->header.textureBindGLBuffer,
-                                     gpuHuman->triangleCount,
+                                     gpuHuman->shader.triangleCount,
                                      gpuHuman->model->header.numberOfIndices,
                                      //-------------
                                      &humanPose->m,
@@ -652,7 +652,7 @@ int doOGLDrawing(
                   gpuHair->VAO,
                   MVPMatrixID,
                   gpuHair->model->header.textureBindGLBuffer,
-                  gpuHair->triangleCount,
+                  gpuHair->shader.triangleCount,
                   gpuHair->model->header.numberOfIndices,
                   //-------------
                   humanPose->x,
@@ -678,7 +678,7 @@ int doOGLDrawing(
                   gpuEyelashes->VAO,
                   MVPMatrixID,
                   gpuEyelashes->model->header.textureBindGLBuffer,
-                  gpuEyelashes->triangleCount,
+                  gpuEyelashes->shader.triangleCount,
                   gpuEyelashes->model->header.numberOfIndices,
                   //-------------
                   humanPose->x,
@@ -698,7 +698,7 @@ int doOGLDrawing(
                   gpuEyebrows->VAO,
                   MVPMatrixID,
                   gpuEyebrows->model->header.textureBindGLBuffer,
-                  gpuEyebrows->triangleCount,
+                  gpuEyebrows->shader.triangleCount,
                   gpuEyebrows->model->header.numberOfIndices,
                   //-------------
                   humanPose->x,
@@ -719,7 +719,7 @@ int doOGLDrawing(
                   gpuEyes->VAO,
                   MVPMatrixID,
                   gpuEyes->model->header.textureBindGLBuffer,
-                  gpuEyes->triangleCount,
+                  gpuEyes->shader.triangleCount,
                   gpuEyes->model->header.numberOfIndices,
                   //-------------
                   humanPose->x,
@@ -741,7 +741,7 @@ int doOGLDrawing(
                   gpuHuman->VAO,
                   MVPMatrixID,
                   gpuHuman->model->header.textureBindGLBuffer,
-                  gpuHuman->triangleCount,
+                  gpuHuman->shader.triangleCount,
                   gpuHuman->model->header.numberOfIndices,
                   //-------------
                   humanPose->x,
@@ -809,7 +809,6 @@ int initializeOGLRenderer(
 }
 
 
-
 int doDrawing(
                 GLuint programID,
                 GLuint programFrameBufferID,
@@ -835,7 +834,7 @@ int doDrawing(
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
-    gpuEyelashes->triangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
+    gpuEyelashes->shader.triangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &gpuEyelashes->VAO,
@@ -851,22 +850,18 @@ int doDrawing(
 
     if (skinnedRendering)
     {/*
-    pushBonesToBufferData(
-                           0,
-                           &gpuEyelashes->VAO,
-                           1,
-                           &gpuEyelashes->skinnedArrayBuffer,
-                           0,
-                           &gpuEyelashes->elementBuffer,
-                           gpuEyelashes->programID,
-                           3,
-                           gpuEyelashes->model->bones->weightIndex,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(unsigned int),
-                           gpuEyelashes->model->bones->weightValue,                      gpuEyelashes->model->header.numberOfBones * 3 * sizeof(float),
-                           gpuEyelashes->model->bones->info->finalVertexTransformation , gpuEyelashes->model->header.numberOfBones * 16 * sizeof(float)
-                         );*/
+pushBonesToBufferData(
+                        int generateNewVao,
+                        int generateNewArrayBuffer,
+                        int generateNewElementBuffer,
+                        GLuint programID,
+                        //-------------------------------------------------------------------
+                        struct shaderModelData * shaderData
+                     )
+                         */
     }
     //------------------------------------------------------------------------------------
-    gpuEyebrows->triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
+    gpuEyebrows->shader.triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &gpuEyebrows->VAO,
@@ -880,7 +875,7 @@ int doDrawing(
                              gpuEyebrows->model->indices        ,  gpuEyebrows->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    gpuHair->triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
+    gpuHair->shader.triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &gpuHair->VAO,
@@ -894,7 +889,7 @@ int doDrawing(
                              gpuHair->model->indices        ,  gpuHair->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    gpuEyes->triangleCount  =  (unsigned int)  gpuEyes->model->header.numberOfVertices/3;
+    gpuEyes->shader.triangleCount  =  (unsigned int)  gpuEyes->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &gpuEyes->VAO,
@@ -908,7 +903,7 @@ int doDrawing(
                              gpuEyes->model->indices        ,  gpuEyes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
-    gpuHuman->triangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
+    gpuHuman->shader.triangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &gpuHuman->VAO,

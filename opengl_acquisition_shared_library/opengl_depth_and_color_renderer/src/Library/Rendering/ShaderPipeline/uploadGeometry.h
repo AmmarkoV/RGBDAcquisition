@@ -12,6 +12,7 @@ struct shaderModelData
   GLuint VAO;
   GLuint arrayBuffer;
   GLuint elementBuffer;
+  unsigned int triangleCount;
 
   //Base geometry
   unsigned long lastTimestampBaseModification;
