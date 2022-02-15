@@ -55,8 +55,12 @@ pushBonesToBufferData(
     //------------------------------------------------------------------------------------------------------------------------------------------------
     if (generateNewElementBuffer)
       { glGenBuffers(1, &shaderData->elementBuffer);            checkOpenGLError(__FILE__, __LINE__); }
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shaderData->elementBuffer);                                       checkOpenGLError(__FILE__, __LINE__);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, shaderData->sizeOfIndices, shaderData->indices , GL_STATIC_DRAW); checkOpenGLError(__FILE__, __LINE__);
+
+    if (shaderData->sizeOfIndices!=0)
+    {
+     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shaderData->elementBuffer);                                       checkOpenGLError(__FILE__, __LINE__);
+     glBufferData(GL_ELEMENT_ARRAY_BUFFER, shaderData->sizeOfIndices, shaderData->indices , GL_STATIC_DRAW); checkOpenGLError(__FILE__, __LINE__);
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------------
     // Create and initialize a buffer object on the server side (GPU)
     if (generateNewArrayBuffer)

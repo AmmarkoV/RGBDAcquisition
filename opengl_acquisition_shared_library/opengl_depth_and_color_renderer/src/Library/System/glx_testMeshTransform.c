@@ -806,6 +806,20 @@ int initializeOGLRenderer(
 }
 
 
+void deallocateGpuTRI(struct GPUTriModel * gputri)
+{
+ if (gputri->shader.initialized==1)
+ {
+    glDeleteBuffers(1, &gputri->shader.arrayBuffer);
+	//-------------------------------------
+	glDeleteBuffers(1, &gputri->shader.elementBuffer);
+	//-------------------------------------
+	glDeleteVertexArrays(1, &gputri->shader.VAO);
+	//-------------------------------------
+	gputri->shader.initialized=0;
+ }
+}
+
 int doDrawing(
                 GLuint programID,
                 GLuint programFrameBufferID,
@@ -832,6 +846,7 @@ int doDrawing(
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
     gpuEyelashes->shader.triangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
+    /*
     pushObjectToBufferData(
                              1,
                              &gpuEyelashes->shader.VAO,
@@ -843,23 +858,30 @@ int doDrawing(
                              gpuEyelashes->model->textureCoords  ,  gpuEyelashes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              gpuEyelashes->model->colors         ,  gpuEyelashes->model->header.numberOfColors        * sizeof(float),
                              gpuEyelashes->model->indices        ,  gpuEyelashes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );
+                          );*/
 
-    if (skinnedRendering)
-    {/*
-pushBonesToBufferData(
-                        int generateNewVao,
-                        int generateNewArrayBuffer,
-                        int generateNewElementBuffer,
-                        GLuint programID,
-                        //-------------------------------------------------------------------
-                        struct shaderModelData * shaderData
-                     )
-                         */
-    }
+
+    gpuEyelashes->shader.initialized=
+    pushBonesToBufferData(
+                             (gpuEyelashes->shader.initialized==0),// generateNewVao
+                             (gpuEyelashes->shader.initialized==0),// generateNewArrayBuffer
+                             (gpuEyelashes->shader.initialized==0),// generateNewElementBuffer
+                              gpuEyelashes->programID,
+                             //-------------------------------------------------------------------
+                              &gpuEyelashes->shader
+                            );
     //------------------------------------------------------------------------------------
     gpuEyebrows->shader.triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
-    pushObjectToBufferData(
+    gpuEyebrows->shader.initialized=
+    pushBonesToBufferData(
+                             (gpuEyebrows->shader.initialized==0),// generateNewVao
+                             (gpuEyebrows->shader.initialized==0),// generateNewArrayBuffer
+                             (gpuEyebrows->shader.initialized==0),// generateNewElementBuffer
+                              gpuEyebrows->programID,
+                             //-------------------------------------------------------------------
+                              &gpuEyebrows->shader
+                            );
+    /*pushObjectToBufferData(
                              1,
                              &gpuEyebrows->shader.VAO,
                              &gpuEyebrows->shader.arrayBuffer,
@@ -870,7 +892,7 @@ pushBonesToBufferData(
                              gpuEyebrows->model->textureCoords  ,  gpuEyebrows->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              gpuEyebrows->model->colors         ,  gpuEyebrows->model->header.numberOfColors        * sizeof(float),
                              gpuEyebrows->model->indices        ,  gpuEyebrows->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );
+                          );*/
     //------------------------------------------------------------------------------------
     gpuHair->shader.triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
     pushObjectToBufferData(
@@ -993,23 +1015,26 @@ pushBonesToBufferData(
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	//-------------------------------------
-	glDeleteBuffers(1, &gpuEyelashes->shader.arrayBuffer);
-	glDeleteBuffers(1, &gpuEyebrows->shader.arrayBuffer);
+	deallocateGpuTRI(gpuEyelashes);
+	deallocateGpuTRI(gpuEyebrows);
+	//glDeleteBuffers(1, &gpuEyelashes->shader.arrayBuffer);
+	//glDeleteBuffers(1, &gpuEyebrows->shader.arrayBuffer);
 	glDeleteBuffers(1, &gpuHair->shader.arrayBuffer);
 	glDeleteBuffers(1, &gpuHuman->shader.arrayBuffer);
 	glDeleteBuffers(1, &gpuEyes->shader.arrayBuffer);
 	//-------------------------------------
-	glDeleteBuffers(1, &gpuEyelashes->shader.elementBuffer);
-	glDeleteBuffers(1, &gpuEyebrows->shader.elementBuffer);
+	//glDeleteBuffers(1, &gpuEyelashes->shader.elementBuffer);
+	//glDeleteBuffers(1, &gpuEyebrows->shader.elementBuffer);
 	glDeleteBuffers(1, &gpuHair->shader.elementBuffer);
 	glDeleteBuffers(1, &gpuHuman->shader.elementBuffer);
 	glDeleteBuffers(1, &gpuEyes->shader.elementBuffer);
 	//-------------------------------------
-	glDeleteVertexArrays(1, &gpuEyelashes->shader.VAO);
-	glDeleteVertexArrays(1, &gpuEyebrows->shader.VAO);
+	//glDeleteVertexArrays(1, &gpuEyelashes->shader.VAO);
+	//glDeleteVertexArrays(1, &gpuEyebrows->shader.VAO);
 	glDeleteVertexArrays(1, &gpuHair->shader.VAO);
 	glDeleteVertexArrays(1, &gpuHuman->shader.VAO);
 	glDeleteVertexArrays(1, &gpuEyes->shader.VAO);
+	//-------------------------------------
 	return 1;
 }
 
