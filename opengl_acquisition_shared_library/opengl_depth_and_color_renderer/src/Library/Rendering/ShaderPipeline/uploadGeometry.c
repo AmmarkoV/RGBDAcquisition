@@ -150,8 +150,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vPosition);                                                  checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfVertices;
      }
+      memoryOffset+=shaderData->sizeOfVertices;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfTextureCoords!=0)
@@ -163,8 +163,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vTexture);                                                   checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vTexture,2,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);     checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfTextureCoords;
      }
+      memoryOffset+=shaderData->sizeOfTextureCoords;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfColors!=0)
