@@ -103,14 +103,11 @@ struct pose6D
 
 struct GPUTriModel
 {
-  GLuint VAO;
-  GLuint arrayBuffer;
-  GLuint skinnedArrayBuffer;
-  GLuint elementBuffer;
   //------------------------
   GLuint programID;
   //------------------------
   struct shaderModelData shader;
+  //------------------------
   struct TRI_Model * model;
 };
 
@@ -559,7 +556,7 @@ int doOGLDrawing(
       {
       drawVertexArrayWithMVPMatrices(
                                      programID,
-                                     gpuHair->VAO,
+                                     gpuHair->shader.VAO,
                                      MVPMatrixID,
                                      gpuHair->model->header.textureBindGLBuffer,
                                      gpuHair->shader.triangleCount,
@@ -580,7 +577,7 @@ int doOGLDrawing(
           {
       drawVertexArrayWithMVPMatrices(
                                      programID,
-                                     gpuEyelashes->VAO,
+                                     gpuEyelashes->shader.VAO,
                                      MVPMatrixID,
                                      gpuEyelashes->model->header.textureBindGLBuffer,
                                      gpuEyelashes->shader.triangleCount,
@@ -595,7 +592,7 @@ int doOGLDrawing(
                                     );
       drawVertexArrayWithMVPMatrices(
                                      programID,
-                                     gpuEyebrows->VAO,
+                                     gpuEyebrows->shader.VAO,
                                      MVPMatrixID,
                                      gpuEyebrows->model->header.textureBindGLBuffer,
                                      gpuEyelashes->shader.triangleCount,
@@ -612,7 +609,7 @@ int doOGLDrawing(
 
       drawVertexArrayWithMVPMatrices(
                                      programID,
-                                     gpuEyes->VAO,
+                                     gpuEyes->shader.VAO,
                                      MVPMatrixID,
                                      gpuEyes->model->header.textureBindGLBuffer,
                                      gpuEyes->shader.triangleCount,
@@ -630,7 +627,7 @@ int doOGLDrawing(
 
       drawVertexArrayWithMVPMatrices(
                                      programID,
-                                     gpuHuman->VAO,
+                                     gpuHuman->shader.VAO,
                                      MVPMatrixID,
                                      gpuHuman->model->header.textureBindGLBuffer,
                                      gpuHuman->shader.triangleCount,
@@ -649,7 +646,7 @@ int doOGLDrawing(
       {
       drawObjectAT(
                   programID,
-                  gpuHair->VAO,
+                  gpuHair->shader.VAO,
                   MVPMatrixID,
                   gpuHair->model->header.textureBindGLBuffer,
                   gpuHair->shader.triangleCount,
@@ -675,7 +672,7 @@ int doOGLDrawing(
           {
       drawObjectAT(
                   programID,
-                  gpuEyelashes->VAO,
+                  gpuEyelashes->shader.VAO,
                   MVPMatrixID,
                   gpuEyelashes->model->header.textureBindGLBuffer,
                   gpuEyelashes->shader.triangleCount,
@@ -695,7 +692,7 @@ int doOGLDrawing(
                   );
       drawObjectAT(
                   programID,
-                  gpuEyebrows->VAO,
+                  gpuEyebrows->shader.VAO,
                   MVPMatrixID,
                   gpuEyebrows->model->header.textureBindGLBuffer,
                   gpuEyebrows->shader.triangleCount,
@@ -716,7 +713,7 @@ int doOGLDrawing(
           }
       drawObjectAT(
                   programID,
-                  gpuEyes->VAO,
+                  gpuEyes->shader.VAO,
                   MVPMatrixID,
                   gpuEyes->model->header.textureBindGLBuffer,
                   gpuEyes->shader.triangleCount,
@@ -738,7 +735,7 @@ int doOGLDrawing(
 
       drawObjectAT(
                   programID,
-                  gpuHuman->VAO,
+                  gpuHuman->shader.VAO,
                   MVPMatrixID,
                   gpuHuman->model->header.textureBindGLBuffer,
                   gpuHuman->shader.triangleCount,
@@ -837,9 +834,9 @@ int doDrawing(
     gpuEyelashes->shader.triangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &gpuEyelashes->VAO,
-                             &gpuEyelashes->arrayBuffer,
-                             &gpuEyelashes->elementBuffer,
+                             &gpuEyelashes->shader.VAO,
+                             &gpuEyelashes->shader.arrayBuffer,
+                             &gpuEyelashes->shader.elementBuffer,
                              gpuEyelashes->programID,
                              gpuEyelashes->model->vertices       ,  gpuEyelashes->model->header.numberOfVertices      * sizeof(float),
                              gpuEyelashes->model->normal         ,  gpuEyelashes->model->header.numberOfNormals       * sizeof(float),
@@ -864,9 +861,9 @@ pushBonesToBufferData(
     gpuEyebrows->shader.triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &gpuEyebrows->VAO,
-                             &gpuEyebrows->arrayBuffer,
-                             &gpuEyebrows->elementBuffer,
+                             &gpuEyebrows->shader.VAO,
+                             &gpuEyebrows->shader.arrayBuffer,
+                             &gpuEyebrows->shader.elementBuffer,
                              gpuEyebrows->programID,
                              gpuEyebrows->model->vertices       ,  gpuEyebrows->model->header.numberOfVertices      * sizeof(float),
                              gpuEyebrows->model->normal         ,  gpuEyebrows->model->header.numberOfNormals       * sizeof(float),
@@ -878,9 +875,9 @@ pushBonesToBufferData(
     gpuHair->shader.triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &gpuHair->VAO,
-                             &gpuHair->arrayBuffer,
-                             &gpuHair->elementBuffer,
+                             &gpuHair->shader.VAO,
+                             &gpuHair->shader.arrayBuffer,
+                             &gpuHair->shader.elementBuffer,
                              gpuHair->programID,
                              gpuHair->model->vertices       ,  gpuHair->model->header.numberOfVertices      * sizeof(float),
                              gpuHair->model->normal         ,  gpuHair->model->header.numberOfNormals       * sizeof(float),
@@ -892,9 +889,9 @@ pushBonesToBufferData(
     gpuEyes->shader.triangleCount  =  (unsigned int)  gpuEyes->model->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &gpuEyes->VAO,
-                             &gpuEyes->arrayBuffer,
-                             &gpuEyes->elementBuffer,
+                             &gpuEyes->shader.VAO,
+                             &gpuEyes->shader.arrayBuffer,
+                             &gpuEyes->shader.elementBuffer,
                              gpuEyes->programID,
                              gpuEyes->model->vertices       ,  gpuEyes->model->header.numberOfVertices      * sizeof(float),
                              gpuEyes->model->normal         ,  gpuEyes->model->header.numberOfNormals       * sizeof(float),
@@ -906,9 +903,9 @@ pushBonesToBufferData(
     gpuHuman->shader.triangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &gpuHuman->VAO,
-                             &gpuHuman->arrayBuffer,
-                             &gpuHuman->elementBuffer,
+                             &gpuHuman->shader.VAO,
+                             &gpuHuman->shader.arrayBuffer,
+                             &gpuHuman->shader.elementBuffer,
                              gpuHuman->programID,
                              gpuHuman->model->vertices       ,  gpuHuman->model->header.numberOfVertices      * sizeof(float),
                              gpuHuman->model->normal         ,  gpuHuman->model->header.numberOfNormals       * sizeof(float),
@@ -996,23 +993,23 @@ pushBonesToBufferData(
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	//-------------------------------------
-	glDeleteBuffers(1, &gpuEyelashes->arrayBuffer);
-	glDeleteBuffers(1, &gpuEyebrows->arrayBuffer);
-	glDeleteBuffers(1, &gpuHair->arrayBuffer);
-	glDeleteBuffers(1, &gpuHuman->arrayBuffer);
-	glDeleteBuffers(1, &gpuEyes->arrayBuffer);
+	glDeleteBuffers(1, &gpuEyelashes->shader.arrayBuffer);
+	glDeleteBuffers(1, &gpuEyebrows->shader.arrayBuffer);
+	glDeleteBuffers(1, &gpuHair->shader.arrayBuffer);
+	glDeleteBuffers(1, &gpuHuman->shader.arrayBuffer);
+	glDeleteBuffers(1, &gpuEyes->shader.arrayBuffer);
 	//-------------------------------------
-	glDeleteBuffers(1, &gpuEyelashes->elementBuffer);
-	glDeleteBuffers(1, &gpuEyebrows->elementBuffer);
-	glDeleteBuffers(1, &gpuHair->elementBuffer);
-	glDeleteBuffers(1, &gpuHuman->elementBuffer);
-	glDeleteBuffers(1, &gpuEyes->elementBuffer);
+	glDeleteBuffers(1, &gpuEyelashes->shader.elementBuffer);
+	glDeleteBuffers(1, &gpuEyebrows->shader.elementBuffer);
+	glDeleteBuffers(1, &gpuHair->shader.elementBuffer);
+	glDeleteBuffers(1, &gpuHuman->shader.elementBuffer);
+	glDeleteBuffers(1, &gpuEyes->shader.elementBuffer);
 	//-------------------------------------
-	glDeleteVertexArrays(1, &gpuEyelashes->VAO);
-	glDeleteVertexArrays(1, &gpuEyebrows->VAO);
-	glDeleteVertexArrays(1, &gpuHair->VAO);
-	glDeleteVertexArrays(1, &gpuHuman->VAO);
-	glDeleteVertexArrays(1, &gpuEyes->VAO);
+	glDeleteVertexArrays(1, &gpuEyelashes->shader.VAO);
+	glDeleteVertexArrays(1, &gpuEyebrows->shader.VAO);
+	glDeleteVertexArrays(1, &gpuHair->shader.VAO);
+	glDeleteVertexArrays(1, &gpuHuman->shader.VAO);
+	glDeleteVertexArrays(1, &gpuEyes->shader.VAO);
 	return 1;
 }
 
