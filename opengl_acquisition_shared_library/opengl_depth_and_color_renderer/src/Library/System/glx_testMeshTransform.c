@@ -827,19 +827,50 @@ void processGPUTRI(struct GPUTriModel * gputri)
      gputri->shader.indices             = model->indices;
      gputri->shader.sizeOfIndices       = model->header.numberOfIndices * sizeof(unsigned int);
      //-----------------------------------------------------------------------------
-     gputri->shader.numberOfBonesPerVertex = 3;
-     gputri->shader.boneIndexes            = model->bones->weightIndex;
-     gputri->shader.sizeOfBoneIndexes      = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
 
-     gputri->shader.boneWeightValues       = model->bones->weightValue;
-     gputri->shader.sizeOfBoneWeightValues = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(float);
 
-     gputri->shader.boneTransforms         = model->bones->info->finalVertexTransformation;
-     gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
 
-     gputri->shader.sizeOfBoneIndexes     = 0;
-     gputri->shader.sizeOfBoneWeightValues= 0;
-     gputri->shader.sizeOfBoneTransforms  = 0;
+     if (model->bones!=0) // If we have bones..
+     {
+      gputri->shader.numberOfBonesPerVertex = 3;
+      gputri->shader.boneIndexes            = model->bones->weightIndex;
+      gputri->shader.sizeOfBoneIndexes      = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
+
+      gputri->shader.boneWeightValues       = model->bones->weightValue;
+      gputri->shader.sizeOfBoneWeightValues = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(float);
+
+      //Special gathering of all the 4x4 matrixes
+      if (gputri->shader.boneTransforms!=0)
+      {
+         free(gputri->shader.boneTransforms);
+         gputri->shader.boneTransforms=0;
+      }
+
+      gputri->shader.sizeOfBoneTransforms   = (1+model->header.numberOfBones) * 16 * sizeof(float);
+      gputri->shader.boneTransforms = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
+
+      if (gputri->shader.boneTransforms!=0)
+      {
+       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+         {
+           if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
+           {
+             unsigned int targetBoneTransformIndex = boneID*16;
+             for (int i=0; i<16; i++)
+             {
+              gputri->shader.boneTransforms[targetBoneTransformIndex+i] = model->bones[boneID].info->finalVertexTransformation[i];
+             }
+           }
+         }
+      }
+     } else
+     {
+      gputri->shader.sizeOfBoneIndexes     = 0;
+      gputri->shader.sizeOfBoneWeightValues= 0;
+      gputri->shader.sizeOfBoneTransforms  = 0;
+     }
+
+
      //-----------------------------------------------------------------------------
     }
 }
@@ -856,6 +887,12 @@ void deallocateGpuTRI(struct GPUTriModel * gputri)
 	glDeleteVertexArrays(1, &gputri->shader.VAO);
 	//-------------------------------------
 	gputri->shader.initialized=0;
+
+    if (gputri->shader.boneTransforms!=0)
+     {
+         free(gputri->shader.boneTransforms);
+         gputri->shader.boneTransforms=0;
+     }
  }
 }
 
@@ -866,11 +903,6 @@ int doDrawing(
                 GLuint renderedTexture,
                 GLuint renderedDepth,
                 struct pose6D * humanPose,
-                struct TRI_Model * humanModel,
-                struct TRI_Model * eyeModel,
-                struct TRI_Model * hairModel,
-                struct TRI_Model * eyebrowsModel,
-                struct TRI_Model * eyelashesModel,
                 struct GPUTriModel * gpuEyelashes,
                 struct GPUTriModel * gpuEyebrows,
                 struct GPUTriModel * gpuHair,
@@ -929,8 +961,6 @@ int doDrawing(
                           );
     //------------------------------------------------------------------------------------
     processGPUTRI(gpuHuman);
-    //gpuHuman->shader.triangleCount  =  (unsigned int)  gpuHuman->model->header.numberOfVertices/3;
-                         /*
     gpuHuman->shader.initialized=
     pushBonesToBufferData(
                              (gpuHuman->shader.initialized==0),// generateNewVao
@@ -939,18 +969,6 @@ int doDrawing(
                               gpuHuman->programID,
                              //-------------------------------------------------------------------
                               &gpuHuman->shader
-                          );*/
-    pushObjectToBufferData(
-                             1,
-                             &gpuHuman->shader.VAO,
-                             &gpuHuman->shader.arrayBuffer,
-                             &gpuHuman->shader.elementBuffer,
-                             gpuHuman->programID,
-                             gpuHuman->model->vertices       ,  gpuHuman->model->header.numberOfVertices      * sizeof(float),
-                             gpuHuman->model->normal         ,  gpuHuman->model->header.numberOfNormals       * sizeof(float),
-                             gpuHuman->model->textureCoords  ,  gpuHuman->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             gpuHuman->model->colors         ,  gpuHuman->model->header.numberOfColors        * sizeof(float),
-                             gpuHuman->model->indices        ,  gpuHuman->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );
     //------------------------------------------------------------------------------------
 	 GLuint quad_vertexbuffer=0;
@@ -1029,11 +1047,12 @@ int doDrawing(
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	//-------------------------------------
-	deallocateGpuTRI(gpuEyelashes);
-	deallocateGpuTRI(gpuEyebrows);
-	deallocateGpuTRI(gpuHair);
-	deallocateGpuTRI(gpuEyes);
-	deallocateGpuTRI(gpuHuman);
+	//We do not need to create everything every time..
+	//deallocateGpuTRI(gpuEyelashes);
+	//deallocateGpuTRI(gpuEyebrows);
+	//deallocateGpuTRI(gpuHair);
+	//deallocateGpuTRI(gpuEyes);
+	//deallocateGpuTRI(gpuHuman);
 	return 1;
 }
 
@@ -2382,11 +2401,6 @@ int main(int argc,const char **argv)
                 renderedTexture,
                 renderedDepth,
                 &humanPose,
-                &humanModel,
-                &eyeModel,
-                &hairModel,
-                &eyebrowsModel,
-                &eyelashesModel,
                 //-------------
                 &gpuEyelashes,
                 &gpuEyebrows,

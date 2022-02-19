@@ -47,7 +47,7 @@ pushBonesToBufferData(
     if (shaderData->boneTransforms==0)   { shaderData->sizeOfBoneTransforms=0;   }
 
     //Select Shader to render with
-    //glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
+    glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
 
     //Take care of VAO, ElementBuffer and ArrayBuffer
     //------------------------------------------------------------------------------------------------------------------------------------------------
