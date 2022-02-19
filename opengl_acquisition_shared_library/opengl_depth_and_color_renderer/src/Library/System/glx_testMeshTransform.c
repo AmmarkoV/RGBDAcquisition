@@ -870,7 +870,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
       gputri->shader.sizeOfBoneTransforms  = 0;
      }
 
-
      //-----------------------------------------------------------------------------
     }
 }
