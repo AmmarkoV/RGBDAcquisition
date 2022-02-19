@@ -47,6 +47,9 @@ pushBonesToBufferData(
     if (shaderData->boneTransforms==0)   { shaderData->sizeOfBoneTransforms=0;   }
 
 
+    //Select Shader to render with
+    glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+
     //Take care of VAO, ElementBuffer and ArrayBuffer
     //------------------------------------------------------------------------------------------------------------------------------------------------
     if (generateNewVao)
@@ -175,8 +178,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vColor);                                                     checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vColor,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfColors;
      }
+     memoryOffset+=shaderData->sizeOfColors;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfNormals!=0)
@@ -187,8 +190,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vNormal);                                                    checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);      checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfNormals;
      }
+     memoryOffset+=shaderData->sizeOfNormals;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------
@@ -200,8 +203,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vBoneIndexIDs);                                                                           checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,GL_FALSE,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfBoneIndexes;
      }
+     memoryOffset+=shaderData->sizeOfBoneIndexes;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfBoneWeightValues!=0)
@@ -212,8 +215,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vBoneWeightValues);                                                                       checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vBoneWeightValues,shaderData->numberOfBonesPerVertex,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfBoneWeightValues;
      }
+     memoryOffset+=shaderData->sizeOfBoneWeightValues;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     if  (shaderData->sizeOfBoneTransforms!=0)
@@ -224,8 +227,8 @@ pushBonesToBufferData(
      {
       glEnableVertexAttribArray(vBoneTransform);                                                      checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vBoneTransform,16,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
-      memoryOffset+=shaderData->sizeOfBoneTransforms;
      }
+     memoryOffset+=shaderData->sizeOfBoneTransforms;
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
@@ -254,7 +257,6 @@ pushObjectToBufferData(
                       )
 {
     #if USE_GLEW
-
     unsigned int numVertices=(unsigned int ) sizeOfVertices/(3*sizeof(float));
     fprintf(stderr,"DrawArray(GL_TRIANGLES,0,%u) ",numVertices);
     fprintf(stderr,"%lu vertices (%u bytes) and %lu normals (%u bytes)\n"  ,
@@ -286,13 +288,9 @@ pushObjectToBufferData(
     }
 
 
-
-
     // Create and initialize a buffer object on the server side (GPU)
     glGenBuffers( 1, arrayBuffer );                   checkOpenGLError(__FILE__, __LINE__);
     glBindBuffer( GL_ARRAY_BUFFER, *arrayBuffer );    checkOpenGLError(__FILE__, __LINE__);
-
-
 
 
     //Create buffer data..
@@ -302,40 +300,35 @@ pushObjectToBufferData(
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                   checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
-    if ((vertices!=0) && (sizeOfVertices!=0) )
+    if (sizeOfVertices!=0)
     {
      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfVertices, vertices);               checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=sizeOfVertices;
-     //stride += 3 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
+    if (sizeOfTextureCoords!=0)
     {
      glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, sizeOfTextureCoords , textureCoords );  checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=sizeOfTextureCoords;
-     //stride += 2 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ( (colors!=0) && (sizeOfColors!=0) )
+    if (sizeOfColors!=0)
     {
      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfColors, colors);                   checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=sizeOfColors;
-     //stride += 3 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ( (normals!=0) && (sizeOfNormals!=0) )
+    if (sizeOfNormals!=0)
     {
      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, sizeOfNormals, normals);                 checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=sizeOfNormals;
-     //stride += 3 * sizeof(float);
     }
     //----------------------------------------------------------------------------------------------------------------------------
-
 
     memoryOffset=0;
 
     //----------------------------------------------------------------------------------------------------------------------------
-    if ((vertices!=0) && (sizeOfVertices!=0))
+    if (sizeOfVertices!=0)
     {
      //Pass vPosition to shader
      GLuint vPosition = glGetAttribLocation(programID, "vPosition" );                        checkOpenGLError(__FILE__, __LINE__);
@@ -347,7 +340,7 @@ pushObjectToBufferData(
      }
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ( (textureCoords!=0) && (sizeOfTextureCoords!=0) )
+    if (sizeOfTextureCoords!=0)
     {
      //Pass vTexture to shader
      GLuint vTexture = glGetAttribLocation(programID, "vTexture");                           checkOpenGLError(__FILE__, __LINE__);
@@ -360,7 +353,7 @@ pushObjectToBufferData(
      }
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ( (colors!=0) && (sizeOfColors!=0) )
+    if (sizeOfColors!=0)
     {
      //Pass vColor to shader
      GLuint vColor = glGetAttribLocation(programID, "vColor");                               checkOpenGLError(__FILE__, __LINE__);
@@ -372,7 +365,7 @@ pushObjectToBufferData(
      }
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if ((normals!=0) && (sizeOfNormals!=0))
+    if (sizeOfNormals!=0)
     {
      //Pass vNormal to shader
      GLuint vNormal = glGetAttribLocation(programID, "vNormal");                             checkOpenGLError(__FILE__, __LINE__);

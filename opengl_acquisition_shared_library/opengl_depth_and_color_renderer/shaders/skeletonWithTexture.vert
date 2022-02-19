@@ -33,6 +33,8 @@ void main()
 
     //Todo: also transform  normal (which is not currently used)
     gl_Position = MVP *  vec4(skinnedVertex.xyz,1.0);
+    //This is simple rendering without skinned
+    gl_Position = MVP *  vec4(vPosition,1.0);
 
     color = vColor;
     UV   =  vTexture;

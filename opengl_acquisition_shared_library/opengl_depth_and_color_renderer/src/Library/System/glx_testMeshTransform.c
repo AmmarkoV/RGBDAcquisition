@@ -77,7 +77,7 @@ char renderEyes = 1;
 char renderEyeHair = 1;
 char renderHair = 0;
 
-int skinnedRendering=0;
+int skinnedRendering=1;
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -859,8 +859,6 @@ int doDrawing(
                              gpuEyelashes->model->colors         ,  gpuEyelashes->model->header.numberOfColors        * sizeof(float),
                              gpuEyelashes->model->indices        ,  gpuEyelashes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
                           );*/
-
-
     gpuEyelashes->shader.initialized=
     pushBonesToBufferData(
                              (gpuEyelashes->shader.initialized==0),// generateNewVao
@@ -895,6 +893,16 @@ int doDrawing(
                           );*/
     //------------------------------------------------------------------------------------
     gpuHair->shader.triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
+    gpuHair->shader.initialized=
+    pushBonesToBufferData(
+                             (gpuHair->shader.initialized==0),// generateNewVao
+                             (gpuHair->shader.initialized==0),// generateNewArrayBuffer
+                             (gpuHair->shader.initialized==0),// generateNewElementBuffer
+                              gpuHair->programID,
+                             //-------------------------------------------------------------------
+                              &gpuHair->shader
+                            );
+    /*
     pushObjectToBufferData(
                              1,
                              &gpuHair->shader.VAO,
@@ -906,9 +914,19 @@ int doDrawing(
                              gpuHair->model->textureCoords  ,  gpuHair->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              gpuHair->model->colors         ,  gpuHair->model->header.numberOfColors        * sizeof(float),
                              gpuHair->model->indices        ,  gpuHair->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );
+                          );*/
     //------------------------------------------------------------------------------------
     gpuEyes->shader.triangleCount  =  (unsigned int)  gpuEyes->model->header.numberOfVertices/3;
+    gpuEyes->shader.initialized=
+    pushBonesToBufferData(
+                             (gpuEyes->shader.initialized==0),// generateNewVao
+                             (gpuEyes->shader.initialized==0),// generateNewArrayBuffer
+                             (gpuEyes->shader.initialized==0),// generateNewElementBuffer
+                              gpuEyes->programID,
+                             //-------------------------------------------------------------------
+                              &gpuEyes->shader
+                          );
+    /*
     pushObjectToBufferData(
                              1,
                              &gpuEyes->shader.VAO,
@@ -920,7 +938,7 @@ int doDrawing(
                              gpuEyes->model->textureCoords  ,  gpuEyes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
                              gpuEyes->model->colors         ,  gpuEyes->model->header.numberOfColors        * sizeof(float),
                              gpuEyes->model->indices        ,  gpuEyes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );
+                          );*/
     //------------------------------------------------------------------------------------
     gpuHuman->shader.triangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
     pushObjectToBufferData(
@@ -941,11 +959,9 @@ int doDrawing(
 	 glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
-	 // Create and compile our GLSL program from the shaders
+	 //Uniforms
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
-	 // Create and compile our GLSL program from the shaders
 	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
-
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 	 do
@@ -1011,30 +1027,14 @@ int doDrawing(
 	} // Check if the ESC key was pressed or the window was closed
     while(renderForever);
 
-
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	//-------------------------------------
 	deallocateGpuTRI(gpuEyelashes);
 	deallocateGpuTRI(gpuEyebrows);
-	//glDeleteBuffers(1, &gpuEyelashes->shader.arrayBuffer);
-	//glDeleteBuffers(1, &gpuEyebrows->shader.arrayBuffer);
-	glDeleteBuffers(1, &gpuHair->shader.arrayBuffer);
-	glDeleteBuffers(1, &gpuHuman->shader.arrayBuffer);
-	glDeleteBuffers(1, &gpuEyes->shader.arrayBuffer);
-	//-------------------------------------
-	//glDeleteBuffers(1, &gpuEyelashes->shader.elementBuffer);
-	//glDeleteBuffers(1, &gpuEyebrows->shader.elementBuffer);
-	glDeleteBuffers(1, &gpuHair->shader.elementBuffer);
-	glDeleteBuffers(1, &gpuHuman->shader.elementBuffer);
-	glDeleteBuffers(1, &gpuEyes->shader.elementBuffer);
-	//-------------------------------------
-	//glDeleteVertexArrays(1, &gpuEyelashes->shader.VAO);
-	//glDeleteVertexArrays(1, &gpuEyebrows->shader.VAO);
-	glDeleteVertexArrays(1, &gpuHair->shader.VAO);
-	glDeleteVertexArrays(1, &gpuHuman->shader.VAO);
-	glDeleteVertexArrays(1, &gpuEyes->shader.VAO);
-	//-------------------------------------
+	deallocateGpuTRI(gpuHair);
+	deallocateGpuTRI(gpuEyes);
+	deallocateGpuTRI(gpuHuman);
 	return 1;
 }
 
@@ -2460,6 +2460,10 @@ int main(int argc,const char **argv)
 
    }
 
+   deallocateGpuTRI(&gpuEyelashes);
+   deallocateGpuTRI(&gpuEyebrows);
+   deallocateGpuTRI(&gpuHair);
+   deallocateGpuTRI(&gpuEyes);
 
    glDeleteProgram(programID);
 
