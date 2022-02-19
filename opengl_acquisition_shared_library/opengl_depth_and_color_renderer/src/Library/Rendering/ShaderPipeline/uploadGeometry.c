@@ -46,9 +46,8 @@ pushBonesToBufferData(
     if (shaderData->boneWeightValues==0) { shaderData->sizeOfBoneWeightValues=0; }
     if (shaderData->boneTransforms==0)   { shaderData->sizeOfBoneTransforms=0;   }
 
-
     //Select Shader to render with
-    glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+    glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
 
     //Take care of VAO, ElementBuffer and ArrayBuffer
     //------------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,7 +72,6 @@ pushBonesToBufferData(
 
 
 
-
     //Create buffer holder data..
     GLsizei    stride = 0;
     GLintptr   memoryOffset=0;
@@ -81,8 +79,6 @@ pushBonesToBufferData(
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                  checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
-
-
 
 
 
@@ -97,7 +93,7 @@ pushBonesToBufferData(
     //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfTextureCoords!=0)
     {
-     glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfTextureCoords , shaderData->textureCoords );  checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfTextureCoords , shaderData->textureCoords);    checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=shaderData->sizeOfTextureCoords;
     }
     //----------------------------------------------------------------------------------------------------------------------------

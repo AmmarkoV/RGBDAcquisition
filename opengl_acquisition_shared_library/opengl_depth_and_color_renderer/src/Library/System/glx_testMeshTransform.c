@@ -805,6 +805,41 @@ int initializeOGLRenderer(
     return 1;
 }
 
+void processGPUTRI(struct GPUTriModel * gputri)
+{
+    struct TRI_Model * model = gputri->model;
+    if (model!=0)
+    {
+     gputri->shader.triangleCount       = (unsigned int) model->header.numberOfVertices/3;
+     //-----------------------------------------------------------------------------
+     gputri->shader.vertices            = model->vertices;
+     gputri->shader.sizeOfVertices      = model->header.numberOfVertices * sizeof(float);
+     //-----------------------------------------------------------------------------
+     gputri->shader.normals             = model->normal;
+     gputri->shader.sizeOfNormals       = model->header.numberOfNormals * sizeof(float);
+     //-----------------------------------------------------------------------------
+     gputri->shader.textureCoords       = model->textureCoords;
+     gputri->shader.sizeOfTextureCoords = model->header.numberOfTextureCoords * sizeof(float);
+     //-----------------------------------------------------------------------------
+     gputri->shader.colors              = model->colors;
+     gputri->shader.sizeOfColors        = model->header.numberOfColors * sizeof(float);
+     //-----------------------------------------------------------------------------
+     gputri->shader.indices             = model->indices;
+     gputri->shader.sizeOfIndices       = model->header.numberOfIndices * sizeof(unsigned int);
+     //-----------------------------------------------------------------------------
+     gputri->shader.numberOfBonesPerVertex = 3;
+     gputri->shader.boneIndexes            = model->bones->weightIndex;
+     gputri->shader.sizeOfBoneIndexes      = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
+
+     gputri->shader.boneWeightValues       = model->bones->weightValue;
+     gputri->shader.sizeOfBoneWeightValues = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(float);
+
+     gputri->shader.boneTransforms         = model->bones->info->finalVertexTransformation;
+     gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
+     //-----------------------------------------------------------------------------
+    }
+}
+
 
 void deallocateGpuTRI(struct GPUTriModel * gputri)
 {
@@ -845,20 +880,7 @@ int doDrawing(
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
     //------------------------------------------------------------------------------------
-    gpuEyelashes->shader.triangleCount  =  (unsigned int)  gpuEyelashes->model->header.numberOfVertices/3;
-    /*
-    pushObjectToBufferData(
-                             1,
-                             &gpuEyelashes->shader.VAO,
-                             &gpuEyelashes->shader.arrayBuffer,
-                             &gpuEyelashes->shader.elementBuffer,
-                             gpuEyelashes->programID,
-                             gpuEyelashes->model->vertices       ,  gpuEyelashes->model->header.numberOfVertices      * sizeof(float),
-                             gpuEyelashes->model->normal         ,  gpuEyelashes->model->header.numberOfNormals       * sizeof(float),
-                             gpuEyelashes->model->textureCoords  ,  gpuEyelashes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             gpuEyelashes->model->colors         ,  gpuEyelashes->model->header.numberOfColors        * sizeof(float),
-                             gpuEyelashes->model->indices        ,  gpuEyelashes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );*/
+    processGPUTRI(gpuEyelashes);
     gpuEyelashes->shader.initialized=
     pushBonesToBufferData(
                              (gpuEyelashes->shader.initialized==0),// generateNewVao
@@ -869,7 +891,7 @@ int doDrawing(
                               &gpuEyelashes->shader
                             );
     //------------------------------------------------------------------------------------
-    gpuEyebrows->shader.triangleCount  =  (unsigned int)  gpuEyebrows->model->header.numberOfVertices/3;
+    processGPUTRI(gpuEyebrows);
     gpuEyebrows->shader.initialized=
     pushBonesToBufferData(
                              (gpuEyebrows->shader.initialized==0),// generateNewVao
@@ -879,20 +901,8 @@ int doDrawing(
                              //-------------------------------------------------------------------
                               &gpuEyebrows->shader
                             );
-    /*pushObjectToBufferData(
-                             1,
-                             &gpuEyebrows->shader.VAO,
-                             &gpuEyebrows->shader.arrayBuffer,
-                             &gpuEyebrows->shader.elementBuffer,
-                             gpuEyebrows->programID,
-                             gpuEyebrows->model->vertices       ,  gpuEyebrows->model->header.numberOfVertices      * sizeof(float),
-                             gpuEyebrows->model->normal         ,  gpuEyebrows->model->header.numberOfNormals       * sizeof(float),
-                             gpuEyebrows->model->textureCoords  ,  gpuEyebrows->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             gpuEyebrows->model->colors         ,  gpuEyebrows->model->header.numberOfColors        * sizeof(float),
-                             gpuEyebrows->model->indices        ,  gpuEyebrows->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );*/
     //------------------------------------------------------------------------------------
-    gpuHair->shader.triangleCount  =  (unsigned int)  gpuHair->model->header.numberOfVertices/3;
+    processGPUTRI(gpuHair);
     gpuHair->shader.initialized=
     pushBonesToBufferData(
                              (gpuHair->shader.initialized==0),// generateNewVao
@@ -902,21 +912,8 @@ int doDrawing(
                              //-------------------------------------------------------------------
                               &gpuHair->shader
                             );
-    /*
-    pushObjectToBufferData(
-                             1,
-                             &gpuHair->shader.VAO,
-                             &gpuHair->shader.arrayBuffer,
-                             &gpuHair->shader.elementBuffer,
-                             gpuHair->programID,
-                             gpuHair->model->vertices       ,  gpuHair->model->header.numberOfVertices      * sizeof(float),
-                             gpuHair->model->normal         ,  gpuHair->model->header.numberOfNormals       * sizeof(float),
-                             gpuHair->model->textureCoords  ,  gpuHair->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             gpuHair->model->colors         ,  gpuHair->model->header.numberOfColors        * sizeof(float),
-                             gpuHair->model->indices        ,  gpuHair->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );*/
     //------------------------------------------------------------------------------------
-    gpuEyes->shader.triangleCount  =  (unsigned int)  gpuEyes->model->header.numberOfVertices/3;
+    processGPUTRI(gpuEyes);
     gpuEyes->shader.initialized=
     pushBonesToBufferData(
                              (gpuEyes->shader.initialized==0),// generateNewVao
@@ -926,21 +923,19 @@ int doDrawing(
                              //-------------------------------------------------------------------
                               &gpuEyes->shader
                           );
-    /*
-    pushObjectToBufferData(
-                             1,
-                             &gpuEyes->shader.VAO,
-                             &gpuEyes->shader.arrayBuffer,
-                             &gpuEyes->shader.elementBuffer,
-                             gpuEyes->programID,
-                             gpuEyes->model->vertices       ,  gpuEyes->model->header.numberOfVertices      * sizeof(float),
-                             gpuEyes->model->normal         ,  gpuEyes->model->header.numberOfNormals       * sizeof(float),
-                             gpuEyes->model->textureCoords  ,  gpuEyes->model->header.numberOfTextureCoords * sizeof(float),      //0,0 //No Texture
-                             gpuEyes->model->colors         ,  gpuEyes->model->header.numberOfColors        * sizeof(float),
-                             gpuEyes->model->indices        ,  gpuEyes->model->header.numberOfIndices       * sizeof(unsigned int)//0,0 //Not Indexed
-                          );*/
     //------------------------------------------------------------------------------------
-    gpuHuman->shader.triangleCount  =  (unsigned int)  humanModel->header.numberOfVertices/3;
+    processGPUTRI(gpuHuman);
+    //gpuHuman->shader.triangleCount  =  (unsigned int)  gpuHuman->model->header.numberOfVertices/3;
+                         /*
+    gpuHuman->shader.initialized=
+    pushBonesToBufferData(
+                             (gpuHuman->shader.initialized==0),// generateNewVao
+                             (gpuHuman->shader.initialized==0),// generateNewArrayBuffer
+                             (gpuHuman->shader.initialized==0),// generateNewElementBuffer
+                              gpuHuman->programID,
+                             //-------------------------------------------------------------------
+                              &gpuHuman->shader
+                          );*/
     pushObjectToBufferData(
                              1,
                              &gpuHuman->shader.VAO,
