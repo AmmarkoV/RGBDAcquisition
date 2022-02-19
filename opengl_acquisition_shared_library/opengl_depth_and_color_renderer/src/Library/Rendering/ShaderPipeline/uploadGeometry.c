@@ -28,7 +28,7 @@ pushBonesToBufferData(
                      )
 {
    #if USE_GLEW
-    fprintf(stderr,"PushBones(BoneIndexes,0,%u) ",shaderData->sizeOfBoneIndexes);
+    fprintf(stderr,"PushBones(BoneIndexes,0,%u)\n",shaderData->sizeOfBoneIndexes);
 
     if (shaderData->numberOfBonesPerVertex>4)
     {
@@ -47,7 +47,7 @@ pushBonesToBufferData(
     if (shaderData->boneTransforms==0)   { shaderData->sizeOfBoneTransforms=0;   }
 
     //Select Shader to render with
-    glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
+    //glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
 
     //Take care of VAO, ElementBuffer and ArrayBuffer
     //------------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,11 +75,16 @@ pushBonesToBufferData(
     //Create buffer holder data..
     GLsizei    stride = 0;
     GLintptr   memoryOffset=0;
-    GLsizeiptr totalBufferDataSize=shaderData->sizeOfBoneIndexes+shaderData->sizeOfBoneWeightValues+shaderData->sizeOfBoneTransforms;
+    GLsizeiptr totalBufferDataSize=shaderData->sizeOfVertices+
+                                   shaderData->sizeOfTextureCoords+
+                                   shaderData->sizeOfColors+
+                                   shaderData->sizeOfNormals+
+                                   shaderData->sizeOfBoneIndexes+
+                                   shaderData->sizeOfBoneWeightValues+
+                                   shaderData->sizeOfBoneTransforms;
     //----------------------------------------------------------------------------------------------------------------------------
-    glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                  checkOpenGLError(__FILE__, __LINE__);
+    glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                           checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
-
 
 
     //Create sub buffers inside buffer data..

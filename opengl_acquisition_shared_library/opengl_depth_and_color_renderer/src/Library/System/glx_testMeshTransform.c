@@ -836,6 +836,10 @@ void processGPUTRI(struct GPUTriModel * gputri)
 
      gputri->shader.boneTransforms         = model->bones->info->finalVertexTransformation;
      gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
+
+     gputri->shader.sizeOfBoneIndexes     = 0;
+     gputri->shader.sizeOfBoneWeightValues= 0;
+     gputri->shader.sizeOfBoneTransforms  = 0;
      //-----------------------------------------------------------------------------
     }
 }
