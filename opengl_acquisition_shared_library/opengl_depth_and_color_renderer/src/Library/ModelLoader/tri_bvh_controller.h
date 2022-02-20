@@ -1219,6 +1219,17 @@ const static int animateTRIModelUsingBVHArmature(
                          1,//Do Transforms, don't just calculate the matrices
                          0 //Default joint convention
                         );
+
+        /*
+        //We update the vertex transformation to the original TRI finalVertexTransformation so it can be
+        //easily uploaded to the shader..
+        for (int boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
+        {
+          //This is done so that the calculated information survives on the new GPU shader
+          //copy4x4FMatrix(modelOriginal->bones[boneID].info->finalVertexTransformation,&transformations4x4[16*boneID]); //This won't work because we want the full chain calculation
+            copy4x4FMatrix(modelOriginal->bones[boneID].info->finalVertexTransformation,modelTemporary.bones[boneID].info->finalVertexTransformation);
+        }*/
+
         //---------------------------------------------------------------
         tri_flattenIndexedModel(modelOutput,&modelTemporary);
         tri_deallocModelInternals(&modelTemporary);

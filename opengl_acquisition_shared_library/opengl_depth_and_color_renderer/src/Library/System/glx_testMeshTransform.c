@@ -2304,8 +2304,9 @@ int main(int argc,const char **argv)
 
      if (!staticRendering)
      {
+       //We animate the model in CPU instead of the shader!
+       //And just give the final calculated vertices for rendering
        animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
-       //triDeepCopyBoneValuesButNotStructure(&indexedEyeModel,&indexedHumanModel);
        animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&hairModel,&indexedHairModel,&mc,fID,0);
        animateTRIModelUsingBVHArmature(&eyebrowsModel,&indexedEyebrowsModel,&mc,fID,0);
@@ -2315,6 +2316,14 @@ int main(int argc,const char **argv)
        gpuHair.model      = &hairModel;
        gpuEyes.model      = &eyeModel;
        gpuHuman.model     = &humanModel;
+
+       //TODO: When skinning takes place in shader we will just give
+       //initial model..
+       //gpuEyelashes.model = &indexedEyelashesModel;
+       //gpuEyebrows.model  = &indexedEyebrowsModel;
+       //gpuHair.model      = &indexedHairModel;
+       //gpuEyes.model      = &indexedEyeModel;
+       //gpuHuman.model     = &indexedHumanModel;
      } else
      {
        tri_flattenIndexedModel(&humanModel,&indexedHumanModel);
