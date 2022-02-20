@@ -874,20 +874,34 @@ void processGPUTRI(struct GPUTriModel * gputri)
          //V is the vertice we will be working in this loop
          unsigned int vertexID = model->bones[boneID].weightIndex[boneWeightID];
          //W is the weight that we have for the specific bone
-         float w = model->bones[boneID].weightValue[boneWeightID];
+         float boneWeightValue = model->bones[boneID].weightValue[boneWeightID];
 
-         //Memory check..
-         if (vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID >=  model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex)
+
+         //Ok we now our target vertexID and the boneID and the boneWeightValue
+         //We will try to fill in the specified index per vertex shader data with our new infos!
+
+         for (int vertexBoneSpot=0; vertexBoneSpot<gputri->shader.numberOfBonesPerVertex; vertexBoneSpot++)
          {
-           fprintf(stderr,RED "Overflow on boneID %u / weight %u => Vertex %u \n" NORMAL,boneID,boneWeightID,vertexID);
-         } else
-         {
-          gputri->shader.boneIndexes[vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID]=boneID;
-          gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID]=w;
+           if (gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] == 0.0)
+           {
+             //Great! we found a clean spot to put our data..!
+             gputri->shader.boneIndexes     [vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneID;
+             gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneWeightValue;
+           } //If no clean spot found data gets ignored!
          }
         }
        }
       }
+
+      //Check data for corruption..
+      //for (int v =0; v<gputri->model->header.numberOfVertices; v++)
+      //{
+      //    int bones = (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=0) +
+      //                (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=1) +
+      //                (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=2) ;
+      //    fprintf(stderr,"Vertex %u => %u bones ",v,bones);
+      //}
+
 
       //Special gathering of all the 4x4 matrixes
       if (gputri->shader.boneTransforms!=0)
