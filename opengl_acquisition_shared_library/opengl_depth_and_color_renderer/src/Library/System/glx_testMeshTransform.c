@@ -830,7 +830,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
      //-----------------------------------------------------------------------------
 
 
-
      if ( (model->bones!=0) && (!performBoneTransformsInCPU) ) // If we have bones that need to be processed in the shader..
      {
       gputri->shader.numberOfBones          = model->header.numberOfBones;
@@ -911,6 +910,10 @@ void processGPUTRI(struct GPUTriModel * gputri)
              //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
            }
          }
+
+         //Make sure BONE 0 is identity
+         create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[0]);
+         transpose4x4FMatrix(&gputri->shader.boneTransforms[0]);
       }
      } else
      {
