@@ -993,6 +993,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOriginal,
                                                  struct BVH_MotionCapture * bvh,
                                                  unsigned int frameID,
+                                                 int performTransformsInCPU,
                                                  int printDebugMessages
                                                 )
 {
@@ -1145,14 +1146,12 @@ const static int animateTRIModelUsingBVHArmature(
                                       (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
                                     )
                                     {
-                                        // Z X Y => X -Z -Y
-                                       rotationOrder = ROTATION_ORDER_XZY;
+                                      // Z X Y => X -Z -Y
+                                      rotationOrder = ROTATION_ORDER_XZY;
                                       rSignX = -1.0;
                                       rSignY = 1.0;
                                       rSignZ = 1.0;
                                     }
-
-
 
                                  if (bvh->jointHierarchy[jID].hasPositionalChannels)
                                    {
@@ -1216,20 +1215,9 @@ const static int animateTRIModelUsingBVHArmature(
                          numberOfBones * 16 * sizeof(float), //Each transform has a 4x4 matrix of floats..!
                          1,//Autodetect default matrices for speedup
                          1,//Direct setting of matrices
-                         1,//Do Transforms, don't just calculate the matrices
+                         performTransformsInCPU,//Do Transforms, don't just calculate the matrices
                          0 //Default joint convention
                         );
-
-        /*
-        //We update the vertex transformation to the original TRI finalVertexTransformation so it can be
-        //easily uploaded to the shader..
-        for (int boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
-        {
-          //This is done so that the calculated information survives on the new GPU shader
-          //copy4x4FMatrix(modelOriginal->bones[boneID].info->finalVertexTransformation,&transformations4x4[16*boneID]); //This won't work because we want the full chain calculation
-            copy4x4FMatrix(modelOriginal->bones[boneID].info->finalVertexTransformation,modelTemporary.bones[boneID].info->finalVertexTransformation);
-        }*/
-
         //---------------------------------------------------------------
         tri_flattenIndexedModel(modelOutput,&modelTemporary);
         tri_deallocModelInternals(&modelTemporary);
@@ -1238,17 +1226,12 @@ const static int animateTRIModelUsingBVHArmature(
         freeMotionBuffer(&frameMotionBuffer);
 
         return 1;
-
-
-
-
        }
     }
     else
     {
         fprintf(stderr,RED "Error: Failed executing bvh transform\n" NORMAL);
     }
-
     return 0;
 }
 

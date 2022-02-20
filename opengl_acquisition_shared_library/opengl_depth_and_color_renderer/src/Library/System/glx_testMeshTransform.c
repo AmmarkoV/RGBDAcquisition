@@ -78,6 +78,7 @@ char renderEyeHair = 1;
 char renderHair = 0;
 
 int skinnedRendering=1;
+int performTransformsInCPU = 1; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -832,6 +833,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
 
      if (model->bones!=0) // If we have bones..
      {
+      gputri->shader.numberOfBones          = model->header.numberOfBones;
       gputri->shader.numberOfBonesPerVertex = 3;
       gputri->shader.boneIndexes            = model->bones->weightIndex;
       gputri->shader.sizeOfBoneIndexes      = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
@@ -846,7 +848,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
          gputri->shader.boneTransforms=0;
       }
 
-      gputri->shader.sizeOfBoneTransforms   = (1+model->header.numberOfBones) * 16 * sizeof(float);
+      gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
       gputri->shader.boneTransforms = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
 
       if (gputri->shader.boneTransforms!=0)
@@ -856,10 +858,13 @@ void processGPUTRI(struct GPUTriModel * gputri)
            if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
            {
              unsigned int targetBoneTransformIndex = boneID*16;
-             for (int i=0; i<16; i++)
-             {
-              gputri->shader.boneTransforms[targetBoneTransformIndex+i] = model->bones[boneID].info->finalVertexTransformation[i];
-             }
+             copy4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex] , model->bones[boneID].info->finalVertexTransformation);
+             //OpenGL will expect a transposed matrix!
+             transpose4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex]); //TODO: This should also be handled on the shader..!
+
+             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
+             //fprintf(stderr,"Bone %u \n",boneID);
+             //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
            }
          }
       }
@@ -2306,24 +2311,28 @@ int main(int argc,const char **argv)
      {
        //We animate the model in CPU instead of the shader!
        //And just give the final calculated vertices for rendering
-       animateTRIModelUsingBVHArmature(&humanModel,&indexedHumanModel,&mc,fID,0);
-       animateTRIModelUsingBVHArmature(&eyeModel,&indexedEyeModel,&mc,fID,0);
-       animateTRIModelUsingBVHArmature(&hairModel,&indexedHairModel,&mc,fID,0);
-       animateTRIModelUsingBVHArmature(&eyebrowsModel,&indexedEyebrowsModel,&mc,fID,0);
-       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,0);
-       gpuEyelashes.model = &eyelashesModel;
-       gpuEyebrows.model  = &eyebrowsModel;
-       gpuHair.model      = &hairModel;
-       gpuEyes.model      = &eyeModel;
-       gpuHuman.model     = &humanModel;
+       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,fID,performTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,fID,performTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,fID,performTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,fID,performTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,performTransformsInCPU,0);
 
-       //TODO: When skinning takes place in shader we will just give
-       //initial model..
-       //gpuEyelashes.model = &indexedEyelashesModel;
-       //gpuEyebrows.model  = &indexedEyebrowsModel;
-       //gpuHair.model      = &indexedHairModel;
-       //gpuEyes.model      = &indexedEyeModel;
-       //gpuHuman.model     = &indexedHumanModel;
+       if (performTransformsInCPU)
+       {
+        gpuHuman.model     = &humanModel;
+        gpuEyes.model      = &eyeModel;
+        gpuHair.model      = &hairModel;
+        gpuEyebrows.model  = &eyebrowsModel;
+        gpuEyelashes.model = &eyelashesModel;
+       } else
+       {
+        //TODO: When skinning takes place in shader we will just give the initial model..
+        gpuEyelashes.model = &indexedEyelashesModel;
+        gpuEyebrows.model  = &indexedEyebrowsModel;
+        gpuHair.model      = &indexedHairModel;
+        gpuEyes.model      = &indexedEyeModel;
+        gpuHuman.model     = &indexedHumanModel;
+       }
      } else
      {
        tri_flattenIndexedModel(&humanModel,&indexedHumanModel);

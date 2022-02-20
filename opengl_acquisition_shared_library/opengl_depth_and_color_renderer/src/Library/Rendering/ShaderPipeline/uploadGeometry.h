@@ -23,6 +23,7 @@ struct shaderModelData
   unsigned int * indices; unsigned int sizeOfIndices;
   //-------------------------------------------------------------------
   unsigned long lastTimestampBoneModification;
+  unsigned int numberOfBones;
   unsigned int numberOfBonesPerVertex;
   unsigned int * boneIndexes;  unsigned int sizeOfBoneIndexes;
   float * boneWeightValues;    unsigned int sizeOfBoneWeightValues;

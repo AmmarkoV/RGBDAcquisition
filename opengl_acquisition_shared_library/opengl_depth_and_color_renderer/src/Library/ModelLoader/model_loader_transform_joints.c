@@ -799,6 +799,8 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        create4x4FIdentityMatrixDirect(m);
      }
 
+
+     // STANDARD CPU WAY TO DO THIS..
      for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[boneID].info->boneWeightsNumber; boneWeightID++)
      {
        //V is the vertice we will be working in this loop

@@ -227,7 +227,9 @@ pushBonesToBufferData(
      if ( (GL_INVALID_OPERATION != vBoneTransform) && (vBoneTransform!=-1) )
      {
       glEnableVertexAttribArray(vBoneTransform);                                                      checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vBoneTransform,16,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
+      //This is 16 in principle but only 4 is correct ?
+      //glVertexAttribPointer(vBoneTransform,16,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
+      glUniformMatrix4fv(vBoneTransform, shaderData->numberOfBones,GL_FALSE/*Do Transpose*/,  shaderData->boneTransforms);
      }
      memoryOffset+=shaderData->sizeOfBoneTransforms;
     }
