@@ -845,6 +845,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
       }
       gputri->shader.sizeOfBoneIndexes      = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
       gputri->shader.boneIndexes            = (unsigned int *) malloc(gputri->shader.sizeOfBoneIndexes);
+      memset(gputri->shader.boneIndexes,0,gputri->shader.sizeOfBoneIndexes); //Make sure empty bones are clean
       //===================================================================================================================================
       if (gputri->shader.boneWeightValues!=0)
       {
@@ -853,6 +854,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
       }
       gputri->shader.sizeOfBoneWeightValues = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(float);
       gputri->shader.boneWeightValues       = (float *) malloc(gputri->shader.sizeOfBoneWeightValues);
+      memset(gputri->shader.boneWeightValues,0,gputri->shader.sizeOfBoneWeightValues); //Make sure empty bones are clean
       //===================================================================================================================================
 
       //We need to store per vertex A) the boneID B) the Weight!
@@ -890,7 +892,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
          free(gputri->shader.boneTransforms);
          gputri->shader.boneTransforms=0;
       }
-
       gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
       gputri->shader.boneTransforms = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
 
@@ -917,7 +918,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
       gputri->shader.sizeOfBoneWeightValues= 0;
       gputri->shader.sizeOfBoneTransforms  = 0;
      }
-
      //-----------------------------------------------------------------------------
     }
 }
