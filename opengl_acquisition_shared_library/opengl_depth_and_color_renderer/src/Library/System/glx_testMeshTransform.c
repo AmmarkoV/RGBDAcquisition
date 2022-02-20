@@ -870,7 +870,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
         //fprintf(stderr,"Bone[%u]-> weights = %u \n",boneID,model->bones[boneID].info->boneWeightsNumber);
         for (unsigned int boneWeightID=0; boneWeightID<model->bones[boneID].info->boneWeightsNumber; boneWeightID++)
         {
-         //fprintf(stderr,"Bone %u / weight %u/%u ..\n",boneID,boneWeightID,model->bones[boneID].info->boneWeightsNumber);
          //V is the vertice we will be working in this loop
          unsigned int vertexID = model->bones[boneID].weightIndex[boneWeightID];
          //W is the weight that we have for the specific bone
@@ -894,13 +893,18 @@ void processGPUTRI(struct GPUTriModel * gputri)
       }
 
       //Check data for corruption..
-      //for (int v =0; v<gputri->model->header.numberOfVertices; v++)
-      //{
-      //    int bones = (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=0) +
-      //                (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=1) +
-      //                (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=2) ;
-      //    fprintf(stderr,"Vertex %u => %u bones ",v,bones);
-      //}
+      /*
+      for (int v=0; v<gputri->model->header.numberOfVertices; v++)
+      {
+          int bones = (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=0) +
+                      (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=1) +
+                      (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=2) ;
+          //fprintf(stderr,"Vertex %u => %u bones ",v,bones);
+          if (bones==0)
+          {
+           fprintf(stderr,RED "No bones for Vertex %u" NORMAL,v);
+          }
+      }*/
 
 
       //Special gathering of all the 4x4 matrixes
@@ -916,14 +920,16 @@ void processGPUTRI(struct GPUTriModel * gputri)
       {
        for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
          {
+           unsigned int targetBoneTransformIndex = boneID*16;
+           //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
            if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
            {
-             unsigned int targetBoneTransformIndex = boneID*16;
-             copy4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex] , model->bones[boneID].info->finalVertexTransformation);
+             float * targetBoneTransformMatrix = &gputri->shader.boneTransforms[targetBoneTransformIndex];
+             copy4x4FMatrix(targetBoneTransformMatrix, model->bones[boneID].info->finalVertexTransformation);
              //OpenGL will expect a transposed matrix!
-             transpose4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex]); //TODO: This should also be handled on the shader..!
+             transpose4x4FMatrix(targetBoneTransformMatrix); //TODO: This should also be handled on the shader..!
 
-             create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
+             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
              //fprintf(stderr,"Bone %u \n",boneID);
              //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
            }
