@@ -804,15 +804,15 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
      for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[boneID].info->boneWeightsNumber; boneWeightID++)
      {
        //V is the vertice we will be working in this loop
-       unsigned int v = triModelIn->bones[boneID].weightIndex[boneWeightID];
+       unsigned int vertexID = triModelIn->bones[boneID].weightIndex[boneWeightID];
        //W is the weight that we have for the specific bone
-       float w = triModelIn->bones[boneID].weightValue[boneWeightID];
+       float boneWeightValue = triModelIn->bones[boneID].weightValue[boneWeightID];
 
        //Vertice transformation ----------------------------------------------
        //We load our input into position/normal
-       position.m[0] = triModelIn->vertices[v*3+0];
-       position.m[1] = triModelIn->vertices[v*3+1];
-       position.m[2] = triModelIn->vertices[v*3+2];
+       position.m[0] = triModelIn->vertices[vertexID*3+0];
+       position.m[1] = triModelIn->vertices[vertexID*3+1];
+       position.m[2] = triModelIn->vertices[vertexID*3+2];
        position.m[3] = 1.0;
 
        //Keep a copy of our matrix on our SSE aligned Matrix4x4OfFloats structure
@@ -820,24 +820,25 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
        //We transform input (initial) position with the transform we computed to get transformedPosition
        transform3DPointFVectorUsing4x4FMatrix(&transformedPosition,&boneTransformMatrix,&position);
-       triModelOut->vertices[v*3+0] += (float) transformedPosition.m[0] * w;
-       triModelOut->vertices[v*3+1] += (float) transformedPosition.m[1] * w;
-       triModelOut->vertices[v*3+2] += (float) transformedPosition.m[2] * w;
+       //Please note that triModelOut->vertices is set to 0 by memset call above so it is clean..!
+       triModelOut->vertices[vertexID*3+0] += (float) transformedPosition.m[0] * boneWeightValue;
+       triModelOut->vertices[vertexID*3+1] += (float) transformedPosition.m[1] * boneWeightValue;
+       triModelOut->vertices[vertexID*3+2] += (float) transformedPosition.m[2] * boneWeightValue;
        //----------------------------------------------------------------------
 
        //Normal transformation ----------------------------------------------
        if (triModelIn->normal!=0)
        {
-        normal.m[0]   = triModelIn->normal[v*3+0];
-        normal.m[1]   = triModelIn->normal[v*3+1];
-        normal.m[2]   = triModelIn->normal[v*3+2];
+        normal.m[0]   = triModelIn->normal[vertexID*3+0];
+        normal.m[1]   = triModelIn->normal[vertexID*3+1];
+        normal.m[2]   = triModelIn->normal[vertexID*3+2];
         normal.m[3]   = 0.0;
 
         //We transform input (initial) normal with the transform we computed to get transformedNormal
         transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(transformedNormal.m,&boneTransformMatrix,normal.m);
-        triModelOut->normal[v*3+0] += (float) transformedNormal.m[0] * w;
-        triModelOut->normal[v*3+1] += (float) transformedNormal.m[1] * w;
-        triModelOut->normal[v*3+2] += (float) transformedNormal.m[2] * w;
+        triModelOut->normal[vertexID*3+0] += (float) transformedNormal.m[0] * boneWeightValue;
+        triModelOut->normal[vertexID*3+1] += (float) transformedNormal.m[1] * boneWeightValue;
+        triModelOut->normal[vertexID*3+2] += (float) transformedNormal.m[2] * boneWeightValue;
        }
        //----------------------------------------------------------------------
      }

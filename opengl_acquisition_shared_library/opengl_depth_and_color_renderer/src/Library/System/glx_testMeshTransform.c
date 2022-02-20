@@ -923,7 +923,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
              //OpenGL will expect a transposed matrix!
              transpose4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex]); //TODO: This should also be handled on the shader..!
 
-             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
+             create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
              //fprintf(stderr,"Bone %u \n",boneID);
              //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
            }

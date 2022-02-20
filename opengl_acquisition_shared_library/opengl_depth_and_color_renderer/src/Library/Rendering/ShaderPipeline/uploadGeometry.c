@@ -217,7 +217,7 @@ pushBonesToBufferData(
     if  (shaderData->sizeOfBoneTransforms!=0)
     {
      //Pass vBoneTransform to shader
-     GLuint vBoneTransform = glGetAttribLocation(programID, "vBoneTransform");                        checkOpenGLError(__FILE__, __LINE__);
+     GLuint vBoneTransform = glGetUniformLocation(programID, "vBoneTransform");                        checkOpenGLError(__FILE__, __LINE__);
      if ( (GL_INVALID_OPERATION != vBoneTransform) && (vBoneTransform!=-1) )
      {
       glEnableVertexAttribArray(vBoneTransform);                                                      checkOpenGLError(__FILE__, __LINE__);

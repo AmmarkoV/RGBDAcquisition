@@ -30,11 +30,11 @@ void main()
     //vec4 skinnedVertex = BoneTransform * vec4(vPosition, 1.0);
 
     //Check doModelTransform call in model_loader_transform
-    vec4 skinnedVertex = vec4(vPosition,1.0); 
-    //vec4 skinnedVertex = vec4(0,0,0,0);
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.x] * vec4(vPosition,1.0) * vBoneWeightValues.x;
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.y] * vec4(vPosition,1.0) * vBoneWeightValues.y;
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.z] * vec4(vPosition,1.0) * vBoneWeightValues.z;    
+    //vec4 skinnedVertex = vec4(vPosition,1.0); 
+    vec4 skinnedVertex = vec4(0,0,0,0);
+    skinnedVertex += vBoneTransform[vBoneIndexIDs[0]] * vec4(vPosition,1.0) * vBoneWeightValues[0];
+    skinnedVertex += vBoneTransform[vBoneIndexIDs[1]] * vec4(vPosition,1.0) * vBoneWeightValues[1];
+    skinnedVertex += vBoneTransform[vBoneIndexIDs[2]] * vec4(vPosition,1.0) * vBoneWeightValues[2];    
     //skinnedVertex = normalize(skinnedVertex);   
     //skinnedVertex.w=1; 
 
