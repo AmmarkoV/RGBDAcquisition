@@ -13,7 +13,7 @@ in  vec2 vTexture;
 //Skeleton Bones
 in uvec3 vBoneIndexIDs;
 in vec3  vBoneWeightValues;
-mat3     vBoneTransform;
+mat4     vBoneTransform;
  
 out vec4 color;
 out vec2 UV;
@@ -26,10 +26,10 @@ void main()
     //vec4 skinnedVertex = vec4(0,0,0,0);
     //skinnedVertex += vBoneTransform[vBoneIndexIDs.w] * vec4(vPosition,1.0) * vBoneWeights.w;
     
-    vec3 skinnedVertex = vec3(0,0,0);
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.x] * vPosition * vBoneWeightValues.x;
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.y] * vPosition * vBoneWeightValues.y;
-    skinnedVertex += vBoneTransform[vBoneIndexIDs.z] * vPosition * vBoneWeightValues.z;    
+    vec4 skinnedVertex = vec4(0,0,0,1);
+    skinnedVertex += vBoneTransform[vBoneIndexIDs.x] * vec4(vPosition,1.0) * vBoneWeightValues.x;
+    skinnedVertex += vBoneTransform[vBoneIndexIDs.y] * vec4(vPosition,1.0) * vBoneWeightValues.y;
+    skinnedVertex += vBoneTransform[vBoneIndexIDs.z] * vec4(vPosition,1.0) * vBoneWeightValues.z;    
 
     //Todo: also transform  normal (which is not currently used)
     //gl_Position = MVP *  vec4(skinnedVertex.xyz,1.0);
