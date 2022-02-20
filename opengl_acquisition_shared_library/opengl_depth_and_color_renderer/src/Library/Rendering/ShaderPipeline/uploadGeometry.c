@@ -28,7 +28,7 @@ pushBonesToBufferData(
                      )
 {
    #if USE_GLEW
-    fprintf(stderr,"PushBones(BoneIndexes,0,%u)\n",shaderData->sizeOfBoneIndexes);
+    fprintf(stderr,"PushBones(BoneIndexes,triangle count %u,%u)\n",shaderData->triangleCount,shaderData->sizeOfBoneIndexes);
 
     if (shaderData->numberOfBonesPerVertex>4)
     {

@@ -78,7 +78,7 @@ char renderEyeHair = 1;
 char renderHair = 0;
 
 int skinnedRendering=1;
-int performTransformsInCPU = 1; // <- Experimental when 0
+int performBoneTransformsInCPU = 1; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -831,15 +831,58 @@ void processGPUTRI(struct GPUTriModel * gputri)
 
 
 
-     if (model->bones!=0) // If we have bones..
+     if ( (model->bones!=0) && (!performBoneTransformsInCPU) ) // If we have bones that need to be processed in the shader..
      {
       gputri->shader.numberOfBones          = model->header.numberOfBones;
       gputri->shader.numberOfBonesPerVertex = 3;
-      gputri->shader.boneIndexes            = model->bones->weightIndex;
-      gputri->shader.sizeOfBoneIndexes      = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
 
-      gputri->shader.boneWeightValues       = model->bones->weightValue;
-      gputri->shader.sizeOfBoneWeightValues = model->header.numberOfBones * gputri->shader.numberOfBonesPerVertex * sizeof(float);
+      //Special gathering per vertex of all the bone stuff
+      //===================================================================================================================================
+      if (gputri->shader.boneIndexes!=0)
+      {
+         free(gputri->shader.boneIndexes);
+         gputri->shader.boneIndexes=0;
+      }
+      gputri->shader.sizeOfBoneIndexes      = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
+      gputri->shader.boneIndexes            = (unsigned int *) malloc(gputri->shader.sizeOfBoneIndexes);
+      //===================================================================================================================================
+      if (gputri->shader.boneWeightValues!=0)
+      {
+         free(gputri->shader.boneWeightValues);
+         gputri->shader.boneWeightValues=0;
+      }
+      gputri->shader.sizeOfBoneWeightValues = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(float);
+      gputri->shader.boneWeightValues       = (float *) malloc(gputri->shader.sizeOfBoneWeightValues);
+      //===================================================================================================================================
+
+      //We need to store per vertex A) the boneID B) the Weight!
+      //This will get streamed to the shader to be enable the joints
+      if ( (gputri->shader.boneIndexes!=0) && (gputri->shader.boneWeightValues!=0) )
+      {
+       //fprintf(stderr,"Will now pack %u bones..\n",model->header.numberOfBones);
+       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+       {
+        //fprintf(stderr,"Bone[%u]-> weights = %u \n",boneID,model->bones[boneID].info->boneWeightsNumber);
+        for (unsigned int boneWeightID=0; boneWeightID<model->bones[boneID].info->boneWeightsNumber; boneWeightID++)
+        {
+         //fprintf(stderr,"Bone %u / weight %u/%u ..\n",boneID,boneWeightID,model->bones[boneID].info->boneWeightsNumber);
+         //V is the vertice we will be working in this loop
+         unsigned int vertexID = model->bones[boneID].weightIndex[boneWeightID];
+         //W is the weight that we have for the specific bone
+         float w = model->bones[boneID].weightValue[boneWeightID];
+
+         //Memory check..
+         if (vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID >=  model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex)
+         {
+           fprintf(stderr,RED "Overflow on boneID %u / weight %u => Vertex %u \n" NORMAL,boneID,boneWeightID,vertexID);
+         } else
+         {
+          gputri->shader.boneIndexes[vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID]=boneID;
+          gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+boneWeightID]=w;
+         }
+        }
+       }
+      }
 
       //Special gathering of all the 4x4 matrixes
       if (gputri->shader.boneTransforms!=0)
@@ -891,6 +934,19 @@ void deallocateGpuTRI(struct GPUTriModel * gputri)
 	glDeleteVertexArrays(1, &gputri->shader.VAO);
 	//-------------------------------------
 	gputri->shader.initialized=0;
+	//-------------------------------------
+
+    if (gputri->shader.boneIndexes!=0)
+      {
+         free(gputri->shader.boneIndexes);
+         gputri->shader.boneIndexes=0;
+      }
+
+    if (gputri->shader.boneWeightValues!=0)
+      {
+         free(gputri->shader.boneWeightValues);
+         gputri->shader.boneWeightValues=0;
+      }
 
     if (gputri->shader.boneTransforms!=0)
      {
@@ -2311,13 +2367,13 @@ int main(int argc,const char **argv)
      {
        //We animate the model in CPU instead of the shader!
        //And just give the final calculated vertices for rendering
-       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,fID,performTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,fID,performTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,fID,performTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,fID,performTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,performTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,performBoneTransformsInCPU,0);
 
-       if (performTransformsInCPU)
+       if (performBoneTransformsInCPU)
        {
         gpuHuman.model     = &humanModel;
         gpuEyes.model      = &eyeModel;
