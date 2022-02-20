@@ -328,8 +328,8 @@ int drawVertexArrayWithMVPMatrices(
   GLint textureLocation = 0;
   if (TextureID!=0)
     {
-      GLint useTexture = glGetUniformLocation(programID, "useTexture"); checkOpenGLError(__FILE__, __LINE__);
-      glUniform1f(useTexture, 1.0);                                      checkOpenGLError(__FILE__, __LINE__);
+      GLint useTexture = glGetUniformLocation(programID, "useTexture");     checkOpenGLError(__FILE__, __LINE__);
+      glUniform1f(useTexture, 1.0);                                         checkOpenGLError(__FILE__, __LINE__);
 
       //fprintf(stderr,"renderingTexture %u\n",TextureID);
       glEnable(GL_TEXTURE_2D);

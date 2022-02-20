@@ -78,7 +78,7 @@ char renderEyeHair = 1;
 char renderHair = 0;
 
 int skinnedRendering=1;
-int performBoneTransformsInCPU = 1; // <- Experimental when 0
+int performBoneTransformsInCPU = 0; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -853,9 +853,13 @@ void processGPUTRI(struct GPUTriModel * gputri)
       }
       gputri->shader.sizeOfBoneWeightValues = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(float);
       gputri->shader.boneWeightValues       = (float *) malloc(gputri->shader.sizeOfBoneWeightValues);
+      //It is really important bone weight values on unused bones are clean so that trash values get zeroed out..
       memset(gputri->shader.boneWeightValues,0,gputri->shader.sizeOfBoneWeightValues); //Make sure empty bones are clean
       //===================================================================================================================================
 
+      //fprintf(stderr,"Rearranging Bone Data : \n");
+      //fprintf(stderr,"We have %u vertices\n",model->header.numberOfVertices);
+      //fprintf(stderr,"We have %u indexes\n",model->header.numberOfIndices);
       //We need to store per vertex A) the boneID B) the Weight!
       //This will get streamed to the shader to be enable the joints
       if ( (gputri->shader.boneIndexes!=0) && (gputri->shader.boneWeightValues!=0) )
@@ -905,15 +909,11 @@ void processGPUTRI(struct GPUTriModel * gputri)
              //OpenGL will expect a transposed matrix!
              transpose4x4FMatrix(&gputri->shader.boneTransforms[targetBoneTransformIndex]); //TODO: This should also be handled on the shader..!
 
-             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
+             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
              //fprintf(stderr,"Bone %u \n",boneID);
              //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
            }
          }
-
-         //Make sure BONE 0 is identity
-         create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[0]);
-         transpose4x4FMatrix(&gputri->shader.boneTransforms[0]);
       }
      } else
      {
@@ -930,6 +930,7 @@ void deallocateGpuTRI(struct GPUTriModel * gputri)
 {
  if (gputri->shader.initialized==1)
  {
+	//-------------------------------------
     glDeleteBuffers(1, &gputri->shader.arrayBuffer);
 	//-------------------------------------
 	glDeleteBuffers(1, &gputri->shader.elementBuffer);
@@ -938,24 +939,24 @@ void deallocateGpuTRI(struct GPUTriModel * gputri)
 	//-------------------------------------
 	gputri->shader.initialized=0;
 	//-------------------------------------
-
     if (gputri->shader.boneIndexes!=0)
       {
          free(gputri->shader.boneIndexes);
          gputri->shader.boneIndexes=0;
       }
-
+	//-------------------------------------
     if (gputri->shader.boneWeightValues!=0)
       {
          free(gputri->shader.boneWeightValues);
          gputri->shader.boneWeightValues=0;
       }
-
+	//-------------------------------------
     if (gputri->shader.boneTransforms!=0)
      {
          free(gputri->shader.boneTransforms);
          gputri->shader.boneTransforms=0;
      }
+	//-------------------------------------
  }
 }
 

@@ -80,8 +80,7 @@ pushBonesToBufferData(
                                    shaderData->sizeOfColors+
                                    shaderData->sizeOfNormals+
                                    shaderData->sizeOfBoneIndexes+
-                                   shaderData->sizeOfBoneWeightValues+
-                                   shaderData->sizeOfBoneTransforms;
+                                   shaderData->sizeOfBoneWeightValues;
     //----------------------------------------------------------------------------------------------------------------------------
     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                           checkOpenGLError(__FILE__, __LINE__);
     //----------------------------------------------------------------------------------------------------------------------------
@@ -128,12 +127,6 @@ pushBonesToBufferData(
     {
      glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneWeightValues , shaderData->boneWeightValues );            checkOpenGLError(__FILE__, __LINE__);
      memoryOffset+=shaderData->sizeOfBoneWeightValues;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfBoneTransforms!=0)
-    {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneTransforms, shaderData->boneTransforms);                   checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfBoneTransforms;
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
@@ -203,7 +196,8 @@ pushBonesToBufferData(
      if ( (GL_INVALID_OPERATION!=vBoneIndexIDs) && (vBoneIndexIDs!=-1) )
      {
       glEnableVertexAttribArray(vBoneIndexIDs);                                                                           checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,GL_FALSE,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
+      //glVertexAttribPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,GL_FALSE,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribIPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
      }
      memoryOffset+=shaderData->sizeOfBoneIndexes;
     }
@@ -231,7 +225,6 @@ pushBonesToBufferData(
       //glVertexAttribPointer(vBoneTransform,16,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
       glUniformMatrix4fv(vBoneTransform, shaderData->numberOfBones,GL_FALSE/*Do Transpose*/,  shaderData->boneTransforms);
      }
-     memoryOffset+=shaderData->sizeOfBoneTransforms;
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
