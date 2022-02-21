@@ -922,7 +922,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
              float * targetBoneTransformMatrix = &gputri->shader.boneTransforms[targetBoneTransformIndex];
              copy4x4FMatrix(targetBoneTransformMatrix, model->bones[boneID].info->finalVertexTransformation);
              //OpenGL expects a transposed matrix but we say to OGL to do it itself in uploadGeometry.c without wasting our CPU time here!
-             //transpose4x4FMatrix(targetBoneTransformMatrix); //TODO: This should also be handled on the shader..!
+             //transpose4x4FMatrix(targetBoneTransformMatrix); //This could also be handled on the shader..!
            }
          }
       }

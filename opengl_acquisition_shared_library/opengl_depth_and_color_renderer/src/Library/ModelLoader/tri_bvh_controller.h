@@ -274,12 +274,12 @@ def getHeadTailDir(pb):
 */
 
 const static int animateTRIModelUsingBVHArmatureOld(
-    struct TRI_Model * modelOutput,
-    struct TRI_Model * modelOriginal,
-    struct BVH_MotionCapture * bvh,
-    unsigned int frameID,
-    int printDebugMessages
-)
+                                                    struct TRI_Model * modelOutput,
+                                                    struct TRI_Model * modelOriginal,
+                                                    struct BVH_MotionCapture * bvh,
+                                                    unsigned int frameID,
+                                                    int printDebugMessages
+                                                   )
 {
     if (modelOriginal==0)  { return 0; }
     if (modelOutput==0)    { return 0; }
@@ -1219,7 +1219,12 @@ const static int animateTRIModelUsingBVHArmature(
                          0 //Default joint convention
                         );
         //---------------------------------------------------------------
-        tri_flattenIndexedModel(modelOutput,&modelTemporary);
+        if (performTransformsInCPU)
+          {
+            //If we are doing CPU bone transforms we have to flatten
+            //Temporary model into our output..
+            tri_flattenIndexedModel(modelOutput,&modelTemporary);
+          }
         tri_deallocModelInternals(&modelTemporary);
         //---------------------------------------------------------------
         free(transformations4x4);

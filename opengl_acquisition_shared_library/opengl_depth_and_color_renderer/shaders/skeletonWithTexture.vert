@@ -5,7 +5,7 @@ uniform mat4 MVP;
 uniform vec3 iResolution;
 uniform float iTime;
 
-const int MAX_BONES = 171; 		
+const int MAX_BONES = 172; 		
 uniform mat4 vBoneTransform[MAX_BONES];
 
 in  vec3 vPosition;
@@ -14,8 +14,8 @@ in  vec3 vNormal;
 in  vec2 vTexture;
 
 //Skeleton Bones
-in vec3  vBoneWeightValues;
 in uvec3 vBoneIndexIDs;
+in vec3  vBoneWeightValues;
  
 out vec4 color;
 out vec2 UV;
