@@ -857,9 +857,6 @@ void processGPUTRI(struct GPUTriModel * gputri)
       memset(gputri->shader.boneWeightValues,0,gputri->shader.sizeOfBoneWeightValues); //Make sure empty bones are clean
       //===================================================================================================================================
 
-      //fprintf(stderr,"Rearranging Bone Data : \n");
-      //fprintf(stderr,"We have %u vertices\n",model->header.numberOfVertices);
-      //fprintf(stderr,"We have %u indexes\n",model->header.numberOfIndices);
       //We need to store per vertex A) the boneID B) the Weight!
       //This will get streamed to the shader to be enable the joints
       if ( (gputri->shader.boneIndexes!=0) && (gputri->shader.boneWeightValues!=0) )
@@ -913,25 +910,20 @@ void processGPUTRI(struct GPUTriModel * gputri)
          free(gputri->shader.boneTransforms);
          gputri->shader.boneTransforms=0;
       }
-      gputri->shader.sizeOfBoneTransforms   = model->header.numberOfBones * 16 * sizeof(float);
-      gputri->shader.boneTransforms = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
-
+      gputri->shader.sizeOfBoneTransforms   = (model->header.numberOfBones) * 16 * sizeof(float);
+      gputri->shader.boneTransforms         = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
       if (gputri->shader.boneTransforms!=0)
       {
        for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
          {
            unsigned int targetBoneTransformIndex = boneID*16;
-           //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
+           create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
            if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
            {
              float * targetBoneTransformMatrix = &gputri->shader.boneTransforms[targetBoneTransformIndex];
              copy4x4FMatrix(targetBoneTransformMatrix, model->bones[boneID].info->finalVertexTransformation);
-             //OpenGL will expect a transposed matrix!
-             transpose4x4FMatrix(targetBoneTransformMatrix); //TODO: This should also be handled on the shader..!
-
-             //create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]); fprintf(stderr,"IDENTITY BONES ");
-             //fprintf(stderr,"Bone %u \n",boneID);
-             //print4x4FMatrix("MATRIX TRANSPOSED",&gputri->shader.boneTransforms[targetBoneTransformIndex],1);
+             //OpenGL expects a transposed matrix but we say to OGL to do it itself in uploadGeometry.c without wasting our CPU time here!
+             //transpose4x4FMatrix(targetBoneTransformMatrix); //TODO: This should also be handled on the shader..!
            }
          }
       }

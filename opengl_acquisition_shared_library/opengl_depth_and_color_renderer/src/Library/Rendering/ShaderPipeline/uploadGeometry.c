@@ -28,7 +28,8 @@ pushBonesToBufferData(
                      )
 {
    #if USE_GLEW
-    fprintf(stderr,"PushBones(BoneIndexes,triangle count %u,%u)\n",shaderData->triangleCount,shaderData->sizeOfBoneIndexes);
+    fprintf(stderr,"PushBones(triangle count %u,Bones Index Size %u)\n",shaderData->triangleCount,shaderData->sizeOfBoneIndexes);
+    fprintf(stderr,"Normal Size %u,Color Size %u, Vertex Size %u\n",shaderData->sizeOfNormals,shaderData->sizeOfColors,shaderData->sizeOfVertices);
 
     if (shaderData->numberOfBonesPerVertex>4)
     {
@@ -48,6 +49,33 @@ pushBonesToBufferData(
 
     //Select Shader to render with
     glUseProgram(programID);                       checkOpenGLError(__FILE__, __LINE__);
+
+
+
+    //First of all pass the uniform Bone Transforms!
+    //if  (shaderData->timestamp < shaderData->lastTimestampBoneModification)
+    {
+      //Sanity check on our OpenGL context to make sure we are in spec
+      GLint maxUniformMatricesOnGLSLShader=0;
+      glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformMatricesOnGLSLShader);
+      maxUniformMatricesOnGLSLShader = maxUniformMatricesOnGLSLShader / (16*sizeof(float));
+      if (maxUniformMatricesOnGLSLShader<=shaderData->numberOfBones)
+      {
+        fprintf(stderr, "Your Geometry exceeds the maximum number of uniform matrices which is %u mat4\n",maxUniformMatricesOnGLSLShader );
+      }
+
+
+      shaderData->lastTimestampBoneModification = shaderData->timestamp + 1;
+      if  (shaderData->sizeOfBoneTransforms!=0)
+      {
+       //Pass vBoneTransform to shader
+       GLuint vBoneTransform = glGetUniformLocation(programID, "vBoneTransform");                        checkOpenGLError(__FILE__, __LINE__);
+       if ( (GL_INVALID_OPERATION != vBoneTransform) && (vBoneTransform!=-1) )
+        {
+         glUniformMatrix4fv(vBoneTransform, shaderData->numberOfBones,GL_TRUE/*We NEED Transpose since our matrices are not OGL major*/,  shaderData->boneTransforms);
+        }
+       }
+    }
 
     //Take care of VAO, ElementBuffer and ArrayBuffer
     //------------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,70 +99,70 @@ pushBonesToBufferData(
     //------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-    //Create buffer holder data..
-    GLsizei    stride = 0;
-    GLintptr   memoryOffset=0;
-    GLsizeiptr totalBufferDataSize=shaderData->sizeOfVertices+
-                                   shaderData->sizeOfTextureCoords+
-                                   shaderData->sizeOfColors+
-                                   shaderData->sizeOfNormals+
-                                   shaderData->sizeOfBoneIndexes+
-                                   shaderData->sizeOfBoneWeightValues;
-    //----------------------------------------------------------------------------------------------------------------------------
-    glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                           checkOpenGLError(__FILE__, __LINE__);
-    //----------------------------------------------------------------------------------------------------------------------------
-
-
-    //Create sub buffers inside buffer data..
-    //----------------------------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfVertices!=0)
+    //if  (shaderData->timestamp < shaderData->lastTimestampBaseModification)
     {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfVertices, shaderData->vertices);               checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfVertices;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfTextureCoords!=0)
-    {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfTextureCoords , shaderData->textureCoords);    checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfTextureCoords;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfColors!=0)
-    {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfColors, shaderData->colors);                   checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfColors;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfNormals!=0)
-    {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfNormals, shaderData->normals);                 checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfNormals;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------------------------
-    //   now upload bones..
-    //----------------------------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------------------------
-    if  (shaderData->sizeOfBoneIndexes!=0)
-    {
-     glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneIndexes, shaderData->boneIndexes);                         checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfBoneIndexes;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfBoneWeightValues!=0)
-    {
-     glBufferSubData( GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneWeightValues , shaderData->boneWeightValues );            checkOpenGLError(__FILE__, __LINE__);
-     memoryOffset+=shaderData->sizeOfBoneWeightValues;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
+      shaderData->lastTimestampBaseModification = shaderData->timestamp + 1;
+      //Create buffer holder data..
+      GLsizei    stride = 0;
+      GLintptr   memoryOffset=0;
+      GLsizeiptr totalBufferDataSize=shaderData->sizeOfVertices+
+                                     shaderData->sizeOfTextureCoords+
+                                     shaderData->sizeOfColors+
+                                     shaderData->sizeOfNormals+
+                                     shaderData->sizeOfBoneIndexes+
+                                     shaderData->sizeOfBoneWeightValues;
+     //----------------------------------------------------------------------------------------------------------------------------
+     glBufferData(GL_ARRAY_BUFFER,totalBufferDataSize,NULL,GL_STATIC_DRAW);                                           checkOpenGLError(__FILE__, __LINE__);
+     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    //Restart count
-    memoryOffset=0;
+     //Create sub buffers inside buffer data..
+     //----------------------------------------------------------------------------------------------------------------------------
+     //----------------------------------------------------------------------------------------------------------------------------
+     if (shaderData->sizeOfVertices!=0)
+     {
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfVertices, shaderData->vertices);               checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfVertices;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
+     if (shaderData->sizeOfTextureCoords!=0)
+     {
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfTextureCoords , shaderData->textureCoords);    checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfTextureCoords;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
+     if (shaderData->sizeOfColors!=0)
+     {
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfColors, shaderData->colors);                   checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfColors;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
+     if (shaderData->sizeOfNormals!=0)
+     {
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfNormals, shaderData->normals);                 checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfNormals;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
+     //----------------------------------------------------------------------------------------------------------------------------
+     //   now upload bones..
+     //----------------------------------------------------------------------------------------------------------------------------
+     //----------------------------------------------------------------------------------------------------------------------------
+     if (shaderData->sizeOfBoneWeightValues!=0)
+     {
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneWeightValues , shaderData->boneWeightValues );            checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfBoneWeightValues;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
+     if  (shaderData->sizeOfBoneIndexes!=0)
+     {//GL_ELEMENT_ARRAY_BUFFER
+      glBufferSubData(GL_ARRAY_BUFFER, memoryOffset, shaderData->sizeOfBoneIndexes, shaderData->boneIndexes);                         checkOpenGLError(__FILE__, __LINE__);
+      memoryOffset+=shaderData->sizeOfBoneIndexes;
+     }
+     //----------------------------------------------------------------------------------------------------------------------------
 
 
+     //Restart count
+     memoryOffset=0;
 
 
 
@@ -188,44 +216,35 @@ pushBonesToBufferData(
      memoryOffset+=shaderData->sizeOfNormals;
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------------------------
-    if (shaderData->sizeOfBoneIndexes!=0)
-    {
-     //Pass vBoneIndexIDs to shader
-     GLuint vBoneIndexIDs = glGetAttribLocation(programID, "vBoneIndexIDs" );                                             checkOpenGLError(__FILE__, __LINE__);
-     if ( (GL_INVALID_OPERATION!=vBoneIndexIDs) && (vBoneIndexIDs!=-1) )
-     {
-      glEnableVertexAttribArray(vBoneIndexIDs);                                                                           checkOpenGLError(__FILE__, __LINE__);
-      //glVertexAttribPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,GL_FALSE,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
-      glVertexAttribIPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,stride,(GLvoid*) memoryOffset); checkOpenGLError(__FILE__, __LINE__);
-     }
-     memoryOffset+=shaderData->sizeOfBoneIndexes;
-    }
-    //----------------------------------------------------------------------------------------------------------------------------
     if (shaderData->sizeOfBoneWeightValues!=0)
     {
      //Pass vBoneWeightValues to shader
-     GLuint vBoneWeightValues = glGetAttribLocation(programID, "vBoneWeightValues");                                      checkOpenGLError(__FILE__, __LINE__);
+     GLuint vBoneWeightValues = glGetAttribLocation(programID, "vBoneWeightValues");                                                  checkOpenGLError(__FILE__, __LINE__);
      if ( (GL_INVALID_OPERATION != vBoneWeightValues ) && (vBoneWeightValues!=-1) )
      {
-      glEnableVertexAttribArray(vBoneWeightValues);                                                                       checkOpenGLError(__FILE__, __LINE__);
+      glEnableVertexAttribArray(vBoneWeightValues);                                                                                   checkOpenGLError(__FILE__, __LINE__);
       glVertexAttribPointer(vBoneWeightValues,shaderData->numberOfBonesPerVertex,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);    checkOpenGLError(__FILE__, __LINE__);
      }
      memoryOffset+=shaderData->sizeOfBoneWeightValues;
     }
     //----------------------------------------------------------------------------------------------------------------------------
-    if  (shaderData->sizeOfBoneTransforms!=0)
+    if (shaderData->sizeOfBoneIndexes!=0)
     {
-     //Pass vBoneTransform to shader
-     GLuint vBoneTransform = glGetUniformLocation(programID, "vBoneTransform");                        checkOpenGLError(__FILE__, __LINE__);
-     if ( (GL_INVALID_OPERATION != vBoneTransform) && (vBoneTransform!=-1) )
+     //Pass vBoneIndexIDs to shader
+     GLuint vBoneIndexIDs = glGetAttribLocation(programID, "vBoneIndexIDs" );                                                         checkOpenGLError(__FILE__, __LINE__);
+     if ( (GL_INVALID_OPERATION!=vBoneIndexIDs) && (vBoneIndexIDs!=-1) )
      {
-      glEnableVertexAttribArray(vBoneTransform);                                                      checkOpenGLError(__FILE__, __LINE__);
-      //This is 16 in principle but only 4 is correct ?
-      //glVertexAttribPointer(vBoneTransform,16,GL_FLOAT,GL_FALSE,stride,(GLvoid*) memoryOffset);       checkOpenGLError(__FILE__, __LINE__);
-      glUniformMatrix4fv(vBoneTransform, shaderData->numberOfBones,GL_FALSE/*Do Transpose*/,  shaderData->boneTransforms);
+      glEnableVertexAttribArray(vBoneIndexIDs);                                                                                       checkOpenGLError(__FILE__, __LINE__);
+      glVertexAttribIPointer(vBoneIndexIDs,shaderData->numberOfBonesPerVertex,GL_UNSIGNED_INT,stride,(GLvoid*) memoryOffset);         checkOpenGLError(__FILE__, __LINE__);
      }
+     memoryOffset+=shaderData->sizeOfBoneIndexes;
     }
+    //----------------------------------------------------------------------------------------------------------------------------
+
+
+    }
+
+
     //----------------------------------------------------------------------------------------------------------------------------
 
    return 1;
