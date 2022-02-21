@@ -829,108 +829,37 @@ void processGPUTRI(struct GPUTriModel * gputri)
      gputri->shader.sizeOfIndices       = model->header.numberOfIndices * sizeof(unsigned int);
      //-----------------------------------------------------------------------------
 
-
+     //If anything below fails sizes of bones will be zero and
+     //wont cause rendering problems
+     gputri->shader.sizeOfBoneIndexes     = 0;
+     gputri->shader.sizeOfBoneWeightValues= 0;
+     gputri->shader.sizeOfBoneTransforms  = 0;
+     //-----------------------------------------------------------------------------
      if ( (model->bones!=0) && (!performBoneTransformsInCPU) ) // If we have bones that need to be processed in the shader..
      {
-      gputri->shader.numberOfBones          = model->header.numberOfBones;
-      gputri->shader.numberOfBonesPerVertex = 3;
+       struct TRI_BonesPackagedPerVertex packed={0};
 
-      //Special gathering per vertex of all the bone stuff
-      //===================================================================================================================================
-      if (gputri->shader.boneIndexes!=0)
-      {
-         free(gputri->shader.boneIndexes);
-         gputri->shader.boneIndexes=0;
-      }
-      gputri->shader.sizeOfBoneIndexes      = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(unsigned int);
-      gputri->shader.boneIndexes            = (unsigned int *) malloc(gputri->shader.sizeOfBoneIndexes);
-      memset(gputri->shader.boneIndexes,0,gputri->shader.sizeOfBoneIndexes); //Make sure empty bones are clean
-      //===================================================================================================================================
-      if (gputri->shader.boneWeightValues!=0)
-      {
-         free(gputri->shader.boneWeightValues);
-         gputri->shader.boneWeightValues=0;
-      }
-      gputri->shader.sizeOfBoneWeightValues = model->header.numberOfVertices * gputri->shader.numberOfBonesPerVertex * sizeof(float);
-      gputri->shader.boneWeightValues       = (float *) malloc(gputri->shader.sizeOfBoneWeightValues);
-      //It is really important bone weight values on unused bones are clean so that trash values get zeroed out..
-      memset(gputri->shader.boneWeightValues,0,gputri->shader.sizeOfBoneWeightValues); //Make sure empty bones are clean
-      //===================================================================================================================================
+       //Since we cycle through the same data it is important to provide
+       //the tri_packageBoneDataPerVertex call with our previous values (if any) so that
+       //it manages the memory correctly
+       packed.boneIndexes      =  gputri->shader.boneIndexes;
+       packed.boneWeightValues =  gputri->shader.boneWeightValues;
+       packed.boneTransforms   =  gputri->shader.boneTransforms;
 
-      //We need to store per vertex A) the boneID B) the Weight!
-      //This will get streamed to the shader to be enable the joints
-      if ( (gputri->shader.boneIndexes!=0) && (gputri->shader.boneWeightValues!=0) )
-      {
-       //fprintf(stderr,"Will now pack %u bones..\n",model->header.numberOfBones);
-       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+       if ( tri_packageBoneDataPerVertex(&packed,model) ) //<- this call repacks bones per vertex and is pretty heavy..
        {
-        //fprintf(stderr,"Bone[%u]-> weights = %u \n",boneID,model->bones[boneID].info->boneWeightsNumber);
-        for (unsigned int boneWeightID=0; boneWeightID<model->bones[boneID].info->boneWeightsNumber; boneWeightID++)
-        {
-         //V is the vertice we will be working in this loop
-         unsigned int vertexID = model->bones[boneID].weightIndex[boneWeightID];
-         //W is the weight that we have for the specific bone
-         float boneWeightValue = model->bones[boneID].weightValue[boneWeightID];
-
-         //Ok we now our target vertexID and the boneID and the boneWeightValue
-         //We will try to fill in the specified index per vertex shader data with our new infos!
-         for (int vertexBoneSpot=0; vertexBoneSpot<gputri->shader.numberOfBonesPerVertex; vertexBoneSpot++)
-         {
-           if (gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] == 0.0)
-           {
-             //Great! we found a clean spot to put our data..!
-             gputri->shader.boneIndexes     [vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneID;
-             gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneWeightValue;
-             break; // Break if we found a clean spot..
-           } //If no clean spot found data gets ignored!
-         }
-        }
+        gputri->shader.numberOfBones          = packed.numberOfBones;
+        gputri->shader.numberOfBonesPerVertex = packed.numberOfBonesPerVertex;
+        //--------------------------------------------------------------------
+        gputri->shader.boneIndexes            = packed.boneIndexes;
+        gputri->shader.sizeOfBoneIndexes      = packed.sizeOfBoneIndexes;
+        //--------------------------------------------------------------------
+        gputri->shader.boneWeightValues       = packed.boneWeightValues;
+        gputri->shader.sizeOfBoneWeightValues = packed.sizeOfBoneWeightValues;
+        //--------------------------------------------------------------------
+        gputri->shader.boneTransforms         = packed.boneTransforms;
+        gputri->shader.sizeOfBoneTransforms   = packed.sizeOfBoneTransforms;
        }
-      }
-
-      //Check data for corruption..
-      /*
-      for (int v=0; v<gputri->model->header.numberOfVertices; v++)
-      {
-          int bones = (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=0) +
-                      (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=1) +
-                      (gputri->shader.boneWeightValues[v*gputri->shader.numberOfBonesPerVertex+0]!=2) ;
-          //fprintf(stderr,"Vertex %u => %u bones ",v,bones);
-          if (bones==0)
-          {
-           fprintf(stderr,RED "No bones for Vertex %u" NORMAL,v);
-          }
-      }*/
-
-
-      //Special gathering of all the 4x4 matrixes
-      if (gputri->shader.boneTransforms!=0)
-      {
-         free(gputri->shader.boneTransforms);
-         gputri->shader.boneTransforms=0;
-      }
-      gputri->shader.sizeOfBoneTransforms   = (model->header.numberOfBones) * 16 * sizeof(float);
-      gputri->shader.boneTransforms         = (float *) malloc(gputri->shader.sizeOfBoneTransforms);
-      if (gputri->shader.boneTransforms!=0)
-      {
-       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
-         {
-           unsigned int targetBoneTransformIndex = boneID*16;
-           create4x4FIdentityMatrixDirect(&gputri->shader.boneTransforms[targetBoneTransformIndex]);
-           if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
-           {
-             float * targetBoneTransformMatrix = &gputri->shader.boneTransforms[targetBoneTransformIndex];
-             copy4x4FMatrix(targetBoneTransformMatrix, model->bones[boneID].info->finalVertexTransformation);
-             //OpenGL expects a transposed matrix but we say to OGL to do it itself in uploadGeometry.c without wasting our CPU time here!
-             //transpose4x4FMatrix(targetBoneTransformMatrix); //This could also be handled on the shader..!
-           }
-         }
-      }
-     } else
-     {
-      gputri->shader.sizeOfBoneIndexes     = 0;
-      gputri->shader.sizeOfBoneWeightValues= 0;
-      gputri->shader.sizeOfBoneTransforms  = 0;
      }
      //-----------------------------------------------------------------------------
     }

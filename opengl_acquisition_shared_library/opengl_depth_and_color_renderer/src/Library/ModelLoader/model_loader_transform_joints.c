@@ -857,8 +857,8 @@ int doModelTransform(
                       struct TRI_Model * triModelIn,
                       float * joint4x4Data,
                       unsigned int joint4x4DataSize ,
-                      unsigned int autodetectAlteredMatrices,
-                      unsigned int directSettingOfMatrices,
+                      unsigned int autodetectAlteredMatrices,//This is no longer used
+                      unsigned int directSettingOfMatrices, //This is no longer used
                       unsigned int performVertexTransform, //If you want to handle the transform on a shader set this to 0
                       unsigned int jointAxisConvention
                     )
@@ -879,47 +879,31 @@ int doModelTransform(
 
  for (unsigned int boneID=0; boneID<triModelIn->header.numberOfBones; boneID++)
    {
-     float * joint4x4Transform = &joint4x4Data[boneID*16];
-
-     autodetectAlteredMatrices = 0; // This should always be 0
-     if (autodetectAlteredMatrices)
-     {
-       if (!is4x4FIdentityMatrix(joint4x4Transform))  { triModelIn->bones[boneID].info->altered=1; } else
-                                                      { triModelIn->bones[boneID].info->altered=0; }
-     } else
-     {
-       //All matrices considered altered
-       triModelIn->bones[boneID].info->altered=1;
-     }
+     //All matrices considered and marked altered when calling this call
+     triModelIn->bones[boneID].info->altered=1;
    }
 
   float initialParentTransform[16]={0};
   //The initial parent transform is an identity matrix..!
   create4x4FIdentityMatrixDirect((float*) &initialParentTransform);
 
-  //This recursively calculates all matrix transforms and prepares the correct matrices
+  //This recursively calculates all matrix transforms and prepares the correct matrices in triModelIn
+  //each boneID gets its final 4x4 matrix in triModelIn->bones[boneID].info->finalVertexTransformation
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  if (directSettingOfMatrices)
-  {
-    recursiveJointHierarchyTransformerDirect(
-                                              triModelIn ,
-                                              triModelIn->header.rootBone  ,
-                                              initialParentTransform ,
-                                              joint4x4Data ,
-                                              joint4x4DataSize ,
-                                              0 /*First call 0 level recursion*/
-                                             );
-  } else
-  {
-    fprintf(stderr,"Indirect transforms no longer supported..!\n");
-    return 0;
-  }
+  recursiveJointHierarchyTransformerDirect(
+                                           triModelIn ,
+                                           triModelIn->header.rootBone  ,
+                                           initialParentTransform ,
+                                           joint4x4Data ,
+                                           joint4x4DataSize ,
+                                           0 /*First call 0 level recursion*/
+                                          );
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (performVertexTransform)
   {
     //Past checks..
    tri_copyModel(triModelOut,triModelIn,1,0); //Last 1 means we also want bone data , Last 0 means we dont need to copy texture data
-   applyVertexTransformation( triModelOut ,  triModelIn );
+   applyVertexTransformation(triModelOut,triModelIn);
   }
 
  return 1;

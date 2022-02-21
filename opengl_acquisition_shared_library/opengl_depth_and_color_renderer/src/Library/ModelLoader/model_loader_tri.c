@@ -950,6 +950,119 @@ int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * pr
 }
 
 
+int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model)
+{
+ boneDataPerVertex->numberOfBones          = model->header.numberOfBones;
+ boneDataPerVertex->numberOfBonesPerVertex = 4;
+
+  //Special gathering per vertex of all the bone stuff
+  //===================================================================================================================================
+  if (boneDataPerVertex->boneIndexes!=0)
+      {
+         free(boneDataPerVertex->boneIndexes);
+         boneDataPerVertex->boneIndexes=0;
+      }
+  boneDataPerVertex->sizeOfBoneIndexes      = model->header.numberOfVertices * boneDataPerVertex->numberOfBonesPerVertex * sizeof(unsigned int);
+  boneDataPerVertex->boneIndexes            = (unsigned int *) malloc(boneDataPerVertex->sizeOfBoneIndexes);
+  memset(boneDataPerVertex->boneIndexes,0,boneDataPerVertex->sizeOfBoneIndexes); //Make sure empty bones are clean
+  //===================================================================================================================================
+  if (boneDataPerVertex->boneWeightValues!=0)
+      {
+         free(boneDataPerVertex->boneWeightValues);
+         boneDataPerVertex->boneWeightValues=0;
+      }
+   boneDataPerVertex->sizeOfBoneWeightValues = model->header.numberOfVertices * boneDataPerVertex->numberOfBonesPerVertex * sizeof(float);
+   boneDataPerVertex->boneWeightValues       = (float *) malloc(boneDataPerVertex->sizeOfBoneWeightValues);
+   //It is really important bone weight values on unused bones are set to zero and delivered clean so that missing bones get zeroed out..
+   memset(boneDataPerVertex->boneWeightValues,0,boneDataPerVertex->sizeOfBoneWeightValues); //Make sure empty bones are clean
+   //===================================================================================================================================
+
+   //We need to store per vertex A) the boneID B) the Weight!
+   //This will get streamed to the shader to be enable the joints
+      if ( (boneDataPerVertex->boneIndexes!=0) && (boneDataPerVertex->boneWeightValues!=0) )
+      {
+       //fprintf(stderr,"Will now pack %u bones..\n",model->header.numberOfBones);
+       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+       {
+        //fprintf(stderr,"Bone[%u]-> weights = %u \n",boneID,model->bones[boneID].info->boneWeightsNumber);
+        for (unsigned int boneWeightID=0; boneWeightID<model->bones[boneID].info->boneWeightsNumber; boneWeightID++)
+        {
+         //V is the vertice we will be working in this loop
+         unsigned int vertexID = model->bones[boneID].weightIndex[boneWeightID];
+         //W is the weight that we have for the specific bone
+         float boneWeightValue = model->bones[boneID].weightValue[boneWeightID];
+
+         //Ok we now our target vertexID and the boneID and the boneWeightValue
+         //We will try to fill in the specified index per vertex shader data with our new infos!
+         char foundASpotToPutThisBoneData = 0;
+         for (int vertexBoneSpot=0; vertexBoneSpot<boneDataPerVertex->numberOfBonesPerVertex; vertexBoneSpot++)
+         {
+           unsigned int bonePerVertexAddress = (vertexID*boneDataPerVertex->numberOfBonesPerVertex)+vertexBoneSpot;
+           if ( (!foundASpotToPutThisBoneData) && (boneDataPerVertex->boneWeightValues[bonePerVertexAddress] == 0.0) )
+           {
+             //Great! we found a clean spot to put our data..!
+             boneDataPerVertex->boneIndexes     [bonePerVertexAddress] = boneID;
+             boneDataPerVertex->boneWeightValues[bonePerVertexAddress] = boneWeightValue;
+             foundASpotToPutThisBoneData=1;
+             break; // Break since we just found a clean spot..
+           } //If no clean spot found data gets ignored!
+         }
+        }
+       }
+      }
+
+      //Check data for corruption..
+      /*
+      for (int v=0; v<gputri->model->header.numberOfVertices; v++)
+      {
+          int bones = (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=0) +
+                      (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=1) +
+                      (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=2) ;
+          //fprintf(stderr,"Vertex %u => %u bones ",v,bones);
+          if (bones==0)
+          {
+           fprintf(stderr,RED "No bones for Vertex %u" NORMAL,v);
+          }
+      }*/
+
+
+      //Special gathering of all the 4x4 matrixes
+      if (boneDataPerVertex->boneTransforms!=0)
+      {
+         free(boneDataPerVertex->boneTransforms);
+         boneDataPerVertex->boneTransforms=0;
+      }
+      boneDataPerVertex->sizeOfBoneTransforms   = (model->header.numberOfBones) * 16 * sizeof(float);
+      boneDataPerVertex->boneTransforms         = (float *) malloc(boneDataPerVertex->sizeOfBoneTransforms);
+      if (boneDataPerVertex->boneTransforms!=0)
+      {
+       for (unsigned int boneID=0; boneID<model->header.numberOfBones; boneID++)
+         {
+           unsigned int targetBoneTransformIndex = boneID*16;
+           if ( (model->bones[boneID].info!=0) && (model->bones[boneID].info->finalVertexTransformation!=0) )
+           {
+             float * s = model->bones[boneID].info->finalVertexTransformation;
+             float * t = &boneDataPerVertex->boneTransforms[targetBoneTransformIndex];
+
+             t[0]=s[0];    t[1]=s[1];    t[2]=s[2];    t[3]=s[3];
+             t[4]=s[4];    t[5]=s[5];    t[6]=s[6];    t[7]=s[7];
+             t[8]=s[8];    t[9]=s[9];    t[10]=s[10];  t[11]=s[11];
+             t[12]=s[12];  t[13]=s[13];  t[14]=s[14];  t[15]=s[15];
+
+             //NOTE: OpenGL expects a transposed matrix but we say to OGL to do it itself in uploadGeometry.c without wasting our CPU time here!
+             //transpose4x4FMatrix(targetBoneTransformMatrix); //This could also be handled on the shader..!
+           }
+         }
+      }
+
+  return 1;
+}
+
+
+
+
+
+
 int findTRIBoneWithName(struct TRI_Model * triModel,const char * searchName ,TRIBoneID * boneIDResult)
 {
     fprintf(stderr,YELLOW "findTRIBoneWithName is deprecated \n" NORMAL );

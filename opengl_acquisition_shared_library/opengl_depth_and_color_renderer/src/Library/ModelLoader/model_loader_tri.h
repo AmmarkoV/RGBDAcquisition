@@ -99,6 +99,25 @@ struct TRI_Bones
 };
 
 
+/**
+* @brief While the regular TRI_Bones structure is nice, useful and economic when processing bones in CPU
+*        when we want to send a TRI Model to get rendered using a GPGPU shader we need to pack bones per vertex
+*        so that the stream of data will fit the GPU architecture
+* @ingroup TRI
+*/
+struct TRI_BonesPackagedPerVertex
+{
+  unsigned int numberOfBones;
+  unsigned int numberOfBonesPerVertex;
+  //----------------------------------
+  unsigned int * boneIndexes;  unsigned int sizeOfBoneIndexes;
+  float * boneWeightValues;    unsigned int sizeOfBoneWeightValues;
+  float * boneTransforms;      unsigned int sizeOfBoneTransforms;
+};
+
+
+
+
 
 /**
 * @brief The header and initial file block of the TRI format , magic for the files is TRI3D
@@ -405,6 +424,16 @@ int tri_makeAllBoneNamesLowerCase(struct TRI_Model * triModel);
 * @retval 0=Bone Does not exist , 1=Bone found
 */
 int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * prefix);
+
+/**
+* @brief Package bones on struct TRI_BonesPackagedPerVertex so the skeleton can get rendered using a GPGPU shader
+* @ingroup TRI
+* @param  output TRI_BonesPackagedPerVertex container that contains allocated data, please remember to free when no longer needed
+* @param  input TRI model
+* @bug    Please note that the boneDataPerVertex->boneTransforms matrices use non-OpenGL major format and need to be transposed but this should also be done in the shader
+* @retval 0=Failure, 1=Success
+*/
+int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model);
 
 
 /**

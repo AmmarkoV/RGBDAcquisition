@@ -72,7 +72,13 @@ pushBonesToBufferData(
        GLuint vBoneTransform = glGetUniformLocation(programID, "vBoneTransform");                        checkOpenGLError(__FILE__, __LINE__);
        if ( (GL_INVALID_OPERATION != vBoneTransform) && (vBoneTransform!=-1) )
         {
-         glUniformMatrix4fv(vBoneTransform, shaderData->numberOfBones,GL_TRUE/*We NEED Transpose since our matrices are not OGL major*/,  shaderData->boneTransforms);
+         glUniformMatrix4fv(
+                             vBoneTransform,
+                             shaderData->numberOfBones,
+                             GL_TRUE, //We NEED Transpose since our matrices are not in an OGL major format
+                             shaderData->boneTransforms
+                           );
+         checkOpenGLError(__FILE__, __LINE__);
         }
        }
     }
