@@ -2284,7 +2284,7 @@ int main(int argc,const char **argv)
       if (randomize)
         {
             randomizeHead(&mc);
-            usleep(100000);
+            usleep(100);
         }
 
 
@@ -2437,7 +2437,7 @@ int main(int argc,const char **argv)
      tri_deallocModelInternals(&eyeModel);
      tri_deallocModelInternals(&hairModel);
      tri_deallocModelInternals(&eyebrowsModel);
-     usleep(1);
+     //usleep(1);
 
      if  (rgb!=0)
      {
