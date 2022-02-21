@@ -799,8 +799,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        create4x4FIdentityMatrixDirect(m);
      }
 
-
-     // STANDARD CPU WAY TO DO THIS..
+     //CPU bone transformations..!
      for (unsigned int boneWeightID=0; boneWeightID<triModelIn->bones[boneID].info->boneWeightsNumber; boneWeightID++)
      {
        //V is the vertice we will be working in this loop
@@ -882,6 +881,7 @@ int doModelTransform(
    {
      float * joint4x4Transform = &joint4x4Data[boneID*16];
 
+     autodetectAlteredMatrices = 0; // This should always be 0
      if (autodetectAlteredMatrices)
      {
        if (!is4x4FIdentityMatrix(joint4x4Transform))  { triModelIn->bones[boneID].info->altered=1; } else

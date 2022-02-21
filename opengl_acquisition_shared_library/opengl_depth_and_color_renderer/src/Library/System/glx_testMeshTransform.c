@@ -872,10 +872,8 @@ void processGPUTRI(struct GPUTriModel * gputri)
          //W is the weight that we have for the specific bone
          float boneWeightValue = model->bones[boneID].weightValue[boneWeightID];
 
-
          //Ok we now our target vertexID and the boneID and the boneWeightValue
          //We will try to fill in the specified index per vertex shader data with our new infos!
-
          for (int vertexBoneSpot=0; vertexBoneSpot<gputri->shader.numberOfBonesPerVertex; vertexBoneSpot++)
          {
            if (gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] == 0.0)
@@ -883,6 +881,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
              //Great! we found a clean spot to put our data..!
              gputri->shader.boneIndexes     [vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneID;
              gputri->shader.boneWeightValues[vertexID*gputri->shader.numberOfBonesPerVertex+vertexBoneSpot] = boneWeightValue;
+             break; // Break if we found a clean spot..
            } //If no clean spot found data gets ignored!
          }
         }

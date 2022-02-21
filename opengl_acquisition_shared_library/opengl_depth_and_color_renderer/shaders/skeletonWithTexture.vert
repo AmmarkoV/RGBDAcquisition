@@ -28,7 +28,7 @@ void main()
     vec4 skinnedVertex  = vBoneTransform[vBoneIndexIDs[0]] * (vBoneWeightValues[0] * vec4(vPosition,1.0));
          skinnedVertex += vBoneTransform[vBoneIndexIDs[1]] * (vBoneWeightValues[1] * vec4(vPosition,1.0));
          skinnedVertex += vBoneTransform[vBoneIndexIDs[2]] * (vBoneWeightValues[2] * vec4(vPosition,1.0));    
-         skinnedVertex = normalize(skinnedVertex); 
+         skinnedVertex  = normalize(skinnedVertex); 
 
     //https://ogldev.org/www/tutorial38/tutorial38.html
     //Todo: also transform  normal (which is not currently used)
