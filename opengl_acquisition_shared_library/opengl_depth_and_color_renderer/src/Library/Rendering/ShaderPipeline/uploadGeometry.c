@@ -106,7 +106,9 @@ pushBonesToBufferData(
 
 
     //if  (shaderData->timestamp < shaderData->lastTimestampBaseModification)
+    if (generateNewArrayBuffer)
     {
+      fprintf(stderr,"PushBones(triangle count %u,Number Of Bones %u,Bones Index Size %u)\n",shaderData->triangleCount,shaderData->numberOfBones,shaderData->sizeOfBoneIndexes);
       shaderData->lastTimestampBaseModification = shaderData->timestamp + 1;
       //Create buffer holder data..
       GLsizei    stride = 0;

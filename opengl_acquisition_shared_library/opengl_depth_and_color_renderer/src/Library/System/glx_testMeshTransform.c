@@ -77,7 +77,6 @@ char renderEyes = 1;
 char renderEyeHair = 1;
 char renderHair = 0;
 
-int skinnedRendering=1;
 int performBoneTransformsInCPU = 0; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
@@ -846,7 +845,7 @@ void processGPUTRI(struct GPUTriModel * gputri)
        packed.boneWeightValues =  gputri->shader.boneWeightValues;
        packed.boneTransforms   =  gputri->shader.boneTransforms;
 
-       if ( tri_packageBoneDataPerVertex(&packed,model) ) //<- this call repacks bones per vertex and is pretty heavy..
+       if ( tri_packageBoneDataPerVertex(&packed,model,gputri->shader.initialized) ) //<- this call repacks bones per vertex and is pretty heavy..
        {
         gputri->shader.numberOfBones          = packed.numberOfBones;
         gputri->shader.numberOfBonesPerVertex = packed.numberOfBonesPerVertex;
@@ -1794,6 +1793,8 @@ int main(int argc,const char **argv)
   GLuint FramebufferName=0;
   GLuint renderedTexture=0;
   GLuint renderedDepth=0;
+
+  int skinnedRendering=(performBoneTransformsInCPU==0); //<--auto set
 
   if (!initializeOGLRenderer(&programID,&programFrameBufferID,&FramebufferName,&renderedTexture,&renderedDepth,skinnedRendering,WIDTH,HEIGHT))
   {

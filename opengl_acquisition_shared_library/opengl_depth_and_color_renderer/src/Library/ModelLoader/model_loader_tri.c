@@ -950,11 +950,14 @@ int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * pr
 }
 
 
-int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model)
+int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model,int onlyGatherBoneTransforms)
 {
  boneDataPerVertex->numberOfBones          = model->header.numberOfBones;
- boneDataPerVertex->numberOfBonesPerVertex = 4;
+ boneDataPerVertex->numberOfBonesPerVertex = 4; //Maximum 4 bones per vertex, if you change this to 3 i.e. dont forget to change the shader!
 
+
+ if (!onlyGatherBoneTransforms)
+ {
   //Special gathering per vertex of all the bone stuff
   //===================================================================================================================================
   if (boneDataPerVertex->boneIndexes!=0)
@@ -1011,19 +1014,9 @@ int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPer
        }
       }
 
-      //Check data for corruption..
-      /*
-      for (int v=0; v<gputri->model->header.numberOfVertices; v++)
-      {
-          int bones = (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=0) +
-                      (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=1) +
-                      (boneDataPerVertex->boneWeightValues[v*boneDataPerVertex->numberOfBonesPerVertex+0]!=2) ;
-          //fprintf(stderr,"Vertex %u => %u bones ",v,bones);
-          if (bones==0)
-          {
-           fprintf(stderr,RED "No bones for Vertex %u" NORMAL,v);
-          }
-      }*/
+ }
+
+
 
 
       //Special gathering of all the 4x4 matrixes

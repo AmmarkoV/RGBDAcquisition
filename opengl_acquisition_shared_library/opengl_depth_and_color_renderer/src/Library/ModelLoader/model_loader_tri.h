@@ -433,8 +433,7 @@ int tri_removePrefixFromAllBoneNames(struct TRI_Model * triModel,const char * pr
 * @bug    Please note that the boneDataPerVertex->boneTransforms matrices use non-OpenGL major format and need to be transposed but this should also be done in the shader
 * @retval 0=Failure, 1=Success
 */
-int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model);
-
+int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPerVertex,struct TRI_Model * model,int onlyGatherBoneTransforms);
 
 /**
 * @brief  Deprecated call, use tri_findBone instead..
