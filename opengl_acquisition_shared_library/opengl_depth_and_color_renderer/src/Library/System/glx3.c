@@ -84,6 +84,35 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
     return 0;
 }
 
+
+
+
+static void run_getenv (const char * name)
+{
+    char * value = getenv (name);
+    if (! value) {
+        printf ("'%s' is not set.\n", name);
+    }
+    else {
+        printf ("%s = %s\n", name, value);
+    }
+}
+
+
+int disableVSync() //This needs to be done before initialization of GLX3 stuff..
+{
+   //NVIDIA VSYNC ENVIRONMENT FLAG
+   run_getenv("__GL_SYNC_TO_VBLANK");
+   setenv ("__GL_SYNC_TO_VBLANK", "0", 0);
+   run_getenv("__GL_SYNC_TO_VBLANK");
+
+   //INTEL VSYNC ENVIRONMENT FLAG
+   run_getenv("vblank_mode");
+   setenv ("vblank_mode", "0", 0);
+   run_getenv("vblank_mode");
+}
+
+
 int start_glx3_stuffWindowed(int WIDTH,int HEIGHT,int argc,const char **argv)
 {
   fprintf(stderr,"start_glx3_stuffWindowed\n");

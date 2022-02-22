@@ -123,6 +123,8 @@ void copy3x3FMatrixTo4x4F(float * out,float * in)
   }
 }
 
+
+
 void copy4x4FMatrix(float * out,float * in)
 {
   if ((out!=0) && (in!=0))
@@ -136,6 +138,13 @@ void copy4x4FMatrix(float * out,float * in)
     out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
    #endif // OPTIMIZED
   }
+}
+
+
+void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,float * in)
+{
+  if (out!=0)
+    { copy4x4FMatrix(out->m,in); }
 }
 
 void copy4x4DMatrix(double * out,double * in)

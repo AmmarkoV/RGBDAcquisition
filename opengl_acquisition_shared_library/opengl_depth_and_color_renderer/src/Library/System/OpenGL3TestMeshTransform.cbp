@@ -29,9 +29,12 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-march=corei7" />
 			<Add option="-Wall" />
 			<Add option="-Wunused-function" />
 			<Add option="-Wunused-variable" />
+			<Add option="-DINTEL_OPTIMIZATIONS" />
+			<Add option="-DUSE_INTEL" />
 			<Add option="-DUSE_GLEW" />
 		</Compiler>
 		<Linker>

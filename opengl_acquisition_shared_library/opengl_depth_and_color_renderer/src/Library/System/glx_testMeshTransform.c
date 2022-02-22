@@ -77,6 +77,7 @@ char renderEyes = 1;
 char renderEyeHair = 1;
 char renderHair = 0;
 
+char VSYNC = 0;
 int performBoneTransformsInCPU = 0; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
@@ -1043,7 +1044,7 @@ int doDrawing(
         ++framesRendered;
       //---------------------------------------------------------------
 
-      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
+      if (renderForever) { usleep(1); } // Cap framerate if looping here...
 	} // Check if the ESC key was pressed or the window was closed
     while(renderForever);
 
@@ -1244,7 +1245,7 @@ int doSkeletonDraw(
         ++framesRendered;
       //---------------------------------------------------------------
 
-      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
+      if (renderForever) { usleep(1); } // Cap framerate if looping here...
 	} // Check if the ESC key was pressed or the window was closed
     while(renderForever);
 
@@ -1417,7 +1418,7 @@ int doBVHDraw(
         ++framesRendered;
       //---------------------------------------------------------------
 
-      if (renderForever) { usleep(1000); } // Cap framerate if looping here...
+      if (renderForever) { usleep(1); } // Cap framerate if looping here...
 	} // Check if the ESC key was pressed or the window was closed
     while(renderForever);
 
@@ -1744,11 +1745,15 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
 
 
 
-
-
-
 int main(int argc,const char **argv)
 {
+  //Disable VSYNC
+  if (VSYNC==0)
+  {
+   disableVSync();
+  }
+
+
   unsigned int WIDTH =(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
   unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
 
@@ -1782,6 +1787,8 @@ int main(int argc,const char **argv)
   fprintf(stderr,"Attempting to setup a %ux%u glx3 context\n",WIDTH,HEIGHT);
   start_glx3_stuff(WIDTH,HEIGHT,visibleWindow,argc,argv);
 
+  //If you dont want VSYNC run with
+  //vblank_mode=0 __GL_SYNC_TO_VBLANK=0 ./gl3MeshTransform
   if (glewInit() != GLEW_OK)
    {
 		fprintf(stderr, "Failed to initialize GLEW\n");
@@ -1839,6 +1846,7 @@ int main(int argc,const char **argv)
 
    int randomize=0;
 
+   int limit = 0;
    /*
    //DAE output Set human pose to somewhere visible..
    //-------------------------------------------------------------------
@@ -1866,6 +1874,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--limit")==0)
+                    {
+                      limit=atoi(argv[i+1]);
+                    } else
            if (strcmp(argv[i],"--axis")==0)
                     {
                       axisRendering=1;
@@ -2287,7 +2299,7 @@ int main(int argc,const char **argv)
       if (randomize)
         {
             randomizeHead(&mc);
-            usleep(100);
+            usleep(10);
         }
 
 
@@ -2440,7 +2452,7 @@ int main(int argc,const char **argv)
      tri_deallocModelInternals(&eyeModel);
      tri_deallocModelInternals(&hairModel);
      tri_deallocModelInternals(&eyebrowsModel);
-     //usleep(1);
+     usleep(1);
 
      if  (rgb!=0)
      {
@@ -2472,7 +2484,18 @@ int main(int argc,const char **argv)
            }
      }
 
-    }
+     if ( (limit>0) && (fID>=limit) )
+     {
+         fprintf(stderr,"Limit hit so stopping outer dataset loop\n");
+         break;
+     }
+    } // For ever BVH frame loop
+
+     if (limit>0)
+     {
+         fprintf(stderr,"Limit hit so stopping outer dataset loop\n");
+         break;
+     }
 
       if (maxFrames>1)
         { fprintf(stderr,CYAN "\n\nLooping Dataset\n\n" NORMAL); }

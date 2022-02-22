@@ -6,6 +6,7 @@
 #ifndef GLX3_H_INCLUDED
 #define GLX3_H_INCLUDED
 
+int disableVSync();
 
 /**
 * @brief create a glx window that can serve OpenGL draw requests

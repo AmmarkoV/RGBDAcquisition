@@ -112,6 +112,9 @@ void copy4x4DMatrix(double * out,double * in);
 
 void copy3x3FMatrixTo4x4F(float * out,float * in);
 
+
+void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,float * in);
+
 /**
 * @brief Copy a 4x4 Matrix of floats to another
 * @ingroup AmMatrix
