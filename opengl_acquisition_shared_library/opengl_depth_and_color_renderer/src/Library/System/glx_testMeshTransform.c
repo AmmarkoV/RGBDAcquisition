@@ -2274,6 +2274,9 @@ int main(int argc,const char **argv)
    alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder",1);
    //exit(0);
 
+   //We need to free this after application is done..
+   unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
+
    if (maxFrames==0)
    {
        maxFrames = mc.numberOfFrames;
@@ -2312,11 +2315,11 @@ int main(int argc,const char **argv)
      {
        //We animate the model in CPU instead of the shader!
        //And just give the final calculated vertices for rendering
-       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,humanMap,fID,performBoneTransformsInCPU,0);
 
        if (performBoneTransformsInCPU)
        {
@@ -2478,6 +2481,7 @@ int main(int argc,const char **argv)
 
 
 
+
    if(dumpSnapshot)
    {
            saveRawImageToFileOGLR(
@@ -2490,6 +2494,9 @@ int main(int argc,const char **argv)
                                  );
 
    }
+
+   //We free our TRI to BVH Map
+   free(humanMap);
 
    deallocateGpuTRI(&gpuEyelashes);
    deallocateGpuTRI(&gpuEyebrows);

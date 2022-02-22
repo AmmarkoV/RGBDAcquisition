@@ -272,75 +272,26 @@ def getHeadTailDir(pb):
     tail = head + pb.bone.length * vec
     return head, tail, vec
 */
-
-const static int animateTRIModelUsingBVHArmatureOld(
-                                                    struct TRI_Model * modelOutput,
-                                                    struct TRI_Model * modelOriginal,
-                                                    struct BVH_MotionCapture * bvh,
-                                                    unsigned int frameID,
-                                                    int printDebugMessages
-                                                   )
+const static unsigned int * createLookupTableFromTRItoBVH(
+                                                          struct TRI_Model * modelOriginal,
+                                                          struct BVH_MotionCapture * bvh,
+                                                          int printDebugMessages
+                                                         )
 {
-    if (modelOriginal==0)  { return 0; }
-    if (modelOutput==0)    { return 0; }
-    if (bvh==0)            { return 0; }
-    //----------------------------------
-    tri_copyModel(modelOutput, modelOriginal, 1 /*We also want bone data*/,0);
+ if (bvh==0)           { fprintf(stderr,"createLookupTableFromTRItoBVH cannot work without a BVH Model\n"); return 0; }
+ if (modelOriginal==0) { fprintf(stderr,"createLookupTableFromTRItoBVH cannot work without a TRI Model\n"); return 0; }
+ //--------------------------------------------------------------------------------------------------------------------
+ unsigned int resolvedJoints=0;
+ unsigned int numberOfBones = modelOriginal->header.numberOfBones;
+ //--------------------------------------------------------------------------------------------------------------------
+ unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
+ //--------------------------------------------------------------------------------------------------------------------
 
-    unsigned int numberOfBones = modelOriginal->header.numberOfBones;
+ if (lookupTableFromTRIToBVH!=0)
+ {
+  memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
 
-    //printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-    //bvh_printBVH(bvh);
-
-    //bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    //bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    //bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    //bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-
-
-
-
-    //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZXY,BVH_ROTATION_ORDER_ZYX);
-    //TODO: Add a flag here to flip rotation axis..!
-    struct BVH_Transform bvhTransform = {0};
-    bvhTransform.useOptimizations=0;
-    if (
-        bvh_loadTransformForFrame(
-                                  bvh,
-                                  frameID,
-                                  &bvhTransform,
-                                  0
-                                 )
-       )
-    {
-        //bvh_swapJointNameRotationAxis(bvh,"lshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        //bvh_swapJointNameRotationAxis(bvh,"rshoulder",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        //bvh_swapJointNameRotationAxis(bvh,"lelbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        //bvh_swapJointNameRotationAxis(bvh,"relbow",BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-        //bvh_swapJointRotationAxis(bvh,BVH_ROTATION_ORDER_ZYX,BVH_ROTATION_ORDER_ZXY);
-
-        unsigned int transformations4x4Size = numberOfBones * 16;
-        float * transformations4x4 = (float *) malloc(sizeof(float) * transformations4x4Size);
-        if (transformations4x4==0)
-        {
-            fprintf(stderr,"Failed to allocate enough memory for bones.. \n");
-            return 0;
-        }
-
-        //Cleanup 4x4 matrix transformation..
-        for (unsigned int mID=0; mID<numberOfBones; mID++)
-        {
-            create4x4FIdentityMatrixDirect(&transformations4x4[mID*16]);
-        }
-
-        unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
-
-        if (lookupTableFromTRIToBVH!=0)
-        {
-            unsigned int resolvedJoints=0;
-            memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
-
-            for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
+  for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
             {
                 TRIBoneID boneID=0;
                 if ( tri_findBone(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
@@ -363,173 +314,25 @@ const static int animateTRIModelUsingBVHArmatureOld(
                 }
             }
 
-            if (resolvedJoints==0)
+  if (resolvedJoints==0)
             {
                 if (printDebugMessages)
                 {
                     printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
                     bvh_printBVH(bvh);
                 }
-                fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
-            }
-            else
+                fprintf(stderr,RED "Could not resolve any joints, freeing empty map..!\n" NORMAL);
+                free(lookupTableFromTRIToBVH);
+                lookupTableFromTRIToBVH = 0;
+            } else
             {
-                struct Matrix4x4OfFloats boneRollCorrection;
-                create4x4FIdentityMatrix(&boneRollCorrection);
+                fprintf(stderr,CYAN "Resolved %u joints..!\n" NORMAL,resolvedJoints);
+            }
+ }
 
-                for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
-                {
-                    if (lookupTableFromTRIToBVH[boneID]!=0)
-                    {
-                        BVHJointID jID = lookupTableFromTRIToBVH[boneID];
-                        //-----------------------------------------------
-                        //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
-                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L1395
-                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/core/transformations.py#L317
-                        //svn.blender.org/svnroot/bf-blender/branches/blender-2.47/source/blender/blenkernel/intern/armature.c
-                        //https://developer.blender.org/T39470
-                        //https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/skeleton.py#L959
-
-                        //struct Matrix4x4OfFloats localBone;
-                        //copy4x4FMatrix(localBone.m,modelOriginal->bones[boneID].info->localTransformation);
-                        //struct Matrix4x4OfFloats localBoneInverted;
-                        //invert4x4FMatrix(&localBoneInverted,&localBone);
-
-                        /*
-                           _Identity = np.identity(4, float)
-                           _RotX = tm.rotation_matrix(math.pi/2, (1,0,0))
-                           _RotY = tm.rotation_matrix(math.pi/2, (0,1,0))
-                           _RotNegX = tm.rotation_matrix(-math.pi/2, (1,0,0))
-                           _RotZ = tm.rotation_matrix(math.pi/2, (0,0,1))
-                           _RotZUpFaceX = np.dot(_RotZ, _RotX)
-                           _RotXY = np.dot(_RotNegX, _RotY)*/
-
-                        #define M_PI 3.14159265358979323846
-
-                        /*
-                        if (
-                             (strcmp("relbow",modelOriginal->bones[boneID].boneName)==0) ||
-                             (strcmp("lelbow",modelOriginal->bones[boneID].boneName)==0)
-                           )
-                        {
-                           fprintf(stderr,"Special Bone %s \n",modelOriginal->bones[boneID].boneName);
-                           //https://math.stackexchange.com/questions/363652/understanding-rotation-matrices
-                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 1.0, 0.0, 0.0); //ROT X
-                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 1.0, 0.0); //ROT Y
-                          //create4x4FRotationMatrix(&boneRollCorrection, (float) M_PI/2, 0.0, 0.0, 1.0); //ROT Z
-                          //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 1.0, 0.0, 0.0); //ROT NEG X
-                          create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 1.0, 0.0); //ROT NEG Y
-
-                          create4x4FIdentityMatrix(&boneRollCorrection);
-                          //create4x4FRotationMatrix(&boneRollCorrection, (float) -M_PI/2, 0.0, 0.0, 1.0); //ROT NEG Z
-                        } else
-                        {
-                          create4x4FIdentityMatrix(&boneRollCorrection);
-                        } */
-
-
-
-
-                        //invert4x4FMatrix(&transformations4x4[boneID*16],bvhTransform.joint[jID].dynamicRotation.m);
-/*
-
-                        memcpy(
-                                &transformations4x4[boneID*16], //model.bones[boneID].info->localTransformation,  //localTransformation, //finalVertexTransformation,
-                                bvhTransform.joint[jID].dynamicRotation.m, //localToWorldTransformation chainTransformation dynamicRotation dynamicTranslation
-                                sizeof(float) * 16
-                              );
-
-                        float YZRotation[]={1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,0,0,1};
-                        float ZYRotation[]={1,0,0,0, 0,0,-1,0, 0,1,0,0, 0,0,0,1};
-                        multiplyTwo4x4FMatrices_Naive(
-                                &transformations4x4[boneID*16],
-                                YZRotation,
-                                bvhTransform.joint[jID].dynamicRotation.m
-                            );
-                        transpose4x4FMatrix(&transformations4x4[boneID*16]);*/
-
-
-                        if (bvh->jointHierarchy[jID].hasPositionalChannels)
-                        {
-                         //This is one of the new joints with positional channels..
-                         //float * m = &transformations4x4[boneID*16];
-                         //m[3]  += ( bvh->jointHierarchy[jID].staticTransformation.m[3] - bvhTransform.joint[jID].dynamicTranslation.m[3]  ) / 10;
-                         //m[7]  += ( bvh->jointHierarchy[jID].staticTransformation.m[7] - bvhTransform.joint[jID].dynamicTranslation.m[7]  ) / 10;
-                         //m[11] += ( bvh->jointHierarchy[jID].staticTransformation.m[11]- bvhTransform.joint[jID].dynamicTranslation.m[11] ) / 10;
-
-                         struct Matrix4x4OfFloats mergedTranslation;
-                         create4x4FTranslationMatrix(
-                                                     &mergedTranslation,
-                                                     (bvhTransform.joint[jID].dynamicTranslation.m[3] - bvh->jointHierarchy[jID].staticTransformation.m[3]  ) / 1,
-                                                     (bvhTransform.joint[jID].dynamicTranslation.m[7] - bvh->jointHierarchy[jID].staticTransformation.m[7]  ) / 1,
-                                                     (bvhTransform.joint[jID].dynamicTranslation.m[11]- bvh->jointHierarchy[jID].staticTransformation.m[11] ) / 1
-                                                    );
-
-                         multiplyTwo4x4FMatrices_Naive(
-                                                       &transformations4x4[boneID*16],
-                                                       bvhTransform.joint[jID].dynamicRotation.m,
-                                                       mergedTranslation.m
-                                                      );
-                        } else
-                        {
-                         //transpose4x4FMatrix(&bvhTransform.joint[jID].dynamicRotation.m);
-
-                         multiplyTwo4x4FMatrices_Naive(
-                                                         &transformations4x4[boneID*16],
-                                                         bvhTransform.joint[jID].dynamicRotation.m,
-                                                         boneRollCorrection.m
-                                                      );
-
-                            /*
-                         multiplyThree4x4FMatrices_Naive(
-                                                         &transformations4x4[boneID*16],
-                                                         bvhTransform.joint[jID].dynamicRotation.m,
-                                                         boneRollCorrection.m,
-                                                         bvhTransform.joint[jID].dynamicTranslation.m
-                                                         //localBone.m
-                                                        );*/
-
-                        }
-                    }
-                }
-            } //have resolved joints
-
-            //fprintf(stderr,CYAN "resolvedJoints = %u "NORMAL,resolvedJoints);
-            free(lookupTableFromTRIToBVH);
-        }
-        else
-        {
-            fprintf(stderr,RED "Error: Could not allocate a lookup table from TRI To BVH\n" NORMAL);
-        }
-
-
-        struct TRI_Model modelTemporary = {0};
-        //---------------------------------------------------------------
-        doModelTransform(
-                         &modelTemporary,
-                         modelOriginal,
-                         transformations4x4,
-                         numberOfBones * 16 * sizeof(float), //Each transform has a 4x4 matrix of floats..!
-                         1,//Autodetect default matrices for speedup
-                         1,//Direct setting of matrices
-                         1,//Do Transforms, don't just calculate the matrices
-                         0 //Default joint convention
-                        );
-        //---------------------------------------------------------------
-        tri_flattenIndexedModel(modelOutput,&modelTemporary);
-        tri_deallocModelInternals(&modelTemporary);
-        //---------------------------------------------------------------
-        free(transformations4x4);
-
-        return 1;
-    }
-    else
-    {
-        fprintf(stderr,RED "Error: Failed executing bvh transform\n" NORMAL);
-    }
-
-    return 0;
+  return lookupTableFromTRIToBVH;
 }
+
 
 
 struct testResult
@@ -992,6 +795,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOutput,
                                                  struct TRI_Model * modelOriginal,
                                                  struct BVH_MotionCapture * bvh,
+                                                 unsigned int * lookupTableFromTRIToBVH,
                                                  unsigned int frameID,
                                                  int performTransformsInCPU,
                                                  int printDebugMessages
@@ -1039,46 +843,9 @@ const static int animateTRIModelUsingBVHArmature(
             create4x4FIdentityMatrixDirect(&transformations4x4[mID*16]);
         }
 
-        unsigned int * lookupTableFromTRIToBVH = (unsigned int*) malloc(sizeof(unsigned int) * numberOfBones);
 
         if (lookupTableFromTRIToBVH!=0)
         {
-            unsigned int resolvedJoints=0;
-            memset(lookupTableFromTRIToBVH,0,sizeof(unsigned int) * numberOfBones);
-
-            for (BVHJointID jID=0; jID<bvh->jointHierarchySize; jID++)
-            {
-                TRIBoneID boneID=0;
-                if ( tri_findBone(modelOriginal,bvh->jointHierarchy[jID].jointName,&boneID) )
-                {
-                    struct TRI_Bones * bone = &modelOriginal->bones[boneID];
-                    if (printDebugMessages)
-                    {
-                        fprintf(stderr,GREEN "Resolved BVH Joint %u/%u = `%s`  => ",jID,bvh->jointHierarchySize,bvh->jointHierarchy[jID].jointName);
-                        fprintf(stderr,"TRI Bone %u/%u = `%s` \n" NORMAL,boneID,numberOfBones,bone->boneName);
-                    }
-                    lookupTableFromTRIToBVH[boneID]=jID;
-                    ++resolvedJoints;
-                }
-                else
-                {
-                    if (printDebugMessages)
-                    {
-                        fprintf(stderr,RED "Could not resolve `%s`\n"NORMAL,bvh->jointHierarchy[jID].jointName);
-                    }
-                }
-            }
-
-            if (resolvedJoints==0)
-            {
-                if (printDebugMessages)
-                {
-                    printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
-                    bvh_printBVH(bvh);
-                }
-                fprintf(stderr,RED "Could not resolve any joints..!\n" NORMAL);
-            }
-            else
             {
                 float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
                 for (unsigned int boneID=0; boneID<numberOfBones; boneID++)
@@ -1198,11 +965,11 @@ const static int animateTRIModelUsingBVHArmature(
                 }
             } //have resolved joints
 
-            free(lookupTableFromTRIToBVH);
+           // free(lookupTableFromTRIToBVH);
         }
         else
         {
-            fprintf(stderr,RED "Error: Could not allocate a lookup table from TRI To BVH\n" NORMAL);
+            fprintf(stderr,RED "Error: Please call createLookupTableFromTRItoBVH to allocate a lookup table from TRI To BVH\n" NORMAL);
         }
 
 
