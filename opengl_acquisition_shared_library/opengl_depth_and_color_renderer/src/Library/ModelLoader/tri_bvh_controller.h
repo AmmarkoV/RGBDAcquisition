@@ -805,7 +805,12 @@ const static int animateTRIModelUsingBVHArmature(
     if (modelOutput==0)    { return 0; }
     if (bvh==0)            { return 0; }
     //----------------------------------
-    tri_copyModel(modelOutput, modelOriginal, 1 /*We also want bone data*/,0);
+   if (performTransformsInCPU)
+     {
+        //If we are doing CPU bone transforms we have to copy our input to our output
+        //so that we keep our original model intact
+        tri_copyModel(modelOutput, modelOriginal, 1 /*We also want bone data*/,0);
+     }
 
     unsigned int numberOfBones = modelOriginal->header.numberOfBones;
 
