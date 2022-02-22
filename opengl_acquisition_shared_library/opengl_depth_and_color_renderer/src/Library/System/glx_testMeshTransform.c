@@ -1035,10 +1035,10 @@ int doDrawing(
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
       //---------------------------------------------------------------
-       unsigned long now=GetTickCountMilliseconds();
+       unsigned long now=GetTickCountMicrosecondsIK();//GetTickCountMilliseconds();
        unsigned long elapsedTime=now-lastRenderingTime;
        if (elapsedTime==0) { elapsedTime=1; }
-       lastFramerate = (float) 1000/(elapsedTime);
+       lastFramerate = (float) 1000000/(elapsedTime);
        lastRenderingTime = now;
       //---------------------------------------------------------------
         ++framesRendered;
@@ -1236,10 +1236,10 @@ int doSkeletonDraw(
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
       //---------------------------------------------------------------
-       unsigned long now=GetTickCountMilliseconds();
+       unsigned long now=GetTickCountMicrosecondsIK();//GetTickCountMilliseconds();
        unsigned long elapsedTime=now-lastRenderingTime;
        if (elapsedTime==0) { elapsedTime=1; }
-       lastFramerate = (float) 1000/(elapsedTime);
+       lastFramerate = (float) 1000000/(elapsedTime);
        lastRenderingTime = now;
       //---------------------------------------------------------------
         ++framesRendered;
@@ -1409,10 +1409,10 @@ int doBVHDraw(
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
       //---------------------------------------------------------------
-       unsigned long now=GetTickCountMilliseconds();
+       unsigned long now=GetTickCountMicrosecondsIK();//GetTickCountMilliseconds();
        unsigned long elapsedTime=now-lastRenderingTime;
        if (elapsedTime==0) { elapsedTime=1; }
-       lastFramerate = (float) 1000/(elapsedTime);
+       lastFramerate = (float) 1000000/(elapsedTime);
        lastRenderingTime = now;
       //---------------------------------------------------------------
         ++framesRendered;
