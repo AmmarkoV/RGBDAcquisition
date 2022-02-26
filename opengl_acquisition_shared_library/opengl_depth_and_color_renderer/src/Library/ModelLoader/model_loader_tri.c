@@ -998,7 +998,7 @@ int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPer
          //Ok we now our target vertexID and the boneID and the boneWeightValue
          //We will try to fill in the specified index per vertex shader data with our new infos!
          char foundASpotToPutThisBoneData = 0;
-         for (int vertexBoneSpot=0; vertexBoneSpot<boneDataPerVertex->numberOfBonesPerVertex; vertexBoneSpot++)
+         for (unsigned int vertexBoneSpot=0; vertexBoneSpot<boneDataPerVertex->numberOfBonesPerVertex; vertexBoneSpot++)
          {
            unsigned int bonePerVertexAddress = (vertexID*boneDataPerVertex->numberOfBonesPerVertex)+vertexBoneSpot;
            if ( (!foundASpotToPutThisBoneData) && (boneDataPerVertex->boneWeightValues[bonePerVertexAddress] == 0.0) )
@@ -1008,6 +1008,9 @@ int tri_packageBoneDataPerVertex(struct TRI_BonesPackagedPerVertex * boneDataPer
              boneDataPerVertex->boneWeightValues[bonePerVertexAddress] = boneWeightValue;
              foundASpotToPutThisBoneData=1;
              break; // Break since we just found a clean spot..
+             //BUG: There is a problem here, I am not sure if it is a logic error or GCC optimization
+             //when the break is called this loop should stop executing however I needed to add the foundASpotToPutThisBoneData
+             //in order to keep this from triggering multiple times..
            } //If no clean spot found data gets ignored!
          }
         }

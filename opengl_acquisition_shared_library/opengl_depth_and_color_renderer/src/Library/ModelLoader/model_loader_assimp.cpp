@@ -8,7 +8,7 @@
 #include <assimp/postprocess.h>
 
 
-#include "../../../../tools/Primitives/skeleton.h"
+//#include "../../../../tools/Primitives/skeleton.h"
 
 #define DO_TRANSFORM 1
 #define USE_NEW_TRANSFORM_MESH_CODE 1
@@ -373,7 +373,7 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
     }
 }
 
-
+/*
 void readNodeHierarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
 
@@ -420,13 +420,13 @@ void readNodeHierarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
                                                                       );
 
-/*
-               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
-                                                                      );
-*/
+
+//               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
+//                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
+//                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
+//                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
+//                                                                      );
+
                NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
               } else
               {
@@ -454,7 +454,7 @@ void readNodeHierarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
        }
     }
 }
-
+*/
 
 
 void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
@@ -473,7 +473,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
     //After we have it we can now use it to read the node heirarchy
     aiMatrix4x4 Identity;
     aiMakeIdentity(&Identity);
-    readNodeHierarchyOLD(mesh,scene->mRootNode,&modifiedSkeleton,sk,Identity,0);
+    //readNodeHierarchyOLD(mesh,scene->mRootNode,&modifiedSkeleton,sk,Identity,0);
 
     //We NEED to clear the vertices and normals since they are added uppon , not having
     //the next two lines results in really weird and undebuggable visual behaviour
@@ -600,14 +600,14 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
 
   struct TRI_Model temporaryIndexedDeformedModel={0};
   fprintf(stderr,"Copying to intermediate mesh\n");
-  copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
+  //copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
   fprintf(stderr,"Transforming intermediate mesh\n");
   transformMeshBasedOnSkeleton( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
   fprintf(stderr,"Flattening intermediate mesh\n");
   fillFlatModelTriFromIndexedModelTri(outFlatModel , &temporaryIndexedDeformedModel);
 
   fprintf(stderr,"Deallocating intermediate mesh\n");
-  deallocModelTri(&temporaryIndexedDeformedModel);
+  //deallocModelTri(&temporaryIndexedDeformedModel);
   fprintf(stderr,"Serving back flattened mesh\n");
 }
 
