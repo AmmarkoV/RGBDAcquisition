@@ -117,7 +117,7 @@ int testMultipleLoad(const char * filename)
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
- 
+
             unsigned int fileNumber=0;
             unsigned int done=0;
             while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
@@ -173,20 +173,20 @@ void printCallingParameters(int argc,const char **argv)
 
 
 
-int main(int argc,const char **argv)
+int bvhConverter(int argc,const char **argv)
 {
     srand(time(NULL)); // randomize seed
-    
-    
+
+
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
-    const char * fromBVHFile="Motions/example.bvh"; 
+    const char * fromBVHFile="Motions/example.bvh";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
-    unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1; 
+    unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
     unsigned int multiThreaded = 0;
@@ -264,10 +264,10 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--extractmotionrangeforlistoffiles")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
-          extractMinimaMaximaFromBVHList(argv[i+1]); 
+          extractMinimaMaximaFromBVHList(argv[i+1]);
 
           exit(0);
-        } else            
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testmultiple")==0)
         {
@@ -310,9 +310,9 @@ int main(int argc,const char **argv)
           // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
 
           if (i+7>=argc)  {
-                             fprintf(stderr,"--testIK requires 7 arguments, previousFrame sourceFrame targetFrame learningRate iterations epochs spring.."); 
-                             fprintf(stderr,"got %u ",argc-i); 
-                             incorrectArguments(); 
+                             fprintf(stderr,"--testIK requires 7 arguments, previousFrame sourceFrame targetFrame learningRate iterations epochs spring..");
+                             fprintf(stderr,"got %u ",argc-i);
+                             incorrectArguments();
                           }
 
           unsigned int previousFrame=atoi(argv[i+1]);
@@ -501,7 +501,7 @@ int main(int argc,const char **argv)
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--addpositionalchannels")==0)
-        { 
+        {
            // ./BVHTester --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
 
            bvh_mergeOffsetsInMotions(&bvhMotion);
@@ -589,22 +589,22 @@ int main(int argc,const char **argv)
           //./BVHTester --from dataset/lhand.qbvh --repeat 100 --set 3 0.5 --set 4 -0.5 --set 5 -0.5 --set 6 0.5 --bvh restR.bvh
 
           if (i+2>=argc)  { incorrectArguments(); }
-          
+
           int mID=atoi(argv[i+1]);
           float value=atof(argv[i+2]);
-          
+
           bvh_setMIDValue(
                           &bvhMotion,
                           mID,
-                          value 
+                          value
                          );
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--setPositionRotation")==0)
         {
           if (i+6>=argc)  { incorrectArguments(); }
-           
-          struct motionTransactionData  cameraPositionRotation={0};  
+
+          struct motionTransactionData  cameraPositionRotation={0};
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=-1*atof(argv[i+1])/10;
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=-1*atof(argv[i+2])/10;
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=-1*atof(argv[i+3])/10;
@@ -620,8 +620,8 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
         {
           if (i+6>=argc)  { incorrectArguments(); }
-          
-          struct motionTransactionData  cameraPositionRotation={0};  
+
+          struct motionTransactionData  cameraPositionRotation={0};
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=-1*atof(argv[i+1])/10;
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=-1*atof(argv[i+2])/10;
           cameraPositionRotation.data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=-1*atof(argv[i+3])/10;
@@ -704,13 +704,13 @@ int main(int argc,const char **argv)
           if (i+1>=argc)  { incorrectArguments(); }
           const char * nameOfIKProblem=argv[i+1];
           fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",nameOfIKProblem);
-          srand(time(NULL)); 
+          srand(time(NULL));
               if (
                    !bvh_RandomizeBasedOnIKProblem(
                                                    &bvhMotion,
                                                    nameOfIKProblem
                                                  )
-                 )  { haltOnError(immediatelyHaltOnError,"Error while randomizing joint angles based on IK problem"); } 
+                 )  { haltOnError(immediatelyHaltOnError,"Error while randomizing joint angles based on IK problem"); }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--selectJoints")==0)
@@ -729,7 +729,7 @@ int main(int argc,const char **argv)
                                      i+2
                                     )
                  ) { haltOnError(immediatelyHaltOnError,"Error while selecting Joints"); }
-            } 
+            }
         } else
         //-----------------------------------------------------
         //-----------------------------------------------------
@@ -788,7 +788,7 @@ int main(int argc,const char **argv)
           maximumRotation[1]=atof(argv[i+7]);
           maximumRotation[2]=atof(argv[i+8]);
           //----
-          
+
           if (bvhMotion.jointHierarchy[bvhMotion.rootJointID].hasQuaternionRotation)
           { //BVH Quaternion
               fprintf(stderr,"Quaternion rotations handled  in bvh_RandomizeRotationsOfFrameBasedOn3D using euler2Quaternions..!\n");
@@ -1005,14 +1005,14 @@ int main(int argc,const char **argv)
           convertToSVG=1;
         }
         //-----------------------------------------------------
-        /* else 
+        /* else
         //Check for incorrect input, this needs to become a smarter check
         {
              if ((i>0) && (argv[i][0]!="-"))
              {
               fprintf(stderr,RED "Unidentified argument %u = %s ..!" NORMAL,i,argv[i]);
               incorrectArguments();
-              printCallingParameters(argc,argv); 
+              printCallingParameters(argc,argv);
              }
         }*/
     }
@@ -1043,3 +1043,13 @@ int main(int argc,const char **argv)
 
     return 0;
 }
+
+
+#ifndef BVH_USE_AS_A_LIBRARY
+int main(int argc,const char **argv)
+{
+  fprintf(stderr,"BVH Loader code - v%s\n\n",BVH_LOADER_VERSION_STRING);
+  return bvhConverter(argc,argv);
+}
+#endif // BVH_USE_AS_A_LIBRARY
+
