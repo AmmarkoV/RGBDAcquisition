@@ -1,5 +1,6 @@
 import ctypes
 import os
+import sys
 from ctypes import *
 from os.path import exists
 
@@ -33,6 +34,15 @@ def bvhConvert(libBVH,arguments):
 libBVH = loadLibrary("./libBVHConverter.so")
 
 startingFlags=list()
+
+
+#Add any arguments given in the python script directly!
+if (len(sys.argv)>1):
+   print('Supplied argument List:', str(sys.argv))
+   for i in range(0, len(sys.argv)):
+     startingFlags.append(sys.argv[i])
+
+   
 startingFlags.append("--test")
 startingFlags.append("--test 123")
 startingFlags.append("--printparams")
