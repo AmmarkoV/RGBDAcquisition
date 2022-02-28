@@ -20,6 +20,4 @@ int bvhConverter(int argc,const char **argv);
 }
 #endif
 
-
-
 #endif // BVH_PROJECT_H_INCLUDED

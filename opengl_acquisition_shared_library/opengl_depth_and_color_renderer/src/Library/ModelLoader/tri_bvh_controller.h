@@ -12,6 +12,10 @@
 #include "../MotionCaptureLoader/calculate/bvh_transform.h"
 #include "../MotionCaptureLoader/edit/bvh_remapangles.h"
 
+#include <stdlib.h> //malloc etc
+#include <stdio.h>  //fprintf etc
+#include <string.h> //memset etc
+
 //For lowercase
 #include <ctype.h>
 

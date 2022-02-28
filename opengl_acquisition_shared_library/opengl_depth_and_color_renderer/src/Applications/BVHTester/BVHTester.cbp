@@ -201,6 +201,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.h" />
+		<Unit filename="bvhLibrary.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
