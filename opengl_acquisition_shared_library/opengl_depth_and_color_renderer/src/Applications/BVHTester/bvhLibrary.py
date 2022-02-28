@@ -20,21 +20,23 @@ def loadLibrary(filename):
 
  return libBVH
 
+def bvhConvert(libBVH,arguments):
+    argumentBytes = []
+    for i in range(len(arguments)):
+        argumentBytes.append(bytes(arguments[i], 'utf-8'))
+    argv = (ctypes.c_char_p * len(argumentBytes))()
+    argv[:] = argumentBytes 
+    argc=len(argumentBytes)
+    libBVH.bvhConverter(argc,argv)
 
 
 libBVH = loadLibrary("./libBVHConverter.so")
 
 startingFlags=list()
 startingFlags.append("--test")
-startingFlags.append("--test")
+startingFlags.append("--test 123")
 startingFlags.append("--printparams")
-
-argv=startingFlags
-argc=len(startingFlags)
-
-#>>> args = (c_char_p * 3)(b'abc',b'def',b'ghi')
-#>>> dll.main(len(args),args)
-
-
-libBVH.bvhConverter(ctypes.c_int(argc),ctypes.c_char_p(argv))
+ 
+bvhConvert(libBVH,startingFlags)
+ 
 

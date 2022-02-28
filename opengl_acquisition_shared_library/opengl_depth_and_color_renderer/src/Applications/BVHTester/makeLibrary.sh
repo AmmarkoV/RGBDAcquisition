@@ -97,12 +97,6 @@ main.c
 "
 
 
-#echo $SOURCE
-#exit 0
-
-
-
-
 gcc -shared -o libBVHConverter.so -fPIC -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
