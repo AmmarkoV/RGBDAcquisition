@@ -92,6 +92,8 @@ $BVH_DIRECTORY/tests/test.c
 $BVH_DIRECTORY/tests/test.h
 $INPUTPARSER_DIRECTORY/InputParser_C.c
 $INPUTPARSER_DIRECTORY/InputParser_C.h
+bvhLibrary.h
+main.c
 "
 
 
