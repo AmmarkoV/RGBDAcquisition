@@ -103,6 +103,9 @@ int dumpBVHToJSONHeader(
          }
        }
      fprintf(fp,"  ],\n\n");
+
+     fprintf(fp,"\"2DJoints\":\n");
+     fprintf(fp,"  [\n");
      fclose(fp);
     } //We managed to open the file
    } else
@@ -166,6 +169,11 @@ int dumpBVHToJSONHeader(
 
       //Append Frame ID
       fprintf(fpBVH," ],\n\n");
+
+
+      fprintf(fpBVH,"\"BVHChannels\":\n");
+      fprintf(fpBVH,"  [\n");
+
       fclose(fpBVH);
      }
     } else
@@ -258,18 +266,19 @@ int dumpBVHToJSONBody(
 
    unsigned int dumped=0;
    unsigned int requestedToDump=0;
-   FILE * fp2D = 0;
+   FILE * fp = 0;
    FILE * fpBVH = 0;
 
-   if ( (filenameInput!=0) && (filenameInput[0]!=0) )   { fp2D = fopen(filenameInput,"a");   ++requestedToDump; }
+   if ( (filenameInput!=0) && (filenameInput[0]!=0) )   { fp = fopen(filenameInput,"a");     ++requestedToDump; }
    if ( (filenameBVH!=0)   && (filenameBVH[0]!=0) )     { fpBVH = fopen(filenameBVH,"a");    ++requestedToDump; }
 
 
    //--------------------------------------------------------------------------------------------------------------------------
    //---------------------------------------------------2D Positions ----------------------------------------------------------
    //--------------------------------------------------------------------------------------------------------------------------
-   if (fp2D!=0)
+   if (fp!=0)
      {
+      fprintf(fpBVH," \"f\":[");
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -297,13 +306,13 @@ int dumpBVHToJSONBody(
 
                 if (mc->jointHierarchy[jID].erase2DCoordinates)
                     {
-                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
-                        fprintf(fp2D,"0,0,0");
+                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                       fprintf(fp,"{\"x\":0,\"y\":0,\"v\":0}");
                     } else
                     {
-                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
+                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
                        fprintf(
-                               fp2D,"%0.6f,%0.6f,%u",
+                               fp,"{\"x\":%0.6f,\"y\":%0.6f,\"v\":%u}",
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                                (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                                (bvhTransform->joint[jID].isOccluded==0)
@@ -311,8 +320,8 @@ int dumpBVHToJSONBody(
                     }
          }
        }
-     fprintf(fp2D,"\n");
-     fclose(fp2D);
+     fprintf(fp,"]\n");
+     fclose(fp);
      ++dumped;
      }
    //-----------------------------------------------------------------------------------------------------------------------------
@@ -323,6 +332,7 @@ int dumpBVHToJSONBody(
    if (fpBVH!=0)
    {
      char comma=' ';
+      fprintf(fpBVH," \"f\":[");
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
@@ -337,13 +347,13 @@ int dumpBVHToJSONBody(
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
 
              if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
-             fprintf(fpBVH,"%0.5f",value);
+             fprintf(fpBVH,"{\"v\":%0.5f}",value);
            }
          }
          //else
          //BVH End Sites have no motion parameters so they dont need to be considered here..
        }
-     fprintf(fpBVH,"\n");
+     fprintf(fpBVH,"]\n");
      //-------------------------------------------------------------------
      fclose(fpBVH);
      ++dumped;
