@@ -332,7 +332,7 @@ int dumpBVHToJSONBody(
    if (fpBVH!=0)
    {
      char comma=' ';
-      fprintf(fpBVH," \"f\":[");
+     fprintf(fpBVH," \"f\":[");
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
