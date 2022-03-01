@@ -81,6 +81,8 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/export/bvh_to_svg.c
             MotionCaptureLoader/export/bvh_to_csv.h
             MotionCaptureLoader/export/bvh_to_csv.c
+            MotionCaptureLoader/export/bvh_to_json.h
+            MotionCaptureLoader/export/bvh_to_json.c
             MotionCaptureLoader/export/bvh_to_bvh.h
             MotionCaptureLoader/export/bvh_to_bvh.c
             MotionCaptureLoader/export/bvh_export.c 

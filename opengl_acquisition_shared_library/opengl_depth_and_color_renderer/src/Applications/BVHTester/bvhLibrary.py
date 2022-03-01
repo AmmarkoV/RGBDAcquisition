@@ -123,7 +123,7 @@ for bvhFile in allBVHFiles:
     #-------------------------------------
     args.append("--selectJoints") 
     args.append("1")
-    args.append("23")
+    args.append("23") #Number of joints to select
     args.append("hip")
     args.append("eye.r")
     args.append("eye.l")
@@ -153,7 +153,7 @@ for bvhFile in allBVHFiles:
     #-------------------------------------
     args.append("--hide2DLocationOfJoints")
     args.append("0")
-    args.append("8")
+    args.append("8") #Number of joints to hide
     args.append("abdomen")
     args.append("chest")
     args.append("eye.r")
