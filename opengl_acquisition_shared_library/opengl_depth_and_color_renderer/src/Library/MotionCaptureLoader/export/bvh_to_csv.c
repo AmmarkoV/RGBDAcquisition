@@ -133,6 +133,7 @@ int dumpBVHToCSVHeader(
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
 
           //----------------------------------
           //If we have hidden joints declared only the 2D part will be hidden..
@@ -185,7 +186,7 @@ int dumpBVHToCSVHeader(
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
+         //-----------------------------------------------------------------------------
          if (!mc->jointHierarchy[jID].isEndSite)
          {
             if (isJointSelected)
@@ -237,8 +238,7 @@ int dumpBVHToCSVHeader(
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
-
+         //-----------------------------------------------------------------------------
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
             unsigned int channelID=0;
@@ -388,7 +388,7 @@ int dumpBVHToCSVBody(
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
+         //-----------------------------------------------------------------------------
          if (
                ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )        ||
                ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
@@ -412,8 +412,7 @@ int dumpBVHToCSVBody(
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
-
+         //-----------------------------------------------------------------------------
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
            unsigned int channelID=0;
