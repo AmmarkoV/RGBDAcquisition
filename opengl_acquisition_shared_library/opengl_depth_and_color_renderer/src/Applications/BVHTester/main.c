@@ -183,6 +183,7 @@ int bvhConverter(int argc,const char **argv)
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
+    unsigned int convertToJSON=0;
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
@@ -992,6 +993,20 @@ int bvhConverter(int argc,const char **argv)
                                               { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--json")==0)
+        {
+          convertToJSON=1;
+          if (i+2>=argc)  { incorrectArguments(); }
+          toSVGDirectory=argv[i+1];
+          toCSVFilename=argv[i+2];
+          //if (i+3>=argc)  { incorrectArguments(); }
+          //if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+          //if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          //if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          //if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+          //                                    { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
@@ -1017,24 +1032,25 @@ int bvhConverter(int argc,const char **argv)
     }
 
     //SVG or CSV output ..
-    if ( (convertToSVG) || (convertToCSV) )
+    if ( (convertToJSON) || (convertToSVG) || (convertToCSV) )
     {
      struct filteringResults filterStats={0};
 
-     dumpBVHToSVGCSV(
-                     toSVGDirectory,
-                     toCSVFilename,
-                     convertToSVG,
-                     convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
-                     &bvhMotion,
-                     &renderingConfiguration,
-                     &filterStats,
-                     occlusions,
-                     filterBehindCamera,//Filter out all poses where even one joint is behind camera
-                     filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame
-                     filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )
-                     0//We don't want to convert to radians
-                 );
+     dumpBVHTo_JSON_SVG_CSV(
+                            toSVGDirectory,
+                            toCSVFilename,
+                            convertToJSON,
+                            convertToSVG,
+                            convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                            &bvhMotion,
+                            &renderingConfiguration,
+                            &filterStats,
+                            occlusions,
+                            filterBehindCamera,//Filter out all poses where even one joint is behind camera
+                            filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame
+                            filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )
+                            0//We don't want to convert to radians
+                           );
     }
 
 

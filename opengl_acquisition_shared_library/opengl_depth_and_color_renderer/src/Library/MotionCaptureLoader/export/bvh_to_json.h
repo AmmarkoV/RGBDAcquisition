@@ -14,6 +14,31 @@ extern "C"
 {
 #endif
 
+int dumpBVHToJSONHeader(
+                        struct BVH_MotionCapture * mc,
+                        const char * filenameInput,
+                        const char * filenameBVH
+                       );
+
+int dumpBVHToJSONFooter(
+                        struct BVH_MotionCapture * mc,
+                        const char * filenameInput,
+                        const char * filenameBVH
+                       );
+
+int dumpBVHToJSONBody(
+                       struct BVH_MotionCapture * mc,
+                       struct BVH_Transform * bvhTransform,
+                       struct simpleRenderer * renderer,
+                       unsigned int fID,
+                       const char * filenameInput,
+                       const char * filenameBVH,
+                       struct filteringResults * filterStats,
+                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                       unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                       unsigned int filterWeirdSkeletons,
+                       unsigned int encodeRotationsAsRadians
+                      );
 
 #ifdef __cplusplus
 }

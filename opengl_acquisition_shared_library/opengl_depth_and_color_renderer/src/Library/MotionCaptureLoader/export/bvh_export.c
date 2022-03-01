@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bvh_export.h"
+#include "bvh_to_json.h"
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
-
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -15,6 +16,96 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+#define CONVERT_EULER_TO_RADIANS M_PI/180.0
+
+int bvhExportFileExists(const char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */ fclose(fp); return 1; }
+ return 0;
+}
+
+float bvhExportEulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
+{
+  if (isItNeeded)
+  {
+    return eulerAngle*CONVERT_EULER_TO_RADIANS;
+  }
+ return eulerAngle;
+}
+
+int bvhExportSkeletonFilter(
+                            struct BVH_MotionCapture * mc,
+                            struct BVH_Transform * bvhTransform,
+                            struct simpleRenderer * renderer,
+                            struct filteringResults * filterStats,
+                            unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                            unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                            unsigned int filterWeirdSkeletons
+                           )
+{
+   //-------------------------------------------------
+   if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
+   {
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (bvhTransform->joint[jID].isBehindCamera)
+         {
+           ++filterStats->filteredOutCSVPoses;
+           ++filterStats->filteredOutCSVBehindPoses;
+           //Just counting to reduce spam..
+           //fprintf(stderr,"Filtered because of being behind camera..\n");
+           return 0;
+         }
+       }
+   }//-----------------------------------------------
+
+   //-------------------------------------------------
+   if (filterOutSkeletonsWithAnyLimbsOutOfImage)
+   {
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+        float x = bvhTransform->joint[jID].pos2D[0];
+        float y = bvhTransform->joint[jID].pos2D[1];
+
+        if (
+             (x<0.0) || (y<0.0) || (renderer->width<x) || (renderer->height<y)
+           )
+        {
+           ++filterStats->filteredOutCSVPoses;
+           ++filterStats->filteredOutCSVOutPoses;
+           //Just counting to reduce spam..
+           //fprintf(stderr,"Filtered because of being limbs out of camera..\n");
+           return 0;
+        }
+       }
+   }//-----------------------------------------------
+
+   //-------------------------------------------------
+   if (filterWeirdSkeletons)
+   { //If all x,y 0 filter out
+       unsigned int jointCount=0;
+       unsigned int jointsInWeirdPositionCount=0;
+       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+        float x = bvhTransform->joint[jID].pos2D[0];
+        float y = bvhTransform->joint[jID].pos2D[1];
+        ++jointCount;
+        if ( (x<0.5) && (y<0.5) )
+        {
+           ++jointsInWeirdPositionCount;
+        }
+       }
+
+        if (jointCount==jointsInWeirdPositionCount)
+        {
+           ++filterStats->filteredOutCSVPoses;
+           return 0;
+        }
+   }//-----------------------------------------------
+
+ return 1;
+}
 
 
 int performPointProjectionsForFrameForcingPositionAndRotation(
@@ -48,14 +139,14 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
         return 0;
       }
 
-   float dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0}; 
+   float dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X]=forcePosition[0];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y]=forcePosition[1];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Z]=forcePosition[2];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X]=forceRotation[0];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y]=forceRotation[1];
    dataOur[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=forceRotation[2];
-   
+
    if (mc->jointHierarchy[rootJoint].hasQuaternionRotation)
    {
         fprintf(stderr,RED "performPointProjectionsForFrameForcingPositionAndRotation: Cannot handle quaternions..\n" NORMAL);
@@ -109,9 +200,9 @@ int performPointProjectionsForFrame(
         return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up
-       { 
+       {
            fprintf(stderr,RED "performPointProjectionsForFrame: Could not load transform for frame %u\n" NORMAL,fID);
-           bvh_cleanTransform(mc,bvhTransform); 
+           bvh_cleanTransform(mc,bvhTransform);
        }
    //----------------------------------------------------------
  return 0;
@@ -140,20 +231,21 @@ int performPointProjectionsForMotionBuffer(
 }
 
 
-int dumpBVHToSVGCSV(
-                    const char * directory,
-                    const char * filename,
-                    int convertToSVG,
-                    int convertToCSV,int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
-                    struct BVH_MotionCapture * mc,
-                    struct BVH_RendererConfiguration * renderConfig,
-                    struct filteringResults * filterStats,
-                    unsigned int occlusions,
-                    unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                    unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
-                    unsigned int filterWeirdSkeletons,
-                    unsigned int encodeRotationsAsRadians
-                   )
+int dumpBVHTo_JSON_SVG_CSV(
+                           const char * directory,
+                           const char * filename,
+                           int convertToJSON,
+                           int convertToSVG,
+                           int convertToCSV,int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
+                           struct BVH_MotionCapture * mc,
+                           struct BVH_RendererConfiguration * renderConfig,
+                           struct filteringResults * filterStats,
+                           unsigned int occlusions,
+                           unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                           unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                           unsigned int filterWeirdSkeletons,
+                           unsigned int encodeRotationsAsRadians
+                          )
 {
   struct BVH_Transform bvhTransform={0};
 
@@ -212,6 +304,7 @@ int dumpBVHToSVGCSV(
 
 
   //If we are dumping to CSV  we need to populate the header, this happens only one time for the file
+  //------------------------------------------------------------------------------------------
   if (convertToCSV)
    {
     dumpBVHToCSVHeader(
@@ -221,8 +314,19 @@ int dumpBVHToSVGCSV(
                         csvFilenameBVH
                       );
    }
+  //------------------------------------------------------------------------------------------
 
-
+  //JSON output
+  //------------------------------------------------------------------------------------------
+   if (convertToJSON)
+   {
+    dumpBVHToJSONHeader(
+                        mc,
+                        csvFilename2D,
+                        csvFilenameBVH
+                       );
+   }
+  //------------------------------------------------------------------------------------------
 
 
   //------------------------------------------------------------------------------------------
@@ -271,6 +375,30 @@ int dumpBVHToSVGCSV(
   //------------------------------------------------------------------------------------------
 
 
+
+
+  //JSON output
+  //------------------------------------------------------------------------------------------
+   if (convertToJSON)
+   {
+            dumpBVHToJSONBody(
+                              mc,
+                              &bvhTransform,
+                              &renderer,
+                              fID,
+                              csvFilename2D,
+                              csvFilenameBVH,
+                              filterStats,
+                              filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                              filterOutSkeletonsWithAnyLimbsOutOfImage,
+                              filterWeirdSkeletons,
+                              encodeRotationsAsRadians
+                             );
+   }
+  //------------------------------------------------------------------------------------------
+
+
+
   //SVG output
   //------------------------------------------------------------------------------------------
    if (convertToSVG)
@@ -317,7 +445,7 @@ int dumpBVHToSVGCSV(
   }
   //------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------
- 
+
  bvh_freeTransform(&bvhTransform);
 
  return (framesDumped==mc->numberOfFrames);

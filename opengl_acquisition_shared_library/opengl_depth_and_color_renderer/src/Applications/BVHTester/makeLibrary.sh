@@ -74,6 +74,8 @@ $BVH_DIRECTORY/export/bvh_to_csv.c
 $BVH_DIRECTORY/export/bvh_to_csv.h
 $BVH_DIRECTORY/export/bvh_to_svg.c
 $BVH_DIRECTORY/export/bvh_to_svg.h
+$BVH_DIRECTORY/export/bvh_to_json.c
+$BVH_DIRECTORY/export/bvh_to_json.h
 $BVH_DIRECTORY/export/bvh_to_trajectoryParserPrimitives.c
 $BVH_DIRECTORY/export/bvh_to_trajectoryParserPrimitives.h
 $BVH_DIRECTORY/export/bvh_to_trajectoryParserTRI.c

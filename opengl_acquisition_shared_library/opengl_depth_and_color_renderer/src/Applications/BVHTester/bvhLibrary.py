@@ -174,9 +174,9 @@ for bvhFile in allBVHFiles:
 
 
     args.append("--occlusions") 
-    args.append("--csv") 
+    args.append("--json") 
     args.append(outputDirectory) 
-    args.append(bodyPart+".csv") 
+    args.append(bodyPart+".json") 
     args.append("2d+bvh")
     args = args + pythonFlags
     bvhConvert(libBVH,args)

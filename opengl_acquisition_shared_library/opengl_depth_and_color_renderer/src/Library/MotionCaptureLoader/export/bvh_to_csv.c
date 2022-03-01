@@ -8,7 +8,6 @@
 #include "../calculate/bvh_project.h"
 #include "../edit/bvh_remapangles.h"
 
-#define CONVERT_EULER_TO_RADIANS M_PI/180.0
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
@@ -17,95 +16,6 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
-
-int fileExists(const char * filename)
-{
- FILE *fp = fopen(filename,"r");
- if( fp ) { /* exists */ fclose(fp); return 1; }
- return 0;
-}
-
-float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
-{
-  if (isItNeeded)
-  {
-    return eulerAngle*CONVERT_EULER_TO_RADIANS;
-  }
- return eulerAngle;
-}
-
-int csvSkeletonFilter(
-                       struct BVH_MotionCapture * mc,
-                       struct BVH_Transform * bvhTransform,
-                       struct simpleRenderer * renderer,
-                       struct filteringResults * filterStats,
-                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                       unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
-                       unsigned int filterWeirdSkeletons
-                     )
-{
-   //-------------------------------------------------
-   if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
-   {
-     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (bvhTransform->joint[jID].isBehindCamera)
-         {
-           ++filterStats->filteredOutCSVPoses;
-           ++filterStats->filteredOutCSVBehindPoses;
-           //Just counting to reduce spam..
-           //fprintf(stderr,"Filtered because of being behind camera..\n");
-           return 0;
-         }
-       }
-   }//-----------------------------------------------
-
-   //-------------------------------------------------
-   if (filterOutSkeletonsWithAnyLimbsOutOfImage)
-   {
-     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-        float x = bvhTransform->joint[jID].pos2D[0];
-        float y = bvhTransform->joint[jID].pos2D[1];
-
-        if (
-             (x<0.0) || (y<0.0) || (renderer->width<x) || (renderer->height<y)
-           )
-        {
-           ++filterStats->filteredOutCSVPoses;
-           ++filterStats->filteredOutCSVOutPoses;
-           //Just counting to reduce spam..
-           //fprintf(stderr,"Filtered because of being limbs out of camera..\n");
-           return 0;
-        }
-       }
-   }//-----------------------------------------------
-
-   //-------------------------------------------------
-   if (filterWeirdSkeletons)
-   { //If all x,y 0 filter out
-       unsigned int jointCount=0;
-       unsigned int jointsInWeirdPositionCount=0;
-       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-        float x = bvhTransform->joint[jID].pos2D[0];
-        float y = bvhTransform->joint[jID].pos2D[1];
-        ++jointCount;
-        if ( (x<0.5) && (y<0.5) )
-        {
-           ++jointsInWeirdPositionCount;
-        }
-       }
-
-        if (jointCount==jointsInWeirdPositionCount)
-        {
-           ++filterStats->filteredOutCSVPoses;
-           return 0;
-        }
-   }//-----------------------------------------------
-
- return 1;
-}
 
 
 
@@ -120,7 +30,7 @@ int dumpBVHToCSVHeader(
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
-   if ( (filename2D!=0) && (filename2D[0]!=0) && (!fileExists(filename2D)) )
+   if ( (filename2D!=0) && (filename2D[0]!=0) && (!bvhExportFileExists(filename2D)) )
    {
     FILE * fp2D = fopen(filename2D,"a");
 
@@ -174,7 +84,7 @@ int dumpBVHToCSVHeader(
 
 
    //3D Positions -------------------------------------------------------------------------------------------------------------
-   if ( (filename3D!=0) && (filename3D[0]!=0) && (!fileExists(filename3D)) )
+   if ( (filename3D!=0) && (filename3D[0]!=0) && (!bvhExportFileExists(filename3D)) )
    {
      FILE * fp3D = fopen(filename3D,"a");
      if (fp3D!=0)
@@ -212,7 +122,7 @@ int dumpBVHToCSVHeader(
    //--------------------------------------------------------------------------------------------------------------------------
 
 
-   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!fileExists(filenameBVH)) )
+   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!bvhExportFileExists(filenameBVH)) )
    {
      FILE * fpBVH = fopen(filenameBVH,"a");
      if (fpBVH!=0)
@@ -268,7 +178,6 @@ int dumpBVHToCSVHeader(
 }
 
 
-
 int dumpBVHToCSVBody(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
@@ -288,15 +197,15 @@ int dumpBVHToCSVBody(
    int isJointEndSiteSelected=1;
 
    if (
-       !csvSkeletonFilter(
-                           mc,
-                           bvhTransform,
-                           renderer,
-                           filterStats,
-                           filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                           filterOutSkeletonsWithAnyLimbsOutOfImage,
-                           filterWeirdSkeletons
-                         )
+       !bvhExportSkeletonFilter(
+                                mc,
+                                bvhTransform,
+                                renderer,
+                                filterStats,
+                                filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                                filterOutSkeletonsWithAnyLimbsOutOfImage,
+                                filterWeirdSkeletons
+                               )
        )
    {
      //fprintf(stderr,"csvSkeletonFilter discarded frame %u\n",fID);
