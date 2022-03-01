@@ -18,7 +18,7 @@ extern "C"
 static const char BVH_LOADER_VERSION_STRING [] = "0.55";
 
 /**
-* @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here 
+* @brief Mathematical operations and structures such as the struct Matrix4x4OfFloats are declared here
 * @ingroup BVH
 */
 #include "mathLibrary.h"
@@ -31,7 +31,7 @@ static const char BVH_LOADER_VERSION_STRING [] = "0.55";
 
 /**
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
-* The human file I use has 1 Root + 164 Joints + 47 End Sites = 212 I set a similar maximum here to ensure better caching.. 
+* The human file I use has 1 Root + 164 Joints + 47 End Sites = 212 I set a similar maximum here to ensure better caching..
 * @ingroup BVH
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 1550
@@ -94,7 +94,7 @@ static const char * rotationOrderNames[] =
   "ZYX",
   "QXQYQZQW", //QBVH
   "RODRIGUES",//QBVH
-//================= 
+//=================
     "End of Channel Rotation Orders" ,
     "Unknown"
 };
@@ -117,7 +117,7 @@ enum CHANNEL_ROTATION_ORDER
 
 
 /**
- * @brief Regardless of the rotation order above when transcations happen motion buffers 
+ * @brief Regardless of the rotation order above when transcations happen motion buffers
  * get their channels rerouted to constant positions so that it is easier to manage them!
  */
 enum MOTIONBUFFER_TRANSACTION_DATA_FIELDS
@@ -176,8 +176,8 @@ struct BVH_Joint
   //--------------------
   char isImmuneToTorsoOcclusions;
   //--------------------
-  
-  struct jointPartOfKnownHierarchy partOfHierarchy; 
+
+  struct jointPartOfKnownHierarchy partOfHierarchy;
   //--------------------
   char erase2DCoordinates;
   char isRoot;
@@ -196,7 +196,7 @@ struct BVH_Joint
   float offset[3];
   struct Matrix4x4OfFloats staticTransformation;
   //--------------------
-  
+
   char  hasPositionalChannels;
   char  hasRotationalChannels;
   char  hasQuaternionRotation;
@@ -337,7 +337,7 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 * @ingroup BVH
 * @param  BVH Structure
 * @param  Parent joint ID we want to make sure that the next supplied joint is a children of
-* @param  Child of joint ID we want to make sure that is a children ( not necessarily the first one ) 
+* @param  Child of joint ID we want to make sure that is a children ( not necessarily the first one )
 * @return 1=HasParent/0=NoParent-Error
 */
 int bvh_isJointAChildrenID(
@@ -575,7 +575,7 @@ float  bvh_getJointPositionYAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,
 float  bvh_getJointPositionZAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,float * motionBuffer);
 
 /**
-* @brief A very important call that handles retreiving data from the motion buffer.. 
+* @brief A very important call that handles retreiving data from the motion buffer..
 * The data output array should be at least MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER elements long
 * @ingroup BVH
 * @param  BVH Structure
@@ -607,6 +607,13 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
 */
 int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parentJoint);
 
+
+void bvh_considerIfJointIsSelected(
+                                   struct BVH_MotionCapture * mc,
+                                   unsigned int jID,
+                                   int * isJointSelected,
+                                   int * isJointEndSiteSelected
+                                  );
 
 int bvh_selectJoints(
                     struct BVH_MotionCapture * mc,

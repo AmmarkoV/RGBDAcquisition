@@ -34,7 +34,6 @@
 #include "../../Library/MotionCaptureLoader/metrics/bvh_measure.h"
 #include "../../Library/MotionCaptureLoader/tests/test.h"
 
-
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
 

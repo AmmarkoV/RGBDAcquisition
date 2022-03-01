@@ -14,19 +14,11 @@
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
-
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
-
-/*
-unsigned int invisibleJoints=0;
-unsigned int   visibleJoints=0;
-unsigned int filteredOutCSVBehindPoses=0;
-unsigned int filteredOutCSVOutPoses=0;
-unsigned int filteredOutCSVPoses=0;*/
 
 int fileExists(const char * filename)
 {
@@ -34,7 +26,6 @@ int fileExists(const char * filename)
  if( fp ) { /* exists */ fclose(fp); return 1; }
  return 0;
 }
-
 
 float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
 {
@@ -45,8 +36,6 @@ float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
  return eulerAngle;
 }
 
-
-
 int csvSkeletonFilter(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
@@ -56,7 +45,7 @@ int csvSkeletonFilter(
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons
                      )
-{ 
+{
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
    {
@@ -72,7 +61,6 @@ int csvSkeletonFilter(
          }
        }
    }//-----------------------------------------------
-
 
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsOutOfImage)
@@ -94,8 +82,6 @@ int csvSkeletonFilter(
         }
        }
    }//-----------------------------------------------
-
-
 
    //-------------------------------------------------
    if (filterWeirdSkeletons)
@@ -124,47 +110,6 @@ int csvSkeletonFilter(
 }
 
 
-void considerIfJointIsSelected(
-                                struct BVH_MotionCapture * mc,
-                                unsigned int jID,
-                                int * isJointSelected,
-                                int * isJointEndSiteSelected
-                               )
-{
-     *isJointSelected=1;
-     *isJointEndSiteSelected=1;
-
-     //First of all, if no joint selections have occured then everything is selected..
-     if (!mc->selectedJoints) { return; }
-      else
-    {
-     //If we reached this far it means there is a selection active..
-     //We consider everything unselected unless proven otherwise..
-     *isJointSelected=0;
-     *isJointEndSiteSelected=0;
-
-
-     //We now check if this joint is selected..
-     //-------------------------------------------------------------
-     //If there is a selection declared then let's consider if the joint is selected..
-
-     if (mc->jointHierarchy[jID].isEndSite)
-     {
-       //If we are talking about an endsite we will have to check with it's parent joint..
-       unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-       if ( (mc->selectedJoints[parentID]) && (mc->selectionIncludesEndSites) )
-                  { *isJointEndSiteSelected=1; }
-     } else
-     {
-       //This is a regular joint..
-       if (mc->selectedJoints[jID])
-                          { *isJointSelected=1; }
-     }
-
-    }
-
-}
-
 
 
 int dumpBVHToCSVHeader(
@@ -173,7 +118,7 @@ int dumpBVHToCSVHeader(
                        const char * filename3D,
                        const char * filenameBVH
                       )
-{ 
+{
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
@@ -187,7 +132,7 @@ int dumpBVHToCSVHeader(
      //2D Positions -------------------------------------------------------------------------------------------------------------
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
           //----------------------------------
           //If we have hidden joints declared only the 2D part will be hidden..
@@ -239,7 +184,7 @@ int dumpBVHToCSVHeader(
 
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
@@ -262,12 +207,10 @@ int dumpBVHToCSVHeader(
       fclose(fp3D);
      }
    } else
-    {
+   {
      fprintf(stderr,"We don't need to regenerate the CSV header for 3D Points, it already exists\n");
-    }
+   }
    //--------------------------------------------------------------------------------------------------------------------------
-
-
 
 
    if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!fileExists(filenameBVH)) )
@@ -275,7 +218,6 @@ int dumpBVHToCSVHeader(
      FILE * fpBVH = fopen(filenameBVH,"a");
      if (fpBVH!=0)
      {
-
       //----------------------------------------------
       /*             IS THIS NEEDED ?
       unsigned int lastElement=0;
@@ -294,15 +236,13 @@ int dumpBVHToCSVHeader(
       //Model Configuration
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
 
-         if (!mc->jointHierarchy[jID].isEndSite)
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
-            if (isJointSelected)
-            {
-                unsigned int channelID=0;
-                for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+            unsigned int channelID=0;
+            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
                     if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
                     fprintf(
@@ -311,7 +251,6 @@ int dumpBVHToCSVHeader(
                             channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
                            );
                  }
-            }
          }
          //else
          //End Sites have no motion fields so they are not present here..
@@ -348,7 +287,7 @@ int dumpBVHToCSVBody(
                        unsigned int filterWeirdSkeletons,
                        unsigned int encodeRotationsAsRadians
                       )
-{ 
+{
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
@@ -387,15 +326,15 @@ int dumpBVHToCSVBody(
    if ( (filenameBVH!=0) && (filenameBVH[0]!=0) ) { fpBVH = fopen(filenameBVH,"a"); ++requestedToDump; }
 
 
-     //--------------------------------------------------------------------------------------------------------------------------
-     //---------------------------------------------------2D Positions ----------------------------------------------------------
-     //--------------------------------------------------------------------------------------------------------------------------
-     if (fp2D!=0)
+   //--------------------------------------------------------------------------------------------------------------------------
+   //---------------------------------------------------2D Positions ----------------------------------------------------------
+   //--------------------------------------------------------------------------------------------------------------------------
+   if (fp2D!=0)
      {
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
           //----------------------------------
           //If we have hidden joints declared only the 2D part will be hidden..
           if (mc->hideSelectedJoints!=0)
@@ -410,8 +349,7 @@ int dumpBVHToCSVBody(
 
          if (
                //If this a regular joint and regular joints are enabled
-               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
-                    ||
+               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) ) ||
                //OR if this is an end joint and end joints are enabled..
                ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
             )
@@ -430,7 +368,7 @@ int dumpBVHToCSVBody(
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                                (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                                (bvhTransform->joint[jID].isOccluded==0)
-                               );
+                              );
                     }
          }
        }
@@ -449,26 +387,15 @@ int dumpBVHToCSVBody(
      char comma=' ';
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
-         if (!mc->jointHierarchy[jID].isEndSite)
+         if (
+               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )        ||
+               ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
+            )
          {
-             if (isJointSelected)
-             {
-               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
-                       fprintf(
-                               fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
-                              );
-             }
-         } else
-         {
-             if (isJointEndSiteSelected)
-             {
-               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
-                fprintf(
-                          fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
-                       );
-             }
+           if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+           fprintf(fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]);
          }
        }
      fprintf(fp3D,"\n");
@@ -484,7 +411,7 @@ int dumpBVHToCSVBody(
      char comma=' ';
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
 
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
@@ -495,8 +422,6 @@ int dumpBVHToCSVBody(
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
 
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
-
-
 /*           //NO LONGER NEEDED, neural networks work fine without being centered @ 0!
              //Due to the particular requirements of MocapNET we need to be able to split orientations in CSV files..
              //We want the neural network to only work with values normalized and centered around 0
@@ -511,17 +436,13 @@ int dumpBVHToCSVBody(
                   //value=(float) bvh_constrainAngleCentered0((float) value,0);
                   value=(float) bvh_RemapAngleCentered0((float) value,csvOrientation);
               }
-             }
-*/
-
-
+             }  */
              if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
              fprintf(fpBVH,"%0.5f",value);
            }
          }
          //else
          //BVH End Sites have no motion parameters so they dont need to be considered here..
-
        }
      fprintf(fpBVH,"\n");
      //-------------------------------------------------------------------

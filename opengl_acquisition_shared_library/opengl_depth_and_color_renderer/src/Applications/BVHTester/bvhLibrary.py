@@ -55,7 +55,6 @@ def bvhConvert(libBVH,arguments):
 #--------------------------------------------------------
 
 
-libBVH = loadLibrary("./libBVHConverter.so")
 
 pythonFlags=list()
 #Add any arguments given in the python script directly!
@@ -63,7 +62,16 @@ if (len(sys.argv)>1):
    print('Supplied argument List:', str(sys.argv))
    for i in range(0, len(sys.argv)):
      pythonFlags.append(sys.argv[i])
-#------------------------------------------------------    
+     if (sys.argv[i]=="--update"): 
+         print('Deleting previous libBVHConverter.so to force update!\n')
+         os.system("rm libBVHConverter.so")
+#------------------------------------------------------   
+
+
+
+
+libBVH = loadLibrary("./libBVHConverter.so")
+ 
 
  
 

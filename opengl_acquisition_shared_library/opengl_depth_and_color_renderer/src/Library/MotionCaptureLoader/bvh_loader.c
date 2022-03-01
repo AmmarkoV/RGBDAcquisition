@@ -27,8 +27,6 @@
 #include "import/fromBVH.h"
 
 
-
-
 //----------------------------------------------------------
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -56,7 +54,6 @@
 
 //A very brief documentation of the BVH spec :
 //http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0BopXj4Kft_RAEE41VLblkkPGHVF8-mon3xSCBMZueRtyb9LCSZDZhXPA
-
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
@@ -1202,18 +1199,53 @@ int bvh_selectChildrenOfJoint(struct BVH_MotionCapture * mc, const char * parent
 
 
 
+void bvh_considerIfJointIsSelected(
+                                   struct BVH_MotionCapture * mc,
+                                   unsigned int jID,
+                                   int * isJointSelected,
+                                   int * isJointEndSiteSelected
+                                  )
+{
+    *isJointSelected=1;
+    *isJointEndSiteSelected=1;
+
+    //First of all, if no joint selections have occured then everything is selected..
+    if (mc->selectedJoints)
+    {
+     //If we reached this far it means there is a selection active..
+     //We consider everything unselected unless proven otherwise..
+     *isJointSelected=0;
+     *isJointEndSiteSelected=0;
+
+     //We now check if this joint is selected..
+     //-------------------------------------------------------------
+     //If there is a selection declared then let's consider if the joint is selected..
+     if (mc->jointHierarchy[jID].isEndSite)
+     {
+       //If we are talking about an endsite we will have to check with it's parent joint..
+       unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+       if ( (mc->selectedJoints[parentID]) && (mc->selectionIncludesEndSites) )
+                          { *isJointEndSiteSelected=1; }
+     } else
+     {
+       //This is a regular joint..
+       if (mc->selectedJoints[jID])
+                          { *isJointSelected=1; }
+     }
+    }
+}
 
 
 
 
 
 int bvh_selectJoints(
-                    struct BVH_MotionCapture * mc,
-                    unsigned int numberOfValues,
-                    unsigned int includeEndSites,
-                    const char **argv,
-                    unsigned int iplus1
-                   )
+                     struct BVH_MotionCapture * mc,
+                     unsigned int numberOfValues,
+                     unsigned int includeEndSites,
+                     const char **argv,
+                     unsigned int iplus1
+                    )
 {
   fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
 
