@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-
+BVHTESTER_DIR="."
 AMMATRIX_DIRECTORY="../../../../../tools/AmMatrix"
 MODELLOADER_DIRECTORY="../../Library/ModelLoader"
 BVH_DIRECTORY="../../Library/MotionCaptureLoader"
@@ -94,8 +94,8 @@ $BVH_DIRECTORY/tests/test.c
 $BVH_DIRECTORY/tests/test.h
 $INPUTPARSER_DIRECTORY/InputParser_C.c
 $INPUTPARSER_DIRECTORY/InputParser_C.h
-bvhLibrary.h
-main.c
+$BVHTESTER_DIR/bvhLibrary.h
+$BVHTESTER_DIR/main.c
 "
 
 
