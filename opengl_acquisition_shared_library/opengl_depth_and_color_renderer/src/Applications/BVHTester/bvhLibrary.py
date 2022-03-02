@@ -4,6 +4,22 @@ import sys
 from ctypes import *
 from os.path import exists
 
+
+#--------------------------------------------------------
+def readCSV(filename):
+  result=dict()
+  import csv
+  with open(filename,newline='') as csvfile:
+        readerIn = csv.reader(csvfile,delimiter=',',quotechar='"')
+        for rowIn in readerIn: 
+           numberOfColumns=len(rowIn)       
+           labels = list(rowIn[i] for i in range(0,numberOfColumns) )
+           if (labels[0]!=''):
+              newList = list()
+              newList.append(labels[1])
+              newList.append(labels[2])
+              result[labels[0]]=newList
+  return result
 #--------------------------------------------------------
 def gatherAllBVHFiles(directoryPath):
    results = list()
@@ -64,7 +80,6 @@ def bvhConvert(libBVH,arguments):
 
 
 
-
 #python main : 
 pythonFlags=list()
 #Add any arguments given in the python script directly!
@@ -83,16 +98,25 @@ libBVH = loadLibrary("./libBVHConverter.so")
  
 
  
-
+datasetDirectory = "/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture"
 outputDirectory = os.getcwd()
-allBVHFiles = gatherAllBVHDirectories("/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture") 
+allBVHFiles = gatherAllBVHDirectories(datasetDirectory) 
+#Keep list for debug.. 
+writeListToFile(allBVHFiles,"listOfBVHFiles.txt")
 print("Output Directory = ",outputDirectory)
 print("Found ",len(allBVHFiles)," BVH files")
 
-#Keep list for debug.. 
-writeListToFile(allBVHFiles,"listOfBVHFiles.txt")
 
-extension=".json"
+#Package Annotations as JSON
+print("Packaging annotations in JSON format")
+annotations=readCSV(datasetDirectory+"/cmu-mocap-annotations.csv")
+import json
+with open("annotations.json", "w") as outfile:
+    json.dump(annotations, outfile, indent=4)
+
+
+mode="json" # json or csv
+extension="."+mode
 bodyPart="upperbody"
 os.system("rm 2d_"+bodyPart+extension)
 os.system("rm bvh_"+bodyPart+extension)
@@ -183,14 +207,15 @@ for bvhFile in allBVHFiles:
 
 
     args.append("--occlusions") 
-    args.append("--json") 
+    args.append("--"+mode) 
     args.append(outputDirectory) 
     args.append(bodyPart+extension) 
     args.append("2d+bvh")
     args = args + pythonFlags
     bvhConvert(libBVH,args)
     numberOfFilesProcessed = numberOfFilesProcessed + 1
-    if (numberOfFilesProcessed==10): 
+    if (numberOfFilesProcessed==2): 
+       print("Stopping now at ",numberOfFilesProcessed," limit")
        break
 
 appendJSONEnding("2d_"+bodyPart+extension)

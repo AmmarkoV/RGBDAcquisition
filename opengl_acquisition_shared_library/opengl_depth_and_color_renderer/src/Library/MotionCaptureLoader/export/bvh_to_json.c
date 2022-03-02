@@ -133,7 +133,7 @@ int dumpBVHToJSONHeader(
        }
      fprintf(fp,"  ],\n\n");
 
-     fprintf(fp,"\"2DJoints\":\n");
+     fprintf(fp,"\"2DJointSamples\":\n");
      fprintf(fp,"  [\n");
      fclose(fp);
     } //We managed to open the file
@@ -184,7 +184,7 @@ int dumpBVHToJSONHeader(
                     if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
                     fprintf(fpBVH,"    {\n");
                     fprintf(fpBVH,"     \"Joint\" : \"%s_%s\",\n", mc->jointHierarchy[jID].jointName,channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]);
-                    fprintf(fpBVH,"     \"JointID\" : %u\n",jID);
+                    fprintf(fpBVH,"     \"JointID\" : %u,\n",jID);
                     fprintf(fpBVH,"     \"ChannelID\" : %u\n",channelID);
                     fprintf(fpBVH,"    }\n");
                  }
@@ -228,8 +228,6 @@ int dumpBVHToJSONFooter(
      fprintf(fp,"] \n }\n");
      }
     }
-
-
 
    if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!bvhExportFileExists(filenameBVH)) )
    {
