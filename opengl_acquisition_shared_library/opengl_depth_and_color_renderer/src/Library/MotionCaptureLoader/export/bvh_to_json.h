@@ -17,7 +17,15 @@ extern "C"
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
-                        const char * filenameBVH
+                        const char * filenameBVH,
+                        float fx,
+                        float fy,
+                        float cx,
+                        float cy,
+                        float near,
+                        float far,
+                        float width,
+                        float height
                        );
 
 int dumpBVHToJSONFooter(
@@ -33,6 +41,8 @@ int dumpBVHToJSONBody(
                        unsigned int fID,
                        const char * filenameInput,
                        const char * filenameBVH,
+                       int didInputOutputPreExist,
+                       int didBVHOutputPreExist,
                        struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,

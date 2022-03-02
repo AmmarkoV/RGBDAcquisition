@@ -258,6 +258,9 @@ int dumpBVHTo_JSON_SVG_CSV(
   if (useCSV_3D_Output)  { snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);  }
   if (useCSV_BVH_Output) { snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);}
 
+  int did2DOutputPreExist  = bvhExportFileExists(csvFilename2D);
+  int didBVHOutputPreExist = bvhExportFileExists(csvFilenameBVH);
+
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
 
@@ -320,10 +323,19 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
    if (convertToJSON)
    {
+
     dumpBVHToJSONHeader(
                         mc,
                         csvFilename2D,
-                        csvFilenameBVH
+                        csvFilenameBVH,
+                        renderer.fx,
+                        renderer.fy,
+                        renderer.cx,
+                        renderer.cy,
+                        renderer.near,
+                        renderer.far,
+                        renderer.width,
+                        renderer.height
                        );
    }
   //------------------------------------------------------------------------------------------
@@ -388,6 +400,8 @@ int dumpBVHTo_JSON_SVG_CSV(
                               fID,
                               csvFilename2D,
                               csvFilenameBVH,
+                              did2DOutputPreExist,
+                              didBVHOutputPreExist,
                               filterStats,
                               filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                               filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -412,12 +426,16 @@ int dumpBVHTo_JSON_SVG_CSV(
                                        &renderer
                                       );
    }
+
+   did2DOutputPreExist=1;
+   didBVHOutputPreExist=1;
   //------------------------------------------------------------------------------------------
   } //For every frame.. ----------------------------------------------------------------------
   //------------------------------------------------------------------------------------------
 
   //JSON output
   //------------------------------------------------------------------------------------------
+  /*
    if (convertToJSON)
    {
     dumpBVHToJSONFooter(
@@ -425,7 +443,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                         csvFilename2D,
                         csvFilenameBVH
                        );
-   }
+   }*/
   //------------------------------------------------------------------------------------------
 
 

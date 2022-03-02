@@ -29,6 +29,13 @@ def writeListToFile(theList,theFilename):
       file.write(theList + "\n")
    file.close()
 #--------------------------------------------------------
+def appendJSONEnding(theFilename):
+   file = open(theFilename, "a")  # append mode
+   file.write("  ]\n  } \n")
+   file.close()
+#--------------------------------------------------------
+
+
 
 def loadLibrary(filename):
  if not exists(filename):
@@ -56,6 +63,9 @@ def bvhConvert(libBVH,arguments):
 
 
 
+
+
+#python main : 
 pythonFlags=list()
 #Add any arguments given in the python script directly!
 if (len(sys.argv)>1):
@@ -65,7 +75,6 @@ if (len(sys.argv)>1):
      if (sys.argv[i]=="--update"): 
          print('Deleting previous libBVHConverter.so to force update!\n')
          os.system("rm libBVHConverter.so")
-#------------------------------------------------------   
 
 
 
@@ -83,10 +92,10 @@ print("Found ",len(allBVHFiles)," BVH files")
 #Keep list for debug.. 
 writeListToFile(allBVHFiles,"listOfBVHFiles.txt")
 
-
+extension=".json"
 bodyPart="upperbody"
-os.system("rm 2d_"+bodyPart+".csv")
-os.system("rm bvh_"+bodyPart+".csv")
+os.system("rm 2d_"+bodyPart+extension)
+os.system("rm bvh_"+bodyPart+extension)
 
 
 minRotationLimit="-45"
@@ -102,7 +111,7 @@ maxDepth="4500" #3000 is too small
 
 #$MIN_DEPTH $MAX_DEPTH $MIN_LIM -179.999999 $MIN_LIM $MAX_LIM 180 $MAX_LIM
 
-
+numberOfFilesProcessed = 0
 for bvhFile in allBVHFiles:
     args=list()
     args.append("--printparams") 
@@ -176,10 +185,16 @@ for bvhFile in allBVHFiles:
     args.append("--occlusions") 
     args.append("--json") 
     args.append(outputDirectory) 
-    args.append(bodyPart+".json") 
+    args.append(bodyPart+extension) 
     args.append("2d+bvh")
     args = args + pythonFlags
     bvhConvert(libBVH,args)
+    numberOfFilesProcessed = numberOfFilesProcessed + 1
+    if (numberOfFilesProcessed==10): 
+       break
+
+appendJSONEnding("2d_"+bodyPart+extension)
+appendJSONEnding("bvh_"+bodyPart+extension)
 
 #./GroundTruthDumper $VIEW_COMMANDS --haltonerror --from $BVHFILE --filtergimballocks 4 $3 --repeat $ITERATIONS $2 --occlusions --csv $outputDir $1 2d+bvh # --bvh $outputDir/$f-random.bvh
 

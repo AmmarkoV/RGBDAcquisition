@@ -20,15 +20,51 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+int countNumberOfJoints(struct BVH_MotionCapture * mc)
+{
+ int isJointSelected=1;
+ int isJointEndSiteSelected=1;
+ unsigned int numberOfJoints = 0;
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID])
+                  {
+                     isJointSelected=0;
+                     if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                  }
+            }
+          //----------------------------------
+         if (!mc->jointHierarchy[jID].isEndSite) { if (isJointSelected) { ++numberOfJoints; } } else
+                                                 { if (isJointEndSiteSelected) { ++numberOfJoints; } }
+       }
+  return numberOfJoints;
+}
+
+
+
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
-                        const char * filenameBVH
+                        const char * filenameBVH,
+                        float fx,
+                        float fy,
+                        float cx,
+                        float cy,
+                        float near,
+                        float far,
+                        float width,
+                        float height
                        )
 {
    fprintf(stderr,"dumpBVHToJSON(in=%s,out=%s)\n",filenameInput,filenameBVH);
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
+   unsigned int countedNumberOfJoints = countNumberOfJoints(mc);
+
 
    if ( (filenameInput!=0) && (filenameInput[0]!=0) && (!bvhExportFileExists(filenameInput)) )
    {
@@ -39,24 +75,17 @@ int dumpBVHToJSONHeader(
      fprintf(fp,"{\n");
      //Give camera information here !
      fprintf(fp,"\"VirtualCameraName\":\"Default Camera\",\n");
-     fprintf(fp,"\"FocalLengthX\":xxx.xx,\n");
-     fprintf(fp,"\"FocalLengthY\":yyy.yy,\n");
-     fprintf(fp,"\"CenterX\":xxx,\n");
-     fprintf(fp,"\"CenterY\":yyy,\n");
-     fprintf(fp,"\"Width\":xxx,\n");
-     fprintf(fp,"\"Height\":yyy,\n");
-     fprintf(fp,"\"CameraPositionX\":x,\n");
-     fprintf(fp,"\"CameraPositionY\":y,\n");
-     fprintf(fp,"\"CameraPositionZ\":z,\n");
-     fprintf(fp,"\"CameraRoll\":x,\n");
-     fprintf(fp,"\"CameraPitch\":y,\n");
-     fprintf(fp,"\"CameraYaw\":z,\n");
-     fprintf(fp,"\"NumberOfJoints\":J,\n");
-     fprintf(fp,"\"NumberOfSamples\":N,\n");
+     fprintf(fp,"\"FocalLengthX\":%f,\n",fx);
+     fprintf(fp,"\"FocalLengthY\":%f,\n",fy);
+     fprintf(fp,"\"CenterX\":%f,\n",cx);
+     fprintf(fp,"\"CenterY\":%f,\n",cy);
+     fprintf(fp,"\"Width\":%f,\n",width);
+     fprintf(fp,"\"Height\":%f,\n",height);
+     fprintf(fp,"\"Near\":%f,\n",near);
+     fprintf(fp,"\"Far\":%f,\n",far);
      fprintf(fp,"\"SelfSupervised\":0,\n");
      fprintf(fp,"\"Perturbed\":0,\n");
-
-
+     fprintf(fp,"\"NumberOfJoints\":%u,\n",countedNumberOfJoints);
 
      fprintf(fp,"\"2DJointsNames\":\n");
      fprintf(fp,"  [\n");
@@ -125,22 +154,17 @@ int dumpBVHToJSONHeader(
       fprintf(fpBVH,"{\n");
       //Give camera information here !
       fprintf(fpBVH,"\"VirtualCameraName\":\"Default Camera\",\n");
-      fprintf(fpBVH,"\"FocalLengthX\":xxx.xx,\n");
-      fprintf(fpBVH,"\"FocalLengthY\":yyy.yy,\n");
-      fprintf(fpBVH,"\"CenterX\":xxx,\n");
-      fprintf(fpBVH,"\"CenterY\":yyy,\n");
-      fprintf(fpBVH,"\"Width\":xxx,\n");
-      fprintf(fpBVH,"\"Height\":yyy,\n");
-      fprintf(fpBVH,"\"CameraPositionX\":x,\n");
-      fprintf(fpBVH,"\"CameraPositionY\":y,\n");
-      fprintf(fpBVH,"\"CameraPositionZ\":z,\n");
-      fprintf(fpBVH,"\"CameraRoll\":x,\n");
-      fprintf(fpBVH,"\"CameraPitch\":y,\n");
-      fprintf(fpBVH,"\"CameraYaw\":z,\n");
-      fprintf(fpBVH,"\"NumberOfJoints\":J,\n");
-      fprintf(fpBVH,"\"NumberOfSamples\":N,\n");
+      fprintf(fpBVH,"\"FocalLengthX\":%f,\n",fx);
+      fprintf(fpBVH,"\"FocalLengthY\":%f,\n",fy);
+      fprintf(fpBVH,"\"CenterX\":%f,\n",cx);
+      fprintf(fpBVH,"\"CenterY\":%f,\n",cy);
+      fprintf(fpBVH,"\"Width\":%f,\n",width);
+      fprintf(fpBVH,"\"Height\":%f,\n",height);
+      fprintf(fpBVH,"\"Near\":%f,\n",near);
+      fprintf(fpBVH,"\"Far\":%f,\n",far);
       fprintf(fpBVH,"\"SelfSupervised\":0,\n");
       fprintf(fpBVH,"\"Perturbed\":0,\n");
+      fprintf(fpBVH,"\"NumberOfJoints\":%u,\n",countedNumberOfJoints);
 
 
       fprintf(fpBVH,"\"BVHJointChannelNames\":\n");
@@ -230,6 +254,8 @@ int dumpBVHToJSONBody(
                        unsigned int fID,
                        const char * filenameInput,
                        const char * filenameBVH,
+                       int didInputOutputPreExist,
+                       int didBVHOutputPreExist,
                        struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -278,7 +304,8 @@ int dumpBVHToJSONBody(
    //--------------------------------------------------------------------------------------------------------------------------
    if (fp!=0)
      {
-      fprintf(fpBVH," \"f\":[");
+      if (didInputOutputPreExist) { fprintf(fp,","); }
+      fprintf(fp,"  [");
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -332,7 +359,8 @@ int dumpBVHToJSONBody(
    if (fpBVH!=0)
    {
      char comma=' ';
-     fprintf(fpBVH," \"f\":[");
+     if (didBVHOutputPreExist) { fprintf(fpBVH,","); }
+     fprintf(fpBVH," [");
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
