@@ -80,10 +80,11 @@ def bvhConvert(libBVH,arguments):
 
 
 
-#python main : 
-pythonFlags=list()
-#Add any arguments given in the python script directly!
-if (len(sys.argv)>1):
+if __name__== "__main__":
+ #python main : 
+ pythonFlags=list()
+ #Add any arguments given in the python script directly!
+ if (len(sys.argv)>1):
    print('Supplied argument List:', str(sys.argv))
    for i in range(0, len(sys.argv)):
      pythonFlags.append(sys.argv[i])
@@ -94,56 +95,56 @@ if (len(sys.argv)>1):
 
 
 
-libBVH = loadLibrary("./libBVHConverter.so")
+ libBVH = loadLibrary("./libBVHConverter.so")
  
 
  
-datasetDirectory = "/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture"
-outputDirectory = os.getcwd()
-allBVHFiles = gatherAllBVHDirectories(datasetDirectory) 
-#Keep list for debug.. 
-writeListToFile(allBVHFiles,"listOfBVHFiles.txt")
-print("Output Directory = ",outputDirectory)
-print("Found ",len(allBVHFiles)," BVH files")
+ datasetDirectory = "/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture"
+ outputDirectory = os.getcwd()
+ allBVHFiles = gatherAllBVHDirectories(datasetDirectory) 
+ #Keep list for debug.. 
+ writeListToFile(allBVHFiles,"listOfBVHFiles.txt")
+ print("Output Directory = ",outputDirectory) 
+ print("Found ",len(allBVHFiles)," BVH files")
 
 
-#Package Annotations as JSON
-print("Packaging annotations in JSON format")
-annotations=readCSV(datasetDirectory+"/cmu-mocap-annotations.csv")
-import json
-with open("annotations.json", "w") as outfile:
+ #Package Annotations as JSON
+ print("Packaging annotations in JSON format")
+ annotations=readCSV(datasetDirectory+"/cmu-mocap-annotations.csv")
+ import json
+ with open("annotations.json", "w") as outfile:
     json.dump(annotations, outfile, indent=4)
 
 
-mode="json" # json or csv
-extension="."+mode
-bodyPart="upperbody"
-os.system("rm 2d_"+bodyPart+extension)
-os.system("rm bvh_"+bodyPart+extension)
+ mode="json" # json or csv
+ extension="."+mode
+ bodyPart="upperbody"
+ os.system("rm 2d_"+bodyPart+extension)
+ os.system("rm bvh_"+bodyPart+extension)
 
 
-minRotationLimit="-45"
-maxRotationLimit="45"
-minORIENTATION="-55" #-45  default , -55 with 10 deg safety  
-maxORIENTATION="55"  # 45  default , 55 with 10 deg safety
-minDepth="900"  #1000 original
-maxDepth="4500" #3000 is too small
+ minRotationLimit="-45"
+ maxRotationLimit="45"
+ minORIENTATION="-55" #-45  default , -55 with 10 deg safety  
+ maxORIENTATION="55"  # 45  default , 55 with 10 deg safety
+ minDepth="900"  #1000 original
+ maxDepth="4500" #3000 is too small
+ 
+ #HIDEBODY="--hide2DLocationOfJoints 0 8 abdomen chest eye.r eye.l toe1-2.r toe5-3.r toe1-2.l toe5-3.l" #We want  to contain these joints in the BVH file and solve them, but they do not
+ #SELECTBODY="--selectJoints 1 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow  lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l $HIDEBODY"
+ #--randomize2D $MIN_DEPTH $MAX_DEPTH $MIN_LIM $FRONT_MIN_ORIENTATION $MIN_LIM $MAX_LIM $FRONT_MAX_ORIENTATION $MAX_LIM" "$SELECTLOWERBODY $RAND_LOWER_BODY
 
-#HIDEBODY="--hide2DLocationOfJoints 0 8 abdomen chest eye.r eye.l toe1-2.r toe5-3.r toe1-2.l toe5-3.l" #We want to contain these joints in the BVH file and solve them, but they do not
-#SELECTBODY="--selectJoints 1 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l $HIDEBODY"
-#--randomize2D $MIN_DEPTH $MAX_DEPTH $MIN_LIM $FRONT_MIN_ORIENTATION $MIN_LIM $MAX_LIM $FRONT_MAX_ORIENTATION $MAX_LIM" "$SELECTLOWERBODY $RAND_LOWER_BODY
+ #$MIN_DEPTH $MAX_DEPTH $MIN_LIM -179.999999 $MIN_LIM $MAX_LIM 180 $MAX_LIM
 
-#$MIN_DEPTH $MAX_DEPTH $MIN_LIM -179.999999 $MIN_LIM $MAX_LIM 180 $MAX_LIM
-
-numberOfFilesProcessed = 0
-for bvhFile in allBVHFiles:
+ numberOfFilesProcessed = 0
+ for bvhFile in allBVHFiles:
     args=list()
     args.append("--printparams") 
     args.append("--haltonerror")
     args.append("--from")
     args.append(bvhFile)
-#RAND_UPPER_BODY="--perturbJointAngles 2 30.0 rshoulder lshoulder --perturbJointAngles 2 16.0 relbow lelbow --perturbJointAngles 2 10.0 abdomen chest"
-#RAND_LOWER_BODY="--perturbJointAngles 2 30.0 rhip lhip --perturbJointAngles 4 10.0 lknee rknee lfoot rfoot --perturbJointAngles 2 10.0 abdomen chest"
+ #RAND_UPPER_BODY="--perturbJointAngles 2 30.0 rshoulder lshoulder --perturbJointAngles 2 16.0 relbow lelbow --perturbJointAngles 2 10.0 abdomen chest"
+ #RAND_LOWER_BODY="--perturbJointAngles 2 30.0 rhip lhip --perturbJointAngles 4 10.0 lknee rknee lfoot rfoot --perturbJointAngles 2 10.0 abdomen chest"
     args.append("--filtergimballocks"); args.append("4")
     #startingFlags.append("--repeat")          ;  startingFlags.append("1")
 
@@ -218,10 +219,7 @@ for bvhFile in allBVHFiles:
        print("Stopping now at ",numberOfFilesProcessed," limit")
        break
 
-appendJSONEnding("2d_"+bodyPart+extension)
-appendJSONEnding("bvh_"+bodyPart+extension)
+ appendJSONEnding("2d_"+bodyPart+extension)
+ appendJSONEnding("bvh_"+bodyPart+extension)
 
-#./GroundTruthDumper $VIEW_COMMANDS --haltonerror --from $BVHFILE --filtergimballocks 4 $3 --repeat $ITERATIONS $2 --occlusions --csv $outputDir $1 2d+bvh # --bvh $outputDir/$f-random.bvh
-
-
-
+ #./GroundTruthDumper $VIEW_COMMANDS --haltonerror --from $BVHFILE --filtergimballocks 4 $3 --repeat $ITERATIONS $2 --occlusions --csv $outputDir $1 2d+bvh # --bvh $outputDir/$f-random.bvh
