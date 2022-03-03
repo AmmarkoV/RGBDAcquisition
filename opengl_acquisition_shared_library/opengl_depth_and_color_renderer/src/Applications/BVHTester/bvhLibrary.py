@@ -27,7 +27,7 @@ def gatherAllBVHFiles(directoryPath):
        if f.is_file():
           #print("f.path=",f.path)
           if (f.path.find(".bvh")!=-1):
-              print("Adding BVH file ",f.path)
+              #print("Adding BVH file ",f.path)
               results.append(f.path)
    return results;
 #--------------------------------------------------------
@@ -35,7 +35,7 @@ def gatherAllBVHDirectories(directoryPath):
    results = list()
    for f in os.scandir(directoryPath):
        if f.is_dir():
-          print("Adding files in ",f.path)
+          #print("Adding files in ",f.path)
           results = results + gatherAllBVHFiles(f.path)
    return results
 #--------------------------------------------------------
