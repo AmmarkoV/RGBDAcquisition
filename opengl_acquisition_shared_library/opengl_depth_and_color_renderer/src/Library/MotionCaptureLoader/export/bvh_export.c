@@ -379,7 +379,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    if (
-       !performPointProjectionsForFrame(
+        performPointProjectionsForFrame(
                                         mc,
                                         &bvhTransform,
                                         fID,
@@ -389,12 +389,6 @@ int dumpBVHTo_JSON_SVG_CSV(
                                        )
        )
    {
-       fprintf(stderr,RED "Could not perform projection for frame %u\n" NORMAL,fID);
-   }
-
-
-
-
    if (
         bvhExportSkeletonFilter(
                                 mc,
@@ -480,6 +474,8 @@ int dumpBVHTo_JSON_SVG_CSV(
    didBVHOutputPreExist=1;
   }//Skeleton is ok to be dumped
 
+  } else //3D Projection was ok
+  { fprintf(stderr,RED "Could not perform projection for frame %u\n" NORMAL,fID); }
    //wipe_2D_Output=0;
    //wipe_3D_Output=0;
    //wipe_BVH_Output=0;

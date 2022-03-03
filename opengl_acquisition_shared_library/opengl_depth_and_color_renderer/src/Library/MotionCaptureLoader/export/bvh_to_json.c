@@ -390,22 +390,6 @@ int dumpBVHToJSONBody(
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
-   if (
-       !bvhExportSkeletonFilter(
-                                mc,
-                                bvhTransform,
-                                renderer,
-                                filterStats,
-                                filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                                filterOutSkeletonsWithAnyLimbsOutOfImage,
-                                filterWeirdSkeletons
-                               )
-       )
-   {
-     //fprintf(stderr,"csvSkeletonFilter discarded frame %u\n",fID);
-     return 0;
-   }
-
    //-------------------------------------------------
    if (encodeRotationsAsRadians)
    {
