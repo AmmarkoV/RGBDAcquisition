@@ -51,6 +51,9 @@ int dumpBVHToJSONHeader(
                         int wiped2DOutput,
                         int wiped3DOutput,
                         int wipedBVHOutput,
+                        int * did2DOutputPreExist,
+                        int * did3DOutputPreExist,
+                        int * didBVHOutputPreExist,
                         const char * filenameInput,
                         const char * filename3D,
                         const char * filenameBVH,
@@ -140,6 +143,9 @@ int dumpBVHToJSONHeader(
      fprintf(fp,"\"2DJointSamples\":\n");
      fprintf(fp,"  [\n");
      fclose(fp);
+
+     //For sure no 2D output pre-exists now!
+     *did2DOutputPreExist = 0;
     } //We managed to open the file
    } else
    {
@@ -225,6 +231,10 @@ int dumpBVHToJSONHeader(
       fprintf(fp3D,"  [\n");
 
       fclose(fp3D);
+
+
+     //For sure no 3D output pre-exists now!
+     *did3DOutputPreExist = 0;
      }
     } else
     {
@@ -297,6 +307,10 @@ int dumpBVHToJSONHeader(
       fprintf(fpBVH,"  [\n");
 
       fclose(fpBVH);
+
+
+      //For sure no 3D output pre-exists now!
+      *didBVHOutputPreExist = 0;
      }
     } else
     {
