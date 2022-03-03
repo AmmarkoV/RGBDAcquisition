@@ -433,7 +433,7 @@ int dumpBVHToJSONBody(
    if (fp!=0)
      {
       if (didInputOutputPreExist) { fprintf(fp,","); }
-      fprintf(fp,"  [");
+      fprintf(fp,"[");
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -492,7 +492,7 @@ int dumpBVHToJSONBody(
    if (fp3D!=0)
      {
       if (did3DOutputPreExist) { fprintf(fp3D,","); }
-      fprintf(fp3D,"  [");
+      fprintf(fp3D,"[");
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -545,7 +545,7 @@ int dumpBVHToJSONBody(
    {
      char comma=' ';
      if (didBVHOutputPreExist) { fprintf(fpBVH,","); }
-     fprintf(fpBVH," [");
+     fprintf(fpBVH,"[");
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);

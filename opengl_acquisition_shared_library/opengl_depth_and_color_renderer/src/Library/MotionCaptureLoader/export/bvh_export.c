@@ -423,6 +423,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
    if (convertToJSON)
    {
+            fprintf(stderr,"Pre-exist out 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
             dumpBVHToJSONBody(
                               mc,
                               &bvhTransform,
