@@ -174,9 +174,6 @@ void printCallingParameters(int argc,const char **argv)
 
 int bvhConverter(int argc,const char **argv)
 {
-    srand(time(NULL)); // randomize seed
-
-
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
     const char * fromBVHFile="Motions/example.bvh";
@@ -1063,6 +1060,7 @@ int bvhConverter(int argc,const char **argv)
 #ifndef BVH_USE_AS_A_LIBRARY
 int main(int argc,const char **argv)
 {
+  srand(time(NULL)); // randomize seed
   fprintf(stderr,"BVH Loader code - v%s\n\n",BVH_LOADER_VERSION_STRING);
   return bvhConverter(argc,argv);
 }
