@@ -339,9 +339,11 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
    if (convertToJSON)
    {
-
     dumpBVHToJSONHeader(
                         mc,
+                        wipe_2D_Output,
+                        wipe_3D_Output,
+                        wipe_BVH_Output,
                         csvFilename2D,
                         csvFilename3D,
                         csvFilenameBVH,

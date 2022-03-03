@@ -16,6 +16,9 @@ extern "C"
 
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
+                        int wiped2DOutput,
+                        int wiped3DOutput,
+                        int wipedBVHOutput,
                         const char * filenameInput,
                         const char * filename3D,
                         const char * filenameBVH,

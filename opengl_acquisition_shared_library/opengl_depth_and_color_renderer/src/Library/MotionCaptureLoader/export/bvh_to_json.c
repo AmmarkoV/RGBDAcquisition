@@ -48,6 +48,9 @@ int countNumberOfJoints(struct BVH_MotionCapture * mc)
 
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
+                        int wiped2DOutput,
+                        int wiped3DOutput,
+                        int wipedBVHOutput,
                         const char * filenameInput,
                         const char * filename3D,
                         const char * filenameBVH,
@@ -67,7 +70,7 @@ int dumpBVHToJSONHeader(
    unsigned int countedNumberOfJoints = countNumberOfJoints(mc);
 
 
-   if ( (filenameInput!=0) && (filenameInput[0]!=0) && (!bvhExportFileExists(filenameInput)) )
+   if  ( (filenameInput!=0) && (filenameInput[0]!=0) && ( (wiped2DOutput) || (!bvhExportFileExists(filenameInput)) ) )
    {
     FILE * fp = fopen(filenameInput,"a");
 
@@ -151,7 +154,7 @@ int dumpBVHToJSONHeader(
 
 
 
-   if ( (filename3D!=0) && (filename3D[0]!=0) && (!bvhExportFileExists(filename3D)) )
+   if ( (filename3D!=0) && (filename3D[0]!=0) && ( (wiped3DOutput) || (!bvhExportFileExists(filename3D)) ) )
    {
      FILE * fp3D = fopen(filename3D,"a");
      if (fp3D!=0)
@@ -241,7 +244,7 @@ int dumpBVHToJSONHeader(
 
 
 
-   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!bvhExportFileExists(filenameBVH)) )
+   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && ( (wipedBVHOutput) || (!bvhExportFileExists(filenameBVH)) ) )
    {
      FILE * fpBVH = fopen(filenameBVH,"a");
      if (fpBVH!=0)
