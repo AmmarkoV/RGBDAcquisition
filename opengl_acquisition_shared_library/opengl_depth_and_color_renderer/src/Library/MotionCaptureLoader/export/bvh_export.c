@@ -25,6 +25,15 @@ int bvhExportFileExists(const char * filename)
  return 0;
 }
 
+
+int bvhExportFileWipe(const char * filename)
+{
+ FILE *fp = fopen(filename,"w");
+ if( fp ) { /* exists */ fclose(fp); return 1; }
+ return 0;
+}
+
+
 float bvhExportEulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
 {
   if (isItNeeded)
@@ -236,7 +245,9 @@ int dumpBVHTo_JSON_SVG_CSV(
                            const char * filename,
                            int convertToJSON,
                            int convertToSVG,
-                           int convertToCSV,int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
+                           int convertToCSV,
+                           int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
+                           int wipe_2D_Output,int wipe_3D_Output,int wipe_BVH_Output,
                            struct BVH_MotionCapture * mc,
                            struct BVH_RendererConfiguration * renderConfig,
                            struct filteringResults * filterStats,
@@ -261,6 +272,10 @@ int dumpBVHTo_JSON_SVG_CSV(
   int did2DOutputPreExist  = bvhExportFileExists(csvFilename2D);
   int did3DOutputPreExist  = bvhExportFileExists(csvFilename3D);
   int didBVHOutputPreExist = bvhExportFileExists(csvFilenameBVH);
+
+  if (wipe_2D_Output)  { did2DOutputPreExist=0;   bvhExportFileWipe(csvFilename2D); }
+  if (wipe_3D_Output)  { did3DOutputPreExist=0;   bvhExportFileWipe(csvFilename3D); }
+  if (wipe_BVH_Output) { didBVHOutputPreExist=0;  bvhExportFileWipe(csvFilenameBVH);}
 
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points

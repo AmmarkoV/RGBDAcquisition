@@ -180,10 +180,9 @@ int bvhConverter(int argc,const char **argv)
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
-    unsigned int convertToJSON=0;
-    unsigned int convertToSVG=0;
-    unsigned int convertToCSV=0;
+    unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
+    unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
     unsigned int multiThreaded = 0;
@@ -212,6 +211,13 @@ int bvhConverter(int argc,const char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+         //-----------------------------------------------------
+        if (strcmp(argv[i],"--wipe")==0)
+        {
+           wipe_2D_Output=1;
+           wipe_3D_Output=1;
+           wipe_BVH_Output=1;
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--headrobot")==0)
         {
@@ -287,7 +293,7 @@ int bvhConverter(int argc,const char **argv)
           unsigned int epochs=atoi(argv[i+6]);
           float spring = atof(argv[i+7]);
 
-           bvhMeasureIterationInfluence(
+          bvhMeasureIterationInfluence(
                       &bvhMotion,
                       learningRate,
                       spring,
@@ -1038,7 +1044,9 @@ int bvhConverter(int argc,const char **argv)
                             toCSVFilename,
                             convertToJSON,
                             convertToSVG,
-                            convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                            convertToCSV,
+                            useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                            wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
                             &bvhMotion,
                             &renderingConfiguration,
                             &filterStats,
