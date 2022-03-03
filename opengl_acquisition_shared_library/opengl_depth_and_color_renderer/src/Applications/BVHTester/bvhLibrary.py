@@ -122,6 +122,7 @@ if __name__== "__main__":
  extension="."+mode
  bodyPart="upperbody"
  os.system("rm 2d_"+bodyPart+extension)
+ os.system("rm 3d_"+bodyPart+extension)
  os.system("rm bvh_"+bodyPart+extension)
 
 
@@ -222,6 +223,7 @@ if __name__== "__main__":
        break
 
  appendJSONEnding("2d_"+bodyPart+extension)
+ appendJSONEnding("3d_"+bodyPart+extension)
  appendJSONEnding("bvh_"+bodyPart+extension)
 
  #./GroundTruthDumper $VIEW_COMMANDS --haltonerror --from $BVHFILE --filtergimballocks 4 $3 --repeat $ITERATIONS $2 --occlusions --csv $outputDir $1 2d+bvh # --bvh $outputDir/$f-random.bvh
