@@ -17,6 +17,7 @@ extern "C"
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
+                        const char * filename3D,
                         const char * filenameBVH,
                         float fx,
                         float fy,
@@ -31,6 +32,7 @@ int dumpBVHToJSONHeader(
 int dumpBVHToJSONFooter(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
+                        const char * filename3D,
                         const char * filenameBVH
                        );
 
@@ -40,6 +42,7 @@ int dumpBVHToJSONBody(
                        struct simpleRenderer * renderer,
                        unsigned int fID,
                        const char * filenameInput,
+                        const char * filename3D,
                        const char * filenameBVH,
                        int didInputOutputPreExist,
                        int didBVHOutputPreExist,

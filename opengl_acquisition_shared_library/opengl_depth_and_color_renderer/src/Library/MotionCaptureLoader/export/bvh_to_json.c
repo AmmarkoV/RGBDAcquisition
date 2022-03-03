@@ -49,6 +49,7 @@ int countNumberOfJoints(struct BVH_MotionCapture * mc)
 int dumpBVHToJSONHeader(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
+                        const char * filename3D,
                         const char * filenameBVH,
                         float fx,
                         float fy,
@@ -146,6 +147,100 @@ int dumpBVHToJSONHeader(
 
 
 
+
+
+
+
+   if ( (filename3D!=0) && (filename3D[0]!=0) && (!bvhExportFileExists(filename3D)) )
+   {
+     FILE * fp3D = fopen(filename3D,"a");
+     if (fp3D!=0)
+     {
+      fprintf(fp3D,"{\n");
+      //Give camera information here !
+      fprintf(fp3D,"\"VirtualCameraName\":\"Default Camera\",\n");
+      fprintf(fp3D,"\"FocalLengthX\":%f,\n",fx);
+      fprintf(fp3D,"\"FocalLengthY\":%f,\n",fy);
+      fprintf(fp3D,"\"CenterX\":%f,\n",cx);
+      fprintf(fp3D,"\"CenterY\":%f,\n",cy);
+      fprintf(fp3D,"\"Width\":%f,\n",width);
+      fprintf(fp3D,"\"Height\":%f,\n",height);
+      fprintf(fp3D,"\"Near\":%f,\n",near);
+      fprintf(fp3D,"\"Far\":%f,\n",far);
+      fprintf(fp3D,"\"SelfSupervised\":0,\n");
+      fprintf(fp3D,"\"Perturbed\":0,\n");
+      fprintf(fp3D,"\"NumberOfJoints\":%u,\n",countedNumberOfJoints);
+
+      fprintf(fp3D,"\"3DJointNames\":\n");
+      fprintf(fp3D,"  [\n");
+
+      char comma=' ';
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
+
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID])
+                  {
+                     isJointSelected=0;
+                     if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                  }
+            }
+          //----------------------------------
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+            if (isJointSelected)
+            {
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+               fprintf(fp3D,"    {\n");
+               fprintf(fp3D,"     \"Joint\" : \"%s\",\n",mc->jointHierarchy[jID].jointName);
+               fprintf(fp3D,"     \"JointID\" : %u\n",jID);
+               fprintf(fp3D,"    }\n");
+            }
+         }
+         else
+         {
+            if (isJointEndSiteSelected)
+            {
+               unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+               fprintf(fp3D,"    {\n");
+               fprintf(fp3D,"     \"Joint\" : \"EndSite_%s\",\n",mc->jointHierarchy[parentID].jointName);
+               fprintf(fp3D,"     \"JointID\" : %u\n",jID);
+               fprintf(fp3D,"    }\n");
+            }
+         }
+       }
+
+      //Append Frame ID
+      fprintf(fp3D," ],\n\n");
+      fprintf(fp3D,"\"3DJointSamples\":\n");
+      fprintf(fp3D,"  [\n");
+
+      fclose(fp3D);
+     }
+    } else
+    {
+     fprintf(stderr,"We don't need to regenerate the JSON header for 3D data, it already exists\n");
+    }
+   //--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
    if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!bvhExportFileExists(filenameBVH)) )
    {
      FILE * fpBVH = fopen(filenameBVH,"a");
@@ -216,6 +311,7 @@ int dumpBVHToJSONHeader(
 int dumpBVHToJSONFooter(
                         struct BVH_MotionCapture * mc,
                         const char * filenameInput,
+                        const char * filename3D,
                         const char * filenameBVH
                        )
 {
@@ -228,6 +324,17 @@ int dumpBVHToJSONFooter(
      fprintf(fp,"] \n }\n");
      }
     }
+
+
+   if ( (filename3D!=0) && (filename3D[0]!=0) && (!bvhExportFileExists(filename3D)) )
+   {
+     FILE * fp3D = fopen(filename3D,"a");
+     if (fp3D!=0)
+     {
+      fprintf(fp3D,"] \n }\n");
+     }
+   }
+
 
    if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!bvhExportFileExists(filenameBVH)) )
    {
@@ -251,6 +358,7 @@ int dumpBVHToJSONBody(
                        struct simpleRenderer    * renderer,
                        unsigned int fID,
                        const char * filenameInput,
+                       const char * filename3D,
                        const char * filenameBVH,
                        int didInputOutputPreExist,
                        int didBVHOutputPreExist,
@@ -290,11 +398,15 @@ int dumpBVHToJSONBody(
 
    unsigned int dumped=0;
    unsigned int requestedToDump=0;
-   FILE * fp = 0;
+   //-------------------------------------------------------------------------------------------------------------
+   FILE * fp    = 0;
+   FILE * fp3D  = 0;
    FILE * fpBVH = 0;
-
+   //-------------------------------------------------------------------------------------------------------------
    if ( (filenameInput!=0) && (filenameInput[0]!=0) )   { fp = fopen(filenameInput,"a");     ++requestedToDump; }
+   if ( (filename3D!=0)    && (filename3D[0]!=0) )      { fp3D = fopen(filename3D,"a");      ++requestedToDump; }
    if ( (filenameBVH!=0)   && (filenameBVH[0]!=0) )     { fpBVH = fopen(filenameBVH,"a");    ++requestedToDump; }
+   //-------------------------------------------------------------------------------------------------------------
 
 
    //--------------------------------------------------------------------------------------------------------------------------
@@ -352,6 +464,63 @@ int dumpBVHToJSONBody(
    //-----------------------------------------------------------------------------------------------------------------------------
    //-----------------------------------------------------------------------------------------------------------------------------
    //-----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+   if (fp3D!=0)
+     {
+      if (didInputOutputPreExist) { fprintf(fp3D,","); }
+      fprintf(fp3D,"  [");
+      char comma=' ';
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID])
+                {
+                  isJointSelected=0;
+                  if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                }
+            }
+          //----------------------------------
+
+         if (
+               //If this a regular joint and regular joints are enabled
+               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) ) ||
+               //OR if this is an end joint and end joints are enabled..
+               ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
+            )
+          {
+            if (bvhTransform->joint[jID].isOccluded) { ++filterStats->invisibleJoints; } else { ++filterStats->visibleJoints; }
+            if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+            fprintf(
+                     fp3D,"{\"x\":%f,\"y\":%f,\"z\":%f}",
+                     bvhTransform->joint[jID].pos3D[0],
+                     bvhTransform->joint[jID].pos3D[1],
+                     bvhTransform->joint[jID].pos3D[2]
+                    );
+         }
+       }
+     fprintf(fp3D,"]\n");
+     fclose(fp3D);
+     ++dumped;
+     }
+
+
+
+
+
+
+
+
+
 
    //Joint Configuration
    if (fpBVH!=0)

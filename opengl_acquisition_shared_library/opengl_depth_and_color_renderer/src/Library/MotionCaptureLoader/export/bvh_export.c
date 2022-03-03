@@ -327,6 +327,7 @@ int dumpBVHTo_JSON_SVG_CSV(
     dumpBVHToJSONHeader(
                         mc,
                         csvFilename2D,
+                        csvFilename3D,
                         csvFilenameBVH,
                         renderer.fx,
                         renderer.fy,
@@ -399,6 +400,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                               &renderer,
                               fID,
                               csvFilename2D,
+                              csvFilename3D,
                               csvFilenameBVH,
                               did2DOutputPreExist,
                               didBVHOutputPreExist,
