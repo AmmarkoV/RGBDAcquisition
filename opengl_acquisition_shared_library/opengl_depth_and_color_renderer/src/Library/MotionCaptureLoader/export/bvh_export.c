@@ -393,6 +393,21 @@ int dumpBVHTo_JSON_SVG_CSV(
    }
 
 
+
+
+   if (
+        bvhExportSkeletonFilter(
+                                mc,
+                                &bvhTransform,
+                                &renderer,
+                                filterStats,
+                                filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                                filterOutSkeletonsWithAnyLimbsOutOfImage,
+                                filterWeirdSkeletons
+                               )
+       )
+   {
+
   //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
 
   //CSV output
@@ -423,7 +438,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
    if (convertToJSON)
    {
-            fprintf(stderr,"Pre-exist out 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
+            //fprintf(stderr,"Pre-exist out 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
             dumpBVHToJSONBody(
                               mc,
                               &bvhTransform,
@@ -463,6 +478,7 @@ int dumpBVHTo_JSON_SVG_CSV(
    did2DOutputPreExist=1;
    did3DOutputPreExist=1;
    didBVHOutputPreExist=1;
+  }//Skeleton is ok to be dumped
 
    //wipe_2D_Output=0;
    //wipe_3D_Output=0;
