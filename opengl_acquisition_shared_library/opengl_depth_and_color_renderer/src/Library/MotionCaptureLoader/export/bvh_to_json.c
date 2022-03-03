@@ -361,6 +361,7 @@ int dumpBVHToJSONBody(
                        const char * filename3D,
                        const char * filenameBVH,
                        int didInputOutputPreExist,
+                       int did3DOutputPreExist,
                        int didBVHOutputPreExist,
                        struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,

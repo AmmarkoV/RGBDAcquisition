@@ -259,6 +259,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   if (useCSV_BVH_Output) { snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);}
 
   int did2DOutputPreExist  = bvhExportFileExists(csvFilename2D);
+  int did3DOutputPreExist  = bvhExportFileExists(csvFilename3D);
   int didBVHOutputPreExist = bvhExportFileExists(csvFilenameBVH);
 
   struct simpleRenderer renderer={0};
@@ -403,6 +404,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                               csvFilename3D,
                               csvFilenameBVH,
                               did2DOutputPreExist,
+                              did3DOutputPreExist,
                               didBVHOutputPreExist,
                               filterStats,
                               filterOutSkeletonsWithAnyLimbsBehindTheCamera,
