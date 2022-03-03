@@ -432,6 +432,7 @@ int dumpBVHTo_JSON_SVG_CSV(
    }
 
    did2DOutputPreExist=1;
+   did3DOutputPreExist=1;
    didBVHOutputPreExist=1;
   //------------------------------------------------------------------------------------------
   } //For every frame.. ----------------------------------------------------------------------
