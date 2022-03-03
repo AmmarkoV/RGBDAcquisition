@@ -474,7 +474,7 @@ int dumpBVHToJSONBody(
 
    if (fp3D!=0)
      {
-      if (didInputOutputPreExist) { fprintf(fp3D,","); }
+      if (did3DOutputPreExist) { fprintf(fp3D,","); }
       fprintf(fp3D,"  [");
       char comma=' ';
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
