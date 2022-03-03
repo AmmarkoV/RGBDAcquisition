@@ -3,6 +3,13 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+#in case of a build after ./batherFiles.sh
+BVHTESTER_DIR="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Applications/BVHTester"
+AMMATRIX_DIRECTORY="tools/AmMatrix"
+MODELLOADER_DIRECTORY="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader"
+BVH_DIRECTORY="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader"
+INPUTPARSER_DIRECTORY="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser"
+
 BVHTESTER_DIR="."
 AMMATRIX_DIRECTORY="../../../../../tools/AmMatrix"
 MODELLOADER_DIRECTORY="../../Library/ModelLoader"

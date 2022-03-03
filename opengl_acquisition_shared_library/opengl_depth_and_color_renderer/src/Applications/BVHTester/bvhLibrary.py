@@ -55,8 +55,10 @@ def appendJSONEnding(theFilename):
 
 def loadLibrary(filename):
  if not exists(filename):
-     print("Could not find BVH Library, compiling a fresh one..!")
-     os.system("./makeLibrary.sh")
+     print("Could not find BVH Library (",filename,"), compiling a fresh one..!")
+     print("Current directory was (",os.getcwd(),") ")
+     directory=os.path.dirname(os.path.abspath(filename))
+     os.system(directory+"/makeLibrary.sh")
  if not exists(filename):
      print("Could not make BVH Library, terminating")
      sys.exit(0)
