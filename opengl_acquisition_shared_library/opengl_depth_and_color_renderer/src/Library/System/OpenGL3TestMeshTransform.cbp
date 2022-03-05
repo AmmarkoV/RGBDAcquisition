@@ -135,6 +135,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../MotionCaptureLoader/export/bvh_to_csv.h" />
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_json.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../MotionCaptureLoader/export/bvh_to_json.h" />
 		<Unit filename="../MotionCaptureLoader/export/bvh_to_svg.c">
 			<Option compilerVar="CC" />
 		</Unit>
