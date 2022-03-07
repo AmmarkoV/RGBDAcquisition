@@ -192,17 +192,17 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
                                               unsigned int timesToRepeat
                                              )
 {
-  if (mc==0)                     { fprintf(stderr,"No motion capture file to repeat\n"); return 0; }
-  if (timesToRepeat==0)          { fprintf(stderr,"No times to repeat\n"); return 0; }
-  if (mc->motionValues==0)       { fprintf(stderr,"No data to repeat\n"); return 0; }
+  if (timesToRepeat==0)          { fprintf(stderr,"No times to repeat\n");                return 1; }
+  if (mc==0)                     { fprintf(stderr,"No motion capture file to repeat\n");  return 0; }
+  if (mc->motionValues==0)       { fprintf(stderr,"No data to repeat\n");                 return 0; }
   if (mc->motionValuesSize==0)   { fprintf(stderr,"Data to repeat has zero data size\n"); return 0; }
   //-------------------------------------------------------------------------------------------------
   fprintf(stderr,"Asked to repeat %u times the %u existing motion records\n",timesToRepeat,mc->numberOfFramesEncountered);
   fprintf(stderr,"Will now try to allocate %lu KB of memory\n",(sizeof(float) * mc->motionValuesSize * (timesToRepeat+1)) / 1024);
-  
+
   float * newMotionValues = (float*) malloc(sizeof(float) * mc->motionValuesSize * (timesToRepeat+1) );
   if (newMotionValues==0) { fprintf(stderr,"Could not allocate new motion values\n"); return 0; }
-  
+
   float * oldMotionValues = mc->motionValues;
   float * ptr=newMotionValues;
 
