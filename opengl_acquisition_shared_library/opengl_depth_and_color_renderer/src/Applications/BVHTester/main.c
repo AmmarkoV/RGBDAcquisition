@@ -118,8 +118,9 @@ int testMultipleLoad(const char * filename)
             ssize_t read;
 
             unsigned int fileNumber=0;
-            unsigned int done=0;
-            while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
+            //unsigned int done=0;
+            // while ( (!done) && ( (read = getline(&line, &len, fp)) != -1) )
+            while ( (read = getline(&line, &len, fp)) != -1)
                 {
                   if (line!=0)
                   {
@@ -180,6 +181,7 @@ int bvhConverter(int argc,const char **argv)
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
+    unsigned int sampleSkip = 0;// <- If you want to artificially reduce the sample size
     unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
@@ -227,6 +229,12 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--mt")==0)
         {
            multiThreaded=1;
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--sampleskip")==0)
+        {
+           if (i+1>=argc)  { incorrectArguments(); }
+           sampleSkip=atoi(argv[i+1]);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--printparams")==0)
@@ -1050,6 +1058,7 @@ int bvhConverter(int argc,const char **argv)
                             &bvhMotion,
                             &renderingConfiguration,
                             &filterStats,
+                            sampleSkip,
                             occlusions,
                             filterBehindCamera,//Filter out all poses where even one joint is behind camera
                             filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame

@@ -67,7 +67,7 @@ int dumpBVHToJSONHeader(
                         float height
                        )
 {
-   fprintf(stderr,"dumpBVHToJSON(in=%s,out=%s)\n",filenameInput,filenameBVH);
+   //fprintf(stderr,"dumpBVHToJSON(in=%s,out=%s)\n",filenameInput,filenameBVH);
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
    unsigned int countedNumberOfJoints = countNumberOfJoints(mc);
@@ -338,7 +338,8 @@ int dumpBVHToJSONFooter(
 
     if (fp!=0)
     {
-     fprintf(fp,"] \n }\n");
+      fprintf(fp,"] \n }\n");
+      fclose(fp);
      }
     }
 
@@ -349,6 +350,7 @@ int dumpBVHToJSONFooter(
      if (fp3D!=0)
      {
       fprintf(fp3D,"] \n }\n");
+      fclose(fp3D);
      }
    }
 
@@ -359,6 +361,7 @@ int dumpBVHToJSONFooter(
      if (fpBVH!=0)
      {
       fprintf(fpBVH,"] \n }\n");
+      fclose(fpBVH);
      }
    }
 

@@ -254,12 +254,12 @@ static inline float sqrt_fast_approximation(const float x)
   union
   {
     int i;
-    float x;
+    float xi;
   } u;
 
-  u.x = x;
+  u.xi = x;
   u.i = (1<<29) + (u.i >> 1) - (1<<22);
-  return u.x;
+  return u.xi;
 }
 
 

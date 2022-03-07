@@ -78,6 +78,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            struct BVH_MotionCapture * mc,
                            struct BVH_RendererConfiguration * renderConfig,
                            struct filteringResults * filterStats,
+                           unsigned int sampleSkip,
                            unsigned int occlusions,
                            unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                            unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,

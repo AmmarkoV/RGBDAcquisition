@@ -1548,7 +1548,7 @@ void *pak_load_file(const char *pak_filename, const char *filename, int *out_fil
 void doTriDrawCalllist(struct TRI_Model * tri )
 {
  #if INCLUDE_OPENGL_CODE
-  unsigned int i=0,z=0;
+  unsigned int i=0,z;
 
 
   glBegin(GL_TRIANGLES);

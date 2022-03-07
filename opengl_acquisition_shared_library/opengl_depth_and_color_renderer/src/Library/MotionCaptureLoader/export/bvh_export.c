@@ -251,6 +251,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            struct BVH_MotionCapture * mc,
                            struct BVH_RendererConfiguration * renderConfig,
                            struct filteringResults * filterStats,
+                           unsigned int sampleSkip,
                            unsigned int occlusions,
                            unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                            unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -378,7 +379,9 @@ int dumpBVHTo_JSON_SVG_CSV(
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
-   if (
+   if ( (sampleSkip==0) || (fID%sampleSkip==0) )
+   {
+    if (
         performPointProjectionsForFrame(
                                         mc,
                                         &bvhTransform,
@@ -388,9 +391,9 @@ int dumpBVHTo_JSON_SVG_CSV(
                                         renderConfig->isDefined
                                        )
        )
-   {
-   if (
-        bvhExportSkeletonFilter(
+    {
+     if (
+         bvhExportSkeletonFilter(
                                 mc,
                                 &bvhTransform,
                                 &renderer,
@@ -399,15 +402,15 @@ int dumpBVHTo_JSON_SVG_CSV(
                                 filterOutSkeletonsWithAnyLimbsOutOfImage,
                                 filterWeirdSkeletons
                                )
-       )
-   {
+        )
+    {
 
   //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
 
   //CSV output
   //------------------------------------------------------------------------------------------
-   if (convertToCSV)
-   {
+      if (convertToCSV)
+      {
             dumpBVHToCSVBody(
                              mc,
                              &bvhTransform,
@@ -422,16 +425,16 @@ int dumpBVHTo_JSON_SVG_CSV(
                              filterWeirdSkeletons,
                              encodeRotationsAsRadians
                             );
-   }
-  //------------------------------------------------------------------------------------------
+      }
+      //------------------------------------------------------------------------------------------
 
 
 
 
-  //JSON output
-  //------------------------------------------------------------------------------------------
-   if (convertToJSON)
-   {
+      //JSON output
+      //------------------------------------------------------------------------------------------
+      if (convertToJSON)
+      {
             //fprintf(stderr,"Pre-exist out 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
             dumpBVHToJSONBody(
                               mc,
@@ -450,35 +453,37 @@ int dumpBVHTo_JSON_SVG_CSV(
                               filterWeirdSkeletons,
                               encodeRotationsAsRadians
                              );
-   }
-  //------------------------------------------------------------------------------------------
+      }
+     //------------------------------------------------------------------------------------------
 
 
 
-  //SVG output
-  //------------------------------------------------------------------------------------------
-   if (convertToSVG)
-   {
-     snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
-     framesDumped +=  dumpBVHToSVGFrame(
-                                       svgFilename,
-                                       mc,
-                                       &bvhTransform,
-                                       fID,
-                                       &renderer
-                                      );
-   }
+     //SVG output
+     //------------------------------------------------------------------------------------------
+     if (convertToSVG)
+     {
+      snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
+      framesDumped +=  dumpBVHToSVGFrame(
+                                        svgFilename,
+                                        mc,
+                                        &bvhTransform,
+                                        fID,
+                                        &renderer
+                                       );
+      }
 
-   did2DOutputPreExist=1;
-   did3DOutputPreExist=1;
-   didBVHOutputPreExist=1;
-  }//Skeleton is ok to be dumped
-
+     did2DOutputPreExist=1;
+     did3DOutputPreExist=1;
+     didBVHOutputPreExist=1;
+   }//Skeleton is ok to be dumped
   } else //3D Projection was ok
   { fprintf(stderr,RED "Could not perform projection for frame %u\n" NORMAL,fID); }
    //wipe_2D_Output=0;
    //wipe_3D_Output=0;
    //wipe_BVH_Output=0;
+
+
+   }// Sample skip control..!
   //------------------------------------------------------------------------------------------
   } //For every frame.. ----------------------------------------------------------------------
   //------------------------------------------------------------------------------------------
@@ -519,6 +524,8 @@ int dumpBVHTo_JSON_SVG_CSV(
   {
    float usedPercentage = (float) 100*(mc->numberOfFrames-filterStats->filteredOutCSVPoses)/mc->numberOfFrames;
    if (usedPercentage==0.0) { fprintf(stderr,RED "----------------\n----------------\n----------------\n"); }
+   if (sampleSkip!=0)
+   { fprintf(stderr,YELLOW "Sample-skip setting was set to 1 sample for every %u\n" NORMAL,sampleSkip); }
    fprintf(stderr,"Used %0.2f%% of dataset\n",usedPercentage);
    if (usedPercentage==0.0) { fprintf(stderr, "----------------\n----------------\n----------------\n" NORMAL); }
 

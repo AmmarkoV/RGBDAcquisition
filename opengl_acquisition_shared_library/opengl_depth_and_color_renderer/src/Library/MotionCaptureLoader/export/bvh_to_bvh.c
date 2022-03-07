@@ -107,8 +107,8 @@ int dumpBVHToBVH(
      fprintf(fp,"HIERARCHY\n");
      //--------------------------------------------------------------------------------------
      unsigned int nextHierarchyLevel; // This gets always overwritten.. = 0;
-     unsigned int hasNext=0;
- 
+     unsigned int hasNext;
+
      for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
         {
           unsigned int currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
@@ -135,7 +135,7 @@ int dumpBVHToBVH(
       //--------------------------------------------------------------------------------------
       fprintf(fp,"Frames: %u\n",mc->numberOfFrames);
       fprintf(fp,"Frame Time: %0.8f\n",mc->frameTime);
- 
+
       for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
       {
         for (unsigned int mID=fID*mc->numberOfValuesPerFrame; mID<(fID+1)*mc->numberOfValuesPerFrame; mID++)
