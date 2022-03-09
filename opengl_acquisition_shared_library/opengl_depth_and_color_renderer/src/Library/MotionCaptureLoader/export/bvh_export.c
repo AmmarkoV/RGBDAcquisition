@@ -274,11 +274,11 @@ int dumpBVHTo_JSON_SVG_CSV(
   int did3DOutputPreExist  = bvhExportFileExists(csvFilename3D);
   int didBVHOutputPreExist = bvhExportFileExists(csvFilenameBVH);
 
-  fprintf(stderr,"Wipe 2D:%u 3D:%u BVH:%u\n",wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output);
+  //fprintf(stderr,"Wipe 2D:%u 3D:%u BVH:%u\n",wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output);
   if (wipe_2D_Output)  { did2DOutputPreExist=0;   bvhExportFileWipe(csvFilename2D); }
   if (wipe_3D_Output)  { did3DOutputPreExist=0;   bvhExportFileWipe(csvFilename3D); }
   if (wipe_BVH_Output) { didBVHOutputPreExist=0;  bvhExportFileWipe(csvFilenameBVH);}
-  fprintf(stderr,"Pre-exist 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
+  //fprintf(stderr,"Pre-exist 2D:%u 3D:%u BVH:%u\n",did2DOutputPreExist,did3DOutputPreExist,didBVHOutputPreExist);
 
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
