@@ -431,7 +431,7 @@ int bvhConverter(int argc,const char **argv)
                                             );
           //----------------------------------------
           renderingConfiguration.isDefined=1;
-          exit(0);
+          //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
