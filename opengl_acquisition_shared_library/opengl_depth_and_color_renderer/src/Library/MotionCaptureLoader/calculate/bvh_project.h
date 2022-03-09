@@ -17,6 +17,9 @@ struct BVH_RendererConfiguration
   unsigned int width;
   unsigned int height;
 
+  //Frustrum limits
+  float near,far;
+
   //Intrinsics
   float fX,fY,cX,cY;
   //Distortion
@@ -26,7 +29,7 @@ struct BVH_RendererConfiguration
   float T[4];
   struct Matrix4x4OfFloats projection;
   struct Matrix4x4OfFloats viewMatrix;
-  int viewport[4]; 
+  int viewport[4];
 };
 
 

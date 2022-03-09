@@ -285,15 +285,15 @@ int dumpBVHTo_JSON_SVG_CSV(
 
   if (renderConfig->isDefined)
   {
-    renderer.fx=renderConfig->fX;
-    renderer.fy=renderConfig->fY;
-    renderer.skew=1.0;
-    renderer.cx=renderConfig->cX;
-    renderer.cy=renderConfig->cY;
-    renderer.near=1.0;
-    renderer.far=10000.0;
-    renderer.width=renderConfig->width;
-    renderer.height=renderConfig->height;
+    renderer.fx     = renderConfig->fX;
+    renderer.fy     = renderConfig->fY;
+    renderer.skew   = 1.0;
+    renderer.cx     = renderConfig->cX;
+    renderer.cy     = renderConfig->cY;
+    renderer.near   = renderConfig->near;
+    renderer.far    = renderConfig->far;
+    renderer.width  = renderConfig->width;
+    renderer.height = renderConfig->height;
 
     //renderer.cameraOffsetPosition[4];
     //renderer.cameraOffsetRotation[4];
@@ -307,8 +307,10 @@ int dumpBVHTo_JSON_SVG_CSV(
     //renderer.viewport[4];
 
     simpleRendererInitializeFromExplicitConfiguration(&renderer);
+    //bvh_freeTransform(&bvhTransform);
+
+
     fprintf(stderr,"Direct Rendering is not implemented yet, please don't use it..\n");
-    bvh_freeTransform(&bvhTransform);
     exit(1);
   } else
   {

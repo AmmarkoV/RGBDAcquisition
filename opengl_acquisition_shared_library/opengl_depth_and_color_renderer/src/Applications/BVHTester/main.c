@@ -201,6 +201,8 @@ int bvhConverter(int argc,const char **argv)
 
     // Emulate GoPro Hero4 @ FullHD mode by default..
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+    renderingConfiguration.near=1.0;
+    renderingConfiguration.far =10000.0;
     renderingConfiguration.width=1920;
     renderingConfiguration.height=1080;
     renderingConfiguration.cX=(float)renderingConfiguration.width/2;
@@ -426,12 +428,11 @@ int bvhConverter(int argc,const char **argv)
                                              renderingConfiguration.cY,
                                              width,
                                              height,
-                                             1.0, //Near
-                                             10000.0 //Far
+                                             renderingConfiguration.near, //Near
+                                             renderingConfiguration.far   //Far
                                             );
           //----------------------------------------
           renderingConfiguration.isDefined=1;
-          //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
