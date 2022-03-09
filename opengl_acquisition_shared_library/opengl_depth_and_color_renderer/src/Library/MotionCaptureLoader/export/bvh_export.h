@@ -26,6 +26,15 @@ extern unsigned int filteredOutCSVBehindPoses;
 extern unsigned int filteredOutCSVOutPoses;
 */
 
+
+int bvhExportFileExists(const char * filename);
+
+int bvhExportFileWipe(const char * filename);
+
+float bvhExportEulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded);
+
+
+
 int bvhExportSkeletonFilter(
                             struct BVH_MotionCapture * mc,
                             struct BVH_Transform * bvhTransform,
