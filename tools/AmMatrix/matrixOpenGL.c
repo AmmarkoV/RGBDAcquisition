@@ -51,19 +51,19 @@ void changeYandZAxisOpenGL4x4Matrix(float * result,float * matrix)
   #if PRINT_MATRIX_DEBUGGING
    fprintf(stderr,"Invert Y and Z axis\n");
   #endif // PRINT_MATRIX_DEBUGGING
-   
+
   struct Matrix4x4OfFloats invertOp = {0};
- 
+
   create4x4FIdentityMatrix(&invertOp);
   invertOp.m[5]=-1;   invertOp.m[10]=-1;
-  
-  multiplyTwo4x4FMatrices_Naive(result,matrix,invertOp.m);  
+
+  multiplyTwo4x4FMatrices_Naive(result,matrix,invertOp.m);
 }
 
 int convertRodriguezAndTranslationTo4x4UnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit)
 {
-  float matrix3x3Rotation[16] = {0}; 
-  
+  float matrix3x3Rotation[16] = {0};
+
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
@@ -104,15 +104,15 @@ int convertRodriguezAndTranslationTo4x4UnprojectionMatrix(float * result4x4, flo
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
 
 
-  print4x4FMatrix("ModelView", result4x4,0); 
+  print4x4FMatrix("ModelView", result4x4,0);
   return 1;
 }
 
 
 int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit )
 {
-  float matrix3x3Rotation[16] = {0};     
-  
+  float matrix3x3Rotation[16] = {0};
+
   //Our translation vector is ready to be used!
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
@@ -136,7 +136,7 @@ int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4,
   /*
       Here what we want to do is generate a 4x4 matrix that does the normal transformation that our
       rodriguez and translation vector define
-       * 
+       *
        * //Transposed in one step
   */
    m[0]=  rm[0];        m[4]= rm[1];        m[8]=  rm[2];       m[12]= -Tx;
@@ -149,7 +149,7 @@ int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4,
    print4x4FMatrix("ModelView", result4x4);
    fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   #endif // PRINT_MATRIX_DEBUGGING
-  
+
   return 1;
 }
 
@@ -157,7 +157,7 @@ int convertRodriguezAndTranslationToOpenGL4x4ProjectionMatrix(float * result4x4,
 
 void buildOpenGLProjectionForIntrinsics(
                                          float * frustum,
-                                         int * viewport ,
+                                         int   * viewport,
                                          float fx,
                                          float fy,
                                          float skew,
@@ -205,10 +205,10 @@ void buildOpenGLProjectionForIntrinsics(
 
 
 
-   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15 
+   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
    struct Matrix4x4OfFloats identMat={0};
    struct Matrix4x4OfFloats finalFrustrum={0};
-   
+
    create4x4FIdentityMatrix(&identMat);
    identMat.m[10]=-1;
    multiplyTwo4x4FMatrices_Naive(finalFrustrum.m,identMat.m,frustum);
@@ -277,7 +277,7 @@ void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor
    create4x4FIdentityMatrix(&identMat);
    identMat.m[10]=-1;
    multiplyTwo4x4FMatricesS(&finalFrustrum,&identMat,&frustum);
-   copy4x4FMatrix(frustumOutput,finalFrustrum.m); 
+   copy4x4FMatrix(frustumOutput,finalFrustrum.m);
 }
 
 //matrix will receive the calculated perspective matrix.
@@ -713,23 +713,23 @@ int _glhProjectf(float * position3D, float *modelview, float *projection, int *v
       fTempo[7]=-fTempo[2];
       //The result normalizes between -1 and 1
       if(fTempo[7]!=0.0)	//The w value
-         { 
+         {
            fTempo[7]=1.0/fTempo[7];
            //Perspective division
            fTempo[4]*=fTempo[7];
            fTempo[5]*=fTempo[7];
            fTempo[6]*=fTempo[7];
-           
+
            //Window coordinates
            //Map x, y to range 0-1
            windowCoordinate[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
            windowCoordinate[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
-      
+
            //This is only correct when glDepthRange(0.0, 1.0)
            windowCoordinate[2]=(1.0+fTempo[6])*0.5;	//Between 0 and 1
           return 1;
          }
-   return 0; 
+   return 0;
 }
 
 int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate)
@@ -882,8 +882,8 @@ void prepareRenderingMatrices(
      transpose4x4FMatrix(projectionMatrix->m); //We want our own Row Major format..
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
-     
-     
+
+
      create4x4FScalingMatrix(viewMatrix,-1.0,1.0,1.0);
 
      glGetViewportMatrix(viewportMatrix->m,viewport[0],viewport[1],viewport[2],viewport[3],near,far);

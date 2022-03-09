@@ -51,6 +51,12 @@
 
 void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,float rX,float rY,float rZ)
 {
+    if ( (rX==0.0) && (rY==0.0) && (rZ==0.0) )
+    {
+        create4x4FIdentityMatrix(rotationMatrix);
+        return ;
+    }
+
     struct Matrix4x4OfFloats rXM={0};
     struct Matrix4x4OfFloats rYM={0};
     struct Matrix4x4OfFloats rZM={0};
@@ -431,8 +437,30 @@ int bvhConverter(int argc,const char **argv)
                                              renderingConfiguration.near, //Near
                                              renderingConfiguration.far   //Far
                                             );
+
+          if  ( (renderingConfiguration.k1!=0.0) || (renderingConfiguration.k2!=0.0) || (renderingConfiguration.k3!=0.0) || (renderingConfiguration.p1!=0.0) || (renderingConfiguration.p2!=0.0) )
+          {
+           fprintf(stderr,"The distortion model has not been implemented so the BVH tool is not able to meet your configuration criteria..!\n");
+           exit(1);
+          }
+
+          if  ( (rX!=0.0) || (rY!=0.0) || (rZ!=0.0) )
+          {
+           fprintf(stderr,"Camera rotation change has been prohibited, please don't use a camera rotation..!\n");
+           exit(1);
+          }
+
+          if  ( (renderingConfiguration.T[0]!=0.0) || (renderingConfiguration.T[1]!=0.0) || (renderingConfiguration.T[2]!=0.0) )
+          {
+           fprintf(stderr,"Camera position change has been prohibited, please don't use a camera rotation..!\n");
+           exit(1);
+          }
+
+          //TODO: Normally at this point we should have defined the matrices needed and set the following switch
+          // Due to some missing stuff in the pipeline this is deactivated so only fX,fY , cX,cY , Width/Height
+          // settings are honored by the converter..
           //----------------------------------------
-          renderingConfiguration.isDefined=1;
+          //renderingConfiguration.isDefined=1; TODO: <- at some point fix this..
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)

@@ -24,7 +24,7 @@ enum bvhIKSolutionStatus
   BVH_IK_NOTSTARTED,
   BVH_IK_STARTED,
   BVH_IK_FINISHED_ITERATION,
-  BVH_IK_FINISHED_EVERYTHING, 
+  BVH_IK_FINISHED_EVERYTHING,
   //--------------------
   BVH_IK_STATES
 };
@@ -56,15 +56,15 @@ struct ikChainParts
 
 struct ikChain
 {
-  //Thread information  
+  //Thread information
   // --------------------------------------------------------------------------
-  unsigned char parallel;  
+  unsigned char parallel;
   unsigned char currentIteration;
   unsigned char status; // enum bvhIKSolutionStatus
-  unsigned char permissionToStart;  
-  unsigned char terminate;  
+  unsigned char permissionToStart;
+  unsigned char terminate;
   unsigned char threadIsSpawned;
-  // -------------------------------------------------------------------------- 
+  // --------------------------------------------------------------------------
   float initialError;
   float previousError;
   float currentError;
@@ -75,8 +75,8 @@ struct ikChain
   unsigned int encounteredWorseSolutionsThanPrevious;
   // --------------------------------------------------------------------------
   unsigned int jobID;
-  unsigned int groupID;  
-  // -------------------------------------------------------------------------- 
+  unsigned int groupID;
+  // --------------------------------------------------------------------------
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN+1];
   struct MotionBuffer * currentSolution;
@@ -95,7 +95,7 @@ struct ikConfiguration
   unsigned int epochs;
   unsigned int considerPreviousSolution;
   unsigned int tryMaintainingLocalOptima;
-  float spring; 
+  float spring;
   float gradientExplosionThreshold;
   unsigned int dumpScreenshots;
   unsigned int verbose;
@@ -120,14 +120,14 @@ static void printIkConfiguration(struct ikConfiguration * ikConfig)
    fprintf(stderr,"verbose = %u \n",ikConfig->verbose);
    fprintf(stderr,"dontUseSolutionHistory = %u \n",(unsigned int) ikConfig->dontUseSolutionHistory);
    fprintf(stderr,"ikVersion = %f ( bin %f ) \n",ikConfig->ikVersion,IK_VERSION);
-  } 
+  }
   fprintf(stderr,"------------------------\n");
-};
+}
 
 struct passIKContextToThread
 {
     struct ikProblem * problem;
-    struct ikConfiguration * ikConfig; 
+    struct ikConfiguration * ikConfig;
     unsigned int chainID;
     unsigned int threadID;
 };
@@ -157,7 +157,7 @@ struct ikProblem
 
  struct ikChain chain[MAXIMUM_CHAINS+1];
 
- //We need a cutoff plane to prevent inverted 
+ //We need a cutoff plane to prevent inverted
  //hierarchies from being compared..
  //----------------------------------------
  float nearCutoffPlane;
@@ -171,7 +171,7 @@ struct ikProblem
  struct passIKContextToThread workerContext[MAXIMUM_CHAINS+1];
 
  //----------------------------------------
- char problemDescription[MAXIMUM_PROBLEM_DESCRIPTION+1];   
+ char problemDescription[MAXIMUM_PROBLEM_DESCRIPTION+1];
 };
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -181,9 +181,9 @@ struct ikProblem
 static struct ikProblem * allocateEmptyIKProblem()
 {
     struct ikProblem * emptyProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
-     if (emptyProblem!=0) 
-         { 
-            memset(emptyProblem,0,sizeof(struct ikProblem)); 
+     if (emptyProblem!=0)
+         {
+            memset(emptyProblem,0,sizeof(struct ikProblem));
          } else
          { fprintf(stderr,"Failed to allocate memory for our IK Problem..\n"); }
      return emptyProblem;
