@@ -94,7 +94,7 @@ int dumpBVHToJSONHeader(
      fprintf(fp,"\"Perturbed\":0,\n");
      fprintf(fp,"\"NumberOfJoints\":%u,\n",countedNumberOfJoints);
 
-     fprintf(fp,"\"2DJointsNames\":\n");
+     fprintf(fp,"\"2DJointNames\":\n");
      fprintf(fp,"  [\n");
 
      char comma=' ';

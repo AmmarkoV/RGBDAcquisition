@@ -1,5 +1,5 @@
 /** @file pthreadWorkerPool.h
- *  @brief  A header-only thread automization library to make your multithreaded-lives easier. 
+ *  @brief  A header-only thread automization library to make your multithreaded-lives easier.
  *  To add to your project just copy this header to your code and don't forget to link with
  *  pthreads, for example : gcc -O3 -pthread yourProject.c -o threadsExample
  *  Repository : https://github.com/AmmarkoV/PThreadWorkerPool
@@ -208,7 +208,7 @@ static int threadpoolMainThreadWaitForWorkersToFinish(struct workerPool * pool)
             // Worker threads will be waiting for this condition to be met before sending "CompleteCondition" signals.
             pool->mainThreadWaiting = 1;
             pthread_cond_wait(&pool->completeWorkCondition, &pool->completeWorkMutex);
-            // This is where partial work on the batch data coordination will happen.  
+            // This is where partial work on the batch data coordination will happen.
             // All of the worker threads will have to finish before we can start the next batch.
         }
         //fprintf(stderr,"Done Waiting!\n");
@@ -295,14 +295,14 @@ static int threadpoolCreate(struct workerPool * pool,unsigned int numberOfThread
       {
           threadsThatAreReady+=pool->workerPoolContext[i].threadInitialized ;
       }
-      
+
       if (threadsThatAreReady==threadsCreated)
       {
           break;
       }
     }
     fprintf(stderr," done \n");
-      
+
     pool->numberOfThreads = threadsCreated;
     pool->initialized = (threadsCreated==numberOfThreadsToSpawn);
     return (threadsCreated==numberOfThreadsToSpawn);
