@@ -13,6 +13,7 @@ import numpy as np
 
 #Import Information
 filename = 'GOPRO4K.MP4' #GOPR3784.MP4
+filename = 'logitech_c920.mkv' #GOPR3784.MP4
 #Input the number of board images to use for calibration (recommended: ~20)
 n_boards = 17
 #Input the number of squares on the board (width and height)
