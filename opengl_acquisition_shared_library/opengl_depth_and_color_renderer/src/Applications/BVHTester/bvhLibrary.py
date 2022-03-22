@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import ctypes
 import os
 import sys
@@ -78,6 +80,13 @@ def bvhConvert(libBVH,arguments):
     argc=len(argumentBytes)
     libBVH.bvhConverter(argc,argv)
 #--------------------------------------------------------
+
+
+
+
+
+
+
 
 
 

@@ -14,6 +14,9 @@ extern "C"
 #endif
 
 
+int bvhConverter_loadAtomic(const char *path);
+int bvhConverter_modifyAtomic(const char ** labels,const float ** values,int numberOfElements);
+
 int bvhConverter(int argc,const char **argv);
 
 

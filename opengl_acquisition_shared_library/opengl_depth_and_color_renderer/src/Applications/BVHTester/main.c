@@ -38,7 +38,6 @@
 #include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
 
 
-
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -48,6 +47,77 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
+
+
+void haltOnError(unsigned int haltingSwitch,const char * message)
+{
+  fprintf(stderr,RED "=======================================\n");
+  fprintf(stderr,"=======================================\n");
+  fprintf(stderr,"Encountered error during procedure %s \n",message);
+  fprintf(stderr,"=======================================\n");
+  fprintf(stderr,"=======================================\n" NORMAL);
+
+  if (haltingSwitch)
+    {
+       fprintf(stderr,RED "Halting because of --haltonerror switch\n" NORMAL);
+       exit(1);
+    }
+}
+
+
+void incorrectArguments()
+{
+  fprintf(stderr,RED "Incorrect number of arguments.. \n" NORMAL);
+  exit(1);
+}
+
+
+
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+
+struct BVH_MotionCapture bvhAtomicMotion={0};
+struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
+
+
+int bvhConverter_loadAtomic(const char *path)
+{
+  float scaleWorld=1.0;
+  int immediatelyHaltOnError = 1;
+  fprintf(stderr,"Attempting to load %s\n",path);
+  if (!bvh_loadBVH(path, &bvhAtomicMotion, scaleWorld))
+          {
+            haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
+          }
+  //Change joint names..
+  bvh_renameJointsForCompatibility(&bvhAtomicMotion);
+  return 0;
+}
+
+
+int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements)
+{
+  fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  for (int i=0; i<numberOfElements; i++)
+  {
+      fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,float rX,float rY,float rZ)
 {
@@ -86,29 +156,6 @@ void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,
                               &rZM
                             );
 
-}
-
-
-void haltOnError(unsigned int haltingSwitch,const char * message)
-{
-  fprintf(stderr,RED "=======================================\n");
-  fprintf(stderr,"=======================================\n");
-  fprintf(stderr,"Encountered error during procedure %s \n",message);
-  fprintf(stderr,"=======================================\n");
-  fprintf(stderr,"=======================================\n" NORMAL);
-
-  if (haltingSwitch)
-    {
-       fprintf(stderr,RED "Halting because of --haltonerror switch\n" NORMAL);
-       exit(1);
-    }
-}
-
-
-void incorrectArguments()
-{
-  fprintf(stderr,RED "Incorrect number of arguments.. \n" NORMAL);
-  exit(1);
 }
 
 
