@@ -94,6 +94,19 @@ int bvhConverter_loadAtomic(const char *path)
           }
   //Change joint names..
   bvh_renameJointsForCompatibility(&bvhAtomicMotion);
+
+
+  // Emulate GoPro Hero4 @ FullHD mode by default..
+  // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+  renderingAtomicConfiguration.near=1.0;
+  renderingAtomicConfiguration.far =10000.0;
+  renderingAtomicConfiguration.width=1920;
+  renderingAtomicConfiguration.height=1080;
+  renderingAtomicConfiguration.cX=(float)renderingAtomicConfiguration.width/2;
+  renderingAtomicConfiguration.cY=(float)renderingAtomicConfiguration.height/2;
+  renderingAtomicConfiguration.fX=582.18394;
+  renderingAtomicConfiguration.fY=582.52915;
+
   return 0;
 }
 
@@ -109,6 +122,15 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 }
 
 
+int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
+{
+  fprintf(stderr,"bvhConverter_rendererConfigurationAtomic received %u elements\n",numberOfElements);
+  for (int i=0; i<numberOfElements; i++)
+  {
+      fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
+  }
+  return 0;
+}
 
 
 

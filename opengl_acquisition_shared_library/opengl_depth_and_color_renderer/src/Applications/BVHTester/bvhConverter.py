@@ -26,38 +26,7 @@ def loadLibrary(filename):
 #--------------------------------------------------------
 
 
-
-
-#pyarr = [0.1, 0.2, 0.3, 0.4]
-#arr = (ctypes.c_float * len(pyarr))(*pyarr)
-
-
-
-
-
-
-
-
-
-
-class BVH():
-  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so" ):
-        print("Initializing BVH from ",libraryPath)
-        self.libBVH = loadLibrary(libraryPath)
-        self.loadBVHFile(bvhPath)
-
-
-  def loadBVHFile(self,bvhPath):
-        # create byte objects from the strings
-        arg1 = bvhPath.encode('utf-8')
- 
-        # send strings to c function
-        self.libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
-        self.libBVH.bvhConverter_loadAtomic(arg1)
-
-  def modify(self,arguments:dict):
-    #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
-    
+def splitDictionaryInLabelsAndFloats(arguments):
     #First prepare the labels of the joints we want to transmit
     #-------------------------------------------------- 
     labels = list(arguments.keys())
@@ -79,8 +48,44 @@ class BVH():
     #--------------------------------------------------  
 
     argc=len(labelsBytes)
+
+    return labelsCStr,valuesArray,argc
+#--------------------------------------------------------
+
+
+class BVH():
+  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so" ):
+        print("Initializing BVH from ",libraryPath)
+        self.libBVH = loadLibrary(libraryPath)
+        self.loadBVHFile(bvhPath)
+  #--------------------------------------------------------
+
+  def loadBVHFile(self,bvhPath):
+        # create byte objects from the strings
+        arg1 = bvhPath.encode('utf-8')
+ 
+        # send strings to c function
+        self.libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
+        self.libBVH.bvhConverter_loadAtomic(arg1)
+  #--------------------------------------------------------
+
+  def modify(self,arguments:dict):
+    #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
+    labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
     self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc)
+  #--------------------------------------------------------
+
+  def configureRenderer(self,arguments:dict):
+    #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
+    labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
+    self.libBVH.bvhConverter_rendererConfigurationAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
+    self.libBVH.bvhConverter_rendererConfigurationAtomic(labelsCStr,valuesArray,argc)
+  #--------------------------------------------------------
+
+
+
+
 
 if __name__== "__main__": 
    bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh") 
@@ -89,5 +94,4 @@ if __name__== "__main__":
    modifications["hip_Yposition"]=200.0
    modifications["hip_Zposition"]=400.0
    bvhFile.modify(modifications)
-
 
