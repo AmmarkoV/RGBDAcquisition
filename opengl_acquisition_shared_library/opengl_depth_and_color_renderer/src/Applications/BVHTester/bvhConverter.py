@@ -74,6 +74,7 @@ class BVH():
         self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
         jointID = self.libBVH.bvhConverter_getJointNameJointID(arg1)
         return jointID
+  #--------------------------------------------------------
 
   def getJoint3D(self, jointID:int):
         self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
@@ -89,14 +90,17 @@ class BVH():
         z3D = self.libBVH.bvhConverter_get3DZ(jointID)
 
         return x3D,y3D,z3D 
+  #--------------------------------------------------------
 
   def getJoint3DUsingJointName(self, jointName:str):
         return self.getJoint3D(self.getJointID(jointName)) 
+  #--------------------------------------------------------
         
   def processFrame(self, frameID:int):
         self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
         self.libBVH.bvhConverter_processFrame(frameID) 
+  #--------------------------------------------------------
 
   def modify(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
