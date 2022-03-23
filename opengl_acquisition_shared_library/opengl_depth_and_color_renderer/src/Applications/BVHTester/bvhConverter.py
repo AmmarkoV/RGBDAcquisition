@@ -78,14 +78,32 @@ class BVH():
   #--------------------------------------------------------
   def getJointName(self, jointID:int):
         self.libBVH.bvhConverter_getJointNameFromJointID.argtypes = [ctypes.c_int]
-        self.libBVH.bvhConverter_getJointNameFromJointID.restype = ctypes.c_char_p
-        return str(self.libBVH.bvhConverter_getJointNameFromJointID(jointID).decode('UTF-8'));  
+        self.libBVH.bvhConverter_getJointNameFromJointID.restype  = ctypes.c_char_p
+        return str(self.libBVH.bvhConverter_getJointNameFromJointID(jointID).decode('UTF-8'));   
+  #--------------------------------------------------------
+  def getJointParent(self, jointID:int):
+        self.libBVH.bvhConverter_getJointParent.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_getJointParent.restype  = ctypes.c_int
+        jointID = self.libBVH.bvhConverter_getJointParent(jointID)
+        return jointID
+  #--------------------------------------------------------
+  def getJointParentList(self):
+        jointList = list() 
+        for jointID in range(0,bvhFile.numberOfJoints):
+            jointList.append(int(bvhFile.getJointParent(jointID)))
+        return jointList
   #--------------------------------------------------------
   def getJointID(self, jointName:str):
         arg1 = jointName.encode('utf-8') 
         self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
         jointID = self.libBVH.bvhConverter_getJointNameJointID(arg1)
         return jointID
+  #--------------------------------------------------------
+  def getJointList(self):
+        jointList = list() 
+        for jointID in range(0,bvhFile.numberOfJoints):
+            jointList.append(bvhFile.getJointName(jointID))
+        return jointList
   #--------------------------------------------------------
   def getJoint3D(self, jointID:int):
         self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
@@ -144,8 +162,8 @@ if __name__== "__main__":
 
    print("File has ",bvhFile.numberOfJoints," joints")
 
-   for jointID in range(0,bvhFile.numberOfJoints):
-       print("Joint ",jointID," -> ",bvhFile.getJointName(jointID))
+   print(" Joint List : ",bvhFile.getJointList())
+   print(" Joint Parent List : ",bvhFile.getJointParentList())
 
    modifications = dict()
    modifications["hip_Xposition"]=100.0

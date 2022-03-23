@@ -23,6 +23,8 @@ int bvhConverter_getJointNameJointID(const char * jointName);
 
 const char * bvhConverter_getJointNameFromJointID(int jointID);
 
+int bvhConverter_getJointParent(int jointID);
+
 float  bvhConverter_get3DX(int jointID);
 float  bvhConverter_get3DY(int jointID);
 float  bvhConverter_get3DZ(int jointID);

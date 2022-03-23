@@ -173,7 +173,14 @@ const char * bvhConverter_getJointNameFromJointID(int jointID)
 }
 
 
-
+int bvhConverter_getJointParent(int jointID)
+{
+    if (jointID<bvhAtomicMotion.jointHierarchySize)
+    {
+        return bvhAtomicMotion.jointHierarchy[jointID].parentJoint;
+    }
+  return 0;
+}
 
 float bvhConverter_get3DX(int jointID)
 {
