@@ -17,7 +17,13 @@ extern "C"
 int bvhConverter_loadAtomic(const char *path);
 
 int bvhConverter_modifyAtomic(const char ** labels,const float ** values,int numberOfElements);
-int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
+int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements);
+int bvhConverter_processFrame(int frameID);
+int bvhConverter_getJointNameJointID(const char * jointName);
+float  bvhConverter_get3DX(int jointID);
+float  bvhConverter_get3DY(int jointID);
+float  bvhConverter_get3DZ(int jointID);
+
 
 int bvhConverter(int argc,const char **argv);
 

@@ -14,6 +14,7 @@ def loadLibrary(filename):
      print("Current directory was (",os.getcwd(),") ")
      directory=os.path.dirname(os.path.abspath(filename))
      os.system(directory+"/makeLibrary.sh")
+     #Magic JIT Just in time compilation, java has nothing on this :P 
  if not exists(filename):
      print("Could not make BVH Library, terminating")
      sys.exit(0)
@@ -63,11 +64,39 @@ class BVH():
   def loadBVHFile(self,bvhPath):
         # create byte objects from the strings
         arg1 = bvhPath.encode('utf-8')
- 
         # send strings to c function
         self.libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
         self.libBVH.bvhConverter_loadAtomic(arg1)
   #--------------------------------------------------------
+  
+  def getJointID(self, jointName:str):
+        arg1 = jointName.encode('utf-8') 
+        self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
+        jointID = self.libBVH.bvhConverter_getJointNameJointID(arg1)
+        return jointID
+
+  def getJoint3D(self, jointID:int):
+        self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_get3DX.restype  = ctypes.c_float
+        x3D = self.libBVH.bvhConverter_get3DX(jointID)
+
+        self.libBVH.bvhConverter_get3DY.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_get3DY.restype  = ctypes.c_float
+        y3D = self.libBVH.bvhConverter_get3DY(jointID)
+
+        self.libBVH.bvhConverter_get3DZ.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_get3DZ.restype  = ctypes.c_float
+        z3D = self.libBVH.bvhConverter_get3DZ(jointID)
+
+        return x3D,y3D,z3D 
+
+  def getJoint3DUsingJointName(self, jointName:str):
+        return self.getJoint3D(self.getJointID(jointName)) 
+        
+  def processFrame(self, frameID:int):
+        self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
+        self.libBVH.bvhConverter_processFrame(frameID) 
 
   def modify(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
@@ -85,8 +114,6 @@ class BVH():
 
 
 
-
-
 if __name__== "__main__": 
    bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh") 
    modifications = dict()
@@ -94,4 +121,11 @@ if __name__== "__main__":
    modifications["hip_Yposition"]=200.0
    modifications["hip_Zposition"]=400.0
    bvhFile.modify(modifications)
+   jointName = "neck"
+   print("Joint ID for ",jointName," is ",bvhFile.getJointID(jointName))
+
+   frameID=0
+   bvhFile.processFrame(frameID)
+   x3D,y3D,z3D = bvhFile.getJoint3DUsingJointName(jointName)
+   print(" Joint ",jointName," 3D values for frame ",frameID," are ",x3D,",",y3D,",",z3D," ")
 

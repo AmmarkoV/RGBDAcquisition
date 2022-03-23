@@ -81,7 +81,8 @@ void incorrectArguments()
 
 struct BVH_MotionCapture bvhAtomicMotion={0};
 struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
-
+struct simpleRenderer rendererAtomic={0};
+struct BVH_Transform bvhTransformAtomic={0};
 
 int bvhConverter_loadAtomic(const char *path)
 {
@@ -107,6 +108,14 @@ int bvhConverter_loadAtomic(const char *path)
   renderingAtomicConfiguration.fX=582.18394;
   renderingAtomicConfiguration.fY=582.52915;
 
+   simpleRendererDefaults(
+                          &rendererAtomic,
+                          renderingAtomicConfiguration.width,
+                          renderingAtomicConfiguration.height,
+                          renderingAtomicConfiguration.fX,
+                          renderingAtomicConfiguration.fY
+                         );
+    simpleRendererInitialize(&rendererAtomic);
   return 0;
 }
 
@@ -132,13 +141,59 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
   return 0;
 }
 
+int  bvhConverter_processFrame(int frameID)
+{
+    int occlusions=1;
+    return performPointProjectionsForFrame(
+                                           &bvhAtomicMotion,
+                                           &bvhTransformAtomic,
+                                           frameID,
+                                           &rendererAtomic,
+                                           occlusions,
+                                           renderingAtomicConfiguration.isDefined
+                                          );
+}
 
+int bvhConverter_getJointNameJointID(const char * jointName)
+{
+  fprintf(stderr,"Asked to resolve %s\n",jointName);
+  BVHJointID jID=0;
+  if (
+        bvh_getJointIDFromJointNameNocase(
+                                          &bvhAtomicMotion,
+                                          jointName,
+                                          &jID
+                                         )
+      )
+      {
+       return jID;
+      }
+  return -1;
+}
 
+float bvhConverter_get3DX(int jointID)
+{
+  fprintf(stderr,"bvhConverter_get3DX(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return bvhTransformAtomic.joint[jointID].pos3D[0]; }
+  return 0.0;
+}
 
+float  bvhConverter_get3DY(int jointID)
+{
+  fprintf(stderr,"bvhConverter_get3DY(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return bvhTransformAtomic.joint[jointID].pos3D[1]; }
+  return 0.0;
+}
 
-
-
-
+float  bvhConverter_get3DZ(int jointID)
+{
+  fprintf(stderr,"bvhConverter_get3DZ(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return bvhTransformAtomic.joint[jointID].pos3D[2]; }
+  return 0.0;
+}
 
 
 void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,float rX,float rY,float rZ)
