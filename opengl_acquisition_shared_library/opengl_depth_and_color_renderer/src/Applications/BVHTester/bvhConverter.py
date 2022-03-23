@@ -89,13 +89,14 @@ class BVH():
   #--------------------------------------------------------
   def getJointParentList(self):
         jointList = list() 
-        for jointID in range(0,bvhFile.numberOfJoints):
-            jointList.append(int(bvhFile.getJointParent(jointID)))
+        for jointID in range(0,self.numberOfJoints):
+            jointList.append(int(self.getJointParent(jointID)))
         return jointList
   #--------------------------------------------------------
   def getJointID(self, jointName:str):
         arg1 = jointName.encode('utf-8') 
         self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
+        self.libBVH.bvhConverter_getJointNameJointID.restype  = ctypes.c_int
         jointID = self.libBVH.bvhConverter_getJointNameJointID(arg1)
         return jointID
   #--------------------------------------------------------
