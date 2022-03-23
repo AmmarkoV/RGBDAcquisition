@@ -79,10 +79,10 @@ void incorrectArguments()
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 
-struct BVH_MotionCapture bvhAtomicMotion={0};
+struct BVH_MotionCapture         bvhAtomicMotion={0};
+struct BVH_Transform             bvhTransformAtomic={0};
+struct simpleRenderer            rendererAtomic={0};
 struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
-struct simpleRenderer rendererAtomic={0};
-struct BVH_Transform bvhTransformAtomic={0};
 
 int bvhConverter_loadAtomic(const char *path)
 {
@@ -146,7 +146,7 @@ int  bvhConverter_processFrame(int frameID)
 
 int bvhConverter_getJointNameJointID(const char * jointName)
 {
-  fprintf(stderr,"Asked to resolve %s\n",jointName);
+  //fprintf(stderr,"Asked to resolve %s\n",jointName);
   BVHJointID jID=0;
   if (
         bvh_getJointIDFromJointNameNocase(
@@ -226,7 +226,7 @@ float  bvhConverter_get2DY(int jointID)
 
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
 {
-  fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   char jointName[512]={0};
   for (int i=0; i<numberOfElements; i++)
   {
@@ -238,8 +238,8 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
       lowercase(jointName);
       lowercase(dof);
       //=======================================================
-      fprintf(stderr," %u - %s->%0.2f ",i,labels[i],values[i]);
-      fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
+      //fprintf(stderr," %u - %s->%0.2f ",i,labels[i],values[i]);
+      //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
       //=======================================================
       int jointID = bvhConverter_getJointNameJointID(jointName);
       //=======================================================
