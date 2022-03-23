@@ -61,7 +61,6 @@ class BVH():
         self.numberOfJoints = 0
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
-
   def loadBVHFile(self,bvhPath):
         # create byte objects from the strings
         arg1 = bvhPath.encode('utf-8')
@@ -71,14 +70,17 @@ class BVH():
         self.numberOfJoints = self.libBVH.bvhConverter_loadAtomic(arg1)
         return self.numberOfJoints
   #--------------------------------------------------------
-  
+  def getJointName(self, jointID:int):
+        self.libBVH.bvhConverter_getJointNameFromJointID.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_getJointNameFromJointID.restype = ctypes.c_char_p
+        return str(self.libBVH.bvhConverter_getJointNameFromJointID(jointID).decode('UTF-8'));  
+  #--------------------------------------------------------
   def getJointID(self, jointName:str):
         arg1 = jointName.encode('utf-8') 
         self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
         jointID = self.libBVH.bvhConverter_getJointNameJointID(arg1)
         return jointID
   #--------------------------------------------------------
-
   def getJoint3D(self, jointID:int):
         self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_get3DX.restype  = ctypes.c_float
@@ -94,7 +96,6 @@ class BVH():
 
         return x3D,y3D,z3D 
   #--------------------------------------------------------
-
   def getJoint2D(self, jointID:int):
         self.libBVH.bvhConverter_get2DX.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_get2DX.restype  = ctypes.c_float
@@ -106,28 +107,23 @@ class BVH():
 
         return x2D,y2D 
   #--------------------------------------------------------
-
   def getJoint3DUsingJointName(self, jointName:str):
         return self.getJoint3D(self.getJointID(jointName)) 
   #--------------------------------------------------------
-
   def getJoint2DUsingJointName(self, jointName:str):
         return self.getJoint2D(self.getJointID(jointName)) 
   #--------------------------------------------------------
-        
   def processFrame(self, frameID:int):
         self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
         self.libBVH.bvhConverter_processFrame(frameID) 
   #--------------------------------------------------------
-
   def modify(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
     self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc)
   #--------------------------------------------------------
-
   def configureRenderer(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
@@ -141,6 +137,10 @@ if __name__== "__main__":
    bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh") 
 
    print("File has ",bvhFile.numberOfJoints," joints")
+
+   for jointID in range(0,bvhFile.numberOfJoints):
+       print("Joint ",jointID," -> ",bvhFile.getJointName(jointID))
+
    modifications = dict()
    modifications["hip_Xposition"]=100.0
    modifications["hip_Yposition"]=200.0

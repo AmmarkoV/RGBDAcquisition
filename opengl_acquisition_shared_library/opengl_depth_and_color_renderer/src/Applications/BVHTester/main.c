@@ -171,6 +171,19 @@ int bvhConverter_getJointNameJointID(const char * jointName)
   return -1;
 }
 
+
+
+const char * bvhConverter_getJointNameFromJointID(int jointID)
+{
+    if (jointID<bvhAtomicMotion.jointHierarchySize)
+    {
+        return bvhAtomicMotion.jointHierarchy[jointID].jointName;
+    }
+}
+
+
+
+
 float bvhConverter_get3DX(int jointID)
 {
   fprintf(stderr,"bvhConverter_get3DX(%u)\n",jointID);

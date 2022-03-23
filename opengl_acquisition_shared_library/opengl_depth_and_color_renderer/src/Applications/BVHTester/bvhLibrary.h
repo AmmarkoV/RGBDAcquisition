@@ -21,6 +21,8 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
 int bvhConverter_processFrame(int frameID);
 int bvhConverter_getJointNameJointID(const char * jointName);
 
+const char * bvhConverter_getJointNameFromJointID(int jointID);
+
 float  bvhConverter_get3DX(int jointID);
 float  bvhConverter_get3DY(int jointID);
 float  bvhConverter_get3DZ(int jointID);
