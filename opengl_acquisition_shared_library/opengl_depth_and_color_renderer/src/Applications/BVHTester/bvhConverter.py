@@ -7,16 +7,22 @@ from ctypes import *
 from os.path import exists
 
 
-def loadLibrary(filename):
+def loadLibrary(filename,relativePath="",forceUpdate=False):
 #--------------------------------------------------------
- if not exists(filename):
+ if (relativePath!=""): 
+     filename=relativePath+"/"+filename
+
+ if (forceUpdate) or (not exists(filename)):
      print("Could not find BVH Library (",filename,"), compiling a fresh one..!")
      print("Current directory was (",os.getcwd(),") ")
      directory=os.path.dirname(os.path.abspath(filename))
-     os.system(directory+"/makeLibrary.sh")
+     creationScript = directory+"/makeLibrary.sh"
+     os.system(creationScript)
      #Magic JIT Just in time compilation, java has nothing on this :P 
  if not exists(filename):
+     directory=os.path.dirname(os.path.abspath(filename))
      print("Could not make BVH Library, terminating")
+     print("Directory we tried was : ",directory)
      sys.exit(0)
  libBVH = CDLL(filename)
  #call C function to check connection
@@ -55,9 +61,9 @@ def splitDictionaryInLabelsAndFloats(arguments):
 
 
 class BVH():
-  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so" ):
+  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False ):
         print("Initializing BVH from ",libraryPath)
-        self.libBVH         = loadLibrary(libraryPath)
+        self.libBVH         = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints = 0
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
@@ -118,11 +124,11 @@ class BVH():
         self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
         self.libBVH.bvhConverter_processFrame(frameID) 
   #--------------------------------------------------------
-  def modify(self,arguments:dict):
+  def modify(self,arguments:dict,frameID=0):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
-    self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
-    self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc)
+    self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int]
+    self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc,frameID)
   #--------------------------------------------------------
   def configureRenderer(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
@@ -134,7 +140,7 @@ class BVH():
 
 
 if __name__== "__main__": 
-   bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh") 
+   bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh",forceLibUpdate=True) 
 
    print("File has ",bvhFile.numberOfJoints," joints")
 
@@ -145,6 +151,9 @@ if __name__== "__main__":
    modifications["hip_Xposition"]=100.0
    modifications["hip_Yposition"]=200.0
    modifications["hip_Zposition"]=400.0
+   modifications["hip_Xrotation"]=1.0
+   modifications["hip_Yrotation"]=2.0
+   modifications["hip_Zrotation"]=4.0
    bvhFile.modify(modifications)
    jointName = "neck"
    print("Joint ID for ",jointName," is ",bvhFile.getJointID(jointName))

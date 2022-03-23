@@ -120,16 +120,6 @@ int bvhConverter_loadAtomic(const char *path)
 }
 
 
-int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements)
-{
-  fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
-  for (int i=0; i<numberOfElements; i++)
-  {
-      fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
-  }
-  return 0;
-}
-
 
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
 {
@@ -179,6 +169,7 @@ const char * bvhConverter_getJointNameFromJointID(int jointID)
     {
         return bvhAtomicMotion.jointHierarchy[jointID].jointName;
     }
+  return "";
 }
 
 
@@ -186,7 +177,7 @@ const char * bvhConverter_getJointNameFromJointID(int jointID)
 
 float bvhConverter_get3DX(int jointID)
 {
-  fprintf(stderr,"bvhConverter_get3DX(%u)\n",jointID);
+  //fprintf(stderr,"bvhConverter_get3DX(%u)\n",jointID);
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return bvhTransformAtomic.joint[jointID].pos3D[0]; }
   return 0.0;
@@ -194,7 +185,7 @@ float bvhConverter_get3DX(int jointID)
 
 float  bvhConverter_get3DY(int jointID)
 {
-  fprintf(stderr,"bvhConverter_get3DY(%u)\n",jointID);
+  //fprintf(stderr,"bvhConverter_get3DY(%u)\n",jointID);
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return bvhTransformAtomic.joint[jointID].pos3D[1]; }
   return 0.0;
@@ -202,7 +193,7 @@ float  bvhConverter_get3DY(int jointID)
 
 float  bvhConverter_get3DZ(int jointID)
 {
-  fprintf(stderr,"bvhConverter_get3DZ(%u)\n",jointID);
+  //fprintf(stderr,"bvhConverter_get3DZ(%u)\n",jointID);
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return bvhTransformAtomic.joint[jointID].pos3D[2]; }
   return 0.0;
@@ -212,7 +203,7 @@ float  bvhConverter_get3DZ(int jointID)
 
 float bvhConverter_get2DX(int jointID)
 {
-  fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
+  //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return (float) bvhTransformAtomic.joint[jointID].pos2D[0]/renderingAtomicConfiguration.width; }
   return 0.0;
@@ -220,11 +211,53 @@ float bvhConverter_get2DX(int jointID)
 
 float  bvhConverter_get2DY(int jointID)
 {
-  fprintf(stderr,"bvhConverter_get2DY(%u)\n",jointID);
+  //fprintf(stderr,"bvhConverter_get2DY(%u)\n",jointID);
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return (float) bvhTransformAtomic.joint[jointID].pos2D[1]/renderingAtomicConfiguration.height; }
   return 0.0;
 }
+
+int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
+{
+  fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  char jointName[512]={0};
+  for (int i=0; i<numberOfElements; i++)
+  {
+      snprintf(jointName,512,"%s",labels[i]);
+      char * delimeter = strchr(jointName,'_');
+       *delimeter = 0;
+      char * dof = delimeter+1;
+      //=======================================================
+      lowercase(jointName);
+      lowercase(dof);
+      //=======================================================
+      fprintf(stderr," %u - %s->%0.2f ",i,labels[i],values[i]);
+      fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
+      //=======================================================
+      int jointID = bvhConverter_getJointNameJointID(jointName);
+      //=======================================================
+      if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); }
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
