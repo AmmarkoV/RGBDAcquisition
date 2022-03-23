@@ -57,7 +57,8 @@ def splitDictionaryInLabelsAndFloats(arguments):
 class BVH():
   def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so" ):
         print("Initializing BVH from ",libraryPath)
-        self.libBVH = loadLibrary(libraryPath)
+        self.libBVH         = loadLibrary(libraryPath)
+        self.numberOfJoints = 0
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
 
@@ -66,7 +67,9 @@ class BVH():
         arg1 = bvhPath.encode('utf-8')
         # send strings to c function
         self.libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
-        self.libBVH.bvhConverter_loadAtomic(arg1)
+        self.libBVH.bvhConverter_loadAtomic.restype  = ctypes.c_int
+        self.numberOfJoints = self.libBVH.bvhConverter_loadAtomic(arg1)
+        return self.numberOfJoints
   #--------------------------------------------------------
   
   def getJointID(self, jointName:str):
@@ -136,6 +139,8 @@ class BVH():
 
 if __name__== "__main__": 
    bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh") 
+
+   print("File has ",bvhFile.numberOfJoints," joints")
    modifications = dict()
    modifications["hip_Xposition"]=100.0
    modifications["hip_Yposition"]=200.0

@@ -116,7 +116,7 @@ int bvhConverter_loadAtomic(const char *path)
                           renderingAtomicConfiguration.fY
                          );
     simpleRendererInitialize(&rendererAtomic);
-  return 0;
+  return bvhAtomicMotion.jointHierarchySize;
 }
 
 
