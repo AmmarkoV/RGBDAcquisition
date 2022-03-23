@@ -102,8 +102,8 @@ class BVH():
   #--------------------------------------------------------
   def getJointList(self):
         jointList = list() 
-        for jointID in range(0,bvhFile.numberOfJoints):
-            jointList.append(bvhFile.getJointName(jointID))
+        for jointID in range(0,self.numberOfJoints):
+            jointList.append(self.getJointName(jointID))
         return jointList
   #--------------------------------------------------------
   def getJoint3D(self, jointID:int):
