@@ -196,6 +196,25 @@ float  bvhConverter_get3DZ(int jointID)
 }
 
 
+
+float bvhConverter_get2DX(int jointID)
+{
+  fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return (float) bvhTransformAtomic.joint[jointID].pos2D[0]/renderingAtomicConfiguration.width; }
+  return 0.0;
+}
+
+float  bvhConverter_get2DY(int jointID)
+{
+  fprintf(stderr,"bvhConverter_get2DY(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return (float) bvhTransformAtomic.joint[jointID].pos2D[1]/renderingAtomicConfiguration.height; }
+  return 0.0;
+}
+
+
+
 void prepare4x4Human36MRotationMatrix(struct Matrix4x4OfFloats * rotationMatrix,float rX,float rY,float rZ)
 {
     if ( (rX==0.0) && (rY==0.0) && (rZ==0.0) )

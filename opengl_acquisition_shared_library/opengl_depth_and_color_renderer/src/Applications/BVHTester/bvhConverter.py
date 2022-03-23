@@ -92,8 +92,24 @@ class BVH():
         return x3D,y3D,z3D 
   #--------------------------------------------------------
 
+  def getJoint2D(self, jointID:int):
+        self.libBVH.bvhConverter_get2DX.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_get2DX.restype  = ctypes.c_float
+        x2D = self.libBVH.bvhConverter_get2DX(jointID)
+
+        self.libBVH.bvhConverter_get2DY.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_get2DY.restype  = ctypes.c_float
+        y2D = self.libBVH.bvhConverter_get2DY(jointID)
+
+        return x2D,y2D 
+  #--------------------------------------------------------
+
   def getJoint3DUsingJointName(self, jointName:str):
         return self.getJoint3D(self.getJointID(jointName)) 
+  #--------------------------------------------------------
+
+  def getJoint2DUsingJointName(self, jointName:str):
+        return self.getJoint2D(self.getJointID(jointName)) 
   #--------------------------------------------------------
         
   def processFrame(self, frameID:int):
@@ -132,4 +148,8 @@ if __name__== "__main__":
    bvhFile.processFrame(frameID)
    x3D,y3D,z3D = bvhFile.getJoint3DUsingJointName(jointName)
    print(" Joint ",jointName," 3D values for frame ",frameID," are ",x3D,",",y3D,",",z3D," ")
+
+
+   x2D,y2D = bvhFile.getJoint2DUsingJointName(jointName)
+   print(" Joint ",jointName," 2D values for frame ",frameID," are ",x2D,",",y2D)
 
