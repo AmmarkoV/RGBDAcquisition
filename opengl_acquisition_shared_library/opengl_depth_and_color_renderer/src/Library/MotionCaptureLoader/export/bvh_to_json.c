@@ -453,6 +453,7 @@ int dumpBVHToJSONBody(
                     } else
                     {
                        if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                       //Please note that our 2D input is normalized [0..1]
                        fprintf(
                                fp,"{\"x\":%0.6f,\"y\":%0.6f,\"v\":%u}",
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
@@ -505,6 +506,9 @@ int dumpBVHToJSONBody(
           {
             if (bvhTransform->joint[jID].isOccluded) { ++filterStats->invisibleJoints; } else { ++filterStats->visibleJoints; }
             if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+            //Please note that our 3D positions are stored in their native "scale" straight out of the renderer
+            //They depend on the BVH scale/units (expect if the --scale argument ( or scaleWorld argument on bvh_loadBVH )
+            //has altered them, that being said in case of MocapNET / they should be centimeters
             fprintf(
                      fp3D,"{\"x\":%f,\"y\":%f,\"z\":%f}",
                      bvhTransform->joint[jID].pos3D[0],

@@ -268,6 +268,8 @@ int dumpBVHToCSVBody(
                     } else
                     {
                        if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
+
+                       //Please note that our 2D input is normalized [0..1]
                        fprintf(
                                fp2D,"%0.6f,%0.6f,%u",
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
@@ -299,7 +301,16 @@ int dumpBVHToCSVBody(
             )
          {
            if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
-           fprintf(fp3D,"%f,%f,%f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]);
+
+           //Please note that our 3D positions are stored in their native "scale" straight out of the renderer
+           //They depend on the BVH scale/units (expect if the --scale argument ( or scaleWorld argument on bvh_loadBVH )
+           //has altered them, that being said in case of MocapNET / they should be centimeters
+           fprintf(
+                    fp3D,"%f,%f,%f",
+                    bvhTransform->joint[jID].pos3D[0],
+                    bvhTransform->joint[jID].pos3D[1],
+                    bvhTransform->joint[jID].pos3D[2]
+                   );
          }
        }
      fprintf(fp3D,"\n");

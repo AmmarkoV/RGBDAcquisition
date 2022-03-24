@@ -1013,6 +1013,7 @@ int bvhConverter(int argc,const char **argv)
           float minimumRotation[3];
           float maximumRotation[3];
 
+          //Randomize 2D expects millimeters and converts them to centimeters internally
           float minimumDepth=-1*atof(argv[i+1])/10;
           float maximumDepth=-1*atof(argv[i+2])/10;
           //----
