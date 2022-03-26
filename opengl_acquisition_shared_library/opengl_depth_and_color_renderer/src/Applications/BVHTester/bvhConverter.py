@@ -141,13 +141,15 @@ class BVH():
   def processFrame(self, frameID:int):
         self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
-        self.libBVH.bvhConverter_processFrame(frameID) 
+        success = self.libBVH.bvhConverter_processFrame(frameID) 
+        return success
   #--------------------------------------------------------
   def modify(self,arguments:dict,frameID=0):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int]
-    self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc,frameID)
+    success = self.libBVH.bvhConverter_modifyAtomic(labelsCStr,valuesArray,argc,frameID)
+    return success
   #--------------------------------------------------------
   def configureRenderer(self,arguments:dict):
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code

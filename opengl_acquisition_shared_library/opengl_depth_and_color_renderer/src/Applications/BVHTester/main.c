@@ -227,6 +227,7 @@ float  bvhConverter_get2DY(int jointID)
   return 0.0;
 }
 
+
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
@@ -264,13 +265,13 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
       if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
       if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
                                       {
-                                         fprintf(stderr,RED "BVH library could not perform modification  \"%s\" for joint \"%s\" \n" NORMAL,dof,jointName);
+                                         fprintf(stderr,RED "\n\n\nBVH library could not perform modification  \"%s\" for joint \"%s\" \n\n\n" NORMAL,dof,jointName);
                                          everythingOk=0;
                                       }
       //==============================================================================================================
       } else
       {
-          fprintf(stderr,RED "BVH library modification could not resolve joint \"%s\" \n" NORMAL,jointName);
+          fprintf(stderr,RED "\n\n\nBVH library modification could not resolve joint \"%s\" \n\n\n" NORMAL,jointName);
           everythingOk=0;
       }
   }
