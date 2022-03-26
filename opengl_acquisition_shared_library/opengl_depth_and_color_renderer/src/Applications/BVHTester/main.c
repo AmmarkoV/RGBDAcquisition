@@ -158,6 +158,7 @@ int bvhConverter_getJointNameJointID(const char * jointName)
       {
        return jID;
       }
+  fprintf(stderr,RED "BVH library could not resolve joint \"%s\" \n" NORMAL,jointName);
   return -1;
 }
 
@@ -169,6 +170,7 @@ const char * bvhConverter_getJointNameFromJointID(int jointID)
     {
         return bvhAtomicMotion.jointHierarchy[jointID].jointName;
     }
+  fprintf(stderr,RED "BVH library could not resolve joint name for joint out bounds \"%u\" \n" NORMAL,jointID);
   return "";
 }
 
@@ -179,6 +181,7 @@ int bvhConverter_getJointParent(int jointID)
     {
         return bvhAtomicMotion.jointHierarchy[jointID].parentJoint;
     }
+  fprintf(stderr,RED "BVH library could not resolve joint parent for joint out bounds \"%u\" \n" NORMAL,jointID);
   return 0;
 }
 
@@ -248,7 +251,11 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
       if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
       if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
       if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); }
+      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+      if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
+                                      {
+                                         fprintf(stderr,RED "BVH library could not perform modification  \"%s\" for joint \"%s\" \n" NORMAL,dof,jointName);
+                                      }
   }
   return 0;
 }
