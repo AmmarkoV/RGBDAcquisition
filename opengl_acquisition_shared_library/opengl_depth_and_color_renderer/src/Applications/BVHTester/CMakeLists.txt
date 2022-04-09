@@ -44,6 +44,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/export/bvh_to_bvh.c
               ../../Library/MotionCaptureLoader/export/bvh_to_svg.c
               ../../Library/MotionCaptureLoader/export/bvh_to_csv.c
+              ../../Library/MotionCaptureLoader/export/bvh_to_json.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
               ../../Library/MotionCaptureLoader/edit/bvh_randomize.c 
