@@ -1,12 +1,18 @@
-#include <immintrin.h>
-//#include <intrin.h>
-#include <x86intrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+
+#if INTEL_OPTIMIZATIONS
+ #include <immintrin.h>
+ //#include <intrin.h>
+ #include <x86intrin.h>
+#endif
+
+
 void mmul_sse(const float * a, const float * b, float * r)
 {
+#if INTEL_OPTIMIZATIONS
   __m128 a_line, b_line, r_line;
   for (int i=0; i<16; i+=4) {
     // unroll the first step of the loop to avoid having to initialize r_line to zero
@@ -21,6 +27,9 @@ void mmul_sse(const float * a, const float * b, float * r)
     }
     _mm_store_ps(&r[i], r_line);     // r[i] = r_line
   }
+#else
+  fprintf(stderr,"mmul_sse not available in this build/architecture\n");
+#endif
 }
 
 
