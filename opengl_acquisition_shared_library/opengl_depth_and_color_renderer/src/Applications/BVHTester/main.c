@@ -328,7 +328,7 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
+int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
     struct ikProblem * problem = 0;
 
@@ -440,9 +440,21 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
       return 0;
     } else
     {
-
-
-
+/*
+         //------------------------------------
+         ikConfig.learningRate = learningRate;
+         ikConfig.iterations = iterations;
+         ikConfig.epochs = epochs;
+         ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
+         ikConfig.gradientExplosionThreshold = 50;
+         ikConfig.spring=spring;
+         ikConfig.dumpScreenshots = 0; // Dont thrash disk
+         ikConfig.verbose = 0; //Dont spam console
+         ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
+         ikConfig.dontUseSolutionHistory=dontUseHistory;
+         ikConfig.ikVersion = IK_VERSION;
+         //------------------------------------
+*/
 
 
 
@@ -451,6 +463,9 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
 }
 
 
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
+{
+}
 
 
 
