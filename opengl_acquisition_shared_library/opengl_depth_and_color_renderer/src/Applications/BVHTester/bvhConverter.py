@@ -106,6 +106,21 @@ class BVH():
             jointList.append(self.getJointName(jointID))
         return jointList
   #--------------------------------------------------------
+  def getJointRotationsForFrame(self, jointID:int, frameID:int):
+        self.libBVH.bvhConverter_getBVHJointRotationXForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+        self.libBVH.bvhConverter_getBVHJointRotationXForFrame.restype  = ctypes.c_float
+        xRot = self.libBVH.bvhConverter_getBVHJointRotationXForFrame(jointID,frameID)
+
+        self.libBVH.bvhConverter_getBVHJointRotationYForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+        self.libBVH.bvhConverter_getBVHJointRotationYForFrame.restype  = ctypes.c_float
+        yRot = self.libBVH.bvhConverter_getBVHJointRotationYForFrame(jointID,frameID)
+
+        self.libBVH.bvhConverter_getBVHJointRotationZForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+        self.libBVH.bvhConverter_getBVHJointRotationZForFrame.restype  = ctypes.c_float
+        zRot = self.libBVH.bvhConverter_getBVHJointRotationZForFrame(jointID,frameID)
+
+        return xRot,yRot,zRot 
+  #--------------------------------------------------------
   def getJoint3D(self, jointID:int):
         self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_get3DX.restype  = ctypes.c_float
@@ -157,7 +172,52 @@ class BVH():
     self.libBVH.bvhConverter_rendererConfigurationAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
     self.libBVH.bvhConverter_rendererConfigurationAtomic(labelsCStr,valuesArray,argc)
   #--------------------------------------------------------
+  def get2DAnd3DAndBVHDictsForFrame(self,frameID=0):
+    #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
+    self.processFrame(frameID=frameID)
 
+    #Our output     
+    #---------------
+    data2D  = dict()
+    data3D  = dict()
+    dataBVH = dict() 
+    #---------------
+
+    for jointID in range(0,self.numberOfJoints):
+    #-------------------------------------------------------
+               print("joint ID = ",jointID) 
+               #-------------------------------------------
+               jointName   = self.getJointName(jointID)
+               #-------------------------------------------
+               x3D,y3D,z3D = self.getJoint3D(jointID)
+               data3D["3DX_"+jointName]=float(x3D)
+               data3D["3DY_"+jointName]=float(y3D)
+               data3D["3DZ_"+jointName]=float(z3D)
+               #-------------------------------------------
+               x2D,y2D = self.getJoint2D(jointID)
+               data2D["2DX_"+jointName]=float(x2D)
+               data2D["2DY_"+jointName]=float(y2D)
+               #-------------------------------------------
+               xRot,yRot,zRot = self.getJointRotationsForFrame(jointID,frameID)
+               if (jointID==0):
+                  dataBVH[jointName+"_Xposition"]=float(x3D)
+                  dataBVH[jointName+"_Yposition"]=float(y3D)
+                  dataBVH[jointName+"_Zposition"]=float(z3D)
+               dataBVH[jointName+"_Xrotation"]=float(xRot)
+               dataBVH[jointName+"_Yrotation"]=float(yRot)
+               dataBVH[jointName+"_Zrotation"]=float(zRot)
+    #-------------------------------------------------------
+    return data2D,data3D,dataBVH 
+  #--------------------------------------------------------
+  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0):
+    bodyPartCStr = bytes(bodyPart, 'utf-8')
+
+    #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
+    labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(target)
+    self.libBVH.bvhConverter_IKFineTune.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int]
+    success = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID)
+    return success  
+  #--------------------------------------------------------
 
 
 if __name__== "__main__": 
@@ -187,4 +247,11 @@ if __name__== "__main__":
 
    x2D,y2D = bvhFile.getJoint2DUsingJointName(jointName)
    print(" Joint ",jointName," 2D values for frame ",frameID," are ",x2D,",",y2D)
+
+   target2D = dict()
+   target2D["2DX_hip"]=100.0
+   target2D["2DY_hip"]=200.0
+
+   bvhFile.fineTuneToMatch("body",target2D,frameID=0)
+
 

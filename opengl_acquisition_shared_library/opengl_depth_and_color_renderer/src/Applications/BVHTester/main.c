@@ -83,6 +83,12 @@ struct BVH_MotionCapture         bvhAtomicMotion={0};
 struct BVH_Transform             bvhTransformAtomic={0};
 struct simpleRenderer            rendererAtomic={0};
 struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
+struct ikProblem * atomicFaceProblem  = 0;
+struct ikProblem * atomicBodyProblem  = 0;
+struct ikProblem * atomicLHandProblem = 0;
+struct ikProblem * atomicRHandProblem = 0;
+struct MotionBuffer * atomicPreviousSolution=0;
+struct MotionBuffer * atomicSolution=0;
 
 int bvhConverter_loadAtomic(const char *path)
 {
@@ -120,6 +126,22 @@ int bvhConverter_loadAtomic(const char *path)
 }
 
 
+int bvhConverter_unloadAtomic()
+{
+    /* TODO: unload all this..!
+    struct BVH_MotionCapture         bvhAtomicMotion={0};
+struct BVH_Transform             bvhTransformAtomic={0};
+struct simpleRenderer            rendererAtomic={0};
+struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
+struct ikProblem * atomicFaceProblem  = 0;
+struct ikProblem * atomicBodyProblem  = 0;
+struct ikProblem * atomicLHandProblem = 0;
+struct ikProblem * atomicRHandProblem = 0;
+struct MotionBuffer * atomicPreviousSolution=0;
+struct MotionBuffer * atomicSolution=0;
+*/
+  fprintf(stderr,"bvhConverter_unloadAtomic not implemented yet..\n");
+}
 
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
 {
@@ -228,6 +250,31 @@ float  bvhConverter_get2DY(int jointID)
 }
 
 
+
+float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID)
+{
+  //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  return 0.0;
+}
+float bvhConverter_getBVHJointRotationYForFrame(int frameID,int jointID)
+{
+  //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  return 0.0;
+}
+float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID)
+{
+  //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
+  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  return 0.0;
+}
+
+
+
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
@@ -281,7 +328,127 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 
 
 
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
+{
+    struct ikProblem * problem = 0;
 
+    //Handle current/previous solution (assuming bvhConverter_modifyAtomic has been called)..
+    //=======================================================================================
+    if (atomicPreviousSolution==0)
+      { atomicPreviousSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    if (atomicPreviousSolution!=0)
+      {
+        if (atomicSolution==0)
+        { //If there is no previous solution then just copy this one as previous
+          bvh_copyMotionFrameToMotionBuffer(
+                                            &bvhAtomicMotion,
+                                            atomicPreviousSolution,
+                                            frameID
+                                           );
+        } else
+        {
+          //If there is a previous solution copy it..!
+          copyMotionBuffer(&atomicPreviousSolution,&atomicSolution);
+        }
+      }
+     //====================================================================
+    if (atomicSolution==0)
+      { atomicSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    if (atomicSolution!=0)
+      {
+        bvh_copyMotionFrameToMotionBuffer(
+                                          &bvhAtomicMotion,
+                                          atomicSolution,
+                                          frameID
+                                         );
+      }
+     //====================================================================
+
+
+    //Construct and/or select the correct problem to solve..!
+    if (strcmp(bodyPart,"body")==0)
+    {
+       if (atomicBodyProblem==0)
+           {
+            atomicBodyProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            prepareDefaultBodyProblem(
+                                          atomicBodyProblem,
+                                          &bvhAtomicMotion,
+                                          &rendererAtomic,
+                                          atomicPreviousSolution,
+                                          atomicSolution,
+                                          &bvhTransformAtomic
+                                         );
+           }
+      problem = atomicBodyProblem;
+    } else
+    if (strcmp(bodyPart,"face")==0)
+    {
+      if (atomicFaceProblem==0)
+           {
+              atomicFaceProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+              prepareDefaultFaceProblem(
+                                        atomicFaceProblem,
+                                        &bvhAtomicMotion,
+                                        &rendererAtomic,
+                                        atomicPreviousSolution,
+                                        atomicSolution,
+                                        &bvhTransformAtomic,
+                                        1
+                                       );
+           }
+      problem = atomicFaceProblem;
+    } else
+    if (strcmp(bodyPart,"rhand")==0)
+    {
+       if (atomicRHandProblem==0)
+           {
+            atomicRHandProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            prepareDefaultLeftHandProblem(
+                                          atomicRHandProblem,
+                                          &bvhAtomicMotion,
+                                          &rendererAtomic,
+                                          atomicPreviousSolution,
+                                          atomicSolution,
+                                          &bvhTransformAtomic,
+                                          1
+                                         );
+           }
+       problem = atomicRHandProblem;
+    } else
+    if (strcmp(bodyPart,"lhand")==0)
+    {
+       if (atomicLHandProblem==0)
+           {
+            atomicLHandProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            prepareDefaultLeftHandProblem(
+                                          atomicLHandProblem,
+                                          &bvhAtomicMotion,
+                                          &rendererAtomic,
+                                          atomicPreviousSolution,
+                                          atomicSolution,
+                                          &bvhTransformAtomic,
+                                          1
+                                         );
+           }
+       problem = atomicLHandProblem;
+    }
+
+    if (problem==0)
+    {
+      fprintf(stderr,"bvhConverter_IKFineTune: Unrecognized body part `%s` \n",bodyPart);
+      return 0;
+    } else
+    {
+
+
+
+
+
+
+      return 1;
+    }
+}
 
 
 

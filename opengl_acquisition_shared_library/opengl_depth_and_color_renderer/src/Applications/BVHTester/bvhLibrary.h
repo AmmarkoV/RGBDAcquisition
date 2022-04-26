@@ -13,9 +13,8 @@ extern "C"
 {
 #endif
 
-
 int bvhConverter_loadAtomic(const char *path);
-
+int bvhConverter_unloadAtomic();
 
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements);
 int bvhConverter_processFrame(int frameID);
@@ -32,10 +31,14 @@ float  bvhConverter_get3DZ(int jointID);
 float  bvhConverter_get2DX(int jointID);
 float  bvhConverter_get2DY(int jointID);
 
+float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID);
+float bvhConverter_getBVHJointRotationYForFrame(int frameID,int jointID);
+float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID);
+
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID);
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID);
 
 int bvhConverter(int argc,const char **argv);
-
 
 #ifdef __cplusplus
 }
