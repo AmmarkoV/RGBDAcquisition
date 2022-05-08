@@ -17,7 +17,7 @@
 *   @author Ammar Qammaz (AmmarkoV)
 */
 
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -142,23 +142,27 @@ static float butterWorth_filter(struct ButterWorth * sensor,float unfilteredValu
  * @param frequency of cutoff
  */
 static struct ButterWorthArray * butterWorth_allocate(int numberOfSensors,float fsampling,float fcutoff)
-{
+{ 
+ printf("butterWorth_allocate(%u,%0.2f,%0.2f)\n",numberOfSensors,fsampling,fcutoff);
  struct ButterWorthArray * bwa = (struct ButterWorthArray *) malloc(sizeof(struct ButterWorthArray));
  if (bwa!=0)
  {
-    
+    bwa->numberOfSensors = 0;
     bwa->sensors = (struct ButterWorth *) malloc(sizeof(struct ButterWorth));
     if (bwa->sensors!=0)
     {
+      printf("bwa->sensors\n");
       bwa->numberOfSensors = numberOfSensors;
       for (int i=0; i<numberOfSensors; i++)
        {
+        printf("sensor %u \n",i);
         struct ButterWorth * sensor = &bwa->sensors[i];
         butterWorth_init(sensor,fsampling,fcutoff);
        } 
     }
  }
 
+ printf("bwa\n");
  return bwa;
 }
 
