@@ -1,27 +1,25 @@
 
 #include "smoothing.h"
-
-struct ButterWorthArray * filterArrayAtomic = 0;
-
-int butterWorth_allocateAtomic(int numberOfSensors,float fsampling,float fcutoff)
+ 
+void * butterWorth_allocateAtomic(int numberOfSensors,float fsampling,float fcutoff)
 {
   //printf("butterWorth_allocateAtomic(%u,%0.2f,%0.2f)\n",numberOfSensors,fsampling,fcutoff);
-  filterArrayAtomic = butterWorth_allocate(numberOfSensors,fsampling,fcutoff);
-  return (filterArrayAtomic!=0);
+  struct ButterWorthArray * filterArrayAtomic = butterWorth_allocate(numberOfSensors,fsampling,fcutoff);
+  return (void *) filterArrayAtomic;
 }
 
 
-int butterWorth_deallocateAtomic()
+int butterWorth_deallocateAtomic(void * handle)
 {
-  //printf("butterWorth_deallocateAtomic()\n");
+  struct ButterWorthArray * filterArrayAtomic = (struct ButterWorthArray *) handle;
   butterWorth_deallocate(filterArrayAtomic);
   return 1;
 }
 
 
-float butterWorth_filterAtomic(int value,float unfilteredValue)
+float butterWorth_filterAtomic(void * handle,int value,float unfilteredValue)
 {
-  //printf("butterWorth_filterAtomic(%u,%0.2f)\n",value,unfilteredValue);
+  struct ButterWorthArray * filterArrayAtomic = (struct ButterWorthArray *) handle;
   if (filterArrayAtomic==0) { return unfilteredValue; }
   if (value>=filterArrayAtomic->numberOfSensors) { return unfilteredValue; }
   return butterWorth_filter(&filterArrayAtomic->sensors[value],unfilteredValue);

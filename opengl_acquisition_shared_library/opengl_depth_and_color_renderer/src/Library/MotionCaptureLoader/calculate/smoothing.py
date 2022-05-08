@@ -10,7 +10,7 @@ from os.path import exists
 class Smooth():
   #--------------------------------------------------------
   def __init__(self, numberOfInputs:int, fSampling:float, fCutoff:float , libraryPath:str = "./libSmoothing.so", forceLibUpdate=False ):
-     print(' Init ') 
+     self.handle = 0
      if not exists(libraryPath):
           print("Could not find Smoothing Library (",libraryPath,"), compiling a fresh one..!")
           print("Current directory was (",os.getcwd(),") ")
@@ -25,15 +25,14 @@ class Smooth():
      self.libSmooth = CDLL(libraryPath)
      #call C function to check connection
      self.libSmooth.connect() 
-     self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_int
+     self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_void_p
      self.libSmooth.butterWorth_allocateAtomic.argtypes = [ ctypes.c_int, ctypes.c_float, ctypes.c_float ]
-     self.libSmooth.butterWorth_allocateAtomic(numberOfInputs,fSampling,fCutoff)
+     self.handle = self.libSmooth.butterWorth_allocateAtomic(numberOfInputs,fSampling,fCutoff)
   #--------------------------------------------------------
   def filter(self,inputList):
-        print('Filter ',inputList) 
         # create byte objects from the strings
         self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_float
-        self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_int, ctypes.c_float]
+        self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_float]
         
         filteredOutput = list()
         for jID in range(0,len(inputList)):
@@ -42,10 +41,10 @@ class Smooth():
         return filteredOutput
   #--------------------------------------------------------
   def __del__(self):
-     print('Destructor called') 
      self.libSmooth.butterWorth_deallocateAtomic.restype  = ctypes.c_int
-     self.libSmooth.butterWorth_deallocateAtomic.argtypes = [ ]
-     self.libSmooth.butterWorth_deallocateAtomic()
+     self.libSmooth.butterWorth_deallocateAtomic.argtypes = [ ctypes.c_void_p ]
+     self.libSmooth.butterWorth_deallocateAtomic(self.handle)
+     self.handle = 0
   #--------------------------------------------------------
 
 
@@ -67,11 +66,13 @@ if __name__== "__main__":
  fCutoff        = 1.1  
  smooth = Smooth(numberOfInputs=numberOfInputs,fSampling=fSampling,fCutoff=fCutoff,libraryPath="./libSmoothing.so",forceLibUpdate = True)
 
- samples = list()
- for i in range(0,numberOfInputs): 
-    samples.append(123.0)
- samples = smooth.filter(samples)
- print(samples)
+ for frame in range(0,100):
+   samples = list()
+   for i in range(0,numberOfInputs): 
+      samples.append(frame+1.0)
+   print("Before -> ",samples)
+   samples = smooth.filter(samples)
+   print("After -> ",samples)
 
 
 
