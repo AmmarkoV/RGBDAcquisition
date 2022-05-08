@@ -9,7 +9,7 @@ int butterWorth_allocateAtomic(int numberOfSensors,float fsampling,float fcutoff
 }
 
 
-int butterWorth_deallocateAtomic(struct ButterWorthArray * bwa)
+int butterWorth_deallocateAtomic()
 {
    butterWorth_deallocate(filterArrayAtomic);
    return 1;

@@ -39,18 +39,19 @@ def bvhConvert(libSmooth,arguments):
 
 class Smooth():
   def __init__(self, numberOfInputs:int, fSampling:float, fCutoff:float , libraryPath:str = "./libSmoothing.so", forceLibUpdate=False ):
-     if not exists(filename):
-          print("Could not find Smoothing Library (",filename,"), compiling a fresh one..!")
+     print(' Init ') 
+     if not exists(libraryPath):
+          print("Could not find Smoothing Library (",libraryPath,"), compiling a fresh one..!")
           print("Current directory was (",os.getcwd(),") ")
-          directory=os.path.dirname(os.path.abspath(filename))
+          directory=os.path.dirname(os.path.abspath(libraryPath))
           os.system(directory+"/makeLibrary.sh")
-     if not exists(filename):
+     if not exists(libraryPath):
           print("Could not make Smoothing Library, terminating")
           sys.exit(0)
      self.numberOfInputs = numberOfInputs
      self.fSampling      = fSampling
      self.fCutoff        = fCutoff
-     self.libSmooth = CDLL(filename)
+     self.libSmooth = CDLL(libraryPath)
      #call C function to check connection
      self.libSmooth.connect() 
      self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_int
@@ -59,6 +60,7 @@ class Smooth():
      #--------------------------------------------------------
 
   def filter(self,inputList):
+        print('Filter ',inputList) 
         # create byte objects from the strings
         self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_float]
         self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_int, ctypes.c_float
@@ -70,8 +72,10 @@ class Smooth():
   #--------------------------------------------------------
 
 
-
-
+  def __del__(self):
+     print('Destructor called') 
+     self.libSmooth.butterWorth_deallocateAtomic.restype  = ctypes.c_int
+     self.libSmooth.butterWorth_deallocateAtomic()
 
 
 
