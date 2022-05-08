@@ -36,8 +36,8 @@ class Smooth():
         
         filteredOutput = list()
         for jID in range(0,len(inputList)):
-          filteredOutput.append(inputList[jID])
-          #filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
+          #filteredOutput.append(inputList[jID])
+          filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
         return filteredOutput
   #--------------------------------------------------------
   def __del__(self):
