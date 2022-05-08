@@ -52,7 +52,6 @@ struct ButterWorth
 };
 
 
-
 /**
  * @brief The complete state of a Butterworth filter instance  
  */
@@ -63,7 +62,6 @@ struct ButterWorthArray
 };
 
 
-
 /**
  * @brief Initialize a "sensor" using  fsampling/fcutoff values
  * @param Butterworth filter instance
@@ -72,6 +70,8 @@ struct ButterWorthArray
  */
 static void butterWorth_init(struct ButterWorth * sensor,float fsampling,float fcutoff)
 {
+  if (sensor!=0)
+   {
     sensor->fs = fsampling;
     sensor->fx = fcutoff;
 
@@ -84,7 +84,8 @@ static void butterWorth_init(struct ButterWorth * sensor,float fsampling,float f
     sensor->b2  = sensor->b0;
     sensor->a1  = 2.0 * (sensor->ita*sensor->ita - 1.0) * sensor->b0;
     sensor->a2  = -(1.0 - sensor->q*sensor->ita + sensor->ita*sensor->ita) * sensor->b0;
-    sensor->a   =(float) (2.0*3.14159265359*sensor->ff)/(2.0*3.14159265359*sensor->ff+1.0); 
+    sensor->a   =(float) (2.0*3.14159265359*sensor->ff)/(2.0*3.14159265359*sensor->ff+1.0);
+  }
 }
 
 
@@ -143,26 +144,25 @@ static float butterWorth_filter(struct ButterWorth * sensor,float unfilteredValu
  */
 static struct ButterWorthArray * butterWorth_allocate(int numberOfSensors,float fsampling,float fcutoff)
 { 
- printf("butterWorth_allocate(%u,%0.2f,%0.2f)\n",numberOfSensors,fsampling,fcutoff);
+ //printf("butterWorth_allocate(%u,%0.2f,%0.2f)\n",numberOfSensors,fsampling,fcutoff);
  struct ButterWorthArray * bwa = (struct ButterWorthArray *) malloc(sizeof(struct ButterWorthArray));
  if (bwa!=0)
  {
     bwa->numberOfSensors = 0;
-    bwa->sensors = (struct ButterWorth *) malloc(sizeof(struct ButterWorth));
+    bwa->sensors = (struct ButterWorth *) malloc(sizeof(struct ButterWorth)*numberOfSensors);
     if (bwa->sensors!=0)
     {
-      printf("bwa->sensors\n");
+      //printf("bwa->sensors\n");
       bwa->numberOfSensors = numberOfSensors;
       for (int i=0; i<numberOfSensors; i++)
        {
-        printf("sensor %u \n",i);
-        struct ButterWorth * sensor = &bwa->sensors[i];
-        butterWorth_init(sensor,fsampling,fcutoff);
+        //printf("sensor %u \n",i);
+        butterWorth_init(&bwa->sensors[i],fsampling,fcutoff);
        } 
     }
  }
 
- printf("bwa\n");
+ //printf("bwa\n");
  return bwa;
 }
 

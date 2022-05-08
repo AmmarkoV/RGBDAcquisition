@@ -8,6 +8,7 @@ from os.path import exists
 
 
 class Smooth():
+  #--------------------------------------------------------
   def __init__(self, numberOfInputs:int, fSampling:float, fCutoff:float , libraryPath:str = "./libSmoothing.so", forceLibUpdate=False ):
      print(' Init ') 
      if not exists(libraryPath):
@@ -25,27 +26,27 @@ class Smooth():
      #call C function to check connection
      self.libSmooth.connect() 
      self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_int
-     self.libSmooth.butterWorth_allocateAtomic.argtypes = ctypes.c_int, ctypes.c_float, ctypes.c_float
+     self.libSmooth.butterWorth_allocateAtomic.argtypes = [ ctypes.c_int, ctypes.c_float, ctypes.c_float ]
      self.libSmooth.butterWorth_allocateAtomic(numberOfInputs,fSampling,fCutoff)
-     #--------------------------------------------------------
-
+  #--------------------------------------------------------
   def filter(self,inputList):
         print('Filter ',inputList) 
         # create byte objects from the strings
-        self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_float]
-        self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_int, ctypes.c_float
+        self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_float
+        self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_int, ctypes.c_float]
         
         filteredOutput = list()
         for jID in range(0,len(inputList)):
-          filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
+          filteredOutput.append(inputList[jID])
+          #filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
         return filteredOutput
   #--------------------------------------------------------
-
-
   def __del__(self):
      print('Destructor called') 
      self.libSmooth.butterWorth_deallocateAtomic.restype  = ctypes.c_int
+     self.libSmooth.butterWorth_deallocateAtomic.argtypes = [ ]
      self.libSmooth.butterWorth_deallocateAtomic()
+  #--------------------------------------------------------
 
 
 
