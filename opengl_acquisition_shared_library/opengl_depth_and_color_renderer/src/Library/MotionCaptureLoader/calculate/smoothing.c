@@ -19,6 +19,7 @@ int butterWorth_deallocateAtomic(void * handle)
 
 float butterWorth_filterAtomic(void * handle,int value,float unfilteredValue)
 {
+  if (handle==0) { return unfilteredValue; }
   struct ButterWorthArray * filterArrayAtomic = (struct ButterWorthArray *) handle;
   if (filterArrayAtomic==0) { return unfilteredValue; }
   if (value>=filterArrayAtomic->numberOfSensors) { return unfilteredValue; }

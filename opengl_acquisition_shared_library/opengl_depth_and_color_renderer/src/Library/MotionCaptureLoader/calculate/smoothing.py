@@ -25,20 +25,22 @@ class Smooth():
      self.libSmooth = CDLL(libraryPath)
      #call C function to check connection
      self.libSmooth.connect() 
-     self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_void_p
-     self.libSmooth.butterWorth_allocateAtomic.argtypes = [ ctypes.c_int, ctypes.c_float, ctypes.c_float ]
+     self.libSmooth.butterWorth_allocateAtomic.restype   = ctypes.c_void_p
+     self.libSmooth.butterWorth_allocateAtomic.argtypes  = [ ctypes.c_int, ctypes.c_float, ctypes.c_float ]
      self.handle = self.libSmooth.butterWorth_allocateAtomic(numberOfInputs,fSampling,fCutoff)
   #--------------------------------------------------------
-  def filter(self,inputList):
+  def filter(self,inputList:list):
         # create byte objects from the strings
         self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_float
         self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_float]
-        
-        filteredOutput = list()
-        for jID in range(0,len(inputList)):
-          #filteredOutput.append(inputList[jID])
-          filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
-        return filteredOutput
+          
+        inputListLength = len(inputList)
+        if (self.numberOfInputs!=inputListLength):
+           print("Given %u inputs instead of expected %u, will not execute filter")
+        else:
+           for jID in range(0,inputListLength): 
+             inputList[jID] = self.libSmooth.butterWorth_filterAtomic(self.handle,jID,inputList[jID])
+        return inputList
   #--------------------------------------------------------
   def __del__(self):
      self.libSmooth.butterWorth_deallocateAtomic.restype  = ctypes.c_int
