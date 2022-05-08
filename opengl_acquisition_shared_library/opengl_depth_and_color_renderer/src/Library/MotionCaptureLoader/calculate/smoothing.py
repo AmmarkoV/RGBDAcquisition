@@ -31,12 +31,43 @@ def bvhConvert(libSmooth,arguments):
     argv = (ctypes.c_char_p * len(argumentBytes))()
     argv[:] = argumentBytes 
     argc=len(argumentBytes)
-    libBVH.bvhConverter(argc,argv)
+    libSmooth.bvhConverter(argc,argv)
 #--------------------------------------------------------
 
 
 
 
+class Smooth():
+  def __init__(self, numberOfInputs:int, fSampling:float, fCutoff:float , libraryPath:str = "./libSmoothing.so", forceLibUpdate=False ):
+     if not exists(filename):
+          print("Could not find Smoothing Library (",filename,"), compiling a fresh one..!")
+          print("Current directory was (",os.getcwd(),") ")
+          directory=os.path.dirname(os.path.abspath(filename))
+          os.system(directory+"/makeLibrary.sh")
+     if not exists(filename):
+          print("Could not make Smoothing Library, terminating")
+          sys.exit(0)
+     self.numberOfInputs = numberOfInputs
+     self.fSampling      = fSampling
+     self.fCutoff        = fCutoff
+     self.libSmooth = CDLL(filename)
+     #call C function to check connection
+     self.libSmooth.connect() 
+     self.libSmooth.butterWorth_allocateAtomic.restype  = ctypes.c_int
+     self.libSmooth.butterWorth_allocateAtomic.argtypes = ctypes.c_int, ctypes.c_float, ctypes.c_float
+     self.libSmooth.butterWorth_allocateAtomic(numberOfInputs,fSampling,fCutoff)
+     #--------------------------------------------------------
+
+  def filter(self,inputList):
+        # create byte objects from the strings
+        self.libSmooth.butterWorth_filterAtomic.argtypes = [ctypes.c_float]
+        self.libSmooth.butterWorth_filterAtomic.restype  = ctypes.c_int, ctypes.c_float
+        
+        filteredOutput = list()
+        for jID in range(0,len(inputList)):
+          filteredOutput.append(self.libSmooth.butterWorth_filterAtomic(jID,inputList[jID])) 
+        return filteredOutput
+  #--------------------------------------------------------
 
 
 
@@ -55,5 +86,20 @@ if __name__== "__main__":
      if (sys.argv[i]=="--update"): 
          print('Deleting previous libSmoothing.so to force update!\n')
          os.system("rm libSmoothing.so")
+  
+ numberOfInputs = 100
+ fSampling      = 120
+ fCutoff        = 1.1  
+ smooth = Smooth(numberOfInputs=numberOfInputs,fSampling=fSampling,fCutoff=fCutoff,libraryPath="./libSmoothing.so")
 
- libSmooth = loadLibrary("./libSmoothing.so")
+ samples = list()
+ for i in range(0,100): 
+    samples.append(123.0)
+ samples = smooth.filter(samples)
+ print(samples)
+
+
+
+
+
+
