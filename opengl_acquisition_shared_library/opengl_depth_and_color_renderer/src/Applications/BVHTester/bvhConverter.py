@@ -187,7 +187,7 @@ class BVH():
     #-------------------------------------------------------
                print("joint ID = ",jointID) 
                #-------------------------------------------
-               jointName   = self.getJointName(jointID)
+               jointName   = self.getJointName(jointID).lower()
                #-------------------------------------------
                x3D,y3D,z3D = self.getJoint3D(jointID)
                data3D["3DX_"+jointName]=float(x3D)
