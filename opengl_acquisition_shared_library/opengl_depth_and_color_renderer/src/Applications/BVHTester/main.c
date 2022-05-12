@@ -478,9 +478,9 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          ikConfig.gradientExplosionThreshold = 50;
          ikConfig.spring= 20;
          ikConfig.dumpScreenshots = 0; // Dont thrash disk
-         ikConfig.verbose = 1; //Dont spam console
+         ikConfig.verbose = 0; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
-         ikConfig.dontUseSolutionHistory=1;
+         ikConfig.dontUseSolutionHistory=0;
          ikConfig.ikVersion = IK_VERSION;
          //------------------------------------
 

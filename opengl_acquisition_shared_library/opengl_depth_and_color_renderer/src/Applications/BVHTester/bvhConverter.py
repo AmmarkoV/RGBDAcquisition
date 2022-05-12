@@ -239,8 +239,8 @@ if __name__== "__main__":
 
    modifications = dict()
    modifications["hip_Xposition"]=100.0
-   modifications["hip_Yposition"]=200.0
-   modifications["hip_Zposition"]=400.0
+   modifications["hip_Yposition"]=100.0
+   modifications["hip_Zposition"]=-400.0
    modifications["hip_Xrotation"]=1.0
    modifications["hip_Yrotation"]=2.0
    modifications["hip_Zrotation"]=4.0
