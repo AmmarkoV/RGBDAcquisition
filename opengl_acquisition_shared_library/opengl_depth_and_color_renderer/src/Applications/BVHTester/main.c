@@ -87,6 +87,7 @@ struct ikProblem * atomicFaceProblem  = 0;
 struct ikProblem * atomicBodyProblem  = 0;
 struct ikProblem * atomicLHandProblem = 0;
 struct ikProblem * atomicRHandProblem = 0;
+struct MotionBuffer * atomicPenultimateSolution=0;
 struct MotionBuffer * atomicPreviousSolution=0;
 struct MotionBuffer * atomicSolution=0;
 
@@ -463,6 +464,12 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 }
 
 
+
+
+
+
+
+
 int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
@@ -495,6 +502,108 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
     { bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);  }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
+
+
+
+
+      //------------------------------------
+         struct ikConfiguration ikConfig = {0};
+         ikConfig.learningRate = 0.01;
+         ikConfig.iterations = 10;
+         ikConfig.epochs = 30;
+         ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
+         ikConfig.gradientExplosionThreshold = 50;
+         ikConfig.spring= 0;
+         ikConfig.dumpScreenshots = 0; // Dont thrash disk
+         ikConfig.verbose = 0; //Dont spam console
+         ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
+         ikConfig.dontUseSolutionHistory=0;
+         ikConfig.ikVersion = IK_VERSION;
+         //------------------------------------
+
+        int multiThreading = 0;
+        float initialMAEInPixels = 0.0;
+        float finalMAEInPixels = 0.0;
+        float initialMAEInMM = 0.0;
+        float finalMAEInMM = 0.0;
+
+         //======================================================================================================
+         //======================================================================================================
+         //======================================================================================================
+        if (strcmp(bodyPart,"body")==0)
+        {
+         char jointName[512]={0};
+         struct BVH_Transform bvhTargetTransform={0};
+
+         for (int i=0; i<numberOfElements; i++)
+         {
+             fprintf(stderr,"Number %u => %s with %0.2f \n",i,labels[i],values[i] );
+             snprintf(jointName,512,"%s",labels[i]);
+             char * delimeter = strchr(jointName,'_');
+             *delimeter = 0;
+             char * coord = jointName;
+             char * dof   = delimeter+1;
+             //=======================================================
+             lowercase(coord);
+             lowercase(dof);
+             fprintf(stderr,"%s/%s \n",coord,dof);
+
+              BVHJointID jID=0;
+              if (
+                  bvh_getJointIDFromJointNameNocase(
+                                                    &bvhAtomicMotion,
+                                                    dof,
+                                                    &jID
+                                                   )
+                )
+                {
+                  if (coord[2]=='x')
+                  {
+                   bvhTargetTransform.joint[jID].pos2D[0] = values[i];
+                  } else
+                  if (coord[2]=='y')
+                  {
+                   bvhTargetTransform.joint[jID].pos2D[1] = values[i];
+                  } else
+                  {
+                    fprintf(stderr,"Could not resolve Coordinate %s for Number %u => %s with %0.2f \n",coord,i,labels[i],values[i] );
+                  }
+
+
+                } else
+                {
+                   fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
+                }
+         }
+
+         if (  approximateBodyFromMotionBufferUsingInverseKinematics(
+                                                                     &bvhAtomicMotion,
+                                                                     &rendererAtomic,
+                                                                     atomicBodyProblem,
+                                                                     &ikConfig,
+                                                                     //----------------
+                                                                     atomicPenultimateSolution,
+                                                                     atomicPreviousSolution,
+                                                                     atomicSolution,
+                                                                     0, //No ground truth..
+                                                                     //----------------
+                                                                     &bvhTargetTransform,
+                                                                     //----------------
+                                                                     multiThreading,// 0=single thread, 1=multi thread
+                                                                     //----------------
+                                                                     &initialMAEInPixels,
+                                                                     &finalMAEInPixels,
+                                                                     &initialMAEInMM,
+                                                                     &finalMAEInMM
+                                                                    )
+            )
+            {
+
+
+            }
+        }
+
+
 
   return 1;
 }
