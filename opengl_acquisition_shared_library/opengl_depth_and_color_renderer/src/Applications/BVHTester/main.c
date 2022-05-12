@@ -533,6 +533,14 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          //======================================================================================================
         if (strcmp(bodyPart,"body")==0)
         {
+         bvh_copyMotionFrameToMotionBuffer(
+                                           &bvhAtomicMotion,
+                                           atomicSolution,
+                                           frameID
+                                          );
+
+
+
          char jointName[512]={0};
          struct BVH_Transform bvhTargetTransform={0};
 
@@ -560,11 +568,11 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
                 {
                   if (coord[2]=='x')
                   {
-                   bvhTargetTransform.joint[jID].pos2D[0] = values[i];
+                   bvhTargetTransform.joint[jID].pos2D[0] = values[i]*renderingAtomicConfiguration.width;
                   } else
                   if (coord[2]=='y')
                   {
-                   bvhTargetTransform.joint[jID].pos2D[1] = values[i];
+                   bvhTargetTransform.joint[jID].pos2D[1] = values[i]*renderingAtomicConfiguration.height;
                   } else
                   {
                     fprintf(stderr,"Could not resolve Coordinate %s for Number %u => %s with %0.2f \n",coord,i,labels[i],values[i] );
