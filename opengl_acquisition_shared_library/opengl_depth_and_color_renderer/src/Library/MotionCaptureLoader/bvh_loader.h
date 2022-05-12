@@ -433,6 +433,21 @@ int bvh_copyMotionFrameToMotionBuffer(
                                       BVHFrameID fromfID
                                      );
 
+
+/**
+* @brief Copy a motion buffer to a motion frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Target frame we want to copy to
+* @param  Source motion buffer we want to copy from
+* @return 1=Success/0=Failure
+*/
+int bvh_copyMotionBufferToMotionFrame(
+                                       struct BVH_MotionCapture * bvhMotion,
+                                       BVHFrameID fromfID,
+                                       struct MotionBuffer * motionBuffer
+                                     );
+
 //float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 
 

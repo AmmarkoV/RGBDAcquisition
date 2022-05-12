@@ -1121,6 +1121,27 @@ int bvh_copyMotionFrameToMotionBuffer(
 
 
 
+int bvh_copyMotionBufferToMotionFrame(
+                                       struct BVH_MotionCapture * bvhMotion,
+                                       BVHFrameID fromfID,
+                                       struct MotionBuffer * motionBuffer
+                                     )
+{
+ if ( (motionBuffer!=0) && (motionBuffer->motion!=0) && ( bvhMotion->numberOfValuesPerFrame <= motionBuffer->bufferSize) && (fromfID < bvhMotion->numberOfFrames) )
+   {
+     memcpy(
+             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
+             motionBuffer->motion,
+             bvhMotion->numberOfValuesPerFrame * sizeof(float)
+           );
+     return 1;
+   }
+ return 0;
+}
+
+
+
+
 
 
 

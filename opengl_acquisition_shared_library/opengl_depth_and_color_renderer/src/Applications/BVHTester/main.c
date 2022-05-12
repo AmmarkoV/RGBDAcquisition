@@ -142,6 +142,7 @@ struct MotionBuffer * atomicPreviousSolution=0;
 struct MotionBuffer * atomicSolution=0;
 */
   fprintf(stderr,"bvhConverter_unloadAtomic not implemented yet..\n");
+  return 0;
 }
 
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
@@ -349,7 +350,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
         } else
         {
           //If there is a previous solution copy it..!
-          copyMotionBuffer(&atomicPreviousSolution,&atomicSolution);
+          copyMotionBuffer(atomicPreviousSolution,atomicSolution);
         }
       }
      //====================================================================
@@ -470,7 +471,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
@@ -509,8 +510,8 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
       //------------------------------------
          struct ikConfiguration ikConfig = {0};
          ikConfig.learningRate = 0.01;
-         ikConfig.iterations = 10;
-         ikConfig.epochs = 30;
+         ikConfig.iterations = iterations;
+         ikConfig.epochs = epochs;
          ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
          ikConfig.gradientExplosionThreshold = 50;
          ikConfig.spring= 0;
@@ -598,14 +599,17 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
                                                                     )
             )
             {
-
-
+              return bvh_copyMotionBufferToMotionFrame(
+                                                       &bvhAtomicMotion,
+                                                       frameID,
+                                                       atomicSolution
+                                                      );
             }
         }
 
 
 
-  return 1;
+  return 0;
 }
 
 
