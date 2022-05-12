@@ -252,6 +252,7 @@ if __name__== "__main__":
    target2D["2DX_hip"]=100.0
    target2D["2DY_hip"]=200.0
 
+   print("fineTuneToMatch")
    bvhFile.fineTuneToMatch("body",target2D,frameID=0)
 
 

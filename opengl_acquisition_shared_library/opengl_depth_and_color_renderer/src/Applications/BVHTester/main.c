@@ -465,6 +465,8 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
+  printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
+  return 1;
 }
 
 
