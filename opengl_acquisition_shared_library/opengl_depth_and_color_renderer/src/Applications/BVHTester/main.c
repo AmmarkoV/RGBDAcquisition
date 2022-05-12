@@ -336,34 +336,14 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
     //Handle current/previous solution (assuming bvhConverter_modifyAtomic has been called)..
     //=======================================================================================
+    if (atomicPenultimateSolution==0)
+          { atomicPenultimateSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    //=======================================================================================
     if (atomicPreviousSolution==0)
-      { atomicPreviousSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
-    if (atomicPreviousSolution!=0)
-      {
-        if (atomicSolution==0)
-        { //If there is no previous solution then just copy this one as previous
-          bvh_copyMotionFrameToMotionBuffer(
-                                            &bvhAtomicMotion,
-                                            atomicPreviousSolution,
-                                            frameID
-                                           );
-        } else
-        {
-          //If there is a previous solution copy it..!
-          copyMotionBuffer(atomicPreviousSolution,atomicSolution);
-        }
-      }
+          { atomicPreviousSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
      //====================================================================
     if (atomicSolution==0)
-      { atomicSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
-    if (atomicSolution!=0)
-      {
-        bvh_copyMotionFrameToMotionBuffer(
-                                          &bvhAtomicMotion,
-                                          atomicSolution,
-                                          frameID
-                                         );
-      }
+          { atomicSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
      //====================================================================
 
 
@@ -372,7 +352,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicBodyProblem==0)
            {
-            atomicBodyProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            atomicBodyProblem = allocateEmptyIKProblem();
             prepareDefaultBodyProblem(
                                           atomicBodyProblem,
                                           &bvhAtomicMotion,
@@ -388,7 +368,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
       if (atomicFaceProblem==0)
            {
-              atomicFaceProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+              atomicFaceProblem = allocateEmptyIKProblem();
               prepareDefaultFaceProblem(
                                         atomicFaceProblem,
                                         &bvhAtomicMotion,
@@ -405,7 +385,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicRHandProblem==0)
            {
-            atomicRHandProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            atomicRHandProblem = allocateEmptyIKProblem();
             prepareDefaultLeftHandProblem(
                                           atomicRHandProblem,
                                           &bvhAtomicMotion,
@@ -422,7 +402,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicLHandProblem==0)
            {
-            atomicLHandProblem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+            atomicLHandProblem = allocateEmptyIKProblem();
             prepareDefaultLeftHandProblem(
                                           atomicLHandProblem,
                                           &bvhAtomicMotion,
@@ -509,16 +489,16 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
 
       //------------------------------------
          struct ikConfiguration ikConfig = {0};
-         ikConfig.learningRate = 0.01;
+         ikConfig.learningRate = 0.001;
          ikConfig.iterations = iterations;
          ikConfig.epochs = epochs;
          ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
          ikConfig.gradientExplosionThreshold = 50;
          ikConfig.spring= 0;
          ikConfig.dumpScreenshots = 0; // Dont thrash disk
-         ikConfig.verbose = 0; //Dont spam console
+         ikConfig.verbose = 1; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
-         ikConfig.dontUseSolutionHistory=0;
+         ikConfig.dontUseSolutionHistory=1;
          ikConfig.ikVersion = IK_VERSION;
          //------------------------------------
 
@@ -533,6 +513,9 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          //======================================================================================================
         if (strcmp(bodyPart,"body")==0)
         {
+         //Keep history..!
+         copyMotionBuffer(atomicPenultimateSolution,atomicPreviousSolution);
+         copyMotionBuffer(atomicPreviousSolution,atomicSolution);
          bvh_copyMotionFrameToMotionBuffer(
                                            &bvhAtomicMotion,
                                            atomicSolution,
@@ -543,10 +526,20 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
 
          char jointName[512]={0};
          struct BVH_Transform bvhTargetTransform={0};
+         int occlusions=1;
+          performPointProjectionsForFrame(
+                                           &bvhAtomicMotion,
+                                           &bvhTargetTransform,
+                                           frameID,
+                                           &rendererAtomic,
+                                           occlusions,
+                                           renderingAtomicConfiguration.isDefined
+                                          );
+
 
          for (int i=0; i<numberOfElements; i++)
          {
-             fprintf(stderr,"Number %u => %s with %0.2f \n",i,labels[i],values[i] );
+             //fprintf(stderr,"Number %u => %s with %0.2f \n",i,labels[i],values[i] );
              snprintf(jointName,512,"%s",labels[i]);
              char * delimeter = strchr(jointName,'_');
              *delimeter = 0;
@@ -555,8 +548,10 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
              //=======================================================
              lowercase(coord);
              lowercase(dof);
-             fprintf(stderr,"%s/%s \n",coord,dof);
 
+
+             if (  (coord[0]=='2') && (  (coord[2]=='x') || (coord[2]=='y') ) )
+             {
               BVHJointID jID=0;
               if (
                   bvh_getJointIDFromJointNameNocase(
@@ -568,21 +563,20 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
                 {
                   if (coord[2]=='x')
                   {
-                   bvhTargetTransform.joint[jID].pos2D[0] = values[i]*renderingAtomicConfiguration.width;
+                   fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
+                   bvhTargetTransform.joint[jID].pos2D[0] = (float) values[i]*renderingAtomicConfiguration.width;
                   } else
                   if (coord[2]=='y')
                   {
-                   bvhTargetTransform.joint[jID].pos2D[1] = values[i]*renderingAtomicConfiguration.height;
-                  } else
-                  {
-                    fprintf(stderr,"Could not resolve Coordinate %s for Number %u => %s with %0.2f \n",coord,i,labels[i],values[i] );
+                   fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
+                   bvhTargetTransform.joint[jID].pos2D[1] = (float) values[i]*renderingAtomicConfiguration.height;
                   }
-
-
                 } else
                 {
-                   fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
+                   //fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
                 }
+            }
+
          }
 
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(

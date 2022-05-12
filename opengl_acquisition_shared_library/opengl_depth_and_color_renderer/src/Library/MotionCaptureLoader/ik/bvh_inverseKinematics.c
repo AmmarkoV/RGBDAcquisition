@@ -42,7 +42,7 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
-  
+
 unsigned long tickBaseIK = 0;
 
 void clear_line()
@@ -149,12 +149,12 @@ float meanBVH2DDistance(
                 float tX=bvhTargetTransform->joint[jID].pos2D[0];
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
-                if (   
-                     (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) ) 
+                if (
+                     (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) )
                    )
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
-                    
+
                     if (verbose)
                     {
                         fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",sX,sY,tX,tY);
@@ -163,7 +163,7 @@ float meanBVH2DDistance(
 
                     numberOfSamples+=1;
                     sumOf2DDistances+=this2DDistance;
-                }  
+                }
             }
         }
         if (verbose)
@@ -231,7 +231,7 @@ float meanBVH3DDistance(
             if (mc->selectedJoints!=0)
             {
               //Selected joints table is declared so we can access it
-              isSelected=mc->selectedJoints[jID]; 
+              isSelected=mc->selectedJoints[jID];
             }
 
             if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
@@ -281,17 +281,17 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
     if (updatedSolution==0)           { fprintf(stderr,"updateProblemSolutionToAllChains: No updated solution\n"); return 0; }
     if (problem->currentSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No currentSolution\n");  return 0; }
     if (problem->initialSolution==0)  { fprintf(stderr,"updateProblemSolutionToAllChains: No initialSolution\n");  return 0; }
-    
+
     //Actual copy ------------------------------------------------------------------
     if (!copyMotionBuffer(problem->currentSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating currentSolution\n");  return 0; }
     if (!copyMotionBuffer(problem->initialSolution,updatedSolution) )  {  fprintf(stderr,"updateProblemSolutionToAllChains: Failed updating initialSolution\n");  return 0; }
-    
+
     if (problem->numberOfChains >= MAXIMUM_CHAINS)
     {
-      fprintf(stderr,"updateProblemSolutionToAllChains: Too many chains.. %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS);  
-      return 0; 
+      fprintf(stderr,"updateProblemSolutionToAllChains: Too many chains.. %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS);
+      return 0;
     }
-    
+
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
         if (!copyMotionBuffer(problem->chain[chainID].currentSolution,updatedSolution))
@@ -305,26 +305,26 @@ int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuf
 
 int cleanProblem(struct ikProblem * problem)
 {
-    if (problem==0) { fprintf(stderr,"Cannot clean null problem\n"); return 0; } 
-        
+    if (problem==0) { fprintf(stderr,"Cannot clean null problem\n"); return 0; }
+
     freeMotionBuffer(&problem->previousSolution);
     freeMotionBuffer(&problem->initialSolution);
     freeMotionBuffer(&problem->currentSolution);
-    
+
     if (problem->numberOfChains >= MAXIMUM_CHAINS)
     {
-        fprintf(stderr,"Cannot clean problem with overflowing number of chains %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS); 
+        fprintf(stderr,"Cannot clean problem with overflowing number of chains %u/%d \n",problem->numberOfChains,MAXIMUM_CHAINS);
         return 0;
     }
 
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
         freeMotionBuffer(&problem->chain[chainID].currentSolution);
-        //Terminate all threads..  
+        //Terminate all threads..
         problem->chain[chainID].terminate=1;
         problem->chain[chainID].threadIsSpawned=0;
     }
-   
+
    if (problem->threadPool.initialized)
    {
        if (!threadpoolDestroy(&problem->threadPool))
@@ -332,7 +332,7 @@ int cleanProblem(struct ikProblem * problem)
            fprintf(stderr,"Failed deleting IK thread pool\n");
        }
    }
-   
+
     return 1;
 }
 
@@ -390,8 +390,8 @@ float calculateChainLoss(
 
         if (economicTransformCalculation)
         {
-            //IMPORTANT: Please note that this call relies on the internal accumulation of jIDs that happens on a regular 
-            //bvh_loadTransformForMotionBuffer call however calling it once before is not guaranteed.. 
+            //IMPORTANT: Please note that this call relies on the internal accumulation of jIDs that happens on a regular
+            //bvh_loadTransformForMotionBuffer call however calling it once before is not guaranteed..
             //So be very very careful..
             transformIsLoaded = bvh_loadTransformForMotionBufferFollowingAListOfJointIDs
                                                                 (
@@ -401,7 +401,7 @@ float calculateChainLoss(
                                                                   0,//Dont populate extra structures we dont need them they just take time
                                                                   problem->chain[chainID].current2DProjectionTransform.listOfJointIDsToTransform,
                                                                   problem->chain[chainID].current2DProjectionTransform.lengthOfListOfJointIDsToTransform
-                                                                );          
+                                                                );
         }  else
         {
             transformIsLoaded = bvh_loadTransformForMotionBuffer(
@@ -411,31 +411,31 @@ float calculateChainLoss(
                                                                   0//Dont populate extra structures we dont need them they just take time
                                                                 );
         }
-   
-                
-                
+
+
+
         if (transformIsLoaded)
         {
            //Only projecting parts is a performance measure..
            #define ONLY_PROJECT_PARTS 1
-           
+
            #if ONLY_PROJECT_PARTS
            //To perform better we can skip projections that are not part of our kinematic chain..
-           //We thus perform fewer matrix multiplications 
+           //We thus perform fewer matrix multiplications
            unsigned int failedProjections=0;
            for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
                   unsigned int jID=problem->chain[chainID].part[partID].jID;
                   failedProjections += ( bvh_projectJIDTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,jID,0,0) == 0 );
-                } 
-                
-           if (failedProjections==0)     
+                }
+
+           if (failedProjections==0)
             {
-           #else             
+           #else
            //We project all Joints to their 2D locations..
             if  (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0))
              {
-           #endif 
+           #endif
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
                    //if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
@@ -443,32 +443,32 @@ float calculateChainLoss(
                     //If the joint importance is zero then why go through all this trouble..
                    {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
-                         
+
                         ///Warning: When you change this please change meanBVH2DDistance as well!
                         float sX=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0];
                         float sY=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1];
                         float tX=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
                         float tY=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
-                        
-                        //Only use source/target joints  that exist and are not occluded.. 
+
+                        //Only use source/target joints  that exist and are not occluded..
                         if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
-                        { 
+                        {
                             loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
                         }/*
                          else
                         {
                            fprintf(stderr,RED "Joint %u failed to be projected (source=%u,target=%u)\n"NORMAL,jID,((sX!=0.0) || (sY!=0.0)),((tX!=0.0) || (tY!=0.0)));
-                        }*/ 
+                        }*/
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
                 } //We add ever part of this chain
             } else  // We successfully projected the BVH file to 2D points..
            { fprintf(stderr,RED "Could not calculate transform projections to 2D for chain %u \n"NORMAL,chainID); }
         } else //Have a valid 2D transform
        { fprintf(stderr,RED "Could not calculate transform for chain %u is invalid\n"NORMAL,chainID); }
-       
+
      } else
-     { fprintf(stderr,RED "Chain %u has too few parts ( %u ) \n" NORMAL,chainID,problem->chain[chainID].numberOfParts); }    
+     { fprintf(stderr,RED "Chain %u has too few parts ( %u ) \n" NORMAL,chainID,problem->chain[chainID].numberOfParts); }
     } else //Have a valid chain
     { fprintf(stderr,RED "Chain %u is invalid\n"NORMAL,chainID); }
     //I have left 0/0 on purpose to cause NaNs when projection errors occur
@@ -495,21 +495,21 @@ int examineSolutionAndKeepIfItIsBetter(
                                       float * solutionToTest
                                     )
 {
-    
+
       float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
                                 problem->chain[chainID].currentSolution->motion[mIDS[1]],
                                 problem->chain[chainID].currentSolution->motion[mIDS[2]]
                               };
         //Calculate loss of try
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
         //float distanceFromInitial=fabs(solutionToTest[0] - originalValues[0]);
         float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
-        
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+
         if (currentLoss<*bestLoss)
         {
             *bestLoss = currentLoss;
@@ -523,7 +523,7 @@ int examineSolutionAndKeepIfItIsBetter(
           problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
           problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
         }
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         return 0;
 }
 
@@ -553,28 +553,28 @@ float iteratePartLoss(
     unsigned long startTime;
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
-    
+
     if (problem->chain[chainID].part[partID].endEffector)
         {
           fprintf(stderr,RED "What are we doing iteratePartLoss of endEffector..\n" NORMAL);
           return 0.0;
         }
-    
+
     if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/10;     gradientExplosionThreshold=gradientExplosionThreshold*10; } else
     if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/1000;   gradientExplosionThreshold=gradientExplosionThreshold/15; }
-    
+
     unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
     if (numberOfMIDElements!=3)
     {
        fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
        fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
        fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
-       
+
        fprintf(stderr,RED "forcing 3 elements from %u -> %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart,problem->chain[chainID].part[partID].mIDStart+2);
        //return NAN;
-    } 
-    
-    
+    }
+
+
     //Motion IDs so that we don't have to seek them in the problem struct every time they will be needed
     unsigned int mIDS[3] =
     {
@@ -582,7 +582,7 @@ float iteratePartLoss(
         problem->chain[chainID].part[partID].mIDStart+1, //This is ok because we have checked for 3 elements above
         problem->chain[chainID].part[partID].mIDStart+2  //This is ok because we have checked for 3 elements above
     };
-    
+
     /*
     if (mIDS[2] >= problem->chain[chainID].currentSolution->bufferSize)
     {
@@ -591,24 +591,24 @@ float iteratePartLoss(
     }*/
 
     //The original values we want to improve
-    float originalValues[3] = 
+    float originalValues[3] =
     {
          problem->chain[chainID].currentSolution->motion[mIDS[0]],
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
-    }; 
-    
+    };
+
     //The original values we want to improve
     unsigned int weHaveAPreviousSolutionHistory=(problem->previousSolution!=0);
     if (!useSolutionHistory) { weHaveAPreviousSolutionHistory=0; }
-    
-    float previousSolution[3] = 
+
+    float previousSolution[3] =
     {
         originalValues[0],
         originalValues[1],
         originalValues[2]
-    }; 
-    
+    };
+
     if (weHaveAPreviousSolutionHistory)
     {
         previousSolution[0] = problem->previousSolution->motion[mIDS[0]];
@@ -616,7 +616,7 @@ float iteratePartLoss(
         previousSolution[2] = problem->previousSolution->motion[mIDS[2]];
     }
 
-    //Shorthand to access joint ID and joint Name witout having to traverse the problem 
+    //Shorthand to access joint ID and joint Name witout having to traverse the problem
     unsigned int jointID = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -635,17 +635,17 @@ float iteratePartLoss(
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
- 
+
    //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
    unsigned int initialLossIsNaN  = (initialLoss!=initialLoss);
    unsigned int initialLossIsZero = (initialLoss==0.0);
-   
-   
+
+
    if (initialLossIsNaN)
    {
        ++problem->chain[chainID].encounteredNumberOfNaNsAtStart;
        if(verbose)
-         { 
+         {
            fprintf(stderr,RED "Started with a NaN loss while processing chain %u for joint %s \n" NORMAL,chainID,jointName);
            bvh_printNotSkippedJoints(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
          }
@@ -664,11 +664,11 @@ float iteratePartLoss(
    if (maximumAcceptableStartingLoss>0.0)
    {
         //The positional subproblem gets a pass to help the other joints..
-        int isItThePositionalSubproblem = ( (partID==0) && ( (chainID==0) || chainID==1) ); 
-        
+        int isItThePositionalSubproblem = ( (partID==0) && ( (chainID==0) || chainID==1) );
+
         //If we are really.. really.. far from the solution we don't want to try and do IK
-        //as it will improve loss but may lead to a weird and incorrect pose 
-        if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) ) 
+        //as it will improve loss but may lead to a weird and incorrect pose
+        if ( (initialLoss>maximumAcceptableStartingLoss) && (!isItThePositionalSubproblem) )
         {
             //We won't process a chain that is not the positional chain and is further than our maximum acceptable starting loss
             if (verbose)
@@ -692,20 +692,20 @@ if (iterationID==0)
 {
     //If the previous solution is not given then it is impossible to use it
     if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
-    { 
-           //We need to remember the initial solution we where given 
+    {
+           //We need to remember the initial solution we where given
             float rememberInitialSolution[3]={
                                               problem->chain[chainID].currentSolution->motion[mIDS[0]],
                                               problem->chain[chainID].currentSolution->motion[mIDS[1]],
-                                              problem->chain[chainID].currentSolution->motion[mIDS[2]] 
-                                             }; 
-            
+                                              problem->chain[chainID].currentSolution->motion[mIDS[2]]
+                                             };
+
             //Maybe previous solution is closer to current observation?
             problem->chain[chainID].currentSolution->motion[mIDS[0]] = (float) problem->previousSolution->motion[mIDS[0]];
             problem->chain[chainID].currentSolution->motion[mIDS[1]] = (float) problem->previousSolution->motion[mIDS[1]];
             problem->chain[chainID].currentSolution->motion[mIDS[2]] = (float) problem->previousSolution->motion[mIDS[2]];
             float previousLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
-            
+
             if (previousLoss<initialLoss)
             {
                 //Congratulations! better solution for free!
@@ -721,15 +721,15 @@ if (iterationID==0)
                 //Previous solution is a worse solution,  let's forget about it and revert back!
                problem->chain[chainID].currentSolution->motion[mIDS[0]] = rememberInitialSolution[0];
                problem->chain[chainID].currentSolution->motion[mIDS[1]] = rememberInitialSolution[1];
-               problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2]; 
-            } 
+               problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2];
+            }
     }
-} 
+}
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
- 
-    char limitsEngaged = problem->chain[chainID].part[partID].limits; 
+
+    char limitsEngaged = problem->chain[chainID].part[partID].limits;
     //---------------------------------------------------------------------------------------
     float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
                                     problem->chain[chainID].part[partID].minimumLimitMID[1],
@@ -745,11 +745,11 @@ if (iterationID==0)
        float newMin = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
        if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[0]); }
        minimumLimitValues[0]=newMin;
-       
+
        newMin = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
        if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[1]); }
        minimumLimitValues[1]=newMin;
-       
+
        newMin = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
        if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[2]); }
        minimumLimitValues[2]=newMin;
@@ -757,15 +757,15 @@ if (iterationID==0)
        float newMax = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
        if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[0]); }
        maximumLimitValues[0]=newMax;
-       
+
        newMax = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
        if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[1]); }
        maximumLimitValues[1]=newMax;
-       
+
        newMax = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
        if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[2]); }
        maximumLimitValues[2]=newMax;
-    }  
+    }
 
     float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
     float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
@@ -845,7 +845,7 @@ if (iterationID==0)
             //We are at a local optima and since tryMaintainingLocalOptima is enabled
             //we will try to maintain it..!
             if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
-              
+
             return initialLoss;
         }
 
@@ -868,46 +868,46 @@ if (iterationID==0)
     for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
         //Calculate losses
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         //float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
         currentLoss[0]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         //distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
         currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
         currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
-        
+
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
-        previousDelta[0]=delta[0]; 
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+        previousDelta[0]=delta[0];
         gradient[0] =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
         delta[0] =  beta * delta[0] + (float) lr * gradient[0];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
-        previousDelta[1]=delta[1]; 
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+        previousDelta[1]=delta[1];
         gradient[1] =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
         delta[1] =  beta * delta[1] + (float) lr * gradient[1];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
-        previousDelta[2]=delta[2]; 
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+        previousDelta[2]=delta[2];
         gradient[2] =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
         delta[2] =  beta * delta[2] + (float) lr * gradient[2];
-        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------  
+        //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
 
-        //Safeguard agains gradient explosions which we detect when we see large gradients  
-        unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  ); 
-        unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) ); 
+        //Safeguard agains gradient explosions which we detect when we see large gradients
+        unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  );
+        unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) );
 
-        if  ( 
-               (deltaExploded) || (encounteredNaNDelta) 
+        if  (
+               (deltaExploded) || (encounteredNaNDelta)
             )
         {
             ++problem->chain[chainID].encounteredExplodingGradients;
@@ -927,7 +927,7 @@ if (iterationID==0)
         }
 
 
-        //Remember previous loss/values 
+        //Remember previous loss/values
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
         previousLoss[2]=currentLoss[2];
@@ -936,13 +936,13 @@ if (iterationID==0)
         previousValues[1]=currentValues[1];
         previousValues[2]=currentValues[2];
         //----------------------------------------------
-        
+
         //We advance our current state..
         currentValues[0]+=delta[0];
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
-        
-        
+
+
         if (limitsEngaged)
         {
           if (currentValues[0]<minimumLimitValues[0]) { currentValues[0]=minimumLimitValues[0]; } else
@@ -955,10 +955,10 @@ if (iterationID==0)
           if (currentValues[2]>maximumLimitValues[2]) { currentValues[2]=maximumLimitValues[2]; }
           //-------------------------------------------------------------------------------------
         }
-        
+
         //----------------------------------------------
-         
-        
+
+
         //We store our new values and calculate our new loss
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
@@ -976,7 +976,7 @@ if (iterationID==0)
             executedEpochs=currentEpoch;
             break;
         } else
-        if (loss + minimumLossDeltaFromBestToBeAcceptable < bestLoss)  
+        if (loss + minimumLossDeltaFromBestToBeAcceptable < bestLoss)
         {
             //Loss has been improved..!
             bestLoss=loss;
@@ -1000,34 +1000,34 @@ if (iterationID==0)
         {
             if (verbose)
                  { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); }
-                 
+
             executedEpochs=currentEpoch;
             break;
         }
-        
-        
+
+
         //Learning rate decay..
-        //3/4  Mean   :10.4969 
+        //3/4  Mean   :10.4969
         //3/5  Mean   :10.34537
         //2/5  Mean   :10.2781
-        //1/6  Mean   :10.2230 
-        //2/6  Mean   :10.12284  
+        //1/6  Mean   :10.2230
+        //2/6  Mean   :10.12284
         //2/7  Mean   :10.0943
         //3/8  Mean   :10.1463
         //3/10 Mean   :10.1280
-        //25/70 Mean   :10.22975  
-        //15/70 Mean   :10.1823  
+        //25/70 Mean   :10.22975
+        //15/70 Mean   :10.1823
         //Distance to -350
-        //2/7   Mean   :10.1286  
+        //2/7   Mean   :10.1286
         //Distance to -330
-        //2/7   Mean   : 9.9858  
-        //2/7 Mean   : 9.93695  
+        //2/7   Mean   : 9.9858
+        //2/7 Mean   : 9.93695
 
 
         float learningRateDecayRate = (float) 2/7;
         lr = (float) learningRateDecayRate * lr;
     }
-    
+
 
     if (verbose)
     {   unsigned long endTime = GetTickCountMicrosecondsIK();
@@ -1037,7 +1037,7 @@ if (iterationID==0)
         fprintf(stderr,"correction of %0.2f,%0.2f,%0.2f deg\n",bestValues[0]-originalValues[0],bestValues[1]-originalValues[1],bestValues[2]-originalValues[2]);
         fprintf(stderr,"correction rate of %0.2f,%0.2f,%0.2f deg\n",(bestValues[0]-originalValues[0])/executedEpochs,(bestValues[1]-originalValues[1])/executedEpochs,(bestValues[2]-originalValues[2])/executedEpochs);
     }
-    
+
     if (weHaveAPreviousSolutionHistory)
     {
       if (
@@ -1054,13 +1054,13 @@ if (iterationID==0)
                                               //-------------------------
                                               previousSolution
                                             )
-         ) 
+         )
          {
-            //fprintf(stderr,"Optimization for joint %s rolled back\n",jointName); 
+            //fprintf(stderr,"Optimization for joint %s rolled back\n",jointName);
             ++problem->chain[chainID].encounteredWorseSolutionsThanPrevious;
          }
     }
-    
+
     if (limitsEngaged)
         {
           if (bestValues[0]<minimumLimitValues[0]) { bestValues[0]=minimumLimitValues[0]; } else
@@ -1078,8 +1078,8 @@ if (iterationID==0)
     problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
     problem->chain[chainID].currentSolution->motion[mIDS[1]] = bestValues[1];
     problem->chain[chainID].currentSolution->motion[mIDS[2]] = bestValues[2];
-    
-    //Multi threaded code (and single threaded code) needs to also concurrently update the final solution for next iterations  
+
+    //Multi threaded code (and single threaded code) needs to also concurrently update the final solution for next iterations
     //In order to get rid of extra bureocracies with motion buffers we also perform the update here..
     //Only a chain is responsible and should update the specific motion values anyways
     problem->currentSolution->motion[mIDS[0]] = bestValues[0];
@@ -1101,14 +1101,14 @@ int iterateChainLoss(
                      float maximumAcceptableStartingLoss,
                      unsigned int epochs,
                      unsigned int tryMaintainingLocalOptima,
-                     float spring, 
+                     float spring,
                      float gradientExplosionThreshold,
                      char useSolutionHistory,
                      unsigned int verbose
                     )
 {
     problem->chain[chainID].status = BVH_IK_STARTED;
-   
+
      //Make sure chain has been fully extended to root joint..
     bvh_markAllJointsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform);
     for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -1116,7 +1116,7 @@ int iterateChainLoss(
       unsigned int jointID = problem->chain[chainID].part[partID].jID;
       bvh_markJointAndParentsAsUsefulInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
     }
-    
+
     for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
     {
         if (!problem->chain[chainID].part[partID].endEffector)
@@ -1130,7 +1130,7 @@ int iterateChainLoss(
                                                maximumAcceptableStartingLoss,
                                                epochs,
                                                tryMaintainingLocalOptima,
-                                               spring, 
+                                               spring,
                                                gradientExplosionThreshold,
                                                useSolutionHistory,
                                                verbose
@@ -1143,11 +1143,11 @@ int iterateChainLoss(
     return 1;
 }
 
- 
+
 
 //This is the regular and easy to follow serial implementation where for each iteration we go through
 //each one of the chains in order.. We still mark the chain status to ensure 1:1 operation with the multithreaded
-//version of the code.. 
+//version of the code..
 int singleThreadedSolver(
                          struct ikProblem * problem,
                          struct ikConfiguration * ikConfig
@@ -1159,7 +1159,7 @@ int singleThreadedSolver(
         {
             //Before we start we will make a copy of the problem->currentSolution to work on improving it..
             copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
-    
+
             problem->chain[chainID].currentIteration=iterationID;
             iterateChainLoss(
                               problem,
@@ -1169,7 +1169,7 @@ int singleThreadedSolver(
                               ikConfig->maximumAcceptableStartingLoss,
                               ikConfig->epochs,
                               ikConfig->tryMaintainingLocalOptima,
-                              ikConfig->spring, 
+                              ikConfig->spring,
                               ikConfig->gradientExplosionThreshold,
                               (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                               ikConfig->verbose
@@ -1199,7 +1199,7 @@ int singleThreadedSolver(
 ///=====================================================================================
 
 
- 
+
 void * iterateChainLossWorkerThread(void * arg)
 {
   //We are a thread so lets retrieve our variables..
@@ -1208,7 +1208,7 @@ void * iterateChainLossWorkerThread(void * arg)
   struct passIKContextToThread * contextArray = (struct passIKContextToThread *) ptr->argumentToPass;
   struct passIKContextToThread * ctx = &contextArray[ptr->threadID];
   fprintf(stderr,"Chain-%u: Started..!\n",ctx->chainID);
-  
+
   threadpoolWorkerInitialWait(ptr);
 
   while (threadpoolWorkerLoopCondition(ptr))
@@ -1223,7 +1223,7 @@ void * iterateChainLossWorkerThread(void * arg)
                            ctx->ikConfig->maximumAcceptableStartingLoss,
                            ctx->ikConfig->epochs,
                            ctx->ikConfig->tryMaintainingLocalOptima,
-                           ctx->ikConfig->spring, 
+                           ctx->ikConfig->spring,
                            ctx->ikConfig->gradientExplosionThreshold,
                            (!ctx->ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                            ctx->ikConfig->verbose
@@ -1244,9 +1244,9 @@ int multiThreadedSolver(
                        )
 {
   //fprintf(stderr,"multiThreadedSolver called\n");
-  //unsigned int numberOfFreshlySpawnThreads=0;  
+  //unsigned int numberOfFreshlySpawnThreads=0;
   unsigned int numberOfWorkerThreads = 0;
-  
+
   //Make sure all threads needed are created but only paying the cost of creating a thread once..!
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
@@ -1254,12 +1254,12 @@ int multiThreadedSolver(
               {
                  problem->workerContext[numberOfWorkerThreads].problem=problem;
                  problem->workerContext[numberOfWorkerThreads].ikConfig=ikConfig;
-                 problem->workerContext[numberOfWorkerThreads].chainID=chainID; 
+                 problem->workerContext[numberOfWorkerThreads].chainID=chainID;
                  problem->workerContext[numberOfWorkerThreads].threadID=numberOfWorkerThreads;
                  ++numberOfWorkerThreads;
               }
         }
-        
+
    if (!problem->threadPool.initialized)
    {
      if (
@@ -1275,21 +1275,21 @@ int multiThreadedSolver(
      }
     fprintf(stderr,"Survived threadpool creation \n");
     sleep(1);
-   } 
+   }
   //fprintf(stderr,GREEN "Worker Threads =%u / Freshly spawned threads = %u \n" NORMAL,numberOfWorkerThreads,numberOfFreshlySpawnThreads);
-  
+
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
-    { 
+    {
          threadpoolMainThreadPrepareWorkForWorkers(&problem->threadPool);
-         
+
         //We go through each chain, if the chain is single threaded we do the same as the singleThreadedSolver
         //if the thread is parallel then we just ask it to start processing the current data and we then need to stop and wait to gather results..
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
               //Before we start we will make a copy of the problem->currentSolution to work on improving it..
               copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
-              
+
               problem->chain[chainID].currentIteration=iterationID;
               if (!problem->chain[chainID].parallel )
               {  //Normal chains run normally..
@@ -1307,17 +1307,17 @@ int multiThreadedSolver(
                                  (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                                  ikConfig->verbose
                                 );
-                                                 
+
                   //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
                   //If we are here it means problem->currentSolution has the best solution IK could find..
               }
         }
-        
+
         threadpoolMainThreadWaitForWorkersToFinish(&problem->threadPool);
         //--------------------------------------------------
     }
-    
-  
+
+
 }
 
 ///=====================================================================================
@@ -1345,7 +1345,7 @@ int extrapolateSolution(
                   extrapolated->motion[mID] = b->motion[mID] + ( b->motion[mID] - a->motion[mID] );
               }
               return 1;
-          }     
+          }
         }
     return 0;
 }
@@ -1361,41 +1361,42 @@ int ensureInitialPositionIsInFrustrum(
                                       struct MotionBuffer * previousSolution
                                      )
 {
-   if (renderer==0) { return 0; } 
-   if (solution==0) { return 0; } 
-   if (solution->motion==0) { return 0; } 
-   if (previousSolution==0) { return 0; } 
-   if (previousSolution->motion==0) { return 0; } 
-    
-   float closestDistanceToCameraInCM=13; //30 cm 
-   
-   
+   if (renderer==0) { return 0; }
+   if (solution==0) { return 0; }
+   if (solution->motion==0) { return 0; }
+   if (previousSolution==0) { return 0; }
+   if (previousSolution->motion==0) { return 0; }
+
+   float closestDistanceToCameraInCM=13; //30 cm
+
+
    if (problem->nearCutoffPlaneDeclared)
        {
            //Overriding with near cutoff plane declared in problem
            closestDistanceToCameraInCM = problem->nearCutoffPlane;
-       } 
-    
-   //TODO : 
+       }
+
+   //TODO :
    //Ensure that  pose is not out of the bounds of camera ?
    //If it is inverse kinematics wont know what to do..
     if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
     {
         fprintf(stderr,RED "Warning: Detected pose behind camera! ..\n" NORMAL);
+        fprintf(stderr,"Initial X Y Z Position was (%0.2f,%0.2f,%0.2f) ! ..\n",solution->motion[0],solution->motion[1],solution->motion[2]);
         if ( (previousSolution!=0) && (previousSolution->motion!=0) )
         {
             if (previousSolution->motion[2] < -1 * closestDistanceToCameraInCM)
                     {
                         fprintf(stderr,GREEN "Fixed using previous frame ! ..\n" NORMAL);
-                        solution->motion[0]=previousSolution->motion[0]; 
-                        solution->motion[1]=previousSolution->motion[1]; 
+                        solution->motion[0]=previousSolution->motion[0];
+                        solution->motion[1]=previousSolution->motion[1];
                         /// This is the most important  --------------------------------
-                        solution->motion[2]=previousSolution->motion[2]; 
+                        solution->motion[2]=previousSolution->motion[2];
                         ///-------------------------------------------------------------------------
-                        solution->motion[3]=previousSolution->motion[3]; 
-                        solution->motion[4]=previousSolution->motion[4]; 
-                        solution->motion[5]=previousSolution->motion[5]; 
-                    } 
+                        solution->motion[3]=previousSolution->motion[3];
+                        solution->motion[4]=previousSolution->motion[4];
+                        solution->motion[5]=previousSolution->motion[5];
+                    }
         }
 
         if (solution->motion[2] > -1 * closestDistanceToCameraInCM)
@@ -1403,8 +1404,9 @@ int ensureInitialPositionIsInFrustrum(
                  solution->motion[2]=-130;
                  fprintf(stderr,RED "Warning: ensureInitialPositionIsInFrustrum will push solution back to %f ..\n" NORMAL,solution->motion[2]);
         }
+        fprintf(stderr,"Initial X Y Z Position after tweak is (%0.2f,%0.2f,%0.2f) ! ..\n",solution->motion[0],solution->motion[1],solution->motion[2]);
     }
-     
+
      return 1;
 }
 
@@ -1423,7 +1425,7 @@ void compareChainsAndAdoptBest(
                                struct MotionBuffer * currentSolution,
                                struct MotionBuffer * checkIfItIsBetterSolution,
                                //---------------------------------
-                               struct BVH_Transform * bvhCurrentTransform, 
+                               struct BVH_Transform * bvhCurrentTransform,
                                struct BVH_Transform * bvhCheckIfItIsBetterTransform,
                                //---------------------------------
                                struct BVH_Transform * bvhTargetTransform
@@ -1439,8 +1441,8 @@ void compareChainsAndAdoptBest(
     {
       for (unsigned int chainID=startChain; chainID<endChain; chainID++)
                 {
-                  float currentSolutionChainLoss  = 0.0;  
-                  float previousSolutionChainLoss = 0.0;  
+                  float currentSolutionChainLoss  = 0.0;
+                  float previousSolutionChainLoss = 0.0;
 
                   unsigned int partIDStart = 0;
                   unsigned int failedProjections=0;
@@ -1449,11 +1451,11 @@ void compareChainsAndAdoptBest(
                      unsigned int jID=problem->chain[chainID].part[partID].jID;
                      failedProjections += ( bvh_projectJIDTo2D(mc,bvhCurrentTransform,renderer,jID,0,0)  == 0 );
                      failedProjections += ( bvh_projectJIDTo2D(mc,bvhCheckIfItIsBetterTransform,renderer,jID,0,0) == 0 );
-                
-                     if (failedProjections==0)     
+
+                     if (failedProjections==0)
                      {
                       jID=problem->chain[chainID].part[partID].jID;
-                         
+
                       ///Warning: When you change this please change meanBVH2DDistance as well!
                       float cX=(float) bvhCheckIfItIsBetterTransform->joint[jID].pos2D[0];
                       float cY=(float) bvhCheckIfItIsBetterTransform->joint[jID].pos2D[1];
@@ -1461,37 +1463,37 @@ void compareChainsAndAdoptBest(
                       float sY=(float) bvhCurrentTransform->joint[jID].pos2D[1];
                       float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
                       float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
-                        
+
                       //Only use source/target joints  that exist and are not occluded..
 
                       if ((tX!=0.0) || (tY!=0.0))
                       {
                         //Don't do anything without the target point..
                         if ((sX!=0.0) || (sY!=0.0))
-                        { 
+                        {
                           //Our current solution
                           currentSolutionChainLoss += getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
 
                         if ((cX!=0.0) || (cY!=0.0))
-                        { 
+                        {
                           //The solution we want to check if is better
                           previousSolutionChainLoss += getSquared2DPointDistance(cX,cY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                         }
                       }
                      }
                     }
-                     
-                     
-                    if (currentSolutionChainLoss > previousSolutionChainLoss) 
+
+
+                    if (currentSolutionChainLoss > previousSolutionChainLoss)
                     {
                         ++problem->chain[chainID].encounteredAdoptedBest;
                         if (ikConfig->verbose)
                              { fprintf(stderr,RED "compareChainsAndAdoptBest: Chain %u came out worse\n" NORMAL,chainID); }
-                        
+
                         for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                         {
-                         //Only perform this on non end-effector parts of chains 
+                         //Only perform this on non end-effector parts of chains
                          if (!problem->chain[chainID].part[partID].endEffector)
                          {
                          //----------------------------------------------------------------------------------
@@ -1501,10 +1503,10 @@ void compareChainsAndAdoptBest(
                                                  problem->chain[chainID].part[partID].mIDStart+2
                                                 };
                          //----------------------------------------------------------------------------------
-                         if ( 
-                              (mIDS[0]<currentSolution->bufferSize) && 
-                              (mIDS[1]<currentSolution->bufferSize) && 
-                              (mIDS[2]<currentSolution->bufferSize) 
+                         if (
+                              (mIDS[0]<currentSolution->bufferSize) &&
+                              (mIDS[1]<currentSolution->bufferSize) &&
+                              (mIDS[2]<currentSolution->bufferSize)
                            )
                               {
                                 currentSolution->motion[mIDS[0]]=checkIfItIsBetterSolution->motion[mIDS[0]];
@@ -1515,15 +1517,15 @@ void compareChainsAndAdoptBest(
                                 viewProblem(problem);
                                 fprintf(stderr,RED "BUG: compareChainsAndAdoptBest: Incorrect chain mIDS for chain %u part %u\n" NORMAL,chainID,partID);
                                 fprintf(stderr,RED "mIDS[0]=%u mIDS[1]=%u mIDS[2]=%u\n" NORMAL,mIDS[0],mIDS[1],mIDS[2]);
-                              } 
-                         //---------------------------------------------------------------------------------- 
+                              }
+                         //----------------------------------------------------------------------------------
                          }
                         }
                     }
                 }
   } else
   {
-    fprintf(stderr,RED "compareChainsAndAdoptBest: Cannot operate on a chain [%u-%u] out of limits[%u]..\n" NORMAL,startChain,endChain,problem->numberOfChains); 
+    fprintf(stderr,RED "compareChainsAndAdoptBest: Cannot operate on a chain [%u-%u] out of limits[%u]..\n" NORMAL,startChain,endChain,problem->numberOfChains);
   }
  } else
  {
@@ -1531,11 +1533,11 @@ void compareChainsAndAdoptBest(
  }
  }
   //fprintf(stderr,"compareChainsAndAdoptBest survived ");
-}   
+}
 
 
 
-int ensureFinalProposedSolutionIsBetterInParts( 
+int ensureFinalProposedSolutionIsBetterInParts(
                                                struct BVH_MotionCapture * mc,
                                                struct simpleRenderer *renderer,
                                                //---------------------------------
@@ -1558,10 +1560,10 @@ int ensureFinalProposedSolutionIsBetterInParts(
    if ( (previousSolution==0) || (previousSolution->motion==0) )    { return 0; }
    if (bvhTargetTransform==0) { return 0; }
    //fprintf(stderr,GREEN "ensureFinalProposedSolutionIsBetterInParts running for %s\n" NORMAL,label);
-   //------------------------------------------------ 
-   struct BVH_Transform bvhCurrentTransform  = {0}; 
+   //------------------------------------------------
+   struct BVH_Transform bvhCurrentTransform  = {0};
    struct BVH_Transform bvhPreviousTransform = {0};
-   //------------------------------------------------ 
+   //------------------------------------------------
    if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
            {
             if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
@@ -1571,7 +1573,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                          renderer,
                                          problem,
                                          startChain,
-                                         endChain, 
+                                         endChain,
                                          ikConfig,
                                          currentSolution,
                                          previousSolution,
@@ -1581,7 +1583,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
                                         );
                return 1;
              }
-           } 
+           }
     bvh_freeTransform(&bvhCurrentTransform);
     bvh_freeTransform(&bvhPreviousTransform);
    //------------------------------------------------
@@ -1591,7 +1593,7 @@ int ensureFinalProposedSolutionIsBetterInParts(
 
 
 
-int springToZeroParts( 
+int springToZeroParts(
                        struct BVH_MotionCapture * mc,
                        struct simpleRenderer *renderer,
                        //---------------------------------
@@ -1609,13 +1611,13 @@ int springToZeroParts(
 {
    if (currentSolution==0)    { return 0; }
    fprintf(stderr,GREEN "springToZeroParts running \n" NORMAL);
-   //------------------------------------------------ 
-   struct BVH_Transform bvhCurrentTransform  = {0}; 
+   //------------------------------------------------
+   struct BVH_Transform bvhCurrentTransform  = {0};
    struct BVH_Transform bvhZeroTransform = {0};
-   //------------------------------------------------ 
-    
+   //------------------------------------------------
+
    struct MotionBuffer * zeroSolution = mallocNewMotionBufferAndCopy(mc,currentSolution);
-   
+
    if (zeroSolution!=0)
    {
     if ( (currentSolution->bufferSize==zeroSolution->bufferSize) )
@@ -1638,7 +1640,7 @@ int springToZeroParts(
                          currentSolution->motion[mIDS[2]]=0;
                     }
                 }
-       
+
      if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
            {
             if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,0))// We don't need extra structures
@@ -1648,7 +1650,7 @@ int springToZeroParts(
                                          renderer,
                                          problem,
                                          startChain,
-                                         endChain, 
+                                         endChain,
                                          ikConfig,
                                          currentSolution,
                                          zeroSolution,
@@ -1675,7 +1677,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           struct BVH_MotionCapture * mc,
                                                           struct simpleRenderer *renderer,
                                                           struct ikProblem * problem,
-                                                          struct ikConfiguration * ikConfig, 
+                                                          struct ikConfiguration * ikConfig,
                                                           //---------------------------------
                                                           struct MotionBuffer * penultimateSolution,
                                                           struct MotionBuffer * previousSolution,
@@ -1685,7 +1687,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           struct BVH_Transform * bvhTargetTransform,
                                                           //---------------------------------
                                                           unsigned int useMultipleThreads,
-                                                          //--------------------------------- 
+                                                          //---------------------------------
                                                           float * initialMAEInPixels,
                                                           float * finalMAEInPixels,
                                                           float * initialMAEInMM,
@@ -1697,13 +1699,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "No problem provided for IK..\n" NORMAL);
         return 0;
     }
-    
+
     if (bvhTargetTransform==0)
     {
         fprintf(stderr,RED "No target transform, can't do IK..\n" NORMAL);
         return 0;
     }
-    
+
     if  ( (solution==0) || (solution->motion==0) )
     {
         fprintf(stderr,RED "No initial solution provided for IK..\n" NORMAL);
@@ -1728,35 +1730,35 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Don't spam console..
     //viewProblem(problem);
     if (problem->chain[0].part[0].jID==0)
-    { 
+    {
       if (!ikConfig->dontUseSolutionHistory)
-       { 
+       {
          ensureInitialPositionIsInFrustrum(problem,renderer,solution,previousSolution);
-       } 
+       }
     } else
     if (ikConfig->verbose)
     {
       fprintf(stderr,RED "%s problem, Not running initial position frustrum check\n" NORMAL,problem->problemDescription);
     }
-    
+
     //Make sure our problem has the correct details ..
-    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;  
-      
+    problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
 
     if (!updateProblemSolutionToAllChains(problem,solution))
            {
              fprintf(stderr,RED "Failed broadcasting current solution to all chains\n" NORMAL);
              return 0;
            }
-    
- 
+
+
     if (!copyMotionBuffer(problem->previousSolution,previousSolution) )
            {
              fprintf(stderr,RED "Failed copying previous solution to problem\n" NORMAL);
              return 0;
-           } 
-        
-    
+           }
+
+
     /*
     //Extrapolated guess
     struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
@@ -1767,8 +1769,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                             previousSolution,
                             extrapolatedGuess
                            );
-                         
-        ensureFinalProposedSolutionIsBetterInParts( 
+
+        ensureFinalProposedSolutionIsBetterInParts(
                                                    mc,
                                                    renderer,
                                                    //---------------------------------
@@ -1777,7 +1779,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains-1, //End Chain
-                                                   //--------------------------------- 
+                                                   //---------------------------------
                                                    ikConfig,
                                                    //---------------------------------
                                                    problem->currentSolution,
@@ -1785,15 +1787,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //---------------------------------
                                                    bvhTargetTransform
                                                    //---------------------------------
-                                                   );                         
-        
+                                                   );
+
         freeMotionBuffer(extrapolatedGuess);
     }*/
 
 
-    
-    
-    
+
+
+
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1801,7 +1803,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
 
     if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
-    {  
+    {
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
         {
@@ -1830,7 +1832,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
      if (useMultipleThreads)
      {
       //Solve the problem using multiple threads..!
-      multiThreadedSolver(problem,ikConfig);          
+      multiThreadedSolver(problem,ikConfig);
      } else
      {
      //Solve the problem using a single thread..!
@@ -1840,28 +1842,28 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
 
-          
+
     if (ikConfig->verbose)
      {
       float * m = problem->initialSolution->motion;
       if (m!=0)
       {
        fprintf(stderr,"Initial Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
-        
+
         if (!ikConfig->dontUseSolutionHistory)
         {
          if  ( (problem->previousSolution!=0) && (problem->previousSolution->motion!=0) )
-         { 
+         {
             m = problem->previousSolution->motion;
-            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]); 
+            fprintf(stderr,"Previous Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
          }
         }
-    
+
        m = solution->motion;
        fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
       }
      }
-     
+
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1880,21 +1882,21 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if (finalMAEInPixels!=0)
         {
         //We calculate the new 2D distance achieved..
-        *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose); 
-        
+        *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
+
         //Was our solution perfect? If it was we don't need to compare to previous
         //----------------------------------------------------
         if (*finalMAEInPixels!=0)
         {
            if (!ikConfig->dontUseSolutionHistory)
            {
-           //Perform projection on previous solution 
-           //----------------------------------------------- 
-           struct BVH_Transform bvhPreviousTransform = {0}; 
+           //Perform projection on previous solution
+           //-----------------------------------------------
+           struct BVH_Transform bvhPreviousTransform = {0};
            if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
            {
             float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
-                                                                                   
+
             if (previousMAEInPixels<*finalMAEInPixels)
             {
                 if (ikConfig->considerPreviousSolution)
@@ -1902,8 +1904,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                     fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
                     copyMotionBuffer(solution,previousSolution);
                 }
-            }           
-            
+            }
+
             }
             bvh_freeTransform(&bvhPreviousTransform);
            //-----------------------------------------------
@@ -1916,40 +1918,40 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             *finalMAEInMM = meanBVH3DDistance(mc,renderer,1,0,solution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
-        
+
         /*
         //This is smoother but worse..
-        springToZeroParts( 
+        springToZeroParts(
                            mc,
                            renderer,
                            //---------------------------------
                            problem,
                            2, //Start Chain
                            problem->numberOfChains, //End Chain
-                           //--------------------------------- 
+                           //---------------------------------
                            ikConfig,
                            //---------------------------------
-                           solution, 
+                           solution,
                            //---------------------------------
                            bvhTargetTransform
                            //---------------------------------
                           );
         */
-        
-        
+
+
         if ( (!ikConfig->dontUseSolutionHistory) && (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from previous solution
-        ensureFinalProposedSolutionIsBetterInParts( 
+        ensureFinalProposedSolutionIsBetterInParts(
                                                    mc,
                                                    renderer,
                                                    //---------------------------------
                                                    "Previous",
-                                                   //--------------------------------- 
+                                                   //---------------------------------
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains-1, //End Chain
-                                                   //--------------------------------- 
+                                                   //---------------------------------
                                                    ikConfig,
                                                    //---------------------------------
                                                    solution,
@@ -1958,23 +1960,23 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    bvhTargetTransform
                                                    //---------------------------------
                                                    );
-        } 
-        
-        
-              
+        }
+
+
+
         if ( (!ikConfig->dontUseSolutionHistory) && (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
         {
-        //This removes some weird noise from pre-previous solution 
-        ensureFinalProposedSolutionIsBetterInParts( 
+        //This removes some weird noise from pre-previous solution
+        ensureFinalProposedSolutionIsBetterInParts(
                                                    mc,
                                                    renderer,
                                                    //---------------------------------
                                                    "Penultimate",
-                                                   //--------------------------------- 
+                                                   //---------------------------------
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains-1, //End Chain
-                                                   //--------------------------------- 
+                                                   //---------------------------------
                                                    ikConfig,
                                                    //---------------------------------
                                                    solution,
@@ -1984,7 +1986,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //---------------------------------
                                                    );
         }
-        
+
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -1995,22 +1997,22 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         dumpBVHToSVGFrame("target.svg",mc,bvhTargetTransform,1,renderer);
         dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
-    
+
     unsigned long endTime = GetTickCountMicrosecondsIK();
-    
+
      if (useMultipleThreads)
         { fprintf(stderr,"MT"); }
-      
-    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n", 
+
+    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n",
                                                endTime-startTime,
                                                problem->problemDescription,
                                                ikConfig->learningRate,
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
                                                ikConfig->epochs );
-    
+
     bvh_freeTransform(&bvhCurrentTransform);
-     
+
     return 1;
 }
 
