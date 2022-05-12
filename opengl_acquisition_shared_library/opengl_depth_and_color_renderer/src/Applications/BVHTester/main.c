@@ -466,6 +466,36 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
+
+  //-----------------------------
+  int initializeIK = 0;
+  if (strcmp(bodyPart,"body")==0)
+    {
+       if (atomicBodyProblem==0)
+           { initializeIK=1; }
+    } else
+  if (strcmp(bodyPart,"rhand")==0)
+    {
+       if (atomicRHandProblem==0)
+           { initializeIK=1; }
+    } else
+  if (strcmp(bodyPart,"lhand")==0)
+    {
+       if (atomicLHandProblem==0)
+           { initializeIK=1; }
+    } else
+  if (strcmp(bodyPart,"face")==0)
+    {
+       if (atomicFaceProblem==0)
+           { initializeIK=1; }
+    }
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    if (initializeIK)
+    { bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);  }
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+
   return 1;
 }
 
