@@ -422,24 +422,6 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
       return 0;
     } else
     {
-/*
-         //------------------------------------
-         ikConfig.learningRate = learningRate;
-         ikConfig.iterations = iterations;
-         ikConfig.epochs = epochs;
-         ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
-         ikConfig.gradientExplosionThreshold = 50;
-         ikConfig.spring=spring;
-         ikConfig.dumpScreenshots = 0; // Dont thrash disk
-         ikConfig.verbose = 0; //Dont spam console
-         ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
-         ikConfig.dontUseSolutionHistory=dontUseHistory;
-         ikConfig.ikVersion = IK_VERSION;
-         //------------------------------------
-*/
-
-
-
       return 1;
     }
 }
@@ -451,7 +433,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs)
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
@@ -489,12 +471,12 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
 
       //------------------------------------
          struct ikConfiguration ikConfig = {0};
-         ikConfig.learningRate = 0.001;
+         ikConfig.learningRate = lr;
          ikConfig.iterations = iterations;
          ikConfig.epochs = epochs;
          ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
          ikConfig.gradientExplosionThreshold = 50;
-         ikConfig.spring= 0;
+         ikConfig.spring= 20;
          ikConfig.dumpScreenshots = 0; // Dont thrash disk
          ikConfig.verbose = 1; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
