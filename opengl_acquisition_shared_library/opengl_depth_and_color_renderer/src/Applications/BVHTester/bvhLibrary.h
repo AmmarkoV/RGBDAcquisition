@@ -38,7 +38,7 @@ float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID);
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID);
 
 int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID);
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID);
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff);
 
 int bvhConverter(int argc,const char **argv);
 

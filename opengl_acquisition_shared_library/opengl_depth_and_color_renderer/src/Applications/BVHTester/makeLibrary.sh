@@ -106,7 +106,7 @@ $BVHTESTER_DIR/main.c
 "
 
 
-gcc -shared -o libBVHConverter.so -fPIC -DBVH_USE_AS_A_LIBRARY $SOURCE
+gcc -shared -o libBVHConverter.so -O3 -fPIC -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
 

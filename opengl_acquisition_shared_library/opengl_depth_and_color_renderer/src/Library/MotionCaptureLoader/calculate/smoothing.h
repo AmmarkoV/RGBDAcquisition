@@ -152,7 +152,13 @@ static struct ButterWorthArray * butterWorth_allocate(int numberOfSensors,float 
     bwa->sensors = (struct ButterWorth *) malloc(sizeof(struct ButterWorth)*numberOfSensors);
     if (bwa->sensors!=0)
     {
-      //printf("bwa->sensors\n");
+      //First of all, make sure every variable is initialized to zero
+      for (int i=0; i<numberOfSensors; i++)
+      {
+        memset((void*) &bwa->sensors[i],0,sizeof(struct ButterWorth));
+      }
+
+      //Then perform initialization
       bwa->numberOfSensors = numberOfSensors;
       for (int i=0; i<numberOfSensors; i++)
        {
@@ -206,12 +212,6 @@ static void * butterWorth_allocateAtomic(int numberOfSensors,float fsampling,flo
 {
   //printf("butterWorth_allocateAtomic(%u,%0.2f,%0.2f)\n",numberOfSensors,fsampling,fcutoff);
   struct ButterWorthArray * filterArrayAtomic = butterWorth_allocate(numberOfSensors,fsampling,fcutoff);
-
-  for (int i=0; i<numberOfSensors; i++)
-  {
-      memset((void*) &filterArrayAtomic->sensors[i],0,sizeof(struct ButterWorth));
-  }
-
   return (void *) filterArrayAtomic;
 }
 

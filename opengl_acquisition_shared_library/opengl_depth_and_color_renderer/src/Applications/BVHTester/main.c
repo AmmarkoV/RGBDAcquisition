@@ -466,6 +466,7 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
     //--------------------------------------------------------------------------
     if (initializeIK)
     {
+     fprintf(stderr,"Butterworth Smoothing filter initialized with fSampling:%0.2f and fCutoff:%0.2f \n",fSampling,fCutoff);
      atomicSmoothingFilter = butterWorth_allocate(bvhAtomicMotion.numberOfValuesPerFrame,fSampling,fCutoff);
      bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);
     }
