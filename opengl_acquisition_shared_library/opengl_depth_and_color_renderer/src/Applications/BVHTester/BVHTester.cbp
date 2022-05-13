@@ -117,6 +117,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_transform.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/smoothing.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c">
 			<Option compilerVar="CC" />
 		</Unit>

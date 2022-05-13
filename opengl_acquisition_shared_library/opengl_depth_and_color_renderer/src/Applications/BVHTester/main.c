@@ -14,6 +14,7 @@
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
 #include "../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.h"
+#include "../../Library/MotionCaptureLoader/calculate/smoothing.h"
 
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
@@ -90,6 +91,8 @@ struct ikProblem * atomicRHandProblem = 0;
 struct MotionBuffer * atomicPenultimateSolution=0;
 struct MotionBuffer * atomicPreviousSolution=0;
 struct MotionBuffer * atomicSolution=0;
+struct ButterWorthArray * atomicSmoothingFilter = 0;
+
 
 int bvhConverter_loadAtomic(const char *path)
 {
@@ -433,7 +436,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr)
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
@@ -462,7 +465,10 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     if (initializeIK)
-    { bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);  }
+    {
+     atomicSmoothingFilter = butterWorth_allocate(bvhAtomicMotion.numberOfValuesPerFrame,fSampling,fCutoff);
+     bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);
+    }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
 
@@ -583,6 +589,17 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
                                                                     )
             )
             {
+
+              if ( (fSampling>0.0) && (fCutoff>0.0) )
+              { //Only perform smoothing if sampling/cutoff is set..
+               for (int mID=0; mID<atomicSolution->bufferSize; mID++)
+               {
+                   atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
+               }
+              }
+
+
+
               return bvh_copyMotionBufferToMotionFrame(
                                                        &bvhAtomicMotion,
                                                        frameID,
