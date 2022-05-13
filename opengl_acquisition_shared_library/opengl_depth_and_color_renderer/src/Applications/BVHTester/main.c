@@ -545,12 +545,12 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
                 {
                   if (coord[2]=='x')
                   {
-                   fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
+                   //fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
                    bvhTargetTransform.joint[jID].pos2D[0] = (float) values[i]*renderingAtomicConfiguration.width;
                   } else
                   if (coord[2]=='y')
                   {
-                   fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
+                   //fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
                    bvhTargetTransform.joint[jID].pos2D[1] = (float) values[i]*renderingAtomicConfiguration.height;
                   }
                 } else
