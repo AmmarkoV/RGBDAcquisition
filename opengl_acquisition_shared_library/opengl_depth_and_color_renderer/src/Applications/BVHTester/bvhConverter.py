@@ -62,7 +62,7 @@ def splitDictionaryInLabelsAndFloats(arguments):
 
 class BVH():
   def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False ):
-        print("Initializing BVH from ",libraryPath)
+        print("Initializing BVH file ",bvhPath," from ",libraryPath)
         self.libBVH         = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints = 0
         self.loadBVHFile(bvhPath)
@@ -74,6 +74,8 @@ class BVH():
         self.libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
         self.libBVH.bvhConverter_loadAtomic.restype  = ctypes.c_int
         self.numberOfJoints = self.libBVH.bvhConverter_loadAtomic(arg1)
+        if (self.numberOfJoints==0):
+           print("Failed to load BVH file ",bvhPath)
         return self.numberOfJoints
   #--------------------------------------------------------
   def getJointName(self, jointID:int):
