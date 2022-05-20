@@ -38,6 +38,8 @@ add_executable(
               ../../Library/MotionCaptureLoader/calculate/bvh_transform.c 
               ../../Library/MotionCaptureLoader/calculate/bvh_project.c 
               ../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.c
+              ../../Library/MotionCaptureLoader/calculate/smoothing.h
+              ../../Library/MotionCaptureLoader/calculate/smoothing.c
               ../../Library/MotionCaptureLoader/import/fromBVH.c
               ../../Library/MotionCaptureLoader/export/bvh_export.c
               ../../Library/MotionCaptureLoader/export/bvh_to_c.c

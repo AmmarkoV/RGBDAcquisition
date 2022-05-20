@@ -19,7 +19,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /**
  * @brief The complete state of a Butterworth filter instance
@@ -229,5 +236,12 @@ static float butterWorth_filterAtomic(void * handle,int value,float unfilteredVa
   struct ButterWorthArray * filterArrayAtomic = (struct ButterWorthArray *) handle;
   return butterWorth_filterArrayElement(filterArrayAtomic,value,unfilteredValue);
 }
+
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -72,6 +72,8 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/calculate/bvh_transform.c
             MotionCaptureLoader/calculate/bvh_project.c
             MotionCaptureLoader/calculate/bvh_to_tri_pose.c
+            MotionCaptureLoader/calculate/smoothing.h
+            MotionCaptureLoader/calculate/smoothing.c
             MotionCaptureLoader/import/fromBVH.c
             MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
             MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c

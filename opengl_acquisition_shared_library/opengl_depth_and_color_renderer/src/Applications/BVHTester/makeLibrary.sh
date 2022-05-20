@@ -3,6 +3,9 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+echo "Compilation handled by : "
+gcc --version
+
 #in case of a build after ./batherFiles.sh
 BVHTESTER_DIR="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Applications/BVHTester"
 AMMATRIX_DIRECTORY="tools/AmMatrix"
@@ -19,7 +22,7 @@ INPUTPARSER_DIRECTORY="../../Library/TrajectoryParser"
 SOURCE="
 $AMMATRIX_DIRECTORY/matrix3x3Tools.c
 $AMMATRIX_DIRECTORY/matrix3x3Tools.h
-$AMMATRIX_DIRECTORY/matrix4x4Tools.c 
+$AMMATRIX_DIRECTORY/matrix4x4Tools.c
 $AMMATRIX_DIRECTORY/matrix4x4Tools.h
 $AMMATRIX_DIRECTORY/matrixCalculations.c
 $AMMATRIX_DIRECTORY/matrixCalculations.h
@@ -54,6 +57,8 @@ $BVH_DIRECTORY/calculate/bvh_project.c
 $BVH_DIRECTORY/calculate/bvh_project.h
 $BVH_DIRECTORY/calculate/bvh_to_tri_pose.c
 $BVH_DIRECTORY/calculate/bvh_to_tri_pose.h
+$BVH_DIRECTORY/calculate/smoothing.c
+$BVH_DIRECTORY/calculate/smoothing.h
 $BVH_DIRECTORY/calculate/bvh_transform.c
 $BVH_DIRECTORY/calculate/bvh_transform.h
 $BVH_DIRECTORY/edit/bvh_cut_paste.c

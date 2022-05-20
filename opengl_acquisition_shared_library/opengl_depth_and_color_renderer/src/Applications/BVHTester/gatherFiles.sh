@@ -33,12 +33,17 @@ ITEM="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Appl
 cd "$DIR"
 mkdir -p $ITEM
 cd $ITEM
+cp $REPO/$ITEM/bvhConverter.py ./
 cp $REPO/$ITEM/bvhLibrary.py ./
 cp $REPO/$ITEM/bvhLibrary.h ./
 cp $REPO/$ITEM/main.c ./
 cd "$DIR"
 cp $REPO/$ITEM/bvhLibrary.py ./
 
+#Also copy the two most important files in root 
+cd "$DIR"
+cp $REPO/$ITEM/bvhConverter.py ./
+cp $REPO/$ITEM/bvhLibrary.py ./
 
 ITEM="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader"
 cd "$DIR"
