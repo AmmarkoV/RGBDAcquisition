@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 #include "../bvh_loader.h"
+#include "../edit/bvh_rename.h"
 #include "../calculate/bvh_project.h"
 #include  "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
@@ -63,6 +64,9 @@ char * read_file(const char * filename,int *length )
 
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
 
 const char *getErrorString(cl_int error)
 {
@@ -207,6 +211,20 @@ const char *getErrorString(cl_int error)
             return "Unknown OpenCL error";
         }
 }
+
+int checkOpenCLError(int err,char * file , int  line)
+{
+  //int err=glGetError();
+  if (err !=  0 /*0*/ )
+    {
+      fprintf(stderr,RED "OpenCL Error (%d) %s : %s %d \n ", err , getErrorString(err) ,  file ,line ); 
+      fprintf(stderr,"\n" NORMAL);
+      return 1;
+    }
+ return 0;
+}
+
+
 
 void printMatrix(float *arr, int n, int m)
 {
@@ -360,24 +378,18 @@ int main(int argc, char const *argv[])
     properties[1] = (cl_context_properties) platform_id;
     properties[2] = 0;
 
-    context = clCreateContext(properties,1,&device_id,NULL,NULL,&err);
-
-    command_queue = clCreateCommandQueue(context,device_id,0,&err);
-
-    inputA = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);
-    if (err < 0)
-        printf("Create buffer Error: %s\n",getErrorString(err) );
-    inputB = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);
-    if (err < 0)
-        printf("Create buffer Error: %s\n",getErrorString(err) );
-    output = clCreateBuffer(context,CL_MEM_WRITE_ONLY,op_len,NULL,&err);
-    if (err < 0)
-        printf("Create buffer Error: %s\n",getErrorString(err) );
-
+    context = clCreateContext(properties,1,&device_id,NULL,NULL,&err);    checkOpenCLError(err,__FILE__, __LINE__);
+    //-------------------------------------------------------------------------------------------------------------
+    command_queue = clCreateCommandQueue(context,device_id,0,&err);       checkOpenCLError(err,__FILE__, __LINE__);
+    //-------------------------------------------------------------------------------------------------------------
+    inputA = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    inputB = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    output = clCreateBuffer(context,CL_MEM_WRITE_ONLY,op_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    //-------------------------------------------------------------------------------------------------------------
     clEnqueueWriteBuffer(command_queue,inputA,CL_TRUE,0,inp_len,matA,0,NULL,NULL);
     clEnqueueWriteBuffer(command_queue,inputB,CL_TRUE,0,inp_len,matB,0,NULL,NULL);
 
-    program = clCreateProgramWithSource(context,1,(const char**) &KernelSource, NULL, &err);
+    program = clCreateProgramWithSource(context,1,(const char**) &KernelSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
 
     if (res = clBuildProgram(program,1,&device_id,NULL,NULL,NULL) != CL_SUCCESS)
         {
@@ -385,33 +397,25 @@ int main(int argc, char const *argv[])
             return -1;
         }
 
-    kernel = clCreateKernel(program,"mat_mul",&err);
-    if (err < 0)
-        printf("Create buffer Error: %s\n",getErrorString(err) );
+    kernel = clCreateKernel(program,"mat_mul",&err); checkOpenCLError(err,__FILE__, __LINE__);
 
-    if (clSetKernelArg(kernel,0,sizeof(cl_mem),&inputA) != CL_SUCCESS)
-        {
-            printf("Kernel setting error\n");
-        }
-    if (clSetKernelArg(kernel,1,sizeof(cl_mem),&inputB) != CL_SUCCESS)
-        {
-            printf("Kernel setting error\n");
-        }
-    if (clSetKernelArg(kernel,2,sizeof(cl_mem),&output) != CL_SUCCESS)
+    if  ( 
+          (clSetKernelArg(kernel,0,sizeof(cl_mem),&inputA) != CL_SUCCESS) ||
+          (clSetKernelArg(kernel,1,sizeof(cl_mem),&inputB) != CL_SUCCESS) ||
+          (clSetKernelArg(kernel,2,sizeof(cl_mem),&output) != CL_SUCCESS)
+        )
         {
             printf("Kernel setting error\n");
         }
 
+    //------------
     global[0] = 3;
     global[1] = 3;
 
-    if(clEnqueueNDRangeKernel(command_queue,kernel,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS )
-        {
-            printf("Enque error\n");
-            return -1;
-        }
-
-    if(clEnqueueReadBuffer(command_queue,output,CL_TRUE,0,op_len,matC,0,NULL,NULL) != CL_SUCCESS )
+    if  ( 
+          (clEnqueueNDRangeKernel(command_queue,kernel,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) ||
+          (clEnqueueReadBuffer(command_queue,output,CL_TRUE,0,op_len,matC,0,NULL,NULL) != CL_SUCCESS )
+        )
         {
             printf("Buffer read error\n");
             return -1;
