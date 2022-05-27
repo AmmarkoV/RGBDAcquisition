@@ -17,6 +17,7 @@ add_executable(bvhtransform bvh_transform_ocl.c
                ../bvh_loader.c
                ../calculate/bvh_transform.c 
                ../calculate/bvh_project.c 
+               ../calculate/smoothing.c
                ../calculate/bvh_to_tri_pose.c
                ../import/fromBVH.c
                ../export/bvh_export.c
@@ -24,6 +25,7 @@ add_executable(bvhtransform bvh_transform_ocl.c
                ../export/bvh_to_bvh.c
                ../export/bvh_to_svg.c
                ../export/bvh_to_csv.c
+               ../export/bvh_to_json.c
                ../export/bvh_to_trajectoryParserTRI.c
                ../export/bvh_to_trajectoryParserPrimitives.c
                ../edit/bvh_randomize.c 
