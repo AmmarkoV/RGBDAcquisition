@@ -1,4 +1,4 @@
-__kernel void glProjectf_ocl(__globalfloat * position3D,__global float *modelview,__global float *projection,__global int *viewport,__global float *windowCoordinate)
+__kernel void glProjectf_ocl(__global float * position3D,__global float *modelview,__global float *projection,__global int *viewport,__global float *windowCoordinate)
 {
 /*
   int n = 3, m = 3, l = 3;

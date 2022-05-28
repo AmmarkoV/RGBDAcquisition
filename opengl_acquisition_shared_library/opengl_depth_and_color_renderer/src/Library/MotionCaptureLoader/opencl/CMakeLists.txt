@@ -14,6 +14,7 @@ endif(OPENCL_OPTIMIZATIONS)
 set_source_files_properties(mat_mul.cl PROPERTIES HEADER_FILE_ONLY TRUE)
 #add_library(bvhtransform STATIC mat_mul.c)
 add_executable(bvhtransform bvh_transform_ocl.c
+               openCLTools.c
                ../bvh_loader.c
                ../calculate/bvh_transform.c 
                ../calculate/bvh_project.c 
