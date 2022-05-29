@@ -16,7 +16,10 @@ __kernel void transform3DPoint(
   int idy = get_global_id(1);
   //-------------------------------------------------------------------------------
   float * m = &transformation4x4[idx*16];
-  float X=input3DPoints[0],Y=input3DPoints[1],Z=input3DPoints[2],W=input3DPoints[3];
+  float X=input3DPoints[idx*4+0];
+  float Y=input3DPoints[idx*4+1];
+  float Z=input3DPoints[idx*4+2];
+  float W=input3DPoints[idx*4+3];
   //-------------------------------------------------------------------------------  
   float * resultPoint3D = &result3DPoints[idx*4];
   //-------------------------------------------------------------------------------

@@ -353,14 +353,14 @@ int main(int argc, char const *argv[])
 
 
     //-------------------------------------------------------------------------------------------------------------
-    cl_mem inputTransformation4x4 = clCreateBuffer(context,CL_MEM_READ_ONLY,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
-    cl_mem inputinput3DPoints     = clCreateBuffer(context,CL_MEM_READ_ONLY,4 *NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
-    cl_mem inputIndices           = clCreateBuffer(context,CL_MEM_READ_ONLY,16*sizeof(int),NULL,&err);                    checkOpenCLError(err,__FILE__, __LINE__);
-    cl_mem outputresult3DPoints   = clCreateBuffer(context,CL_MEM_WRITE_ONLY,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputTransformation4x4 = clCreateBuffer(context,CL_MEM_READ_ONLY ,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputinput3DPoints     = clCreateBuffer(context,CL_MEM_READ_ONLY ,4 *NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputIndices           = clCreateBuffer(context,CL_MEM_READ_ONLY ,16*sizeof(int),NULL,&err);                    checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem outputresult3DPoints   = clCreateBuffer(context,CL_MEM_WRITE_ONLY,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
     //-------------------------------------------------------------------------------------------------------------
-    clEnqueueWriteBuffer(command_queue,inputTransformation4x4,CL_TRUE,0,16*NUMBER_OF_POINTS*sizeof(int),matA,0,NULL,NULL);
-    clEnqueueWriteBuffer(command_queue,inputinput3DPoints,    CL_TRUE,0,4 *NUMBER_OF_POINTS*sizeof(int),matB,0,NULL,NULL);
-    clEnqueueWriteBuffer(command_queue,inputIndices,          CL_TRUE,0,16*sizeof(int),matB,0,NULL,NULL);
+    clEnqueueWriteBuffer(command_queue,inputTransformation4x4,CL_TRUE,0,16*NUMBER_OF_POINTS*sizeof(int),transformationMatrices4x4,0,NULL,NULL);
+    clEnqueueWriteBuffer(command_queue,inputinput3DPoints,    CL_TRUE,0,4 *NUMBER_OF_POINTS*sizeof(int),input3DPoints,0,NULL,NULL);
+    clEnqueueWriteBuffer(command_queue,inputIndices,          CL_TRUE,0,16*sizeof(int),indices,0,NULL,NULL);
     //-------------------------------------------------------------------------------------------------------------
 
 
@@ -372,12 +372,15 @@ int main(int argc, char const *argv[])
             getBuildError(programTransform3DPoint,&device_id);
             return -1;
         }
+        
+    fprintf(stderr,"Ready to clCreateKernel\n");
     cl_kernel kernelTransform3DPoint = clCreateKernel(programTransform3DPoint,"transform3DPoint",&err); checkOpenCLError(err,__FILE__, __LINE__);
+    fprintf(stderr,"Ready to clSetKernelArg\n");
     if  ( 
           (clSetKernelArg(kernelTransform3DPoint,0,sizeof(cl_mem),&inputTransformation4x4) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,1,sizeof(cl_mem),&input3DPoints) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,2,sizeof(cl_mem),&indices) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,3,sizeof(cl_mem),&output3DPoints) != CL_SUCCESS)
+          (clSetKernelArg(kernelTransform3DPoint,1,sizeof(cl_mem),&inputinput3DPoints) != CL_SUCCESS) ||
+          (clSetKernelArg(kernelTransform3DPoint,2,sizeof(cl_mem),&inputIndices) != CL_SUCCESS) ||
+          (clSetKernelArg(kernelTransform3DPoint,3,sizeof(cl_mem),&outputresult3DPoints) != CL_SUCCESS)
         )
         {
             printf("Kernel setting error\n");
@@ -386,6 +389,7 @@ int main(int argc, char const *argv[])
     //------------
     global[0] = NUMBER_OF_POINTS;
     global[1] = 4; //X,Y,Z,W
+    fprintf(stderr,"Ready to RUN\n");
     //------------
     if  ( 
           (clEnqueueNDRangeKernel(command_queue,kernelTransform3DPoint,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) ||
