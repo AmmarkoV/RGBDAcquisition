@@ -21,6 +21,7 @@ const char *getErrorString(cl_int error);
 int checkOpenCLError(int err,char * file , int  line);
 
 
+int getBuildError(cl_program program,cl_device_id *devices);
 
 #ifdef __cplusplus
 }

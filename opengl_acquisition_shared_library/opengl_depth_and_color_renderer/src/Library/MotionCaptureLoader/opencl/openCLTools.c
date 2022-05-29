@@ -209,3 +209,33 @@ int checkOpenCLError(int err,char * file , int  line)
  return 0;
 }
 
+
+
+int getBuildError(cl_program program,cl_device_id *devices)
+{
+ char *buff_erro;
+ cl_int errcode;
+ size_t build_log_len;
+ errcode = clGetProgramBuildInfo(program, devices[0], CL_PROGRAM_BUILD_LOG, 0, NULL, &build_log_len);
+ if (errcode) {
+               printf("clGetProgramBuildInfo 1 failed (%s) at line %d\n",getErrorString(errcode),__LINE__);
+               exit(-1);
+             }
+
+    buff_erro = malloc(build_log_len);
+    if (!buff_erro) {
+        printf("malloc failed at line %d\n", __LINE__);
+        exit(-2);
+    }
+
+    errcode = clGetProgramBuildInfo(program, devices[0], CL_PROGRAM_BUILD_LOG, build_log_len, buff_erro, NULL);
+    if (errcode) {
+        printf("clGetProgramBuildInfo 2 failed (%s) at line %d\n",getErrorString(errcode),__LINE__);
+        exit(-3);
+    }
+
+    fprintf(stderr,"Build log: \n%s\n", buff_erro); //Be careful with  the fprint
+    free(buff_erro);
+    fprintf(stderr,"clBuildProgram failed\n");
+    exit(EXIT_FAILURE);
+}
