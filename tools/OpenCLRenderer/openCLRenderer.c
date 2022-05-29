@@ -7,10 +7,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "../bvh_loader.h"
-#include "../edit/bvh_rename.h"
-#include "../calculate/bvh_project.h"
-#include  "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define BUF_SIZE 2048
 #define ERROR -1
@@ -35,115 +31,6 @@ void printMatrix(float *arr, int n, int m)
     printf("\n" );
 }
 
-
-
-
-
-int bvh_projectTo2DOCL(
-                     struct BVH_MotionCapture * mc,
-                     struct BVH_Transform     * bvhTransform,
-                     struct simpleRenderer    * renderer,
-                     unsigned int               occlusions,
-                     unsigned int               directRendering
-                   )
-{
-      if (!bvhTransform) { return 0; } 
-      if (!bvhTransform->transformStructInitialized) { return 0; } 
-    
-    
-      bvhTransform->jointsOccludedIn2DProjection=0;
-      
-      float position2D[3]={0.0,0.0,0.0}; 
-      float pos3DFloat[4];
-
-
-      //Then project 3D positions on 2D frame and save results..
-      #if USE_TRANSFORM_HASHING
-      fprintf(stderr,"bvh_projectTo2D called with %u items in hash\n",bvhTransform->lengthOfListOfJointIDsToTransform);
-      for (unsigned int hashID=0; hashID<bvhTransform->lengthOfListOfJointIDsToTransform; hashID++)
-         {
-           //USING_HASH
-           unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
-      #else 
-      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-         {
-      #endif     
-        if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-        { 
-           pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
-           pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
-           pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];
-           pos3DFloat[3]= (float) bvhTransform->joint[jID].pos3D[3];
-
-          //Two cases here , we either want to want to render using our camera position where we have to do some extra matrix operations
-          //to recenter our mesh and transform it accordingly
-          //-------------------------------------------------------------------------------------------
-          if (!directRendering)
-          {
-           float pos3DCenterFloat[4];
-           pos3DCenterFloat[0]= (float) bvhTransform->centerPosition[0];
-           pos3DCenterFloat[1]= (float) bvhTransform->centerPosition[1];
-           pos3DCenterFloat[2]= (float) bvhTransform->centerPosition[2];
-           pos3DCenterFloat[3]=1.0;
-
-           simpleRendererRender(
-                                 renderer ,
-                                 pos3DFloat,
-                                 pos3DCenterFloat,
-                                 0,
-                                 0,
-                                 &position2D[0],
-                                 &position2D[1],
-                                 &position2D[2]
-                               );
-
-            //Should this only happen when position2DW>=0.0
-            //bvhTransform->joint[jID].pos3D[0] = (float) pos3DCenterFloat[0];
-            //bvhTransform->joint[jID].pos3D[1] = (float) pos3DCenterFloat[1];
-            //bvhTransform->joint[jID].pos3D[2] = (float) pos3DCenterFloat[2];               );
-         }
-           else
-         {
-         //-------------------------------------------------------------------------------------------
-         //Or we directly render using the matrices in our simplerenderer
-         //-------------------------------------------------------------------------------------------
-           fprintf(stderr, "DIRECT RENDER ");
-           simpleRendererRenderUsingPrecalculatedMatrices(
-                                                          renderer,
-                                                          pos3DFloat,
-                                                          &position2D[0],
-                                                          &position2D[1],
-                                                          &position2D[2]
-                                                         );
-          } 
-         //-------------------------------------------------------------------------------------------
-
-           if (position2D[2]>=0.0) 
-           {
-              bvhTransform->joint[jID].pos2D[0] = (float) position2D[0];
-              bvhTransform->joint[jID].pos2D[1] = (float) position2D[1];
-              bvhTransform->joint[jID].pos2DCalculated=1;
-           } else
-           {
-              bvhTransform->joint[jID].pos2D[0] = 0.0;
-              bvhTransform->joint[jID].pos2D[1] = 0.0;
-              bvhTransform->joint[jID].isBehindCamera=1;
-           }   
-        }
-         
-      } //Joint Loop , render all joint points..
-
-    //------------------------------------------------------------------------------------------
-    if (occlusions)
-     {
-      //Also project our Torso coordinates..
-       bvh_populateRectangle2DFromProjections(mc,bvhTransform,&bvhTransform->torso); 
-       bvh_projectTo2DHandleOcclusions(mc,bvhTransform);
-     //------------------------------------------------------------------------------------------
-     }//End of occlusion code
-
- return (mc->jointHierarchySize>0);
-}
 
 
 
@@ -198,73 +85,8 @@ void randomizeFloatArray(float * arr,unsigned int numberOfItems)
 
 int main(int argc, char const *argv[])
 {
-    
     //-----------------------------------------------------------
-    //-----------------------------------------------------------
-    //-----------------------------------------------------------
-    struct BVH_MotionCapture bvhMotion={0};
-    struct simpleRenderer renderer={0};
 
-    // Emulate GoPro Hero4 @ FullHD mode by default..
-    // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-    renderer.fx=582.18394;
-    renderer.fy=582.52915;
-    renderer.skew=1.0;
-    renderer.width=1920;
-    renderer.height=1080;
-    renderer.cx=(float)renderer.width/2;
-    renderer.cy=(float)renderer.height/2;
-    renderer.near=1.0;
-    renderer.far=10000.0;
-    //640,480 , 575.57 , 575.57, //Kinect
-    
-   simpleRendererDefaults(
-                          &renderer,
-                          renderer.width,
-                          renderer.height,
-                          renderer.fx,
-                          renderer.fy
-                         );
-    
-    simpleRendererInitialize(&renderer);
-    
-    const char * fromBVHFile="01_08.bvh";
-    //First of all we need to load the BVH file
-    if (!bvh_loadBVH(fromBVHFile, &bvhMotion,1.0))
-          {
-            exit(0);
-          }
-
-          //Change joint names..
-          bvh_renameJointsForCompatibility(&bvhMotion);
-          
-          
-    struct BVH_Transform bvhTransform = {0};
-    bvhTransform.useOptimizations=0;
-    unsigned int frameID =0;
-    if (
-        bvh_loadTransformForFrame(
-                                  &bvhMotion,
-                                  frameID,
-                                  &bvhTransform,
-                                  0
-                                 )
-       )
-    {
-        if ( bvh_projectTo2D(
-                             &bvhMotion,
-                             &bvhTransform,
-                             &renderer,
-                             1,
-                             0 //Direct render
-                           )
-            )
-            {
-                fprintf(stderr,"Projected..!\n");
-            }
-    }
-    //-----------------------------------------------------------
-    //-----------------------------------------------------------
     //-----------------------------------------------------------
 
 
