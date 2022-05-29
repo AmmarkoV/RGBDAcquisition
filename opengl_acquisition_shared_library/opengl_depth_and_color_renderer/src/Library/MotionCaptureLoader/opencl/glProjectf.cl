@@ -1,18 +1,5 @@
 __kernel void glProjectf_ocl(__global float * position3D,__global float *modelview,__global float *projection,__global int *viewport,__global float *windowCoordinate)
 {
-/*
-  int n = 3, m = 3, l = 3;
-  int idx = get_global_id(0);
-  int idy = get_global_id(1);
-  if (idx < 3 && idy < 3) {
-    int i;
-    float sum = 0;
-    for (i = 0 ; i < n ; ++i) {
-      sum += A[idy*n+i] * B[idx+i*n];
-    }
-    C[idx+idy*n] = sum;
-  }*/
-
       float objx=position3D[0];
       float objy=position3D[1];
       float objz=position3D[2];
@@ -23,8 +10,7 @@ __kernel void glProjectf_ocl(__global float * position3D,__global float *modelvi
       fTempo[1]=modelview[1]*objx+modelview[5]*objy+modelview[9]*objz+modelview[13];
       fTempo[2]=modelview[2]*objx+modelview[6]*objy+modelview[10]*objz+modelview[14];
       fTempo[3]=modelview[3]*objx+modelview[7]*objy+modelview[11]*objz+modelview[15];
-      //Projection transform, the final row of projection matrix is always [0 0 -1 0]
-      //so we optimize for that.
+      //Projection transform, the final row of projection matrix is always [0 0 -1 0] so we optimize for that.
       fTempo[4]=projection[0]*fTempo[0]+projection[4]*fTempo[1]+projection[8]*fTempo[2]+projection[12]*fTempo[3];
       fTempo[5]=projection[1]*fTempo[0]+projection[5]*fTempo[1]+projection[9]*fTempo[2]+projection[13]*fTempo[3];
       fTempo[6]=projection[2]*fTempo[0]+projection[6]*fTempo[1]+projection[10]*fTempo[2]+projection[14]*fTempo[3];

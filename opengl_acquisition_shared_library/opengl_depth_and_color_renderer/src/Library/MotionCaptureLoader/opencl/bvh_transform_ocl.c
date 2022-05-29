@@ -17,6 +17,7 @@
 
 #define END 0
 
+char *matrixMultiplicationSource = "";
 char *KernelSource = "";
 
 
@@ -249,7 +250,7 @@ int main(int argc, char const *argv[])
     printMatrix(matA,n,n);
     printMatrix(matB,n,n);
 
-    KernelSource = read_file("mat_mul.cl",&len);
+    matrixMultiplicationSource = read_file("mat_mul.cl",&len);
 
     if (clGetPlatformIDs(1,&platform_id,&num_of_platforms) != CL_SUCCESS)
         {
@@ -303,7 +304,7 @@ int main(int argc, char const *argv[])
     clEnqueueWriteBuffer(command_queue,inputA,CL_TRUE,0,inp_len,matA,0,NULL,NULL);
     clEnqueueWriteBuffer(command_queue,inputB,CL_TRUE,0,inp_len,matB,0,NULL,NULL);
 
-    program = clCreateProgramWithSource(context,1,(const char**) &KernelSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
+    program = clCreateProgramWithSource(context,1,(const char**) &matrixMultiplicationSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
 
     if (res = clBuildProgram(program,1,&device_id,NULL,NULL,NULL) != CL_SUCCESS)
         {

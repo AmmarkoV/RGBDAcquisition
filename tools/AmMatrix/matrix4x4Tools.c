@@ -1373,9 +1373,9 @@ int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * t
   float * m = transformation4x4;
   register float X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
 
-  resultPoint3D[0] = m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
-  resultPoint3D[1] = m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
-  resultPoint3D[2] = m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
+  resultPoint3D[0] = m[e3]  * W + m[e0]  * X + m[e1]  * Y + m[e2]  * Z;
+  resultPoint3D[1] = m[e7]  * W + m[e4]  * X + m[e5]  * Y + m[e6]  * Z;
+  resultPoint3D[2] = m[e11] * W + m[e8]  * X + m[e9]  * Y + m[e10] * Z;
   resultPoint3D[3] = m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
