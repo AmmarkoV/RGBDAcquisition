@@ -1,4 +1,4 @@
-__kernel void mat_mul(__global float *A, __global float *B, __global float *C)
+__kernel void matrixMultiplication(__global float *A, __global float *B, __global float *C)
 {
   int n = 3, m = 3, l = 3;
   int idx = get_global_id(0);

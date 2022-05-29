@@ -18,7 +18,7 @@
 #define END 0
 
 char *matrixMultiplicationSource = "";
-char *KernelSource = "";
+char *transform3DPointSource     = "";
 
 
 void printMatrix(float *arr, int n, int m)
@@ -233,12 +233,9 @@ int main(int argc, char const *argv[])
     cl_device_id device_id;
     cl_uint num_of_devices;
     cl_context context;
-    cl_context_properties properties[3];
-    cl_kernel kernel;
+    cl_context_properties properties[3]; 
     cl_command_queue command_queue;
     cl_int err;
-    cl_program program;
-    cl_mem inputA, inputB, output;
     size_t local[2], global[2];
     int len;
     int res;
@@ -250,7 +247,8 @@ int main(int argc, char const *argv[])
     printMatrix(matA,n,n);
     printMatrix(matB,n,n);
 
-    matrixMultiplicationSource = read_file("mat_mul.cl",&len);
+    matrixMultiplicationSource = read_file("matrixMultiplication.cl",&len);
+    transform3DPointSource     = read_file("transform3DPoint.cl",&len);
 
     if (clGetPlatformIDs(1,&platform_id,&num_of_platforms) != CL_SUCCESS)
         {
@@ -289,31 +287,32 @@ int main(int argc, char const *argv[])
      }
 
 
+    //-------------------------------------------------------------------------------------------------------------
     properties[0] = CL_CONTEXT_PLATFORM;
     properties[1] = (cl_context_properties) platform_id;
     properties[2] = 0;
-
+    //-------------------------------------------------------------------------------------------------------------
     context = clCreateContext(properties,1,&device_id,NULL,NULL,&err);    checkOpenCLError(err,__FILE__, __LINE__);
     //-------------------------------------------------------------------------------------------------------------
     command_queue = clCreateCommandQueue(context,device_id,0,&err);       checkOpenCLError(err,__FILE__, __LINE__);
     //-------------------------------------------------------------------------------------------------------------
-    inputA = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
-    inputB = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
-    output = clCreateBuffer(context,CL_MEM_WRITE_ONLY,op_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputA = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputB = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem output = clCreateBuffer(context,CL_MEM_WRITE_ONLY,op_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
     //-------------------------------------------------------------------------------------------------------------
     clEnqueueWriteBuffer(command_queue,inputA,CL_TRUE,0,inp_len,matA,0,NULL,NULL);
     clEnqueueWriteBuffer(command_queue,inputB,CL_TRUE,0,inp_len,matB,0,NULL,NULL);
+    //-------------------------------------------------------------------------------------------------------------
 
-    program = clCreateProgramWithSource(context,1,(const char**) &matrixMultiplicationSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
 
-    if (res = clBuildProgram(program,1,&device_id,NULL,NULL,NULL) != CL_SUCCESS)
+    
+    cl_program programMatrixMultiplication = clCreateProgramWithSource(context,1,(const char**) &matrixMultiplicationSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
+    if (res = clBuildProgram(programMatrixMultiplication,1,&device_id,NULL,NULL,NULL) != CL_SUCCESS)
         {
             printf("Error building program: %s\n",getErrorString(res));
             return -1;
         }
-
-    kernel = clCreateKernel(program,"mat_mul",&err); checkOpenCLError(err,__FILE__, __LINE__);
-
+    cl_kernel kernel = clCreateKernel(programMatrixMultiplication,"matrixMultiplication",&err); checkOpenCLError(err,__FILE__, __LINE__);
     if  ( 
           (clSetKernelArg(kernel,0,sizeof(cl_mem),&inputA) != CL_SUCCESS) ||
           (clSetKernelArg(kernel,1,sizeof(cl_mem),&inputB) != CL_SUCCESS) ||
@@ -326,7 +325,55 @@ int main(int argc, char const *argv[])
     //------------
     global[0] = 3;
     global[1] = 3;
+    //------------
+    if  ( 
+          (clEnqueueNDRangeKernel(command_queue,kernel,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) ||
+          (clEnqueueReadBuffer(command_queue,output,CL_TRUE,0,op_len,matC,0,NULL,NULL) != CL_SUCCESS )
+        )
+        {
+            printf("Buffer read error\n");
+            return -1;
+        }
+    printMatrix(matC,n,n);
 
+
+
+
+
+
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    cl_mem inputA = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputB = clCreateBuffer(context,CL_MEM_READ_ONLY,inp_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem output = clCreateBuffer(context,CL_MEM_WRITE_ONLY,op_len,NULL,&err);  checkOpenCLError(err,__FILE__, __LINE__);
+    //-------------------------------------------------------------------------------------------------------------
+    clEnqueueWriteBuffer(command_queue,inputA,CL_TRUE,0,inp_len,matA,0,NULL,NULL);
+    clEnqueueWriteBuffer(command_queue,inputB,CL_TRUE,0,inp_len,matB,0,NULL,NULL);
+    //-------------------------------------------------------------------------------------------------------------
+
+
+    
+    cl_program programMatrixMultiplication = clCreateProgramWithSource(context,1,(const char**) &matrixMultiplicationSource, NULL, &err); checkOpenCLError(err,__FILE__, __LINE__);
+    if (res = clBuildProgram(programMatrixMultiplication,1,&device_id,NULL,NULL,NULL) != CL_SUCCESS)
+        {
+            printf("Error building program: %s\n",getErrorString(res));
+            return -1;
+        }
+    cl_kernel kernel = clCreateKernel(programMatrixMultiplication,"matrixMultiplication",&err); checkOpenCLError(err,__FILE__, __LINE__);
+    if  ( 
+          (clSetKernelArg(kernel,0,sizeof(cl_mem),&inputA) != CL_SUCCESS) ||
+          (clSetKernelArg(kernel,1,sizeof(cl_mem),&inputB) != CL_SUCCESS) ||
+          (clSetKernelArg(kernel,2,sizeof(cl_mem),&output) != CL_SUCCESS)
+        )
+        {
+            printf("Kernel setting error\n");
+        }
+
+    //------------
+    global[0] = 3;
+    global[1] = 3;
+    //------------
     if  ( 
           (clEnqueueNDRangeKernel(command_queue,kernel,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) ||
           (clEnqueueReadBuffer(command_queue,output,CL_TRUE,0,op_len,matC,0,NULL,NULL) != CL_SUCCESS )
@@ -336,7 +383,12 @@ int main(int argc, char const *argv[])
             return -1;
         }
 
-    printMatrix(matC,n,n);
+
+
+
+
+
+
 
     return 0;
 }

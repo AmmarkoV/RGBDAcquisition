@@ -5,7 +5,12 @@
   resultPoint3D[3] = m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 */
 
-__kernel void glProjectf_ocl(__global float * result3DPoints,__global float *transformation4x4,__global float *input3DPoints,__global int * indices)
+__kernel void transform3DPoint(
+                                __global float * result3DPoints,
+                                __global float *transformation4x4,
+                                __global float *input3DPoints,
+                                __global int * indices
+                              )
 {
   float * m = transformation4x4;
   register float X=input3DPoints[0],Y=input3DPoints[1],Z=input3DPoints[2],W=input3DPoints[3];
@@ -25,6 +30,5 @@ __kernel void glProjectf_ocl(__global float * result3DPoints,__global float *tra
    resultPoint3D[1]/=resultPoint3D[3];
    resultPoint3D[2]/=resultPoint3D[3];
    resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
-   return 1;
-  } else
+  }  
 }
