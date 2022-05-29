@@ -2,6 +2,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+unsigned long tickBaseJointEstimatorOCL = 0;
+
+unsigned long GetTickCountMicrosecondsOCL()
+{
+    struct timespec ts;
+    if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0)
+        {
+            return 0;
+        }
+
+    if (tickBaseJointEstimatorOCL==0)
+        {
+            tickBaseJointEstimatorOCL = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+            return 0;
+        }
+
+    return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBaseJointEstimatorOCL;
+}
+
+
 
 char * read_file(const char * filename,int *length )
 {

@@ -14,6 +14,8 @@ extern "C"
 #define CL_TARGET_OPENCL_VERSION 220
 #include <CL/cl.h>
 
+unsigned long GetTickCountMicrosecondsOCL();
+
 char * read_file(const char * filename,int *length );
 
 const char *getErrorString(cl_int error);

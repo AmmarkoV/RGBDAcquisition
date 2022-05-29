@@ -149,9 +149,50 @@ int bvh_projectTo2DOCL(
 
 
 
+void transform3DPointHost(
+                          unsigned int numberOf3DPoints,
+                          float * transformation4x4,
+                          float * input3DPoints,
+                          int *   indices,
+                          float * result3DPoints
+                         )
+{
+  for (int idx = 0;  idx<numberOf3DPoints; idx++)
+  {
+  //-------------------------------------------------------------------------------
+  float * m = &transformation4x4[idx*16];
+  float X=input3DPoints[idx*4+0];
+  float Y=input3DPoints[idx*4+1];
+  float Z=input3DPoints[idx*4+2];
+  float W=input3DPoints[idx*4+3];
+  //-------------------------------------------------------------------------------  
+  float * resultPoint3D = &result3DPoints[idx*4];
+  //-------------------------------------------------------------------------------
+  resultPoint3D[0] = m[3]  * W + m[0]  * X + m[1]  * Y + m[2]  * Z;
+  resultPoint3D[1] = m[7]  * W + m[4]  * X + m[5]  * Y + m[6]  * Z;
+  resultPoint3D[2] = m[11] * W + m[8]  * X + m[9]  * Y + m[10] * Z;
+  resultPoint3D[3] = m[15] * W + m[12] * X + m[13] * Y + m[14] * Z;
+  //-------------------------------------------------------------------------------
+
+  // Ok we have our results but now to normalize our vector
+  if (resultPoint3D[3]!=0.0)
+  {
+   resultPoint3D[0]/=resultPoint3D[3];
+   resultPoint3D[1]/=resultPoint3D[3];
+   resultPoint3D[2]/=resultPoint3D[3];
+   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
+  }    
+  }
+}
 
 
-
+void randomizeFloatArray(float * arr,unsigned int numberOfItems)
+{
+  for (int i=0; i<numberOfItems; i++)
+  {
+      arr[i]=rand();
+  }
+}
 
 
 
@@ -340,7 +381,7 @@ int main(int argc, char const *argv[])
 
 
 
-    #define NUMBER_OF_POINTS 32
+    #define NUMBER_OF_POINTS 10024
     float transformationMatrices4x4[16*NUMBER_OF_POINTS]={0};
     float input3DPoints[4 *NUMBER_OF_POINTS]={0};
     int indices[16]={
@@ -349,19 +390,34 @@ int main(int argc, char const *argv[])
                        11,8 ,9 ,10,
                        15,12,13,14
                     };
-    float output3DPoints[16*NUMBER_OF_POINTS]={0};
+    float output3DPoints[4*NUMBER_OF_POINTS]={0};
+    float output3DHostPoints[4*NUMBER_OF_POINTS]={0};
+   
+    randomizeFloatArray(transformationMatrices4x4,16*NUMBER_OF_POINTS);
+    randomizeFloatArray(input3DPoints,4*NUMBER_OF_POINTS);
+
+    unsigned long startTime = GetTickCountMicrosecondsOCL(); 
+    transform3DPointHost(
+                          NUMBER_OF_POINTS,
+                          transformationMatrices4x4,
+                          input3DPoints,
+                          indices,
+                          output3DHostPoints
+                         );
+    unsigned long endTime = GetTickCountMicrosecondsOCL(); 
+    fprintf(stderr,"Host Point 3D Transform = %lu microseconds\n",endTime-startTime);
 
 
-    //-------------------------------------------------------------------------------------------------------------
-    cl_mem inputTransformation4x4 = clCreateBuffer(context,CL_MEM_READ_ONLY ,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
-    cl_mem inputinput3DPoints     = clCreateBuffer(context,CL_MEM_READ_ONLY ,4 *NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    cl_mem inputTransformation4x4 = clCreateBuffer(context,CL_MEM_READ_ONLY ,16*NUMBER_OF_POINTS*sizeof(float),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
+    cl_mem inputinput3DPoints     = clCreateBuffer(context,CL_MEM_READ_ONLY ,4 *NUMBER_OF_POINTS*sizeof(float),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
     cl_mem inputIndices           = clCreateBuffer(context,CL_MEM_READ_ONLY ,16*sizeof(int),NULL,&err);                    checkOpenCLError(err,__FILE__, __LINE__);
-    cl_mem outputresult3DPoints   = clCreateBuffer(context,CL_MEM_WRITE_ONLY,16*NUMBER_OF_POINTS*sizeof(int),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
-    //-------------------------------------------------------------------------------------------------------------
-    clEnqueueWriteBuffer(command_queue,inputTransformation4x4,CL_TRUE,0,16*NUMBER_OF_POINTS*sizeof(int),transformationMatrices4x4,0,NULL,NULL);
-    clEnqueueWriteBuffer(command_queue,inputinput3DPoints,    CL_TRUE,0,4 *NUMBER_OF_POINTS*sizeof(int),input3DPoints,0,NULL,NULL);
+    cl_mem outputresult3DPoints   = clCreateBuffer(context,CL_MEM_WRITE_ONLY,4*NUMBER_OF_POINTS*sizeof(float),NULL,&err);   checkOpenCLError(err,__FILE__, __LINE__);
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    clEnqueueWriteBuffer(command_queue,inputTransformation4x4,CL_TRUE,0,16*NUMBER_OF_POINTS*sizeof(float),transformationMatrices4x4,0,NULL,NULL);
+    clEnqueueWriteBuffer(command_queue,inputinput3DPoints,    CL_TRUE,0,4 *NUMBER_OF_POINTS*sizeof(float),input3DPoints,0,NULL,NULL);
     clEnqueueWriteBuffer(command_queue,inputIndices,          CL_TRUE,0,16*sizeof(int),indices,0,NULL,NULL);
-    //-------------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
     
@@ -372,15 +428,12 @@ int main(int argc, char const *argv[])
             getBuildError(programTransform3DPoint,&device_id);
             return -1;
         }
-        
-    fprintf(stderr,"Ready to clCreateKernel\n");
     cl_kernel kernelTransform3DPoint = clCreateKernel(programTransform3DPoint,"transform3DPoint",&err); checkOpenCLError(err,__FILE__, __LINE__);
-    fprintf(stderr,"Ready to clSetKernelArg\n");
     if  ( 
           (clSetKernelArg(kernelTransform3DPoint,0,sizeof(cl_mem),&inputTransformation4x4) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,1,sizeof(cl_mem),&inputinput3DPoints) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,2,sizeof(cl_mem),&inputIndices) != CL_SUCCESS) ||
-          (clSetKernelArg(kernelTransform3DPoint,3,sizeof(cl_mem),&outputresult3DPoints) != CL_SUCCESS)
+          (clSetKernelArg(kernelTransform3DPoint,1,sizeof(cl_mem),&inputinput3DPoints)     != CL_SUCCESS) ||
+          (clSetKernelArg(kernelTransform3DPoint,2,sizeof(cl_mem),&inputIndices)           != CL_SUCCESS) ||
+          (clSetKernelArg(kernelTransform3DPoint,3,sizeof(cl_mem),&outputresult3DPoints)   != CL_SUCCESS)
         )
         {
             printf("Kernel setting error\n");
@@ -389,22 +442,47 @@ int main(int argc, char const *argv[])
     //------------
     global[0] = NUMBER_OF_POINTS;
     global[1] = 4; //X,Y,Z,W
-    fprintf(stderr,"Ready to RUN\n");
+    startTime = GetTickCountMicrosecondsOCL(); 
     //------------
     if  ( 
-          (clEnqueueNDRangeKernel(command_queue,kernelTransform3DPoint,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) ||
-          (clEnqueueReadBuffer(command_queue,outputresult3DPoints,CL_TRUE,0,16*NUMBER_OF_POINTS*sizeof(int),output3DPoints,0,NULL,NULL) != CL_SUCCESS )
+          (clEnqueueNDRangeKernel(command_queue,kernelTransform3DPoint,2,NULL,global,NULL,0,NULL,NULL) != CL_SUCCESS ) 
         )
+        {
+            printf("Could not execute  error\n");
+            return -1;
+        }
+    endTime = GetTickCountMicrosecondsOCL(); 
+    fprintf(stderr,"OpenCL Point 3D Transform = %lu microseconds\n",endTime-startTime);
+
+
+   if  (clEnqueueReadBuffer(command_queue,outputresult3DPoints,CL_TRUE,0,4*NUMBER_OF_POINTS*sizeof(float),output3DPoints,0,NULL,NULL) != CL_SUCCESS )
         {
             printf("Buffer read error\n");
             return -1;
         }
 
+    for (int i=0; i<NUMBER_OF_POINTS; i++)
+    {
+     float hW = output3DHostPoints[i*4+3];
+     if (hW==0.0) { hW=1.0; }
+     float hX = output3DHostPoints[i*4+0]/hW;
+     float hY = output3DHostPoints[i*4+1]/hW;
+     float hZ = output3DHostPoints[i*4+2]/hW;
+     
+     float dW = output3DPoints[i*4+3];
+     if (dW==0.0) { dW=1.0; }
+     float dX = output3DPoints[i*4+0]/dW;
+     float dY = output3DPoints[i*4+1]/dW;
+     float dZ = output3DPoints[i*4+2]/dW;
 
-
-
-
-
+     if ( (hX!=dX) || (hY!=dY) || (hZ!=dZ) ) 
+     {
+       fprintf(stderr,"Difference in Point %u  = ",i);
+       fprintf(stderr,"%0.2f,%0.2f,%0.2f  ",hX,hY,hZ);
+       fprintf(stderr,"%0.2f,%0.2f,%0.2f\n",dX,dY,dZ);
+     } 
+    }
+     
 
 
     return 0;
