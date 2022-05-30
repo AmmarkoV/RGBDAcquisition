@@ -37,66 +37,7 @@ int simpleRendererDefaults(
 }
 
 
-
-int simpleRendererInitialize(struct simpleRenderer * sr)
-{
-  sr->viewport[0]=0;
-  sr->viewport[1]=0;
-  sr->viewport[2]=sr->width;
-  sr->viewport[3]=sr->height;
-
-  buildOpenGLProjectionForIntrinsics(
-                                      sr->projectionMatrix.m ,
-                                      sr->viewport ,
-                                      sr->fx,
-                                      sr->fy,
-                                      sr->skew,
-                                      sr->cx,
-                                      sr->cy,
-                                      sr->width,
-                                      sr->height,
-                                      sr->near,
-                                      sr->far
-                                     );
- 
-   create4x4FIdentityMatrix(&sr->viewMatrix);
-   create4x4FScalingMatrix(&sr->viewMatrix,0.01,0.01,-0.01); 
-
-   //Initialization of matrices not yet used
-   create4x4FIdentityMatrix(&sr->modelMatrix);
-   create4x4FIdentityMatrix(&sr->modelViewMatrix);
-
- return 1;
-}
-
-
-
-
-
-
-
-
-int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
-{
-  //We basically have to do nothing to initialize this way since we have an explicit configuration populating our struct
-  //This call is made to basically track when we try to use an explicit configuration
-  return 1;
-}
-
-
-
-
-int simpleRendererRender(
-                         struct simpleRenderer * sr ,
-                         float * position3D,
-                         float * center3D,
-                         float * objectRotation,
-                         unsigned int rotationOrder,
-                         ///---------------
-                         float * output2DX,
-                         float * output2DY,
-                         float * output2DW
-                        )
+int simpleRendererUpdateMovelViewTransform(struct simpleRenderer * sr)
 {
  struct Matrix4x4OfFloats modelTransformationF;
  ///--------------------------------------------------------------------
@@ -121,8 +62,90 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
  multiplyTwo4x4FMatricesS(&sr->modelViewMatrix,&sr->viewMatrix,&modelTransformationF);
  ///--------------------------------------------------------------------
+ return 1;
+}
 
 
+
+
+int simpleRendererInitialize(struct simpleRenderer * sr)
+{
+  sr->viewport[0]=0;
+  sr->viewport[1]=0;
+  sr->viewport[2]=sr->width;
+  sr->viewport[3]=sr->height;
+
+  buildOpenGLProjectionForIntrinsics(
+                                      sr->projectionMatrix.m ,
+                                      sr->viewport ,
+                                      sr->fx,
+                                      sr->fy,
+                                      sr->skew,
+                                      sr->cx,
+                                      sr->cy,
+                                      sr->width,
+                                      sr->height,
+                                      sr->near,
+                                      sr->far
+                                     );
+
+   create4x4FIdentityMatrix(&sr->viewMatrix);
+   create4x4FScalingMatrix(&sr->viewMatrix,0.01,0.01,-0.01);
+
+   //Initialization of matrices not yet used
+   create4x4FIdentityMatrix(&sr->modelMatrix);
+   simpleRendererUpdateMovelViewTransform(sr);    //create4x4FIdentityMatrix(&sr->modelViewMatrix);
+
+
+ return 1;
+}
+
+
+
+
+
+
+
+
+int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
+{
+  //We basically have to do nothing to initialize this way since we have an explicit configuration populating our struct
+  //This call is made to basically track when we try to use an explicit configuration
+  return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int simpleRendererRenderEx(
+                         struct simpleRenderer * sr ,
+                         float * position3D,
+                         float * center3D,
+                         float * objectRotation,
+                         unsigned int rotationOrder,
+                         ///---------------
+                         float * output2DX,
+                         float * output2DY,
+                         float * output2DW,
+                         ///---------------
+                         char updateModelView
+                        )
+{
+ ///--------------------------------------------------------------------
+ if (updateModelView)
+  { simpleRendererUpdateMovelViewTransform(sr); }
+ ///--------------------------------------------------------------------
 
 
 
@@ -131,7 +154,7 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
   struct Matrix4x4OfFloats objectMatrixRotation;
 
-  if (objectRotation==0) 
+  if (objectRotation==0)
     {
       create4x4FIdentityMatrix(&objectMatrixRotation);
     }   else
@@ -143,13 +166,13 @@ int simpleRendererRender(
                                                       (float) objectRotation[2],
                                                       rotationOrder
                                                      );
-    }  
-    
+    }
+
  ///--------------------------------------------------------------------
 
 
 
-   struct Vector4x1OfFloats point3D={0};  
+   struct Vector4x1OfFloats point3D={0};
    struct Vector4x1OfFloats resultPoint3D={0};
    point3D.m[0]=(float) (position3D[0]-center3D[0]);
    point3D.m[1]=(float) (position3D[1]-center3D[1]);
@@ -167,7 +190,7 @@ int simpleRendererRender(
   float windowCoordinates[3]={0};
 
 
-  if (!sr->removeObjectPosition) 
+  if (!sr->removeObjectPosition)
    { //This is more probable to happen
     final3DPosition[0]=(float) resultPoint3D.m[0]+center3D[0]+sr->cameraOffsetPosition[0];
     final3DPosition[1]=(float) resultPoint3D.m[1]+center3D[1]+sr->cameraOffsetPosition[1];
@@ -179,8 +202,8 @@ int simpleRendererRender(
     final3DPosition[1]=(float) resultPoint3D.m[1]+sr->cameraOffsetPosition[1];
     final3DPosition[2]=(float) resultPoint3D.m[2]+sr->cameraOffsetPosition[2];
     final3DPosition[3]=(float) 1.0;//resultPoint3D.m[3];
-   } 
-   
+   }
+
  ///--------------------------------------------------------------------
 
 
@@ -219,6 +242,35 @@ int simpleRendererRender(
 }
 
 
+
+
+
+int simpleRendererRender(
+                         struct simpleRenderer * sr ,
+                         float * position3D,
+                         float * center3D,
+                         float * objectRotation,
+                         unsigned int rotationOrder,
+                         ///---------------
+                         float * output2DX,
+                         float * output2DY,
+                         float * output2DW
+                        )
+{
+   return simpleRendererRenderEx(
+                                 sr,
+                                 position3D,
+                                 center3D,
+                                 objectRotation,
+                                 rotationOrder,
+                                 ///---------------
+                                 output2DX,
+                                 output2DY,
+                                 output2DW,
+                                 ///---------------
+                                 1 //Do updates..!
+                                );
+}
 
 
 int simpleRendererRenderUsingPrecalculatedMatrices(
@@ -269,8 +321,8 @@ int simpleRendererMultiRenderUsingPrecalculatedMatrices(
                                                           float * output2DY,
                                                           float * output2DW
                                                         )
-{ 
-  
+{
+
   return 0;
 }
 

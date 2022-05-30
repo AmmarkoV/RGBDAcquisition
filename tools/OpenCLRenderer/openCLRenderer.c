@@ -1,5 +1,6 @@
 
 
+#include "openCLRenderer.h"
 #include "openCLTools.h"
 
 #include <stdio.h>
@@ -80,6 +81,15 @@ void randomizeFloatArray(float * arr,unsigned int numberOfItems)
       arr[i]=rand();
   }
 }
+
+
+
+int oclr_initialize(struct oclRenderer * or)
+{
+    
+    
+}
+
 
 
 

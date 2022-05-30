@@ -1725,6 +1725,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         exit(0);
     }
 
+    //Make sure renderer gets its MV matrix calculated.. (since this is no longer done automatically)
+    simpleRendererUpdateMovelViewTransform(renderer);
+
     unsigned long startTime = GetTickCountMicrosecondsIK();
 
     //Don't spam console..

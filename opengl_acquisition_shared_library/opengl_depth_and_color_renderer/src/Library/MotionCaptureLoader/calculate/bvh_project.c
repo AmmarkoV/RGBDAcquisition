@@ -20,7 +20,7 @@ void bvh_cleanTransform(
       fprintf(stderr,"bvh_cleanTransform problem with allocated transform\n");
       exit(1);
   }
-  
+
   unsigned int jID=0;
   for (jID=0; jID<mc->jointHierarchySize; jID++)
          {
@@ -173,9 +173,9 @@ int bvh_projectJIDTo2D(
                      unsigned int               directRendering
                    )
 {
-      float position2D[3]={0.0,0.0,0.0}; 
+      float position2D[3]={0.0,0.0,0.0};
 
- 
+
       if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
       {
            float pos3DFloat[4];
@@ -195,7 +195,7 @@ int bvh_projectJIDTo2D(
            pos3DCenterFloat[2]= (float) bvhTransform->centerPosition[2];
            pos3DCenterFloat[3]=1.0;
 
-           simpleRendererRender(
+           simpleRendererRenderEx(
                                  renderer ,
                                  pos3DFloat,
                                  pos3DCenterFloat,
@@ -203,7 +203,8 @@ int bvh_projectJIDTo2D(
                                  0,
                                  &position2D[0],
                                  &position2D[1],
-                                 &position2D[2]
+                                 &position2D[2],
+                                 0 //<- we skip this !
                                );
 
          }
@@ -220,10 +221,10 @@ int bvh_projectJIDTo2D(
                                                           &position2D[1],
                                                           &position2D[2]
                                                          );
-          } 
+          }
          //-------------------------------------------------------------------------------------------
 
-           if (position2D[2]>=0.0) 
+           if (position2D[2]>=0.0)
            {
               bvhTransform->joint[jID].pos2D[0] = (float) position2D[0];
               bvhTransform->joint[jID].pos2D[1] = (float) position2D[1];
@@ -235,10 +236,10 @@ int bvh_projectJIDTo2D(
               bvhTransform->joint[jID].isBehindCamera=1;
            }
 
-           return 1; 
+           return 1;
         }
-        
- return 0;         
+
+ return 0;
 }
 
 
@@ -256,15 +257,17 @@ int bvh_projectTo2D(
                      unsigned int               directRendering
                    )
 {
-      if (!bvhTransform) { return 0; } 
-      if (!bvhTransform->transformStructInitialized) { return 0; } 
-    
-    
+      if (!bvhTransform) { return 0; }
+      if (!bvhTransform->transformStructInitialized) { return 0; }
+
+
       bvhTransform->jointsOccludedIn2DProjection=0;
-      
-      float position2D[3]={0.0,0.0,0.0}; 
+
+      float position2D[3]={0.0,0.0,0.0};
       float pos3DFloat[4];
 
+      //Do this once..!
+      simpleRendererUpdateMovelViewTransform(renderer);
 
       //Then project 3D positions on 2D frame and save results..
       #if USE_TRANSFORM_HASHING
@@ -273,12 +276,12 @@ int bvh_projectTo2D(
          {
            //USING_HASH
            unsigned int jID=bvhTransform->listOfJointIDsToTransform[hashID];
-      #else 
+      #else
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
          {
-      #endif     
+      #endif
         if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-        { 
+        {
            pos3DFloat[0]= (float) bvhTransform->joint[jID].pos3D[0];
            pos3DFloat[1]= (float) bvhTransform->joint[jID].pos3D[1];
            pos3DFloat[2]= (float) bvhTransform->joint[jID].pos3D[2];
@@ -295,16 +298,17 @@ int bvh_projectTo2D(
            pos3DCenterFloat[2]= (float) bvhTransform->centerPosition[2];
            pos3DCenterFloat[3]=1.0;
 
-           simpleRendererRender(
-                                 renderer ,
-                                 pos3DFloat,
-                                 pos3DCenterFloat,
-                                 0,
-                                 0,
-                                 &position2D[0],
-                                 &position2D[1],
-                                 &position2D[2]
-                               );
+           simpleRendererRenderEx(
+                                  renderer ,
+                                  pos3DFloat,
+                                  pos3DCenterFloat,
+                                  0,
+                                  0,
+                                  &position2D[0],
+                                  &position2D[1],
+                                  &position2D[2],
+                                  0 //Don't update more than once per BVH skeleton
+                                );
 
             //Should this only happen when position2DW>=0.0
             //bvhTransform->joint[jID].pos3D[0] = (float) pos3DCenterFloat[0];
@@ -324,10 +328,10 @@ int bvh_projectTo2D(
                                                           &position2D[1],
                                                           &position2D[2]
                                                          );
-          } 
+          }
          //-------------------------------------------------------------------------------------------
 
-           if (position2D[2]>=0.0) 
+           if (position2D[2]>=0.0)
            {
               bvhTransform->joint[jID].pos2D[0] = (float) position2D[0];
               bvhTransform->joint[jID].pos2D[1] = (float) position2D[1];
@@ -337,16 +341,16 @@ int bvh_projectTo2D(
               bvhTransform->joint[jID].pos2D[0] = 0.0;
               bvhTransform->joint[jID].pos2D[1] = 0.0;
               bvhTransform->joint[jID].isBehindCamera=1;
-           }   
+           }
         }
-         
+
       } //Joint Loop , render all joint points..
 
     //------------------------------------------------------------------------------------------
     if (occlusions)
      {
       //Also project our Torso coordinates..
-       bvh_populateRectangle2DFromProjections(mc,bvhTransform,&bvhTransform->torso); 
+       bvh_populateRectangle2DFromProjections(mc,bvhTransform,&bvhTransform->torso);
        bvh_projectTo2DHandleOcclusions(mc,bvhTransform);
      //------------------------------------------------------------------------------------------
      }//End of occlusion code
