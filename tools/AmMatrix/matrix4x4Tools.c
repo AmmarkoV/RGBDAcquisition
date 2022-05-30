@@ -492,7 +492,105 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees)
 }
 //---------------------------------------------------------
 
+void create4x4FRotationZXY(struct Matrix4x4OfFloats * m,float degreesX,float degreesY,float degreesZ)
+{
+    //---------------------------------------------------------
+    float radiansX = (float) degreesX * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosX = (float) cosf((float)radiansX);
+    float sinX = (float) sinf((float)radiansX);
+    //---------------------------------------------------------
+    float radiansY = (float) degreesY * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosY = (float) cosf((float)radiansY);
+    float sinY = (float) sinf((float)radiansY);
+    //---------------------------------------------------------
+    float radiansZ = (float) degreesZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosZ = (float) cosf((float)radiansZ);
+    float sinZ = (float) sinf((float)radiansZ);
+    //---------------------------------------------------------
+    //                       == RZ ==                                        == RX ==                                                  == RY ==
+    //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} } * { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
+    //https://www.wolframalpha.com/input?i=%7B+%7B+cosZ%2C+sinZ%2C+0+%7D+%2C+%7B+-sinZ%2C+cosZ+%2C+0%7D+%2C+%7B0%2C0%2C1%7D++%7D+*+%7B+%7B1%2C+0+%2C0%7D+%2C+%7B0%2C+cosX%2C+sinX%7D%2C+%7B0%2C+-sinX%2C+cosX%7D+%7D+*+%7B+%7B+cosY%2C+0%2C+-sinY+%7D%2C+%7B0%2C+1+%2C0+%7D%2C+%7B+sinY%2C+0+%2C+cosY+%7D+%7D
+    //--------------
+    //    Row 1
+    //--------------
+    m->m[0] = (sinX * sinY * sinZ) + (cosY * cosZ);
+    m->m[1] = cosX * sinZ;
+    m->m[2] = (sinX * cosY * sinZ) - (sinY * cosZ);
+    m->m[3] = 0.0;
+    //--------------
+    //    Row 2
+    //--------------
+    m->m[4] = (sinX * sinY * cosZ) - (cosY * sinZ);
+    m->m[5] = cosX * cosZ;
+    m->m[6] = (sinX * cosY * cosZ) + (sinY * sinZ);
+    m->m[7] = 0.0;
+    //--------------
+    //    Row 3
+    //--------------
+    m->m[8]  = cosX * sinY;
+    m->m[9]  = -sinY;
+    m->m[10] = cosX * cosZ;
+    m->m[11] = 0.0;
+    //--------------
+    //    Row 4
+    //--------------
+    m->m[12] = 0.0;
+    m->m[13] = 0.0;
+    m->m[14] = 0.0;
+    m->m[15] = 1.0;
+    //--------------
+    return;
+}
 
+void create4x4FRotationZYX(struct Matrix4x4OfFloats * m,float degreesX,float degreesY,float degreesZ)
+{
+    //---------------------------------------------------------
+    float radiansX = (float) degreesX * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosX = (float) cosf((float)radiansX);
+    float sinX = (float) sinf((float)radiansX);
+    //---------------------------------------------------------
+    float radiansY = (float) degreesY * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosY = (float) cosf((float)radiansY);
+    float sinY = (float) sinf((float)radiansY);
+    //---------------------------------------------------------
+    float radiansZ = (float) degreesZ * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
+    float cosZ = (float) cosf((float)radiansZ);
+    float sinZ = (float) sinf((float)radiansZ);
+    //---------------------------------------------------------
+    //                       == RZ ==                                        == RY ==                                                  == RX ==
+    //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } *  { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }  * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} }
+    //https://www.wolframalpha.com/input?i=%7B+%7B+cosZ%2C+sinZ%2C+0+%7D+%2C+%7B+-sinZ%2C+cosZ+%2C+0%7D+%2C+%7B0%2C0%2C1%7D++%7D+*++%7B+%7B+cosY%2C+0%2C+-sinY+%7D%2C+%7B0%2C+1+%2C0+%7D%2C+%7B+sinY%2C+0+%2C+cosY+%7D+%7D++*+%7B+%7B1%2C+0+%2C0%7D+%2C+%7B0%2C+cosX%2C+sinX%7D%2C+%7B0%2C+-sinX%2C+cosX%7D+%7D+
+    //--------------
+    //    Row 1
+    //--------------
+    m->m[0] = cosY * cosZ;
+    m->m[1] = (sinX * sinY * cosZ) + cosX * sinZ ;
+    m->m[2] = (sinX * sinZ) - (cosX * sinY * cosZ);
+    m->m[3] = 0.0;
+    //--------------
+    //    Row 2
+    //--------------
+    m->m[4] = -cosY * sinZ;
+    m->m[5] = (cosX * cosZ) - (sinX * sinY * sinZ);
+    m->m[6] = (cosX * sinY * sinZ) + (sinX * cosZ);
+    m->m[7] = 0.0;
+    //--------------
+    //    Row 3
+    //--------------
+    m->m[8]  = sinY;
+    m->m[9]  = sinX * (-cosY);
+    m->m[10] = cosX * cosY;
+    m->m[11] = 0.0;
+    //--------------
+    //    Row 4
+    //--------------
+    m->m[12] = 0.0;
+    m->m[13] = 0.0;
+    m->m[14] = 0.0;
+    m->m[15] = 1.0;
+    //--------------
+    return;
+}
 
 
 
@@ -521,33 +619,33 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    switch (rotationOrder)
    {
      case ROTATION_ORDER_XYZ :
-       //multiplyThree4x4FMatrices(m,&rX,&rY,&rZ);
        multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity);
      break;
      case ROTATION_ORDER_XZY :
-       //multiplyThree4x4FMatrices(m,&rX,&rZ,&rY);
        multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity);
      break;
      case ROTATION_ORDER_YXZ :
-       //multiplyThree4x4FMatrices(m,&rY,&rX,&rZ);
        multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity);
      break;
      case ROTATION_ORDER_YZX :
-       //multiplyThree4x4FMatrices(m,&rY,&rZ,&rX);
        multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_ZXY :
        //This is the rotation order commonly used in all joints of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
-       //multiplyThree4x4FMatrices(m,&rZ,&rX,&rY);
-       //fprintf(stderr,"ZXY ");
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity);
+       //Speed this up and you get a speedup for MocapNET IK
+       //{ {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} }
+       //{ { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
+       //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} } * { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
+       //4% speedup on IK by not using the multiplyThree4x4 Matrix call and using the precalculated version..!
+       create4x4FRotationZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
+       //multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity);
      break;
      case ROTATION_ORDER_ZYX :
        //This is the rotation order used in the LAFAN1 dataset ( https://github.com/ubisoft/ubisoft-laforge-animation-dataset )
        //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
-       //multiplyThree4x4FMatrices(m,&rZ,&rY,&rX);
-       //fprintf(stderr,"ZYX ");
-       multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
+       //0.4% speedup on IK by not using the multiplyThree4x4 Matrix call and using the precalculated version..!
+       create4x4FRotationZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
+       //multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_RPY:
        doRPYTransformationF(

@@ -198,17 +198,24 @@ int bvh_populateRectangle2DFromProjections(
 unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH_Transform * bvhTransform,const BVHJointID jID)
 {
   //This call is called millions of times during IK so it is really important to be fast
+  //Ironically this is slower than going with one if statement for some reason..!
+  /*return (
+            ((bvhTransform->useOptimizations) && (!bvhTransform->skipCalculationsForJoint[jID])) ||
+            (!bvhTransform->useOptimizations)
+         );*/
+
+
   //Normaly we should check if the bvhTransform structure is null but given that this call is called millions of times only if you have a transform
   //we skip the check
   //if (bvhTransform!=0)
   //  {
-       if (bvhTransform->useOptimizations)
+        if (bvhTransform->useOptimizations) // Deactivating this improves IK by 0.3%
         {
          //If we are using optimizations and this joint is not skipped then transform this joint
          //Normally we should check for index errors but in an effort to speed up the function to the maximum extent the check is skipped
-         //if (jID<bvhTransform->numberOfJointsToTransform)  //<- check can be disabled for speedup
+         //if (jID<bvhTransform->numberOfJointsToTransform)  //<- check can be disabled for speedup of + 0.5%
               {
-                 return  (!bvhTransform->skipCalculationsForJoint[jID]);
+                 return  !bvhTransform->skipCalculationsForJoint[jID];
               }
           return 0;
         }
