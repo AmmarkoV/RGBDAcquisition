@@ -1016,7 +1016,6 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
   //This gets spammed a *LOT* so it needs to be improved..
   if ( (motionBuffer!=0) && (data!=0) && (sizeOfData >= sizeof(float) * MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER) ) //QBVH
   {
-
       // If there are no positional channels erase them..!
       if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels) //This used to be isRoot before QBVH
       {
