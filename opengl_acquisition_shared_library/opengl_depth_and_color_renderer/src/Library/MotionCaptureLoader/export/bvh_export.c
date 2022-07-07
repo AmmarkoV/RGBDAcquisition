@@ -246,6 +246,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            int convertToJSON,
                            int convertToSVG,
                            int convertToCSV,
+                           int convertToAngleHeatmap,
                            int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
                            int wipe_2D_Output,int wipe_3D_Output,int wipe_BVH_Output,
                            struct BVH_MotionCapture * mc,

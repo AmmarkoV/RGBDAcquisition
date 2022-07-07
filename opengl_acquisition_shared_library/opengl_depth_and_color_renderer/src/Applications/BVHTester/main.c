@@ -738,7 +738,7 @@ int bvhConverter(int argc,const char **argv)
     const char * toSVGDirectory="tmp/";
     const char * toCSVFilename="data.csv";
     unsigned int sampleSkip = 0;// <- If you want to artificially reduce the sample size
-    unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0;
+    unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0, convertToAngleHeatmap=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
     unsigned int occlusions = 0;
@@ -1571,6 +1571,11 @@ int bvhConverter(int argc,const char **argv)
              ) { haltOnError(immediatelyHaltOnError,"Error while outputing a BVH file.."); }
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--angleheatmap")==0)
+        {
+           convertToAngleHeatmap=1;
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--csv")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
@@ -1634,6 +1639,7 @@ int bvhConverter(int argc,const char **argv)
                             convertToJSON,
                             convertToSVG,
                             convertToCSV,
+                            convertToAngleHeatmap,
                             useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
                             wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
                             &bvhMotion,
