@@ -35,6 +35,7 @@ float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID);
 float bvhConverter_getBVHJointRotationYForFrame(int frameID,int jointID);
 float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID);
 
+int bvhConverter_modifySingleAtomic(const char * label,const float value,int frameID);
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID);
 
 int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID);

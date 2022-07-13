@@ -79,7 +79,6 @@ void incorrectArguments()
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
-
 struct BVH_MotionCapture         bvhAtomicMotion={0};
 struct BVH_Transform             bvhTransformAtomic={0};
 struct simpleRenderer            rendererAtomic={0};
@@ -109,10 +108,10 @@ int bvhConverter_loadAtomic(const char *path)
 
   // Emulate GoPro Hero4 @ FullHD mode by default..
   // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-  renderingAtomicConfiguration.near=1.0;
-  renderingAtomicConfiguration.far =10000.0;
-  renderingAtomicConfiguration.width=1920;
-  renderingAtomicConfiguration.height=1080;
+  renderingAtomicConfiguration.near   = 1.0;
+  renderingAtomicConfiguration.far    = 10000.0;
+  renderingAtomicConfiguration.width  = 1920;
+  renderingAtomicConfiguration.height = 1080;
   renderingAtomicConfiguration.cX=(float)renderingAtomicConfiguration.width/2;
   renderingAtomicConfiguration.cY=(float)renderingAtomicConfiguration.height/2;
   renderingAtomicConfiguration.fX=582.18394;
@@ -276,6 +275,55 @@ float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID)
   if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
      { return (float) bvh_getJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID); }
   return 0.0;
+}
+
+
+
+int bvhConverter_modifySingleAtomic(const char * label,const float value,int frameID)
+{
+ //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  int everythingOk = 1;
+  char jointName[512]={0};
+  snprintf(jointName,512,"%s",label);
+  char * delimeter = strchr(jointName,'_');
+  *delimeter = 0;
+  char * dof = delimeter+1;
+  //=======================================================
+  lowercase(jointName);
+  lowercase(dof);
+  //=======================================================
+  //fprintf(stderr," %u - %s->%0.2f ",i,label,value);
+  //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
+  //=======================================================
+  //int jointID = bvhConverter_getJointNameJointID(jointName);
+  BVHJointID jointID=0;
+  if (
+            bvh_getJointIDFromJointNameNocase(
+                                               &bvhAtomicMotion,
+                                               jointName,
+                                               &jointID
+                                             )
+      )
+      {
+      //==============================================================================================================
+      if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+                                      {
+                                         fprintf(stderr,RED "\n\n\nBVH library could not perform modification  \"%s\" for joint \"%s\" \n\n\n" NORMAL,dof,jointName);
+                                         everythingOk=0;
+                                      }
+      //==============================================================================================================
+      } else
+      {
+          fprintf(stderr,RED "\n\n\nBVH library modification could not resolve joint \"%s\" \n\n\n" NORMAL,jointName);
+          everythingOk=0;
+      }
+  return everythingOk;
 }
 
 
@@ -757,14 +805,14 @@ int bvhConverter(int argc,const char **argv)
 
     // Emulate GoPro Hero4 @ FullHD mode by default..
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-    renderingConfiguration.near=1.0;
-    renderingConfiguration.far =10000.0;
-    renderingConfiguration.width=1920;
-    renderingConfiguration.height=1080;
-    renderingConfiguration.cX=(float)renderingConfiguration.width/2;
-    renderingConfiguration.cY=(float)renderingConfiguration.height/2;
-    renderingConfiguration.fX=582.18394;
-    renderingConfiguration.fY=582.52915;
+    renderingConfiguration.near   = 1.0;
+    renderingConfiguration.far    = 10000.0;
+    renderingConfiguration.width  = 1920;
+    renderingConfiguration.height = 1080;
+    renderingConfiguration.cX     = (float)renderingConfiguration.width/2;
+    renderingConfiguration.cY     = (float)renderingConfiguration.height/2;
+    renderingConfiguration.fX     = 582.18394;
+    renderingConfiguration.fY     = 582.52915;
     //640,480 , 575.57 , 575.57, //Kinect
     //-------------------------------------------------------------------------------------
 

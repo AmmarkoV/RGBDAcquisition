@@ -43,6 +43,10 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+
+//Experiment : Try to use langevin dynamics for annealed gradient descent
+#define USE_LANGEVIN_DYNAMICS 1
+
 unsigned long tickBaseIK = 0;
 
 void clear_line()
@@ -529,7 +533,12 @@ int examineSolutionAndKeepIfItIsBetter(
 
 
 
+float randomNoise(float noiseMagnitude)
+{
+  float x = ((float)rand()/(float)(RAND_MAX)) * noiseMagnitude;
 
+  return x-(float) (noiseMagnitude/2);
+}
 
 
 
@@ -888,19 +897,25 @@ if (iterationID==0)
 
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-        previousDelta[0]=delta[0];
-        gradient[0] =  (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
-        delta[0] =  beta * delta[0] + (float) lr * gradient[0];
+        previousDelta[0] = delta[0];
+        gradient[0]      = (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
+        delta[0]         = beta * delta[0] + (float) lr * gradient[0];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-        previousDelta[1]=delta[1];
-        gradient[1] =  (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
-        delta[1] =  beta * delta[1] + (float) lr * gradient[1];
+        previousDelta[1] = delta[1];
+        gradient[1]      = (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
+        delta[1]         = beta * delta[1] + (float) lr * gradient[1];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-        previousDelta[2]=delta[2];
-        gradient[2] =  (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
-        delta[2] =  beta * delta[2] + (float) lr * gradient[2];
+        previousDelta[2] = delta[2];
+        gradient[2]      = (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
+        delta[2]         = beta * delta[2] + (float) lr * gradient[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
+        #if USE_LANGEVIN_DYNAMICS
+           //Attempt to use Langevin dynamics for annealed gradient descent
+           delta[0]+=randomNoise(2.0);
+           delta[1]+=randomNoise(2.0);
+           delta[2]+=randomNoise(2.0);
+        #endif // USE_LANGEVIN_DYNAMICS
 
         //Safeguard agains gradient explosions which we detect when we see large gradients
         unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  );
@@ -2004,7 +2019,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     unsigned long endTime = GetTickCountMicrosecondsIK();
 
      if (useMultipleThreads)
-        { fprintf(stderr,"MT"); }
+        { fprintf(stderr,RED "MT" NORMAL); }
+
+    #if USE_LANGEVIN_DYNAMICS
+     fprintf(stderr,RED "L" NORMAL);
+    #endif // USE_LANGEVIN_DYNAMICS
 
     fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n",
                                                endTime-startTime,
@@ -2013,7 +2032,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                ikConfig->maximumAcceptableStartingLoss,
                                                ikConfig->iterations,
                                                ikConfig->epochs );
-
     bvh_freeTransform(&bvhCurrentTransform);
 
     return 1;
