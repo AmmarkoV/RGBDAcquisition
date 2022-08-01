@@ -1850,6 +1850,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
      if (useMultipleThreads)
      {
       //Solve the problem using multiple threads..!
+      //Due to game theory and the lack of information sharing between different "Actors"
+      //The accuracy of this is worse than the single threaded version
       multiThreadedSolver(problem,ikConfig);
      } else
      {

@@ -170,6 +170,11 @@ int  bvhConverter_processFrame(int frameID)
                                           );
 }
 
+int bvhConverter_getNumberOfJoints()
+{
+ return bvhAtomicMotion.jointHierarchySize;
+}
+
 int bvhConverter_getJointNameJointID(const char * jointName)
 {
   //fprintf(stderr,"Asked to resolve %s\n",jointName);
@@ -305,6 +310,7 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
                                              )
       )
       {
+      fprintf(stderr,"Joint ID %u / %s => %0.2f \n",jointID,dof,value);
       //==============================================================================================================
       if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
       if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
@@ -329,6 +335,23 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
 
 
 int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
+{
+  //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  int everythingOk = 1;
+  char jointName[512]={0};
+  for (int i=0; i<numberOfElements; i++)
+  {
+      if (!bvhConverter_modifySingleAtomic(labels[i],values[i],frameID))
+      {
+          fprintf(stderr,RED "\n\n\nBVH library modification failed resolving all joints\n\n\n" NORMAL);
+          everythingOk=0;
+      }
+  }
+  return everythingOk;
+}
+
+
+int bvhConverter_modifyAtomicOLD(const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   int everythingOk = 1;
@@ -377,7 +400,6 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
   }
   return everythingOk;
 }
-
 
 
 
