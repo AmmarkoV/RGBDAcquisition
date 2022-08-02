@@ -612,6 +612,16 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
 
 
+/**
+* @brief Direct access to the motion data, without Joint hierarchy,Frame separation etc, should not be used unless you really know what you are doing..
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Motion element we want to write
+* @return Motion ID to change
+* @return Motion Value to set
+*/
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float value);
+
 
 /**
 * @brief Perform a select query marking all the children of a specific joint ..

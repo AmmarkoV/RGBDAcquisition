@@ -1579,11 +1579,13 @@ int bvhConverter(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--studymid")==0)
         {
-          BVHMotionChannelID mID = atoi(argv[i+1]);
+          BVHFrameID         fID = atoi(argv[i+1]);
+          BVHMotionChannelID mID = atoi(argv[i+2]);
 
           bvh_studyMID2DImpact(
                                 &bvhMotion,
                                 &renderingConfiguration,
+                                fID,
                                 mID,
                                -180.0,
                                 180.0

@@ -22,7 +22,8 @@ int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jo
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
                            struct BVH_RendererConfiguration* renderingConfiguration,
-                           BVHMotionChannelID mID,
+                           BVHFrameID fID,
+                           BVHMotionChannelID mIDRelativeToOneFrame,
                            float rangeMinimum,
                            float rangeMaximum
                         );

@@ -1,4 +1,5 @@
 #include "bvh_remapangles.h"
+#include "../calculate/bvh_transform.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -130,14 +131,115 @@ int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jo
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
                            struct BVH_RendererConfiguration* renderingConfiguration,
-                           BVHMotionChannelID mID,
+                           BVHFrameID fID,
+                           BVHMotionChannelID mIDRelativeToOneFrame,
                            float rangeMinimum,
                            float rangeMaximum
                           )
 {
+  struct simpleRenderer renderer={0};
+  //Declare and populate the simpleRenderer that will project our 3D points
+
+  if (renderingConfiguration->isDefined)
+  {
+    renderer.fx     = renderingConfiguration->fX;
+    renderer.fy     = renderingConfiguration->fY;
+    renderer.skew   = 1.0;
+    renderer.cx     = renderingConfiguration->cX;
+    renderer.cy     = renderingConfiguration->cY;
+    renderer.near   = renderingConfiguration->near;
+    renderer.far    = renderingConfiguration->far;
+    renderer.width  = renderingConfiguration->width;
+    renderer.height = renderingConfiguration->height;
+
+    //renderer.cameraOffsetPosition[4];
+    //renderer.cameraOffsetRotation[4];
+    //renderer.removeObjectPosition;
 
 
-return 0;
+    //renderer.projectionMatrix[16];
+    //renderer.viewMatrix[16];
+    //renderer.modelMatrix[16];
+    //renderer.modelViewMatrix[16];
+    //renderer.viewport[4];
+
+    simpleRendererInitializeFromExplicitConfiguration(&renderer);
+    //bvh_freeTransform(&bvhTransform);
+
+
+    fprintf(stderr,"Direct Rendering is not implemented yet, please don't use it..\n");
+    return 0;
+  } else
+  {
+   //This is the normal rendering where we just simulate our camera center
+   simpleRendererDefaults(
+                          &renderer,
+                          renderingConfiguration->width,
+                          renderingConfiguration->height,
+                          renderingConfiguration->fX,
+                          renderingConfiguration->fY
+                         );
+    simpleRendererInitialize(&renderer);
+  }
+
+
+
+  struct BVH_Transform bvhTransformOriginal = {0};
+  struct BVH_Transform bvhTransformChanged  = {0};
+
+
+  BVHMotionChannelID mID = fID * bvh->numberOfValuesPerFrame + mIDRelativeToOneFrame;
+
+
+   bvh_loadTransformForFrame(
+                             bvh,
+                             fID ,
+                             &bvhTransformOriginal,
+                             0
+                            );
+
+  if (
+      bvh_projectTo2D(
+                      bvh,
+                      &bvhTransformOriginal,
+                      &renderer,
+                      0, //occlusions,
+                      0//directRendering
+                    )
+      )
+      {
+        BVHMotionChannelID originalValue = bvh_getMotionValue(bvh,mID);
+
+        float v= rangeMinimum;
+        while (v<rangeMaximum)
+        {
+          bvh_setMotionValue(bvh,mID,v);
+
+          bvh_loadTransformForFrame(
+                                    bvh,
+                                    fID ,
+                                    &bvhTransformChanged,
+                                    0
+                                   );
+
+          if (
+                bvh_projectTo2D(
+                                bvh,
+                                &bvhTransformChanged,
+                                &renderer,
+                                0, //occlusions,
+                                0//directRendering
+                               )
+              )
+              {
+                   //...
+              }
+
+          v+=1.0;
+        }
+      }
+
+return 1;
 }
 
 

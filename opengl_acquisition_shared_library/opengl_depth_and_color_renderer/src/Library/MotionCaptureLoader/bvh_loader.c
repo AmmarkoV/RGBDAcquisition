@@ -1092,9 +1092,16 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 
 
 
-float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID)
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
 {
   return bvhMotion->motionValues[mID];
+}
+
+
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float value)
+{
+  bvhMotion->motionValues[mID]=value;
+  return 1;
 }
 
 
