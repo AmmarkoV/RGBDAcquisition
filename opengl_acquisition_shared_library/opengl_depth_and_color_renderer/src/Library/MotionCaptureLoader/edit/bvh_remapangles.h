@@ -24,9 +24,9 @@ int bvh_studyMID2DImpact(
                            struct BVH_RendererConfiguration* renderingConfiguration,
                            BVHFrameID fID,
                            BVHMotionChannelID mIDRelativeToOneFrame,
-                           float rangeMinimum,
-                           float rangeMaximum
-                        );
+                           float *rangeMinimum,
+                           float *rangeMaximum
+                          );
 
 #ifdef __cplusplus
 }

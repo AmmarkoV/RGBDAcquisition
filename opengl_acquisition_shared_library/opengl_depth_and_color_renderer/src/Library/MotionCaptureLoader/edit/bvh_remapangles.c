@@ -1,5 +1,6 @@
 #include "bvh_remapangles.h"
 #include "../calculate/bvh_transform.h"
+#include "../ik/bvh_inverseKinematics.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -133,8 +134,8 @@ int bvh_studyMID2DImpact(
                            struct BVH_RendererConfiguration* renderingConfiguration,
                            BVHFrameID fID,
                            BVHMotionChannelID mIDRelativeToOneFrame,
-                           float rangeMinimum,
-                           float rangeMaximum
+                           float *rangeMinimum,
+                           float *rangeMaximum
                           )
 {
   struct simpleRenderer renderer={0};
@@ -152,20 +153,8 @@ int bvh_studyMID2DImpact(
     renderer.width  = renderingConfiguration->width;
     renderer.height = renderingConfiguration->height;
 
-    //renderer.cameraOffsetPosition[4];
-    //renderer.cameraOffsetRotation[4];
-    //renderer.removeObjectPosition;
-
-
-    //renderer.projectionMatrix[16];
-    //renderer.viewMatrix[16];
-    //renderer.modelMatrix[16];
-    //renderer.modelViewMatrix[16];
-    //renderer.viewport[4];
-
     simpleRendererInitializeFromExplicitConfiguration(&renderer);
     //bvh_freeTransform(&bvhTransform);
-
 
     fprintf(stderr,"Direct Rendering is not implemented yet, please don't use it..\n");
     return 0;
@@ -182,14 +171,24 @@ int bvh_studyMID2DImpact(
     simpleRendererInitialize(&renderer);
   }
 
+  FILE * fp = fopen("study.dat","w");
+
+  if (fp!=0)
+  {
+   struct BVH_Transform bvhTransformOriginal = {0};
+   struct BVH_Transform bvhTransformChanged  = {0};
 
 
-  struct BVH_Transform bvhTransformOriginal = {0};
-  struct BVH_Transform bvhTransformChanged  = {0};
+   BVHMotionChannelID mID = fID * bvh->numberOfValuesPerFrame + mIDRelativeToOneFrame;
 
+   fprintf(stderr,"bvh_studyMID2DImpact(%u,%u,%0.2f,%0.2f)\n",fID,mIDRelativeToOneFrame,*rangeMinimum,*rangeMaximum);
 
-  BVHMotionChannelID mID = fID * bvh->numberOfValuesPerFrame + mIDRelativeToOneFrame;
-
+   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s\n",
+           mID,
+           bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
+           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID
+           ,bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName
+          );
 
    bvh_loadTransformForFrame(
                              bvh,
@@ -210,9 +209,10 @@ int bvh_studyMID2DImpact(
       {
         BVHMotionChannelID originalValue = bvh_getMotionValue(bvh,mID);
 
-        float v= rangeMinimum;
-        while (v<rangeMaximum)
+        float v = *rangeMinimum;
+        while (v<*rangeMaximum)
         {
+          //fprintf(stderr,"Studying MID => %u / Value %f\n",mID,v);
           bvh_setMotionValue(bvh,mID,v);
 
           bvh_loadTransformForFrame(
@@ -232,13 +232,35 @@ int bvh_studyMID2DImpact(
                                )
               )
               {
-                   //...
+                  float mae =  meanBVH2DDistance(
+                                                  bvh,
+                                                  &renderer,
+                                                  1,
+                                                  0,
+                                                  &bvhTransformChanged,
+                                                  &bvhTransformOriginal,
+                                                  0
+                                                );
+                  //fprintf(stderr," %f\n",mae);
+                  fprintf(fp,"%f %f\n",v,mae);
+              } else
+              {
+                fprintf(stderr,"Failed projecting v=%f..\n",v);
               }
 
           v+=1.0;
         }
-      }
 
+
+          bvh_setMotionValue(bvh,mID,originalValue);
+      } else
+      {
+          fprintf(stderr,"Failed projecting original..\n");
+      }
+      //using ls 1 t 'TTT'
+      system("gnuplot -e \"set terminal png size 1000,800 font 'Helvetica,24'; set output 'out.png'; set style line 1 lt 1 lc rgb 'green' lw 3; plot 'study.dat'  with lines \"");
+      fclose(fp);
+  }
 return 1;
 }
 
