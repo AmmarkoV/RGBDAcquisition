@@ -351,58 +351,6 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 }
 
 
-int bvhConverter_modifyAtomicOLD(const char ** labels,const float * values,int numberOfElements,int frameID)
-{
-  //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
-  int everythingOk = 1;
-  char jointName[512]={0};
-  for (int i=0; i<numberOfElements; i++)
-  {
-      snprintf(jointName,512,"%s",labels[i]);
-      char * delimeter = strchr(jointName,'_');
-       *delimeter = 0;
-      char * dof = delimeter+1;
-      //=======================================================
-      lowercase(jointName);
-      lowercase(dof);
-      //=======================================================
-      //fprintf(stderr," %u - %s->%0.2f ",i,labels[i],values[i]);
-      //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
-      //=======================================================
-      //int jointID = bvhConverter_getJointNameJointID(jointName);
-      BVHJointID jointID=0;
-       if (
-            bvh_getJointIDFromJointNameNocase(
-                                               &bvhAtomicMotion,
-                                               jointName,
-                                               &jointID
-                                             )
-          )
-      {
-      //==============================================================================================================
-      if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-      if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&bvhAtomicMotion,jointID,frameID,values[i]); } else
-                                      {
-                                         fprintf(stderr,RED "\n\n\nBVH library could not perform modification  \"%s\" for joint \"%s\" \n\n\n" NORMAL,dof,jointName);
-                                         everythingOk=0;
-                                      }
-      //==============================================================================================================
-      } else
-      {
-          fprintf(stderr,RED "\n\n\nBVH library modification could not resolve joint \"%s\" \n\n\n" NORMAL,jointName);
-          everythingOk=0;
-      }
-  }
-  return everythingOk;
-}
-
-
-
 int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
     struct ikProblem * problem = 0;
@@ -1628,6 +1576,19 @@ int bvhConverter(int argc,const char **argv)
            dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
            dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
         } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--studymid")==0)
+        {
+          BVHMotionChannelID mID = atoi(argv[i+1]);
+
+          bvh_studyMID2DImpact(
+                                &bvhMotion,
+                                &renderingConfiguration,
+                                mID,
+                               -180.0,
+                                180.0
+                              );
+        }
         //-----------------------------------------------------
         if (strcmp(argv[i],"--bvh")==0)
         {
