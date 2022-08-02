@@ -102,8 +102,8 @@ float get3DPointDistance(float aX,float aY,float aZ,float bX,float bY,float bZ)
 
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 {
-    float diffX = (float) aX-bX;
-    float diffY = (float) aY-bY;
+    float diffX = (float) (aX-bX);
+    float diffY = (float) (aY-bY);
     //We calculate the distance here..!
     return (diffX*diffX) + (diffY*diffY);
 }

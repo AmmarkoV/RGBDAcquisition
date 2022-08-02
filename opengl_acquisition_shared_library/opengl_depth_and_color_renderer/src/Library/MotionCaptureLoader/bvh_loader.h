@@ -618,9 +618,9 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
 * @param  BVH Structure
 * @param  Motion element we want to write
 * @return Motion ID to change
-* @return Motion Value to set
+* @return Motion Value Pointer to Value to set
 */
-int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float value);
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float * value);
 
 
 /**

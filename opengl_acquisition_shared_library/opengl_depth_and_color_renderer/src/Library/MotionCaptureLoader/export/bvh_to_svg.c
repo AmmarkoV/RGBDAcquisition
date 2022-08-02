@@ -63,13 +63,17 @@ int dumpBVHToSVGFrame(
       {
         unsigned int parentJID = mc->jointHierarchy[jID].parentJoint;
 
-        fprintf(
-                fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" />\n",
-                bvhTransform->joint[parentJID].pos2D[0],
-                bvhTransform->joint[parentJID].pos2D[1],
-                bvhTransform->joint[jID].pos2D[0],
-                bvhTransform->joint[jID].pos2D[1]
-               );
+        if ( (jID!=parentJID) && (parentJID<mc->jointHierarchySize) )
+        {
+         fprintf(
+                 fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" /><!-- %u/%u -->\n",
+                 bvhTransform->joint[parentJID].pos2D[0],
+                 bvhTransform->joint[parentJID].pos2D[1],
+                 bvhTransform->joint[jID].pos2D[0],
+                 bvhTransform->joint[jID].pos2D[1],
+                 jID,mc->jointHierarchySize
+                );
+        }
       }
 
 

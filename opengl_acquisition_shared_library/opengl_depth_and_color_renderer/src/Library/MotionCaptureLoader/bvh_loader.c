@@ -1098,9 +1098,10 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
 }
 
 
-int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float value)
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float * value)
 {
-  bvhMotion->motionValues[mID]=value;
+  //fprintf(stderr,"bvh_setMotionValue(%u,%0.2f)\n",mID,*value);
+  bvhMotion->motionValues[mID]=*value;
   return 1;
 }
 

@@ -1,6 +1,7 @@
 #include "bvh_remapangles.h"
 #include "../calculate/bvh_transform.h"
 #include "../ik/bvh_inverseKinematics.h"
+#include "../export/bvh_to_svg.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -128,6 +129,40 @@ int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jo
 
 
 
+float meanBVH2DDistanceStudy(
+                             struct BVH_MotionCapture * mc,
+                             struct BVH_Transform * bvhSourceTransform,
+                             struct BVH_Transform * bvhTargetTransform
+                            )
+{
+ //-----------------
+ float sumOf2DDistances=0.0;
+ unsigned int numberOfSamples=0;
+ for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+        {
+          ///Warning: When you change this please change calculateChainLoss as well!
+          float sX=bvhSourceTransform->joint[jID].pos2D[0];
+          float sY=bvhSourceTransform->joint[jID].pos2D[1];
+          float tX=bvhTargetTransform->joint[jID].pos2D[0];
+          float tY=bvhTargetTransform->joint[jID].pos2D[1];
+
+          if ( ( (sX!=0.0) || (sY!=0.0) ) && ( (tX!=0.0) || (tY!=0.0) ) )
+                {
+                    float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
+                    numberOfSamples+=1;
+                    sumOf2DDistances+=this2DDistance;
+                }
+        }
+
+        if (numberOfSamples>0)
+        {
+            return (float)  sumOf2DDistances/numberOfSamples;
+        }
+
+  return 0.0;
+}
+
+
 
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
@@ -138,8 +173,8 @@ int bvh_studyMID2DImpact(
                            float *rangeMaximum
                           )
 {
-  struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
+  struct simpleRenderer renderer={0};
 
   if (renderingConfiguration->isDefined)
   {
@@ -178,90 +213,92 @@ int bvh_studyMID2DImpact(
    struct BVH_Transform bvhTransformOriginal = {0};
    struct BVH_Transform bvhTransformChanged  = {0};
 
+   /*
+    for (int m=0; m<bvh->numberOfValuesPerFrame; m++)
+    {
+     fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s \n",
+           m,
+           bvh->motionToJointLookup[m].jointID,
+           bvh->motionToJointLookup[m].channelID,
+           bvh->jointHierarchy[bvh->motionToJointLookup[m].jointID].jointName,
+           channelNames[bvh->motionToJointLookup[m].channelID]
+          );
+    }*/
 
-   BVHMotionChannelID mID = fID * bvh->numberOfValuesPerFrame + mIDRelativeToOneFrame;
+   BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+   float originalValue = bvh_getMotionValue(bvh,mID);
 
    fprintf(stderr,"bvh_studyMID2DImpact(%u,%u,%0.2f,%0.2f)\n",fID,mIDRelativeToOneFrame,*rangeMinimum,*rangeMaximum);
 
-   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s\n",
+
+
+   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f\n",
            mID,
            bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
-           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID
-           ,bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName
+           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID,
+           bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
+           channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID],
+           originalValue
           );
 
-   bvh_loadTransformForFrame(
-                             bvh,
-                             fID ,
-                             &bvhTransformOriginal,
-                             0
-                            );
 
-  if (
-      bvh_projectTo2D(
-                      bvh,
-                      &bvhTransformOriginal,
-                      &renderer,
-                      0, //occlusions,
-                      0//directRendering
-                    )
+   if (
+       (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
+       (bvh_projectTo2D(bvh,&bvhTransformOriginal,&renderer,0,0))
       )
       {
-        BVHMotionChannelID originalValue = bvh_getMotionValue(bvh,mID);
+       dumpBVHToSVGFrame(
+                         "study.svg",
+                         bvh,
+                         &bvhTransformOriginal,
+                         fID,
+                         &renderer
+                        );
 
         float v = *rangeMinimum;
         while (v<*rangeMaximum)
         {
           //fprintf(stderr,"Studying MID => %u / Value %f\n",mID,v);
-          bvh_setMotionValue(bvh,mID,v);
-
-          bvh_loadTransformForFrame(
-                                    bvh,
-                                    fID ,
-                                    &bvhTransformChanged,
-                                    0
-                                   );
+          bvh_setMotionValue(bvh,mID,&v);
 
           if (
-                bvh_projectTo2D(
-                                bvh,
-                                &bvhTransformChanged,
-                                &renderer,
-                                0, //occlusions,
-                                0//directRendering
-                               )
-              )
-              {
-                  float mae =  meanBVH2DDistance(
-                                                  bvh,
-                                                  &renderer,
-                                                  1,
-                                                  0,
-                                                  &bvhTransformChanged,
-                                                  &bvhTransformOriginal,
-                                                  0
-                                                );
-                  //fprintf(stderr," %f\n",mae);
-                  fprintf(fp,"%f %f\n",v,mae);
-              } else
-              {
-                fprintf(stderr,"Failed projecting v=%f..\n",v);
-              }
-
+              (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
+              (bvh_projectTo2D(bvh,&bvhTransformChanged,&renderer,0,0))
+             )
+             {
+                 float mae = meanBVH2DDistanceStudy(
+                                                   bvh,
+                                                   &bvhTransformChanged,
+                                                   &bvhTransformOriginal
+                                                  );
+                //fprintf(stderr," %f\n",mae);
+                 fprintf(fp,"%f %f\n",v,mae);
+             }
           v+=1.0;
         }
 
-
-          bvh_setMotionValue(bvh,mID,originalValue);
+        bvh_setMotionValue(bvh,mID,&originalValue);
       } else
       {
           fprintf(stderr,"Failed projecting original..\n");
       }
-      //using ls 1 t 'TTT'
-      system("gnuplot -e \"set terminal png size 1000,800 font 'Helvetica,24'; set output 'out.png'; set style line 1 lt 1 lc rgb 'green' lw 3; plot 'study.dat'  with lines \"");
       fclose(fp);
+
+      //using ls 1 t 'TTT'
+      char command[2048]={0};
+      snprintf(
+               command,2048,"gnuplot -e \"set terminal png size 800,512 font 'Helvetica,14'; set output 'out.png'; set xrange[%0.2f:%0.2f]; set style line 1 lt 1 lc rgb 'blue' lw 3; plot 'study.dat' with lines ls 1 title '%s %s Error'\"",
+               *rangeMinimum,*rangeMaximum,
+               bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
+               channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID]
+              );
+
+      //fprintf(stderr,"%s\n",command);
+      system(command);
+      return 1;
   }
-return 1;
+
+  return 0;
 }
 
 

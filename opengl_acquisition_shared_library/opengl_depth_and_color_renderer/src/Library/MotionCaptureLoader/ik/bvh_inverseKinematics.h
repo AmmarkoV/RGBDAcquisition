@@ -189,6 +189,7 @@ static struct ikProblem * allocateEmptyIKProblem()
      return emptyProblem;
 }
 
+float get2DPointDistance(float aX,float aY,float bX,float bY);
 
 int cleanProblem(struct ikProblem * problem);
 int viewProblem(struct ikProblem * problem);
