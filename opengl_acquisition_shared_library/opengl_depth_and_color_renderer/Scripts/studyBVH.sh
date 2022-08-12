@@ -525,8 +525,10 @@ for M in $MOTION
  done 
 
 mv study.svg study-f$FRAMEID.svg
+convert study-f$FRAMEID.svg study-f$FRAMEID.png
+zip all-study-f$FRAMEID.zip study-*
 
-#./BVHTester --from Motions/05_01.bvh --studymid 233 395
+#./BVHTester --from Motions/05_01.bvh --set 2 -200 --studymid 233 395
 
 
 
