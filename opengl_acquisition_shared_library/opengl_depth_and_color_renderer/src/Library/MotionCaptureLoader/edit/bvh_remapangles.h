@@ -25,7 +25,8 @@ int bvh_studyMID2DImpact(
                            BVHFrameID fID,
                            BVHMotionChannelID mIDRelativeToOneFrame,
                            float *rangeMinimum,
-                           float *rangeMaximum
+                           float *rangeMaximum,
+                           float *resolution
                           );
 
 #ifdef __cplusplus

@@ -170,7 +170,8 @@ int bvh_studyMID2DImpact(
                            BVHFrameID fID,
                            BVHMotionChannelID mIDRelativeToOneFrame,
                            float *rangeMinimum,
-                           float *rangeMaximum
+                           float *rangeMaximum,
+                           float *resolution
                           )
 {
   //Declare and populate the simpleRenderer that will project our 3D points
@@ -232,13 +233,16 @@ int bvh_studyMID2DImpact(
 
 
 
-   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f\n",
+   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
            mID,
            bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
            bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID,
            bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
            channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID],
-           originalValue
+           originalValue,
+           *rangeMinimum,
+           *rangeMaximum,
+           *resolution
           );
 
 
@@ -254,7 +258,7 @@ int bvh_studyMID2DImpact(
                          fID,
                          &renderer
                         );
-
+        float increment = *resolution;
         float v = *rangeMinimum;
         while (v<*rangeMaximum)
         {
@@ -274,7 +278,7 @@ int bvh_studyMID2DImpact(
                 //fprintf(stderr," %f\n",mae);
                  fprintf(fp,"%f %f\n",v,mae);
              }
-          v+=1.0;
+          v+=increment;
         }
 
         bvh_setMotionValue(bvh,mID,&originalValue);

@@ -474,10 +474,27 @@ int dumpBVHTo_JSON_SVG_CSV(
                                         &renderer
                                        );
       }
+     //------------------------------------------------------------------------------------------
+
+
+
+     //Angle output
+     //------------------------------------------------------------------------------------------
+      if (convertToAngleHeatmap)
+      {
+
+      }
+     //------------------------------------------------------------------------------------------
+
+
+
+
+
 
      did2DOutputPreExist=1;
      did3DOutputPreExist=1;
      didBVHOutputPreExist=1;
+
    }//Skeleton is ok to be dumped
   } else //3D Projection was ok
   { fprintf(stderr,RED "Could not perform projection for frame %u\n" NORMAL,fID); }
