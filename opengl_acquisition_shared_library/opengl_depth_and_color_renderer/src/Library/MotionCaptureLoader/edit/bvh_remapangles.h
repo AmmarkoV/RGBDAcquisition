@@ -19,6 +19,15 @@ int bvh_swapJointRotationAxis(struct BVH_MotionCapture * bvh,char inputRotationO
 
 int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jointName,char inputRotationOrder,char swappedRotationOrder);
 
+
+int dumpBVHAsProbabilitiesHeader(
+                                 struct BVH_MotionCapture * mc,
+                                 const char * filename,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution
+                                );
+
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
                            struct BVH_RendererConfiguration* renderingConfiguration,

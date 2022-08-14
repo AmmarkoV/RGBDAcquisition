@@ -164,6 +164,151 @@ float meanBVH2DDistanceStudy(
 
 
 
+
+int dumpBVHAsProbabilitiesHeader(
+                                 struct BVH_MotionCapture * mc,
+                                 const char * filename,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution
+                                )
+{
+   int isJointSelected=1;
+   int isJointEndSiteSelected=1;
+
+   //if ( (filename!=0) && (filename[0]!=0) && (!bvhExportFileExists(filename)) )
+   //{
+
+     char comma=' ';
+     //2D Positions -------------------------------------------------------------------------------------------------------------
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         FILE * fp = fopen(filename,"a");
+
+    if (fp!=0)
+    {
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
+
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID])
+                  {
+                     isJointSelected=0;
+                     if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                  }
+            }
+          //----------------------------------
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+            if (isJointSelected)
+            {
+                if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                fprintf(fp,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+            }
+         }
+         else
+         {
+            if (isJointEndSiteSelected)
+            {
+               unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+               if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+               fprintf(fp,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+            }
+         }
+
+
+
+          //--------------------------------------------------------------------------------------------------------------------------
+     fprintf(fp,"\n");
+     fclose(fp);
+   }
+
+
+       }
+
+}
+
+
+
+
+int dumpBVHAsProbabilitiesBody(
+                                 struct BVH_MotionCapture * bvh,
+                                 const char * filename,
+                                 struct BVH_RendererConfiguration* renderingConfiguration,
+                                 BVHFrameID fID,
+                                 BVHMotionChannelID mIDRelativeToOneFrame,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution
+                             )
+{
+/*
+   //--------------------------------------------------------------------------------------------------------------------------
+   //---------------------------------------------------2D Positions ----------------------------------------------------------
+   //--------------------------------------------------------------------------------------------------------------------------
+   if (fp!=0)
+     {
+      if (didInputOutputPreExist) { fprintf(fp,","); }
+      fprintf(fp,"[");
+      char comma=' ';
+      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID])
+                {
+                  isJointSelected=0;
+                  if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                }
+            }
+          //----------------------------------
+
+         if (
+               //If this a regular joint and regular joints are enabled
+               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) ) ||
+               //OR if this is an end joint and end joints are enabled..
+               ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
+            )
+          {
+                if (bvhTransform->joint[jID].isOccluded) { ++filterStats->invisibleJoints; } else { ++filterStats->visibleJoints; }
+
+                if (mc->jointHierarchy[jID].erase2DCoordinates)
+                    {
+                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                       fprintf(fp,"{\"x\":0,\"y\":0,\"v\":0}");
+                    } else
+                    {
+                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                       //Please note that our 2D input is normalized [0..1]
+                       fprintf(
+                               fp,"{\"x\":%0.6f,\"y\":%0.6f,\"v\":%u}",
+                               (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
+                               (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
+                               (bvhTransform->joint[jID].isOccluded==0)
+                              );
+                    }
+         }
+       }
+     fprintf(fp,"]\n");
+     fclose(fp);
+     ++dumped;
+     }
+   //-----------------------------------------------------------------------------------------------------------------------------
+   //-----------------------------------------------------------------------------------------------------------------------------
+   //-----------------------------------------------------------------------------------------------------------------------------
+*/
+}
+
+
+
+
+
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
                            struct BVH_RendererConfiguration* renderingConfiguration,
