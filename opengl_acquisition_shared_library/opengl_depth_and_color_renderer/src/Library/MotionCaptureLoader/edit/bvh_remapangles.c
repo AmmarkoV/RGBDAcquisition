@@ -163,10 +163,34 @@ float meanBVH2DDistanceStudy(
 }
 
 
+int initializeStandaloneHeatmapFile(const char * filename,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution)
+{
+ FILE * fp = fopen(filename,"w");
+ if (fp!=0)
+         {
+          char comma=' ';
+          float increment = *resolution;
+          float v = *rangeMinimum;
+          while (v<*rangeMaximum)
+          {
+            if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+            fprintf(fp,"%0.2f",v);
+            v+=increment;
+          }
 
-//./GroundTruthDumper --printparams --haltonerror --from dataset/MotionCapture/12/12_04.bvh --angleheatmap --filtergimballocks 4 --selectJoints 1 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --hide2DLocationOfJoints 0 8 abdomen chest eye.r eye.l toe1-2.r toe5-3.r toe1-2.l toe5-3.l --perturbJointAngles 2 30.0 rshoulder lshoulder --perturbJointAngles 2 16.0 relbow lelbow --perturbJointAngles 2 10.0 abdomen chest --perturbJointAngles 2 30.0 rhip lhip --perturbJointAngles 4 10.0 lknee rknee lfoot rfoot --perturbJointAngles 2 10.0 abdomen chest --repeat 0 --sampleskip 2 --filterout 0 0 -130.0 0 90 0 1920 1080 570.7 570.3 6 rhand lhip 0 120 rhand rhip 0 120 rhand lhand 0 150 lhand rhip 0 120 lhand lhip 0 120 lhand rhand 0 150 --randomize2D 900 4500 -45 -179.999999 -45 45 180 45 --occlusions --csv dataset/ body_all.csv 2d+3d+bvh
+          fprintf(fp,"\n");
+          fclose(fp);
+          return 1;
+         }
+ return 0;
+}
 
 
+
+//  ./BVHTester --printparams --haltonerror --from Motions/05_01.bvh --angleheatmap --filtergimballocks 4 --selectJoints 1 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --hide2DLocationOfJoints 0 8 abdomen chest eye.r eye.l toe1-2.r toe5-3.r toe1-2.l toe5-3.l --perturbJointAngles 2 30.0 rshoulder lshoulder --perturbJointAngles 2 16.0 relbow lelbow --perturbJointAngles 2 10.0 abdomen chest --perturbJointAngles 2 30.0 rhip lhip --perturbJointAngles 4 10.0 lknee rknee lfoot rfoot --perturbJointAngles 2 10.0 abdomen chest --repeat 0 --sampleskip 2 --filterout 0 0 -130.0 0 90 0 1920 1080 570.7 570.3 6 rhand lhip 0 120 rhand rhip 0 120 rhand lhand 0 150 lhand rhip 0 120 lhand lhip 0 120 lhand rhand 0 150 --randomize2D 900 4500 -45 -179.999999 -45 45 180 45 --occlusions --csv debug/ body_all.csv 2d+3d+bvh
 int dumpBVHAsProbabilitiesHeader(
                                  struct BVH_MotionCapture * mc,
                                  const char * filename,
@@ -175,62 +199,38 @@ int dumpBVHAsProbabilitiesHeader(
                                  float *resolution
                                 )
 {
-   int isJointSelected=1;
-   int isJointEndSiteSelected=1;
+     char initialFilenameWithoutExtension[512]={0};
+     snprintf(initialFilenameWithoutExtension,512,"%s",filename);
+     char * dot = strchr(initialFilenameWithoutExtension,'.');
+     if (dot!=0) { *dot=0; }
 
-   //if ( (filename!=0) && (filename[0]!=0) && (!bvhExportFileExists(filename)) )
-   //{
+     char specificJointFilename[512]={0};
 
-     char comma=' ';
-     //2D Positions -------------------------------------------------------------------------------------------------------------
+     int isJointSelected=1;
+     int isJointEndSiteSelected=1;
+
      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         FILE * fp = fopen(filename,"a");
-
-    if (fp!=0)
-    {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
          //-----------------------------------------------------------------------------
-
-          //----------------------------------
-          //If we have hidden joints declared only the 2D part will be hidden..
-          if (mc->hideSelectedJoints!=0)
-            {  //If we want to hide the specific joint then it is not selected..
-               if (mc->hideSelectedJoints[jID])
-                  {
-                     isJointSelected=0;
-                     if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
-                  }
-            }
-          //----------------------------------
-         if (!mc->jointHierarchy[jID].isEndSite)
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
-            if (isJointSelected)
-            {
-                if (comma==',') { fprintf(fp,",");  } else { comma=','; }
-                fprintf(fp,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
-            }
+            unsigned int channelID=0;
+            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                 {
+                    snprintf(
+                             specificJointFilename,512,"%s_%s_%s.csv",
+                             initialFilenameWithoutExtension,
+                             mc->jointHierarchy[jID].jointNameLowercase,
+                             channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                            );
+
+                     initializeStandaloneHeatmapFile(specificJointFilename,rangeMinimum,rangeMaximum,resolution);
+                 }
          }
-         else
-         {
-            if (isJointEndSiteSelected)
-            {
-               unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-               if (comma==',') { fprintf(fp,",");  } else { comma=','; }
-               fprintf(fp,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
-            }
-         }
-
-
-
-          //--------------------------------------------------------------------------------------------------------------------------
-     fprintf(fp,"\n");
-     fclose(fp);
-   }
-
-
        }
 
+   return 1;
 }
 
 
