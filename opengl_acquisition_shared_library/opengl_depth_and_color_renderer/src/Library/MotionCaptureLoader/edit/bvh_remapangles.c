@@ -112,7 +112,7 @@ int bvh_swapJointNameRotationAxis(struct BVH_MotionCapture * bvh,const char * jo
   if ( (bvh!=0) && (bvh->jointHierarchy!=0) )
   {
     BVHJointID jID=0;
-
+    //----------------
     if ( bvh_getJointIDFromJointName(bvh,jointName,&jID) )
     {
       if (bvh->jointHierarchy[jID].channelRotationOrder == inputRotationOrder)
@@ -135,10 +135,16 @@ float meanBVH2DDistanceStudy(
                              struct BVH_Transform * bvhTargetTransform
                             )
 {
- //-----------------
- float sumOf2DDistances=0.0;
- unsigned int numberOfSamples=0;
- for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+ if (mc==0) { return 0.0; }
+ if (bvhSourceTransform==0) { return 0.0; }
+ if (bvhTargetTransform==0) { return 0.0; }
+ //-----------------------------------------
+
+ if ( (bvhSourceTransform->joint!=0) && (bvhTargetTransform->joint!=0) )
+ {
+  float sumOf2DDistances=0.0;
+  unsigned int numberOfSamples=0;
+  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
         {
           ///Warning: When you change this please change calculateChainLoss as well!
           float sX=bvhSourceTransform->joint[jID].pos2D[0];
@@ -158,9 +164,12 @@ float meanBVH2DDistanceStudy(
         {
             return (float)  sumOf2DDistances/numberOfSamples;
         }
-
+ }
+ //-----------------------------------------
   return 0.0;
 }
+
+
 
 
 int initializeStandaloneHeatmapFile(
@@ -192,6 +201,8 @@ int initializeStandaloneHeatmapFile(
 
 
 
+
+
 //  ./BVHTester --printparams --haltonerror --from Motions/05_01.bvh --angleheatmap --filtergimballocks 4 --selectJoints 1 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --hide2DLocationOfJoints 0 8 abdomen chest eye.r eye.l toe1-2.r toe5-3.r toe1-2.l toe5-3.l --perturbJointAngles 2 30.0 rshoulder lshoulder --perturbJointAngles 2 16.0 relbow lelbow --perturbJointAngles 2 10.0 abdomen chest --perturbJointAngles 2 30.0 rhip lhip --perturbJointAngles 4 10.0 lknee rknee lfoot rfoot --perturbJointAngles 2 10.0 abdomen chest --repeat 0 --sampleskip 2 --filterout 0 0 -130.0 0 90 0 1920 1080 570.7 570.3 6 rhand lhip 0 120 rhand rhip 0 120 rhand lhand 0 150 lhand rhip 0 120 lhand lhip 0 120 lhand rhand 0 150 --randomize2D 900 4500 -45 -179.999999 -45 45 180 45 --occlusions --csv debug/ body_all.csv 2d+3d+bvh
 int dumpBVHAsProbabilitiesHeader(
                                  struct BVH_MotionCapture * mc,
@@ -207,11 +218,12 @@ int dumpBVHAsProbabilitiesHeader(
      if (dot!=0) { *dot=0; }
      //----------------------------------------------------------
      char specificJointFilename[1024]={0};
+     //----------------------------------------------------------
 
      int isJointSelected=1;
      int isJointEndSiteSelected=1;
 
-     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+     for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
        {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
          //-----------------------------------------------------------------------------
@@ -226,14 +238,18 @@ int dumpBVHAsProbabilitiesHeader(
                              mc->jointHierarchy[jID].jointNameLowercase,
                              channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
                             );
-
+                     //----------------------------------------------------------
                      initializeStandaloneHeatmapFile(specificJointFilename,rangeMinimum,rangeMaximum,resolution);
+                     //----------------------------------------------------------
                  }
          }
        }
 
    return 1;
 }
+
+
+
 
 
 
@@ -254,10 +270,11 @@ int bvh_plotJointChannelHeatmap(
   {
    struct BVH_Transform bvhTransformOriginal = {0};
    struct BVH_Transform bvhTransformChanged  = {0};
-
+   //----------------------------------------------------------
    BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
-
+   //----------------------------------------------------------
    BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+   //----------------------------------------------------------
 
    fprintf(stderr,"bvh_plotJointChannelHeatmap(%s,fID %u,jID %u, cID %u,mID %u)\n",filename,fID,jID,channelID,mID);
    float originalValue = bvh_getMotionValue(bvh,mID);
@@ -267,11 +284,13 @@ int bvh_plotJointChannelHeatmap(
        (bvh_projectTo2D(bvh,&bvhTransformOriginal,renderer,0,0))
       )
       {
+        //fprintf(stderr,"bvh_loadTransformForFrame \n");
         char comma=' ';
         float increment = *resolution;
         float v = *rangeMinimum;
         while (v<*rangeMaximum)
         {
+          fprintf(stderr,"V %f \n",v);
           bvh_setMotionValue(bvh,mID,&v);
 
           if (
@@ -279,6 +298,7 @@ int bvh_plotJointChannelHeatmap(
               (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
              )
              {
+                 fprintf(stderr,".");
                  float mae = meanBVH2DDistanceStudy(
                                                     bvh,
                                                     &bvhTransformChanged,
@@ -319,19 +339,21 @@ int dumpBVHAsProbabilitiesBody(
      if (dot!=0) { *dot=0; }
      //----------------------------------------------------------
      char specificJointFilename[1024]={0};
+     //----------------------------------------------------------
 
      int isJointSelected=1;
      int isJointEndSiteSelected=1;
 
-     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+     for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
          //-----------------------------------------------------------------------------
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
             unsigned int channelID=0;
             for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
+                    //----------------------------------------------------------
                     snprintf(
                              specificJointFilename,1024,"%s_%s_%s.csv",
                              initialFilenameWithoutExtension,
@@ -350,6 +372,7 @@ int dumpBVHAsProbabilitiesBody(
                                                  rangeMaximum,
                                                  resolution
                                                 );
+                     //----------------------------------------------------------
                  }
          }
          //-----------------------------------------------------------------------------

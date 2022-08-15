@@ -259,6 +259,7 @@ int bvh_projectTo2D(
 {
       if (!bvhTransform) { return 0; }
       if (!bvhTransform->transformStructInitialized) { return 0; }
+      if (!renderer) { return 0; }
 
 
       bvhTransform->jointsOccludedIn2DProjection=0;
