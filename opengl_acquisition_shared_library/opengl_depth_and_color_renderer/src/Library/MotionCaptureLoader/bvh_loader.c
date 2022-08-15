@@ -1094,7 +1094,15 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 
 float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
 {
-  return bvhMotion->motionValues[mID];
+  if (bvhMotion!=0)
+  {
+   if (mID<bvhMotion->motionValuesSize)
+   {
+     return bvhMotion->motionValues[mID];
+   }
+  }
+  fprintf(stderr,"Could not resolve mID %u\n",mID);
+  return 0.0;
 }
 
 

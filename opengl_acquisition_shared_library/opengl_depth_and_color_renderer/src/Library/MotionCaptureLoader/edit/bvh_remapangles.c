@@ -291,6 +291,7 @@ int bvh_plotJointChannelHeatmap(
         bvh_setMotionValue(bvh,mID,&originalValue);
       }
 
+      fprintf(fp,"\n");
       fclose(fp);
       return 1;
   }
@@ -335,8 +336,7 @@ int dumpBVHAsProbabilitiesBody(
                              mc->jointHierarchy[jID].jointNameLowercase,
                              channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
                             );
-
-                     //initializeStandaloneHeatmapFile(specificJointFilename,rangeMinimum,rangeMaximum,resolution);
+                     //-----------------------------------------------------------------------------
                      bvh_plotJointChannelHeatmap(
                                                  specificJointFilename,
                                                  mc,
@@ -350,6 +350,7 @@ int dumpBVHAsProbabilitiesBody(
                                                 );
                  }
          }
+         //-----------------------------------------------------------------------------
        }
 
    return 1;
