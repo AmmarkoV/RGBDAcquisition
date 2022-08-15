@@ -163,10 +163,12 @@ float meanBVH2DDistanceStudy(
 }
 
 
-int initializeStandaloneHeatmapFile(const char * filename,
-                                 float *rangeMinimum,
-                                 float *rangeMaximum,
-                                 float *resolution)
+int initializeStandaloneHeatmapFile(
+                                    const char * filename,
+                                    float *rangeMinimum,
+                                    float *rangeMaximum,
+                                    float *resolution
+                                   )
 {
  FILE * fp = fopen(filename,"w");
  if (fp!=0)
@@ -203,7 +205,7 @@ int dumpBVHAsProbabilitiesHeader(
      snprintf(initialFilenameWithoutExtension,512,"%s",filename);
      char * dot = strchr(initialFilenameWithoutExtension,'.');
      if (dot!=0) { *dot=0; }
-
+     //----------------------------------------------------------
      char specificJointFilename[512]={0};
 
      int isJointSelected=1;
@@ -235,11 +237,72 @@ int dumpBVHAsProbabilitiesHeader(
 
 
 
+int bvh_plotJointChannelHeatmap(
+                                 const char * filename,
+                                 struct BVH_MotionCapture * bvh,
+                                 struct simpleRenderer * renderer,
+                                 BVHFrameID fID,
+                                 BVHJointID jID,
+                                 BVHMotionChannelID channelID,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution
+                               )
+{
+  FILE * fp = fopen(filename,"a");
+  if (fp!=0)
+  {
+   struct BVH_Transform bvhTransformOriginal = {0};
+   struct BVH_Transform bvhTransformChanged  = {0};
+
+   BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
+
+   BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+   float originalValue = bvh_getMotionValue(bvh,mID);
+
+   if (
+       (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
+       (bvh_projectTo2D(bvh,&bvhTransformOriginal,&renderer,0,0))
+      )
+      {
+        char comma=' ';
+        float increment = *resolution;
+        float v = *rangeMinimum;
+        while (v<*rangeMaximum)
+        {
+          bvh_setMotionValue(bvh,mID,&v);
+
+          if (
+              (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
+              (bvh_projectTo2D(bvh,&bvhTransformChanged,&renderer,0,0))
+             )
+             {
+                 float mae = meanBVH2DDistanceStudy(
+                                                    bvh,
+                                                    &bvhTransformChanged,
+                                                    &bvhTransformOriginal
+                                                   );
+                 if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                 fprintf(fp,"%0.2f",mae);
+             }
+          v+=increment;
+        }
+
+        bvh_setMotionValue(bvh,mID,&originalValue);
+      }
+
+      fclose(fp);
+      return 1;
+  }
+  return 0;
+}
+
+
 
 int dumpBVHAsProbabilitiesBody(
-                                 struct BVH_MotionCapture * bvh,
+                                 struct BVH_MotionCapture * mc,
                                  const char * filename,
-                                 struct BVH_RendererConfiguration* renderingConfiguration,
+                                 struct simpleRenderer * renderer,
                                  BVHFrameID fID,
                                  BVHMotionChannelID mIDRelativeToOneFrame,
                                  float *rangeMinimum,
@@ -247,64 +310,49 @@ int dumpBVHAsProbabilitiesBody(
                                  float *resolution
                              )
 {
-/*
-   //--------------------------------------------------------------------------------------------------------------------------
-   //---------------------------------------------------2D Positions ----------------------------------------------------------
-   //--------------------------------------------------------------------------------------------------------------------------
-   if (fp!=0)
-     {
-      if (didInputOutputPreExist) { fprintf(fp,","); }
-      fprintf(fp,"[");
-      char comma=' ';
-      for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+     char initialFilenameWithoutExtension[512]={0};
+     snprintf(initialFilenameWithoutExtension,512,"%s",filename);
+     char * dot = strchr(initialFilenameWithoutExtension,'.');
+     if (dot!=0) { *dot=0; }
+     //----------------------------------------------------------
+     char specificJointFilename[512]={0};
+
+     int isJointSelected=1;
+     int isJointEndSiteSelected=1;
+
+     for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-          //----------------------------------
-          //If we have hidden joints declared only the 2D part will be hidden..
-          if (mc->hideSelectedJoints!=0)
-            {  //If we want to hide the specific joint then it is not selected..
-               if (mc->hideSelectedJoints[jID])
-                {
-                  isJointSelected=0;
-                  if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
-                }
-            }
-          //----------------------------------
+         //-----------------------------------------------------------------------------
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
+         {
+            unsigned int channelID=0;
+            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                 {
+                    snprintf(
+                             specificJointFilename,512,"%s_%s_%s.csv",
+                             initialFilenameWithoutExtension,
+                             mc->jointHierarchy[jID].jointNameLowercase,
+                             channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                            );
 
-         if (
-               //If this a regular joint and regular joints are enabled
-               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) ) ||
-               //OR if this is an end joint and end joints are enabled..
-               ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
-            )
-          {
-                if (bvhTransform->joint[jID].isOccluded) { ++filterStats->invisibleJoints; } else { ++filterStats->visibleJoints; }
-
-                if (mc->jointHierarchy[jID].erase2DCoordinates)
-                    {
-                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
-                       fprintf(fp,"{\"x\":0,\"y\":0,\"v\":0}");
-                    } else
-                    {
-                       if (comma==',') { fprintf(fp,",");  } else { comma=','; }
-                       //Please note that our 2D input is normalized [0..1]
-                       fprintf(
-                               fp,"{\"x\":%0.6f,\"y\":%0.6f,\"v\":%u}",
-                               (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
-                               (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
-                               (bvhTransform->joint[jID].isOccluded==0)
-                              );
-                    }
+                     //initializeStandaloneHeatmapFile(specificJointFilename,rangeMinimum,rangeMaximum,resolution);
+                     bvh_plotJointChannelHeatmap(
+                                                 specificJointFilename,
+                                                 mc,
+                                                 renderer,
+                                                 fID,
+                                                 jID,
+                                                 channelID,
+                                                 rangeMinimum,
+                                                 rangeMaximum,
+                                                 resolution
+                                                );
+                 }
          }
        }
-     fprintf(fp,"]\n");
-     fclose(fp);
-     ++dumped;
-     }
-   //-----------------------------------------------------------------------------------------------------------------------------
-   //-----------------------------------------------------------------------------------------------------------------------------
-   //-----------------------------------------------------------------------------------------------------------------------------
-*/
+
+   return 1;
 }
 
 
