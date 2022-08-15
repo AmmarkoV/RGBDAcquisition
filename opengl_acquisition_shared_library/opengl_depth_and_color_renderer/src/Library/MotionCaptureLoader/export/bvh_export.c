@@ -503,7 +503,15 @@ int dumpBVHTo_JSON_SVG_CSV(
      //------------------------------------------------------------------------------------------
       if (convertToAngleHeatmap)
       {
-
+         dumpBVHAsProbabilitiesBody(
+                                    mc,
+                                    csvFilenameBVH,
+                                    &renderer,
+                                    fID,
+                                    &rangeMinimum,
+                                    &rangeMaximum,
+                                    &resolution
+                                   );
       }
      //------------------------------------------------------------------------------------------
 
