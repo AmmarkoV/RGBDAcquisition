@@ -28,6 +28,18 @@ int dumpBVHAsProbabilitiesHeader(
                                  float *resolution
                                 );
 
+
+int dumpBVHAsProbabilitiesBody(
+                                 struct BVH_MotionCapture * mc,
+                                 const char * filename,
+                                 struct simpleRenderer * renderer,
+                                 BVHFrameID fID,
+                                 float *rangeMinimum,
+                                 float *rangeMaximum,
+                                 float *resolution
+                             );
+
+
 int bvh_studyMID2DImpact(
                            struct BVH_MotionCapture * bvh,
                            struct BVH_RendererConfiguration* renderingConfiguration,

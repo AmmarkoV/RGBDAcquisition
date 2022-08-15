@@ -5,6 +5,7 @@
 #include "bvh_to_json.h"
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
+#include "../edit/bvh_remapangles.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -284,9 +285,9 @@ int dumpBVHTo_JSON_SVG_CSV(
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
 
-   float rangeMinimum =-180.0;
-   float rangeMaximum = 180.0;
-   float resolution   = 6.0;
+  float rangeMinimum =-180.0;
+  float rangeMaximum = 180.0;
+  float resolution   = 6.0;
 
   if (renderConfig->isDefined)
   {
@@ -503,6 +504,7 @@ int dumpBVHTo_JSON_SVG_CSV(
      //------------------------------------------------------------------------------------------
       if (convertToAngleHeatmap)
       {
+         //fprintf(stderr,"min %0.2f / max %0.2f / res %0.2f\n",rangeMinimum,rangeMaximum,resolution);
          dumpBVHAsProbabilitiesBody(
                                     mc,
                                     csvFilenameBVH,

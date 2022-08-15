@@ -276,8 +276,9 @@ int bvh_plotJointChannelHeatmap(
    BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
    //----------------------------------------------------------
 
-   fprintf(stderr,"bvh_plotJointChannelHeatmap(%s,fID %u,jID %u, cID %u,mID %u)\n",filename,fID,jID,channelID,mID);
+   //fprintf(stderr,"bvh_plotJointChannelHeatmap(%s,fID %u,jID %u, cID %u,mID %u)\n",filename,fID,jID,channelID,mID);
    float originalValue = bvh_getMotionValue(bvh,mID);
+   //fprintf(stderr,"min %0.2f / max %0.2f / res %0.2f\n",*rangeMinimum,*rangeMaximum,*resolution);
 
    if (
        (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
@@ -290,7 +291,6 @@ int bvh_plotJointChannelHeatmap(
         float v = *rangeMinimum;
         while (v<*rangeMaximum)
         {
-          fprintf(stderr,"V %f \n",v);
           bvh_setMotionValue(bvh,mID,&v);
 
           if (
@@ -298,13 +298,14 @@ int bvh_plotJointChannelHeatmap(
               (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
              )
              {
-                 fprintf(stderr,".");
+                 //-----------------------------------------------------------------------------
                  float mae = meanBVH2DDistanceStudy(
                                                     bvh,
                                                     &bvhTransformChanged,
                                                     &bvhTransformOriginal
                                                    );
                  if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                 //-----------------------------------------------------------------------------
                  fprintf(fp,"%0.2f",mae);
              }
           v+=increment;
@@ -327,31 +328,31 @@ int dumpBVHAsProbabilitiesBody(
                                  const char * filename,
                                  struct simpleRenderer * renderer,
                                  BVHFrameID fID,
-                                 BVHMotionChannelID mIDRelativeToOneFrame,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
                                  float *resolution
                              )
 {
-     char initialFilenameWithoutExtension[512]={0};
-     snprintf(initialFilenameWithoutExtension,512,"%s",filename);
-     char * dot = strchr(initialFilenameWithoutExtension,'.');
-     if (dot!=0) { *dot=0; }
-     //----------------------------------------------------------
-     char specificJointFilename[1024]={0};
-     //----------------------------------------------------------
+  if ( (rangeMinimum==0) || (rangeMaximum==0) || (resolution==0) ) { fprintf(stderr,"dumpBVHAsProbabilitiesBody no ranges\n"); return 0; }
 
-     int isJointSelected=1;
-     int isJointEndSiteSelected=1;
+  char initialFilenameWithoutExtension[512]={0};
+  snprintf(initialFilenameWithoutExtension,512,"%s",filename);
+  char * dot = strchr(initialFilenameWithoutExtension,'.');
+  if (dot!=0) { *dot=0; }
+  //----------------------------------------------------------
+  char specificJointFilename[1024]={0};
+  //----------------------------------------------------------
 
-     for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+  int isJointSelected=1;
+  int isJointEndSiteSelected=1;
+
+  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
          //-----------------------------------------------------------------------------
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
-            unsigned int channelID=0;
-            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+            for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
                     //----------------------------------------------------------
                     snprintf(
