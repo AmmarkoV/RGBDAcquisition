@@ -520,8 +520,8 @@ int bvh_studyMID2DImpact(
               );
 
       //fprintf(stderr,"%s\n",command);
-      system(command);
-      return 1;
+      int i = system(command);
+      return (i==0);
   }
 
   return 0;
