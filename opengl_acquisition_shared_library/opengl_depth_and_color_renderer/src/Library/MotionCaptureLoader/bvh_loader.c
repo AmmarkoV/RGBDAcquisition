@@ -1108,9 +1108,16 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
 
 int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float * value)
 {
-  //fprintf(stderr,"bvh_setMotionValue(%u,%0.2f)\n",mID,*value);
-  bvhMotion->motionValues[mID]=*value;
-  return 1;
+  if (bvhMotion!=0)
+  {
+   if (mID<bvhMotion->motionValuesSize)
+   {
+    bvhMotion->motionValues[mID]=*value;
+    return 1;
+   }
+  }
+  fprintf(stderr,"Could not resolve mID %u\n",mID);
+  return 0;
 }
 
 

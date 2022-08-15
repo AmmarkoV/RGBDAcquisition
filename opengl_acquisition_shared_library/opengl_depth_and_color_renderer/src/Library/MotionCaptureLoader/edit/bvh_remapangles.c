@@ -206,7 +206,7 @@ int dumpBVHAsProbabilitiesHeader(
      char * dot = strchr(initialFilenameWithoutExtension,'.');
      if (dot!=0) { *dot=0; }
      //----------------------------------------------------------
-     char specificJointFilename[512]={0};
+     char specificJointFilename[1024]={0};
 
      int isJointSelected=1;
      int isJointEndSiteSelected=1;
@@ -221,7 +221,7 @@ int dumpBVHAsProbabilitiesHeader(
             for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
                     snprintf(
-                             specificJointFilename,512,"%s_%s_%s.csv",
+                             specificJointFilename,1024,"%s_%s_%s.csv",
                              initialFilenameWithoutExtension,
                              mc->jointHierarchy[jID].jointNameLowercase,
                              channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
@@ -258,11 +258,13 @@ int bvh_plotJointChannelHeatmap(
    BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
 
    BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+
+   fprintf(stderr,"bvh_plotJointChannelHeatmap(%s,fID %u,jID %u, cID %u,mID %u)\n",filename,fID,jID,channelID,mID);
    float originalValue = bvh_getMotionValue(bvh,mID);
 
    if (
        (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
-       (bvh_projectTo2D(bvh,&bvhTransformOriginal,&renderer,0,0))
+       (bvh_projectTo2D(bvh,&bvhTransformOriginal,renderer,0,0))
       )
       {
         char comma=' ';
@@ -274,7 +276,7 @@ int bvh_plotJointChannelHeatmap(
 
           if (
               (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
-              (bvh_projectTo2D(bvh,&bvhTransformChanged,&renderer,0,0))
+              (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
              )
              {
                  float mae = meanBVH2DDistanceStudy(
@@ -316,7 +318,7 @@ int dumpBVHAsProbabilitiesBody(
      char * dot = strchr(initialFilenameWithoutExtension,'.');
      if (dot!=0) { *dot=0; }
      //----------------------------------------------------------
-     char specificJointFilename[512]={0};
+     char specificJointFilename[1024]={0};
 
      int isJointSelected=1;
      int isJointEndSiteSelected=1;
@@ -331,7 +333,7 @@ int dumpBVHAsProbabilitiesBody(
             for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
                     snprintf(
-                             specificJointFilename,512,"%s_%s_%s.csv",
+                             specificJointFilename,1024,"%s_%s_%s.csv",
                              initialFilenameWithoutExtension,
                              mc->jointHierarchy[jID].jointNameLowercase,
                              channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
