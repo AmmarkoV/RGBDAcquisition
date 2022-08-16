@@ -322,12 +322,34 @@ int bvh_plotJointChannelHeatmap(
 }
 
 
+int countBodyDoF(struct BVH_MotionCapture * mc)
+{
+  int isJointSelected=1;
+  int isJointEndSiteSelected=1;
+  int count=0;
+
+  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
+         {
+            for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                 {
+                     count+=1;
+                 }
+         }
+       }
+   return count;
+}
+
 
 int dumpBVHAsProbabilitiesBody(
                                  struct BVH_MotionCapture * mc,
                                  const char * filename,
                                  struct simpleRenderer * renderer,
                                  BVHFrameID fID,
+                                 int numberOfHeatmapTasks,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
                                  float *resolution
@@ -345,6 +367,7 @@ int dumpBVHAsProbabilitiesBody(
 
   int isJointSelected=1;
   int isJointEndSiteSelected=1;
+  int executedTasks=0;
 
   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -354,6 +377,8 @@ int dumpBVHAsProbabilitiesBody(
          {
             for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
+                    //fprintf(stderr,"\r Generation %u/%u %0.2f%%\r",executedTasks,numberOfHeatmapTasks,(float) (100*executedTasks)/numberOfHeatmapTasks);
+                    executedTasks+=1;
                     //----------------------------------------------------------
                     snprintf(
                              specificJointFilename,1024,"%s_%s_%s.csv",

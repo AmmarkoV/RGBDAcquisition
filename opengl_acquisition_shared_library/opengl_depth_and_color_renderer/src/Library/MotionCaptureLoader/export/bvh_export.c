@@ -285,7 +285,8 @@ int dumpBVHTo_JSON_SVG_CSV(
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
 
-  float rangeMinimum =-180.0;
+  int heatmapTasks   = 0;
+  float rangeMinimum = -180.0;
   float rangeMaximum = 180.0;
   float resolution   = 6.0;
 
@@ -380,6 +381,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
   if (convertToAngleHeatmap)
   {
+    heatmapTasks = countBodyDoF(mc);
     dumpBVHAsProbabilitiesHeader(
                                   mc,
                                   csvFilenameBVH,
@@ -404,6 +406,8 @@ int dumpBVHTo_JSON_SVG_CSV(
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
+   if (fID%10==0) { fprintf(stderr,"\r Exporting Frame %u/%u %0.2f%%\r",fID,mc->numberOfFrames,(float) (100*fID)/mc->numberOfFrames); }
+
    if ( (sampleSkip==0) || (fID%sampleSkip==0) )
    {
     if (
@@ -510,6 +514,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                                     csvFilenameBVH,
                                     &renderer,
                                     fID,
+                                    heatmapTasks,
                                     &rangeMinimum,
                                     &rangeMaximum,
                                     &resolution
@@ -557,6 +562,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
   //                            GIVE FINAL CONSOLE OUTPUT HERE
   //------------------------------------------------------------------------------------------
+  fprintf(stderr,"\n\n");
   if (filterStats->visibleJoints!=0)
   {
     fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*filterStats->invisibleJoints/filterStats->visibleJoints);
