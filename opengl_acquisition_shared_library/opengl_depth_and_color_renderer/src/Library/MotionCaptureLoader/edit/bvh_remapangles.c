@@ -304,7 +304,7 @@ int bvh_plotJointChannelHeatmap(
                                                     &bvhTransformChanged,
                                                     &bvhTransformOriginal
                                                    );
-                 if (comma==',') { fprintf(fp,",");  } else { comma=','; }
+                 if (comma==',') { fprintf(fp,","); } else { comma=','; }
                  //-----------------------------------------------------------------------------
                  fprintf(fp,"%0.2f",mae);
              }
