@@ -170,8 +170,72 @@ float meanBVH2DDistanceStudy(
   return 0.0;
 }
 
+int convertHeatmapToProbabilities(
+                                  float * output,
+                                  unsigned int heatmapResolution
+                                 )
+{
+ float scale = 100.0; // Scale to a 100% to  make CSV file better
+ float max = 0.0;
+ float sum = 0.0;
+ //Gather stats
+ for (int h=0; h<heatmapResolution; h++)
+ {
+   if (output[h]>max) { max=output[h]; }
+   sum+=output[h];
+ }
+ //------------
+ if (sum!=0.0)
+ {
+  //Rescale Output
+  for (int h=0; h<heatmapResolution; h++)
+  {
+    output[h] = (scale * (max-output[h])) / sum;
+  }
+ return 1;
+ }
+ //------------
+ return 0;
+}
 
+int countBodyDoF(struct BVH_MotionCapture * mc)
+{
+  int isJointSelected=1;
+  int isJointEndSiteSelected=1;
+  int count=0;
 
+  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+         //-----------------------------------------------------------------------------
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
+         {
+            for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                 {
+                     count+=1;
+                 }
+         }
+       }
+   return count;
+}
+
+int countNumberOfHeatmapResolutions(
+                                    struct BVH_MotionCapture * mc,
+                                    float *rangeMinimum,
+                                    float *rangeMaximum,
+                                    float *resolution
+                                   )
+{
+  int count=0;
+  float increment = *resolution;
+  float v = *rangeMinimum;
+  while (v<*rangeMaximum)
+        {
+          count+=1;
+          v+=increment;
+        }
+  return count;
+}
 
 int initializeStandaloneHeatmapFile(
                                     const char * filename,
@@ -310,7 +374,7 @@ int generateHeatmap(
        while (v<*rangeMaximum)
         {
           bvh_setMotionValue(bvh,mID,&v);
-
+          //-----------------------------
           if (
               (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
               (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
@@ -321,12 +385,16 @@ int generateHeatmap(
                                                         &bvhTransformChanged,
                                                         &bvhTransformOriginal
                                                        );
-                 //fprintf(stderr,"Studying MID => %u / Value %f\n",mID,output[value] );
              }
           v+=increment;
           value+=1;
         }
-
+        //-----------------------------------------
+        convertHeatmapToProbabilities(
+                                       output,
+                                       heatmapResolution
+                                     );
+        //-----------------------------------------
         bvh_setMotionValue(bvh,mID,&originalValue);
         return 1;
       } else
@@ -402,47 +470,6 @@ int bvh_plotJointChannelHeatmap(
 }
 
 
-int countBodyDoF(struct BVH_MotionCapture * mc)
-{
-  int isJointSelected=1;
-  int isJointEndSiteSelected=1;
-  int count=0;
-
-  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-         //-----------------------------------------------------------------------------
-         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
-         {
-            for (unsigned int channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
-                 {
-                     count+=1;
-                 }
-         }
-       }
-   return count;
-}
-
-
-
-int countNumberOfHeatmapResolutions(
-                                    struct BVH_MotionCapture * mc,
-                                    float *rangeMinimum,
-                                    float *rangeMaximum,
-                                    float *resolution
-                                   )
-{
-  int count=0;
-  float increment = *resolution;
-  float v = *rangeMinimum;
-  while (v<*rangeMaximum)
-        {
-          count+=1;
-          v+=increment;
-        }
-  return count;
-}
-
 int dumpBVHAsProbabilitiesBody(
                                  struct BVH_MotionCapture * mc,
                                  const char * filename,
@@ -497,7 +524,7 @@ int dumpBVHAsProbabilitiesBody(
                                                  rangeMinimum,
                                                  rangeMaximum,
                                                  resolution,
-                                                 numberOfHeatmapTasks
+                                                 heatmapResolution
                                                 );
                      //----------------------------------------------------------
                  }
