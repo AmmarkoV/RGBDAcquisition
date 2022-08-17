@@ -135,7 +135,7 @@ float meanBVH2DDistanceStudy(
                              struct BVH_Transform * bvhTargetTransform
                             )
 {
- if (mc==0) { return 0.0; }
+ if (mc==0)                 { return 0.0; }
  if (bvhSourceTransform==0) { return 0.0; }
  if (bvhTargetTransform==0) { return 0.0; }
  //-----------------------------------------
@@ -146,7 +146,7 @@ float meanBVH2DDistanceStudy(
   unsigned int numberOfSamples=0;
   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
         {
-          ///Warning: When you change this please change calculateChainLoss as well!
+          //fprintf(stderr,"meanBVH2DDistanceStudy(jID -> %u)\n",jID);
           float sX=bvhSourceTransform->joint[jID].pos2D[0];
           float sY=bvhSourceTransform->joint[jID].pos2D[1];
           float tX=bvhTargetTransform->joint[jID].pos2D[0];
@@ -155,6 +155,7 @@ float meanBVH2DDistanceStudy(
           if ( ( (sX!=0.0) || (sY!=0.0) ) && ( (tX!=0.0) || (tY!=0.0) ) )
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
+                    //fprintf(stderr,"meanBVH2DDistanceStudy(jID -> %u) => %f\n",jID,this2DDistance);
                     numberOfSamples+=1;
                     sumOf2DDistances+=this2DDistance;
                 }
@@ -250,6 +251,90 @@ int dumpBVHAsProbabilitiesHeader(
 
 
 
+int generateHeatmap(
+                     float * output,
+                     unsigned int heatmapResolution,
+                     struct BVH_MotionCapture * bvh,
+                     struct simpleRenderer * renderer,
+                     BVHFrameID fID,
+                     BVHMotionChannelID mIDRelativeToOneFrame,
+                     float *rangeMinimum,
+                     float *rangeMaximum,
+                     float *resolution,
+                     int doSVG
+                   )
+{
+ if (output==0) { return 0; }
+ //-----------------------------------------------------------------------------------
+ struct BVH_Transform bvhTransformOriginal = {0};
+ struct BVH_Transform bvhTransformChanged  = {0};
+ //-----------------------------------------------------------------------------------
+ BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+ float originalValue = bvh_getMotionValue(bvh,mID);
+ //-----------------------------------------------------------------------------------
+ if (doSVG)
+ {
+ fprintf(stderr,"generateHeatmap(%u,%u,%0.2f,%0.2f)\n",fID,mIDRelativeToOneFrame,*rangeMinimum,*rangeMaximum);
+ fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
+           mID,
+           bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
+           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID,
+           bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
+           channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID],
+           originalValue,
+           *rangeMinimum,
+           *rangeMaximum,
+           *resolution
+          );
+ }
+ //-----------------------------------------------------------------------------------
+ if (
+       (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
+       (bvh_projectTo2D(bvh,&bvhTransformOriginal,renderer,0,0))
+    )
+    {
+       if (doSVG)
+       {
+        dumpBVHToSVGFrame(
+                          "study.svg",
+                          bvh,
+                          &bvhTransformOriginal,
+                          fID,
+                          renderer
+                         );
+       }
+
+       unsigned int value = 0;
+       float increment = *resolution;
+       float v         = *rangeMinimum;
+       while (v<*rangeMaximum)
+        {
+          bvh_setMotionValue(bvh,mID,&v);
+
+          if (
+              (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
+              (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
+             )
+             {
+                 output[value] = meanBVH2DDistanceStudy(
+                                                        bvh,
+                                                        &bvhTransformChanged,
+                                                        &bvhTransformOriginal
+                                                       );
+                 //fprintf(stderr,"Studying MID => %u / Value %f\n",mID,output[value] );
+             }
+          v+=increment;
+          value+=1;
+        }
+
+        bvh_setMotionValue(bvh,mID,&originalValue);
+        return 1;
+      } else
+      {
+          fprintf(stderr,"Failed projecting original..\n");
+      }
+  return 0;
+}
 
 
 
@@ -262,58 +347,53 @@ int bvh_plotJointChannelHeatmap(
                                  BVHMotionChannelID channelID,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
-                                 float *resolution
+                                 float *resolution,
+                                 unsigned int heatmapResolution
                                )
 {
   FILE * fp = fopen(filename,"a");
   if (fp!=0)
   {
-   struct BVH_Transform bvhTransformOriginal = {0};
-   struct BVH_Transform bvhTransformChanged  = {0};
-   //----------------------------------------------------------
-   BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
-   //----------------------------------------------------------
-   BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-   //----------------------------------------------------------
+   float * output = (float*) malloc(sizeof(float) * heatmapResolution);
+   if (output!=0)
+   {
+    struct BVH_Transform bvhTransformOriginal = {0};
+    struct BVH_Transform bvhTransformChanged  = {0};
+    //----------------------------------------------------------
+    BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
+    //----------------------------------------------------------
+    BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+    //----------------------------------------------------------
 
-   //fprintf(stderr,"bvh_plotJointChannelHeatmap(%s,fID %u,jID %u, cID %u,mID %u)\n",filename,fID,jID,channelID,mID);
-   float originalValue = bvh_getMotionValue(bvh,mID);
-   //fprintf(stderr,"min %0.2f / max %0.2f / res %0.2f\n",*rangeMinimum,*rangeMaximum,*resolution);
 
-   if (
-       (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
-       (bvh_projectTo2D(bvh,&bvhTransformOriginal,renderer,0,0))
-      )
-      {
-        //fprintf(stderr,"bvh_loadTransformForFrame \n");
-        char comma=' ';
-        float increment = *resolution;
-        float v = *rangeMinimum;
-        while (v<*rangeMaximum)
-        {
-          bvh_setMotionValue(bvh,mID,&v);
+    if (
+         generateHeatmap(
+                         output,
+                         heatmapResolution,
+                         bvh,
+                         renderer,
+                         fID,
+                         mIDRelativeToOneFrame,
+                         rangeMinimum,
+                         rangeMaximum,
+                         resolution,
+                         0 // Dont dump SVG
+                        )
+       )
+       {
+           char comma=' ';
+           for (int h=0; h<heatmapResolution; h++)
+           {
+             //-----------------------------------------------------------------------------
+             if (comma==',') { fprintf(fp,","); } else { comma=','; }
+             //-----------------------------------------------------------------------------
+             fprintf(fp,"%0.2f",output[h]);
+             //-----------------------------------------------------------------------------
+           }
+       }
 
-          if (
-              (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
-              (bvh_projectTo2D(bvh,&bvhTransformChanged,renderer,0,0))
-             )
-             {
-                 //-----------------------------------------------------------------------------
-                 float mae = meanBVH2DDistanceStudy(
-                                                    bvh,
-                                                    &bvhTransformChanged,
-                                                    &bvhTransformOriginal
-                                                   );
-                 if (comma==',') { fprintf(fp,","); } else { comma=','; }
-                 //-----------------------------------------------------------------------------
-                 fprintf(fp,"%0.2f",mae);
-             }
-          v+=increment;
-        }
-
-        bvh_setMotionValue(bvh,mID,&originalValue);
+      if (output!=0) { free(output); }
       }
-
       fprintf(fp,"\n");
       fclose(fp);
       return 1;
@@ -344,12 +424,32 @@ int countBodyDoF(struct BVH_MotionCapture * mc)
 }
 
 
+
+int countNumberOfHeatmapResolutions(
+                                    struct BVH_MotionCapture * mc,
+                                    float *rangeMinimum,
+                                    float *rangeMaximum,
+                                    float *resolution
+                                   )
+{
+  int count=0;
+  float increment = *resolution;
+  float v = *rangeMinimum;
+  while (v<*rangeMaximum)
+        {
+          count+=1;
+          v+=increment;
+        }
+  return count;
+}
+
 int dumpBVHAsProbabilitiesBody(
                                  struct BVH_MotionCapture * mc,
                                  const char * filename,
                                  struct simpleRenderer * renderer,
                                  BVHFrameID fID,
                                  int numberOfHeatmapTasks,
+                                 int heatmapResolution,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
                                  float *resolution
@@ -396,7 +496,8 @@ int dumpBVHAsProbabilitiesBody(
                                                  channelID,
                                                  rangeMinimum,
                                                  rangeMaximum,
-                                                 resolution
+                                                 resolution,
+                                                 numberOfHeatmapTasks
                                                 );
                      //----------------------------------------------------------
                  }
@@ -406,6 +507,7 @@ int dumpBVHAsProbabilitiesBody(
 
    return 1;
 }
+
 
 
 
@@ -458,95 +560,51 @@ int bvh_studyMID2DImpact(
 
   if (fp!=0)
   {
-   struct BVH_Transform bvhTransformOriginal = {0};
-   struct BVH_Transform bvhTransformChanged  = {0};
-
-   /*
-    for (int m=0; m<bvh->numberOfValuesPerFrame; m++)
-    {
-     fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s \n",
-           m,
-           bvh->motionToJointLookup[m].jointID,
-           bvh->motionToJointLookup[m].channelID,
-           bvh->jointHierarchy[bvh->motionToJointLookup[m].jointID].jointName,
-           channelNames[bvh->motionToJointLookup[m].channelID]
-          );
-    }*/
-
-   BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-   float originalValue = bvh_getMotionValue(bvh,mID);
-
-   fprintf(stderr,"bvh_studyMID2DImpact(%u,%u,%0.2f,%0.2f)\n",fID,mIDRelativeToOneFrame,*rangeMinimum,*rangeMaximum);
-
-
-
-   fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
-           mID,
-           bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
-           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID,
-           bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
-           channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID],
-           originalValue,
-           *rangeMinimum,
-           *rangeMaximum,
-           *resolution
-          );
-
-
-   if (
-       (bvh_loadTransformForFrame(bvh,fID,&bvhTransformOriginal,0)) &&
-       (bvh_projectTo2D(bvh,&bvhTransformOriginal,&renderer,0,0))
-      )
-      {
-       dumpBVHToSVGFrame(
-                         "study.svg",
+   unsigned int numberOfHeatmapTasks = countNumberOfHeatmapResolutions(bvh,rangeMinimum,rangeMaximum,resolution);
+   float * output = (float*) malloc(sizeof(float) * numberOfHeatmapTasks);
+   if (output!=0)
+   {
+    if (
+         generateHeatmap(
+                         output,
+                         numberOfHeatmapTasks,
                          bvh,
-                         &bvhTransformOriginal,
+                         &renderer,
                          fID,
-                         &renderer
-                        );
+                         mIDRelativeToOneFrame,
+                         rangeMinimum,
+                         rangeMaximum,
+                         resolution,
+                         1 // Dump SVG
+                        )
+       )
+       {
         float increment = *resolution;
         float v = *rangeMinimum;
-        while (v<*rangeMaximum)
-        {
-          //fprintf(stderr,"Studying MID => %u / Value %f\n",mID,v);
-          bvh_setMotionValue(bvh,mID,&v);
+        for (int h=0; h<numberOfHeatmapTasks; h++)
+           {
+                 fprintf(fp,"%f %f\n",v,output[h]);
+                 v+=increment;
+           }
+       }
+   }
+   //File needs to be dumped before gnuplot
+   //---------
+   fclose(fp);
+   //---------
 
-          if (
-              (bvh_loadTransformForFrame(bvh,fID,&bvhTransformChanged,0)) &&
-              (bvh_projectTo2D(bvh,&bvhTransformChanged,&renderer,0,0))
-             )
-             {
-                 float mae = meanBVH2DDistanceStudy(
-                                                   bvh,
-                                                   &bvhTransformChanged,
-                                                   &bvhTransformOriginal
-                                                  );
-                //fprintf(stderr," %f\n",mae);
-                 fprintf(fp,"%f %f\n",v,mae);
-             }
-          v+=increment;
-        }
-
-        bvh_setMotionValue(bvh,mID,&originalValue);
-      } else
-      {
-          fprintf(stderr,"Failed projecting original..\n");
-      }
-      fclose(fp);
-
-      //using ls 1 t 'TTT'
-      char command[2048]={0};
-      snprintf(
+   //using ls 1 t 'TTT'
+   char command[2048]={0};
+   snprintf(
                command,2048,"gnuplot -e \"set terminal png size 800,512 font 'Helvetica,14'; set output 'out.png'; set xrange[%0.2f:%0.2f]; set style line 1 lt 1 lc rgb 'blue' lw 3; plot 'study.dat' with lines ls 1 title '%s %s Error'\"",
                *rangeMinimum,*rangeMaximum,
                bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
                channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID]
-              );
+           );
 
-      //fprintf(stderr,"%s\n",command);
-      int i = system(command);
-      return (i==0);
+   //fprintf(stderr,"%s\n",command);
+   int i = system(command);
+   return (i==0);
   }
 
   return 0;

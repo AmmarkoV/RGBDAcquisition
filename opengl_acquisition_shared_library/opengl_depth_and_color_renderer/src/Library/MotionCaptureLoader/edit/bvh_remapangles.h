@@ -31,12 +31,20 @@ int dumpBVHAsProbabilitiesHeader(
 
 int countBodyDoF(struct BVH_MotionCapture * mc);
 
+int countNumberOfHeatmapResolutions(
+                                    struct BVH_MotionCapture * mc,
+                                    float *rangeMinimum,
+                                    float *rangeMaximum,
+                                    float *resolution
+                                   );
+
 int dumpBVHAsProbabilitiesBody(
                                  struct BVH_MotionCapture * mc,
                                  const char * filename,
                                  struct simpleRenderer * renderer,
                                  BVHFrameID fID,
                                  int numberOfHeatmapTasks,
+                                 int heatmapResolution,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
                                  float *resolution

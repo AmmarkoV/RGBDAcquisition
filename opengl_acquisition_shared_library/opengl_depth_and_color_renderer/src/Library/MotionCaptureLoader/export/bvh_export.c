@@ -285,10 +285,11 @@ int dumpBVHTo_JSON_SVG_CSV(
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
 
-  int heatmapTasks   = 0;
-  float rangeMinimum = -180.0;
-  float rangeMaximum = 180.0;
-  float resolution   = 6.0;
+  int heatmapTasks      = 0;
+  int heatmapResolution = 360;
+  float rangeMinimum    = -180.0;
+  float rangeMaximum    = 180.0;
+  float resolution      = 6.0;
 
   if (renderConfig->isDefined)
   {
@@ -382,6 +383,12 @@ int dumpBVHTo_JSON_SVG_CSV(
   if (convertToAngleHeatmap)
   {
     heatmapTasks = countBodyDoF(mc);
+    heatmapResolution = countNumberOfHeatmapResolutions(
+                                                        mc,
+                                                        &rangeMinimum,
+                                                        &rangeMaximum,
+                                                        &resolution
+                                                       );
     if (!didBVHOutputPreExist)
     {
      dumpBVHAsProbabilitiesHeader(
@@ -518,6 +525,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                                     &renderer,
                                     fID,
                                     heatmapTasks,
+                                    heatmapResolution,
                                     &rangeMinimum,
                                     &rangeMaximum,
                                     &resolution
