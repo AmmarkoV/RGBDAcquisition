@@ -409,7 +409,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
-   if (fID%10==0) { fprintf(stderr,"\r %s - Exporting Frame %u/%u %0.2f%%    \r",csvFilenameBVH,fID,mc->numberOfFrames,(float) (100*fID)/mc->numberOfFrames); }
+   if (fID%10==0) { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",csvFilenameBVH,fID,mc->numberOfFrames,(float) (100*fID)/mc->numberOfFrames); }
 
    if ( (sampleSkip==0) || (fID%sampleSkip==0) )
    {
