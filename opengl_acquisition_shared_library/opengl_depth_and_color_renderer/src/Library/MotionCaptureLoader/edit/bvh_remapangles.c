@@ -699,8 +699,11 @@ int bvh_study3DJoint2DImpact(
 
    BVHMotionChannelID mIDRelativeToOneFrame = 0;
    //----------------------------------------------------------
+   int channelTypeA=0;
    BVHMotionChannelID mIDA = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+   int channelTypeB=0;
    BVHMotionChannelID mIDB = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+   int channelTypeC=0;
    BVHMotionChannelID mIDC = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
    //----------------------------------------------------------
    int c=0;
@@ -710,14 +713,17 @@ int bvh_study3DJoint2DImpact(
                      unsigned int channelTypeID = bvh->jointHierarchy[jID].channelType[channelNumber];
                      //-------------------------------------------------------------------------------------
                      if(c==0) {
+                                channelTypeA=channelTypeID;
                                 mIDA = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
                                 fprintf(stderr,"Channel A %u \n",mIDRelativeToOneFrame,mIDA);
                               } else
                      if(c==1) {
+                                channelTypeB=channelTypeID;
                                 mIDB = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
                                 fprintf(stderr,"Channel B %u \n",mIDRelativeToOneFrame,mIDB);
                               } else
                      if(c==2) {
+                                channelTypeC=channelTypeID;
                                 mIDC = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
                                 fprintf(stderr,"Channel C %u \n",mIDRelativeToOneFrame,mIDC);
                               } else
@@ -784,7 +790,7 @@ int bvh_study3DJoint2DImpact(
           }
           vB+=increment*5;
          }
-         vC+=increment*4;
+         vC+=increment*2;
         }
 
         bvh_setMotionValue(bvh,mIDA,&originalValueA);
@@ -796,15 +802,22 @@ int bvh_study3DJoint2DImpact(
       }
       fclose(fp);
 
-      //using ls 1 t 'TTT'
+      //set palette rgbformulae 33,13,10;
+      //set style fill transparent solid 0.4 noborder;
+      // w points pointsize 1 palette pointtype 7
       char command[2048]={0};
       snprintf(
-               command,2048,"gnuplot -e \"set terminal png size 800,512 font 'Helvetica,14'; set output 'out.png'; set view 45, 45, 1, 1; splot 'study.dat' using 1:2:3:4 w points pointsize 1 palette pointtype 7 title '%s 3D Error'\"",
-               *rangeMinimum,*rangeMaximum,
-               bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName
+               command,2048,"gnuplot -e \"set terminal png size 1000,1000 font 'Helvetica,14';\
+                set output 'out.png'; set view 65, 25, 1, 1;\
+                set xlabel '%s'; set ylabel '%s'; set zlabel '%s';\
+                splot 'study.dat' using 1:2:3:4 w points pointsize 1 palette title '%s 3D Error'\"",
+               channelNames[channelTypeA],
+               channelNames[channelTypeB],
+               channelNames[channelTypeC],
+               bvh->jointHierarchy[jID].jointName
               );
 
-      //fprintf(stderr,"%s\n",command);
+      fprintf(stderr,"%s\n",command);
       int i = system(command);
       return (i==0);
   }
