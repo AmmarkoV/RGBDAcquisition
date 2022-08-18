@@ -61,6 +61,16 @@ int bvh_studyMID2DImpact(
                            float *resolution
                           );
 
+int bvh_study3DJoint2DImpact(
+                           struct BVH_MotionCapture * bvh,
+                           struct BVH_RendererConfiguration* renderingConfiguration,
+                           BVHFrameID fID,
+                           BVHJointID jID,
+                           float *rangeMinimum,
+                           float *rangeMaximum,
+                           float *resolution
+                          );
+
 #ifdef __cplusplus
 }
 #endif

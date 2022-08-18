@@ -1595,7 +1595,25 @@ int bvhConverter(int argc,const char **argv)
                                 &maxRange,
                                 &resolution
                               );
-        }
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--study3d")==0)
+        {
+          BVHFrameID         fID   = atoi(argv[i+1]);
+          BVHMotionChannelID jID   = atoi(argv[i+2]);
+          float         minRange   = -180.0;
+          float         maxRange   =  180.0;
+          float         resolution =  6.0;
+          bvh_study3DJoint2DImpact(
+                                   &bvhMotion,
+                                   &renderingConfiguration,
+                                   fID,
+                                   jID,
+                                   &minRange,
+                                   &maxRange,
+                                   &resolution
+                                  );
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--bvh")==0)
         {
