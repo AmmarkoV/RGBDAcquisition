@@ -788,7 +788,7 @@ int bvh_study3DJoint2DImpact(
              }
            vA+=increment*2;
           }
-          vB+=increment*5;
+          vB+=increment*2;
          }
          vC+=increment*2;
         }
@@ -806,6 +806,7 @@ int bvh_study3DJoint2DImpact(
       //set style fill transparent solid 0.4 noborder;
       // w points pointsize 1 palette pointtype 7
       char command[2048]={0};
+      /*
       snprintf(
                command,2048,"gnuplot -e \"set terminal png size 1000,1000 font 'Helvetica,14';\
                 set output 'out.png'; set view 65, 25, 1, 1;\
@@ -815,7 +816,16 @@ int bvh_study3DJoint2DImpact(
                channelNames[channelTypeB],
                channelNames[channelTypeC],
                bvh->jointHierarchy[jID].jointName
+              );*/
+
+      snprintf(
+               command,2048,"python3 Scripts/plot.py --view 65 25 --x '%s' --y '%s' --z '%s' --joint '%s'",
+               channelNames[channelTypeA],
+               channelNames[channelTypeB],
+               channelNames[channelTypeC],
+               bvh->jointHierarchy[jID].jointName
               );
+
 
       fprintf(stderr,"%s\n",command);
       int i = system(command);

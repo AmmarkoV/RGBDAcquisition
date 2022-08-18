@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 # Fixing random state for reproducibility
 np.random.seed(19680801)
@@ -24,22 +25,50 @@ def readData(filename):
     return columnA, columnB, columnC, columnD
 
 
+jointName=" Title "
+xLabel=" X "
+yLabel=" Y "
+zLabel=" Z "
+viewAzimuth=45
+viewElevation=45
+transparency=0.8
+scale = 0.15 #Smaller is smaller :P
 
-def randrange(n, vmin, vmax):
-    """
-    Helper function to make an array of random numbers having shape (n, )
-    with each number distributed Uniform(vmin, vmax).
-    """
-    return (vmax - vmin)*np.random.rand(n) + vmin
+
+if (len(sys.argv)>1):
+       #print('Argument List:', str(sys.argv))
+       for i in range(0, len(sys.argv)):
+           if (sys.argv[i]=="--joint"):
+             jointName=sys.argv[i+1]
+           if (sys.argv[i]=="--x"):
+             xLabel=sys.argv[i+1]
+           if (sys.argv[i]=="--y"):
+             yLabel=sys.argv[i+1]
+           if (sys.argv[i]=="--z"):
+             zLabel=sys.argv[i+1]
+           if (sys.argv[i]=="--view"):
+             viewAzimuth=int(sys.argv[i+1])
+             viewElevation=int(sys.argv[i+2])
+
 
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 
 xs,ys,zs,vs = readData("study.dat")
-ax.scatter(xs, ys, zs, c=vs, s=0.5, alpha=0.5)
 
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
+maxValue = scale * max(vs)
+svs = [(maxValue-x)/maxValue for x in vs]
 
-plt.show()
+ax.view_init(viewAzimuth,viewElevation) 
+
+cm = plt.cm.get_cmap('RdYlBu')
+sc = ax.scatter(xs, ys, zs, c=vs, s=svs, cmap=cm, alpha=transparency)
+plt.colorbar(sc) 
+
+ax.set_title(jointName) # Title of the plot
+ax.set_xlabel(xLabel)
+ax.set_ylabel(yLabel)
+ax.set_zlabel(zLabel)
+
+fig.savefig("out.png")
+#plt.show()
