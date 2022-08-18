@@ -697,29 +697,29 @@ int bvh_study3DJoint2DImpact(
    struct BVH_Transform bvhTransformOriginal = {0};
    struct BVH_Transform bvhTransformChanged  = {0};
 
-   BVHMotionChannelID mIDRelativeToOneFrame = 0;//bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
+   BVHMotionChannelID mIDRelativeToOneFrame = 0;
    //----------------------------------------------------------
    BVHMotionChannelID mIDA = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
    BVHMotionChannelID mIDB = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
    BVHMotionChannelID mIDC = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
    //----------------------------------------------------------
    int c=0;
-   for (int channelID=0; channelID<bvh->jointHierarchy[jID].loadedChannels; channelID++)
+   for (int channelNumber=0; channelNumber<bvh->jointHierarchy[jID].loadedChannels; channelNumber++)
                  {
-                     fprintf(stderr,"Joint %u / Channel %u \n",jID,channelID);
-                     mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
+                     fprintf(stderr,"Joint %u / Channel Number %u \n",jID,channelNumber);
+                     unsigned int channelTypeID = bvh->jointHierarchy[jID].channelType[channelNumber];
                      //-------------------------------------------------------------------------------------
                      if(c==0) {
-                                mIDA = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-                                fprintf(stderr,"Channel 1 %u / %u \n",mIDRelativeToOneFrame,mIDA);
+                                mIDA = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
+                                fprintf(stderr,"Channel A %u \n",mIDRelativeToOneFrame,mIDA);
                               } else
                      if(c==1) {
-                                mIDB = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-                                fprintf(stderr,"Channel 2 %u / %u \n",mIDRelativeToOneFrame,mIDA);
+                                mIDB = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
+                                fprintf(stderr,"Channel B %u \n",mIDRelativeToOneFrame,mIDB);
                               } else
                      if(c==2) {
-                                mIDC = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-                                fprintf(stderr,"Channel 3 %u / %u \n",mIDRelativeToOneFrame,mIDA);
+                                mIDC = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
+                                fprintf(stderr,"Channel C %u \n",mIDRelativeToOneFrame,mIDC);
                               } else
                               {
                                 fprintf(stderr,"Too Many Channels (%u)!\n",bvh->jointHierarchy[jID].loadedChannels);
