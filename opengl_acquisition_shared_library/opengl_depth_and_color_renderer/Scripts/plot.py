@@ -32,7 +32,7 @@ zLabel=" Z "
 viewAzimuth=45
 viewElevation=45
 transparency=0.8
-scale = 0.15 #Smaller is smaller :P
+scale = 0.12 #Smaller is smaller :P
 
 
 if (len(sys.argv)>1):
@@ -46,6 +46,8 @@ if (len(sys.argv)>1):
              yLabel=sys.argv[i+1]
            if (sys.argv[i]=="--z"):
              zLabel=sys.argv[i+1]
+           if (sys.argv[i]=="--s"):
+             scale=float(sys.argv[i+1])
            if (sys.argv[i]=="--view"):
              viewAzimuth=int(sys.argv[i+1])
              viewElevation=int(sys.argv[i+2])

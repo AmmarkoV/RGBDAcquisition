@@ -819,10 +819,12 @@ int bvh_study3DJoint2DImpact(
               );*/
 
       snprintf(
-               command,2048,"python3 Scripts/plot.py --view 65 25 --x '%s' --y '%s' --z '%s' --joint '%s'",
+               command,2048,"python3 Scripts/plot.py --view 65 25 --x '%s' --y '%s' --z '%s' --joint '%s / Frame %u / Joint %s '",
                channelNames[channelTypeA],
                channelNames[channelTypeB],
                channelNames[channelTypeC],
+               bvh->fileName,
+               fID,
                bvh->jointHierarchy[jID].jointName
               );
 
