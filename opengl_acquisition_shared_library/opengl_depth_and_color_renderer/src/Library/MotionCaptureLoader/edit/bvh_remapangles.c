@@ -847,7 +847,7 @@ int bvh_study3DJoint2DImpact(
       //----------------------
       //Remove intermediate data file which is large
       //----------------------
-      snprintf(command,2048,"rm %s",filenameData);
+      snprintf(command,2048,"rm %s&",filenameData);
       fprintf(stderr,"%s\n",command);
       i = system(command);
       //----------------------

@@ -515,8 +515,6 @@ else
 fi
 
 
-
-
 rm study-*
 FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2`
 
@@ -537,7 +535,8 @@ for J in $JOINT
   ffmpeg -framerate 30 -i study-f%04d-m$J.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-m$J.webm  # -b:v 30000k  -s 640x480 
 done
 
-
 zip all-study-f$FRAMEID.zip study-* Scripts/study.html
+
+firefox Scripts/study.html
 
 exit 0

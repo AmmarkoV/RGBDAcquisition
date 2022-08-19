@@ -20,7 +20,7 @@ int dumpBVHToSVGFrame(
    if (fp!=0)
    {
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
-      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(200,200,200);stroke-width:3;stroke:rgb(100,100,100)\" />\n",width,height);
+      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(100,100,100);stroke-width:3;stroke:rgb(100,100,100)\" />\n",width,height);
       fprintf(fp,"<text x=\"10\" y=\"15\">Frame %u</text>\n",fID);
       fprintf(fp,"<text x=\"10\" y=\"30\">Model Position %0.2f,%0.2f,%0.2f</text>\n",
               renderer->cameraOffsetPosition[0]*10,renderer->cameraOffsetPosition[1]*10,renderer->cameraOffsetPosition[2]*10);
