@@ -522,6 +522,8 @@ echo "Name : $NAME"
 FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2 | xargs`
 echo "Number Of Frames : $FRAMEID"
 
+#Run for every frame/joint
+#-----------------------------
 for F in `seq 1 $FRAMEID`
 do
  for J in $JOINT
@@ -531,16 +533,23 @@ do
  done
  wait
 done
+#-----------------------------
 
-
+#Combine images to video
+#------------------------------
 ffmpeg -framerate 30 -i study-pose-f%04d.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-pose.webm  # -b:v 30000k  -s 640x480 
 for J in $JOINT
  do
   ffmpeg -framerate 30 -i study-f%04d-j$J.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-j$J.webm  # -b:v 30000k  -s 640x480 
 done
+#------------------------------
 
+#Compress all output
+#------------------------------
 zip all-study-$NAME.zip study-* Scripts/study.html
+#------------------------------
 
+#See output
 firefox Scripts/study.html
 
 exit 0
