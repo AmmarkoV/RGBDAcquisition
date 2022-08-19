@@ -516,7 +516,11 @@ fi
 
 
 rm study-*
-FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2`
+
+NAME=`basename $BVHFILE`
+echo "Name : $NAME"
+FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2 | xargs`
+echo "Number Of Frames : $FRAMEID"
 
 for F in `seq 1 $FRAMEID`
 do
@@ -532,10 +536,10 @@ done
 ffmpeg -framerate 30 -i study-f%04d.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-pose.webm  # -b:v 30000k  -s 640x480 
 for J in $JOINT
  do
-  ffmpeg -framerate 30 -i study-f%04d-m$J.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-m$J.webm  # -b:v 30000k  -s 640x480 
+  ffmpeg -framerate 30 -i study-f%04d-j$J.png -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p study-j$J.webm  # -b:v 30000k  -s 640x480 
 done
 
-zip all-study-f$FRAMEID.zip study-* Scripts/study.html
+zip all-study-$NAME.zip study-* Scripts/study.html
 
 firefox Scripts/study.html
 

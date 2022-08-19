@@ -695,13 +695,13 @@ int bvh_study3DJoint2DImpact(
   int viewElevation=45;
 
   char filenameData[512]={0};
-  snprintf(filenameData,512,"study-f%04u-m%u.dat",fID,jID);
+  snprintf(filenameData,512,"study-f%04u-j%u.dat",fID,jID);
   char filenamePose[512]={0};
-  snprintf(filenamePose,512,"study-f%04u-m%u.svg",fID,jID);
+  snprintf(filenamePose,512,"study-f%04u-j%u.svg",fID,jID);
   char filenamePosePNG[512]={0};
-  snprintf(filenamePosePNG,512,"study-f%04u-m%u.png",fID,jID);
+  snprintf(filenamePosePNG,512,"study-f%04u-j%u.png",fID,jID);
   char filenameImage[512]={0};
-  snprintf(filenameImage,512,"study-f%04u-m%u.png",fID,jID);
+  snprintf(filenameImage,512,"study-f%04u-j%u.png",fID,jID);
 
   FILE * fp = fopen(filenameData,"w");
 
