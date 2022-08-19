@@ -696,10 +696,10 @@ int bvh_study3DJoint2DImpact(
 
   char filenameData[512]={0};
   snprintf(filenameData,512,"study-f%04u-j%u.dat",fID,jID);
-  char filenamePose[512]={0};
-  snprintf(filenamePose,512,"study-f%04u-j%u.svg",fID,jID);
+  char filenamePoseSVG[512]={0};
+  snprintf(filenamePoseSVG,512,"study-pose-f%04u.svg",fID);
   char filenamePosePNG[512]={0};
-  snprintf(filenamePosePNG,512,"study-f%04u-j%u.png",fID,jID);
+  snprintf(filenamePosePNG,512,"study-pose-f%04u.png",fID);
   char filenameImage[512]={0};
   snprintf(filenameImage,512,"study-f%04u-j%u.png",fID,jID);
 
@@ -765,7 +765,7 @@ int bvh_study3DJoint2DImpact(
       )
       {
        dumpBVHToSVGFrame(
-                         filenamePose,
+                         filenamePoseSVG,
                          bvh,
                          &bvhTransformOriginal,
                          fID,
@@ -818,7 +818,7 @@ int bvh_study3DJoint2DImpact(
       //----------------------
       //Convert the pose.svg to pose.png
       //----------------------
-      snprintf(command,2048,"convert %s %s&",filenamePose,filenamePosePNG);
+      snprintf(command,2048,"convert %s %s&",filenamePoseSVG,filenamePosePNG);
       fprintf(stderr,"%s\n",command);
       int i = system(command);
 
