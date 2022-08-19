@@ -698,6 +698,8 @@ int bvh_study3DJoint2DImpact(
   snprintf(filenameData,512,"study-f%04u-m%u.dat",fID,jID);
   char filenamePose[512]={0};
   snprintf(filenamePose,512,"study-f%04u-m%u.svg",fID,jID);
+  char filenamePosePNG[512]={0};
+  snprintf(filenamePosePNG,512,"study-f%04u-m%u.png",fID,jID);
   char filenameImage[512]={0};
   snprintf(filenameImage,512,"study-f%04u-m%u.png",fID,jID);
 
@@ -769,6 +771,7 @@ int bvh_study3DJoint2DImpact(
                          fID,
                          &renderer
                         );
+
         float increment = *resolution;
         float vA = *rangeMinimum;
         float vB = *rangeMinimum;
@@ -807,28 +810,21 @@ int bvh_study3DJoint2DImpact(
         bvh_setMotionValue(bvh,mIDA,&originalValueA);
         bvh_setMotionValue(bvh,mIDB,&originalValueB);
         bvh_setMotionValue(bvh,mIDC,&originalValueC);
-      } else
-      {
-          fprintf(stderr,"Failed projecting original..\n");
       }
       fclose(fp);
 
-      //set palette rgbformulae 33,13,10;
-      //set style fill transparent solid 0.4 noborder;
-      // w points pointsize 1 palette pointtype 7
+      //----------------------
       char command[2048]={0};
-      /*
-      snprintf(
-               command,2048,"gnuplot -e \"set terminal png size 1000,1000 font 'Helvetica,14';\
-                set output 'out.png'; set view 65, 25, 1, 1;\
-                set xlabel '%s'; set ylabel '%s'; set zlabel '%s';\
-                splot 'study.dat' using 1:2:3:4 w points pointsize 1 palette title '%s 3D Error'\"",
-               channelNames[channelTypeA],
-               channelNames[channelTypeB],
-               channelNames[channelTypeC],
-               bvh->jointHierarchy[jID].jointName
-              );*/
+      //----------------------
+      //Convert the pose.svg to pose.png
+      //----------------------
+      snprintf(command,2048,"convert %s %s&",filenamePose,filenamePosePNG);
+      fprintf(stderr,"%s\n",command);
+      int i = system(command);
 
+      //----------------------
+      //Print the 3D plot..
+      //----------------------
       snprintf(
                command,2048,"python3 Scripts/plot.py --from %s --to %s --view %u %u --x '%s' --y '%s' --z '%s' --joint '%s / Frame %u / Joint %s '",
                filenameData,
@@ -842,10 +838,21 @@ int bvh_study3DJoint2DImpact(
                fID,
                bvh->jointHierarchy[jID].jointName
               );
-
-
       fprintf(stderr,"%s\n",command);
-      int i = system(command);
+      i = system(command);
+      //----------------------
+
+
+
+      //----------------------
+      //Remove intermediate data file which is large
+      //----------------------
+      snprintf(command,2048,"rm %s",filenameData);
+      fprintf(stderr,"%s\n",command);
+      i = system(command);
+      //----------------------
+
+
       return (i==0);
   }
 

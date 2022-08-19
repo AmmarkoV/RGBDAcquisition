@@ -522,17 +522,12 @@ FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2`
 
 for F in `seq 1 $FRAMEID`
 do
-for J in $JOINT
+ for J in $JOINT
  do
   echo $J
-  ./BVHTester --from $BVHFILE --set 0 0 --set 1 0 --set 2 -200 --study3d $F $J
-  TARGET=`printf "study-f%04u-m%u.png" $F $J`
-  mv out.png $TARGET
- done 
-
-convert study.svg study.png
-TARGET=`printf "study-f%04u.png" $F`
-mv study.png $TARGET
+  ./BVHTester --from $BVHFILE --set 0 0 --set 1 0 --set 2 -200 --study3d $F $J&
+ done
+ wait
 done
 
 
