@@ -24,7 +24,8 @@ def readData(filename):
  
     return columnA, columnB, columnC, columnD
 
-
+filename="study.dat"
+output="out.png"
 jointName=" Title "
 xLabel=" X "
 yLabel=" Y "
@@ -38,6 +39,10 @@ scale = 0.12 #Smaller is smaller :P
 if (len(sys.argv)>1):
        #print('Argument List:', str(sys.argv))
        for i in range(0, len(sys.argv)):
+           if (sys.argv[i]=="--from"):
+             filename=sys.argv[i+1]
+           if (sys.argv[i]=="--to"):
+             output=sys.argv[i+1]
            if (sys.argv[i]=="--joint"):
              jointName=sys.argv[i+1]
            if (sys.argv[i]=="--x"):
@@ -56,7 +61,7 @@ if (len(sys.argv)>1):
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 
-xs,ys,zs,vs = readData("study.dat")
+xs,ys,zs,vs = readData(filename)
 
 maxValue = scale * max(vs)
 svs = [(maxValue-x)/maxValue for x in vs]
@@ -72,5 +77,5 @@ ax.set_xlabel(xLabel)
 ax.set_ylabel(yLabel)
 ax.set_zlabel(zLabel)
 
-fig.savefig("out.png")
+fig.savefig(output)
 #plt.show()

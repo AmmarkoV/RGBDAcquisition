@@ -520,12 +520,12 @@ fi
 rm study-*
 FRAMEID=`cat $BVHFILE | grep Frames | cut -d: -f2`
 
-for F in `seq 1 5`
+for F in `seq 1 $FRAMEID`
 do
 for J in $JOINT
  do
   echo $J
-  ./BVHTester --from $BVHFILE --set 2 -200 --study3d $F $J
+  ./BVHTester --from $BVHFILE --set 0 0 --set 1 0 --set 2 -200 --study3d $F $J
   TARGET=`printf "study-f%04u-m%u.png" $F $J`
   mv out.png $TARGET
  done 
@@ -543,10 +543,6 @@ for J in $JOINT
 done
 
 
-zip all-study-f$FRAMEID.zip study-*
-
-#./BVHTester --from Motions/05_01.bvh --set 2 -200 --studymid 233 395
-
-
+zip all-study-f$FRAMEID.zip study-* Scripts/study.html
 
 exit 0

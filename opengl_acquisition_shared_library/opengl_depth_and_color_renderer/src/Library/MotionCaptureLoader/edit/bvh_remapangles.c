@@ -690,7 +690,18 @@ int bvh_study3DJoint2DImpact(
     simpleRendererInitialize(&renderer);
   }
 
-  FILE * fp = fopen("study.dat","w");
+
+  int viewAzimuth=45;
+  int viewElevation=45;
+
+  char filenameData[512]={0};
+  snprintf(filenameData,512,"study-f%04u-m%u.dat",fID,jID);
+  char filenamePose[512]={0};
+  snprintf(filenamePose,512,"study-f%04u-m%u.svg",fID,jID);
+  char filenameImage[512]={0};
+  snprintf(filenameImage,512,"study-f%04u-m%u.png",fID,jID);
+
+  FILE * fp = fopen(filenameData,"w");
 
   if (fp!=0)
   {
@@ -752,7 +763,7 @@ int bvh_study3DJoint2DImpact(
       )
       {
        dumpBVHToSVGFrame(
-                         "study.svg",
+                         filenamePose,
                          bvh,
                          &bvhTransformOriginal,
                          fID,
@@ -819,7 +830,11 @@ int bvh_study3DJoint2DImpact(
               );*/
 
       snprintf(
-               command,2048,"python3 Scripts/plot.py --view 65 25 --x '%s' --y '%s' --z '%s' --joint '%s / Frame %u / Joint %s '",
+               command,2048,"python3 Scripts/plot.py --from %s --to %s --view %u %u --x '%s' --y '%s' --z '%s' --joint '%s / Frame %u / Joint %s '",
+               filenameData,
+               filenameImage,
+               viewAzimuth,
+               viewElevation,
                channelNames[channelTypeA],
                channelNames[channelTypeB],
                channelNames[channelTypeC],
