@@ -27,6 +27,7 @@
 #include "../../Library/MotionCaptureLoader/edit/bvh_filter.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_merge.h"
+#include "../../Library/MotionCaptureLoader/edit/bvh_remapangles.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_interpolate.h"
 
 #include "../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h"

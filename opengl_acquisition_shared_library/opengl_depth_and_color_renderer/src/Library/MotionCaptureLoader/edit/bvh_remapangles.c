@@ -173,27 +173,45 @@ float meanBVH2DDistanceStudy(
 
 int convertHeatmapToProbabilities(
                                   float * output,
-                                  unsigned int heatmapResolution
+                                  unsigned int heatmapResolution,
+                                  int winnerTakesAll
                                  )
 {
- float scale = 1.0; // You can scale to more (e.g. x100%) to make CSV decimal file more accurate
- float max = 0.0;
- float sum = 0.0;
- //Gather stats
- for (int h=0; h<heatmapResolution; h++)
+ if (winnerTakesAll)
  {
-   if (output[h]>max) { max=output[h]; }
-   sum+=output[h];
- }
- //------------
- if (sum!=0.0)
+   float max    = 0.0;
+   int selected = 0;
+   for (int h=0; h<heatmapResolution; h++)
+   {
+     if (output[h]>max) {
+                          max=output[h];
+                          selected=h;
+                        }
+     output[h]=0.0;
+   }
+   output[selected]=1.0;
+   return 1;
+ } else
  {
-  //Rescale Output
-  for (int h=0; h<heatmapResolution; h++)
-  {
-    output[h] = (scale * (max-output[h])) / sum;
-  }
- return 1;
+   float scale = 1.0; // You can scale to more (e.g. x100%) to make CSV decimal file more accurate
+   float max = 0.0;
+   float sum = 0.0;
+   //Gather stats
+   for (int h=0; h<heatmapResolution; h++)
+   {
+     if (output[h]>max) { max=output[h]; }
+     sum+=output[h];
+   }
+   //------------
+   if (sum!=0.0)
+   {
+    //Rescale Output
+    for (int h=0; h<heatmapResolution; h++)
+    {
+      output[h] = (scale * (max-output[h])) / sum;
+    }
+    return 1;
+   }
  }
  //------------
  return 0;
@@ -254,7 +272,7 @@ int initializeStandaloneHeatmapFile(
           while (v<*rangeMaximum)
           {
             if (comma==',') { fprintf(fp,",");  } else { comma=','; }
-            fprintf(fp,"%0.2f",v);
+            fprintf(fp,"%0.4f",v);
             v+=increment;
           }
 
@@ -393,7 +411,8 @@ int generateHeatmap(
         //-----------------------------------------
         convertHeatmapToProbabilities(
                                        output,
-                                       heatmapResolution
+                                       heatmapResolution,
+                                       1//<- Winner takes all
                                      );
         //-----------------------------------------
         bvh_setMotionValue(bvh,mID,&originalValue);
@@ -729,17 +748,17 @@ int bvh_study3DJoint2DImpact(
                      if(c==0) {
                                 channelTypeA=channelTypeID;
                                 mIDA = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
-                                fprintf(stderr,"Channel A %u \n",mIDRelativeToOneFrame,mIDA);
+                                fprintf(stderr,"Channel A %u/%u\n",mIDRelativeToOneFrame,mIDA);
                               } else
                      if(c==1) {
                                 channelTypeB=channelTypeID;
                                 mIDB = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
-                                fprintf(stderr,"Channel B %u \n",mIDRelativeToOneFrame,mIDB);
+                                fprintf(stderr,"Channel B %u/%u\n",mIDRelativeToOneFrame,mIDB);
                               } else
                      if(c==2) {
                                 channelTypeC=channelTypeID;
                                 mIDC = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelTypeID);
-                                fprintf(stderr,"Channel C %u \n",mIDRelativeToOneFrame,mIDC);
+                                fprintf(stderr,"Channel C %u/%u\n",mIDRelativeToOneFrame,mIDC);
                               } else
                               {
                                 fprintf(stderr,"Too Many Channels (%u)!\n",bvh->jointHierarchy[jID].loadedChannels);
