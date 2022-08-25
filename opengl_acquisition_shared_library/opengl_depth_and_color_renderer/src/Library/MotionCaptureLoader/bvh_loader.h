@@ -285,6 +285,9 @@ int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC);
 
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint);
 
+
+unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID);
+
 /**
 * @brief Load a BVH file by giving a filename and filling in a BVH_MotionCapture struct
 * @ingroup BVH

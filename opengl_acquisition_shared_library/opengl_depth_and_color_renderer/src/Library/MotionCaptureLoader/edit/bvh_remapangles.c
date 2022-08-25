@@ -1,4 +1,5 @@
 #include "bvh_remapangles.h"
+#include "../bvh_loader.h"
 #include "../calculate/bvh_transform.h"
 #include "../ik/bvh_inverseKinematics.h"
 #include "../export/bvh_to_svg.h"

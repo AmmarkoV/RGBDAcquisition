@@ -544,6 +544,9 @@ for J in $JOINT
 done
 #------------------------------
 
+rm study-*.png 
+rm study-*.svg 
+
 #Compress all output
 #------------------------------
 zip all-study-$NAME.zip study-* Scripts/study.html
