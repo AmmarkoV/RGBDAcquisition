@@ -176,7 +176,7 @@ int convertHeatmapToProbabilities(
                                   unsigned int heatmapResolution
                                  )
 {
- float scale = 100.0; // Scale to a 100% to  make CSV file better
+ float scale = 1.0; // You can scale to more (e.g. x100%) to make CSV decimal file more accurate
  float max = 0.0;
  float sum = 0.0;
  //Gather stats
@@ -456,7 +456,7 @@ int bvh_plotJointChannelHeatmap(
              //-----------------------------------------------------------------------------
              if (comma==',') { fprintf(fp,","); } else { comma=','; }
              //-----------------------------------------------------------------------------
-             fprintf(fp,"%0.2f",output[h]);
+             fprintf(fp,"%0.4f",output[h]);
              //-----------------------------------------------------------------------------
            }
        }
