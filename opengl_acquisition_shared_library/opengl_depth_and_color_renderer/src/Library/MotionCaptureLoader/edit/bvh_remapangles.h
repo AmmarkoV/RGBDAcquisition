@@ -1,5 +1,5 @@
-#ifndef BVH_INTERPOLATE_H_INCLUDED
-#define BVH_INTERPOLATE_H_INCLUDED
+#ifndef BVH_REMAPANGLES_H_INCLUDED
+#define BVH_REMAPANGLES_H_INCLUDED
 
 #include "../bvh_loader.h"
 
@@ -75,4 +75,4 @@ int bvh_study3DJoint2DImpact(
 }
 #endif
 
-#endif // BVH_INTERPOLATE_H_INCLUDED
+#endif // BVH_REMAPANGLES_H_INCLUDED
