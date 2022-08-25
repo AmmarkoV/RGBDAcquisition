@@ -344,6 +344,7 @@ int generateHeatmap(
                      float *rangeMinimum,
                      float *rangeMaximum,
                      float *resolution,
+                     int winnerTakesAll,
                      int doSVG
                    )
 {
@@ -412,7 +413,7 @@ int generateHeatmap(
         convertHeatmapToProbabilities(
                                        output,
                                        heatmapResolution,
-                                       1//<- Winner takes all
+                                       winnerTakesAll//<- Winner takes all
                                      );
         //-----------------------------------------
         bvh_setMotionValue(bvh,mID,&originalValue);
@@ -453,6 +454,7 @@ int bvh_plotJointChannelHeatmap(
     BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
     //----------------------------------------------------------
 
+    int winnerTakesAll = 1;
 
     if (
          generateHeatmap(
@@ -465,6 +467,7 @@ int bvh_plotJointChannelHeatmap(
                          rangeMinimum,
                          rangeMaximum,
                          resolution,
+                         winnerTakesAll, //WinnerTakesAll
                          0 // Dont dump SVG
                         )
        )
@@ -475,7 +478,16 @@ int bvh_plotJointChannelHeatmap(
              //-----------------------------------------------------------------------------
              if (comma==',') { fprintf(fp,","); } else { comma=','; }
              //-----------------------------------------------------------------------------
-             fprintf(fp,"%0.4f",output[h]);
+             if (winnerTakesAll)
+             {
+               //Save Space in CSV file
+               if (output[h]>=1.0) { fprintf(fp,"1"); } else
+                                   { fprintf(fp,"0"); }
+             } else
+             {
+              //Have some decent accuracy
+              fprintf(fp,"%0.4f",output[h]);
+             }
              //-----------------------------------------------------------------------------
            }
        }
@@ -622,6 +634,7 @@ int bvh_studyMID2DImpact(
                          rangeMinimum,
                          rangeMaximum,
                          resolution,
+                         0,//<- No winner takes all
                          1 // Dump SVG
                         )
        )
