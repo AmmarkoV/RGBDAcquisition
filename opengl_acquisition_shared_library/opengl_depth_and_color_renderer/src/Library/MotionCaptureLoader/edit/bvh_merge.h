@@ -37,6 +37,10 @@ int bvh_mergeFacesRobot(
                          const char **argv
                         );
 
+
+
+int bvh_updateJointLookupMaps(struct BVH_MotionCapture * mc);
+
 #ifdef __cplusplus
 }
 #endif

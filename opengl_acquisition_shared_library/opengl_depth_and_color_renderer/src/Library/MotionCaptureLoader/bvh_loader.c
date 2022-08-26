@@ -236,11 +236,39 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 }
 
 
-unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
+unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
-   if ( (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) )
+   //fprintf(stderr,"IN bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelTypeID);
+   if ( (bvhMotion!=0) && (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) )
    {
-     return  (fID * bvhMotion->numberOfValuesPerFrame) + bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
+     if (bvhMotion->jointHierarchy[jID].loadedChannels >= BVH_VALID_CHANNEL_NAMES)
+     {
+         fprintf(stderr,RED "BUG:  jID %u / fID %u  has an incorrect number of channels (%u) \n" NORMAL ,jID,fID,bvhMotion->jointHierarchy[jID].loadedChannels);
+     }
+
+
+     //Manual re-resolution of channel!
+     int resolvedChannelType = 0;
+     int resolvedChannel     = 0;
+     for (int cID=0; cID<bvhMotion->jointHierarchy[jID].loadedChannels; cID++)
+     {
+        //fprintf(stderr,"LOOP jID %u / channel %u / channelTypeID %u\n",jID,cID,bvhMotion->jointHierarchy[jID].channelType[cID]);
+        if (channelTypeID==bvhMotion->jointHierarchy[jID].channelType[cID])
+        {
+            resolvedChannelType = 1;
+            resolvedChannel     = cID;
+        }
+     }
+     unsigned int channelIDMotionOffset =  bvhMotion->jointToMotionLookup[jID].jointMotionOffset + resolvedChannel;
+
+     if (resolvedChannelType==0)
+     {
+         fprintf(stderr,RED "BUG: Unable to resolve jID %u / fID %u / channelTypeID %u\n" NORMAL ,jID,fID,channelTypeID);
+     }
+     //This is broken ?
+     //unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
+
+     return  (fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset;
    }
 
   return 0;
@@ -471,17 +499,13 @@ int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID
 
 int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 {
- /*
- if (jID>bvhMotion->jointHierarchySize) { return 0; }
- return (
-          (bvhMotion->jointHierarchy[jID].loadedChannels>0) &&
-          (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)
-        );
-  */
- if (jID<bvhMotion->jointHierarchySize)
+ if (bvhMotion)
+ {
+  if (jID<bvhMotion->jointHierarchySize)
      {
         return bvhMotion->jointHierarchy[jID].hasRotationalChannels;
      }
+ }
  return 0;
 }
 

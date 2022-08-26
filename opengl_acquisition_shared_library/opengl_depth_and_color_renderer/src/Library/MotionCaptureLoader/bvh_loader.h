@@ -216,7 +216,7 @@ struct BVH_Joint
 struct BVH_JointToMotion_LookupTable
 {
   BVHMotionChannelID jointMotionOffset;
-  BVHMotionChannelID channelIDMotionOffset[BVH_VALID_CHANNEL_NAMES];
+  BVHMotionChannelID channelIDMotionOffset[BVH_VALID_CHANNEL_NAMES]; //<- THIS IS BUGGED?
 };
 
 /**

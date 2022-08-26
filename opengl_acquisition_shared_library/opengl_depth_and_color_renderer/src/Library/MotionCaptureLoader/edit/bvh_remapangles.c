@@ -3,6 +3,7 @@
 #include "../calculate/bvh_transform.h"
 #include "../ik/bvh_inverseKinematics.h"
 #include "../export/bvh_to_svg.h"
+#include "bvh_merge.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -340,7 +341,7 @@ int generateHeatmap(
                      struct BVH_MotionCapture * bvh,
                      struct simpleRenderer * renderer,
                      BVHFrameID fID,
-                     BVHMotionChannelID mIDRelativeToOneFrame,
+                     BVHMotionChannelID resolvedMID,
                      float *rangeMinimum,
                      float *rangeMaximum,
                      float *resolution,
@@ -353,18 +354,18 @@ int generateHeatmap(
  struct BVH_Transform bvhTransformOriginal = {0};
  struct BVH_Transform bvhTransformChanged  = {0};
  //-----------------------------------------------------------------------------------
- BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+ BVHMotionChannelID mID = resolvedMID;
  float originalValue = bvh_getMotionValue(bvh,mID);
  //-----------------------------------------------------------------------------------
  if (doSVG)
  {
- fprintf(stderr,"generateHeatmap(%u,%u,%0.2f,%0.2f)\n",fID,mIDRelativeToOneFrame,*rangeMinimum,*rangeMaximum);
+ fprintf(stderr,"generateHeatmap(%u,%u,%0.2f,%0.2f)\n",fID,resolvedMID,*rangeMinimum,*rangeMaximum);
  fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
            mID,
-           bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID,
-           bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID,
-           bvh->jointHierarchy[bvh->motionToJointLookup[mIDRelativeToOneFrame].jointID].jointName,
-           channelNames[bvh->motionToJointLookup[mIDRelativeToOneFrame].channelID],
+           bvh->motionToJointLookup[resolvedMID].jointID,
+           bvh->motionToJointLookup[resolvedMID].channelID,
+           bvh->jointHierarchy[bvh->motionToJointLookup[resolvedMID].jointID].jointName,
+           channelNames[bvh->motionToJointLookup[resolvedMID].channelID],
            originalValue,
            *rangeMinimum,
            *rangeMaximum,
@@ -391,8 +392,9 @@ int generateHeatmap(
 
        if (winnerTakesAll)
        {
-        //fprintf(stderr,"Ultra fast winner takes all\n");
-
+        //-----------------------------------
+        //-----------------------------------
+        //-----------------------------------
         unsigned int value = 0;
         float increment    = *resolution;
         float vMin         = *rangeMinimum;
@@ -415,12 +417,18 @@ int generateHeatmap(
               output[value-1]=1;
         }
         return 1;
+        //-----------------------------------
+        //-----------------------------------
+        //-----------------------------------
        } else
        {
-       unsigned int value = 0;
-       float increment = *resolution;
-       float v         = *rangeMinimum;
-       while (v<*rangeMaximum)
+        //-----------------------------------
+        //-----------------------------------
+        //-----------------------------------
+        unsigned int value = 0;
+        float increment = *resolution;
+        float v         = *rangeMinimum;
+        while (v<*rangeMaximum)
         {
           bvh_setMotionValue(bvh,mID,&v);
           //-----------------------------
@@ -446,10 +454,10 @@ int generateHeatmap(
                                      );
         //-----------------------------------------
         bvh_setMotionValue(bvh,mID,&originalValue);
+        //-----------------------------------
+        //-----------------------------------
+        //-----------------------------------
        }
-
-
-
 
         return 1;
       } else
@@ -467,7 +475,7 @@ int bvh_plotJointChannelHeatmap(
                                  struct simpleRenderer * renderer,
                                  BVHFrameID fID,
                                  BVHJointID jID,
-                                 BVHMotionChannelID channelID,
+                                 BVHMotionChannelID channelType,
                                  float *rangeMinimum,
                                  float *rangeMaximum,
                                  float *resolution,
@@ -483,10 +491,11 @@ int bvh_plotJointChannelHeatmap(
     struct BVH_Transform bvhTransformOriginal = {0};
     struct BVH_Transform bvhTransformChanged  = {0};
     //----------------------------------------------------------
-    BVHMotionChannelID mIDRelativeToOneFrame = bvh->jointToMotionLookup[jID].channelIDMotionOffset[channelID];
+    //fprintf(stderr,"OUT bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelType);
+    BVHMotionChannelID mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelType);
     //----------------------------------------------------------
-    BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
-    //----------------------------------------------------------
+    fprintf(stderr,"bvh_plotJointChannelHeatmap(fID=%u/jID=%u/channelType=%u => mID = %u)\n",fID,jID,channelType,mID);
+
 
     int winnerTakesAll = 1;
 
@@ -497,7 +506,7 @@ int bvh_plotJointChannelHeatmap(
                          bvh,
                          renderer,
                          fID,
-                         mIDRelativeToOneFrame,
+                         mID,
                          rangeMinimum,
                          rangeMaximum,
                          resolution,
@@ -548,7 +557,11 @@ int dumpBVHAsProbabilitiesBody(
                                  float *resolution
                              )
 {
-  if ( (rangeMinimum==0) || (rangeMaximum==0) || (resolution==0) ) { fprintf(stderr,"dumpBVHAsProbabilitiesBody no ranges\n"); return 0; }
+  if ( (rangeMinimum==0) || (rangeMaximum==0) || (resolution==0) )
+     { fprintf(stderr,"dumpBVHAsProbabilitiesBody no ranges\n"); return 0; }
+
+  //Make sure..?
+  //bvh_updateJointLookupMaps(mc);
 
   char initialFilenameWithoutExtension[512]={0};
   snprintf(initialFilenameWithoutExtension,512,"%s",filename);
@@ -572,12 +585,13 @@ int dumpBVHAsProbabilitiesBody(
                  {
                     //fprintf(stderr,"\r Generation %u/%u %0.2f%%\r",executedTasks,numberOfHeatmapTasks,(float) (100*executedTasks)/numberOfHeatmapTasks);
                     executedTasks+=1;
+                    unsigned int channelType = mc->jointHierarchy[jID].channelType[channelID];
                     //----------------------------------------------------------
                     snprintf(
                              specificJointFilename,1024,"%s_%s_%s.csv",
                              initialFilenameWithoutExtension,
                              mc->jointHierarchy[jID].jointNameLowercase,
-                             channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                             channelNames[channelType]
                             );
                      //-----------------------------------------------------------------------------
                      bvh_plotJointChannelHeatmap(
@@ -586,7 +600,7 @@ int dumpBVHAsProbabilitiesBody(
                                                  renderer,
                                                  fID,
                                                  jID,
-                                                 channelID,
+                                                 channelType,
                                                  rangeMinimum,
                                                  rangeMaximum,
                                                  resolution,
@@ -649,6 +663,10 @@ int bvh_studyMID2DImpact(
     simpleRendererInitialize(&renderer);
   }
 
+
+  BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+
+
   FILE * fp = fopen("study.dat","w");
 
   if (fp!=0)
@@ -664,7 +682,7 @@ int bvh_studyMID2DImpact(
                          bvh,
                          &renderer,
                          fID,
-                         mIDRelativeToOneFrame,
+                         mID,
                          rangeMinimum,
                          rangeMaximum,
                          resolution,
