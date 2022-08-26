@@ -239,7 +239,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
    //fprintf(stderr,"IN bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelTypeID);
-   if ( (bvhMotion!=0) && (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) )
+   if ( (bvhMotion!=0) && (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) && (fID<bvhMotion->numberOfFrames) )
    {
      if (bvhMotion->jointHierarchy[jID].loadedChannels >= BVH_VALID_CHANNEL_NAMES)
      {
@@ -294,14 +294,16 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
   if (bvhMotion==0) { return 0; }
-  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;        }
-  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;      }
-  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
-  if (bvhMotion->fileName!=0)                   {  free(bvhMotion->fileName);           bvhMotion->fileName=0;            }
-
-  if  (bvhMotion->jointHierarchy!=0)            { free(bvhMotion->jointHierarchy);      bvhMotion->jointHierarchy=0;}
-  if  (bvhMotion->jointToMotionLookup!=0)       { free(bvhMotion->jointToMotionLookup); bvhMotion->jointToMotionLookup=0;}
-  if  (bvhMotion->motionToJointLookup!=0)       { free(bvhMotion->motionToJointLookup); bvhMotion->motionToJointLookup=0;}
+  //-----------------------------------------------------------------------------------------------------------------------
+  if (bvhMotion->motionValues!=0)               { free(bvhMotion->motionValues);        bvhMotion->motionValues=0;        }
+  if (bvhMotion->selectedJoints!=0)             { free(bvhMotion->selectedJoints);      bvhMotion->selectedJoints=0;      }
+  if (bvhMotion->hideSelectedJoints!=0)         { free(bvhMotion->hideSelectedJoints);  bvhMotion->hideSelectedJoints=0;  }
+  if (bvhMotion->fileName!=0)                   { free(bvhMotion->fileName);            bvhMotion->fileName=0;            }
+  //-----------------------------------------------------------------------------------------------------------------------
+  if (bvhMotion->jointHierarchy!=0)             { free(bvhMotion->jointHierarchy);      bvhMotion->jointHierarchy=0;      }
+  if (bvhMotion->jointToMotionLookup!=0)        { free(bvhMotion->jointToMotionLookup); bvhMotion->jointToMotionLookup=0; }
+  if (bvhMotion->motionToJointLookup!=0)        { free(bvhMotion->motionToJointLookup); bvhMotion->motionToJointLookup=0; }
+  //-----------------------------------------------------------------------------------------------------------------------
 
   //Wipe everything
   memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));

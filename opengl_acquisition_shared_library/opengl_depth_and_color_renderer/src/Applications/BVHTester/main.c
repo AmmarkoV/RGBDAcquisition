@@ -1584,7 +1584,7 @@ int bvhConverter(int argc,const char **argv)
           BVHMotionChannelID mID   = atoi(argv[i+2]);
           float         minRange   = -180.0;
           float         maxRange   =  180.0;
-          float         resolution =  6.0;
+          float         resolution =  3.0;
 
           fprintf(stderr,"abvh_studyMID2DImpact(%u,%u,%0.2f,%0.2f)\n",fID,mID,minRange,maxRange);
           bvh_studyMID2DImpact(

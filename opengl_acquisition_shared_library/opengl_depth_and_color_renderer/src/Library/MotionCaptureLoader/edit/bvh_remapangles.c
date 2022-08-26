@@ -494,7 +494,7 @@ int bvh_plotJointChannelHeatmap(
     //fprintf(stderr,"OUT bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelType);
     BVHMotionChannelID mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,fID,channelType);
     //----------------------------------------------------------
-    fprintf(stderr,"bvh_plotJointChannelHeatmap(fID=%u/jID=%u/channelType=%u => mID = %u)\n",fID,jID,channelType,mID);
+    //fprintf(stderr,"bvh_plotJointChannelHeatmap(fID=%u/jID=%u/channelType=%u => mID = %u)\n",fID,jID,channelType,mID);
 
 
     int winnerTakesAll = 1;
