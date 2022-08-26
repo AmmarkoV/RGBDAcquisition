@@ -391,10 +391,10 @@ int generateHeatmap(
 
        if (winnerTakesAll)
        {
-        fprintf(stderr,"Ultra fast winner takes all \n");
+        fprintf(stderr,"Ultra fast winner takes all\n");
 
         unsigned int value = 0;
-        float increment = *resolution;
+        float increment    = *resolution;
         float vMin         = *rangeMinimum;
         float vMax         = vMin+increment;
         while (vMin<*rangeMaximum)
