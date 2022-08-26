@@ -263,7 +263,13 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 
      if (resolvedChannelType==0)
      {
-         fprintf(stderr,RED "BUG: Unable to resolve jID %u / fID %u / channelTypeID %u\n" NORMAL ,jID,fID,channelTypeID);
+         if ( (jID==0) && (channelTypeID==BVH_ROTATION_W) )
+         {
+           //Special case QBVH ..!
+         } else
+         {
+          fprintf(stderr,RED "BUG: %s | Unable to resolve jID %u | fID %u/%u | channelTypeID %u\n" NORMAL,bvhMotion->fileName,jID,fID,bvhMotion->numberOfFrames,channelTypeID);
+         }
      }
      //This is broken ?
      //unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
