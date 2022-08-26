@@ -388,6 +388,35 @@ int generateHeatmap(
                          );
        }
 
+
+       if (winnerTakesAll)
+       {
+        fprintf(stderr,"Ultra fast winner takes all \n");
+
+        unsigned int value = 0;
+        float increment = *resolution;
+        float vMin         = *rangeMinimum;
+        float vMax         = vMin+increment;
+        while (vMin<*rangeMaximum)
+        {
+          output[value] = 0;
+          vMin+=increment;
+          vMax+=increment;
+
+          if ( (vMin<=originalValue) && (originalValue<vMax) )
+          {
+              output[value]=1;
+          }
+          value+=1;
+        }
+
+        if (originalValue==*rangeMaximum)
+        {
+              output[value-1]=1;
+        }
+        return 1;
+       } else
+       {
        unsigned int value = 0;
        float increment = *resolution;
        float v         = *rangeMinimum;
@@ -417,6 +446,11 @@ int generateHeatmap(
                                      );
         //-----------------------------------------
         bvh_setMotionValue(bvh,mID,&originalValue);
+       }
+
+
+
+
         return 1;
       } else
       {
