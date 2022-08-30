@@ -289,7 +289,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   int heatmapResolution = 360;
   float rangeMinimum    = -180.0;
   float rangeMaximum    = 180.0;
-  float resolution      = 3.0;
+  float resolution      = 10.0;
 
   if (renderConfig->isDefined)
   {
