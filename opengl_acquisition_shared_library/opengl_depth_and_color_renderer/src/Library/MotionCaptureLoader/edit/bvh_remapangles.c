@@ -367,6 +367,7 @@ int generateHeatmap(
                    )
 {
  if (output==0) { return 0; }
+ if (bvh==0)    { return 0; }
  //-----------------------------------------------------------------------------------
  struct BVH_Transform bvhTransformOriginal = {0};
  struct BVH_Transform bvhTransformChanged  = {0};
@@ -377,12 +378,7 @@ int generateHeatmap(
  if (doSVG)
  {
  fprintf(stderr,"generateHeatmap(fID %u/%u,mID %u/%u,%0.2f,%0.2f)\n",fID,bvh->numberOfFrames,resolvedMID,bvh->motionValuesSize,*rangeMinimum,*rangeMaximum);
- fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
-           mID,
-           bvh->motionToJointLookup[resolvedMID].jointID,
-           bvh->motionToJointLookup[resolvedMID].channelID,
-           bvh->jointHierarchy[bvh->motionToJointLookup[resolvedMID].jointID].jointName,
-           channelNames[bvh->motionToJointLookup[resolvedMID].channelID],
+ fprintf(stderr,"Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
            originalValue,
            *rangeMinimum,
            *rangeMaximum,
@@ -397,7 +393,7 @@ int generateHeatmap(
     {
        if (doSVG)
        {
-        fprintf(stderr,"dumping svg file\n");
+        //fprintf(stderr,"dumping svg file\n");
         dumpBVHToSVGFrame(
                           "study.svg",
                           bvh,
