@@ -334,6 +334,23 @@ int dumpBVHAsProbabilitiesHeader(
 }
 
 
+float bvh_getMotionValueRemappedCenteredToZero(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
+{
+ float originalValue = bvh_getMotionValue(bvhMotion,mID);
+ float remappedValue = originalValue;
+
+ if (originalValue==180.0)
+ {
+     remappedValue=-180.0;
+ } else
+ {
+    remappedValue = bvh_constrainAngleCentered0(originalValue,0);
+ }
+ //---------------------------------------------------------------
+ return remappedValue;
+}
+
+
 
 int generateHeatmap(
                      float * output,
@@ -355,11 +372,11 @@ int generateHeatmap(
  struct BVH_Transform bvhTransformChanged  = {0};
  //-----------------------------------------------------------------------------------
  BVHMotionChannelID mID = resolvedMID;
- float originalValue = bvh_getMotionValue(bvh,mID);
+ float originalValue = bvh_getMotionValue(bvh,mID); // bvh_getMotionValueRemappedCenteredToZero(bvh,mID); // bvh_getMotionValue(bvh,mID);
  //-----------------------------------------------------------------------------------
  if (doSVG)
  {
- fprintf(stderr,"generateHeatmap(%u,%u,%0.2f,%0.2f)\n",fID,resolvedMID,*rangeMinimum,*rangeMaximum);
+ fprintf(stderr,"generateHeatmap(fID %u/%u,mID %u/%u,%0.2f,%0.2f)\n",fID,bvh->numberOfFrames,resolvedMID,bvh->motionValuesSize,*rangeMinimum,*rangeMaximum);
  fprintf(stderr,"MID %u / Joint %u/ Channel %u / %s %s / Original Value %0.2f / Min %0.2f / Max %0.2f / Increment %0.2f\n",
            mID,
            bvh->motionToJointLookup[resolvedMID].jointID,
@@ -380,6 +397,7 @@ int generateHeatmap(
     {
        if (doSVG)
        {
+        fprintf(stderr,"dumping svg file\n");
         dumpBVHToSVGFrame(
                           "study.svg",
                           bvh,
@@ -392,6 +410,7 @@ int generateHeatmap(
 
        if (winnerTakesAll)
        {
+        //fprintf(stderr,"WINNER TAKES ALL\n");
         //-----------------------------------
         //-----------------------------------
         //-----------------------------------
@@ -422,6 +441,7 @@ int generateHeatmap(
         //-----------------------------------
        } else
        {
+        //fprintf(stderr,"PLOT/TEST ALL VALUES\n");
         //-----------------------------------
         //-----------------------------------
         //-----------------------------------
@@ -665,6 +685,20 @@ int bvh_studyMID2DImpact(
 
 
   BVHMotionChannelID mID = (fID * bvh->numberOfValuesPerFrame) + mIDRelativeToOneFrame;
+
+
+
+  if (fID>=bvh->numberOfFrames)
+  {
+      fprintf(stderr,"Frame ID fID (%u) overflows (total %u frames) .. cannot continue\n",fID,bvh->numberOfFrames);
+      return 0;
+  }
+
+  if (mID>=bvh->motionValuesSize)
+  {
+      fprintf(stderr,"mID (%u) overflows (%u) .. cannot continue\n",mID,mIDRelativeToOneFrame);
+      return 0;
+  }
 
 
   FILE * fp = fopen("study.dat","w");
