@@ -746,7 +746,7 @@ void recursiveJointHierarchyTransformer(
   struct Matrix4x4OfFloats boneGlobalInverseTransform;
   struct Matrix4x4OfFloats matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose;
 
-  copy4x4FMatrixToAlignedContainer(&matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose,&in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
+  copy4x4FMatrixToAlignedContainer(&matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose,in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
   copy4x4FMatrixToAlignedContainer(&boneGlobalInverseTransform,in->header.boneGlobalInverseTransform); //This is repeated many times for no reason
 
   multiplyThree4x4FMatrices(
@@ -757,7 +757,7 @@ void recursiveJointHierarchyTransformer(
                            );
 
   //Copy back our calculated output to the TRI bones
-  copy4x4FMatrix(in->bones[curBone].info->finalVertexTransformation,&finalVertexTransformation);
+  copy4x4FMatrix(in->bones[curBone].info->finalVertexTransformation,finalVertexTransformation.m);
 
 
    //Each bone might have multiple children, we recursively execute the same transform for all children of this node..!
