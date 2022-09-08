@@ -311,7 +311,8 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
                                              )
       )
       {
-      fprintf(stderr,"Joint ID %u / %s => %0.2f \n",jointID,dof,value);
+      // The next line is a debug message that spams a *lot*!
+      //fprintf(stderr,"Joint ID %u / %s => %0.2f \n",jointID,dof,value);
       //==============================================================================================================
       if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
       if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
