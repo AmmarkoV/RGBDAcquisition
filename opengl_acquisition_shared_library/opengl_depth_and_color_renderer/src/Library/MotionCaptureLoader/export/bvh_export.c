@@ -268,15 +268,19 @@ int dumpBVHTo_JSON_SVG_CSV(
   char csvFilename2D[512]={0};
   char csvFilename3D[512]={0};
   char csvFilenameBVH[512]={0};
+  char csvFilenameMap[512]={0};
   if (useCSV_2D_Output)  { snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);  }
   if (useCSV_3D_Output)  { snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);  }
   if (useCSV_BVH_Output) { snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);}
+  snprintf(csvFilenameMap,512,"%s/map_%s",directory,filename);
 
   int did2DOutputPreExist  = bvhExportFileExists(csvFilename2D);
   int did3DOutputPreExist  = bvhExportFileExists(csvFilename3D);
   int didBVHOutputPreExist = bvhExportFileExists(csvFilenameBVH);
+  int didMapOutputPreExist = bvhExportFileExists(csvFilenameMap);
 
   //fprintf(stderr,"Wipe 2D:%u 3D:%u BVH:%u\n",wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output);
+  if ((wipe_2D_Output)||(wipe_3D_Output)||(wipe_BVH_Output)) { bvhExportFileWipe(csvFilenameMap);}
   if (wipe_2D_Output)  { did2DOutputPreExist=0;   bvhExportFileWipe(csvFilename2D); }
   if (wipe_3D_Output)  { did3DOutputPreExist=0;   bvhExportFileWipe(csvFilename3D); }
   if (wipe_BVH_Output) { didBVHOutputPreExist=0;  bvhExportFileWipe(csvFilenameBVH);}
@@ -346,7 +350,8 @@ int dumpBVHTo_JSON_SVG_CSV(
                         mc,
                         csvFilename2D,
                         csvFilename3D,
-                        csvFilenameBVH
+                        csvFilenameBVH,
+                        csvFilenameMap
                       );
    }
   //------------------------------------------------------------------------------------------
@@ -458,6 +463,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                              csvFilename2D,
                              csvFilename3D,
                              csvFilenameBVH,
+                             csvFilenameMap,
                              filterStats,
                              filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                              filterOutSkeletonsWithAnyLimbsOutOfImage,

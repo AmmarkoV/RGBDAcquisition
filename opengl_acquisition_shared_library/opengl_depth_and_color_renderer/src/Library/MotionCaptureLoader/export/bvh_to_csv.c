@@ -24,9 +24,26 @@ int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
                        const char * filename2D,
                        const char * filename3D,
-                       const char * filenameBVH
+                       const char * filenameBVH,
+                       const char * filenameMap
                       )
 {
+   if ( (filenameMap!=0) && (filenameMap[0]!=0) && (!bvhExportFileExists(filenameMap)) )
+   {
+    FILE * fpMap = fopen(filenameMap,"a");
+
+    if (fpMap!=0)
+    {
+     fprintf(fpMap,"file,sample\n");
+     fclose(fpMap);
+    }
+   }
+
+
+
+
+
+
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
 
@@ -186,6 +203,7 @@ int dumpBVHToCSVBody(
                        const char * filename2D,
                        const char * filename3D,
                        const char * filenameBVH,
+                       const char * filenameMap,
                        struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -225,10 +243,24 @@ int dumpBVHToCSVBody(
    FILE * fp2D = 0;
    FILE * fp3D = 0;
    FILE * fpBVH = 0;
+   FILE * fpMap = 0;
 
-   if ( (filename2D!=0) && (filename2D[0]!=0) )   { fp2D = fopen(filename2D,"a");   ++requestedToDump; }
-   if ( (filename3D!=0) && (filename3D[0]!=0) )   { fp3D = fopen(filename3D,"a");   ++requestedToDump; }
-   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) ) { fpBVH = fopen(filenameBVH,"a"); ++requestedToDump; }
+   if ( (filename2D!=0)  && (filename2D[0]!=0) )   { fp2D  = fopen(filename2D,"a");   ++requestedToDump; }
+   if ( (filename3D!=0)  && (filename3D[0]!=0) )   { fp3D  = fopen(filename3D,"a");   ++requestedToDump; }
+   if ( (filenameBVH!=0) && (filenameBVH[0]!=0))   { fpBVH = fopen(filenameBVH,"a");  ++requestedToDump; }
+   if ( (filenameMap!=0) && (filenameMap[0]!=0))   { fpMap = fopen(filenameMap,"a");  ++requestedToDump; }
+
+
+   //Map File -------------------------------------------
+   if (fpMap!=0)
+   {
+     fprintf(fpMap,"%s,%u\n",mc->fileName,fID);
+     fclose(fpMap);
+     ++dumped;
+   }
+   //-------------------------------------------------------------------
+
+
 
 
    //--------------------------------------------------------------------------------------------------------------------------
