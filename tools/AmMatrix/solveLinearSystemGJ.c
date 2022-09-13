@@ -261,9 +261,7 @@ int gatherResultOLD(double * result , double * mat  , unsigned int totalLines )
          mat[i*ElementsNumber + line] *= calculatedItem;
         }
 
-    if (line==0) { break; } else
-                 { --line; }
-
+     --line;
   }
 
   //Store results in resulting matrix
@@ -314,7 +312,7 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
         fprintf(stderr,"Line %u is not ok ,  %u/%d oks \n",line,ok,ElementsNumber);
     }
 
-    if (line==0) { break; } else 
+    if (line==0) { break; } else
                  { --line; }
   }
 
