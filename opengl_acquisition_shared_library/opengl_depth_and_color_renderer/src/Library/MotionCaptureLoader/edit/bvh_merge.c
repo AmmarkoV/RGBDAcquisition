@@ -83,7 +83,7 @@ int bvh_mergeWith(
             rules.jointAssociationTargetToSourceExists[targetJID]=1;
             rules.jointAssociationTargetToSource[targetJID]=sourceJID;
             fprintf(
-                    stderr,GREEN "Correspondace of source(%s/%u)/target(%s/%u) ..\n" NORMAL,
+                    stderr,GREEN "Correspondence of source(%s/%u)/target(%s/%u) ..\n" NORMAL,
                     sourceMC->jointHierarchy[sourceJID].jointName,sourceJID,
                     targetMC->jointHierarchy[targetJID].jointName,targetJID
                    );

@@ -1103,6 +1103,7 @@ int bvhConverter(int argc,const char **argv)
           //First of all we need to load the BVH file
           if (!bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld))
           {
+            fprintf(stderr,"Error loading file `%s` \n",fromBVHFile);
             haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
           }
 

@@ -320,8 +320,8 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
 //----------------------------------------------------------------------------------------------------
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
 {
- //fprintf(stderr,"Loading BVH %s \n",filename);
- bvhMotion->scaleWorld=scaleWorld;
+  //fprintf(stderr,"Loading BVH %s \n",filename);
+  bvhMotion->scaleWorld=scaleWorld;
   int successfullRead=0;
   FILE *fd=0;
   fd = fopen(filename,"r");
@@ -344,10 +344,14 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
        if (readBVHMotion(bvhMotion,fd))
        {
          successfullRead=1;
-       }
-      }
+       } else
+       { fprintf(stderr,"Error reading BVH motion for file %s\n",filename); }
+      } else
+      { fprintf(stderr,"Error reading BVH header for file %s\n",filename); }
       fclose(fd);
-    }
+    } else
+    { fprintf(stderr,"Could not open BVH file %s to read\n",filename); }
+
  return successfullRead;
 }
 //----------------------------------------------------------------------------------------------------
