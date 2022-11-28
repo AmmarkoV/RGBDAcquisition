@@ -1614,6 +1614,8 @@ int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4
   return 0;
 }
 
+#define USE_NEW_THREE_4X4_MATRIXMUL 0
+
 enum THREE4X4MATRICESCASES
 {
     MAT_4x4_CASE_NO_ACTIVE_MATRICES=0,            // 0
@@ -1638,11 +1640,12 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
+    #if USE_NEW_THREE_4X4_MATRIXMUL
     unsigned char multiplicationCase = 0;
     //----------------------------------------------------
-    if (matrixCIsIdentity!=0) { multiplicationCase += 4; }
-    if (matrixBIsIdentity!=0) { multiplicationCase += 2; }
-    if (matrixAIsIdentity!=0) { multiplicationCase += 1; }
+    if (matrixCIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXC; }
+    if (matrixBIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXB; }
+    if (matrixAIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXA; }
     //----------------------------------------------------
 
     switch (multiplicationCase)
@@ -1661,12 +1664,7 @@ int multiplyThree4x4FMatricesWithIdentityHints(
         return 0;
       //---------------------------------------------------------------------------------------------------------------------------
     };
-    return 0;
-
-
-
-
-
+    #else
     unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
@@ -1689,8 +1687,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
         return 1;
     };
     //----------------------------------------------------------
-
    return 1;
+   #endif // USE_NEW_THREE_4X4_MATRIXMUL
+
   }
  return 0;
 }
