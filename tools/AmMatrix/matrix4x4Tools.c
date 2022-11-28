@@ -720,6 +720,8 @@ void create4x4FRotationZXY(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //                       == RZ ==                                        == RX ==                                                  == RY ==
     //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} } * { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
     //https://www.wolframalpha.com/input?i=%7B+%7B+cosZ%2C+sinZ%2C+0+%7D+%2C+%7B+-sinZ%2C+cosZ+%2C+0%7D+%2C+%7B0%2C0%2C1%7D++%7D+*+%7B+%7B1%2C+0+%2C0%7D+%2C+%7B0%2C+cosX%2C+sinX%7D%2C+%7B0%2C+-sinX%2C+cosX%7D+%7D+*+%7B+%7B+cosY%2C+0%2C+-sinY+%7D%2C+%7B0%2C+1+%2C0+%7D%2C+%7B+sinY%2C+0+%2C+cosY+%7D+%7D
+    //{{cosZ,sinZ,0,0},{-sinZ,cosZ,0,0},{0,0,1,0},{0,0,0,1}}*{{1,0,0,0},{0,cosX,sinX,0},{0,-sinX,cosX,0},{0,0,0,1}}*{{cosY,0,-sinY,0},{0,1,0,0},{sinY,0,cosY,0},{0,0,0,1}}
+    //https://www.wolframalpha.com/input?key=&i=%7B%7BcosZ%2CsinZ%2C0%2C0%7D%2C%7B-sinZ%2CcosZ%2C0%2C0%7D%2C%7B0%2C0%2C1%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D*%7B%7B1%2C0%2C0%2C0%7D%2C%7B0%2CcosX%2CsinX%2C0%7D%2C%7B0%2C-sinX%2CcosX%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D*%7B%7BcosY%2C0%2C-sinY%2C0%7D%2C%7B0%2C1%2C0%2C0%7D%2C%7BsinY%2C0%2CcosY%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D
     //--------------
     //    Row 1
     //--------------
@@ -1612,6 +1614,17 @@ int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4
   return 0;
 }
 
+enum THREE4X4MATRICESCASES
+{
+    MAT_4x4_CASE_NO_ACTIVE_MATRICES=0,            // 0
+    MAT_4x4_CASE_MATRIXA,                         // 1
+    MAT_4x4_CASE_MATRIXB,                         // 2
+    MAT_4x4_CASE_MATRIXA_AND_MATRIXB,             // 3
+    MAT_4x4_CASE_MATRIXC,                         // 4
+    MAT_4x4_CASE_MATRIXA_AND_MATRIXC,             // 5
+    MAT_4x4_CASE_MATRIXB_AND_MATRIXC,             // 6
+    MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC  // 7
+};
 
 int multiplyThree4x4FMatricesWithIdentityHints(
                                                 struct Matrix4x4OfFloats * result,
@@ -1625,8 +1638,36 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
-    unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
+    unsigned char multiplicationCase = 0;
+    //----------------------------------------------------
+    if (matrixCIsIdentity!=0) { multiplicationCase += 4; }
+    if (matrixBIsIdentity!=0) { multiplicationCase += 2; }
+    if (matrixAIsIdentity!=0) { multiplicationCase += 1; }
+    //----------------------------------------------------
 
+    switch (multiplicationCase)
+    {
+      //---------------------------------------------------------------------------------------------------------------------------
+      case MAT_4x4_CASE_NO_ACTIVE_MATRICES              :  create4x4FIdentityMatrix(result);              return 1;          break;
+      case MAT_4x4_CASE_MATRIXA                         :  copy4x4FMatrix(result->m,matrixA->m);          return 1;          break;
+      case MAT_4x4_CASE_MATRIXB                         :  copy4x4FMatrix(result->m,matrixB->m);          return 1;          break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB             :  return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);          break;
+      case MAT_4x4_CASE_MATRIXC                         :  copy4x4FMatrix(result->m,matrixC->m);          return 1;          break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXC             :  return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);          break;
+      case MAT_4x4_CASE_MATRIXB_AND_MATRIXC             :  return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);          break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC :  return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); break;
+      //---------------------------------------------------------------------------------------------------------------------------
+      default:
+        return 0;
+      //---------------------------------------------------------------------------------------------------------------------------
+    };
+    return 0;
+
+
+
+
+
+    unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
     //Do the absolutely minimum number of operations required
     //----------------------------------------------------------
     switch (numberOfOperationsNeeded)
@@ -1634,9 +1675,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
       case 3:
         return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC);
       case 2:
-        if (matrixAIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);  } else
-        if (matrixBIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);  } else
-        if (matrixCIsIdentity)       { return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);  }
+        if (matrixAIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);  } else
+        if (matrixBIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);  } else
+        if (matrixCIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);  }
       case 1:
         if (!matrixAIsIdentity)    { copy4x4FMatrix(result->m,matrixA->m); } else
         if (!matrixBIsIdentity)    { copy4x4FMatrix(result->m,matrixB->m); } else
