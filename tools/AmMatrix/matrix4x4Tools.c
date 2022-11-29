@@ -1614,7 +1614,7 @@ int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4
   return 0;
 }
 
-#define USE_NEW_THREE_4X4_MATRIXMUL 0
+#define USE_NEW_THREE_4X4_MATRIXMUL 1
 
 enum THREE4X4MATRICESCASES
 {
@@ -1641,11 +1641,12 @@ int multiplyThree4x4FMatricesWithIdentityHints(
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
     #if USE_NEW_THREE_4X4_MATRIXMUL
-    unsigned char multiplicationCase = 0;
+    unsigned char multiplicationCase  = MAT_4x4_CASE_NO_ACTIVE_MATRICES;
     //----------------------------------------------------
-    if (matrixCIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXC; }
-    if (matrixBIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXB; }
-    if (matrixAIsIdentity!=0) { multiplicationCase += MAT_4x4_CASE_MATRIXA; }
+    multiplicationCase += (!matrixAIsIdentity) * MAT_4x4_CASE_MATRIXA;
+    multiplicationCase += (!matrixBIsIdentity) * MAT_4x4_CASE_MATRIXB;
+    multiplicationCase += (!matrixCIsIdentity) * MAT_4x4_CASE_MATRIXC;
+    //fprintf(stderr,"Mult A:%u B:%u C:%u => %u\n",matrixAIsIdentity,matrixBIsIdentity,matrixCIsIdentity,multiplicationCase);
     //----------------------------------------------------
 
     switch (multiplicationCase)
@@ -1995,6 +1996,19 @@ void create4x4FModelTransformation(
       }
 
 
+    #if USE_NEW_THREE_4X4_MATRIXMUL
+       //Re-use already optimized code-path
+        multiplyThree4x4FMatricesWithIdentityHints(
+                                                    m,
+                                                    &intermediateMatrixTranslation,
+                                                    (translationSpecified==0),
+                                                    &intermediateMatrixRotation,
+                                                    (rotationSpecified==0),
+                                                    &intermediateScalingMatrix,
+                                                    (scaleSpecified==0)
+                                                  );
+        return;
+    #else
     //Count number of matrix multiplications needed..!
     int numberOfOperationsNeeded = translationSpecified + rotationSpecified + scaleSpecified;
 
@@ -2020,6 +2034,7 @@ void create4x4FModelTransformation(
          multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
         return;
     };
+    #endif // USE_NEW_THREE_4X4_MATRIXMUL
     //----------------------------------------------------------
 }
 
