@@ -1796,9 +1796,9 @@ int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * t
  {
   // What we want to do ( in mathematica )
   // { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
+  // https://www.wolframalpha.com/input?i=%7B+%7Ba%2Cb%2Cc%2Cd%7D+%2C+%7Be%2Cf%2Cg%2Ch%7D+%2C+%7Bi%2Cj%2Ck%2Cl%7D+%2C+%7Bm%2Cn%2Co%2Cp%7D+%7D+*+%7B+%7B+X+%7D+%2C+%7B+Y+%7D++%2C+%7B+Z+%7D+%2C+%7B+W+%7D+%7D
 
-  // This gives us
-
+  // This gives us :
   //{
   //  {e3 W + e0 X + e1 Y + e2 Z},
   //  {e7 W + e4 X + e5 Y + e6 Z},
