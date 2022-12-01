@@ -155,6 +155,10 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m);
 int is4x4FIdentityMatrix(float * m);
 
 int is4x4FZeroMatrix(float  * m);
+
+
+int are4x4FMatricesEqual(float * m1,float * m2);
+
 int is4x4FIdentityMatrixS(struct Matrix4x4OfFloats * m);
 
 int is4x4FIdentityMatrixPercisionCompensating(struct Matrix4x4OfFloats * m);

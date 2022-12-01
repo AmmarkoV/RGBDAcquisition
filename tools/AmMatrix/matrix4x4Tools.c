@@ -241,7 +241,7 @@ float degrees_to_radF(float degrees)
 
 int floatPEq(float * element , float value )
 {
- const float machineFloatPercision= 0.0001;
+ const float machineFloatPercision= 0.0001; // 0.0001; original
  if ( *element == value ) { return 1; }
 
  if ( ( value-machineFloatPercision<*element ) && (( *element<value+machineFloatPercision )) ) { return 1; }
@@ -263,11 +263,22 @@ int is4x4FIdentityMatrix(float  * m)
 int is4x4FZeroMatrix(float  * m)
 {
    return (
-            (floatPEq(&m[0],0.0)) &&(floatPEq(&m[1],0.0)) &&(floatPEq(&m[2],0.0)) &&(floatPEq(&m[3],0.0)) &&
-            (floatPEq(&m[4],0.0)) &&(floatPEq(&m[5],0.0)) &&(floatPEq(&m[6],0.0)) &&(floatPEq(&m[7],0.0)) &&
-            (floatPEq(&m[8],0.0)) &&(floatPEq(&m[9],0.0)) &&(floatPEq(&m[10],0.0))&&(floatPEq(&m[11],0.0))&&
+            (floatPEq(&m[0] ,0.0))&&(floatPEq(&m[1], 0.0))&&(floatPEq(&m[2] ,0.0))&&(floatPEq(&m[3] ,0.0))&&
+            (floatPEq(&m[4] ,0.0))&&(floatPEq(&m[5], 0.0))&&(floatPEq(&m[6] ,0.0))&&(floatPEq(&m[7] ,0.0))&&
+            (floatPEq(&m[8] ,0.0))&&(floatPEq(&m[9], 0.0))&&(floatPEq(&m[10],0.0))&&(floatPEq(&m[11],0.0))&&
             (floatPEq(&m[12],0.0))&&(floatPEq(&m[13],0.0))&&(floatPEq(&m[14],0.0))&&(floatPEq(&m[15],0.0))
            );
+}
+
+
+int are4x4FMatricesEqual(float * m1,float * m2)
+{
+   return (
+           (floatPEq(&m1[0],m2[0])) &&(floatPEq(&m1[1],m2[1])) &&(floatPEq(&m1[2],m2[2])) &&(floatPEq(&m1[3],m2[3])) &&
+           (floatPEq(&m1[4],m2[4])) &&(floatPEq(&m1[5],m2[5])) &&(floatPEq(&m1[6],m2[6])) &&(floatPEq(&m1[7],m2[7])) &&
+           (floatPEq(&m1[8],m2[8])) &&(floatPEq(&m1[9],m2[9])) &&(floatPEq(&m1[10],m2[10]))&&(floatPEq(&m1[11],m2[11]))&&
+           (floatPEq(&m1[12],m2[12]))&&(floatPEq(&m1[13],m2[13]))&&(floatPEq(&m1[14],m2[14]))&&(floatPEq(&m1[15],m2[15]))
+          );
 }
 
 
@@ -572,7 +583,7 @@ void create4x4FRotationXZY(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //--------------
     m->m[4] = (sinX * sinY) - (cosX * cosY * sinZ);
     m->m[5] = cosX * cosZ;
-    m->m[6] = (cosX * sinY * sinZ) + (sinZ * cosY);
+    m->m[6] = (cosX * sinY * sinZ) + (sinX * cosY);
     m->m[7] = 0.0;
     //--------------
     //    Row 3
@@ -740,8 +751,8 @@ void create4x4FRotationZXY(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //    Row 3
     //--------------
     m->m[8]  = cosX * sinY;
-    m->m[9]  = -sinY;
-    m->m[10] = cosX * cosZ;
+    m->m[9]  = -sinX;
+    m->m[10] = cosX * cosY;
     m->m[11] = 0.0;
     //--------------
     //    Row 4
@@ -776,7 +787,7 @@ void create4x4FRotationZYX(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //    Row 1
     //--------------
     m->m[0] = cosY * cosZ;
-    m->m[1] = (sinX * sinY * cosZ) + cosX * sinZ ;
+    m->m[1] = (sinX * sinY * cosZ) + (cosX * sinZ);
     m->m[2] = (sinX * sinZ) - (cosX * sinY * cosZ);
     m->m[3] = 0.0;
     //--------------
@@ -806,47 +817,30 @@ void create4x4FRotationZYX(struct Matrix4x4OfFloats * m,float degreesX,float deg
 
 
 
-void create4x4FMatrixFromEulerAnglesWithRotationOrderNew(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
+void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
 {
-  fprintf(stderr,"create4x4FMatrixFromEulerAnglesWithRotationOrderNew does not produce the same result as the OLD CODE!\n");
-  fprintf(stderr,"TODO: Fix it!!\n");
   if (rotationOrder!=0)
   {
    char rXisIdentity = (degreesEulerX==0.0);
    char rYisIdentity = (degreesEulerY==0.0);
    char rZisIdentity = (degreesEulerZ==0.0);
+   char numberOfIdentityMatrices = rXisIdentity+rYisIdentity+rZisIdentity;
 
-   if ( (!rXisIdentity) || (!rYisIdentity) || (!rZisIdentity) )
+   if ( numberOfIdentityMatrices!=3 )
    {
-    //Assuming the rotation axis are correct
-    //rX,rY,rZ should hold our 4x4 rotation matrices
-    //struct Matrix4x4OfFloats rX;
-    //create4x4FRotationX(&rX,degreesEulerX);
-    //struct Matrix4x4OfFloats rY;
-    //create4x4FRotationY(&rY,degreesEulerY);
-    //struct Matrix4x4OfFloats rZ;
-    //create4x4FRotationZ(&rZ,degreesEulerZ);
-
-   // ./BVHGUI2 --from dataset/MotionCapture/lafan1/dance2_subject2.bvh
-   // ./BVHGUI2 --from dataset/headerWithHeadAndOneMotion.bvh
-
-   switch (rotationOrder)
-   {
+    switch (rotationOrder)
+    {
      case ROTATION_ORDER_XYZ :
        create4x4FRotationXYZ(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rY,rYisIdentity,&rZ,rZisIdentity);
      break;
      case ROTATION_ORDER_XZY :
        create4x4FRotationXZY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rX,rXisIdentity,&rZ,rZisIdentity,&rY,rYisIdentity);
      break;
      case ROTATION_ORDER_YXZ :
        create4x4FRotationYXZ(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rX,rXisIdentity,&rZ,rZisIdentity);
      break;
      case ROTATION_ORDER_YZX :
        create4x4FRotationYZX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rY,rYisIdentity,&rZ,rZisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_ZXY :
        //This is the rotation order commonly used in all joints of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
@@ -856,14 +850,12 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrderNew(struct Matrix4x4OfFloat
        //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} } * { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
        //4% speedup on IK by not using the multiplyThree4x4 Matrix call and using the precalculated version..!
        create4x4FRotationZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rX,rXisIdentity,&rY,rYisIdentity);
      break;
      case ROTATION_ORDER_ZYX :
        //This is the rotation order used in the LAFAN1 dataset ( https://github.com/ubisoft/ubisoft-laforge-animation-dataset )
        //And in the root hip rotation of the DAZ-Friendly CMU dataset ( https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release )
        //0.4% speedup on IK by not using the multiplyThree4x4 Matrix call and using the precalculated version..!
        create4x4FRotationZYX(m,degreesEulerX,degreesEulerY,degreesEulerZ);
-       //multiplyThree4x4FMatricesWithIdentityHints(m,&rZ,rZisIdentity,&rY,rYisIdentity,&rX,rXisIdentity);
      break;
      case ROTATION_ORDER_RPY:
        doRPYTransformationF(
@@ -890,7 +882,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrderNew(struct Matrix4x4OfFloat
 }
 
 
-void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
+void create4x4FMatrixFromEulerAnglesWithRotationOrderOld(struct Matrix4x4OfFloats * m,float degreesEulerX, float degreesEulerY, float degreesEulerZ,unsigned int rotationOrder)
 {
   if (rotationOrder!=0)
   {
@@ -963,6 +955,41 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        create4x4FIdentityMatrix(m);
      break;
     };
+
+
+/*
+enum ROTATION_ORDER
+{
+  ROTATION_ORDER_NONE=0,
+  ROTATION_ORDER_XYZ,//1
+  ROTATION_ORDER_XZY,//2
+  ROTATION_ORDER_YXZ,//3
+  ROTATION_ORDER_YZX,//4
+  ROTATION_ORDER_ZXY,//5
+  ROTATION_ORDER_ZYX,//6
+  ROTATION_ORDER_RPY,//7
+  ROTATION_ORDER_RODRIGUES,//8
+  //--------------------
+  ROTATION_ORDER_NUMBER_OF_NAMES
+};
+
+*/
+/*
+    //Do check with new code, apparently i fixed it :)
+    struct Matrix4x4OfFloats checkNew={0};
+    create4x4FMatrixFromEulerAnglesWithRotationOrderNew(&checkNew,degreesEulerX,degreesEulerY,degreesEulerZ,rotationOrder);
+    if (!are4x4FMatricesEqual(m->m,checkNew.m))
+    {
+      fprintf(stderr,"DISCREPANCY IN NEW 4x4 CODE for rotation order %u (%0.2f,%0.2f,%0.2f)!\n",rotationOrder,degreesEulerX,degreesEulerY,degreesEulerZ);
+      print4x4FMatrix("New calculation",checkNew.m,1);
+      print4x4FMatrix("Old calculation",m->m,1);
+      exit(1);
+    } else
+    {
+      fprintf(stderr,"New vs old 4x4 code matches..\n");
+    }*/
+
+
     return;
    }
   }
