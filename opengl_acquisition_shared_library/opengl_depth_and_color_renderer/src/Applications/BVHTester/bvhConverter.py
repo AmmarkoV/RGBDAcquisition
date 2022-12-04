@@ -7,6 +7,17 @@ from ctypes import *
 from os.path import exists
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 def loadLibrary(filename,relativePath="",forceUpdate=False):
 #--------------------------------------------------------
  if (relativePath!=""): 
@@ -65,9 +76,15 @@ class BVH():
         print("Initializing BVH file ",bvhPath," from ",libraryPath)
         self.libBVH         = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints = 0
+        self.traceStages    = False #If set to true each call will be emitted in stdout to speed-up debugging
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
+  def stage(self,message):
+        if (self.traceStages):
+            print(bcolors.WARNING,message,bcolors.ENDC)
+  #--------------------------------------------------------
   def loadBVHFile(self,bvhPath):
+        self.stage("loadBVHFile")
         # create byte objects from the strings
         arg1 = bvhPath.encode('utf-8')
         # send strings to c function
@@ -79,23 +96,34 @@ class BVH():
         return self.numberOfJoints
   #--------------------------------------------------------
   def getJointName(self, jointID:int):
+        self.stage("getJointName")
         self.libBVH.bvhConverter_getJointNameFromJointID.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_getJointNameFromJointID.restype  = ctypes.c_char_p
-        return str(self.libBVH.bvhConverter_getJointNameFromJointID(jointID).decode('UTF-8'));   
+        return str(self.libBVH.bvhConverter_getJointNameFromJointID(jointID).decode('UTF-8'));
+  #--------------------------------------------------------
+  def isJointEndSite(self, jointID:int):
+        self.stage("isJointEndSite")
+        self.libBVH.bvhConverter_isJointEndSite.argtypes = [ctypes.c_int]
+        self.libBVH.bvhConverter_isJointEndSite.restype  = ctypes.c_int
+        retval = self.libBVH.bvhConverter_isJointEndSite(jointID)
+        return retval
   #--------------------------------------------------------
   def getJointParent(self, jointID:int):
+        self.stage("getJointParent")
         self.libBVH.bvhConverter_getJointParent.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_getJointParent.restype  = ctypes.c_int
         jointID = self.libBVH.bvhConverter_getJointParent(jointID)
         return jointID
   #--------------------------------------------------------
   def getJointParentList(self):
+        self.stage("getJointParentList")
         jointList = list() 
         for jointID in range(0,self.numberOfJoints):
             jointList.append(int(self.getJointParent(jointID)))
         return jointList
   #--------------------------------------------------------
   def getJointID(self, jointName:str):
+        self.stage("getJointID")
         arg1 = jointName.encode('utf-8') 
         self.libBVH.bvhConverter_getJointNameJointID.argtypes = [ctypes.c_char_p]
         self.libBVH.bvhConverter_getJointNameJointID.restype  = ctypes.c_int
@@ -103,27 +131,35 @@ class BVH():
         return jointID
   #--------------------------------------------------------
   def getJointList(self):
+        self.stage("getJointList")
         jointList = list() 
         for jointID in range(0,self.numberOfJoints):
             jointList.append(self.getJointName(jointID))
         return jointList
   #--------------------------------------------------------
   def getJointRotationsForFrame(self, jointID:int, frameID:int):
-        self.libBVH.bvhConverter_getBVHJointRotationXForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
-        self.libBVH.bvhConverter_getBVHJointRotationXForFrame.restype  = ctypes.c_float
-        xRot = self.libBVH.bvhConverter_getBVHJointRotationXForFrame(frameID,jointID)
+        self.stage("getJointRotationsForFrame")
+        if (self.isJointEndSite(jointID)==1):
+          xRot=0.0
+          yRot=0.0
+          zRot=0.0  
+        else: 
+          self.libBVH.bvhConverter_getBVHJointRotationXForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+          self.libBVH.bvhConverter_getBVHJointRotationXForFrame.restype  = ctypes.c_float
+          xRot = self.libBVH.bvhConverter_getBVHJointRotationXForFrame(frameID,jointID)
 
-        self.libBVH.bvhConverter_getBVHJointRotationYForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
-        self.libBVH.bvhConverter_getBVHJointRotationYForFrame.restype  = ctypes.c_float
-        yRot = self.libBVH.bvhConverter_getBVHJointRotationYForFrame(frameID,jointID)
+          self.libBVH.bvhConverter_getBVHJointRotationYForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+          self.libBVH.bvhConverter_getBVHJointRotationYForFrame.restype  = ctypes.c_float
+          yRot = self.libBVH.bvhConverter_getBVHJointRotationYForFrame(frameID,jointID)
 
-        self.libBVH.bvhConverter_getBVHJointRotationZForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
-        self.libBVH.bvhConverter_getBVHJointRotationZForFrame.restype  = ctypes.c_float
-        zRot = self.libBVH.bvhConverter_getBVHJointRotationZForFrame(frameID,jointID)
+          self.libBVH.bvhConverter_getBVHJointRotationZForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
+          self.libBVH.bvhConverter_getBVHJointRotationZForFrame.restype  = ctypes.c_float
+          zRot = self.libBVH.bvhConverter_getBVHJointRotationZForFrame(frameID,jointID)
 
         return xRot,yRot,zRot 
   #--------------------------------------------------------
   def getJoint3D(self, jointID:int):
+        self.stage("getJoint3D")
         self.libBVH.bvhConverter_get3DX.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_get3DX.restype  = ctypes.c_float
         x3D = self.libBVH.bvhConverter_get3DX(jointID)
@@ -139,6 +175,7 @@ class BVH():
         return x3D,y3D,z3D 
   #--------------------------------------------------------
   def getJoint2D(self, jointID:int):
+        self.stage("getJoint2D")
         self.libBVH.bvhConverter_get2DX.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_get2DX.restype  = ctypes.c_float
         x2D = self.libBVH.bvhConverter_get2DX(jointID)
@@ -156,12 +193,14 @@ class BVH():
         return self.getJoint2D(self.getJointID(jointName)) 
   #--------------------------------------------------------
   def processFrame(self, frameID:int):
+        self.stage("processFrame")
         self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
         self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
         success = self.libBVH.bvhConverter_processFrame(frameID) 
         return success
   #--------------------------------------------------------
   def modify(self,arguments:dict,frameID=0):
+    self.stage("modify")
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int]
@@ -175,6 +214,7 @@ class BVH():
     self.libBVH.bvhConverter_rendererConfigurationAtomic(labelsCStr,valuesArray,argc)
   #--------------------------------------------------------
   def get2DAnd3DAndBVHDictsForFrame(self,frameID=0):
+    self.stage("get2DAnd3DAndBVHDictsForFrame ")
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     self.processFrame(frameID=frameID)
 
@@ -203,18 +243,20 @@ class BVH():
                data2D["2DY_"+jointName]=float(y2D)
                #-------------------------------------------
                #print("Getting Joint Rotations")
-               xRot,yRot,zRot = self.getJointRotationsForFrame(jointID,frameID)
-               if (jointID==0):
-                  dataBVH[jointName+"_Xposition"]=float(x3D)
-                  dataBVH[jointName+"_Yposition"]=float(y3D)
-                  dataBVH[jointName+"_Zposition"]=float(z3D)
-               dataBVH[jointName+"_Xrotation"]=float(xRot)
-               dataBVH[jointName+"_Yrotation"]=float(yRot)
-               dataBVH[jointName+"_Zrotation"]=float(zRot)
+               if (self.isJointEndSite(jointID)==0): #Do not try to recover rotations for EndSites (they dont have rotations)
+                 xRot,yRot,zRot = self.getJointRotationsForFrame(jointID,frameID)
+                 if (jointID==0):
+                    dataBVH[jointName+"_Xposition"]=float(x3D)
+                    dataBVH[jointName+"_Yposition"]=float(y3D)
+                    dataBVH[jointName+"_Zposition"]=float(z3D)
+                 dataBVH[jointName+"_Xrotation"]=float(xRot)
+                 dataBVH[jointName+"_Yrotation"]=float(yRot)
+                 dataBVH[jointName+"_Zrotation"]=float(zRot)
     #-------------------------------------------------------
     return data2D,data3D,dataBVH 
   #--------------------------------------------------------
   def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=10,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0):
+    self.stage("fineTuneToMatch ")
     bodyPartCStr = bytes(bodyPart, 'utf-8')
 
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code

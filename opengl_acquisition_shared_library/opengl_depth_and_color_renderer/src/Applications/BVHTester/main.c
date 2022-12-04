@@ -50,7 +50,6 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
 void haltOnError(unsigned int haltingSwitch,const char * message)
 {
   fprintf(stderr,RED "=======================================\n");
@@ -66,15 +65,11 @@ void haltOnError(unsigned int haltingSwitch,const char * message)
     }
 }
 
-
 void incorrectArguments()
 {
   fprintf(stderr,RED "Incorrect number of arguments.. \n" NORMAL);
   exit(1);
 }
-
-
-
 
 //------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -92,6 +87,10 @@ struct MotionBuffer * atomicPenultimateSolution=0;
 struct MotionBuffer * atomicPreviousSolution=0;
 struct MotionBuffer * atomicSolution=0;
 struct ButterWorthArray * atomicSmoothingFilter = 0;
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+//------------------------------------------------------------------
 
 
 int bvhConverter_loadAtomic(const char *path)
@@ -158,7 +157,7 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
   return 0;
 }
 
-int  bvhConverter_processFrame(int frameID)
+int bvhConverter_processFrame(int frameID)
 {
     int occlusions=1;
     return performPointProjectionsForFrame(
@@ -260,6 +259,16 @@ float  bvhConverter_get2DY(int jointID)
 }
 
 
+
+int bvhConverter_isJointEndSite(int jointID)
+{
+    if (jointID<bvhAtomicMotion.jointHierarchySize)
+    {
+        return bvhAtomicMotion.jointHierarchy[jointID].isEndSite;
+    }
+  fprintf(stderr,RED "BVH library could not resolve if joint is an EndSite because joint is out bounds \"%u\" \n" NORMAL,jointID);
+  return 0;
+}
 
 float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID)
 {

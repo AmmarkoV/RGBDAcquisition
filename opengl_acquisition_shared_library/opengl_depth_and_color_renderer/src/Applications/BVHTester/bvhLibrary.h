@@ -32,6 +32,8 @@ float  bvhConverter_get3DZ(int jointID);
 float  bvhConverter_get2DX(int jointID);
 float  bvhConverter_get2DY(int jointID);
 
+int bvhConverter_isJointEndSite(int jointID);
+
 float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID);
 float bvhConverter_getBVHJointRotationYForFrame(int frameID,int jointID);
 float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID);
