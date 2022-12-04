@@ -298,6 +298,11 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
   lowercase(jointName);
   lowercase(dof);
   //=======================================================
+  if (strstr(jointName,"endsite_")!=0)
+  {
+     fprintf(stderr,RED "Endsites can't be modified..!\n" NORMAL);
+     return 0;
+  }
   //fprintf(stderr," %u - %s->%0.2f ",i,label,value);
   //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
   //=======================================================

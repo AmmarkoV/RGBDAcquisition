@@ -246,7 +246,6 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
          fprintf(stderr,RED "BUG:  jID %u / fID %u  has an incorrect number of channels (%u) \n" NORMAL ,jID,fID,bvhMotion->jointHierarchy[jID].loadedChannels);
      }
 
-
      //Manual re-resolution of channel!
      int resolvedChannelType = 0;
      int resolvedChannel     = 0;
@@ -268,7 +267,15 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
            //Special case QBVH ..!
          } else
          {
-          fprintf(stderr,RED "BUG: %s | Unable to resolve jID %u | fID %u/%u | channelTypeID %u\n" NORMAL,bvhMotion->fileName,jID,fID,bvhMotion->numberOfFrames,channelTypeID);
+          fprintf(
+                  stderr,RED "BUG:%s|Unable to resolve jID %u (%s)|fID %u/%u|channelTypeID %u\n" NORMAL,
+                  bvhMotion->fileName,
+                  jID,
+                  bvhMotion->jointHierarchy[jID].jointName,
+                  fID,
+                  bvhMotion->numberOfFrames,
+                  channelTypeID
+                 );
          }
      }
      //This is broken ?
@@ -932,6 +939,7 @@ float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointI
          return bvhMotion->motionValues[mID];
        } else
        {
+         //bvh_printBVH(bvhMotion);
          fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
        }
     }
@@ -1052,6 +1060,13 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
   //This gets spammed a *LOT* so it needs to be improved..
   if ( (motionBuffer!=0) && (data!=0) && (sizeOfData >= sizeof(float) * MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER) ) //QBVH
   {
+      //?
+      //if (bvhMotion->jointHierarchy[jID].isEndSite)
+      //{
+        //Fast-Path out, end-sites have no data to retrieve
+      //  return 1;
+      //}
+
       // If there are no positional channels erase them..!
       if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels) //This used to be isRoot before QBVH
       {
@@ -1079,6 +1094,9 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
        unsigned int mID;
        switch (bvhMotion->jointHierarchy[jID].channelRotationOrder)
        {
+           case BVH_ROTATION_ORDER_NONE:
+             fprintf(stderr,"bhv_retrieveDataFromMotionBuffer: Asked to retrieve without rotation order..!\n");
+           break;
            case BVH_ROTATION_ORDER_ZXY :
              //Special code to speed up cases that match the BVH specification ZXY rotation orders
              mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,0,BVH_ROTATION_X);

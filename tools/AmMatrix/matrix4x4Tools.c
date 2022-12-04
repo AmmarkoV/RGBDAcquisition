@@ -1085,10 +1085,18 @@ void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y
 
 void create4x4FScalingMatrix(struct Matrix4x4OfFloats * m, float scaleX, float scaleY, float scaleZ)
 {
+   #if OPTIMIZED
+   memset(m->m,0,16*sizeof(float));
+   m->m[0]  = scaleX;
+   m->m[5]  = scaleY;
+   m->m[10] = scaleZ;
+   m->m[15] = 1.0;
+  #else
     if (m==0) { return ;}
     create4x4FIdentityMatrix(m);
     // Scale slots.
     m->m[0] = scaleX; m->m[5] = scaleY; m->m[10] = scaleZ;
+  #endif // OPTIMIZED
 }
 
 float det4x4FMatrix(float * mat)
