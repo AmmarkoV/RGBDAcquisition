@@ -5,7 +5,6 @@
 		<Option title="BVHTester" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/calculate/" />
 		<Build>
 			<Target title="Debug">
 				<Option output="../../../BVHTester" prefix_auto="1" extension_auto="1" />
@@ -182,7 +181,6 @@
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/MotionCaptureLoader/calculate/" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/ik/hardcodedProblems_inverseKinematics.c">
