@@ -152,9 +152,20 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
   fprintf(stderr,"bvhConverter_rendererConfigurationAtomic received %u elements\n",numberOfElements);
   for (int i=0; i<numberOfElements; i++)
   {
-      fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
+      //fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
+      if (strcmp(labels[i],"near")==0)   { renderingAtomicConfiguration.near   = values[i]; } else
+      if (strcmp(labels[i],"far")==0)    { renderingAtomicConfiguration.far    = values[i]; } else
+      if (strcmp(labels[i],"width")==0)  { renderingAtomicConfiguration.width  = (unsigned int) values[i]; } else
+      if (strcmp(labels[i],"height")==0) { renderingAtomicConfiguration.height = (unsigned int) values[i]; } else
+      if (strcmp(labels[i],"cX")==0)     { renderingAtomicConfiguration.cX     = values[i]; } else
+      if (strcmp(labels[i],"cY")==0)     { renderingAtomicConfiguration.cY     = values[i]; } else
+      if (strcmp(labels[i],"fX")==0)     { renderingAtomicConfiguration.fX     = values[i]; } else
+      if (strcmp(labels[i],"fY")==0)     { renderingAtomicConfiguration.fY     = values[i]; } else
+        {
+          fprintf(stderr,RED"bvhConverter_rendererConfigurationAtomic: Unknown command %u - %s->%0.2f\n" NORMAL,i,labels[i],values[i]);
+        }
   }
-  return 0;
+  return 1;
 }
 
 int bvhConverter_processFrame(int frameID)
