@@ -45,7 +45,7 @@
 
 
 //Experiment : Try to use langevin dynamics for annealed gradient descent
-#define USE_LANGEVIN_DYNAMICS 1
+#define USE_LANGEVIN_DYNAMICS 0
 
 unsigned long tickBaseIK = 0;
 
@@ -117,14 +117,14 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
 
 
 float meanBVH2DDistance(
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    int useAllJoints,
-    BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-    struct BVH_Transform * bvhSourceTransform,
-    struct BVH_Transform * bvhTargetTransform,
-    unsigned int verbose
-)
+                        struct BVH_MotionCapture * mc,
+                        struct simpleRenderer *renderer,
+                        int useAllJoints,
+                        BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
+                        struct BVH_Transform * bvhSourceTransform,
+                        struct BVH_Transform * bvhTargetTransform,
+                        unsigned int verbose
+                       )
 {
     if (verbose)
     {
@@ -187,15 +187,15 @@ float meanBVH2DDistance(
 
 
 float meanBVH3DDistance(
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    int useAllJoints,
-    BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-    float * sourceMotionBuffer,
-    struct BVH_Transform * bvhSourceTransform,
-    float * targetMotionBuffer,
-    struct BVH_Transform * bvhTargetTransform
-)
+                        struct BVH_MotionCapture * mc,
+                        struct simpleRenderer *renderer,
+                        int useAllJoints,
+                        BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
+                        float * sourceMotionBuffer,
+                        struct BVH_Transform * bvhSourceTransform,
+                        float * targetMotionBuffer,
+                        struct BVH_Transform * bvhTargetTransform
+                       )
 {
     if (targetMotionBuffer==0)
     {
@@ -443,7 +443,7 @@ float calculateChainLoss(
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
                    //if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
-                    if (problem->chain[chainID].part[partID].jointImportance!=0.0)
+                   if (problem->chain[chainID].part[partID].jointImportance!=0.0)
                     //If the joint importance is zero then why go through all this trouble..
                    {
                         unsigned int jID=problem->chain[chainID].part[partID].jID;
@@ -486,20 +486,19 @@ float calculateChainLoss(
 
 
 int examineSolutionAndKeepIfItIsBetter(
-                                      struct ikProblem * problem,
-                                      unsigned int iterationID,
-                                      unsigned int chainID,
-                                      unsigned int partID,
-                                      unsigned int * mIDS,
-                                      float * originalValues,
-                                      float * bestValues,
-                                      float * bestLoss,
-                                      float spring,
-                                      //-------------------------
-                                      float * solutionToTest
-                                    )
+                                       struct ikProblem * problem,
+                                       unsigned int iterationID,
+                                       unsigned int chainID,
+                                       unsigned int partID,
+                                       unsigned int * mIDS,
+                                       float * originalValues,
+                                       float * bestValues,
+                                       float * bestLoss,
+                                       float spring,
+                                       //-------------------------
+                                       float * solutionToTest
+                                      )
 {
-
       float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
                                 problem->chain[chainID].currentSolution->motion[mIDS[1]],
@@ -559,7 +558,7 @@ float iteratePartLoss(
                       unsigned int verbose
                      )
 {
-    unsigned long startTime;
+    unsigned long startTime=0;
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
 

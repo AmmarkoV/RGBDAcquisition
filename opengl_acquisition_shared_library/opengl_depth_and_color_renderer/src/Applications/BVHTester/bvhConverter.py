@@ -72,7 +72,7 @@ def splitDictionaryInLabelsAndFloats(arguments):
 
 
 class BVH():
-  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False ):
+  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False):
         print("Initializing BVH file ",bvhPath," from ",libraryPath)
         self.libBVH         = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints = 0
@@ -144,18 +144,19 @@ class BVH():
           yRot=0.0
           zRot=0.0  
         else: 
+          #--------------------------------------------------------
           self.libBVH.bvhConverter_getBVHJointRotationXForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
           self.libBVH.bvhConverter_getBVHJointRotationXForFrame.restype  = ctypes.c_float
           xRot = self.libBVH.bvhConverter_getBVHJointRotationXForFrame(frameID,jointID)
-
+          #--------------------------------------------------------
           self.libBVH.bvhConverter_getBVHJointRotationYForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
           self.libBVH.bvhConverter_getBVHJointRotationYForFrame.restype  = ctypes.c_float
           yRot = self.libBVH.bvhConverter_getBVHJointRotationYForFrame(frameID,jointID)
-
+          #--------------------------------------------------------
           self.libBVH.bvhConverter_getBVHJointRotationZForFrame.argtypes = [ctypes.c_int, ctypes.c_int]
           self.libBVH.bvhConverter_getBVHJointRotationZForFrame.restype  = ctypes.c_float
           zRot = self.libBVH.bvhConverter_getBVHJointRotationZForFrame(frameID,jointID)
-
+          #--------------------------------------------------------
         return xRot,yRot,zRot 
   #--------------------------------------------------------
   def getJoint3D(self, jointID:int):
@@ -229,7 +230,7 @@ class BVH():
     #-------------------------------------------------------
                #print("joint ID = ",jointID) 
                #-------------------------------------------
-               jointName   = self.getJointName(jointID).lower()
+               jointName = self.getJointName(jointID).lower()
                #-------------------------------------------
                #print("Getting 3D")
                x3D,y3D,z3D = self.getJoint3D(jointID)
@@ -255,7 +256,7 @@ class BVH():
     #-------------------------------------------------------
     return data2D,data3D,dataBVH 
   #--------------------------------------------------------
-  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=10,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0):
+  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0):
     self.stage("fineTuneToMatch ")
     bodyPartCStr = bytes(bodyPart, 'utf-8')
 
@@ -265,7 +266,7 @@ class BVH():
     self.libBVH.bvhConverter_IKFineTune.restype  = ctypes.c_int
     success = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff)
     if (success==1):
-       print("Retrieving HCD results!")
+       print("Retrieving HCD results for ",iterations," iterations!")
        return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
 
     return dict()  

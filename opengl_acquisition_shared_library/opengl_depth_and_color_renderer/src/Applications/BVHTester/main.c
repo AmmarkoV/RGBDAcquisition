@@ -91,8 +91,6 @@ struct ButterWorthArray * atomicSmoothingFilter = 0;
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
-
-
 int bvhConverter_loadAtomic(const char *path)
 {
   float scaleWorld=1.0;
@@ -149,6 +147,17 @@ struct MotionBuffer * atomicSolution=0;
 
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
 {
+  // Emulate GoPro Hero4 @ FullHD mode by default..
+  // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+  renderingAtomicConfiguration.near   = 1.0;
+  renderingAtomicConfiguration.far    = 10000.0;
+  renderingAtomicConfiguration.width  = 1920;
+  renderingAtomicConfiguration.height = 1080;
+  renderingAtomicConfiguration.cX=(float)renderingAtomicConfiguration.width/2;
+  renderingAtomicConfiguration.cY=(float)renderingAtomicConfiguration.height/2;
+  renderingAtomicConfiguration.fX=582.18394;
+  renderingAtomicConfiguration.fY=582.52915;
+
   fprintf(stderr,"bvhConverter_rendererConfigurationAtomic received %u elements\n",numberOfElements);
   for (int i=0; i<numberOfElements; i++)
   {
@@ -165,6 +174,15 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
           fprintf(stderr,RED"bvhConverter_rendererConfigurationAtomic: Unknown command %u - %s->%0.2f\n" NORMAL,i,labels[i],values[i]);
         }
   }
+
+   simpleRendererDefaults(
+                          &rendererAtomic,
+                          renderingAtomicConfiguration.width,
+                          renderingAtomicConfiguration.height,
+                          renderingAtomicConfiguration.fX,
+                          renderingAtomicConfiguration.fY
+                         );
+    simpleRendererInitialize(&rendererAtomic);
   return 1;
 }
 
@@ -518,10 +536,7 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
 
-
-
-
-      //------------------------------------
+    //------------------------------------
          struct ikConfiguration ikConfig = {0};
          ikConfig.learningRate = lr;
          ikConfig.iterations = iterations;
