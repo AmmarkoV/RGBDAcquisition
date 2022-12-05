@@ -399,3 +399,27 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
  fprintf(stderr,"Errors occured during bvh_GrowMocapFileByMirroringJointAndItsChildren\n");
  return 0;
 }
+
+
+
+
+
+
+
+
+
+int bvh_flipLeftAndRight(
+                         struct BVH_MotionCapture * mc,
+                         BVHFrameID fID
+                        )
+{
+  BVHJointID jIDA,jIDB;
+  unsigned int rangeOfJIDA,rangeOfJIDB;
+  unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
+
+ return 0;
+}
+
+
+
+

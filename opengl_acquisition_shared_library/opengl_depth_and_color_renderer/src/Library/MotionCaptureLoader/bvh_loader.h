@@ -143,10 +143,16 @@ struct motionTransactionData
 };
 
 
+/** * @brief Typedefs to make sure there are no logic errors when accessing a Joint */
 typedef unsigned int BVHJointID;
+/** * @brief Typedefs to make sure there are no logic errors when accessing a Frame*/
 typedef unsigned int BVHFrameID;
+/** * @brief Typedefs to make sure there are no logic errors when accessing a Motion Channel*/
 typedef unsigned int BVHMotionChannelID;
 
+/**
+  * @brief MotionBuffers are a C "vector" container to flexibly carry, copy and process motions in different functions
+  */
 struct MotionBuffer
 {
   float * motion;
@@ -173,30 +179,28 @@ struct jointPartOfKnownHierarchy
 */
 struct BVH_Joint
 {
-  //--------------------
+  //-------------------------------------------
   char isImmuneToTorsoOcclusions;
-  //--------------------
-
+  //-------------------------------------------
   struct jointPartOfKnownHierarchy partOfHierarchy;
-  //--------------------
+  //-------------------------------------------
   char erase2DCoordinates;
   char isRoot;
   char hasBrace;
   char isEndSite;
   char hasEndSite;
-  //--------------------
-  char jointName[MAX_BVH_JOINT_NAME+1]; //+Null terminator space
+  //-------------------------------------------
+  char jointName[MAX_BVH_JOINT_NAME+1];          //+Null terminator space
   char jointNameLowercase[MAX_BVH_JOINT_NAME+1]; //+Null terminator space
   unsigned int jointNameHash;
-  //--------------------
+  //-------------------------------------------
   BVHJointID parentJoint;
   BVHJointID endSiteJoint;
   unsigned int hierarchyLevel;
-  //--------------------
+  //-------------------------------------------
   float offset[3];
   struct Matrix4x4OfFloats staticTransformation;
-  //--------------------
-
+  //-------------------------------------------
   char  hasPositionalChannels;
   char  hasRotationalChannels;
   char  hasQuaternionRotation;
@@ -204,7 +208,11 @@ struct BVH_Joint
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
   unsigned int loadedChannels;
-  //--------------------
+  //-------------------------------------------
+  //This is new functionality to define symmetries and flip L/R joints/poses
+  BVHJointID symmetricJoint;
+  unsigned int symmetryType;
+  //-------------------------------------------
 };
 
 
