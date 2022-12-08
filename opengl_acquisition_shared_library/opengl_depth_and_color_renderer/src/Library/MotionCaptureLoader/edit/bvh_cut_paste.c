@@ -3,6 +3,14 @@
 #include <string.h>
 #include "bvh_cut_paste.h"
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
 int scanJointHierarchyUntilThisGroupEnds(
                                          struct BVH_MotionCapture * mc,
                                          BVHJointID jID,
@@ -417,9 +425,45 @@ int bvh_symmetricflipLeftAndRight(
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
 
+  char symmetricTo[512]={0};
+
   bvh_printBVH(mc);
   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
   {
+    unsigned int jNameLength = strlen(mc->jointHierarchy[jID].jointNameLowercase);
+    if (jNameLength>2)
+    {
+        if ( (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-2]=='.') &&
+             (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-1]=='l') )
+             {
+                 //This is a left symmetric joint!
+                 snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
+                 symmetricTo[jNameLength-1]='r';
+                 fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+             } else
+        if ( (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-2]=='.') &&
+             (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-1]=='r') )
+             {
+                 //This is a right symmetric joint!
+                 snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
+                 symmetricTo[jNameLength-1]='l';
+                 fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+             } else
+        if ( (mc->jointHierarchy[jID].jointNameLowercase[0]=='l')  )
+             {
+                 //This is a left symmetric joint!
+                 snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
+                 symmetricTo[0]='r';
+                 fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+             } else
+        if ( (mc->jointHierarchy[jID].jointNameLowercase[0]=='r')  )
+             {
+                 //This is a right symmetric joint!
+                 snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
+                 symmetricTo[0]='l';
+                 fprintf(stderr,GREEN "Joint %s is Right Symmetric\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+             }
+    }
 
   }
   exit(0);
