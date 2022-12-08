@@ -67,6 +67,12 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
                                                    int alsoIncludeOriginalMotion
                                                   );
 
+
+int bvh_symmetricflipLeftAndRight(
+                                  struct BVH_MotionCapture * mc,
+                                  BVHFrameID fID
+                                 );
+
 #ifdef __cplusplus
 }
 #endif

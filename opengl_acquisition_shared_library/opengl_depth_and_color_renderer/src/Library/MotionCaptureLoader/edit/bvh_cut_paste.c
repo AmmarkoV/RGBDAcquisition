@@ -408,14 +408,26 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
 
 
 
-int bvh_flipLeftAndRight(
-                         struct BVH_MotionCapture * mc,
-                         BVHFrameID fID
-                        )
+int bvh_symmetricflipLeftAndRight(
+                                  struct BVH_MotionCapture * mc,
+                                  BVHFrameID fID
+                                 )
 {
   BVHJointID jIDA,jIDB;
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
+
+  bvh_printBVH(mc);
+  for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+  {
+
+  }
+  exit(0);
+  /*
+  //This is new functionality to define symmetries and flip L/R joints/poses
+  BVHJointID symmetricJoint;
+  unsigned int symmetryType;
+  char symmetryIsLeftJoint;*/
 
  return 0;
 }

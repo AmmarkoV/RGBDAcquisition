@@ -212,6 +212,7 @@ struct BVH_Joint
   //This is new functionality to define symmetries and flip L/R joints/poses
   BVHJointID symmetricJoint;
   unsigned int symmetryType;
+  char symmetryIsLeftJoint;
   //-------------------------------------------
 };
 

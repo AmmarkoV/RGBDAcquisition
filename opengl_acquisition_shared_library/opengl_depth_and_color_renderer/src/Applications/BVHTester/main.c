@@ -1224,6 +1224,13 @@ int bvhConverter(int argc,const char **argv)
                                );
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--symmetricflip")==0)
+        {
+          BVHFrameID fID = 0;
+          for (fID=0; fID<bvhMotion.numberOfFrames; fID++)
+              { bvh_symmetricflipLeftAndRight(&bvhMotion,fID); }
+        } else
+        //-----------------------------------------------------
 
         //-----------------------------------------------------
         if (strcmp(argv[i],"--repeat")==0)
