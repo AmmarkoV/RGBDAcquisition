@@ -461,7 +461,7 @@ int bvh_symmetricflipLeftAndRight(
                  //This is a right symmetric joint!
                  snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
                  symmetricTo[0]='l';
-                 fprintf(stderr,GREEN "Joint %s is Right Symmetric\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                 fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
              }
     }
 
