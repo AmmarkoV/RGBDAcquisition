@@ -425,6 +425,7 @@ int bvh_symmetricflipLeftAndRight(
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
 
+  BVHJointID symmetricJID=0;
   char symmetricTo[512]={0};
 
   bvh_printBVH(mc);
@@ -439,7 +440,15 @@ int bvh_symmetricflipLeftAndRight(
                  //This is a left symmetric joint!
                  snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
                  symmetricTo[jNameLength-1]='r';
-                 fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                 if (bvh_getJointIDFromJointNameNocase(mc,symmetricTo,&symmetricJID))
+                 {
+                    fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                    mc->jointHierarchy[jID].symmetricJoint=symmetricJID;
+                    mc->jointHierarchy[jID].symmetryIsLeftJoint=1;
+                    mc->jointHierarchy[symmetricJID].symmetricJoint=jID;
+                    mc->jointHierarchy[symmetricJID].symmetryIsLeftJoint=0;
+                 }  else
+                 { fprintf(stderr,RED "Could not resolve joint `%s` \n",symmetricTo); }
              } else
         if ( (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-2]=='.') &&
              (mc->jointHierarchy[jID].jointNameLowercase[jNameLength-1]=='r') )
@@ -447,21 +456,45 @@ int bvh_symmetricflipLeftAndRight(
                  //This is a right symmetric joint!
                  snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
                  symmetricTo[jNameLength-1]='l';
-                 fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                 if (bvh_getJointIDFromJointNameNocase(mc,symmetricTo,&symmetricJID))
+                 {
+                    fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                    mc->jointHierarchy[jID].symmetricJoint=symmetricJID;
+                    mc->jointHierarchy[jID].symmetryIsLeftJoint=1;
+                    mc->jointHierarchy[symmetricJID].symmetricJoint=jID;
+                    mc->jointHierarchy[symmetricJID].symmetryIsLeftJoint=0;
+                 }  else
+                 { fprintf(stderr,RED "Could not resolve joint `%s` \n",symmetricTo); }
              } else
         if ( (mc->jointHierarchy[jID].jointNameLowercase[0]=='l')  )
              {
                  //This is a left symmetric joint!
                  snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
                  symmetricTo[0]='r';
-                 fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                 if (bvh_getJointIDFromJointNameNocase(mc,symmetricTo,&symmetricJID))
+                 {
+                    fprintf(stderr,RED "Joint %s is Left Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                    mc->jointHierarchy[jID].symmetricJoint=symmetricJID;
+                    mc->jointHierarchy[jID].symmetryIsLeftJoint=1;
+                    mc->jointHierarchy[symmetricJID].symmetricJoint=jID;
+                    mc->jointHierarchy[symmetricJID].symmetryIsLeftJoint=0;
+                 }  else
+                 { fprintf(stderr,RED "Could not resolve joint `%s` \n",symmetricTo); }
              } else
         if ( (mc->jointHierarchy[jID].jointNameLowercase[0]=='r')  )
              {
                  //This is a right symmetric joint!
                  snprintf(symmetricTo,512,"%s",mc->jointHierarchy[jID].jointNameLowercase);
                  symmetricTo[0]='l';
-                 fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                 if (bvh_getJointIDFromJointNameNocase(mc,symmetricTo,&symmetricJID))
+                 {
+                    fprintf(stderr,GREEN "Joint %s is Right Symmetric to %s\n" NORMAL,mc->jointHierarchy[jID].jointNameLowercase,symmetricTo);
+                    mc->jointHierarchy[jID].symmetricJoint=symmetricJID;
+                    mc->jointHierarchy[jID].symmetryIsLeftJoint=1;
+                    mc->jointHierarchy[symmetricJID].symmetricJoint=jID;
+                    mc->jointHierarchy[symmetricJID].symmetryIsLeftJoint=0;
+                 }  else
+                 { fprintf(stderr,RED "Could not resolve joint `%s` \n",symmetricTo); }
              }
     }
 
