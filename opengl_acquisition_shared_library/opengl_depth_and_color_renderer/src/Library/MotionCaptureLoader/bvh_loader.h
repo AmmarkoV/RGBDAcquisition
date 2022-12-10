@@ -286,6 +286,7 @@ struct BVH_MotionCapture
   //------------------------
 
   //---------
+  char checkedForSymmetricJoints;
   char debug;
 };
 

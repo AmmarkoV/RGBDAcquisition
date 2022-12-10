@@ -419,6 +419,11 @@ int bvh_swapJointMotionsForFrameID(
                                     char flipX,char flipY,char flipZ
                                   )
 {
+  if (
+       (!mc->jointHierarchy[jIDA].isEndSite) &&
+       (!mc->jointHierarchy[jIDB].isEndSite)
+     )
+  {
   //-------------------------------------------------------
   float jIDA_vX = bvh_getJointRotationXAtFrame(mc,jIDA,fID);
   float jIDA_vY = bvh_getJointRotationYAtFrame(mc,jIDA,fID);
@@ -428,7 +433,6 @@ int bvh_swapJointMotionsForFrameID(
   float jIDB_vY = bvh_getJointRotationYAtFrame(mc,jIDB,fID);
   float jIDB_vZ = bvh_getJointRotationZAtFrame(mc,jIDB,fID);
   //-------------------------------------------------------
-
   float fX = 1.0,fY = 1.0,fZ = 1.0;
   //-------------------------------------------------------
   if (flipX) { fX=-1.0; }
@@ -443,6 +447,7 @@ int bvh_swapJointMotionsForFrameID(
   bvh_setJointRotationYAtFrame(mc,jIDB,fID,fY*jIDA_vY);
   bvh_setJointRotationZAtFrame(mc,jIDB,fID,fZ*jIDA_vZ);
   //-------------------------------------------------------
+  }
   return 1;
 }
 
@@ -450,6 +455,8 @@ int bvh_swapJointMotionsForFrameID(
 
 int bvh_symmetricJointNameParser(struct BVH_MotionCapture * mc)
 {
+  if (!mc->checkedForSymmetricJoints)
+  {
   BVHJointID jIDA,jIDB;
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
@@ -457,7 +464,7 @@ int bvh_symmetricJointNameParser(struct BVH_MotionCapture * mc)
   BVHJointID symmetricJID=0;
   char symmetricTo[512]={0};
   //-------------------------
-  bvh_printBVH(mc);
+  //bvh_printBVH(mc);
   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
   {
     unsigned int jNameLength = strlen(mc->jointHierarchy[jID].jointNameLowercase);
@@ -527,6 +534,10 @@ int bvh_symmetricJointNameParser(struct BVH_MotionCapture * mc)
              }
     }// nameLength>2
   } //for
+
+
+    mc->checkedForSymmetricJoints = 1;
+  }
  return 1;
 }
 
@@ -540,8 +551,20 @@ int bvh_symmetricflipLeftAndRight(
 {
     if (bvh_symmetricJointNameParser(mc))
     {
+      //-------------------------------------------------------
       BVHJointID jIDA=0;
       BVHJointID jIDB=0;
+      //-------------------------------------------------------
+      float root_vX = bvh_getJointRotationXAtFrame(mc,mc->rootJointID,fID);
+      float root_vY = bvh_getJointRotationYAtFrame(mc,mc->rootJointID,fID);
+      float root_vZ = bvh_getJointRotationZAtFrame(mc,mc->rootJointID,fID);
+      //-------------------------------------------------------
+      float fX = 1.0,fY = -1.0,fZ = -1.0;
+      //-------------------------------------------------------
+      bvh_setJointRotationXAtFrame(mc,jIDA,fID,fX*root_vX);
+      bvh_setJointRotationYAtFrame(mc,jIDA,fID,fY*root_vY);
+      bvh_setJointRotationZAtFrame(mc,jIDA,fID,fZ*root_vZ);
+      //-------------------------------------------------------
       for (jIDA=0; jIDA<mc->jointHierarchySize; jIDA++)
         {
             if (mc->jointHierarchy[jIDA].symmetryIsLeftJoint)
@@ -552,7 +575,7 @@ int bvh_symmetricflipLeftAndRight(
                                                fID,
                                                jIDA,
                                                jIDB,
-                                               0,0,0
+                                               0,1,1
                                              );
             }
         }
