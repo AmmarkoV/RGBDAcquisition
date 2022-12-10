@@ -513,6 +513,7 @@ int examineSolutionAndKeepIfItIsBetter(
         float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
+        //TODO : try combinations here
         if (currentLoss<*bestLoss)
         {
             *bestLoss = currentLoss;
@@ -555,6 +556,7 @@ float iteratePartLoss(
                       float spring,
                       float gradientExplosionThreshold,
                       char useSolutionHistory,
+                      char useLangevinDynamics,
                       unsigned int verbose
                      )
 {
@@ -909,12 +911,13 @@ if (iterationID==0)
         delta[2]         = beta * delta[2] + (float) lr * gradient[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
-        #if USE_LANGEVIN_DYNAMICS
+        if (useLangevinDynamics)
+        {
            //Attempt to use Langevin dynamics for annealed gradient descent
            delta[0]+=randomNoise(2.0);
            delta[1]+=randomNoise(2.0);
            delta[2]+=randomNoise(2.0);
-        #endif // USE_LANGEVIN_DYNAMICS
+        }
 
         //Safeguard agains gradient explosions which we detect when we see large gradients
         unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  );
@@ -1118,6 +1121,7 @@ int iterateChainLoss(
                      float spring,
                      float gradientExplosionThreshold,
                      char useSolutionHistory,
+                     char useLangevinDynamics,
                      unsigned int verbose
                     )
 {
@@ -1147,6 +1151,7 @@ int iterateChainLoss(
                                                spring,
                                                gradientExplosionThreshold,
                                                useSolutionHistory,
+                                               useLangevinDynamics,
                                                verbose
                                                );
          }
@@ -1186,6 +1191,7 @@ int singleThreadedSolver(
                               ikConfig->spring,
                               ikConfig->gradientExplosionThreshold,
                               (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
+                              ikConfig->useLangevinDynamics,
                               ikConfig->verbose
                            );
 
@@ -1240,6 +1246,7 @@ void * iterateChainLossWorkerThread(void * arg)
                            ctx->ikConfig->spring,
                            ctx->ikConfig->gradientExplosionThreshold,
                            (!ctx->ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
+                           ctx->ikConfig->useLangevinDynamics,
                            ctx->ikConfig->verbose
                          );
     //--------------------------------
@@ -1319,6 +1326,7 @@ int multiThreadedSolver(
                                  ikConfig->spring,
                                  ikConfig->gradientExplosionThreshold,
                                  (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
+                                 ikConfig->useLangevinDynamics,
                                  ikConfig->verbose
                                 );
 

@@ -100,6 +100,7 @@ struct ikConfiguration
   unsigned int dumpScreenshots;
   unsigned int verbose;
   char dontUseSolutionHistory;
+  char useLangevinDynamics;
   float ikVersion;
 };
 
