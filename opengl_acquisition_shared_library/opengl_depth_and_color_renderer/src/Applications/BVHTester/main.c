@@ -1232,6 +1232,14 @@ int bvhConverter(int argc,const char **argv)
         } else
         //-----------------------------------------------------
 
+        if (strcmp(argv[i],"--repeatsymmetry")==0)
+        {
+          BVHFrameID newStartFID=bvhMotion.numberOfFrames;
+          bvh_GrowMocapFileByCopyingExistingMotions(&bvhMotion,1);
+          BVHFrameID fID = 0;
+          for (fID=newStartFID; fID<bvhMotion.numberOfFrames; fID++)
+              { bvh_symmetricflipLeftAndRight(&bvhMotion,fID); }
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--repeat")==0)
         {

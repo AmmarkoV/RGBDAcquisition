@@ -502,7 +502,8 @@ cd ..
 #MID 496 / Joint 210/ Channel 5 / toe5-3.l Xrotation 
 #MID 497 / Joint 210/ Channel 6 / toe5-3.l Yrotation 
  
-./BVHTester --from Motions/05_01.bvh --symmetricflip --bvh symmetricflip.bvh
+#./BVHTester --from Motions/05_01.bvh --symmetricflip --bvh symmetricflip.bvh
+./BVHTester --from Motions/05_01.bvh --repeatsymmetry --bvh symmetricflip.bvh
  
 
 exit 0

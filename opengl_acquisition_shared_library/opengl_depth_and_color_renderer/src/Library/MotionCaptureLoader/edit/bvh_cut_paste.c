@@ -555,6 +555,8 @@ int bvh_symmetricflipLeftAndRight(
       BVHJointID jIDA=0;
       BVHJointID jIDB=0;
       //-------------------------------------------------------
+      bvh_setJointPositionXAtFrame(mc,mc->rootJointID,fID,-1.0*bvh_getJointPositionXAtFrame(mc,mc->rootJointID,fID));
+      //-------------------------------------------------------
       float root_vX = bvh_getJointRotationXAtFrame(mc,mc->rootJointID,fID);
       float root_vY = bvh_getJointRotationYAtFrame(mc,mc->rootJointID,fID);
       float root_vZ = bvh_getJointRotationZAtFrame(mc,mc->rootJointID,fID);
