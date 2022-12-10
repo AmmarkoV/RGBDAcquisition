@@ -411,23 +411,31 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
 
 
 
+int bvh_swapJointMotionsForFrameID(
+                                    struct BVH_MotionCapture * mc,
+                                    BVHFrameID fID,
+                                    BVHJointID jIDA,
+                                    BVHJointID jIDB,
+                                    char flipX,char flipY,char flipZ
+                                  )
+{
 
 
 
 
+}
 
-int bvh_symmetricflipLeftAndRight(
-                                  struct BVH_MotionCapture * mc,
-                                  BVHFrameID fID
-                                 )
+
+
+int bvh_symmetricJointNameParser(struct BVH_MotionCapture * mc)
 {
   BVHJointID jIDA,jIDB;
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
-
+  //-------------------------
   BVHJointID symmetricJID=0;
   char symmetricTo[512]={0};
-
+  //-------------------------
   bvh_printBVH(mc);
   for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
   {
@@ -496,19 +504,36 @@ int bvh_symmetricflipLeftAndRight(
                  }  else
                  { fprintf(stderr,RED "Could not resolve joint `%s` \n",symmetricTo); }
              }
-    }
-
-  }
-  exit(0);
-  /*
-  //This is new functionality to define symmetries and flip L/R joints/poses
-  BVHJointID symmetricJoint;
-  unsigned int symmetryType;
-  char symmetryIsLeftJoint;*/
-
- return 0;
+    }// nameLength>2
+  } //for
+ return 1;
 }
 
 
 
 
+int bvh_symmetricflipLeftAndRight(
+                                  struct BVH_MotionCapture * mc,
+                                  BVHFrameID fID
+                                 )
+{
+    if (bvh_symmetricJointNameParser(mc))
+    {
+      BVHJointID jIDA=0;
+      BVHJointID jIDB=0;
+      for (jIDA=0; jIDA<mc->jointHierarchySize; jIDA++)
+        {
+            if (mc->jointHierarchy[jIDA].symmetryIsLeftJoint)
+            {
+               jIDB=mc->jointHierarchy[jIDA].symmetricJoint;
+               bvh_swapJointMotionsForFrameID(
+                                               mc,
+                                               fID,
+                                               jIDA,
+                                               jIDB,
+                                               0,0,0
+                                             );
+            }
+        }
+    }
+}
