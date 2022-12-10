@@ -419,10 +419,31 @@ int bvh_swapJointMotionsForFrameID(
                                     char flipX,char flipY,char flipZ
                                   )
 {
+  //-------------------------------------------------------
+  float jIDA_vX = bvh_getJointRotationXAtFrame(mc,jIDA,fID);
+  float jIDA_vY = bvh_getJointRotationYAtFrame(mc,jIDA,fID);
+  float jIDA_vZ = bvh_getJointRotationZAtFrame(mc,jIDA,fID);
+  //-------------------------------------------------------
+  float jIDB_vX = bvh_getJointRotationXAtFrame(mc,jIDB,fID);
+  float jIDB_vY = bvh_getJointRotationYAtFrame(mc,jIDB,fID);
+  float jIDB_vZ = bvh_getJointRotationZAtFrame(mc,jIDB,fID);
+  //-------------------------------------------------------
 
-
-
-
+  float fX = 1.0,fY = 1.0,fZ = 1.0;
+  //-------------------------------------------------------
+  if (flipX) { fX=-1.0; }
+  if (flipY) { fY=-1.0; }
+  if (flipZ) { fZ=-1.0; }
+  //-------------------------------------------------------
+  bvh_setJointRotationXAtFrame(mc,jIDA,fID,fX*jIDB_vX);
+  bvh_setJointRotationYAtFrame(mc,jIDA,fID,fY*jIDB_vY);
+  bvh_setJointRotationZAtFrame(mc,jIDA,fID,fZ*jIDB_vZ);
+  //-------------------------------------------------------
+  bvh_setJointRotationXAtFrame(mc,jIDB,fID,fX*jIDA_vX);
+  bvh_setJointRotationYAtFrame(mc,jIDB,fID,fY*jIDA_vY);
+  bvh_setJointRotationZAtFrame(mc,jIDB,fID,fZ*jIDA_vZ);
+  //-------------------------------------------------------
+  return 1;
 }
 
 
