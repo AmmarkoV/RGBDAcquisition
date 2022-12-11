@@ -485,7 +485,7 @@ float calculateChainLoss(
 
 
 
-int examineSolutionAndKeepIfItIsBetterSingle(
+int examineSolutionAndKeepIfItIsBetterSingleTry(
                                              struct ikProblem * problem,
                                              unsigned int iterationID,
                                              unsigned int chainID,
@@ -509,11 +509,8 @@ int examineSolutionAndKeepIfItIsBetterSingle(
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
-        //float distanceFromInitial=fabs(solutionToTest[0] - originalValues[0]);
         float currentLoss =calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-
-        //TODO : try combinations here
         if (currentLoss<*bestLoss)
         {
             *bestLoss = currentLoss;
@@ -529,6 +526,14 @@ int examineSolutionAndKeepIfItIsBetterSingle(
         }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         return 0;
+}
+
+
+float randomNoise(float noiseMagnitude)
+{
+  float x = ((float)rand()/(float)(RAND_MAX)) * noiseMagnitude;
+
+  return x-(float) (noiseMagnitude/2);
 }
 
 
@@ -560,49 +565,104 @@ int examineSolutionAndKeepIfItIsBetter(
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-                { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted+=1; } else //Roll Back..!
+                { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-                { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted+=1; } else //Roll Back..!
+                { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-                { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1; } else //Roll Back..!
+                { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------
         //if (accepted>0)
         //  { fprintf(stderr,GREEN "Accepted %u changes\n" NORMAL,accepted); }
         //-------------------  -------------------  -------------------  -------------------
-
         return (accepted!=0);
-}
-
-
-float randomNoise(float noiseMagnitude)
-{
-  float x = ((float)rand()/(float)(RAND_MAX)) * noiseMagnitude;
-
-  return x-(float) (noiseMagnitude/2);
 }
 
 
 void ensureValuesInLimits(float vals[3],float mins[3],float maxes[3])
 {
  //-------------------------------------------------------------------------------------
- if (vals[0]<mins[0])  { vals[0]=mins[0]; } else
+ if (vals[0]<mins[0])  { vals[0]=mins[0];  } else
  if (vals[0]>maxes[0]) { vals[0]=maxes[0]; }
  //-------------------------------------------------------------------------------------
- if (vals[1]<mins[1])  { vals[1]=mins[1]; } else
+ if (vals[1]<mins[1])  { vals[1]=mins[1];  } else
  if (vals[1]>maxes[1]) { vals[1]=maxes[1]; }
  //-------------------------------------------------------------------------------------
- if (vals[2]<mins[2])  { vals[2]=mins[2]; } else
+ if (vals[2]<mins[2])  { vals[2]=mins[2];  } else
  if (vals[2]>maxes[2]) { vals[2]=maxes[2]; }
  //-------------------------------------------------------------------------------------
+}
+
+
+int weAreAtALocalOptimum(
+                         struct ikProblem * problem,
+                         unsigned int chainID,
+                         unsigned int partID,
+                         float d,
+                         float initialLoss,
+                         float currentValues[3],
+                         float delta[3],
+                         unsigned int mIDS[3],
+                         unsigned int verbose
+                        )
+{
+  //Are we at a global optimum? -------------------------------------------------------------------
+  //Do we care ? ----------------------------------------------------------------------------------
+  unsigned int badLosses=0;
+  for (unsigned int i=0; i<3; i++)
+        {
+            float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
+            problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
+            float lossPlusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
+            problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
+            float lossMinusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
+            problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
+
+            if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
+            {
+                if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
+                delta[i] = d; // Why d ? and not 0
+                ++badLosses;
+            }
+            else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
+            {
+                if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
+                delta[i] = d;
+            }
+            else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
+            {
+                if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
+                delta[i] = -d;
+            }
+            else
+            {
+                if (verbose)
+                {
+                    fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
+                    fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
+                    delta[i] = d;
+                    ++badLosses;
+                }
+            }
+        }
+        if (badLosses==3)
+        {
+            //We tried nudging all parameters both ways and couldn't improve anything
+            //We are at a local optima and since tryMaintainingLocalOptima is enabled
+            //we will try to maintain it..!
+            if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
+
+            return 1;
+        }
+    return 0;
 }
 
 
@@ -873,54 +933,19 @@ if (iterationID==0)
    ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
     {
-       //Are we at a global optimum? -------------------------------------------------------------------
-       //Do we care ? ----------------------------------------------------------------------------------
-        unsigned int badLosses=0;
-        for (unsigned int i=0; i<3; i++)
-        {
-            float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
-            problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
-            float lossPlusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
-            problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
-            float lossMinusD=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);
-            problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
-
-            if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
-            {
-                if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
-                delta[i] = d; // Why d ? and not 0
-                ++badLosses;
-            }
-            else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
-            {
-                if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
-                delta[i] = d;
-            }
-            else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
-            {
-                if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
-                delta[i] = -d;
-            }
-            else
-            {
-                if (verbose)
-                {
-                    fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
-                    fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
-                    delta[i] = d;
-                    ++badLosses;
-                }
-            }
-        }
-        if (badLosses==3)
-        {
-            //We tried nudging all parameters both ways and couldn't improve anything
-            //We are at a local optima and since tryMaintainingLocalOptima is enabled
-            //we will try to maintain it..!
-            if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
-
-            return initialLoss;
-        }
+        if (
+             weAreAtALocalOptimum(
+                                  problem,
+                                  chainID,
+                                  partID,
+                                  d,
+                                  initialLoss,
+                                  currentValues,
+                                  delta,
+                                  mIDS,
+                                  verbose
+                                 )
+            ) { return initialLoss; }
     } // tryMaintainingLocalOptima
 ///--------------------------------------------------------------------------------------------------------------
 ///--------------------------------------------------------------------------------------------------------------
