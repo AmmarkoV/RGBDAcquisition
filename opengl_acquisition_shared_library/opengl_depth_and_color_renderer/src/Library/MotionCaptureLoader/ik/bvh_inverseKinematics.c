@@ -927,19 +927,34 @@ if (iterationID==0)
     //Gradual fine tuning.. On a first glance it works worse..
     //lr = lr / iterationID;
 
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
     unsigned int consecutiveBadSteps=0;
     unsigned int maximumConsecutiveBadEpochs=3;
     float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
-
+    //Learning rate decay..
+        //3/4  Mean   :10.4969
+        //3/5  Mean   :10.34537
+        //2/5  Mean   :10.2781
+        //1/6  Mean   :10.2230
+        //2/6  Mean   :10.12284
+        //2/7  Mean   :10.0943
+        //3/8  Mean   :10.1463
+        //3/10 Mean   :10.1280
+        //25/70 Mean   :10.22975
+        //15/70 Mean   :10.1823
+        //Distance to -350
+        //2/7   Mean   :10.1286
+        //Distance to -330
+        //2/7   Mean   : 9.9858
+        //2/7 Mean   : 9.93695
+    float learningRateDecayRate = (float) 2/7;
+   ///--------------------------------------------------------------------------------------------------------------
     //Give an initial direction..
     float delta[3]= {d,d,d};
-
-
-   ///--------------------------------------------------------------------------------------------------------------
-   ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
@@ -958,17 +973,15 @@ if (iterationID==0)
                                  )
             ) { return initialLoss; }
     } // tryMaintainingLocalOptima
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
-///--------------------------------------------------------------------------------------------------------------
-
-
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
     if (verbose)
     {
         fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
         fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",initialLoss,originalValues[0],originalValues[1],originalValues[2]);
     }
+   ///--------------------------------------------------------------------------------------------------------------
+   ///--------------------------------------------------------------------------------------------------------------
 
 
     unsigned int executedEpochs=epochs;
@@ -979,17 +992,17 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         //float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
         currentLoss[0]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
-        problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
+        if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         //distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
         currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
-        problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
+        if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
         currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
-        problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
+        if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
 
@@ -1040,7 +1053,6 @@ if (iterationID==0)
             break;
         }
 
-
         //Remember previous loss/values
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
@@ -1050,33 +1062,18 @@ if (iterationID==0)
         previousValues[1]=currentValues[1];
         previousValues[2]=currentValues[2];
         //----------------------------------------------
-
         //We advance our current state..
+        //----------------------------------------------
         currentValues[0]+=delta[0];
         currentValues[1]+=delta[1];
         currentValues[2]+=delta[2];
-
-
+        //----------------------------------------------
         if (limitsEngaged)
-        {
-          ensureValuesInLimits(currentValues,minimumLimitValues,maximumLimitValues);
-          /*
-          if (currentValues[0]<minimumLimitValues[0]) { currentValues[0]=minimumLimitValues[0]; } else
-          if (currentValues[0]>maximumLimitValues[0]) { currentValues[0]=maximumLimitValues[0]; }
-          //-------------------------------------------------------------------------------------
-          if (currentValues[1]<minimumLimitValues[1]) { currentValues[1]=minimumLimitValues[1]; } else
-          if (currentValues[1]>maximumLimitValues[1]) { currentValues[1]=maximumLimitValues[1]; }
-          //-------------------------------------------------------------------------------------
-          if (currentValues[2]<minimumLimitValues[2]) { currentValues[2]=minimumLimitValues[2]; } else
-          if (currentValues[2]>maximumLimitValues[2]) { currentValues[2]=maximumLimitValues[2]; }
-          //-------------------------------------------------------------------------------------
-          */
-        }
-
+           { ensureValuesInLimits(currentValues,minimumLimitValues,maximumLimitValues); }
         //----------------------------------------------
 
-
         //We store our new values and calculate our new loss
+        //----------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
@@ -1117,33 +1114,13 @@ if (iterationID==0)
         {
             if (verbose)
                  { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); }
-
             executedEpochs=currentEpoch;
             break;
         }
 
-
-        //Learning rate decay..
-        //3/4  Mean   :10.4969
-        //3/5  Mean   :10.34537
-        //2/5  Mean   :10.2781
-        //1/6  Mean   :10.2230
-        //2/6  Mean   :10.12284
-        //2/7  Mean   :10.0943
-        //3/8  Mean   :10.1463
-        //3/10 Mean   :10.1280
-        //25/70 Mean   :10.22975
-        //15/70 Mean   :10.1823
-        //Distance to -350
-        //2/7   Mean   :10.1286
-        //Distance to -330
-        //2/7   Mean   : 9.9858
-        //2/7 Mean   : 9.93695
-
-
-        float learningRateDecayRate = (float) 2/7;
         lr = (float) learningRateDecayRate * lr;
-    }
+
+    } // for number of epochs
 
 
     if (verbose)

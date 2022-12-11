@@ -2670,95 +2670,81 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "hip","Hips",    // Joint
-                               2.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              1, //Force specific mIDStart/mIDEnd
-                              0, //We have a position which since it comes from root joint should start at 0
-                              2  //We have a position which since it comes from root joint should end at 2
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "hip","Hips", // Joint
+                                         2.0,         //Importance
+                                         0,           //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        1, //Force specific mIDStart/mIDEnd
+                                        0, //We have a position which since it comes from root joint should start at 0
+                                        2  //We have a position which since it comes from root joint should end at 2
+                                       );
      problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
      //problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-     //problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
+     //problem->chain[chainID].part[partID-1].mIDEnd=2;   //First Position
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "hip","Hips",    // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              1, //Force specific mIDStart/mIDEnd
-                              3, //We have a rotation which since it comes from root joint should start at 3
-                              5  //We have a rotation which since it comes from root joint should end at 5
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "hip","Hips", // Joint
+                                         1.0,         //Importance
+                                         0,           //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        1, //Force specific mIDStart/mIDEnd
+                                        3, //We have a rotation which since it comes from root joint should start at 3
+                                        5  //We have a rotation which since it comes from root joint should end at 5
+                                       );
      //problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
      //problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck",0,    // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "neck",0, // Joint
+                                         1.0,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "head",0,    // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "head",0, // Joint
+                                         1.0,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "rshoulder","rShldr", // Joint
+                                         1.0,                 //Importance
+                                         1,                   //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
      ++correct;
      checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
-                              "rshoulder","rShldr", // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lshoulder","lShldr",      // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhip","rThigh", // Joint
+                              "rhand",0,// Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -2769,9 +2755,21 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lshoulder","lShldr", // Joint
+                                         1.0,                 //Importance
+                                         1,                   //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
-                              "lhip","lThigh", // Joint
+                              "lhand",0,// Joint
                                1.5,     //Importance
                                1,       //IsEndEffector
                               //-----------------------------------------
@@ -2782,31 +2780,78 @@ int prepareDefaultBodyProblem(
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.l",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "rhip","rThigh", // Joint
+                                         1.5,            //Importance
+                                         1,              //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "rfoot",0, // Joint
+                                         1.0,      //Importance
+                                         0,        //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lhip","lThigh", // Joint
+                                         1.5,            //Importance
+                                         1,              //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lfoot",0, // Joint
+                                         1.0,      //Importance
+                                         0,        //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "eye.l",0,// Joint
+                                         2.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
 
 
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.r",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "eye.r",0,// Joint
+                                         2.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
     //----------------------------------------------------------
     if (correct!=checksum)
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
@@ -3644,16 +3689,16 @@ float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsign
 // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 15
 
 int bvhTestIK(
-    struct BVH_MotionCapture * mc,
-    float lr,
-    float spring,
-    unsigned int iterations,
-    unsigned int epochs,
-    unsigned int fIDPrevious,
-    unsigned int fIDSource,
-    unsigned int fIDTarget,
-    unsigned int multiThreaded
-)
+              struct BVH_MotionCapture * mc,
+              float lr,
+              float spring,
+              unsigned int iterations,
+              unsigned int epochs,
+              unsigned int fIDPrevious,
+              unsigned int fIDSource,
+              unsigned int fIDTarget,
+              unsigned int multiThreaded
+             )
 {
     int result=0;
 
@@ -3723,37 +3768,36 @@ int bvhTestIK(
                 if  (bvh_projectTo2D(mc,&bvhTargetTransform,&renderer,0,0))
                 {
                     struct ikConfiguration ikConfig= {0};
-                    //------------------------------------
-                    ikConfig.learningRate = lr;
-                    ikConfig.iterations = iterations;
-                    ikConfig.epochs = epochs;
-                    ikConfig.spring = spring;
-                    ikConfig.gradientExplosionThreshold = 50;
-                    ikConfig.dumpScreenshots = 1;
-                    ikConfig.maximumAcceptableStartingLoss=0.0; // Dont use this
-                    ikConfig.verbose = 1;
-                    ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
-                    ikConfig.dontUseSolutionHistory=0;
-                    ikConfig.useLangevinDynamics = 1;
+                    //--------------------------------------------------
+                    ikConfig.learningRate                  = lr;
+                    ikConfig.iterations                    = iterations;
+                    ikConfig.epochs                        = epochs;
+                    ikConfig.spring                        = spring;
+                    ikConfig.gradientExplosionThreshold    = 50;
+                    ikConfig.dumpScreenshots               = 1;
+                    ikConfig.maximumAcceptableStartingLoss = 0.0; // Dont use this
+                    ikConfig.verbose                       = 1;
+                    ikConfig.tryMaintainingLocalOptima     = 1; //Less Jittery but can be stuck at local optima
+                    ikConfig.dontUseSolutionHistory        = 0;
+                    ikConfig.useLangevinDynamics           = 1;
                     ikConfig.ikVersion = IK_VERSION;
-                    //------------------------------------
+                    //--------------------------------------------------
 
-
-
-                      struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
-                      if (problem!=0)
+                    struct ikProblem * problem= (struct ikProblem * ) malloc(sizeof(struct ikProblem));
+                    if (problem!=0)
                                      { memset(problem,0,sizeof(struct ikProblem)); } else
                                      { fprintf(stderr,"Failed to allocate memory for our IK problem..\n");  return 0; }
 
-                        if (!prepareDefaultBodyProblem(
-                                                                                            problem,
-                                                                                            mc,
-                                                                                            &renderer,
-                                                                                            previousSolution,
-                                                                                            solution,
-                                                                                            &bvhTargetTransform
-                                                                                        )
-                         )
+                    if (
+                        !prepareDefaultBodyProblem(
+                                                   problem,
+                                                   mc,
+                                                   &renderer,
+                                                   previousSolution,
+                                                   solution,
+                                                   &bvhTargetTransform
+                                                  )
+                       )
                          {
                                fprintf(stderr,"Could not prepare the problem for IK solution\n");
                                free(problem);
