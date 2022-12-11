@@ -12,7 +12,7 @@
 #include <string.h>
 #include <math.h>
 
-
+#include <assert.h> //assert support for debugging
 #include <time.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -602,6 +602,43 @@ void ensureValuesInLimits(float vals[3],float mins[3],float maxes[3])
 }
 
 
+void updateLimitsBasedOnMAE(
+                            struct ikProblem * problem,
+                            unsigned int chainID,
+                            unsigned int partID,
+                            float originalValues[3],
+                            float minimumLimitValues[3],
+                            float maximumLimitValues[3]
+                           )
+{
+       char limitsEngaged = problem->chain[chainID].part[partID].limits;
+       //Update Minima ------------------------------------------------------------
+       float newMin = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[0]); }
+       minimumLimitValues[0]=newMin;
+
+       newMin = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[1]); }
+       minimumLimitValues[1]=newMin;
+
+       newMin = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
+       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[2]); }
+       minimumLimitValues[2]=newMin;
+       //---------------------------------------------------------------------------
+       float newMax = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[0]); }
+       maximumLimitValues[0]=newMax;
+
+       newMax = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[1]); }
+       maximumLimitValues[1]=newMax;
+
+       newMax = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
+       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[2]); }
+       maximumLimitValues[2]=newMax;
+}
+
+
 int weAreAtALocalOptimum(
                          struct ikProblem * problem,
                          unsigned int chainID,
@@ -614,8 +651,8 @@ int weAreAtALocalOptimum(
                          unsigned int verbose
                         )
 {
+  assert(d!=0.0);
   //Are we at a global optimum? -------------------------------------------------------------------
-  //Do we care ? ----------------------------------------------------------------------------------
   unsigned int badLosses=0;
   for (unsigned int i=0; i<3; i++)
         {
@@ -653,16 +690,8 @@ int weAreAtALocalOptimum(
                 }
             }
         }
-        if (badLosses==3)
-        {
-            //We tried nudging all parameters both ways and couldn't improve anything
-            //We are at a local optima and since tryMaintainingLocalOptima is enabled
-            //we will try to maintain it..!
-            if (verbose) { fprintf(stderr, YELLOW "Maintaining local optimum and leaving joint with no change..!\n" NORMAL); }
-
-            return 1;
-        }
-    return 0;
+  //-------------------------------------------------------------------------------------------------------
+  return (badLosses==3);
 }
 
 
@@ -871,35 +900,17 @@ if (iterationID==0)
                                     problem->chain[chainID].part[partID].maximumLimitMID[1],
                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
     //---------------------------------------------------------------------------------------
-
     if ( problem->chain[chainID].part[partID].maeDeclared )
     {
-       //Update Minima ------------------------------------------------------------
-       float newMin = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[0]); }
-       minimumLimitValues[0]=newMin;
-
-       newMin = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[1]); }
-       minimumLimitValues[1]=newMin;
-
-       newMin = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[2]); }
-       minimumLimitValues[2]=newMin;
-       //---------------------------------------------------------------------------
-       float newMax = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[0]); }
-       maximumLimitValues[0]=newMax;
-
-       newMax = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[1]); }
-       maximumLimitValues[1]=newMax;
-
-       newMax = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[2]); }
-       maximumLimitValues[2]=newMax;
+      updateLimitsBasedOnMAE(
+                             problem,
+                             chainID,
+                             partID,
+                             originalValues,
+                             minimumLimitValues,
+                             maximumLimitValues
+                            );
     }
-
     //----------------------------------------------------------------------------------
     float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
     float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
@@ -1430,7 +1441,7 @@ int multiThreadedSolver(
         //--------------------------------------------------
     }
 
-
+  return 1;
 }
 
 ///=====================================================================================
