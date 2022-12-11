@@ -485,19 +485,19 @@ float calculateChainLoss(
 
 
 
-int examineSolutionAndKeepIfItIsBetter(
-                                       struct ikProblem * problem,
-                                       unsigned int iterationID,
-                                       unsigned int chainID,
-                                       unsigned int partID,
-                                       unsigned int * mIDS,
-                                       float * originalValues,
-                                       float * bestValues,
-                                       float * bestLoss,
-                                       float spring,
-                                       //-------------------------
-                                       float * solutionToTest
-                                      )
+int examineSolutionAndKeepIfItIsBetterSingle(
+                                             struct ikProblem * problem,
+                                             unsigned int iterationID,
+                                             unsigned int chainID,
+                                             unsigned int partID,
+                                             unsigned int * mIDS,
+                                             float * originalValues,
+                                             float * bestValues,
+                                             float * bestLoss,
+                                             float spring,
+                                             //-------------------------
+                                             float * solutionToTest
+                                            )
 {
       float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
@@ -531,6 +531,52 @@ int examineSolutionAndKeepIfItIsBetter(
         return 0;
 }
 
+
+int examineSolutionAndKeepIfItIsBetter(
+                                       struct ikProblem * problem,
+                                       unsigned int iterationID,
+                                       unsigned int chainID,
+                                       unsigned int partID,
+                                       unsigned int * mIDS,
+                                       float * originalValues,
+                                       float * bestValues,
+                                       float * bestLoss,
+                                       float spring,
+                                       //-------------------------
+                                       float * solutionToTest
+                                      )
+{
+        int accepted = 0;
+        float currentLoss = *bestValues;
+        //---------------------------------------------------
+        float previousValues[3]={
+                                problem->chain[chainID].currentSolution->motion[mIDS[0]],
+                                problem->chain[chainID].currentSolution->motion[mIDS[1]],
+                                problem->chain[chainID].currentSolution->motion[mIDS[2]]
+                              };
+        //-------------------  -------------------
+        //Calculate loss of try
+        //-------------------  -------------------  -------------------  -------------------
+        problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
+        currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        if (currentLoss<*bestLoss)
+        { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted=1; } else //Roll Back..!
+        {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
+        //------------------------------------------------------------------------------
+        problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
+        currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        if (currentLoss<*bestLoss)
+        { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted=1; } else //Roll Back..!
+        {  problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
+        //------------------------------------------------------------------------------
+        problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
+        currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        if (currentLoss<*bestLoss)
+        { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted=1; } else //Roll Back..!
+        {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
+        //-------------------  -------------------  -------------------  -------------------
+        return accepted;
+}
 
 
 float randomNoise(float noiseMagnitude)
