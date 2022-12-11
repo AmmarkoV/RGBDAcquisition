@@ -554,8 +554,8 @@ int examineSolutionAndKeepIfItIsBetter(
                                 problem->chain[chainID].currentSolution->motion[mIDS[1]],
                                 problem->chain[chainID].currentSolution->motion[mIDS[2]]
                               };
-        //-------------------  -------------------
-        //Calculate loss of try
+        //-------------------  -------------------  -------------------  -------------------
+        // Calculate loss of try
         //-------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
@@ -575,11 +575,10 @@ int examineSolutionAndKeepIfItIsBetter(
                 { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1; } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------
+        //if (accepted>0)
+        //  { fprintf(stderr,GREEN "Accepted %u changes\n" NORMAL,accepted); }
+        //-------------------  -------------------  -------------------  -------------------
 
-        if (accepted>0)
-        {
-            fprintf(stderr,GREEN "Accepted %u changes\n" NORMAL,accepted);
-        }
         return (accepted!=0);
 }
 
@@ -592,7 +591,19 @@ float randomNoise(float noiseMagnitude)
 }
 
 
-
+void ensureValuesInLimits(float vals[3],float mins[3],float maxes[3])
+{
+ //-------------------------------------------------------------------------------------
+ if (vals[0]<mins[0])  { vals[0]=mins[0]; } else
+ if (vals[0]>maxes[0]) { vals[0]=maxes[0]; }
+ //-------------------------------------------------------------------------------------
+ if (vals[1]<mins[1])  { vals[1]=mins[1]; } else
+ if (vals[1]>maxes[1]) { vals[1]=maxes[1]; }
+ //-------------------------------------------------------------------------------------
+ if (vals[2]<mins[2])  { vals[2]=mins[2]; } else
+ if (vals[2]>maxes[2]) { vals[2]=maxes[2]; }
+ //-------------------------------------------------------------------------------------
+}
 
 
 float iteratePartLoss(
@@ -694,13 +705,14 @@ float iteratePartLoss(
 
     ///Having calculated all these joints from here on we only need to update this joint and its children ( we dont care about their parents since they dont change .. )
     bvh_markJointAsUsefulAndParentsAsUselessInTransform(problem->mc,&problem->chain[chainID].current2DProjectionTransform,jointID);
-   //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
    //Some reasons not to perform optimization is starting from NaN, starting from 0 or starting with a very high loss
+   //---------------------------------------------------------------------------------------------------------------------------------------------------------------
    unsigned int initialLossIsNaN  = (initialLoss!=initialLoss);
    unsigned int initialLossIsZero = (initialLoss==0.0);
-
+   //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
    if (initialLossIsNaN)
    {
@@ -779,7 +791,7 @@ if (iterationID==0)
                 initialLoss = previousLoss;
             } else
             {
-                //Previous solution is a worse solution,  let's forget about it and revert back!
+               //Previous solution is a worse solution,  let's forget about it and revert back!
                problem->chain[chainID].currentSolution->motion[mIDS[0]] = rememberInitialSolution[0];
                problem->chain[chainID].currentSolution->motion[mIDS[1]] = rememberInitialSolution[1];
                problem->chain[chainID].currentSolution->motion[mIDS[2]] = rememberInitialSolution[2];
@@ -828,15 +840,16 @@ if (iterationID==0)
        maximumLimitValues[2]=newMax;
     }
 
+    //----------------------------------------------------------------------------------
     float previousValues[3] = { originalValues[0],originalValues[1],originalValues[2] };
     float currentValues[3]  = { originalValues[0],originalValues[1],originalValues[2] };
     float bestValues[3]     = { originalValues[0],originalValues[1],originalValues[2] };
-
+    //----------------------------------------------------------------------------------
     float previousLoss[3]   = { initialLoss, initialLoss, initialLoss };
     float currentLoss[3]    = { initialLoss, initialLoss, initialLoss };
     float previousDelta[3]  = { 0.0,0.0,0.0 };
     float gradient[3]       = { 0.0,0.0,0.0 };
-
+    //----------------------------------------------------------------------------------
     float bestLoss = initialLoss;
     //float loss=initialLoss;
 
@@ -844,12 +857,11 @@ if (iterationID==0)
     //lr = lr / iterationID;
 
     unsigned int consecutiveBadSteps=0;
-    float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     unsigned int maximumConsecutiveBadEpochs=3;
+    float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
     float beta = 0.9; // Momentum
-
 
     //Give an initial direction..
     float delta[3]= {d,d,d};
@@ -909,9 +921,7 @@ if (iterationID==0)
 
             return initialLoss;
         }
-
-//-------------------------------------------------------------------------------------------------------------
-    }
+    } // tryMaintainingLocalOptima
 ///--------------------------------------------------------------------------------------------------------------
 ///--------------------------------------------------------------------------------------------------------------
 ///--------------------------------------------------------------------------------------------------------------
@@ -1013,6 +1023,8 @@ if (iterationID==0)
 
         if (limitsEngaged)
         {
+          ensureValuesInLimits(currentValues,minimumLimitValues,maximumLimitValues);
+          /*
           if (currentValues[0]<minimumLimitValues[0]) { currentValues[0]=minimumLimitValues[0]; } else
           if (currentValues[0]>maximumLimitValues[0]) { currentValues[0]=maximumLimitValues[0]; }
           //-------------------------------------------------------------------------------------
@@ -1022,6 +1034,7 @@ if (iterationID==0)
           if (currentValues[2]<minimumLimitValues[2]) { currentValues[2]=minimumLimitValues[2]; } else
           if (currentValues[2]>maximumLimitValues[2]) { currentValues[2]=maximumLimitValues[2]; }
           //-------------------------------------------------------------------------------------
+          */
         }
 
         //----------------------------------------------
@@ -1131,6 +1144,8 @@ if (iterationID==0)
 
     if (limitsEngaged)
         {
+          ensureValuesInLimits(bestValues,minimumLimitValues,maximumLimitValues);
+          /*
           if (bestValues[0]<minimumLimitValues[0]) { bestValues[0]=minimumLimitValues[0]; } else
           if (bestValues[0]>maximumLimitValues[0]) { bestValues[0]=maximumLimitValues[0]; }
           //-------------------------------------------------------------------------------------
@@ -1139,7 +1154,7 @@ if (iterationID==0)
           //-------------------------------------------------------------------------------------
           if (bestValues[2]<minimumLimitValues[2]) { bestValues[2]=minimumLimitValues[2]; } else
           if (bestValues[2]>maximumLimitValues[2]) { bestValues[2]=maximumLimitValues[2]; }
-          //-------------------------------------------------------------------------------------
+          //-------------------------------------------------------------------------------------*/
         }
 
     //After finishing with the optimization procedure we store the best result we achieved..!

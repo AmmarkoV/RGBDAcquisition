@@ -749,14 +749,14 @@ const static int alignRotationOfTRIVsBVH(
     int matched = 0;
     struct testResult bvhResult[7]={0};
     checkBVHRotation(
-                      &bvhResult,
+                      (struct testResult*) &bvhResult,
                        bvh,
                        bvhJointName
                     );
 
     struct testResult triResult[7]={0};
     checkTRIRotation(
-                      &triResult,
+                      (struct testResult*) &triResult,
                       modelOriginal,
                       triJointName,
                       childOfTriChild
