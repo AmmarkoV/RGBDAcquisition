@@ -110,19 +110,21 @@ int bvhConverter_loadAtomic(const char *path)
   renderingAtomicConfiguration.far    = 10000.0;
   renderingAtomicConfiguration.width  = 1920;
   renderingAtomicConfiguration.height = 1080;
-  renderingAtomicConfiguration.cX=(float)renderingAtomicConfiguration.width/2;
-  renderingAtomicConfiguration.cY=(float)renderingAtomicConfiguration.height/2;
-  renderingAtomicConfiguration.fX=582.18394;
-  renderingAtomicConfiguration.fY=582.52915;
-
-   simpleRendererDefaults(
+  renderingAtomicConfiguration.cX     = (float)renderingAtomicConfiguration.width/2;
+  renderingAtomicConfiguration.cY     = (float)renderingAtomicConfiguration.height/2;
+  renderingAtomicConfiguration.fX     = 582.18394;
+  renderingAtomicConfiguration.fY     = 582.52915;
+  //----------------------------------------------
+  simpleRendererDefaults(
                           &rendererAtomic,
                           renderingAtomicConfiguration.width,
                           renderingAtomicConfiguration.height,
                           renderingAtomicConfiguration.fX,
                           renderingAtomicConfiguration.fY
                          );
-    simpleRendererInitialize(&rendererAtomic);
+  //----------------------------------------------
+  simpleRendererInitialize(&rendererAtomic);
+  //----------------------------------------------
   return bvhAtomicMotion.jointHierarchySize;
 }
 
@@ -548,6 +550,7 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          ikConfig.verbose = 0; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
          ikConfig.dontUseSolutionHistory=0;
+         ikConfig.useLangevinDynamics = 1;
          ikConfig.ikVersion = IK_VERSION;
          //------------------------------------
 

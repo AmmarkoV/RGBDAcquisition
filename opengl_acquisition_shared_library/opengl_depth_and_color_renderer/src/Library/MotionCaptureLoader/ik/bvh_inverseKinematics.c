@@ -560,22 +560,27 @@ int examineSolutionAndKeepIfItIsBetter(
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-        { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted=1; } else //Roll Back..!
-        {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
+                { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted+=1; } else //Roll Back..!
+                {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-        { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted=1; } else //Roll Back..!
-        {  problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
+                { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted+=1; } else //Roll Back..!
+                {  problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
         currentLoss = calculateChainLoss(problem,chainID,partID,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
-        { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted=1; } else //Roll Back..!
-        {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
+                { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1; } else //Roll Back..!
+                {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------
-        return accepted;
+
+        if (accepted>0)
+        {
+            fprintf(stderr,GREEN "Accepted %u changes\n" NORMAL,accepted);
+        }
+        return (accepted!=0);
 }
 
 
@@ -960,9 +965,9 @@ if (iterationID==0)
         if (useLangevinDynamics)
         {
            //Attempt to use Langevin dynamics for annealed gradient descent
-           delta[0]+=randomNoise(2.0);
-           delta[1]+=randomNoise(2.0);
-           delta[2]+=randomNoise(2.0);
+           delta[0]+=randomNoise(1.0);
+           delta[1]+=randomNoise(1.0);
+           delta[2]+=randomNoise(1.0);
         }
 
         //Safeguard agains gradient explosions which we detect when we see large gradients
@@ -2076,9 +2081,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
      if (useMultipleThreads)
         { fprintf(stderr,RED "MT" NORMAL); }
 
-    #if USE_LANGEVIN_DYNAMICS
-     fprintf(stderr,RED "L" NORMAL);
-    #endif // USE_LANGEVIN_DYNAMICS
+    if (ikConfig->useLangevinDynamics)
+        { fprintf(stderr,RED "L" NORMAL); }
 
     fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n",
                                                endTime-startTime,
