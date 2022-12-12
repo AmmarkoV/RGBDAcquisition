@@ -974,6 +974,8 @@ int bvhConverter(int argc,const char **argv)
            fprintf(fp,"Epochs : %u<br>\n",epochs);
            fprintf(fp,"<br>\n");
 
+
+           unsigned long startTime = GetTickCountMicrosecondsIK();
            fprintf(fp,"<table>\n<tr>\n<td>Source<br>Frame</td><td>Target<br>Frame</td><td>Mean Average<br> Error</td><td>Link</td></tr>\n");
            unsigned int step = 0;
            while(
@@ -1005,7 +1007,9 @@ int bvhConverter(int argc,const char **argv)
             maeSamples+=1;
            }
            fprintf(fp,"</table>");
+           unsigned long endTime = GetTickCountMicrosecondsIK();
            fprintf(fp,"<br><br>Total M.A.E. for %u samples : %0.2f mm<br>\n",maeSamples,(float) maeSum/maeSamples);
+           fprintf(fp,"Elapsed Time : %lu microseconds (%0.2f fps) <br>\n",(unsigned long) endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
            fprintf(fp,"</body></html>");
            fclose(fp);
           }

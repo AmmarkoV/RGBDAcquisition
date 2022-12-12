@@ -256,7 +256,7 @@ class BVH():
     #-------------------------------------------------------
     return data2D,data3D,dataBVH 
   #--------------------------------------------------------
-  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0,langevinDynamics=0.5):
+  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0,langevinDynamics=0.3):
     self.stage("fineTuneToMatch ")
     bodyPartCStr = bytes(bodyPart, 'utf-8')
 

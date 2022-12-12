@@ -930,11 +930,11 @@ if (iterationID==0)
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
     unsigned int consecutiveBadSteps=0;
-    unsigned int maximumConsecutiveBadEpochs=5;
+    unsigned int maximumConsecutiveBadEpochs=3;
     float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
-    float beta = 0.9; // Momentum
+    float momentum = 0.8; // Momentum | 0.9 Large / 0.2 Small
     //Learning rate decay..
         //3/4  Mean   :10.4969
         //3/5  Mean   :10.34537
@@ -1009,15 +1009,15 @@ if (iterationID==0)
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         previousDelta[0] = delta[0];
         gradient[0]      = (float) 0.5 * (previousLoss[0] - currentLoss[0]) / (delta[0]+e);
-        delta[0]         = beta * delta[0] + (float) lr * gradient[0];
+        delta[0]         = momentum * delta[0] + (float) lr * gradient[0];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         previousDelta[1] = delta[1];
         gradient[1]      = (float) 0.5 * (previousLoss[1] - currentLoss[1]) / (delta[1]+e);
-        delta[1]         = beta * delta[1] + (float) lr * gradient[1];
+        delta[1]         = momentum * delta[1] + (float) lr * gradient[1];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         previousDelta[2] = delta[2];
         gradient[2]      = (float) 0.5 * (previousLoss[2] - currentLoss[2]) / (delta[2]+e);
-        delta[2]         = beta * delta[2] + (float) lr * gradient[2];
+        delta[2]         = momentum * delta[2] + (float) lr * gradient[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
         if (useLangevinDynamics!=0)
@@ -1043,7 +1043,7 @@ if (iterationID==0)
              fprintf(stderr,RED "gradients[%0.2f,%0.2f,%0.2f]\n" NORMAL,gradient[0],gradient[1],gradient[2]);
              fprintf(stderr,RED "previousLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,previousLoss[0],previousLoss[1],previousLoss[2]);
              fprintf(stderr,RED "currentLoss[%0.2f,%0.2f,%0.2f]\n" NORMAL,currentLoss[0],currentLoss[1],currentLoss[2]);
-             fprintf(stderr,RED "lr = %f beta = %0.2f \n" NORMAL,lr,beta);
+             fprintf(stderr,RED "lr = %f momentum = %0.2f \n" NORMAL,lr,momentum);
             }
              //Just stop after an explosion..
             executedEpochs=currentEpoch;
