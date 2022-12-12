@@ -15,7 +15,7 @@ extern "C"
 #define IK_VERSION 0.38
 
 #define MAXIMUM_CHAINS 16
-#define MAXIMUM_PARTS_OF_CHAIN 16
+#define MAXIMUM_PARTS_OF_CHAIN 24
 #define MAXIMUM_PROBLEM_DESCRIPTION 64
 
 enum bvhIKSolutionStatus

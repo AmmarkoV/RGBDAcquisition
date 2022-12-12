@@ -2742,16 +2742,28 @@ int prepareDefaultBodyProblem(
                                        );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhand",0,// Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "relbow","rForeArm", // Joint
+                                         1.0,                //Importance
+                                         1,                  //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "rhand",0,// Joint
+                                         1.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
 
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -2767,24 +2779,47 @@ int prepareDefaultBodyProblem(
                                        );
      ++correct;
      checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lhand",0,// Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lelbow","lForeArm", // Joint
+                                         1.0,                //Importance
+                                         1,                  //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lhand",0,// Joint
+                                         1.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
      ++correct;
      checksum+=addNewPartToChainProblem(
                                         problem,mc,
                                         //-----------------------------------------
                                         "rhip","rThigh", // Joint
-                                         1.5,            //Importance
+                                         1.0,            //Importance
                                          1,              //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "rknee","rShin",  // Joint
+                                         1.0,     //Importance
+                                         1,       //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,
                                         //-----------------------------------------
@@ -2796,7 +2831,7 @@ int prepareDefaultBodyProblem(
                                         //-----------------------------------------
                                         "rfoot",0, // Joint
                                          1.0,      //Importance
-                                         0,        //IsEndEffector
+                                         1,        //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,
                                         //-----------------------------------------
@@ -2807,8 +2842,20 @@ int prepareDefaultBodyProblem(
                                         problem,mc,
                                         //-----------------------------------------
                                         "lhip","lThigh", // Joint
-                                         1.5,            //Importance
+                                         1.0,            //Importance
                                          1,              //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "lknee","lShin",  // Joint
+                                         1.0,     //Importance
+                                         1,       //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,
                                         //-----------------------------------------
@@ -2820,7 +2867,7 @@ int prepareDefaultBodyProblem(
                                         //-----------------------------------------
                                         "lfoot",0, // Joint
                                          1.0,      //Importance
-                                         0,        //IsEndEffector
+                                         1,        //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,
                                         //-----------------------------------------
@@ -2831,7 +2878,31 @@ int prepareDefaultBodyProblem(
                                         problem,mc,
                                         //-----------------------------------------
                                         "eye.l",0,// Joint
-                                         2.5,     //Importance
+                                         1.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "eye.r",0,// Joint
+                                         1.5,     //Importance
+                                         1,       //IsEndEffector
+                                        //-----------------------------------------
+                                        &groupID,&jobID,&chainID,&partID,
+                                        //-----------------------------------------
+                                        0,0,0 //Automatic mID Start/End assignment
+                                       );
+     ++correct;
+     checksum+=addNewPartToChainProblem(
+                                        problem,mc,
+                                        //-----------------------------------------
+                                        "ear.l","__temporalis02.l",// Joint
+                                         1.5,     //Importance
                                          1,       //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,
@@ -2844,8 +2915,8 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                                         problem,mc,
                                         //-----------------------------------------
-                                        "eye.r",0,// Joint
-                                         2.5,     //Importance
+                                        "ear.r","__temporalis02.r",// Joint
+                                         1.5,     //Importance
                                          1,       //IsEndEffector
                                         //-----------------------------------------
                                         &groupID,&jobID,&chainID,&partID,

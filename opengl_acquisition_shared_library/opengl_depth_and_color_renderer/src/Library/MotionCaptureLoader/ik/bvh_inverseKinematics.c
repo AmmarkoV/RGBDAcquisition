@@ -997,14 +997,13 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         //distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
         currentLoss[1]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
-        if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
+        if (currentLoss[1]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
         currentLoss[2]=calculateChainLoss(problem,chainID,partID,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
-        if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
+        if (currentLoss[2]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-
 
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
@@ -1024,18 +1023,16 @@ if (iterationID==0)
         if (useLangevinDynamics)
         {
            //Attempt to use Langevin dynamics for annealed gradient descent
-           delta[0]+=randomNoise(1.0);
-           delta[1]+=randomNoise(1.0);
-           delta[2]+=randomNoise(1.0);
+           delta[0]+=randomNoise(0.5);
+           delta[1]+=randomNoise(0.5);
+           delta[2]+=randomNoise(0.5);
         }
 
         //Safeguard agains gradient explosions which we detect when we see large gradients
         unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  );
         unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) );
 
-        if  (
-               (deltaExploded) || (encounteredNaNDelta)
-            )
+        if  ( (deltaExploded) || (encounteredNaNDelta) )
         {
             ++problem->chain[chainID].encounteredExplodingGradients;
             fprintf(stderr,RED "EXPLODED %s @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
@@ -1053,7 +1050,9 @@ if (iterationID==0)
             break;
         }
 
+        //----------------------------------------------
         //Remember previous loss/values
+        //----------------------------------------------
         previousLoss[0]=currentLoss[0];
         previousLoss[1]=currentLoss[1];
         previousLoss[2]=currentLoss[2];
@@ -1071,7 +1070,6 @@ if (iterationID==0)
         if (limitsEngaged)
            { ensureValuesInLimits(currentValues,minimumLimitValues,maximumLimitValues); }
         //----------------------------------------------
-
         //We store our new values and calculate our new loss
         //----------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
@@ -1107,9 +1105,7 @@ if (iterationID==0)
             if (verbose)
                   { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n" NORMAL,currentEpoch,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
         }
-
-
-
+        //----------------------------------------------
         if (consecutiveBadSteps>=maximumConsecutiveBadEpochs)
         {
             if (verbose)
@@ -1117,9 +1113,9 @@ if (iterationID==0)
             executedEpochs=currentEpoch;
             break;
         }
-
+        //----------------------------------------------
         lr = (float) learningRateDecayRate * lr;
-
+        //----------------------------------------------
     } // for number of epochs
 
 
