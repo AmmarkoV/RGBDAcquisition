@@ -3773,6 +3773,7 @@ float bvhTestIK(
                 float spring,
                 unsigned int iterations,
                 unsigned int epochs,
+                float langevin,
                 unsigned int fIDPrevious,
                 unsigned int fIDSource,
                 unsigned int fIDTarget,
@@ -3858,7 +3859,7 @@ float bvhTestIK(
                     ikConfig.verbose                       = 1;
                     ikConfig.tryMaintainingLocalOptima     = 1; //Less Jittery but can be stuck at local optima
                     ikConfig.dontUseSolutionHistory        = 0;
-                    ikConfig.useLangevinDynamics           = 1;
+                    ikConfig.useLangevinDynamics           = langevin;
                     ikConfig.ikVersion = IK_VERSION;
                     //--------------------------------------------------
 

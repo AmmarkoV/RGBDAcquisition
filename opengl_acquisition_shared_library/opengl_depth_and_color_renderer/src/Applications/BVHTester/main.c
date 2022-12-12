@@ -941,8 +941,8 @@ int bvhConverter(int argc,const char **argv)
         {
           // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
 
-          if (i+8>=argc)  {
-                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring..");
+          if (i+9>=argc)  {
+                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin..");
                              fprintf(stderr,"got %u ",argc-i);
                              incorrectArguments();
                           }
@@ -955,6 +955,7 @@ int bvhConverter(int argc,const char **argv)
           unsigned int iterations=atoi(argv[i+6]);
           unsigned int epochs=atoi(argv[i+7]);
           float spring = atof(argv[i+8]);
+          float langevin=atof(argv[i+9]);
 
           float maeSum = 0.0;
           unsigned int maeSamples = 0;
@@ -971,9 +972,9 @@ int bvhConverter(int argc,const char **argv)
            fprintf(fp,"Learning Rate : %f<br>\n",learningRate);
            fprintf(fp,"Iterations : %u<br>\n",iterations);
            fprintf(fp,"Epochs : %u<br>\n",epochs);
-           fprintf(fp,"<br><br><br>\n");
+           fprintf(fp,"<br>\n");
 
-           fprintf(fp,"<table>\n<tr>\n<td>Source<br>Frame</td><td>Target<br>Frame</td><td>Mean Average Error</td><td>Link</td></tr>\n");
+           fprintf(fp,"<table>\n<tr>\n<td>Source<br>Frame</td><td>Target<br>Frame</td><td>Mean Average<br> Error</td><td>Link</td></tr>\n");
            unsigned int step = 0;
            while(
                  (sourceFrame+step<bvhMotion.numberOfFrames) &&
@@ -986,6 +987,7 @@ int bvhConverter(int argc,const char **argv)
                                   spring,
                                   iterations,
                                   epochs,
+                                  langevin,
                                   previousFrame+step,
                                   sourceFrame+step,
                                   targetFrame+step,
@@ -1008,6 +1010,7 @@ int bvhConverter(int argc,const char **argv)
            fclose(fp);
           }
 
+          fprintf(stdout,"MAE:%0.2f",(float) maeSum/maeSamples);
           exit(0);
         } else
         //-----------------------------------------------------
