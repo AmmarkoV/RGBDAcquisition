@@ -49,17 +49,17 @@ int prepareDefaultBodyProblem(
 
 float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsigned long endTime);
 
-int bvhTestIK(
-              struct BVH_MotionCapture * mc,
-              float lr,
-              float spring,
-              unsigned int iterations,
-              unsigned int epochs,
-              unsigned int fIDPrevious,
-              unsigned int fIDSource,
-              unsigned int fIDTarget,
-              unsigned int multiThreaded
-             );
+float bvhTestIK(
+                struct BVH_MotionCapture * mc,
+                float lr,
+                float spring,
+                unsigned int iterations,
+                unsigned int epochs,
+                unsigned int fIDPrevious,
+                unsigned int fIDSource,
+                unsigned int fIDTarget,
+                unsigned int multiThreaded
+               );
 
 
 

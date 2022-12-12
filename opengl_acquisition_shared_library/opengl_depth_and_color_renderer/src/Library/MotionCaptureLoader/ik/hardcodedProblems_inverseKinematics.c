@@ -3686,42 +3686,50 @@ int prepareDefaultBodyProblem(
 
 
 int writeHTML(
-    unsigned int fIDSource,
-    unsigned int fIDTarget,
-    float initialMAEInPixels,
-    float finalMAEInPixels,
-    float initialMAEInMM,
-    float finalMAEInMM,
-    int dumpScreenshots
-)
+               unsigned int fIDSource,
+               unsigned int fIDTarget,
+               float initialMAEInPixels,
+               float finalMAEInPixels,
+               float initialMAEInMM,
+               float finalMAEInMM,
+               int dumpScreenshots
+             )
 {
+    char command[1024];
     if (dumpScreenshots)
     {
-        int i=system("convert initial.svg initial.png&");
+        snprintf(command,1024,"convert initial.svg initial_%u_%u.png&",fIDSource,fIDTarget);
+        int i=system(command); //"convert initial.svg initial.png&"
         if (i!=0)
         {
             fprintf(stderr,"Error converting image..\n");
         }
-        i=system("convert target.svg target.png&");
+        //-----------------------------------------------------------------------------------
+        snprintf(command,1024,"convert target.svg target_%u_%u.png&",fIDSource,fIDTarget);
+        i=system(command); //"convert target.svg target.png&"
         if (i!=0)
         {
             fprintf(stderr,"Error converting image..\n");
         }
-        i=system("convert solution.svg solution.png&");
+        //-----------------------------------------------------------------------------------
+        snprintf(command,1024,"convert solution.svg solution_%u_%u.png&",fIDSource,fIDTarget);
+        i=system(command); //"convert solution.svg solution.png&"
         if (i!=0)
         {
             fprintf(stderr,"Error converting image..\n");
         }
+        //-----------------------------------------------------------------------------------
 
-        FILE * html=fopen("report.html","w");
+        snprintf(command,1024,"report_%u_%u.html",fIDSource,fIDTarget);
+        FILE * html=fopen(command,"w"); //"report.html"
         if (html!=0)
         {
             fprintf(html,"<html><body><br>\n");
             //------------------------------------------------------------
             fprintf(html,"<table><tr>\n");
-            fprintf(html,"<td><img src=\"initial.png\" width=400></td>\n");
-            fprintf(html,"<td><img src=\"target.png\" width=400></td>\n");
-            fprintf(html,"<td><img src=\"solution.png\" width=400></td>\n");
+            fprintf(html,"<td><img src=\"initial_%u_%u.png\" width=400></td>\n",fIDSource,fIDTarget);
+            fprintf(html,"<td><img src=\"target_%u_%u.png\" width=400></td>\n",fIDSource,fIDTarget);
+            fprintf(html,"<td><img src=\"solution_%u_%u.png\" width=400></td>\n",fIDSource,fIDTarget);
             fprintf(html,"</tr>\n");
             //------------------------------------------------------------
             fprintf(html,"<tr>\n");
@@ -3759,17 +3767,17 @@ float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsign
 
 // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 15
 
-int bvhTestIK(
-              struct BVH_MotionCapture * mc,
-              float lr,
-              float spring,
-              unsigned int iterations,
-              unsigned int epochs,
-              unsigned int fIDPrevious,
-              unsigned int fIDSource,
-              unsigned int fIDTarget,
-              unsigned int multiThreaded
-             )
+float bvhTestIK(
+                struct BVH_MotionCapture * mc,
+                float lr,
+                float spring,
+                unsigned int iterations,
+                unsigned int epochs,
+                unsigned int fIDPrevious,
+                unsigned int fIDSource,
+                unsigned int fIDTarget,
+                unsigned int multiThreaded
+               )
 {
     int result=0;
 
@@ -3923,14 +3931,14 @@ int bvhTestIK(
 
                         //-------------------------------------------------------------------------------------------------
                         writeHTML(
-                            fIDSource,
-                            fIDTarget,
-                            initialMAEInPixels,
-                            finalMAEInPixels,
-                            initialMAEInMM,
-                            finalMAEInMM,
-                            ikConfig.dumpScreenshots
-                        );
+                                  fIDSource,
+                                  fIDTarget,
+                                  initialMAEInPixels,
+                                  finalMAEInPixels,
+                                  initialMAEInMM,
+                                  finalMAEInMM,
+                                  ikConfig.dumpScreenshots
+                                 );
                         //-------------------------------------------------------------------------------------------------
 
                     }
@@ -3961,7 +3969,7 @@ int bvhTestIK(
     }
 
     bvh_freeTransform(&bvhTargetTransform);
-    return result;
+    return finalMAEInMM*10;
 }
 
 

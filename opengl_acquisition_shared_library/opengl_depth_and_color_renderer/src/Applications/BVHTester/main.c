@@ -155,10 +155,10 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
   renderingAtomicConfiguration.far    = 10000.0;
   renderingAtomicConfiguration.width  = 1920;
   renderingAtomicConfiguration.height = 1080;
-  renderingAtomicConfiguration.cX=(float)renderingAtomicConfiguration.width/2;
-  renderingAtomicConfiguration.cY=(float)renderingAtomicConfiguration.height/2;
-  renderingAtomicConfiguration.fX=582.18394;
-  renderingAtomicConfiguration.fY=582.52915;
+  renderingAtomicConfiguration.cX     = (float)renderingAtomicConfiguration.width/2;
+  renderingAtomicConfiguration.cY     = (float)renderingAtomicConfiguration.height/2;
+  renderingAtomicConfiguration.fX     = 582.18394;
+  renderingAtomicConfiguration.fY     = 582.52915;
 
   fprintf(stderr,"bvhConverter_rendererConfigurationAtomic received %u elements\n",numberOfElements);
   for (int i=0; i<numberOfElements; i++)
@@ -941,8 +941,8 @@ int bvhConverter(int argc,const char **argv)
         {
           // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
 
-          if (i+7>=argc)  {
-                             fprintf(stderr,"--testIK requires 7 arguments, previousFrame sourceFrame targetFrame learningRate iterations epochs spring..");
+          if (i+8>=argc)  {
+                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring..");
                              fprintf(stderr,"got %u ",argc-i);
                              incorrectArguments();
                           }
@@ -950,22 +950,54 @@ int bvhConverter(int argc,const char **argv)
           unsigned int previousFrame=atoi(argv[i+1]);
           unsigned int sourceFrame=atoi(argv[i+2]);
           unsigned int targetFrame=atoi(argv[i+3]);
-          float        learningRate = atof(argv[i+4]);
-          unsigned int iterations=atoi(argv[i+5]);
-          unsigned int epochs=atoi(argv[i+6]);
-          float spring = atof(argv[i+7]);
+          unsigned int stepFrame=atoi(argv[i+4]);
+          float        learningRate = atof(argv[i+5]);
+          unsigned int iterations=atoi(argv[i+6]);
+          unsigned int epochs=atoi(argv[i+7]);
+          float spring = atof(argv[i+8]);
 
-           bvhTestIK(
-                      &bvhMotion,
-                      learningRate,
-                      spring,
-                      iterations,
-                      epochs,
-                      previousFrame,
-                      sourceFrame,
-                      targetFrame,
-                      multiThreaded
-                    );
+          FILE * fp = fopen("report.html","w");
+          if (fp!=0)
+          {
+           fprintf(fp,"<html><body>");
+           fprintf(fp,"File : %s<br>\n",bvhMotion.fileName);
+           fprintf(fp,"Previous Frame : %u<br>\n",previousFrame);
+           fprintf(fp,"Source Frame : %u<br>\n",sourceFrame);
+           fprintf(fp,"Target Frame : %u<br>\n",targetFrame);
+           fprintf(fp,"Step Frame : %u<br>\n",stepFrame);
+           fprintf(fp,"Learning Rate : %f<br>\n",learningRate);
+           fprintf(fp,"Iterations : %u<br>\n",iterations);
+           fprintf(fp,"Epochs : %u<br>\n",epochs);
+           fprintf(fp,"<br><br><br>\n");
+
+           unsigned int step = 0;
+           while(
+                 (sourceFrame+step<bvhMotion.numberOfFrames) &&
+                 (targetFrame+step<bvhMotion.numberOfFrames)
+               )
+           {
+            float mae = bvhTestIK(
+                                  &bvhMotion,
+                                  learningRate,
+                                  spring,
+                                  iterations,
+                                  epochs,
+                                  previousFrame+step,
+                                  sourceFrame+step,
+                                  targetFrame+step,
+                                  multiThreaded
+                                );
+
+            fprintf(fp,"<a href=\"report_%u_%u.html\">Frames  %u -> %u  M.A.E. => %0.2f</a><br>\n",
+                        sourceFrame+step,targetFrame+step,
+                        sourceFrame+step,targetFrame+step,
+                        mae
+                        );
+            step+=stepFrame;
+           }
+           fprintf(fp,"</body></html>");
+           fclose(fp);
+          }
 
           exit(0);
         } else
