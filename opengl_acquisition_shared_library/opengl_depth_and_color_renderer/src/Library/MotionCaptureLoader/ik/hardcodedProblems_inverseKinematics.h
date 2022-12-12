@@ -59,7 +59,8 @@ float bvhTestIK(
                 unsigned int fIDPrevious,
                 unsigned int fIDSource,
                 unsigned int fIDTarget,
-                unsigned int multiThreaded
+                unsigned int multiThreaded,
+                char verboseAndDumpFiles
                );
 
 

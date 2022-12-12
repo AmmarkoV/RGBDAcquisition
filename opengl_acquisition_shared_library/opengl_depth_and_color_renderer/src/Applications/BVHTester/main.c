@@ -941,8 +941,8 @@ int bvhConverter(int argc,const char **argv)
         {
           // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
 
-          if (i+9>=argc)  {
-                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin..");
+          if (i+10>=argc)  {
+                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin verbosity..");
                              fprintf(stderr,"got %u ",argc-i);
                              incorrectArguments();
                           }
@@ -956,6 +956,7 @@ int bvhConverter(int argc,const char **argv)
           unsigned int epochs=atoi(argv[i+7]);
           float spring = atof(argv[i+8]);
           float langevin=atof(argv[i+9]);
+          char verbose = atoi(argv[i+10]);
 
           float maeSum = 0.0;
           unsigned int maeSamples = 0;
@@ -996,7 +997,8 @@ int bvhConverter(int argc,const char **argv)
                                   previousFrame+step,
                                   sourceFrame+step,
                                   targetFrame+step,
-                                  multiThreaded
+                                  multiThreaded,
+                                  verbose
                                 );
 
             fprintf(fp,"<tr><td>%u</td><td>%u</td><td>%0.2f mm</td><td><a href=\"report_%u_%u.html\">Open</a></td></tr>\n",

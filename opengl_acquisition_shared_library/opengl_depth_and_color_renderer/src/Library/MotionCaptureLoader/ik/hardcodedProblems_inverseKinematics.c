@@ -3777,7 +3777,8 @@ float bvhTestIK(
                 unsigned int fIDPrevious,
                 unsigned int fIDSource,
                 unsigned int fIDTarget,
-                unsigned int multiThreaded
+                unsigned int multiThreaded,
+                char verboseAndDumpFiles
                )
 {
     int result=0;
@@ -3854,9 +3855,9 @@ float bvhTestIK(
                     ikConfig.epochs                        = epochs;
                     ikConfig.spring                        = spring;
                     ikConfig.gradientExplosionThreshold    = 50;
-                    ikConfig.dumpScreenshots               = 1;
                     ikConfig.maximumAcceptableStartingLoss = 0.0; // Dont use this
-                    ikConfig.verbose                       = 1;
+                    ikConfig.dumpScreenshots               = verboseAndDumpFiles;
+                    ikConfig.verbose                       = verboseAndDumpFiles;
                     ikConfig.tryMaintainingLocalOptima     = 1; //Less Jittery but can be stuck at local optima
                     ikConfig.dontUseSolutionHistory        = 0;
                     ikConfig.useLangevinDynamics           = langevin;
