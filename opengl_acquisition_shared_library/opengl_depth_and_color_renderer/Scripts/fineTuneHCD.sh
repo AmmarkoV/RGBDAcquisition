@@ -3,6 +3,13 @@ THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$THISDIR"
 cd ..
 
+rm callgrind.out.* 
+rm target_*.png
+rm initial_*.png
+rm solution_*.png
+rm report_*.html
+rm report.csv
+
 
 PREVIOUS_FRAME="3"
 CURRENT_FRAME="4"
@@ -28,6 +35,9 @@ do
   done
  done 
 done
+
+
+python3 Scripts/plotFineTune.py
 #valgrind --tool=callgrind --dump-instr=yes --collect-jumps=yes ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK $PREVIOUS_FRAME $CURRENT_FRAME $TARGET_FRAME $STEP_FRAME $LR $ITERATIONS $EPOCHS 1 $LANGEVIN_DYNAMICS $@
 
 
