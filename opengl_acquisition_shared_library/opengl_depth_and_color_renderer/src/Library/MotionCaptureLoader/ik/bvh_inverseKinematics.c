@@ -930,7 +930,7 @@ if (iterationID==0)
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
     unsigned int consecutiveBadSteps=0;
-    unsigned int maximumConsecutiveBadEpochs=3;
+    unsigned int maximumConsecutiveBadEpochs=5;
     float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
@@ -951,7 +951,7 @@ if (iterationID==0)
         //Distance to -330
         //2/7   Mean   : 9.9858
         //2/7 Mean   : 9.93695
-    float learningRateDecayRate = (float) 2/7;
+    float learningRateDecayRate = (float) 2/3; // 2/7;
    ///--------------------------------------------------------------------------------------------------------------
     //Give an initial direction..
     float delta[3]= {d,d,d};
@@ -1028,8 +1028,8 @@ if (iterationID==0)
            delta[2]+=randomNoise(useLangevinDynamics);
         }
 
-        //Safeguard agains gradient explosions which we detect when we see large gradients
-        unsigned int deltaExploded = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold)  );
+        //Safeguard against gradient explosions which we detect when we see large gradients
+        unsigned int deltaExploded       = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold) );
         unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) );
 
         if  ( (deltaExploded) || (encounteredNaNDelta) )
@@ -1105,7 +1105,7 @@ if (iterationID==0)
             if (verbose)
                   { fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f(%0.2f)  |  %0.2f(%0.2f)  |  %0.2f(%0.2f) \n" NORMAL,currentEpoch,loss,currentValues[0],delta[0],currentValues[1],delta[1],currentValues[2],delta[2]); }
         }
-        //----------------------------------------------
+
         if (consecutiveBadSteps>=maximumConsecutiveBadEpochs)
         {
             if (verbose)
@@ -1152,19 +1152,7 @@ if (iterationID==0)
     }
 
     if (limitsEngaged)
-        {
-          ensureValuesInLimits(bestValues,minimumLimitValues,maximumLimitValues);
-          /*
-          if (bestValues[0]<minimumLimitValues[0]) { bestValues[0]=minimumLimitValues[0]; } else
-          if (bestValues[0]>maximumLimitValues[0]) { bestValues[0]=maximumLimitValues[0]; }
-          //-------------------------------------------------------------------------------------
-          if (bestValues[1]<minimumLimitValues[1]) { bestValues[1]=minimumLimitValues[1]; } else
-          if (bestValues[1]>maximumLimitValues[1]) { bestValues[1]=maximumLimitValues[1]; }
-          //-------------------------------------------------------------------------------------
-          if (bestValues[2]<minimumLimitValues[2]) { bestValues[2]=minimumLimitValues[2]; } else
-          if (bestValues[2]>maximumLimitValues[2]) { bestValues[2]=maximumLimitValues[2]; }
-          //-------------------------------------------------------------------------------------*/
-        }
+        { ensureValuesInLimits(bestValues,minimumLimitValues,maximumLimitValues); }
 
     //After finishing with the optimization procedure we store the best result we achieved..!
     problem->chain[chainID].currentSolution->motion[mIDS[0]] = bestValues[0];
