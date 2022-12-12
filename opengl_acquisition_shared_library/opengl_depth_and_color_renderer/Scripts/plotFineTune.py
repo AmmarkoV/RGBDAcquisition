@@ -205,7 +205,7 @@ if __name__== "__main__":
 
  filename="report.csv"
  output="out.png"
- jointName=" Title "
+ jointName=" HCD FineTune "
  data = readCSVFile(filename,1.0) 
  #-------------------------
  xCol=1
