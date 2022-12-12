@@ -964,12 +964,15 @@ int bvhConverter(int argc,const char **argv)
           if (fp!=0)
           {
            fprintf(fp,"<html><body>");
+
+           // <iframe src="demo_iframe.htm" height="200" width="300" title="Iframe Example"></iframe>
            fprintf(fp,"File : %s<br>\n",bvhMotion.fileName);
            fprintf(fp,"Previous Frame : %u<br>\n",previousFrame);
            fprintf(fp,"Source Frame : %u<br>\n",sourceFrame);
            fprintf(fp,"Target Frame : %u<br>\n",targetFrame);
            fprintf(fp,"Step Frame : %u<br>\n",stepFrame);
            fprintf(fp,"Learning Rate : %f<br>\n",learningRate);
+           fprintf(fp,"Langevin Dynamics : %f<br>\n",langevin);
            fprintf(fp,"Iterations : %u<br>\n",iterations);
            fprintf(fp,"Epochs : %u<br>\n",epochs);
            fprintf(fp,"<br>\n");
@@ -1014,7 +1017,45 @@ int bvhConverter(int argc,const char **argv)
            fclose(fp);
           }
 
+          //----------------------------------------------------
+          //----------------------------------------------------
           fprintf(stdout,"MAE:%0.2f",(float) maeSum/maeSamples);
+          if (!fileExistsIK("report.csv"))
+             {
+               fp = fopen("report.csv","w");
+               if (fp!=0)
+                {
+                  fprintf(fp,"dataset,learningRate,previous,start,target,step,iterations,epochs,langevin,samples,mae\n");
+                  fclose(fp);
+                }
+             }
+          //----------------------------------------------------
+          //----------------------------------------------------
+           if (fileExistsIK("report.csv"))
+             {
+               fp = fopen("report.csv","a");
+               if (fp!=0)
+                {
+                  fprintf(
+                          fp,"%s,%f,%u,%u,%u,%u,%u,%u,%f,%u,%f\n",
+                          bvhMotion.fileName,
+                          learningRate,
+                          previousFrame,
+                          sourceFrame,
+                          targetFrame,
+                          stepFrame,
+                          iterations,
+                          epochs,
+                          langevin,
+                          maeSamples,
+                          (float) maeSum/maeSamples
+                          );
+                  fclose(fp);
+                }
+             }
+          //----------------------------------------------------
+          //----------------------------------------------------
+
           exit(0);
         } else
         //-----------------------------------------------------

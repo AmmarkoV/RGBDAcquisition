@@ -196,6 +196,9 @@ float get2DPointDistance(float aX,float aY,float bX,float bY);
 int cleanProblem(struct ikProblem * problem);
 int viewProblem(struct ikProblem * problem);
 
+
+char fileExistsIK(const char * filename);
+
 unsigned long GetTickCountMicrosecondsIK();
 
 //Temporary call that allows outside control..

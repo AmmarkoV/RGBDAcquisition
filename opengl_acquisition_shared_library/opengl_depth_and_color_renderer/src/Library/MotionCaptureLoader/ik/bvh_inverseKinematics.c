@@ -60,6 +60,19 @@ void clear_line()
     }
 }
 
+
+char fileExistsIK(const char * filename)
+{
+    FILE *fp = fopen(filename,"r");
+    if( fp )
+        {
+            /* exists */
+            fclose(fp);
+            return 1;
+        }
+    return 0;
+}
+
 unsigned long GetTickCountMicrosecondsIK()
 {
     struct timespec ts;
