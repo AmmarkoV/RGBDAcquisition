@@ -100,7 +100,7 @@ struct ikConfiguration
   unsigned int dumpScreenshots;
   unsigned int verbose;
   char dontUseSolutionHistory;
-  char useLangevinDynamics;
+  float useLangevinDynamics;
   float ikVersion;
 };
 
@@ -120,6 +120,7 @@ static void printIkConfiguration(struct ikConfiguration * ikConfig)
    fprintf(stderr,"dumpScreenshots = %u \n",ikConfig->dumpScreenshots);
    fprintf(stderr,"verbose = %u \n",ikConfig->verbose);
    fprintf(stderr,"dontUseSolutionHistory = %u \n",(unsigned int) ikConfig->dontUseSolutionHistory);
+   fprintf(stderr,"useLangevinDynamics = %f \n",ikConfig->useLangevinDynamics);
    fprintf(stderr,"ikVersion = %f ( bin %f ) \n",ikConfig->ikVersion,IK_VERSION);
   }
   fprintf(stderr,"------------------------\n");

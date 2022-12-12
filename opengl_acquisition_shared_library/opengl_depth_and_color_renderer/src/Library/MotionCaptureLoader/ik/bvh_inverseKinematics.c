@@ -707,7 +707,7 @@ float iteratePartLoss(
                       float spring,
                       float gradientExplosionThreshold,
                       char useSolutionHistory,
-                      char useLangevinDynamics,
+                      float useLangevinDynamics,
                       unsigned int verbose
                      )
 {
@@ -1020,12 +1020,12 @@ if (iterationID==0)
         delta[2]         = beta * delta[2] + (float) lr * gradient[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
-        if (useLangevinDynamics)
+        if (useLangevinDynamics!=0)
         {
            //Attempt to use Langevin dynamics for annealed gradient descent
-           delta[0]+=randomNoise(0.5);
-           delta[1]+=randomNoise(0.5);
-           delta[2]+=randomNoise(0.5);
+           delta[0]+=randomNoise(useLangevinDynamics);
+           delta[1]+=randomNoise(useLangevinDynamics);
+           delta[2]+=randomNoise(useLangevinDynamics);
         }
 
         //Safeguard agains gradient explosions which we detect when we see large gradients
@@ -1196,7 +1196,7 @@ int iterateChainLoss(
                      float spring,
                      float gradientExplosionThreshold,
                      char useSolutionHistory,
-                     char useLangevinDynamics,
+                     float useLangevinDynamics,
                      unsigned int verbose
                     )
 {

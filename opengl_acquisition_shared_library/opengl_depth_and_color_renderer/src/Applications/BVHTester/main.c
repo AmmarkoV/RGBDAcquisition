@@ -501,7 +501,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff)
+int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff,float langevinDynamics)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
@@ -550,7 +550,7 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          ikConfig.verbose = 0; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
          ikConfig.dontUseSolutionHistory=0;
-         ikConfig.useLangevinDynamics = 1;
+         ikConfig.useLangevinDynamics = langevinDynamics;
          ikConfig.ikVersion = IK_VERSION;
          //------------------------------------
 

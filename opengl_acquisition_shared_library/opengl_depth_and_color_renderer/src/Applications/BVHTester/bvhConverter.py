@@ -256,15 +256,15 @@ class BVH():
     #-------------------------------------------------------
     return data2D,data3D,dataBVH 
   #--------------------------------------------------------
-  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0):
+  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0,langevinDynamics=0.5):
     self.stage("fineTuneToMatch ")
     bodyPartCStr = bytes(bodyPart, 'utf-8')
 
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(target)
-    self.libBVH.bvhConverter_IKFineTune.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_float, ctypes.c_float, ctypes.c_float]
+    self.libBVH.bvhConverter_IKFineTune.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_float, ctypes.c_float, ctypes.c_float,ctypes.c_float]
     self.libBVH.bvhConverter_IKFineTune.restype  = ctypes.c_int
-    success = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff)
+    success = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff,langevinDynamics)
     if (success==1):
        print("Retrieving HCD results for ",iterations," iterations!")
        return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
