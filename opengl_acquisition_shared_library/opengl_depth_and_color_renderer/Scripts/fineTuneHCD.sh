@@ -14,13 +14,13 @@ EPOCHS="10"
 LANGEVIN_DYNAMICS="0.3"
 VERBOSITY="0"
 
-for EPOCHS in `echo "5 10 15 20"`
+for EPOCHS in `echo "5 10 15"`
 do
- for ITERATIONS in `echo "3 5 10 15 20 25"`
+ for ITERATIONS in `echo "5 10 15"`
  do
-  for LR  in `echo "1 0.1 0.01 0.001"`
+  for LR  in `echo "0.01 0.03 0.06 0.09 0.1"`
   do
-   for LANGEVIN_DYNAMICS  in `echo "0.1 0.3 1 2"`
+   for LANGEVIN_DYNAMICS  in `echo "0.1 0.2 0.3 0.4 0.5"`
    do
       echo "IT: $ITERATIONS | EP: $EPOCHS | LR: $LR | LANGV: $LANGEVIN_DYNAMICS"
       ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK $PREVIOUS_FRAME $CURRENT_FRAME $TARGET_FRAME $STEP_FRAME $LR $ITERATIONS $EPOCHS 1 $LANGEVIN_DYNAMICS $VERBOSITY $@
