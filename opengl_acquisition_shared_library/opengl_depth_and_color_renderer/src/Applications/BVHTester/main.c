@@ -956,6 +956,9 @@ int bvhConverter(int argc,const char **argv)
           unsigned int epochs=atoi(argv[i+7]);
           float spring = atof(argv[i+8]);
 
+          float maeSum = 0.0;
+          unsigned int maeSamples = 0;
+
           FILE * fp = fopen("report.html","w");
           if (fp!=0)
           {
@@ -970,6 +973,7 @@ int bvhConverter(int argc,const char **argv)
            fprintf(fp,"Epochs : %u<br>\n",epochs);
            fprintf(fp,"<br><br><br>\n");
 
+           fprintf(fp,"<table>\n<tr>\n<td>Source<br>Frame</td><td>Target<br>Frame</td><td>Mean Average Error</td><td>Link</td></tr>\n");
            unsigned int step = 0;
            while(
                  (sourceFrame+step<bvhMotion.numberOfFrames) &&
@@ -988,13 +992,18 @@ int bvhConverter(int argc,const char **argv)
                                   multiThreaded
                                 );
 
-            fprintf(fp,"<a href=\"report_%u_%u.html\">Frames  %u -> %u  M.A.E. => %0.2f</a><br>\n",
+            fprintf(fp,"<tr><td>%u</td><td>%u</td><td>%0.2f mm</td><td><a href=\"report_%u_%u.html\">Open</a></td></tr>\n",
                         sourceFrame+step,targetFrame+step,
-                        sourceFrame+step,targetFrame+step,
-                        mae
+                        mae,
+                        sourceFrame+step,targetFrame+step
                         );
+
+            maeSum+=mae;
             step+=stepFrame;
+            maeSamples+=1;
            }
+           fprintf(fp,"</table>");
+           fprintf(fp,"<br><br>Total M.A.E. for %u samples : %0.2f mm<br>\n",maeSamples,(float) maeSum/maeSamples);
            fprintf(fp,"</body></html>");
            fclose(fp);
           }
