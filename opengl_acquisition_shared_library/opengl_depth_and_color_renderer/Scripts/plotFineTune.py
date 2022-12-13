@@ -229,7 +229,7 @@ if __name__== "__main__":
  #-------------------------
  viewAzimuth=45
  viewElevation=45
- transparency=0.8
+ transparency=0.6
  scale = 0.12 #Smaller is smaller :P
 
  
