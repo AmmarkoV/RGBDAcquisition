@@ -216,7 +216,14 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
       return 0;
   }
 
-  float * newMotionValues = (float*) malloc(sizeof(float) * ( mc->motionValuesSize + mcSource->motionValuesSize + 1 ) );
+  if (mc->numberOfValuesPerFrame!=mcSource->numberOfValuesPerFrame)
+  {
+      fprintf(stderr,"Inconsistent Source/Target Files..\n");
+      return 0;
+  }
+
+
+  float * newMotionValues = (float*) malloc(sizeof(float) * ( mc->motionValuesSize + mcSource->motionValuesSize + 2 ) );
   if (newMotionValues==0) { fprintf(stderr,"Could not allocate new motion values\n"); return 0; }
 
   float * oldMotionValues = mc->motionValues;
@@ -224,7 +231,7 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
 
   fprintf(stderr,"Copying : ");
   ptr+=mc->motionValuesSize;
-  memcpy(ptr,oldMotionValues,sizeof(float) * mcSource->motionValuesSize);
+  memcpy(ptr,mcSource->motionValues,sizeof(float) * mcSource->motionValuesSize);
   fprintf(stderr," Done\n");
 
   mc->numberOfFrames            += mcSource->numberOfFrames;
