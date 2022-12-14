@@ -48,6 +48,12 @@ int bvh_EraseAndAllocateSpaceForNumberOfFrames(
                                                unsigned int targetNumberOfFrames
                                               );
 
+
+int bvh_GrowMocapFileByCopyingOtherMocapFile(
+                                              struct BVH_MotionCapture * mc,
+                                              struct BVH_MotionCapture * mcSource
+                                             );
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,
                                               unsigned int timesToRepeat

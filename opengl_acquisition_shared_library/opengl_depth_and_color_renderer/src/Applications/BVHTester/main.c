@@ -1245,6 +1245,28 @@ int bvhConverter(int argc,const char **argv)
           bvh_renameJointsForCompatibility(&bvhMotion);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--addfrom")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments();}
+          const char * addfromBVHFile=argv[i+1];
+          struct BVH_MotionCapture addedMotion={0};
+          //First of all we need to load the BVH file
+          if (!bvh_loadBVH(addfromBVHFile, &addedMotion, scaleWorld))
+          {
+            fprintf(stderr,"Error loading file `%s` \n",addfromBVHFile);
+            haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
+          }
+
+          //Change joint names..
+          bvh_renameJointsForCompatibility(&addedMotion);
+          bvh_GrowMocapFileByCopyingOtherMocapFile(
+                                                   &bvhMotion,
+                                                   &addedMotion
+                                                  );
+          bvh_free(&addedMotion);
+
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--addpositionalchannels")==0)
         {
            // ./BVHTester --from dataset/head.bvh --addpositionalchannels --bvh test.bvh

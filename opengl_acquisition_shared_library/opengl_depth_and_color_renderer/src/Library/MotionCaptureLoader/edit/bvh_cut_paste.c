@@ -195,6 +195,49 @@ int bvh_EraseAndAllocateSpaceForNumberOfFrames(struct BVH_MotionCapture * mc,uns
 
 
 
+int bvh_GrowMocapFileByCopyingOtherMocapFile(
+                                              struct BVH_MotionCapture * mc,
+                                              struct BVH_MotionCapture * mcSource
+                                             )
+{
+  if (mc==0)                           { fprintf(stderr,"No motion capture file to repeat\n");  return 0; }
+  if (mc->motionValues==0)             { fprintf(stderr,"No data to repeat\n");                 return 0; }
+  if (mc->motionValuesSize==0)         { fprintf(stderr,"Data to repeat has zero data size\n"); return 0; }
+  if (mcSource==0)                     { fprintf(stderr,"No motion capture file to repeat\n");  return 0; }
+  if (mcSource->motionValues==0)       { fprintf(stderr,"No data to repeat\n");                 return 0; }
+  if (mcSource->motionValuesSize==0)   { fprintf(stderr,"Data to repeat has zero data size\n"); return 0; }
+  //-------------------------------------------------------------------------------------------------
+  fprintf(stderr,"Asked to copy %s to %s\n",mc->fileName,mcSource->fileName);
+  fprintf(stderr,"Will now try to allocate %lu KB of memory\n",(sizeof(float) * (mc->motionValuesSize+ mcSource->motionValuesSize)) / 1024);
+
+  if (mc->jointHierarchySize!=mcSource->jointHierarchySize)
+  {
+      fprintf(stderr,"Inconsistent Source/Target Files..\n");
+      return 0;
+  }
+
+  float * newMotionValues = (float*) malloc(sizeof(float) * ( mc->motionValuesSize + mcSource->motionValuesSize + 1 ) );
+  if (newMotionValues==0) { fprintf(stderr,"Could not allocate new motion values\n"); return 0; }
+
+  float * oldMotionValues = mc->motionValues;
+  float * ptr=newMotionValues;
+
+  fprintf(stderr,"Copying : ");
+  ptr+=mc->motionValuesSize;
+  memcpy(ptr,oldMotionValues,sizeof(float) * mcSource->motionValuesSize);
+  fprintf(stderr," Done\n");
+
+  mc->numberOfFrames            += mcSource->numberOfFrames;
+  mc->numberOfFramesEncountered += mcSource->numberOfFrames;
+  mc->motionValuesSize          += mcSource->motionValuesSize;
+  mc->motionValues               = newMotionValues;
+  free(oldMotionValues);
+
+ return 1;
+}
+
+
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,
                                               unsigned int timesToRepeat
