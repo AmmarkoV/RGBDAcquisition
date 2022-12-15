@@ -292,10 +292,10 @@ int is4x4FIdentityMatrixS(struct Matrix4x4OfFloats * m)
 int is4x4FIdentityMatrixPercisionCompensating(struct Matrix4x4OfFloats  * m)
 {
    return (
-    (floatPEq(&m->m[0],1.0)) &&(floatPEq(&m->m[1],0.0)) &&(floatPEq(&m->m[2],0.0)) &&(floatPEq(&m->m[3],0.0)) &&
-    (floatPEq(&m->m[4],0.0)) &&(floatPEq(&m->m[5],1.0)) &&(floatPEq(&m->m[6],0.0)) &&(floatPEq(&m->m[7],0.0)) &&
-    (floatPEq(&m->m[8],0.0)) &&(floatPEq(&m->m[9],0.0)) &&(floatPEq(&m->m[10],1.0))&&(floatPEq(&m->m[11],0.0))&&
-    (floatPEq(&m->m[12],0.0))&&(floatPEq(&m->m[13],0.0))&&(floatPEq(&m->m[14],0.0))&&(floatPEq(&m->m[15],1.0))
+              (floatPEq(&m->m[0],1.0)) &&(floatPEq(&m->m[1],0.0)) &&(floatPEq(&m->m[2],0.0)) &&(floatPEq(&m->m[3],0.0)) &&
+              (floatPEq(&m->m[4],0.0)) &&(floatPEq(&m->m[5],1.0)) &&(floatPEq(&m->m[6],0.0)) &&(floatPEq(&m->m[7],0.0)) &&
+              (floatPEq(&m->m[8],0.0)) &&(floatPEq(&m->m[9],0.0)) &&(floatPEq(&m->m[10],1.0))&&(floatPEq(&m->m[11],0.0))&&
+              (floatPEq(&m->m[12],0.0))&&(floatPEq(&m->m[13],0.0))&&(floatPEq(&m->m[14],0.0))&&(floatPEq(&m->m[15],1.0))
            );
 }
 
@@ -1250,11 +1250,12 @@ int transpose4x4FMatrix(float * mat)
   tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
   tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
   tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
-
-  return 1;
+  } else
+  { //Believe it or not this is the fastest branch prediction :P
+    return 0;
   }
 
-  return 0;
+ return 1;
 }
 
 
@@ -1269,18 +1270,20 @@ int transpose4x4DMatrix(double * mat)
       12  13  14  15          3  7  11  15   */
 
    double tmp;
-   tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
-   tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
-   tmp = mat[3]; mat[3]=mat[12]; mat[12]=tmp;
+   tmp = mat[1];  mat[1]=mat[4];   mat[4]=tmp;
+   tmp = mat[2];  mat[2]=mat[8];   mat[8]=tmp;
+   tmp = mat[3];  mat[3]=mat[12];  mat[12]=tmp;
 
 
-   tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
-   tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
+   tmp = mat[6];  mat[6]=mat[9];   mat[9]=tmp;
+   tmp = mat[13]; mat[13]=mat[7];  mat[7]=tmp;
    tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
-   return 1;
+  } else
+  { //Believe it or not this is the fastest branch prediction :P
+    return 0;
   }
 
-  return 0;
+ return 1;
 }
 
 
@@ -1289,13 +1292,11 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 {
  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
  {
-
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
   print4x4DMatrix("A", matrixA);
   print4x4DMatrix("B", matrixB);
   #endif // PRINT_MATRIX_DEBUGGING
-
 
   //MULTIPLICATION_RESULT FIRST ROW
   result[0]=matrixA[0] * matrixB[0] + matrixA[1] * matrixB[4]  + matrixA[2] * matrixB[8]  + matrixA[3] * matrixB[12];
@@ -1325,9 +1326,12 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
    print4x4DMatrix("AxB", result);
   #endif // PRINT_MATRIX_DEBUGGING
 
-  return 1;
+  } else
+  { //Believe it or not this is the fastest branch prediction :P
+    return 0;
   }
-  return 0;
+
+ return 1;
 }
 
 
@@ -1357,7 +1361,6 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
   print4x4FMatrix("B", matrixB);
   #endif // PRINT_MATRIX_DEBUGGING
 
-
   //MULTIPLICATION_RESULT FIRST ROW
   result[0]=matrixA[0] * matrixB[0] + matrixA[1] * matrixB[4]  + matrixA[2] * matrixB[8]  + matrixA[3] * matrixB[12];
   result[1]=matrixA[0] * matrixB[1] + matrixA[1] * matrixB[5]  + matrixA[2] * matrixB[9]  + matrixA[3] * matrixB[13];
@@ -1385,10 +1388,12 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
   #if PRINT_MATRIX_DEBUGGING
    print4x4FMatrix("AxB", result);
   #endif // PRINT_MATRIX_DEBUGGING
-
-  return 1;
+  } else
+  { //Believe it or not this is the fastest branch prediction :P
+    return 0;
   }
- return 0;
+
+ return 1;
 }
 
 
@@ -1396,7 +1401,7 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
 //https://software.intel.com/content/www/us/en/develop/articles/performance-of-classic-matrix-multiplication-algorithm-on-intel-xeon-phi-processor-system.html
 int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const float * matrixB)
 {
-   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
+  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
   {
    for(int i = 0; i < 4; i += 1 )
 	{
@@ -1410,9 +1415,12 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 			result[4*i+j] = sum;
 		}
 	}
-  return 1;
+  } else
+  { //Believe it or not this is the fastest branch prediction :P
+    return 0;
   }
- return 0;
+
+ return 1;
 }
 
 
