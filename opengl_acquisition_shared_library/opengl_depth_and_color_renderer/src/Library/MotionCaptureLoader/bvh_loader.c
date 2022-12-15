@@ -489,7 +489,7 @@ int bvh_OffsetPositionRotation(
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
-int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
+int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion,BVHJointID jID)
 {
  if (jID<bvhMotion->jointHierarchySize)
      {
