@@ -230,7 +230,10 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
   float * ptr=newMotionValues;
 
   fprintf(stderr,"Copying : ");
+  //Copying original data
+  memcpy(ptr,mc->motionValues,sizeof(float) * mc->motionValuesSize);
   ptr+=mc->motionValuesSize;
+  //Copy extra data
   memcpy(ptr,mcSource->motionValues,sizeof(float) * mcSource->motionValuesSize);
   fprintf(stderr," Done\n");
 
