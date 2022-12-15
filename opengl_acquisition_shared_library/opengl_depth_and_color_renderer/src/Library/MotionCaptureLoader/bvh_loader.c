@@ -235,7 +235,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
  return channelOrder;
 }
 
-
+#define NEW_RESOLVE_CODE 1
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
    //fprintf(stderr,"IN bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelTypeID);
@@ -250,6 +250,11 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
      //Manual re-resolution of channel!
      int resolvedChannelType = 0;
      int resolvedChannel     = 0;
+
+     #if NEW_RESOLVE_CODE
+       resolvedChannel     = bvhMotion->jointHierarchy[jID].resolveChannelType[channelTypeID];
+       resolvedChannelType = (resolvedChannel!=BVH_INVALID_CHANNEL);
+     #else
      for (int cID=0; cID<bvhMotion->jointHierarchy[jID].loadedChannels; cID++)
      {
         //fprintf(stderr,"LOOP jID %u / channel %u / channelTypeID %u\n",jID,cID,bvhMotion->jointHierarchy[jID].channelType[cID]);
@@ -259,11 +264,16 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
             resolvedChannel     = cID;
         }
      }
-     unsigned int channelIDMotionOffset =  bvhMotion->jointToMotionLookup[jID].jointMotionOffset + resolvedChannel;
+     #endif // NEW_RESOLVE_CODE
 
-     if (resolvedChannelType==0)
+     if (resolvedChannelType!=0)
      {
-         if ( (jID==0) && (channelTypeID==BVH_ROTATION_W) )
+      //unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
+       unsigned int channelIDMotionOffset =  bvhMotion->jointToMotionLookup[jID].jointMotionOffset + resolvedChannel;
+       return  (fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset;
+     }
+
+     if ( (jID==0) && (channelTypeID==BVH_ROTATION_W) )
          {
            //Special case QBVH ..!
          } else
@@ -278,11 +288,7 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
                   channelTypeID
                  );
          }
-     }
      //This is broken ?
-     //unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[channelTypeID];
-
-     return  (fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset;
    }
 
   return 0;

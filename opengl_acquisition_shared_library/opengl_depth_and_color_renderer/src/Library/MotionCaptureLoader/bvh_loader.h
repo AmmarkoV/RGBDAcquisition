@@ -77,8 +77,10 @@ enum CHANNEL_NAMES
   BVH_RODRIGUES_X,//8
   BVH_RODRIGUES_Y,//9
   BVH_RODRIGUES_Z,//10
-  //--------------------
-  BVH_VALID_CHANNEL_NAMES
+  //---------------------
+  BVH_VALID_CHANNEL_NAMES,
+  //---------------------
+  BVH_INVALID_CHANNEL
 };
 
 
@@ -206,6 +208,7 @@ struct BVH_Joint
   char  hasQuaternionRotation;
   char  hasRodriguesRotation;
   char  channelType[BVH_VALID_CHANNEL_NAMES];
+  char  resolveChannelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
   unsigned int loadedChannels;
   //-------------------------------------------
