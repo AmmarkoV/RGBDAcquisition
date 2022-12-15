@@ -16,6 +16,9 @@ DATASETA="/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/Motion
 DATASETB="/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture/121/121_15.bvh"
 DATASETC="/home/ammar/Documents/Programming/DNNTracker/DNNTracker/dataset/MotionCapture/122/122_27.bvh"
 
+#./BVHTester --from $DATASET --addfrom $DATASETA --addfrom $DATASETB --addfrom $DATASETC --bvh t.bvh
+#exit 0
+
 PREVIOUS_FRAME="3"
 CURRENT_FRAME="4"
 TARGET_FRAME="40"

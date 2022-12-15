@@ -923,16 +923,16 @@ int bvhConverter(int argc,const char **argv)
           float spring = atof(argv[i+7]);
 
           bvhMeasureIterationInfluence(
-                      &bvhMotion,
-                      learningRate,
-                      spring,
-                      iterations,
-                      epochs,
-                      previousFrame,
-                      sourceFrame,
-                      targetFrame,
-                      multiThreaded
-                    );
+                                       &bvhMotion,
+                                       learningRate,
+                                       spring,
+                                       iterations,
+                                       epochs,
+                                       previousFrame,
+                                       sourceFrame,
+                                       targetFrame,
+                                       multiThreaded
+                                      );
 
           exit(0);
         } else
@@ -968,6 +968,7 @@ int bvhConverter(int argc,const char **argv)
 
            // <iframe src="demo_iframe.htm" height="200" width="300" title="Iframe Example"></iframe>
            fprintf(fp,"File : %s<br>\n",bvhMotion.fileName);
+           fprintf(fp," %u frames / %u joints / %u motion values per frame<br>\n",bvhMotion.numberOfFrames,bvhMotion.jointHierarchySize,bvhMotion.numberOfValuesPerFrame);
            fprintf(fp,"Previous Frame : %u<br>\n",previousFrame);
            fprintf(fp,"Source Frame : %u<br>\n",sourceFrame);
            fprintf(fp,"Target Frame : %u<br>\n",targetFrame);
@@ -1247,6 +1248,7 @@ int bvhConverter(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--addfrom")==0)
         {
+          fprintf(stderr,"File %s initially had %u frames\n",bvhMotion.fileName,bvhMotion.numberOfFrames);
           if (i+1>=argc)  { incorrectArguments();}
           const char * addfromBVHFile=argv[i+1];
           struct BVH_MotionCapture addedMotion={0};
@@ -1263,8 +1265,8 @@ int bvhConverter(int argc,const char **argv)
                                                    &bvhMotion,
                                                    &addedMotion
                                                   );
+          fprintf(stderr,"After adding %s file %s has %u frames\n",addedMotion.fileName,bvhMotion.fileName,bvhMotion.numberOfFrames);
           bvh_free(&addedMotion);
-
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--addpositionalchannels")==0)
