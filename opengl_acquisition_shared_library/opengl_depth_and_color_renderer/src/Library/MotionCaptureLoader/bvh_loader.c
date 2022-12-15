@@ -239,13 +239,14 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
    //fprintf(stderr,"IN bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelTypeID);
-   if ( (bvhMotion!=0) && (channelTypeID<BVH_VALID_CHANNEL_NAMES) && (jID<bvhMotion->jointHierarchySize) && (fID<bvhMotion->numberOfFrames) )
+   if (
+         (bvhMotion!=0) &&
+         (channelTypeID<BVH_VALID_CHANNEL_NAMES) &&
+         (jID<bvhMotion->jointHierarchySize) &&
+         (fID<bvhMotion->numberOfFrames) &&
+         (bvhMotion->jointHierarchy[jID].loadedChannels < BVH_VALID_CHANNEL_NAMES)
+      )
    {
-     if (bvhMotion->jointHierarchy[jID].loadedChannels >= BVH_VALID_CHANNEL_NAMES)
-     {
-         fprintf(stderr,RED "BUG:  jID %u / fID %u  has an incorrect number of channels (%u) \n" NORMAL ,jID,fID,bvhMotion->jointHierarchy[jID].loadedChannels);
-     }
-
      //Manual re-resolution of channel!
      int resolvedChannelType = 0;
      int resolvedChannel     = 0;
