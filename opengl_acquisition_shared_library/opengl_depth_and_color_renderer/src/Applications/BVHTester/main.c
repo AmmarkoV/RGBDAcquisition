@@ -544,7 +544,7 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          ikConfig.iterations = iterations;
          ikConfig.epochs = epochs;
          ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
-         ikConfig.gradientExplosionThreshold = 50;
+         ikConfig.gradientExplosionThreshold = 20; //50 default
          ikConfig.spring= 20;
          ikConfig.dumpScreenshots = 0; // Dont thrash disk
          ikConfig.verbose = 0; //Dont spam console
