@@ -1335,26 +1335,21 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 }
 
 
-int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
+void multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
 {
  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
-  double tmp[16];
-
-  return (
-             (multiplyTwo4x4DMatrices(tmp,matrixB,matrixC)) &&
-             (multiplyTwo4x4DMatrices(result,matrixA,tmp ))
-         );
+   double tmp[16];
+   multiplyTwo4x4DMatrices(tmp,matrixB,matrixC);
+   multiplyTwo4x4DMatrices(result,matrixA,tmp);
   }
-  return 0;
 }
 
 
 
-int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
+void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
 {
-  int res = 0;
-  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
+  //if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) This gets called millions of times.. removing the check frees 0.43 clocks
   {
   #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
@@ -1386,13 +1381,12 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
   result[14]=matrixA[12] * matrixB[2] + matrixA[13] * matrixB[6]  + matrixA[14] * matrixB[10]   + matrixA[15] * matrixB[14];
   result[15]=matrixA[12] * matrixB[3] + matrixA[13] * matrixB[7]  + matrixA[14] * matrixB[11]   + matrixA[15] * matrixB[15];
 
-  res=1;
   #if PRINT_MATRIX_DEBUGGING
    print4x4FMatrix("AxB", result);
   #endif // PRINT_MATRIX_DEBUGGING
   }
 
- return res;
+ return;
 }
 
 
@@ -1624,21 +1618,19 @@ void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float *
   struct Matrix4x4OfFloats bufB;
    copy4x4FMatrix(bufB.m,matrixB);
    multiplyTwo4x4FMatricesS(result,&bufA,&bufB);
+  return;
 }
 
 
-int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC)
+void multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC)
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
-  float tmp[16];
-
-  return (
-           (multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC)) &&
-           (multiplyTwo4x4FMatrices_Naive(result , matrixA , tmp))
-         );
+   float tmp[16];
+   multiplyTwo4x4FMatrices_Naive(tmp,matrixB,matrixC);
+   multiplyTwo4x4FMatrices_Naive(result,matrixA, tmp);
   }
-  return 0;
+  return;
 }
 
 void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
@@ -1649,6 +1641,7 @@ void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x
    multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC);
    multiplyTwo4x4FMatricesS(result,matrixA,&tmp);
   }
+  return;
 }
 
 #define USE_NEW_THREE_4X4_MATRIXMUL 1

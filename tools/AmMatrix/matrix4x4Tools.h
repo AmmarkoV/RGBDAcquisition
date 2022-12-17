@@ -318,7 +318,7 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 * @param  Input 4x4 Float Matrix C
 * @retval 0=failure,1=success
 */
-int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
+void multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
 
 
 /**
@@ -329,7 +329,7 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
+void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
 
 
 
@@ -360,7 +360,7 @@ int multiplyThree4x4FMatricesWithIdentityHints(
                                                 int matrixCIsIdentity
                                               );
 
-int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
+void multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
 
 void multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
 

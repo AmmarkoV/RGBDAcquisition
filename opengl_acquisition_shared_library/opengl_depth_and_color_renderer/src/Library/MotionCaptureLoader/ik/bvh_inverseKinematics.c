@@ -472,11 +472,7 @@ float calculateChainLoss(
                         {
                             loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
-                        }/*
-                         else
-                        {
-                           fprintf(stderr,RED "Joint %u failed to be projected (source=%u,target=%u)\n"NORMAL,jID,((sX!=0.0) || (sY!=0.0)),((tX!=0.0) || (tY!=0.0)));
-                        }*/
+                        }
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
                 } //We add ever part of this chain
             } else  // We successfully projected the BVH file to 2D points..
@@ -666,7 +662,7 @@ int weAreAtALocalOptimum(
 {
   assert(d!=0.0);
   //Are we at a global optimum? -------------------------------------------------------------------
-  unsigned int badLosses=0;
+  int badLosses=0;
   for (unsigned int i=0; i<3; i++)
         {
             float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
@@ -678,29 +674,26 @@ int weAreAtALocalOptimum(
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
-                if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
+                //if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
                 delta[i] = d; // Why d ? and not 0
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
             {
-                if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
+                //if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
                 delta[i] = d;
             }
             else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
             {
-                if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
+                //if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
                 delta[i] = -d;
             }
-            else
+            else if (verbose)
             {
-                if (verbose)
-                {
-                    fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
-                    fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
-                    delta[i] = d;
-                    ++badLosses;
-                }
+                fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
+                fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
+                delta[i] = d;
+                ++badLosses;
             }
         }
   //-------------------------------------------------------------------------------------------------------
