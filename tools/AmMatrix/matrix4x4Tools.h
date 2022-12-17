@@ -344,11 +344,11 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
 void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const float * matrixB);
 
 
-int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
+void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
 
-int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
+void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
 
-int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB,struct Matrix4x4OfFloats * matrixC);
+void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB,struct Matrix4x4OfFloats * matrixC);
 
 int multiplyThree4x4FMatricesWithIdentityHints(
                                                 struct Matrix4x4OfFloats * result,
@@ -362,7 +362,7 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 
 int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
 
-int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
+void multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
 
 
 

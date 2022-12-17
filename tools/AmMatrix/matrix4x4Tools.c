@@ -1353,6 +1353,7 @@ int multiplyThree4x4DMatrices(double * result , double * matrixA , double * matr
 
 int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
 {
+  int res = 0;
   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
   {
   #if PRINT_MATRIX_DEBUGGING
@@ -1385,15 +1386,13 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
   result[14]=matrixA[12] * matrixB[2] + matrixA[13] * matrixB[6]  + matrixA[14] * matrixB[10]   + matrixA[15] * matrixB[14];
   result[15]=matrixA[12] * matrixB[3] + matrixA[13] * matrixB[7]  + matrixA[14] * matrixB[11]   + matrixA[15] * matrixB[15];
 
+  res=1;
   #if PRINT_MATRIX_DEBUGGING
    print4x4FMatrix("AxB", result);
   #endif // PRINT_MATRIX_DEBUGGING
-  } else
-  { //Believe it or not this is the fastest branch prediction :P
-    return 0;
   }
 
- return 1;
+ return res;
 }
 
 
@@ -1401,6 +1400,7 @@ int multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const f
 //https://software.intel.com/content/www/us/en/develop/articles/performance-of-classic-matrix-multiplication-algorithm-on-intel-xeon-phi-processor-system.html
 int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const float * matrixB)
 {
+  int res = 0;
   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
   {
    for(int i = 0; i < 4; i += 1 )
@@ -1415,12 +1415,10 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 			result[4*i+j] = sum;
 		}
 	}
-  } else
-  { //Believe it or not this is the fastest branch prediction :P
-    return 0;
+	res=1;
   }
 
- return 1;
+ return res;
 }
 
 
@@ -1606,27 +1604,26 @@ void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const f
 
 
 
-int multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
+void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m); //109.53 fps in the sven dataset
     ////multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m); // 107.77 fps in the sven dataset
-    return 1;
 #else
-   return multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
+   multiplyTwo4x4FMatrices_Naive(result->m,matrixA->m,matrixB->m);
 #endif
 }
 
 
 
 
-int multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * matrixA , float * matrixB)
+void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * matrixA , float * matrixB)
 {
   struct Matrix4x4OfFloats bufA;
    copy4x4FMatrix(bufA.m,matrixA);
   struct Matrix4x4OfFloats bufB;
    copy4x4FMatrix(bufB.m,matrixB);
-  return  multiplyTwo4x4FMatricesS(result,&bufA,&bufB);
+   multiplyTwo4x4FMatricesS(result,&bufA,&bufB);
 }
 
 
@@ -1644,17 +1641,14 @@ int multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * m
   return 0;
 }
 
-int multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
+void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
    struct Matrix4x4OfFloats tmp;
-   return (
-           ( multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC)  ) &&
-           ( multiplyTwo4x4FMatricesS(result,matrixA,&tmp) )
-          );
+   multiplyTwo4x4FMatricesS(&tmp,matrixB,matrixC);
+   multiplyTwo4x4FMatricesS(result,matrixA,&tmp);
   }
-  return 0;
 }
 
 #define USE_NEW_THREE_4X4_MATRIXMUL 1
@@ -1695,14 +1689,14 @@ int multiplyThree4x4FMatricesWithIdentityHints(
     switch (multiplicationCase)
     {
       //---------------------------------------------------------------------------------------------------------------------------
-      case MAT_4x4_CASE_NO_ACTIVE_MATRICES              :  create4x4FIdentityMatrix(result);              return 1;          break;
-      case MAT_4x4_CASE_MATRIXA                         :  copy4x4FMatrix(result->m,matrixA->m);          return 1;          break;
-      case MAT_4x4_CASE_MATRIXB                         :  copy4x4FMatrix(result->m,matrixB->m);          return 1;          break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB             :  return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);          break;
-      case MAT_4x4_CASE_MATRIXC                         :  copy4x4FMatrix(result->m,matrixC->m);          return 1;          break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXC             :  return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);          break;
-      case MAT_4x4_CASE_MATRIXB_AND_MATRIXC             :  return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);          break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC :  return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); break;
+      case MAT_4x4_CASE_NO_ACTIVE_MATRICES              :  create4x4FIdentityMatrix(result);                          return 1;  break;
+      case MAT_4x4_CASE_MATRIXA                         :  copy4x4FMatrix(result->m,matrixA->m);                      return 1;  break;
+      case MAT_4x4_CASE_MATRIXB                         :  copy4x4FMatrix(result->m,matrixB->m);                      return 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixB);          return 1;  break;
+      case MAT_4x4_CASE_MATRIXC                         :  copy4x4FMatrix(result->m,matrixC->m);                      return 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixC);          return 1;  break;
+      case MAT_4x4_CASE_MATRIXB_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixB,matrixC);          return 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC :  multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); return 1;  break;
       //---------------------------------------------------------------------------------------------------------------------------
       default:
         return 0;
@@ -1739,19 +1733,16 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 }
 
 
-int multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
+void multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (matrixD!=0) && (result!=0) )
   {
-  struct Matrix4x4OfFloats tmpA;
-  struct Matrix4x4OfFloats tmpB;
-  return (
-            (multiplyTwo4x4FMatricesS(&tmpA,matrixC,matrixD)) &&
-            (multiplyTwo4x4FMatricesS(&tmpB,matrixB,&tmpA)) &&
-            (multiplyTwo4x4FMatricesS(result,matrixA,&tmpB))
-         );
+   struct Matrix4x4OfFloats tmpA;
+   struct Matrix4x4OfFloats tmpB;
+   multiplyTwo4x4FMatricesS(&tmpA,matrixC,matrixD);
+   multiplyTwo4x4FMatricesS(&tmpB,matrixB,&tmpA);
+   multiplyTwo4x4FMatricesS(result,matrixA,&tmpB);
   }
-  return 0;
 }
 
 

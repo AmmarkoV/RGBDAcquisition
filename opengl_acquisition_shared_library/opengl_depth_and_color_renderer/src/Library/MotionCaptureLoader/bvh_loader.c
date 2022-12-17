@@ -589,62 +589,63 @@ int bvh_getJointIDFromJointNameNocase(
 {
  if ( (bvhMotion!=0) && (jointName!=0) && (jID!=0) )
  {
-  if (strlen(jointName)>=MAX_BVH_JOINT_NAME)
+   unsigned int jointNameLength = strlen(jointName);
+   //-----------------------------------------------
+   if (jointNameLength<MAX_BVH_JOINT_NAME)
+     {
+       //Moved to heap @ 2021/04/21 trying to debug a stack overflow.. :P
+       //char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
+       char * jointNameLowercase = (char *) malloc(sizeof(char) * (jointNameLength+1)); //extra space for the null termination..
+
+       if (jointNameLowercase!=0)
+       {
+        snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
+        lowercase(jointNameLowercase);
+
+        unsigned int i=0;
+        for (i=0; i<bvhMotion->jointHierarchySize; i++)
+         {
+           if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
+           {
+            *jID=i;
+            free(jointNameLowercase);
+            return 1;
+           }
+          }
+       free(jointNameLowercase);
+      }
+     } else
      {
        fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
-       return 0;
      }
-
-   unsigned int jointNameLength = strlen(jointName);
-
-   //Moved to heap @ 2021/04/21 trying to debug a stack overflow.. :P
-   //char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
-   char * jointNameLowercase = (char *) malloc(sizeof(char) * (jointNameLength+1)); //extra space for the null termination..
-
-   if (jointNameLowercase!=0)
-   {
-     snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
-     lowercase(jointNameLowercase);
-
-     unsigned int i=0;
-     for (i=0; i<bvhMotion->jointHierarchySize; i++)
-      {
-        if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
-        {
-         *jID=i;
-         free(jointNameLowercase);
-         return 1;
-        }
-       }
-    free(jointNameLowercase);
-   }
  }
  return 0;
 }
-
-
 
 int bvh_getRootJointID(
                        struct BVH_MotionCapture * bvhMotion,
                        BVHJointID * jID
                       )
 {
+  int res = 0;
   if ( (bvhMotion!=0) && (jID!=0) )
   {
    *jID = bvhMotion->rootJointID;
-   return 1;
+   res = 1;
   }
-  return 0;
+
+  return res;
 }
 
 
 int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 {
+  int res = 0;
   if ( (bvhMotion!=0) && (jID<bvhMotion->jointHierarchySize) )
   {
-       return bvhMotion->jointHierarchy[jID].parentJoint;
+       res = bvhMotion->jointHierarchy[jID].parentJoint;
   }
- return 0;
+ return res;
 }
 
 
@@ -655,6 +656,7 @@ int bvh_isJointAChildrenID(
                            BVHJointID childJID
                           )
 {
+  int res = 0;
   if ( (bvhMotion!=0) && (parentJID!=0)  && (childJID!=0) )
   {
    unsigned int jumps = 0;
@@ -662,8 +664,8 @@ int bvh_isJointAChildrenID(
    BVHJointID jID = childJID;
     while (jID!=bvhMotion->rootJointID)
     {
-      if(bvhMotion->jointHierarchy[jID].parentJoint == parentJID) { return 1; }
-      if(jID == parentJID)                                        { return 1; }
+      if(bvhMotion->jointHierarchy[jID].parentJoint == parentJID) { res=1; break; }
+      if(jID == parentJID)                                        { res=1; break; }
 
       //Jump to parent..
       jID = bvhMotion->jointHierarchy[jID].parentJoint;
@@ -671,12 +673,13 @@ int bvh_isJointAChildrenID(
        if (jumps > bvhMotion->jointHierarchySize)
                   {
                     fprintf(stderr,RED "BUG: more jumps than hierarchy size ?" NORMAL);
-                    return 0;
+                    res=0;
+                    break;
                   }
       ++jumps;
     }
   }
-  return 0;
+  return res;
 }
 
 
