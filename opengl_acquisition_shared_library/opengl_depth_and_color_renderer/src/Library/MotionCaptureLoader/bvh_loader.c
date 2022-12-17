@@ -236,9 +236,37 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 }
 
 #define NEW_RESOLVE_CODE 1
+
+
+
+#define NEW_RESOLVE_CODE 1
+
+
+#if NEW_RESOLVE_CODE
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
-   //fprintf(stderr,"IN bvh_resolveFrameAndJointAndChannelToMotionID(jID=%u/fID=%u/channelType=%u\n",jID,fID,channelTypeID);
+   if (
+         (bvhMotion!=0) &&
+         (channelTypeID<BVH_VALID_CHANNEL_NAMES) &&
+         (jID<bvhMotion->jointHierarchySize) &&
+         (fID<bvhMotion->numberOfFrames)
+      )
+   {
+     //Manual re-resolution of channel!
+     //-------------------------------------------------------------------------------------------------------------
+     unsigned int resolvedChannel       = bvhMotion->jointHierarchy[jID].resolveChannelType[channelTypeID];
+     unsigned int resolvedChannelType   = (resolvedChannel!=BVH_INVALID_CHANNEL);
+     unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].jointMotionOffset + resolvedChannel;
+     //-------------------------------------------------------------------------------------------------------------
+     return  (resolvedChannelType) * ((fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset);
+   } else
+   {
+       return 0;
+   }
+}
+#else
+unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
+{
    if (
          (bvhMotion!=0) &&
          (channelTypeID<BVH_VALID_CHANNEL_NAMES) &&
@@ -248,23 +276,17 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
       )
    {
      //Manual re-resolution of channel!
-     int resolvedChannelType = 0;
-     int resolvedChannel     = 0;
-
-     #if NEW_RESOLVE_CODE
-       resolvedChannel     = bvhMotion->jointHierarchy[jID].resolveChannelType[channelTypeID];
-       resolvedChannelType = (resolvedChannel!=BVH_INVALID_CHANNEL);
-     #else
-     for (int cID=0; cID<bvhMotion->jointHierarchy[jID].loadedChannels; cID++)
-     {
+       int resolvedChannel     = 0;
+       int resolvedChannelType = 0;
+       for (int cID=0; cID<bvhMotion->jointHierarchy[jID].loadedChannels; cID++)
+       {
         //fprintf(stderr,"LOOP jID %u / channel %u / channelTypeID %u\n",jID,cID,bvhMotion->jointHierarchy[jID].channelType[cID]);
         if (channelTypeID==bvhMotion->jointHierarchy[jID].channelType[cID])
         {
             resolvedChannelType = 1;
             resolvedChannel     = cID;
         }
-     }
-     #endif // NEW_RESOLVE_CODE
+       }
 
      if (resolvedChannelType!=0)
      {
@@ -293,7 +315,7 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 
   return 0;
 }
-
+#endif
 
 
 

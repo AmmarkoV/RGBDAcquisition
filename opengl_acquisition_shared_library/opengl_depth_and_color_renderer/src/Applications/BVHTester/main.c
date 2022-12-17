@@ -988,6 +988,7 @@ int bvhConverter(int argc,const char **argv)
                  (targetFrame+step<bvhMotion.numberOfFrames)
                )
            {
+            //------------------------------------------------------------------------------------------------
             float mae = bvhTestIK(
                                   &bvhMotion,
                                   learningRate,
@@ -1001,16 +1002,19 @@ int bvhConverter(int argc,const char **argv)
                                   multiThreaded,
                                   verbose
                                 );
-
+            //------------------------------------------------------------------------------------------------
+            fprintf(stderr,"\n\n\n\n Progress : %u / %u \n\n\n\n",sourceFrame+step,bvhMotion.numberOfFrames);
+            //------------------------------------------------------------------------------------------------
             fprintf(fp,"<tr><td>%u</td><td>%u</td><td>%0.2f mm</td><td><a href=\"report_%u_%u.html\">Open</a></td></tr>\n",
                         sourceFrame+step,targetFrame+step,
                         mae,
                         sourceFrame+step,targetFrame+step
                         );
-
+            //------------------------------------------------------------------------------------------------
             maeSum+=mae;
             step+=stepFrame;
             maeSamples+=1;
+            //------------------------------------------------------------------------------------------------
            }
            fprintf(fp,"</table>");
            unsigned long endTime = GetTickCountMicrosecondsIK();
