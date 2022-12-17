@@ -695,6 +695,7 @@ void lookAt(
 
 int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate)
 {
+      int result = 0;
       float objx=position3D[0];
       float objy=position3D[1];
       float objz=position3D[2];
@@ -727,13 +728,14 @@ int _glhProjectf(float * position3D, float *modelview, float *projection, int *v
 
            //This is only correct when glDepthRange(0.0, 1.0)
            windowCoordinate[2]=(1.0+fTempo[6])*0.5;	//Between 0 and 1
-          return 1;
+           result = 1;
          }
-   return 0;
+   return result;
 }
 
 int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate)
-  {
+{
+      int result = 0;
       //Transformation matrices
       float m[16], A[16];
       float in[4], out[4];
@@ -747,15 +749,20 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
       in[1]=(winy-(float)viewport[1])/(float)viewport[3]*2.0-1.0;
       in[2]=2.0*winz-1.0;
       in[3]=1.0;
+
       //Objects coordinates
       MultiplyMatrixByVector4by4OpenGL_FLOAT(out, m, in);
-      if(out[3]==0.0) {return 0;}
-      out[3]=1.0/out[3];
-      objectCoordinate[0]=out[0]*out[3];
-      objectCoordinate[1]=out[1]*out[3];
-      objectCoordinate[2]=out[2]*out[3];
-      return 1;
-  }
+      if(out[3]!=0.0)
+         {
+          out[3]=1.0/out[3];
+          objectCoordinate[0]=out[0]*out[3];
+          objectCoordinate[1]=out[1]*out[3];
+          objectCoordinate[2]=out[2]*out[3];
+          result=1;
+         }
+
+      return result;
+}
 
 int
 glLookAt(
@@ -867,7 +874,6 @@ void prepareRenderingMatrices(
                               struct Matrix4x4OfFloats * viewportMatrix
                              )
 {
-
      int viewport[4]={0};
      buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor(
                                                            projectionMatrix->m ,
@@ -882,7 +888,6 @@ void prepareRenderingMatrices(
      transpose4x4FMatrix(projectionMatrix->m); //We want our own Row Major format..
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
-
 
      create4x4FScalingMatrix(viewMatrix,-1.0,1.0,1.0);
 
@@ -906,19 +911,15 @@ void correctProjectionMatrixForDifferentViewport(
     float originalViewportWidth = originalViewport[2];
     float originalViewportHeight = originalViewport[3];
 
-
     float newViewportX = newViewport[0];
     float newViewportY = newViewport[1];
     float newViewportWidth = newViewport[2];
     float newViewportHeight = newViewport[3];
 
-
-
 	float xC = (newViewportX - 0.5f * originalViewportWidth - originalViewportX) / originalViewportWidth;
 	float yC = -(newViewportY - 0.5f * originalViewportHeight - originalViewportY) / originalViewportHeight;
 	float wC = (float) newViewportWidth/originalViewportWidth;
 	float hC = (float) newViewportHeight/originalViewportHeight;
-
 
 	float correction[16]={0};
 
@@ -927,7 +928,6 @@ void correctProjectionMatrixForDifferentViewport(
 	correction[5]= (1.f / hC);
 	correction[7]= -2.0 * (yC - hC / 2.f) * (1.f / hC);
     //transpose4x4DMatrix(correction);
-
 
     multiplyTwo4x4FMatrices_Naive(out,correction,projectionMatrix);
     //or ?

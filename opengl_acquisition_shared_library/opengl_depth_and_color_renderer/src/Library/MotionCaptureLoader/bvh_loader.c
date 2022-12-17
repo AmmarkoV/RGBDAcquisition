@@ -245,6 +245,8 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 #if NEW_RESOLVE_CODE
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
 {
+   unsigned int result = 0;
+   //-----------------------
    if (
          (bvhMotion!=0) &&
          (channelTypeID<BVH_VALID_CHANNEL_NAMES) &&
@@ -258,11 +260,9 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
      unsigned int resolvedChannelType   = (resolvedChannel!=BVH_INVALID_CHANNEL);
      unsigned int channelIDMotionOffset = bvhMotion->jointToMotionLookup[jID].jointMotionOffset + resolvedChannel;
      //-------------------------------------------------------------------------------------------------------------
-     return  (resolvedChannelType) * ((fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset);
-   } else
-   {
-       return 0;
+     result = (resolvedChannelType) * ((fID * bvhMotion->numberOfValuesPerFrame) + channelIDMotionOffset);
    }
+  return result;
 }
 #else
 unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCapture * bvhMotion,BVHJointID jID, BVHFrameID fID,unsigned int channelTypeID)
