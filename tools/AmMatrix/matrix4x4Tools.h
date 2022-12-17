@@ -329,7 +329,7 @@ void multiplyThree4x4DMatrices(double * result , double * matrixA , double * mat
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
+static inline void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
 
 
 

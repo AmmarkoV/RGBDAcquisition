@@ -1347,7 +1347,7 @@ void multiplyThree4x4DMatrices(double * result , double * matrixA , double * mat
 
 
 
-void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
+static inline void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
 {
   //if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) This gets called millions of times.. removing the check frees 0.43 clocks
   {
@@ -1392,7 +1392,7 @@ void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const 
 
 
 //https://software.intel.com/content/www/us/en/develop/articles/performance-of-classic-matrix-multiplication-algorithm-on-intel-xeon-phi-processor-system.html
-int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const float * matrixB)
+static inline int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const float * matrixB)
 {
   int res = 0;
   if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
@@ -1433,7 +1433,7 @@ int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * matrixA ,const fl
 #endif
 
 
-void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
+static inline void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const float * matrixB)
 {
  //http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
 #if INTEL_OPTIMIZATIONS
@@ -1510,7 +1510,7 @@ void multiplyTwo4x4FMatrices_SSE3(float * result ,const float * matrixA ,const f
 }
 
 //__attribute__((aligned(16)))
-void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const float * matrixB)
+static inline void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     //https://software.intel.com/sites/landingpage/IntrinsicsGuide for more info
