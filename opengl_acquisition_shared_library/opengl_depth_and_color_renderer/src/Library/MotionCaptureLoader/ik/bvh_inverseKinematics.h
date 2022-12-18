@@ -72,9 +72,10 @@ struct ikChain
   unsigned char terminate;
   unsigned char threadIsSpawned;
   // --------------------------------------------------------------------------
-  float initialError; //TODO
-  float previousError;
-  float currentError;
+  float initialLoss;
+  float previousLoss;
+  float currentLoss;
+  unsigned int lossUpdates;
   // --------------------------------------------------------------------------
   unsigned int encounteredAdoptedBest;
   unsigned int encounteredNumberOfNaNsAtStart;
@@ -97,6 +98,8 @@ struct ikChain
 struct ikConfiguration
 {
   float maximumAcceptableStartingLoss;
+  unsigned int iterationEarlyStopping;
+  float iterationMinimumLossDelta;
   float learningRate;
   unsigned int iterations;
   unsigned int epochs;

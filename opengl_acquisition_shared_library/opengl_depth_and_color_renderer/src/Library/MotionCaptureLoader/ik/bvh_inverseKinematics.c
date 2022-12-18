@@ -1182,6 +1182,15 @@ if (iterationID==0)
     problem->currentSolution->motion[mIDS[1]] = bestValues[1];
     problem->currentSolution->motion[mIDS[2]] = bestValues[2];
 
+    //Track losses
+    //--------------------------------------------------------------------------
+    problem->chain[chainID].previousLoss = problem->chain[chainID].currentLoss;
+    problem->chain[chainID].currentLoss  = bestLoss;
+    if (problem->chain[chainID].lossUpdates==0)
+         { problem->chain[chainID].initialLoss = problem->chain[chainID].currentLoss; }
+    problem->chain[chainID].lossUpdates = problem->chain[chainID].lossUpdates+1;
+    //--------------------------------------------------------------------------
+
     return bestLoss;
 }
 
@@ -1246,6 +1255,15 @@ int iterateChainLoss(
 }
 
 
+float calculateCachedProblemLoss(struct ikProblem * problem)
+{
+ float res=0.0;
+ for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+ {
+    res+=problem->chain[chainID].currentLoss;
+ }
+ return res;
+}
 
 //This is the regular and easy to follow serial implementation where for each iteration we go through
 //each one of the chains in order.. We still mark the chain status to ensure 1:1 operation with the multithreaded
@@ -1257,6 +1275,9 @@ int singleThreadedSolver(
 {
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
+        //-----------------------------------------------------------------------
+        float lossBeforeOptimization = calculateCachedProblemLoss(problem);
+        //-----------------------------------------------------------------------
         for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
             //Before we start we will make a copy of the problem->currentSolution to work on improving it..
@@ -1268,21 +1289,34 @@ int singleThreadedSolver(
                               ikConfig,
                               iterationID,
                               chainID
-                              /*,
-                              ikConfig->learningRate,
-                              ikConfig->maximumAcceptableStartingLoss,
-                              ikConfig->epochs,
-                              ikConfig->tryMaintainingLocalOptima,
-                              ikConfig->spring,
-                              ikConfig->gradientExplosionThreshold,
-                              (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
-                              ikConfig->useLangevinDynamics,
-                              ikConfig->verbose*/
-                           );
+                            );
 
              //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
              //If we are here it means problem->currentSolution has the best solution IK could find..
         }
+        //-----------------------------------------------------------------------
+        float lossAfterOptimization = calculateCachedProblemLoss(problem);
+        //-----------------------------------------------------------------------
+        if ( (iterationID>1) && (ikConfig->iterationEarlyStopping) )
+        {
+            if (lossBeforeOptimization-lossAfterOptimization<=ikConfig->iterationMinimumLossDelta)
+            { //Optimization was ineffective! We are probably dealing with ill-conditioned problem
+                if (ikConfig->verbose)
+                  {
+                    fprintf(stderr,RED "Terminating on %u/%u iterations to save cycles \n" NORMAL,iterationID,ikConfig->iterations);
+                    fprintf(stderr,RED "Loss went %0.2f -> %0.2f  (Limit is %0.2f) \n" NORMAL,lossBeforeOptimization,lossAfterOptimization,ikConfig->iterationMinimumLossDelta);
+                  }
+                break;
+            } else
+            {
+              if (ikConfig->verbose)
+                  {
+                    fprintf(stderr,GREEN "%u/%u iterations \n" NORMAL,iterationID,ikConfig->iterations);
+                    fprintf(stderr,NORMAL "Loss went %0.2f -> %0.2f\n" NORMAL,lossBeforeOptimization,lossAfterOptimization);
+                  }
+            }
+        }
+        //---------------
     }
 
    //We are running using a single thread so we mark everything finished at the same time..

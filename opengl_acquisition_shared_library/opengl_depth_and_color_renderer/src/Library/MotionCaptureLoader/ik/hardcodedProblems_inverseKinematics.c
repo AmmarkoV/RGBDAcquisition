@@ -3855,6 +3855,8 @@ float bvhTestIK(
                     ikConfig.epochs                        = epochs;
                     ikConfig.spring                        = spring;
                     ikConfig.gradientExplosionThreshold    = 50;
+                    ikConfig.iterationEarlyStopping        = 1;  //<-
+                    ikConfig.iterationMinimumLossDelta     = 10; //<- losses seem to be numbers 2000 -> 300 so 10 is a good limit
                     ikConfig.maximumAcceptableStartingLoss = 0.0; // Dont use this
                     ikConfig.dumpScreenshots               = verboseAndDumpFiles;
                     ikConfig.verbose                       = verboseAndDumpFiles;
