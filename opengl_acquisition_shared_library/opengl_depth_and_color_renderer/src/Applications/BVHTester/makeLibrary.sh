@@ -110,8 +110,18 @@ $BVHTESTER_DIR/bvhLibrary.h
 $BVHTESTER_DIR/main.c
 "
 
+INTEL_OPTIMIZATIONS=`cat /proc/cpuinfo | grep sse3`
 
-gcc -shared -o libBVHConverter.so -O3 -fPIC -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
+if [[ -n $var ]] ; then
+ echo "No intel optimizations available"
+ EXTRA_FLAGS=" "
+else
+ echo "Intel Optimizations available and will be used"
+ EXTRA_FLAGS="-DINTEL_OPTIMIZATIONS"
+fi
+ 
+
+gcc -shared -o libBVHConverter.so -O3 -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
 

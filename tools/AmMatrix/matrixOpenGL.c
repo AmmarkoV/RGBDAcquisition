@@ -57,7 +57,7 @@ void changeYandZAxisOpenGL4x4Matrix(float * result,float * matrix)
   create4x4FIdentityMatrix(&invertOp);
   invertOp.m[5]=-1;   invertOp.m[10]=-1;
 
-  multiplyTwo4x4FMatricesS(result,matrix,invertOp.m);
+  multiplyTwoRaw4x4FMatricesS(result,matrix,invertOp.m);
 }
 
 int convertRodriguezAndTranslationTo4x4UnprojectionMatrix(float * result4x4, float * rodriguez , float * translation , float scaleToDepthUnit)
@@ -211,7 +211,7 @@ void buildOpenGLProjectionForIntrinsics(
 
    create4x4FIdentityMatrix(&identMat);
    identMat.m[10]=-1;
-   multiplyTwo4x4FMatricesS(finalFrustrum.m,identMat.m,frustum);
+   multiplyTwoRaw4x4FMatricesS(finalFrustrum.m,identMat.m,frustum);
    copy4x4FMatrix(frustum,finalFrustrum.m);
 
    //This should produce our own Row Major Format
@@ -449,7 +449,7 @@ void lookAt(
    //glTranslatef(-eyex, -eyey, -eyez);
    struct Matrix4x4OfFloats translation={0};
    create4x4FTranslationMatrix(&translation , -eyex, -eyey, -eyez );
-   multiplyTwo4x4FMatricesS(matrix,initial.m,translation.m);
+   multiplyTwoRaw4x4FMatricesS(matrix,initial.m,translation.m);
 
 }
 
@@ -929,7 +929,7 @@ void correctProjectionMatrixForDifferentViewport(
 	correction[7]= -2.0 * (yC - hC / 2.f) * (1.f / hC);
     //transpose4x4DMatrix(correction);
 
-    multiplyTwo4x4FMatricesS(out,correction,projectionMatrix);
+    multiplyTwoRaw4x4FMatricesS(out,correction,projectionMatrix);
     //or ?
     //multiplyTwo4x4DMatrices(out,projectionMatrix,correction);
 }

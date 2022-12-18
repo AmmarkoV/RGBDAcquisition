@@ -819,7 +819,7 @@ void recursiveJointHierarchyTransformerDirect(
   if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
      {
        //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
-       multiplyTwo4x4FMatricesS(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
+       multiplyTwoRaw4x4FMatricesS(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
      } else
      {
        //If there is no 4x4 transform to use then just copy our local transformation
@@ -828,11 +828,11 @@ void recursiveJointHierarchyTransformerDirect(
      }
 
   //We calculate the globalTransformation of the node by chaining it to its parent..!
-  multiplyTwo4x4FMatricesS(
-                           globalTransformation,
-                           parentTransform,
-                           nodeTransformation
-                          );
+  multiplyTwoRaw4x4FMatricesS(
+                              (float*) globalTransformation,
+                              parentTransform,
+                              (float*) nodeTransformation
+                             );
 
   //Since we have everything ready, let's store the bone position..
   struct Vector4x1OfFloats boneCenter={0}; boneCenter.m[3]=1.0;

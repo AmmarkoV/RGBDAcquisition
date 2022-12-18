@@ -1610,6 +1610,16 @@ void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x
 
 
 
+void multiplyTwoRaw4x4FMatricesS(float * result ,float * matrixA ,float * matrixB)
+{
+#if INTEL_OPTIMIZATIONS
+    multiplyTwo4x4FMatrices_SSE2(result,matrixA,matrixB); //109.53 fps in the sven dataset
+    ////multiplyTwo4x4FMatrices_SSE3(result,matrixA,matrixB); // 107.77 fps in the sven dataset
+#else
+   multiplyTwo4x4FMatrices_Naive(result,matrixA,matrixB);
+#endif
+}
+
 
 void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * matrixA , float * matrixB)
 {

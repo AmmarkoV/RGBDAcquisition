@@ -949,7 +949,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                                                       rotationOrder
                                                                                     );
 
-                                    multiplyTwo4x4FMatrices_Naive(
+                                    multiplyTwoRaw4x4FMatricesS(
                                                                   &transformations4x4[boneID*16],
                                                                   dynamicRotation.m,
                                                                   mergedTranslation.m

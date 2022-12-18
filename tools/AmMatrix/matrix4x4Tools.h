@@ -329,7 +329,7 @@ void multiplyThree4x4DMatrices(double * result , double * matrixA , double * mat
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-static inline void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
+//static inline void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB);
 
 
 
@@ -345,6 +345,8 @@ void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const flo
 
 
 void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
+
+void multiplyTwoRaw4x4FMatricesS(float * result ,float * matrixA ,float * matrixB);
 
 void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
 
