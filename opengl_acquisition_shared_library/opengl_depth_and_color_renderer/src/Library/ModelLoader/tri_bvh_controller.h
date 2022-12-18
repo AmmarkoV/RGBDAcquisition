@@ -481,7 +481,7 @@ const static int checkBVHRotation(
          //-----------------------------------------------------------------------------------------------
 
 
-         for (int i=0; i<7; i++)
+         for (unsigned int i=0; i<7; i++)
          {
             fprintf(stderr,"Test %u (mID=%u set to %0.2f) ",i,bvhResult[i].mID,bvhResult[i].value);
             if (bvhResult[i].value>0.0) { fprintf(stderr," "); }

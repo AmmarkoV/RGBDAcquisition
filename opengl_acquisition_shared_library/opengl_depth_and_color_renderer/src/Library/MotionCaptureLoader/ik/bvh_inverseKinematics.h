@@ -72,7 +72,7 @@ struct ikChain
   unsigned char terminate;
   unsigned char threadIsSpawned;
   // --------------------------------------------------------------------------
-  float initialError;
+  float initialError; //TODO
   float previousError;
   float currentError;
   // --------------------------------------------------------------------------

@@ -114,7 +114,7 @@ int bvhMeasureIterationInfluence(
     struct BVH_Transform bvhTargetTransform= {0};
 
     const int MAX_ITERATIONS=25;
-                   
+
     struct simpleRenderer renderer= {0};
     const float distance=-150;
     simpleRendererDefaults( &renderer, 1920, 1080, 582.18394,   582.52915 );// https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
@@ -136,18 +136,18 @@ int bvhMeasureIterationInfluence(
 
     if ( (solution!=0) && (groundTruth!=0) && (initialSolution!=0) && (previousSolution!=0) )
     {
-        
-      for (int startFrame=60; startFrame<mc->numberOfFrames; startFrame+=30)
-      for (int testIteration=0; testIteration<4; testIteration++)
+
+      for (unsigned int startFrame=60; startFrame<mc->numberOfFrames; startFrame+=30)
+      for (unsigned int testIteration=0; testIteration<4; testIteration++)
       {
         fIDTarget = startFrame;
         if (testIteration==0) { fIDSource=fIDTarget-5;  } else
         if (testIteration==1) { fIDSource=fIDTarget-40; } else
         if (testIteration==2) { fIDSource=fIDTarget-60; } else
-        if (testIteration==3) { fIDSource=fIDTarget-80; } 
+        if (testIteration==3) { fIDSource=fIDTarget-80; }
         fprintf(stderr,"Started test iteration testing Source %u / Previous %u \n",fIDSource,fIDPrevious);
-        
-        
+
+
         if (
             ( bvh_copyMotionFrameToMotionBuffer(mc,initialSolution,fIDSource) ) &&
             ( bvh_copyMotionFrameToMotionBuffer(mc,previousSolution,fIDPrevious) ) &&
@@ -161,7 +161,7 @@ int bvhMeasureIterationInfluence(
               bvh_copyMotionFrameToMotionBuffer(mc,penultimateSolution,fIDPrevious-1);
             } else
             {
-              bvh_copyMotionFrameToMotionBuffer(mc,penultimateSolution,fIDPrevious); 
+              bvh_copyMotionFrameToMotionBuffer(mc,penultimateSolution,fIDPrevious);
             }
             //------------------------------------------------------------------------
             initialSolution->motion[0]=0;
@@ -206,7 +206,7 @@ int bvhMeasureIterationInfluence(
                     //------------------------------------
 
 
-    
+
                       struct ikProblem * problem = (struct ikProblem * ) malloc(sizeof(struct ikProblem));
                       if (problem!=0)
                                      { memset(problem,0,sizeof(struct ikProblem)); } else
@@ -226,11 +226,11 @@ int bvhMeasureIterationInfluence(
                                free(problem);
                                return 0;
                          }
-                   
-                   
-                   
-                   
-                   //fprintf(stdout,"Iterations,MAE,FPS\n"); 
+
+
+
+
+                   //fprintf(stdout,"Iterations,MAE,FPS\n");
                    for (ikConfig.iterations=1; ikConfig.iterations<MAX_ITERATIONS; ikConfig.iterations++)
                    {
                      //--------------------------------------------------------
@@ -240,7 +240,7 @@ int bvhMeasureIterationInfluence(
                      solution->motion[2]=distance;
                      //--------------------------------------------------------
 
-                     
+
                    unsigned long startTime = GetTickCountMicrosecondsIK();
 
                     if (
@@ -250,7 +250,7 @@ int bvhMeasureIterationInfluence(
                             problem,
                             &ikConfig,
                             //---------------
-                            penultimateSolution,  
+                            penultimateSolution,
                             previousSolution,
                             solution,
                             groundTruth,
@@ -258,7 +258,7 @@ int bvhMeasureIterationInfluence(
                             &bvhTargetTransform,
                             //-------------------
                             multiThreaded, //Use a single thread unless --mt is supplied before testik command!
-                            //------------------- 
+                            //-------------------
                             &initialMAEInPixels,
                             &finalMAEInPixels,
                             &initialMAEInMM,
@@ -282,28 +282,28 @@ int bvhMeasureIterationInfluence(
                         //fprintf(stderr,"MAE in 2D Pixels went from %0.2f to %0.2f \n",initialMAEInPixels,finalMAEInPixels);
                         fprintf(stderr,"MAE in 3D mm went from %0.2f to %0.2f \n",initialMAEInMM*10,finalMAEInMM*10);
                         fprintf(stderr,"Computation time was %lu microseconds ( %0.2f fps )\n",endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
-                        
-                        
+
+
                         float fpsResult =convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime);
                         float accResult=finalMAEInMM*10;
                         fprintf(stderr,"test %u | %u->%u / %u | %u/%u iteration / %0.2f MM / %0.2f \n",testIteration,fIDSource,fIDTarget,mc->numberOfFrames,ikConfig.iterations,MAX_ITERATIONS,accResult,fpsResult);
-                        
+
                         // .dat output
-                        fprintf(stdout,"%u %0.2f %0.2f %u\n",ikConfig.iterations,accResult,fpsResult,testIteration); 
-                        
+                        fprintf(stdout,"%u %0.2f %0.2f %u\n",ikConfig.iterations,accResult,fpsResult,testIteration);
+
                     }
                     else
                     {
                         fprintf(stderr,RED "Failed to run IK code..\n" NORMAL);
                     }
                    }
-                   
-                   
-                   
-                   
+
+
+
+
                   //Cleanup allocations needed for the problem..
                   cleanProblem(problem);
-                  free(problem); 
+                  free(problem);
                   problem=0;
                 }
                 else
@@ -312,8 +312,8 @@ int bvhMeasureIterationInfluence(
                 }
             }
         }
-        
-       fprintf(stdout,"\n\n"); 
+
+       fprintf(stdout,"\n\n");
       } //Test loop
         freeMotionBuffer(&previousSolution);
         previousSolution = 0; // Double make sure that variable is clean
@@ -324,7 +324,7 @@ int bvhMeasureIterationInfluence(
         freeMotionBuffer(&groundTruth);
         groundTruth = 0;      // Double make sure that variable is clean
     } //Have correct data
-          
+
     return result;
 }
 
@@ -338,21 +338,21 @@ int extractMinimaMaximaFromBVHList(const char * filename)
  FILE * fp = fopen(filename,"r");
     if (fp!=0)
         {
-           
-            struct BVH_MotionCapture bvhMotion={0}; 
-            unsigned int numberOfValues=0; 
-            
-            
+
+            struct BVH_MotionCapture bvhMotion={0};
+            unsigned int numberOfValues=0;
+
+
             float * minima = 0;
             float * maxima = 0;
             unsigned int minmaxSize = 0;
-            
+
             char * line = NULL;
             size_t len = 0;
             ssize_t read;
- 
+
             unsigned int fileNumber=0;
-            while  ( (read = getline(&line, &len, fp)) != -1) 
+            while  ( (read = getline(&line, &len, fp)) != -1)
                 {
                   if (line!=0)
                   {
@@ -368,13 +368,13 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                       if (line[lineLength-2]==13) { line[lineLength-2]=0; }
                     }
 
-                  if (bvhMotion.motionValues!=0)   
+                  if (bvhMotion.motionValues!=0)
                     {
-                      //Instead of regular freeing we do this weird free to avoid freeing last structure to able to access its mIDs 
+                      //Instead of regular freeing we do this weird free to avoid freeing last structure to able to access its mIDs
                       bvh_free(&bvhMotion);
-                      fprintf(stderr,"Freed file `%s`\n",line); 
+                      fprintf(stderr,"Freed file `%s`\n",line);
                     }
-                    
+
                   fprintf(stderr,"Next file is `%s`\n",line);
                   if ( bvh_loadBVH(line, &bvhMotion, 1.0) )
                    {
@@ -382,7 +382,7 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                       //Change joint names..
                       bvh_renameJointsForCompatibility(&bvhMotion);
                       fprintf(stderr,"Did rename `%s`\n",line);
-                      
+
                       if (numberOfValues!=0)
                       {
                           if (numberOfValues != bvhMotion.numberOfValuesPerFrame)
@@ -392,37 +392,37 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                               exit(1);
                           }
                       }
-                      
+
                       numberOfValues = bvhMotion.numberOfValuesPerFrame;
-                      
+
                       fprintf(stderr,"There needs to be a check for alternating BVH file sizes..!");
                       if (minima==0)
-                           { 
-                             minima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame); 
-                             minmaxSize=bvhMotion.numberOfValuesPerFrame; 
+                           {
+                             minima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                             minmaxSize=bvhMotion.numberOfValuesPerFrame;
                              memset(minima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
                            }
                       if (maxima==0)
-                           { 
-                             maxima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame); 
-                             minmaxSize=bvhMotion.numberOfValuesPerFrame; 
+                           {
+                             maxima = (float*) malloc(sizeof(float) * bvhMotion.numberOfValuesPerFrame);
+                             minmaxSize=bvhMotion.numberOfValuesPerFrame;
                              memset(maxima,0,sizeof(float) * bvhMotion.numberOfValuesPerFrame);
                            }
-            
+
                       if ( (minima!=0) && (maxima!=0) )
                         {
                             if (minmaxSize!=bvhMotion.numberOfValuesPerFrame)
                             {
-                               fprintf(stderr,"Inconsistent BVH files of different number of parameters given.. Terminating.. \n");            
+                               fprintf(stderr,"Inconsistent BVH files of different number of parameters given.. Terminating.. \n");
                                free(minima); minima=0;
                                free(maxima); maxima=0;
                                bvh_free(&bvhMotion);
                                fclose(fp);
-                               return 0; 
+                               return 0;
                             }
                         }
-                      
-                      
+
+
                       unsigned int mIDAbsolute=0;
                       for (unsigned int fID=0; fID<bvhMotion.numberOfFrames; fID++)
                       {
@@ -430,7 +430,7 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                          {
                             if (bvhMotion.motionValues[mIDAbsolute]<minima[mID]) { minima[mID]=bvhMotion.motionValues[mIDAbsolute]; }
                             if (bvhMotion.motionValues[mIDAbsolute]>maxima[mID]) { maxima[mID]=bvhMotion.motionValues[mIDAbsolute]; }
-                            ++mIDAbsolute; 
+                            ++mIDAbsolute;
                          }
                       }
 
@@ -442,8 +442,8 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                   ++fileNumber;
                   //if (fileNumber==10) { break; }
                 }
-          
-           if ( (maxima!=0) && (minima!=0) ) 
+
+           if ( (maxima!=0) && (minima!=0) )
                           {
                              fprintf(stdout,"\n\n\n//Minima/Maxima for %u files :\n\n",fileNumber);
                              fprintf(stdout,"float minimumLimits[%u]={0};\n",numberOfValues);
@@ -452,7 +452,7 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                              for (unsigned int mID=7; mID<numberOfValues; mID++)
                                             {
                                                unsigned int jID = bvhMotion.motionToJointLookup[mID].jointID;
-                                               if (minima[mID]!=0.0) { fprintf(stdout,"minimumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,minima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }  
+                                               if (minima[mID]!=0.0) { fprintf(stdout,"minimumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,minima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }
                                                if (maxima[mID]!=0.0) { fprintf(stdout,"maximumLimits[%u]=%0.2f;//jID=%u -> %s\n",mID,maxima[mID],jID,bvhMotion.jointHierarchy[jID].jointName); }
                                             }
                              fprintf(stdout,"\n\n//--------------------------\n");
@@ -460,18 +460,18 @@ int extractMinimaMaximaFromBVHList(const char * filename)
                            {
                                fprintf(stdout,"Error with number of values, possibly mixed files..\n");
                            }
-          
+
           bvh_free(&bvhMotion);
-          
-          if (line!=0) { 
+
+          if (line!=0) {
                          fprintf(stderr,"Freed final file `%s`\n",line);
-                         free(line); 
+                         free(line);
                        }
-                       
+
             //Done using memory
             if(minima!=0) { free(minima); minima=0; }
             if(maxima!=0) { free(maxima); maxima=0; }
-          
+
           fclose(fp);
           return 1;
         }

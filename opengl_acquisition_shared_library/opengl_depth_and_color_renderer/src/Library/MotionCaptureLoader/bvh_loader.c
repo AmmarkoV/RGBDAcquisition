@@ -1089,6 +1089,7 @@ float  bvh_getJointPositionZAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,
 
 int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData)
 {
+  int res = 0;
   //This gets spammed a *LOT* so it needs to be improved..
   if ( (motionBuffer!=0) && (data!=0) && (sizeOfData >= sizeof(float) * MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER) ) //QBVH
   {
@@ -1167,10 +1168,10 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
           data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]=0.0;
       }
 
-    return 1;
+    res = 1;
   }
 
-  return 0;
+  return res;
 }
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
