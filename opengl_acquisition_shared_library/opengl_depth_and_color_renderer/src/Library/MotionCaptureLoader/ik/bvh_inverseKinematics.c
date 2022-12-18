@@ -1316,7 +1316,7 @@ int singleThreadedSolver(
                   }
             }
         }
-        //---------------
+        //-----------------------------------------------------------------------
     }
 
    //We are running using a single thread so we mark everything finished at the same time..
@@ -1358,16 +1358,7 @@ void * iterateChainLossWorkerThread(void * arg)
                            ctx->problem,
                            ctx->ikConfig,
                            ctx->problem->chain[ctx->chainID].currentIteration,
-                           ctx->chainID/*,
-                           ctx->ikConfig->learningRate,
-                           ctx->ikConfig->maximumAcceptableStartingLoss,
-                           ctx->ikConfig->epochs,
-                           ctx->ikConfig->tryMaintainingLocalOptima,
-                           ctx->ikConfig->spring,
-                           ctx->ikConfig->gradientExplosionThreshold,
-                           (!ctx->ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
-                           ctx->ikConfig->useLangevinDynamics,
-                           ctx->ikConfig->verbose*/
+                           ctx->chainID
                          );
     //--------------------------------
     threadpoolWorkerLoopEnd(ptr);
@@ -1422,7 +1413,10 @@ int multiThreadedSolver(
   //We will perform a number of iterations  each of which have to be synced in the end..
   for (unsigned int iterationID=0; iterationID<ikConfig->iterations; iterationID++)
     {
-         threadpoolMainThreadPrepareWorkForWorkers(&problem->threadPool);
+        //-----------------------------------------------------------------------
+        float lossBeforeOptimization = calculateCachedProblemLoss(problem);
+        //-----------------------------------------------------------------------
+        threadpoolMainThreadPrepareWorkForWorkers(&problem->threadPool);
 
         //We go through each chain, if the chain is single threaded we do the same as the singleThreadedSolver
         //if the thread is parallel then we just ask it to start processing the current data and we then need to stop and wait to gather results..
@@ -1432,23 +1426,14 @@ int multiThreadedSolver(
               copyMotionBuffer(problem->chain[chainID].currentSolution,problem->currentSolution);
 
               problem->chain[chainID].currentIteration=iterationID;
-              if (!problem->chain[chainID].parallel )
+              if (!problem->chain[chainID].parallel)
               {  //Normal chains run normally..
                 //fprintf(stderr,"Running single threaded task for chain %u\n",chainID);
                 iterateChainLoss(
                                  problem,
                                  ikConfig,
                                  iterationID,
-                                 chainID/*,
-                                 ikConfig->learningRate,
-                                 ikConfig->maximumAcceptableStartingLoss,
-                                 ikConfig->epochs,
-                                 ikConfig->tryMaintainingLocalOptima,
-                                 ikConfig->spring,
-                                 ikConfig->gradientExplosionThreshold,
-                                 (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
-                                 ikConfig->useLangevinDynamics,
-                                 ikConfig->verbose*/
+                                 chainID
                                 );
 
                   //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
@@ -1458,6 +1443,30 @@ int multiThreadedSolver(
 
         threadpoolMainThreadWaitForWorkersToFinish(&problem->threadPool);
         //--------------------------------------------------
+
+        //-----------------------------------------------------------------------
+        float lossAfterOptimization = calculateCachedProblemLoss(problem);
+        //-----------------------------------------------------------------------
+        if ( (iterationID>1) && (ikConfig->iterationEarlyStopping) )
+        {
+            if (lossBeforeOptimization-lossAfterOptimization<=ikConfig->iterationMinimumLossDelta)
+            { //Optimization was ineffective! We are probably dealing with ill-conditioned problem
+                if (ikConfig->verbose)
+                  {
+                    fprintf(stderr,RED "Terminating on %u/%u iterations to save cycles \n" NORMAL,iterationID,ikConfig->iterations);
+                    fprintf(stderr,RED "Loss went %0.2f -> %0.2f  (Limit is %0.2f) \n" NORMAL,lossBeforeOptimization,lossAfterOptimization,ikConfig->iterationMinimumLossDelta);
+                  }
+                break;
+            } else
+            {
+              if (ikConfig->verbose)
+                  {
+                    fprintf(stderr,GREEN "%u/%u iterations \n" NORMAL,iterationID,ikConfig->iterations);
+                    fprintf(stderr,NORMAL "Loss went %0.2f -> %0.2f\n" NORMAL,lossBeforeOptimization,lossAfterOptimization);
+                  }
+            }
+        }
+        //-----------------------------------------------------------------------
     }
 
   return 1;

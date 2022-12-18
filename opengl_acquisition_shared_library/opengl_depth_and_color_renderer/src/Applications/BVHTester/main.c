@@ -543,8 +543,8 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          ikConfig.learningRate = lr;
          ikConfig.iterations = iterations;
          ikConfig.epochs = epochs;
-         ikConfig.maximumAcceptableStartingLoss= 30000;//12000; //WARING < -  consider setting this to 0
-         ikConfig.gradientExplosionThreshold = 20; //50 default
+         ikConfig.maximumAcceptableStartingLoss = 30000;//12000; //WARING < -  consider setting this to 0
+         ikConfig.gradientExplosionThreshold    = 20; //50 default
          ikConfig.iterationEarlyStopping        = 1;  //<-
          ikConfig.iterationMinimumLossDelta     = 10; //<- losses seem to be numbers 2000 -> 300 so 10 is a good limit
          ikConfig.spring= 20;
