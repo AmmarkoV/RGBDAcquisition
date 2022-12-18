@@ -958,8 +958,9 @@ int bvhConverter(int argc,const char **argv)
           float langevin=atof(argv[i+9]);
           char verbose = atoi(argv[i+10]);
 
-          float maeSum = 0.0;
-          unsigned int maeSamples = 0;
+          float maeSum              = 0.0;
+          unsigned int maeSamples   = 0;
+          unsigned long elapsedTime = 0;
 
           FILE * fp = fopen("report.html","w");
           if (fp!=0)
@@ -980,7 +981,6 @@ int bvhConverter(int argc,const char **argv)
            fprintf(fp,"<br>\n");
 
 
-           unsigned long startTime = GetTickCountMicrosecondsIK();
            fprintf(fp,"<table>\n<tr>\n<td>Source<br>Frame</td><td>Target<br>Frame</td><td>Mean Average<br> Error</td><td>Link</td></tr>\n");
            unsigned int step = 0;
            while(
@@ -989,6 +989,7 @@ int bvhConverter(int argc,const char **argv)
                )
            {
             //------------------------------------------------------------------------------------------------
+            unsigned long startTime = GetTickCountMicrosecondsIK();
             float mae = bvhTestIK(
                                   &bvhMotion,
                                   learningRate,
@@ -1002,6 +1003,8 @@ int bvhConverter(int argc,const char **argv)
                                   multiThreaded,
                                   verbose
                                 );
+            unsigned long endTime = GetTickCountMicrosecondsIK();
+            elapsedTime+= endTime - startTime;
             //------------------------------------------------------------------------------------------------
             fprintf(stderr,"\n\n\n\n Progress : %u / %u \n\n\n\n",sourceFrame+step,bvhMotion.numberOfFrames);
             //------------------------------------------------------------------------------------------------
@@ -1017,9 +1020,8 @@ int bvhConverter(int argc,const char **argv)
             //------------------------------------------------------------------------------------------------
            }
            fprintf(fp,"</table>");
-           unsigned long endTime = GetTickCountMicrosecondsIK();
            fprintf(fp,"<br><br>Total M.A.E. for %u samples : %0.2f mm<br>\n",maeSamples,(float) maeSum/maeSamples);
-           fprintf(fp,"Elapsed Time : %lu microseconds (%0.2f fps) <br>\n",(unsigned long) endTime-startTime,convertStartEndTimeFromMicrosecondsToFPSIK(startTime,endTime));
+           fprintf(fp,"Elapsed Time : %lu microseconds (%0.2f fps) <br>\n",(unsigned long) elapsedTime,convertStartEndTimeFromMicrosecondsToFPSIK(0,(unsigned long) elapsedTime/maeSamples));
            fprintf(fp,"</body></html>");
            fclose(fp);
           }
@@ -1032,7 +1034,7 @@ int bvhConverter(int argc,const char **argv)
                fp = fopen("report.csv","w");
                if (fp!=0)
                 {
-                  fprintf(fp,"dataset,learningRate,previous,start,target,step,iterations,epochs,langevin,samples,mae\n");
+                  fprintf(fp,"dataset,learningRate,previous,start,target,step,iterations,epochs,langevin,samples,mae,fps\n");
                   fclose(fp);
                 }
              }
@@ -1044,7 +1046,7 @@ int bvhConverter(int argc,const char **argv)
                if (fp!=0)
                 {
                   fprintf(
-                          fp,"%s,%f,%u,%u,%u,%u,%u,%u,%f,%u,%f\n",
+                          fp,"%s,%f,%u,%u,%u,%u,%u,%u,%f,%u,%f,%f\n",
                           bvhMotion.fileName,
                           learningRate,
                           previousFrame,
@@ -1055,7 +1057,8 @@ int bvhConverter(int argc,const char **argv)
                           epochs,
                           langevin,
                           maeSamples,
-                          (float) maeSum/maeSamples
+                          (float) maeSum/maeSamples,
+                          convertStartEndTimeFromMicrosecondsToFPSIK(0,(unsigned long) elapsedTime/maeSamples)
                           );
                   fclose(fp);
                 }
