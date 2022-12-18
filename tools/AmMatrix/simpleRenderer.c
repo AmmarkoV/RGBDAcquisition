@@ -142,6 +142,7 @@ int simpleRendererRenderEx(
                          char updateModelView
                         )
 {
+ int res = 0;
  ///--------------------------------------------------------------------
  if (updateModelView)
   { simpleRendererUpdateMovelViewTransform(sr); }
@@ -225,7 +226,7 @@ int simpleRendererRenderEx(
       *output2DX = windowCoordinates[0];//windowCoordinates[2];
       *output2DY = windowCoordinates[1];//windowCoordinates[2];
       *output2DW = windowCoordinates[2];
-      return 1;
+      res = 1;
      }
      // else
      //{
@@ -238,7 +239,7 @@ int simpleRendererRenderEx(
     // }
  ///--------------------------------------------------------------------
 
- return 0;
+ return res;
 }
 
 

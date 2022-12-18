@@ -776,69 +776,70 @@ int bvh_loadTransformForMotionBufferFollowingAListOfJointIDs(
                                                              unsigned int lengthOfJointIDList
                                                             )
 {
+  int res = 0;
   //Only do transforms on allocated context
   if ( (bvhMotion!=0) && (motionBuffer!=0) && (bvhTransform!=0))
   {
     //Make sure there is enough memory allocated..
-    if (!bvh_allocateTransform(bvhMotion,bvhTransform))
+    if (bvh_allocateTransform(bvhMotion,bvhTransform))
     {
-      fprintf(stderr,"Failed allocating memory for bvh trasnform :(\n");
-      return 0;
-    }
 
-  //First of all we need to clean the BVH_Transform structure
-  bvhTransform->jointsOccludedIn2DProjection=0;
+      //First of all we need to clean the BVH_Transform structure
+      bvhTransform->jointsOccludedIn2DProjection=0;
 
 
-  //First of all we need to populate all local dynamic transformation of our chain
-  //This step only has to do with our Motion Buffer and doesn't perform the final transformations
-  //----------------------------------------------------------------------------------------
-   for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
-   {
-    unsigned int jID=listOfJointIDsToTransform[hID];
-    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-    {
-      bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
-    }
-  }
+      //First of all we need to populate all local dynamic transformation of our chain
+      //This step only has to do with our Motion Buffer and doesn't perform the final transformations
+      //----------------------------------------------------------------------------------------
+       for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
+       {
+        unsigned int jID=listOfJointIDsToTransform[hID];
+        if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+        {
+          bvh_prepareMatricesForTransform(bvhMotion,motionBuffer,bvhTransform,jID);
+        }
+       }
 
-  //We will now apply all dynamic transformations across the BVH chains
-  //-----------------------------------------------------------------------
-   for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
-   {
-    unsigned int jID=listOfJointIDsToTransform[hID];
-    if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
-    {
-      bvh_performActualTransform(
-                                 bvhMotion,
-                                 motionBuffer,
-                                 bvhTransform,
-                                 jID
-                                );
-    }
-   }
-  //----------------------------------------------------------------------------------------
+      //We will now apply all dynamic transformations across the BVH chains
+      //-----------------------------------------------------------------------
+      for (unsigned int hID=0; hID<lengthOfJointIDList; hID++)
+      {
+        unsigned int jID=listOfJointIDsToTransform[hID];
+        if (bvh_shouldJointBeTransformedGivenOurOptimizations(bvhTransform,jID))
+        {
+          bvh_performActualTransform(
+                                     bvhMotion,
+                                     motionBuffer,
+                                     bvhTransform,
+                                     jID
+                                    );
+        }
+       }
+      //-----------------------------------------------------------------------------------
+      bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
+      bvhTransform->centerPosition[1]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[1];
+      bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
+      //-----------------------------------------------------------------------------------
 
-  bvhTransform->centerPosition[0]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[0];
-  bvhTransform->centerPosition[1]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[1];
-  bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
 
-
-  if (!populateTorso)
-  {
-    //Fast path out of here
-    return 1;
+      if (!populateTorso)
+      {
+        //Fast path out of here
+        res = 1;
+      } else
+      {
+       if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
+         {
+         //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
+         }
+        res = 1;
+      }
   } else
-  {
-   if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
-     {
-     //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
-     }
-    return 1;
-  }
+  { fprintf(stderr,"Failed allocating memory for bvh trasnform :(\n"); }
+  //--------------------------------------------------------------------
  }
 
- return 0;
+ return res;
 }
 
 

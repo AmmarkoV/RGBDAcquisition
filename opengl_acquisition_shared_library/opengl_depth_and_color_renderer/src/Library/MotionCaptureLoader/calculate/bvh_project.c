@@ -173,6 +173,7 @@ int bvh_projectJIDTo2D(
                      unsigned int               directRendering
                    )
 {
+      int res = 0;
       float position2D[3]={0.0,0.0,0.0};
 
 
@@ -236,10 +237,10 @@ int bvh_projectJIDTo2D(
               bvhTransform->joint[jID].isBehindCamera=1;
            }
 
-           return 1;
+           res = 1;
         }
 
- return 0;
+ return res;
 }
 
 

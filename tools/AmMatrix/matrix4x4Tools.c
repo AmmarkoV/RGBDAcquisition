@@ -1819,6 +1819,7 @@ void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,con
 
 int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * transformation4x4,float * point3D)
 {
+ int res = 0;
  if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
  {
   // What we want to do ( in mathematica )
@@ -1843,21 +1844,20 @@ int transform3DPointFVectorUsing4x4FMatrix_Naive(float * resultPoint3D,float * t
   // Ok we have our results but now to normalize our vector
   if (resultPoint3D[3]!=0.0)
   {
-   resultPoint3D[0]/=resultPoint3D[3];
-   resultPoint3D[1]/=resultPoint3D[3];
-   resultPoint3D[2]/=resultPoint3D[3];
-   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
-   return 1;
+     resultPoint3D[0]/=resultPoint3D[3];
+     resultPoint3D[1]/=resultPoint3D[3];
+     resultPoint3D[2]/=resultPoint3D[3];
+     resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
+     res = 1;
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
      fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
      fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
-     return 0;
+     res = 0;
   }
-  return 1;
  }
- return 0;
+ return res;
 }
 
 

@@ -44,9 +44,6 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-//Experiment : Try to use langevin dynamics for annealed gradient descent
-#define USE_LANGEVIN_DYNAMICS 0
-
 unsigned long tickBaseIK = 0;
 
 void clear_line()
@@ -703,9 +700,11 @@ int weAreAtALocalOptimum(
 
 float iteratePartLoss(
                       struct ikProblem * problem,
+                      struct ikConfiguration * config,
                       unsigned int iterationID,
                       unsigned int chainID,
-                      unsigned int partID,
+                      unsigned int partID
+                      /*
                       float lr,
                       float maximumAcceptableStartingLoss,
                       unsigned int epochs,
@@ -714,10 +713,21 @@ float iteratePartLoss(
                       float gradientExplosionThreshold,
                       char useSolutionHistory,
                       float useLangevinDynamics,
-                      unsigned int verbose
+                      unsigned int verbose*/
                      )
 {
     unsigned long startTime=0;
+    //-----------------------------------------------------------------------------
+    float lr                               = config->learningRate;
+    float maximumAcceptableStartingLoss    = config->maximumAcceptableStartingLoss;
+    unsigned int epochs                    = config->epochs;
+    unsigned int tryMaintainingLocalOptima = config->tryMaintainingLocalOptima;
+    float spring                           = config->spring;
+    float gradientExplosionThreshold       = config->gradientExplosionThreshold;
+    char useSolutionHistory                = !config->dontUseSolutionHistory;
+    float useLangevinDynamics              = config->useLangevinDynamics;
+    unsigned int verbose                   = config->verbose;
+    //-----------------------------------------------------------------------------
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
 
@@ -936,7 +946,7 @@ if (iterationID==0)
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
     unsigned int consecutiveBadSteps=0;
-    unsigned int maximumConsecutiveBadEpochs=3;
+    unsigned int maximumConsecutiveBadEpochs=1; //By default 3
     float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
@@ -1181,8 +1191,10 @@ if (iterationID==0)
 
 int iterateChainLoss(
                      struct ikProblem * problem,
+                     struct ikConfiguration * config,
                      unsigned int iterationID,
-                     unsigned int chainID,
+                     unsigned int chainID
+                     /*,
                      float lr,
                      float maximumAcceptableStartingLoss,
                      unsigned int epochs,
@@ -1191,7 +1203,7 @@ int iterateChainLoss(
                      float gradientExplosionThreshold,
                      char useSolutionHistory,
                      float useLangevinDynamics,
-                     unsigned int verbose
+                     unsigned int verbose*/
                     )
 {
     problem->chain[chainID].status = BVH_IK_STARTED;
@@ -1210,9 +1222,11 @@ int iterateChainLoss(
         { //If the part is  not an end effector it has parameters to change and improve
                               iteratePartLoss(
                                                problem,
+                                               config,
                                                iterationID,
                                                chainID,
-                                               partID,
+                                               partID
+                                               /*,
                                                lr,
                                                maximumAcceptableStartingLoss,
                                                epochs,
@@ -1221,7 +1235,7 @@ int iterateChainLoss(
                                                gradientExplosionThreshold,
                                                useSolutionHistory,
                                                useLangevinDynamics,
-                                               verbose
+                                               verbose*/
                                                );
          }
     }
@@ -1251,8 +1265,10 @@ int singleThreadedSolver(
             problem->chain[chainID].currentIteration=iterationID;
             iterateChainLoss(
                               problem,
+                              ikConfig,
                               iterationID,
-                              chainID,
+                              chainID
+                              /*,
                               ikConfig->learningRate,
                               ikConfig->maximumAcceptableStartingLoss,
                               ikConfig->epochs,
@@ -1261,7 +1277,7 @@ int singleThreadedSolver(
                               ikConfig->gradientExplosionThreshold,
                               (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                               ikConfig->useLangevinDynamics,
-                              ikConfig->verbose
+                              ikConfig->verbose*/
                            );
 
              //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
@@ -1306,8 +1322,9 @@ void * iterateChainLossWorkerThread(void * arg)
     //--------------------------------
          iterateChainLoss(
                            ctx->problem,
+                           ctx->ikConfig,
                            ctx->problem->chain[ctx->chainID].currentIteration,
-                           ctx->chainID,
+                           ctx->chainID/*,
                            ctx->ikConfig->learningRate,
                            ctx->ikConfig->maximumAcceptableStartingLoss,
                            ctx->ikConfig->epochs,
@@ -1316,7 +1333,7 @@ void * iterateChainLossWorkerThread(void * arg)
                            ctx->ikConfig->gradientExplosionThreshold,
                            (!ctx->ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                            ctx->ikConfig->useLangevinDynamics,
-                           ctx->ikConfig->verbose
+                           ctx->ikConfig->verbose*/
                          );
     //--------------------------------
     threadpoolWorkerLoopEnd(ptr);
@@ -1386,8 +1403,9 @@ int multiThreadedSolver(
                 //fprintf(stderr,"Running single threaded task for chain %u\n",chainID);
                 iterateChainLoss(
                                  problem,
+                                 ikConfig,
                                  iterationID,
-                                 chainID,
+                                 chainID/*,
                                  ikConfig->learningRate,
                                  ikConfig->maximumAcceptableStartingLoss,
                                  ikConfig->epochs,
@@ -1396,7 +1414,7 @@ int multiThreadedSolver(
                                  ikConfig->gradientExplosionThreshold,
                                  (!ikConfig->dontUseSolutionHistory), //<- Note that the variable is useSolutionHistory so thats why the double negation..
                                  ikConfig->useLangevinDynamics,
-                                 ikConfig->verbose
+                                 ikConfig->verbose*/
                                 );
 
                   //Each iteratePartLoss call updates the problem->currentSolution with the latest and greatest solution
