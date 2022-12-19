@@ -739,7 +739,7 @@ float iteratePartLoss(
         //Distance to -330
         //2/7   Mean   : 9.9858
         //2/7 Mean   : 9.93695
-    if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 2/3; } // 2/7;
+    if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 0.3; }
     if  (maximumConsecutiveBadEpochs==0) { maximumConsecutiveBadEpochs=1; } //By default 3
     if  (momentum==0.0)                  { momentum = (float) 0.8; } // Momentum | 0.9 Large / 0.2 Small
     //-----------------------------------------------------------------------------

@@ -125,7 +125,7 @@ void copy3x3FMatrixTo4x4F(float * out,float * in)
 
 
 
-void copy4x4FMatrix(float * out,float * in)
+void copy4x4FMatrix(float * out,const float * in)
 {
   if ((out!=0) && (in!=0))
   {
@@ -141,7 +141,7 @@ void copy4x4FMatrix(float * out,float * in)
 }
 
 
-void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,float * in)
+void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,const float * in)
 {
   if (out!=0)
     { copy4x4FMatrix(out->m,in); }
@@ -1099,9 +1099,9 @@ void create4x4FScalingMatrix(struct Matrix4x4OfFloats * m, float scaleX, float s
   #endif // OPTIMIZED
 }
 
-float det4x4FMatrix(float * mat)
+float det4x4FMatrix(const float * mat)
 {
- float * a = mat;
+ const float * a = mat;
 
  float   detA  = a[I11] * a[I22] * a[I33]  * a[I44];
          detA += a[I11] * a[I23] * a[I34]  * a[I42];
@@ -1140,9 +1140,9 @@ float det4x4FMatrix(float * mat)
 }
 
 
-int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * mat)
+int invert4x4FMatrix(struct Matrix4x4OfFloats * result,const struct Matrix4x4OfFloats * mat)
 {
- float * a = mat->m;
+ const float * a = mat->m;
  float * b = result->m;
  float detA = det4x4FMatrix(mat->m);
  if (detA==0.0)
@@ -1288,7 +1288,7 @@ int transpose4x4DMatrix(double * mat)
 
 
 
-int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
+int multiplyTwo4x4DMatrices(double * result ,const double * matrixA ,const double * matrixB)
 {
  if ( (matrixA!=0) && (matrixB!=0) && (result!=0) )
  {
@@ -1335,7 +1335,7 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 }
 
 
-void multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC)
+void multiplyThree4x4DMatrices(double * result ,const double * matrixA ,const double * matrixB ,const double * matrixC)
 {
  if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
@@ -1347,7 +1347,7 @@ void multiplyThree4x4DMatrices(double * result , double * matrixA , double * mat
 
 
 
-static inline void multiplyTwo4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB)
+static inline void multiplyTwo4x4FMatrices_Naive(float * result,const float * matrixA,const float * matrixB)
 {
   //if ( (matrixA!=0) && (matrixB!=0) && (result!=0) ) This gets called millions of times.. removing the check frees 0.43 clocks
   {
@@ -1598,7 +1598,7 @@ static inline void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * ma
 
 
 
-void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB)
+void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,const struct Matrix4x4OfFloats * matrixA ,const struct Matrix4x4OfFloats * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m); //109.53 fps in the sven dataset
@@ -1610,7 +1610,7 @@ void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x
 
 
 
-void multiplyTwoRaw4x4FMatricesS(float * result ,float * matrixA ,float * matrixB)
+void multiplyTwoRaw4x4FMatricesS(float * result ,const float * matrixA ,const float * matrixB)
 {
 #if INTEL_OPTIMIZATIONS
     multiplyTwo4x4FMatrices_SSE2(result,matrixA,matrixB); //109.53 fps in the sven dataset
@@ -1621,7 +1621,7 @@ void multiplyTwoRaw4x4FMatricesS(float * result ,float * matrixA ,float * matrix
 }
 
 
-void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float * matrixA , float * matrixB)
+void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result ,const float * matrixA ,const float * matrixB)
 {
   struct Matrix4x4OfFloats bufA;
    copy4x4FMatrix(bufA.m,matrixA);
@@ -1632,7 +1632,7 @@ void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result , float *
 }
 
 
-void multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC)
+void multiplyThree4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB ,const float * matrixC)
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
@@ -1643,7 +1643,7 @@ void multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * 
   return;
 }
 
-void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC)
+void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,const struct Matrix4x4OfFloats * matrixA,const struct Matrix4x4OfFloats * matrixB ,const struct Matrix4x4OfFloats * matrixC)
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
@@ -1669,11 +1669,11 @@ enum THREE_4X4_MATRICES_CASES
 
 int multiplyThree4x4FMatricesWithIdentityHints(
                                                 struct Matrix4x4OfFloats * result,
-                                                struct Matrix4x4OfFloats * matrixA,
+                                                const struct Matrix4x4OfFloats * matrixA,
                                                 int matrixAIsIdentity,
-                                                struct Matrix4x4OfFloats * matrixB,
+                                                const struct Matrix4x4OfFloats * matrixB,
                                                 int matrixBIsIdentity,
-                                                struct Matrix4x4OfFloats * matrixC,
+                                                const struct Matrix4x4OfFloats * matrixC,
                                                 int matrixCIsIdentity
                                               )
 {
@@ -1709,7 +1709,13 @@ int multiplyThree4x4FMatricesWithIdentityHints(
 }
 
 
-void multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD)
+void multiplyFour4x4FMatrices(
+                              struct Matrix4x4OfFloats * result,
+                              const struct Matrix4x4OfFloats * matrixA,
+                              const struct Matrix4x4OfFloats * matrixB,
+                              const struct Matrix4x4OfFloats * matrixC,
+                              const struct Matrix4x4OfFloats * matrixD
+                             )
 {
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (matrixD!=0) && (result!=0) )
   {

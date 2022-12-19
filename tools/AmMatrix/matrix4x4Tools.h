@@ -113,7 +113,7 @@ void copy4x4DMatrix(double * out,double * in);
 void copy3x3FMatrixTo4x4F(float * out,float * in);
 
 
-void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,float * in);
+void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,const float * in);
 
 /**
 * @brief Copy a 4x4 Matrix of floats to another
@@ -122,7 +122,7 @@ void copy4x4FMatrixToAlignedContainer(struct Matrix4x4OfFloats * out,float * in)
 * @param  Input Matrix
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void copy4x4FMatrix(float * out,float * in);
+void copy4x4FMatrix(float * out,const float * in);
 
 /**
 * @brief Convert a 4x4 Matrix from Float To Double
@@ -267,7 +267,7 @@ void create4x4FRotationZ(struct Matrix4x4OfFloats * m,float degrees);
 * @param  Input 4x4 Matrix
 * @retval Det(mat)
 */
-float det4x4FMatrix(float * mat) ;
+float det4x4FMatrix(const float * mat) ;
 
 /**
 * @brief Invert a 4x4 matrix
@@ -276,7 +276,7 @@ float det4x4FMatrix(float * mat) ;
 * @param  Output ( should be already allocated ) 3x3 Matrix
 * @retval 0=failure,1=success
 */
-int invert4x4FMatrix(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * mat) ;
+int invert4x4FMatrix(struct Matrix4x4OfFloats * result,const struct Matrix4x4OfFloats * mat) ;
 
 
 /**
@@ -307,7 +307,7 @@ int transpose4x4DMatrix(double * mat);
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB);
+int multiplyTwo4x4DMatrices(double * result ,const double * matrixA ,const double * matrixB);
 
 /**
 * @brief Multiply 3x 4x4 Double matrices ( A * B * C )
@@ -318,7 +318,7 @@ int multiplyTwo4x4DMatrices(double * result ,double * matrixA ,double * matrixB)
 * @param  Input 4x4 Float Matrix C
 * @retval 0=failure,1=success
 */
-void multiplyThree4x4DMatrices(double * result , double * matrixA , double * matrixB , double * matrixC);
+void multiplyThree4x4DMatrices(double * result ,const double * matrixA ,const double * matrixB ,const double * matrixC);
 
 
 /**
@@ -344,27 +344,33 @@ void multiplyThree4x4DMatrices(double * result , double * matrixA , double * mat
 void multiplyTwo4x4FMatrices_SSE(float * result ,const float * matrixA,const float * matrixB);
 
 
-void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB);
+void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,const struct Matrix4x4OfFloats * matrixA ,const struct Matrix4x4OfFloats * matrixB);
 
-void multiplyTwoRaw4x4FMatricesS(float * result ,float * matrixA ,float * matrixB);
+void multiplyTwoRaw4x4FMatricesS(float * result ,const float * matrixA ,const float * matrixB);
 
-void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result, float * matrixA, float * matrixB);
+void multiplyTwo4x4FMatricesBuffered(struct Matrix4x4OfFloats * result,const float * matrixA,const float * matrixB);
 
-void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x4OfFloats * matrixA,struct Matrix4x4OfFloats * matrixB,struct Matrix4x4OfFloats * matrixC);
+void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,const struct Matrix4x4OfFloats * matrixA,const struct Matrix4x4OfFloats * matrixB,const struct Matrix4x4OfFloats * matrixC);
 
 int multiplyThree4x4FMatricesWithIdentityHints(
                                                 struct Matrix4x4OfFloats * result,
-                                                struct Matrix4x4OfFloats * matrixA,
+                                                const struct Matrix4x4OfFloats * matrixA,
                                                 int matrixAIsIdentity,
-                                                struct Matrix4x4OfFloats * matrixB,
+                                                const struct Matrix4x4OfFloats * matrixB,
                                                 int matrixBIsIdentity,
-                                                struct Matrix4x4OfFloats * matrixC,
+                                                const struct Matrix4x4OfFloats * matrixC,
                                                 int matrixCIsIdentity
                                               );
 
-void multiplyThree4x4FMatrices_Naive(float * result , float * matrixA , float * matrixB , float * matrixC);
+void multiplyThree4x4FMatrices_Naive(float * result ,const float * matrixA ,const float * matrixB ,const float * matrixC);
 
-void multiplyFour4x4FMatrices(struct Matrix4x4OfFloats * result ,struct Matrix4x4OfFloats * matrixA ,struct Matrix4x4OfFloats * matrixB ,struct Matrix4x4OfFloats * matrixC ,struct Matrix4x4OfFloats * matrixD);
+void multiplyFour4x4FMatrices(
+                              struct Matrix4x4OfFloats * result,
+                              const struct Matrix4x4OfFloats * matrixA,
+                              const struct Matrix4x4OfFloats * matrixB,
+                              const struct Matrix4x4OfFloats * matrixC,
+                              const struct Matrix4x4OfFloats * matrixD
+                             );
 
 
 
