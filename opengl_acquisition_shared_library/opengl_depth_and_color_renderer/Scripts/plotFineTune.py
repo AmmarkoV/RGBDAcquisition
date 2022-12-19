@@ -232,15 +232,15 @@ if __name__== "__main__":
  target1Col=11
  target2Col=12
 
-  if (len(sys.argv)>5):
+ if (len(sys.argv)>5):
        target1Col,target1Ok = resolve(data["label"],sys.argv[5])
-  if (len(sys.argv)>4):
+ if (len(sys.argv)>4):
        target2Col,target2Ok = resolve(data["label"],sys.argv[4])
-  if (len(sys.argv)>3):
+ if (len(sys.argv)>3):
        zCol,zOk = resolve(data["label"],sys.argv[3])
-  if (len(sys.argv)>2):
+ if (len(sys.argv)>2):
        yCol,yOk = resolve(data["label"],sys.argv[2])
-  if (len(sys.argv)>1):
+ if (len(sys.argv)>1):
        xCol,xOk = resolve(data["label"],sys.argv[1])
        
  #-------------------------
@@ -261,7 +261,7 @@ if __name__== "__main__":
  zs  = splitNumpyArray(data["body"],zCol,1) # 8 = langevin
  vs  = splitNumpyArray(data["body"],target1Col,1) # 10 = mae 
  v2s = splitNumpyArray(data["body"],target2Col,1) # 10 = mae 
- 
+ #xs = xs + (v2s*0.01)
 
  ax.view_init(viewAzimuth,viewElevation) 
 

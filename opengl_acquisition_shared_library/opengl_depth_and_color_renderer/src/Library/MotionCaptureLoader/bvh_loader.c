@@ -650,6 +650,8 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 
 
 
+
+
 int bvh_isJointAChildrenID(
                            struct BVH_MotionCapture * bvhMotion,
                            BVHJointID parentJID,
@@ -926,6 +928,39 @@ int bvh_scaleAllOffsets(
   return 0;
 }
 
+
+int bvh_scaleAllJointChildrenOffsets(
+                                     struct BVH_MotionCapture * bvhMotion,
+                                     const char * jointName,
+                                     float scalingRatio
+                                    )
+{
+  if (scalingRatio==1.0) { return 1; }
+  if (bvhMotion!=0)
+    {
+      BVHJointID parentID=0;
+      if ( bvh_getJointIDFromJointNameNocase(bvhMotion,jointName,&parentID) )
+      {
+        for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+        {
+         if ( bvh_isJointAChildrenID(bvhMotion,parentID,jID) )
+         {
+          bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
+          bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
+          bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
+
+          float * m = bvhMotion->jointHierarchy[jID].staticTransformation.m;
+          m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (float) bvhMotion->jointHierarchy[jID].offset[0];
+          m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (float) bvhMotion->jointHierarchy[jID].offset[1];
+          m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (float) bvhMotion->jointHierarchy[jID].offset[2];
+          m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
+         }
+       }
+       return 1;
+      }
+    }
+  return 0;
+}
 
 
 

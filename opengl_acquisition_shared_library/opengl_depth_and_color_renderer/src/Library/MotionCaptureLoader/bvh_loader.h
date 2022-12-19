@@ -490,6 +490,14 @@ int bvh_scaleAllOffsets(
                        );
 
 
+
+int bvh_scaleAllJointChildrenOffsets(
+                                     struct BVH_MotionCapture * bvhMotion,
+                                     const char * jointName,
+                                     float scalingRatio
+                                    );
+
+
 int bvh_getMotionChannelName(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID,char * target,unsigned int targetLength);
 
 /**

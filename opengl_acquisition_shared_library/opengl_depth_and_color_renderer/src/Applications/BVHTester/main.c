@@ -1225,6 +1225,19 @@ int bvhConverter(int argc,const char **argv)
                               );
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--scaleJointChildrenOffsets")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments(); }
+          const char * jointName = argv[i+1];
+          float scaleRatio = atof(argv[i+2]);
+          fprintf(stderr,"Joint Children of %s will get an offset scaling ratio = %0.2f \n",jointName,scaleRatio);
+          bvh_scaleAllJointChildrenOffsets(
+                                           &bvhMotion,
+                                           jointName,
+                                           scaleRatio
+                                          );
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--onlyFirstFrame")==0)
         {
           bvh_copyMotionFrame(&bvhMotion, 0, 1 );
