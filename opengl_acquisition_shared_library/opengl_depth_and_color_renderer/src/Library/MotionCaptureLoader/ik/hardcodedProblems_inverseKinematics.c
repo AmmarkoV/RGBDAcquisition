@@ -3774,6 +3774,8 @@ float bvhTestIK(
                 unsigned int iterations,
                 unsigned int epochs,
                 float langevin,
+                float learningRateDecayRate,
+                float momentum,
                 unsigned int fIDPrevious,
                 unsigned int fIDSource,
                 unsigned int fIDTarget,
@@ -3863,6 +3865,8 @@ float bvhTestIK(
                     ikConfig.tryMaintainingLocalOptima     = 1; //Less Jittery but can be stuck at local optima
                     ikConfig.dontUseSolutionHistory        = 0;
                     ikConfig.useLangevinDynamics           = langevin;
+                    ikConfig.learningRateDecayRate         = learningRateDecayRate;
+                    ikConfig.hcdMomentum                   = momentum;
                     ikConfig.ikVersion = IK_VERSION;
                     //--------------------------------------------------
 

@@ -704,30 +704,47 @@ float iteratePartLoss(
                       unsigned int iterationID,
                       unsigned int chainID,
                       unsigned int partID
-                      /*
-                      float lr,
-                      float maximumAcceptableStartingLoss,
-                      unsigned int epochs,
-                      unsigned int tryMaintainingLocalOptima,
-                      float spring,
-                      float gradientExplosionThreshold,
-                      char useSolutionHistory,
-                      float useLangevinDynamics,
-                      unsigned int verbose*/
                      )
 {
     unsigned long startTime=0;
     //-----------------------------------------------------------------------------
-    float lr                               = config->learningRate;
-    float maximumAcceptableStartingLoss    = config->maximumAcceptableStartingLoss;
-    unsigned int epochs                    = config->epochs;
-    unsigned int tryMaintainingLocalOptima = config->tryMaintainingLocalOptima;
-    float spring                           = config->spring;
-    float gradientExplosionThreshold       = config->gradientExplosionThreshold;
-    char useSolutionHistory                = !config->dontUseSolutionHistory;
-    float useLangevinDynamics              = config->useLangevinDynamics;
-    unsigned int verbose                   = config->verbose;
+    float minimumLossDeltaFromBestToBeAcceptable = config->eopchMinimumLossDelta; //Just be better than best..
+    unsigned int maximumConsecutiveBadEpochs     = config->epochEarlyStopping;
+    float lr                                     = config->learningRate;
+    float learningRateDecayRate                  = config->learningRateDecayRate;
+    float maximumAcceptableStartingLoss          = config->maximumAcceptableStartingLoss;
+    float momentum                               = config->hcdMomentum;
+    unsigned int epochs                          = config->epochs;
+    unsigned int tryMaintainingLocalOptima       = config->tryMaintainingLocalOptima;
+    float spring                                 = config->spring;
+    float gradientExplosionThreshold             = config->gradientExplosionThreshold;
+    char useSolutionHistory                      = !config->dontUseSolutionHistory;
+    float useLangevinDynamics                    = config->useLangevinDynamics;
+    unsigned int verbose                         = config->verbose;
     //-----------------------------------------------------------------------------
+    //Sensible Defaults
+    //Learning rate decay..
+        //3/4  Mean   :10.4969
+        //3/5  Mean   :10.34537
+        //2/5  Mean   :10.2781
+        //1/6  Mean   :10.2230
+        //2/6  Mean   :10.12284
+        //2/7  Mean   :10.0943
+        //3/8  Mean   :10.1463
+        //3/10 Mean   :10.1280
+        //25/70 Mean   :10.22975
+        //15/70 Mean   :10.1823
+        //Distance to -350
+        //2/7   Mean   :10.1286
+        //Distance to -330
+        //2/7   Mean   : 9.9858
+        //2/7 Mean   : 9.93695
+    if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 2/3; } // 2/7;
+    if  (maximumConsecutiveBadEpochs==0) { maximumConsecutiveBadEpochs=1; } //By default 3
+    if  (momentum==0.0)                  { momentum = (float) 0.8; } // Momentum | 0.9 Large / 0.2 Small
+    //-----------------------------------------------------------------------------
+
+
 
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
 
@@ -906,7 +923,6 @@ if (iterationID==0)
 //-------------------------------------------
 //-------------------------------------------
 //-------------------------------------------
-
     char limitsEngaged = problem->chain[chainID].part[partID].limits;
     //---------------------------------------------------------------------------------------
     float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
@@ -946,28 +962,8 @@ if (iterationID==0)
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
     unsigned int consecutiveBadSteps=0;
-    unsigned int maximumConsecutiveBadEpochs=1; //By default 3
-    float minimumLossDeltaFromBestToBeAcceptable = 0.0; //Just be better than best..
     float e=0.000001;
     float d=lr; //0.0005;
-    float momentum = 0.8; // Momentum | 0.9 Large / 0.2 Small
-    //Learning rate decay..
-        //3/4  Mean   :10.4969
-        //3/5  Mean   :10.34537
-        //2/5  Mean   :10.2781
-        //1/6  Mean   :10.2230
-        //2/6  Mean   :10.12284
-        //2/7  Mean   :10.0943
-        //3/8  Mean   :10.1463
-        //3/10 Mean   :10.1280
-        //25/70 Mean   :10.22975
-        //15/70 Mean   :10.1823
-        //Distance to -350
-        //2/7   Mean   :10.1286
-        //Distance to -330
-        //2/7   Mean   : 9.9858
-        //2/7 Mean   : 9.93695
-    float learningRateDecayRate = (float) 2/3; // 2/7;
    ///--------------------------------------------------------------------------------------------------------------
     //Give an initial direction..
     float delta[3]= {d,d,d};

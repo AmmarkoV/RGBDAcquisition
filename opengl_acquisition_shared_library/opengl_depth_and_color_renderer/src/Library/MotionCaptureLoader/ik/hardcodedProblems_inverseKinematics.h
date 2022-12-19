@@ -56,6 +56,8 @@ float bvhTestIK(
                 unsigned int iterations,
                 unsigned int epochs,
                 float langevin,
+                float learningRateDecayRate,
+                float momentum,
                 unsigned int fIDPrevious,
                 unsigned int fIDSource,
                 unsigned int fIDTarget,

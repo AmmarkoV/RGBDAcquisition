@@ -100,7 +100,10 @@ struct ikConfiguration
   float maximumAcceptableStartingLoss;
   unsigned int iterationEarlyStopping;
   float iterationMinimumLossDelta;
+  unsigned int epochEarlyStopping;
+  float eopchMinimumLossDelta;
   float learningRate;
+  float learningRateDecayRate;
   unsigned int iterations;
   unsigned int epochs;
   unsigned int considerPreviousSolution;
@@ -111,6 +114,7 @@ struct ikConfiguration
   unsigned int verbose;
   char dontUseSolutionHistory;
   float useLangevinDynamics;
+  float hcdMomentum; // Momentum | 0.9 Large / 0.2 Small
   float ikVersion;
 };
 

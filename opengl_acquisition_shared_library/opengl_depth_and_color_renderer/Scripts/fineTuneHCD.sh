@@ -29,20 +29,28 @@ ITERATIONS="20"
 EPOCHS="10"
 LANGEVIN_DYNAMICS="0.002"
 VERBOSITY="0"
+LEARNING_RATE_DECAY="0.8"
+MOMENTUM="0.42"
 
-for EPOCHS in `echo "15"`
+for LEARNING_RATE_DECAY in ` seq 0.2 0.1 0.9 | tr "," "." `
 do
- for ITERATIONS in ` seq 20 1 25 | tr "," "." `
+ for MOMENTUM in ` seq 0.22 0.1 0.52 | tr "," "." `
  do
-  for LR  in ` seq 0.0018 0.0001 0.0026 | tr "," "." `
+  for EPOCHS in `echo "15"`
   do
-   for LANGEVIN_DYNAMICS  in `seq 0.0 0.0005 0.005 | tr "," "."`
+   for ITERATIONS in ` seq 20 1 25 | tr "," "." `
    do
+    for LR  in ` seq 0.0018 0.0001 0.0026 | tr "," "." `
+    do
+     for LANGEVIN_DYNAMICS  in `seq 0.0 0.001 0.005 | tr "," "."`
+     do
       echo "IT: $ITERATIONS | EP: $EPOCHS | LR: $LR | LANGV: $LANGEVIN_DYNAMICS"
-      ./BVHTester --from $DATASET --addfrom $DATASETA --addfrom $DATASETB --addfrom $DATASETC --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK $PREVIOUS_FRAME $CURRENT_FRAME $TARGET_FRAME $STEP_FRAME $LR $ITERATIONS $EPOCHS 1 $LANGEVIN_DYNAMICS $VERBOSITY $@
-   done
+      ./BVHTester --from $DATASET --addfrom $DATASETA --addfrom $DATASETB --addfrom $DATASETC --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK $PREVIOUS_FRAME $CURRENT_FRAME $TARGET_FRAME $STEP_FRAME $LR $ITERATIONS $EPOCHS 1 $LANGEVIN_DYNAMICS $VERBOSITY $LEARNING_RATE_DECAY $MOMENTUM $@
+     done
+    done
+   done 
   done
- done 
+ done
 done
 
 
