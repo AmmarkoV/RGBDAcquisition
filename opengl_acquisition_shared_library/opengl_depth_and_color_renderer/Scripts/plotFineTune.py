@@ -211,7 +211,13 @@ def readCSVFile(filename,memPercentage,useHalfFloats=0):
     return {'label':inputLabels, 'body':npInput };
 
 
-
+def resolve(theList,theName):
+  result = 0
+  for item in theList:
+     if (item==theName):
+        return result,True
+     result = result + 1
+  return result,False 
 
 if __name__== "__main__":
 
@@ -219,12 +225,27 @@ if __name__== "__main__":
  output="out.png"
  jointName=" HCD FineTune "
  data = readCSVFile(filename,1.0) 
- #-------------------------
+
  xCol=1
- xLabel=data["label"][xCol]
  yCol=6
- yLabel=data["label"][yCol]
  zCol=8
+ target1Col=11
+ target2Col=12
+
+  if (len(sys.argv)>5):
+       target1Col,target1Ok = resolve(data["label"],sys.argv[5])
+  if (len(sys.argv)>4):
+       target2Col,target2Ok = resolve(data["label"],sys.argv[4])
+  if (len(sys.argv)>3):
+       zCol,zOk = resolve(data["label"],sys.argv[3])
+  if (len(sys.argv)>2):
+       yCol,yOk = resolve(data["label"],sys.argv[2])
+  if (len(sys.argv)>1):
+       xCol,xOk = resolve(data["label"],sys.argv[1])
+       
+ #-------------------------
+ xLabel=data["label"][xCol]
+ yLabel=data["label"][yCol]
  zLabel=data["label"][zCol]
  #-------------------------
  viewAzimuth=45
@@ -234,17 +255,18 @@ if __name__== "__main__":
 
  
  fig = plt.figure()
- ax = fig.add_subplot(projection='3d')
- xs = splitNumpyArray(data["body"],xCol,1) # 1 = learning rate
- ys = splitNumpyArray(data["body"],yCol,1) # 6 = iteration
- zs = splitNumpyArray(data["body"],zCol,1) # 8 = langevin
- vs = splitNumpyArray(data["body"],10,1) # 10 = mae 
+ ax  = fig.add_subplot(projection='3d')
+ xs  = splitNumpyArray(data["body"],xCol,1) # 1 = learning rate
+ ys  = splitNumpyArray(data["body"],yCol,1) # 6 = iteration
+ zs  = splitNumpyArray(data["body"],zCol,1) # 8 = langevin
+ vs  = splitNumpyArray(data["body"],target1Col,1) # 10 = mae 
+ v2s = splitNumpyArray(data["body"],target2Col,1) # 10 = mae 
  
 
  ax.view_init(viewAzimuth,viewElevation) 
 
  cm = plt.cm.get_cmap('RdYlBu')
- sc = ax.scatter(xs, ys, zs, c=vs, s=vs, cmap=cm, alpha=transparency)
+ sc = ax.scatter(xs, ys, zs, c=vs, s=v2s , cmap=cm, alpha=transparency)
  plt.colorbar(sc) 
 
  ax.set_title(jointName) # Title of the plot
