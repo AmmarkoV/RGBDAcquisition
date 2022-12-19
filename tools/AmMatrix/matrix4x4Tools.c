@@ -1415,6 +1415,10 @@ static inline int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * mat
  return res;
 }
 
+//Interesting examples :
+//https://github.com/microsoft/DirectXMath/blob/main/Inc/DirectXMathMatrix.inl
+//https://github.com/romz-pl/matrix-matrix-multiply
+
 
 #if INTEL_OPTIMIZATIONS
 #define _MM_TRANSPOSE4_PS_HARDCODED(row0, row1, row2, row3) {       \
