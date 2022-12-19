@@ -1654,9 +1654,8 @@ void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,struct Matrix4x
   return;
 }
 
-#define USE_NEW_THREE_4X4_MATRIXMUL 1
 
-enum THREE4X4MATRICESCASES
+enum THREE_4X4_MATRICES_CASES
 {
     MAT_4x4_CASE_NO_ACTIVE_MATRICES=0,            // 0
     MAT_4x4_CASE_MATRIXA,                         // 1
@@ -1678,9 +1677,9 @@ int multiplyThree4x4FMatricesWithIdentityHints(
                                                 int matrixCIsIdentity
                                               )
 {
+  int res = 0;
   if ( (matrixA!=0) && (matrixB!=0) && (matrixC!=0) && (result!=0) )
   {
-    #if USE_NEW_THREE_4X4_MATRIXMUL
     unsigned char multiplicationCase  = MAT_4x4_CASE_NO_ACTIVE_MATRICES;
     //----------------------------------------------------
     multiplicationCase += (!matrixAIsIdentity) * MAT_4x4_CASE_MATRIXA;
@@ -1692,47 +1691,21 @@ int multiplyThree4x4FMatricesWithIdentityHints(
     switch (multiplicationCase)
     {
       //---------------------------------------------------------------------------------------------------------------------------
-      case MAT_4x4_CASE_NO_ACTIVE_MATRICES              :  create4x4FIdentityMatrix(result);                          return 1;  break;
-      case MAT_4x4_CASE_MATRIXA                         :  copy4x4FMatrix(result->m,matrixA->m);                      return 1;  break;
-      case MAT_4x4_CASE_MATRIXB                         :  copy4x4FMatrix(result->m,matrixB->m);                      return 1;  break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixB);          return 1;  break;
-      case MAT_4x4_CASE_MATRIXC                         :  copy4x4FMatrix(result->m,matrixC->m);                      return 1;  break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixC);          return 1;  break;
-      case MAT_4x4_CASE_MATRIXB_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixB,matrixC);          return 1;  break;
-      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC :  multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); return 1;  break;
+      case MAT_4x4_CASE_NO_ACTIVE_MATRICES              :  create4x4FIdentityMatrix(result);                          res = 1;  break;
+      case MAT_4x4_CASE_MATRIXA                         :  copy4x4FMatrix(result->m,matrixA->m);                      res = 1;  break;
+      case MAT_4x4_CASE_MATRIXB                         :  copy4x4FMatrix(result->m,matrixB->m);                      res = 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixB);          res = 1;  break;
+      case MAT_4x4_CASE_MATRIXC                         :  copy4x4FMatrix(result->m,matrixC->m);                      res = 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixA,matrixC);          res = 1;  break;
+      case MAT_4x4_CASE_MATRIXB_AND_MATRIXC             :  multiplyTwo4x4FMatricesS(result,matrixB,matrixC);          res = 1;  break;
+      case MAT_4x4_CASE_MATRIXA_AND_MATRIXB_AND_MATRIXC :  multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC); res = 1;  break;
       //---------------------------------------------------------------------------------------------------------------------------
       default:
-        return 0;
+        res = 0;
       //---------------------------------------------------------------------------------------------------------------------------
     };
-    #else
-    unsigned int numberOfOperationsNeeded = (matrixAIsIdentity==0) + (matrixBIsIdentity==0) + (matrixCIsIdentity==0);
-    //Do the absolutely minimum number of operations required
-    //----------------------------------------------------------
-    switch (numberOfOperationsNeeded)
-    {
-      case 3:
-        return multiplyThree4x4FMatrices(result,matrixA,matrixB,matrixC);
-      case 2:
-        if (matrixAIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixB,matrixC);  } else
-        if (matrixBIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixA,matrixC);  } else
-        if (matrixCIsIdentity)     { return multiplyTwo4x4FMatricesS(result,matrixA,matrixB);  }
-      case 1:
-        if (!matrixAIsIdentity)    { copy4x4FMatrix(result->m,matrixA->m); } else
-        if (!matrixBIsIdentity)    { copy4x4FMatrix(result->m,matrixB->m); } else
-        if (!matrixCIsIdentity)    { copy4x4FMatrix(result->m,matrixC->m); }
-        return 1;
-      case 0:
-      default:
-        create4x4FIdentityMatrix(result);
-        return 1;
-    };
-    //----------------------------------------------------------
-   return 1;
-   #endif // USE_NEW_THREE_4X4_MATRIXMUL
-
   }
- return 0;
+ return res;
 }
 
 
@@ -2032,47 +2005,17 @@ void create4x4FModelTransformation(
         scaleSpecified=1;
       }
 
-
-    #if USE_NEW_THREE_4X4_MATRIXMUL
-       //Re-use already optimized code-path
-        multiplyThree4x4FMatricesWithIdentityHints(
-                                                    m,
-                                                    &intermediateMatrixTranslation,
-                                                    (translationSpecified==0),
-                                                    &intermediateMatrixRotation,
-                                                    (rotationSpecified==0),
-                                                    &intermediateScalingMatrix,
-                                                    (scaleSpecified==0)
-                                                  );
-        return;
-    #else
-    //Count number of matrix multiplications needed..!
-    int numberOfOperationsNeeded = translationSpecified + rotationSpecified + scaleSpecified;
-
-    //Do the absolutely minimum number of operations required
-    //----------------------------------------------------------
-    //fprintf(stderr,"Number Of Multiplications needed %u\n",numberOfOperationsNeeded);
-    switch (numberOfOperationsNeeded)
-    {
-      case 0:
-         create4x4FIdentityMatrix(m);
-        return;
-      case 1:
-         if (translationSpecified==1) { copy4x4FMatrix(m->m,intermediateMatrixTranslation.m); } else
-         if (rotationSpecified==1)    { copy4x4FMatrix(m->m,intermediateMatrixRotation.m);    } else
-         if (scaleSpecified==1)       { copy4x4FMatrix(m->m,intermediateScalingMatrix.m);     }
-        return;
-      case 2:
-         if (scaleSpecified==0)       { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateMatrixRotation); } else
-         if (translationSpecified==0) { multiplyTwo4x4FMatricesS(m,&intermediateMatrixRotation,&intermediateScalingMatrix);     } else
-         if (rotationSpecified==0)    { multiplyTwo4x4FMatricesS(m,&intermediateMatrixTranslation,&intermediateScalingMatrix);  }
-        return;
-      case 3:
-         multiplyThree4x4FMatrices(m,&intermediateMatrixTranslation,&intermediateMatrixRotation,&intermediateScalingMatrix);
-        return;
-    };
-    #endif // USE_NEW_THREE_4X4_MATRIXMUL
-    //----------------------------------------------------------
+     //Re-use already optimized code-path
+     multiplyThree4x4FMatricesWithIdentityHints(
+                                                m,
+                                                &intermediateMatrixTranslation,
+                                                (translationSpecified==0),
+                                                &intermediateMatrixRotation,
+                                                (rotationSpecified==0),
+                                                &intermediateScalingMatrix,
+                                                (scaleSpecified==0)
+                                               );
+     return;
 }
 
 

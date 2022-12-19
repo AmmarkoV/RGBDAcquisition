@@ -261,7 +261,9 @@ if __name__== "__main__":
  zs  = splitNumpyArray(data["body"],zCol,1) # 8 = langevin
  vs  = splitNumpyArray(data["body"],target1Col,1) # 10 = mae 
  v2s = splitNumpyArray(data["body"],target2Col,1) # 10 = mae 
- #xs = xs + (v2s*0.01)
+ 
+ v2sMean = np.mean(v2s)
+ v2s = v2s * (100.0/v2sMean)
 
  ax.view_init(viewAzimuth,viewElevation) 
 
