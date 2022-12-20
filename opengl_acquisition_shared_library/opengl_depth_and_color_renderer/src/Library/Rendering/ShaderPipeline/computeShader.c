@@ -16,7 +16,7 @@
 #include <GL/glext.h>
 #endif // USE_GLEW
 
-
+#include "shader_loader.h"
 
 
 

@@ -39,7 +39,7 @@ int uploadColorImageAsTexture(
         internalFormat = GL_RGBA;
     } else
     {
-       fprintf(stderr,"");
+       fprintf(stderr,"Unknown color channel number %u \n",colorChannels);
     }
 
 

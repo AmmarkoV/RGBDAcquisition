@@ -176,6 +176,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../MotionCaptureLoader/tests/test.h" />
+		<Unit filename="../Rendering/ShaderPipeline/computeShader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/computeShader.h" />
 		<Unit filename="../Rendering/ShaderPipeline/render_buffer.c">
 			<Option compilerVar="CC" />
 		</Unit>
