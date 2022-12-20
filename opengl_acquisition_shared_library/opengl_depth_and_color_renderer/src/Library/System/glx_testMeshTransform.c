@@ -78,7 +78,7 @@ char renderEyeHair = 1;
 char renderHair = 0;
 
 char VSYNC = 0;
-int performBoneTransformsInCPU = 0; // <- Experimental when 0
+int performBoneTransformsInCPU = 1; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
