@@ -739,9 +739,9 @@ float iteratePartLoss(
         //Distance to -330
         //2/7   Mean   : 9.9858
         //2/7 Mean   : 9.93695
-    if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 0.3; }
+    if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 0.8; }
     if  (maximumConsecutiveBadEpochs==0) { maximumConsecutiveBadEpochs=1; } //By default 3
-    if  (momentum==0.0)                  { momentum = (float) 0.8; } // Momentum | 0.9 Large / 0.2 Small
+    if  (momentum==0.0)                  { momentum = (float) 0.4; } // Momentum | 0.9 Large / 0.2 Small
     //-----------------------------------------------------------------------------
 
 
@@ -754,8 +754,20 @@ float iteratePartLoss(
           return 0.0;
         }
 
-    if (problem->chain[chainID].part[partID].bigChanges)   { lr=lr/10;     gradientExplosionThreshold=gradientExplosionThreshold*10; } else
-    if (problem->chain[chainID].part[partID].smallChanges) { lr=lr/1000;   gradientExplosionThreshold=gradientExplosionThreshold/15; }
+    //Modifiers in case of magnitude differences in problem chain
+    //---------------------------------------------------------------
+    if (problem->chain[chainID].part[partID].bigChanges)
+         {
+          lr=lr*10;
+          learningRateDecayRate=learningRateDecayRate/2;
+          gradientExplosionThreshold=gradientExplosionThreshold*10;
+         } else
+    if (problem->chain[chainID].part[partID].smallChanges)
+         {
+           lr=lr/1000;
+           gradientExplosionThreshold=gradientExplosionThreshold/15;
+         }
+    //---------------------------------------------------------------
 
     unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
     if (numberOfMIDElements!=3)
@@ -954,20 +966,13 @@ if (iterationID==0)
     float gradient[3]       = { 0.0,0.0,0.0 };
     //----------------------------------------------------------------------------------
     float bestLoss = initialLoss;
-    //float loss=initialLoss;
-
-    //Gradual fine tuning.. On a first glance it works worse..
-    //lr = lr / iterationID;
 
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
-    unsigned int consecutiveBadSteps=0;
-    float e=0.000001;
-    float d=lr; //0.0005;
+    float e=0.000001; //Prevent division by zero
+    unsigned int consecutiveBadSteps=0; //Bad step counter
    ///--------------------------------------------------------------------------------------------------------------
-    //Give an initial direction..
-    float delta[3]= {d,d,d};
-   ///--------------------------------------------------------------------------------------------------------------
+    float delta[3]= {lr,lr,lr}; //Gives a positive initial direction..
    ///--------------------------------------------------------------------------------------------------------------
     if (tryMaintainingLocalOptima)
     {
@@ -976,7 +981,7 @@ if (iterationID==0)
                                   problem,
                                   chainID,
                                   partID,
-                                  d,
+                                  lr,
                                   initialLoss,
                                   currentValues,
                                   delta,
@@ -1127,6 +1132,8 @@ if (iterationID==0)
         }
         //----------------------------------------------
         lr = (float) learningRateDecayRate * lr;
+        //Gradual fine tuning.. On a first glance it works worse..
+        //lr = lr * (learningRateDecayRate * iterationID); <- could also geometrically scale
         //----------------------------------------------
     } // for number of epochs
 
@@ -1225,23 +1232,13 @@ int iterateChainLoss(
     {
         if (!problem->chain[chainID].part[partID].endEffector)
         { //If the part is  not an end effector it has parameters to change and improve
-                              iteratePartLoss(
-                                               problem,
-                                               config,
-                                               iterationID,
-                                               chainID,
-                                               partID
-                                               /*,
-                                               lr,
-                                               maximumAcceptableStartingLoss,
-                                               epochs,
-                                               tryMaintainingLocalOptima,
-                                               spring,
-                                               gradientExplosionThreshold,
-                                               useSolutionHistory,
-                                               useLangevinDynamics,
-                                               verbose*/
-                                               );
+          iteratePartLoss(
+                          problem,
+                          config,
+                          iterationID,
+                          chainID,
+                          partID
+                         );
          }
     }
 
@@ -1612,7 +1609,7 @@ void compareChainsAndAdoptBest(
                       float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
                       float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
 
-                      //Only use source/target joints  that exist and are not occluded..
+                      //Only use source/target joints that exist and are not occluded..
 
                       if ((tX!=0.0) || (tY!=0.0))
                       {
@@ -1819,6 +1816,54 @@ int springToZeroParts(
 }
 
 
+int doExtrapolatedGuess(
+                        struct BVH_MotionCapture * mc,
+                        struct simpleRenderer *renderer,
+                        struct ikProblem * problem,
+                        struct ikConfiguration * ikConfig,
+                        //---------------------------------
+                        struct MotionBuffer * solution,
+                        struct MotionBuffer * penultimateSolution,
+                        struct MotionBuffer * previousSolution,
+                        //---------------------------------
+                        struct BVH_Transform * bvhTargetTransform
+                       )
+{
+    //Extrapolated guess
+    struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
+    if (extrapolatedGuess!=0)
+    {
+        extrapolateSolution(
+                            penultimateSolution,
+                            previousSolution,
+                            extrapolatedGuess
+                           );
+
+        ensureFinalProposedSolutionIsBetterInParts(
+                                                   mc,
+                                                   renderer,
+                                                   //---------------------------------
+                                                   "Extrapolation",
+                                                   //---------------------------------
+                                                   problem,
+                                                   2, //Start Chain
+                                                   problem->numberOfChains-1, //End Chain
+                                                   //---------------------------------
+                                                   ikConfig,
+                                                   //---------------------------------
+                                                   problem->currentSolution,
+                                                   extrapolatedGuess,
+                                                   //---------------------------------
+                                                   bvhTargetTransform
+                                                   //---------------------------------
+                                                   );
+
+        freeMotionBuffer(extrapolatedGuess);
+        return 1;
+    }
+  return 0;
+}
+
 
 
 int approximateBodyFromMotionBufferUsingInverseKinematics(
@@ -1910,38 +1955,19 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
            }
 
 
-    /*
     //Extrapolated guess
-    struct MotionBuffer * extrapolatedGuess = mallocNewMotionBufferAndCopy(mc,solution);
-    if (extrapolatedGuess!=0)
-    {
-        extrapolateSolution(
-                            penultimateSolution,
-                            previousSolution,
-                            extrapolatedGuess
-                           );
-
-        ensureFinalProposedSolutionIsBetterInParts(
-                                                   mc,
-                                                   renderer,
-                                                   //---------------------------------
-                                                   "Extrapolation",
-                                                   //---------------------------------
-                                                   problem,
-                                                   2, //Start Chain
-                                                   problem->numberOfChains-1, //End Chain
-                                                   //---------------------------------
-                                                   ikConfig,
-                                                   //---------------------------------
-                                                   problem->currentSolution,
-                                                   extrapolatedGuess,
-                                                   //---------------------------------
-                                                   bvhTargetTransform
-                                                   //---------------------------------
-                                                   );
-
-        freeMotionBuffer(extrapolatedGuess);
-    }*/
+    doExtrapolatedGuess(
+                        mc,
+                        renderer,
+                        problem,
+                        ikConfig,
+                        //---------------------------------
+                        solution,
+                        penultimateSolution,
+                        previousSolution,
+                        //---------------------------------
+                        bvhTargetTransform
+                       );
 
 
 

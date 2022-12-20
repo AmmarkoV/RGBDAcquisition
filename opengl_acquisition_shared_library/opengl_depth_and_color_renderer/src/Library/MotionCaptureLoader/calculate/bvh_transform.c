@@ -197,28 +197,28 @@ int bvh_populateRectangle2DFromProjections(
 
 unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH_Transform * bvhTransform,const BVHJointID jID)
 {
-  unsigned char res;
   //This call is called millions of times during IK so it is really important to be fast
-  //Ironically this is slower than going with one if statement for some reason..!
-  /*return (
-            ((bvhTransform->useOptimizations) && (!bvhTransform->skipCalculationsForJoint[jID])) ||
-            (!bvhTransform->useOptimizations)
-         );*/
 
+  //                                                                                           || <- Using + instead of ||
+  //                                                                                           \/
+  return (((bvhTransform->useOptimizations) && (!bvhTransform->skipCalculationsForJoint[jID])) + (!bvhTransform->useOptimizations) );
 
+  //The old implementation is retained here for historical reasons :P
+
+  //unsigned char res;
   //Normaly we should check if the bvhTransform structure is null but given that this call is called millions of times only if you have a transform
   //we skip the check
   //if (bvhTransform!=0)
   //  {
-        switch(bvhTransform->useOptimizations)
-        {
-          case 1:
-              res = !bvhTransform->skipCalculationsForJoint[jID];
-          break;
-          default :
-              res = 1;
-          break;
-        };
+  //      switch(bvhTransform->useOptimizations)
+  //      {
+  //        case 1:
+  //            res = !bvhTransform->skipCalculationsForJoint[jID];
+  //        break;
+  //        default :
+  //            res = 1;
+  //        break;
+  //     };
 
         //if (bvhTransform->useOptimizations) // Deactivating this improves IK by 0.3%
         //{
@@ -231,7 +231,7 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
           //return 0;
         //}
   //  }
-  return res;
+  //return res;
 }
 
 

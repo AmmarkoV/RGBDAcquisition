@@ -32,15 +32,15 @@ VERBOSITY="0"
 LEARNING_RATE_DECAY="0.8"
 MOMENTUM="0.42"
 
-for LEARNING_RATE_DECAY in ` seq 0.2 0.1 0.9 | tr "," "." `
+for LEARNING_RATE_DECAY in ` seq 0.1 0.1 0.9 | tr "," "." `
 do
- for MOMENTUM in ` seq 0.22 0.1 0.92 | tr "," "." `
+ for MOMENTUM in ` seq 0.12 0.1 0.92 | tr "," "." `
  do
   for EPOCHS in `echo "15"`
   do
    for ITERATIONS in ` seq 25 1 25 | tr "," "." `
    do
-    for LR  in ` seq 0.0018 0.0001 0.0026 | tr "," "." `
+    for LR  in ` seq 0.0018 0.0001 0.0076 | tr "," "." `
     do
      for LANGEVIN_DYNAMICS  in `seq 0.0 0.001 0.0 | tr "," "."`
      do
