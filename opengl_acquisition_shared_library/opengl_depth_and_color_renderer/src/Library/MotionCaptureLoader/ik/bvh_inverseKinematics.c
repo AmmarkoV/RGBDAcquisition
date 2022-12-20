@@ -1858,7 +1858,7 @@ int doExtrapolatedGuess(
                                                    //---------------------------------
                                                    );
 
-        freeMotionBuffer(extrapolatedGuess);
+        freeMotionBuffer(&extrapolatedGuess);
         return 1;
     }
   return 0;
