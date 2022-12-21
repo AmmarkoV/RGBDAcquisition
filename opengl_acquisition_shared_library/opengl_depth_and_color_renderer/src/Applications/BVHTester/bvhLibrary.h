@@ -16,6 +16,8 @@ extern "C"
 int bvhConverter_loadAtomic(const char *path);
 int bvhConverter_unloadAtomic();
 
+int bvhConverter_scale(float scaleRatio);
+
 int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements);
 int bvhConverter_processFrame(int frameID);
 int bvhConverter_getJointNameJointID(const char * jointName);

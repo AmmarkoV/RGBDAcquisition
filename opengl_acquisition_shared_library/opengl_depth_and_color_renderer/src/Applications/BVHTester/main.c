@@ -201,6 +201,17 @@ int bvhConverter_processFrame(int frameID)
                                           );
 }
 
+
+int bvhConverter_scale(float scaleRatio)
+{
+  fprintf(stderr,"Offset scaling ratio = %0.2f \n",scaleRatio);
+  return bvh_scaleAllOffsets(
+                              &bvhAtomicMotion,
+                              scaleRatio
+                            );
+}
+
+
 int bvhConverter_getNumberOfJoints()
 {
  return bvhAtomicMotion.jointHierarchySize;

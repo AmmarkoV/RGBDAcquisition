@@ -95,6 +95,12 @@ class BVH():
            print("Failed to load BVH file ",bvhPath)
         return self.numberOfJoints
   #--------------------------------------------------------
+  def scale(self, scaleRatio:float):
+        self.stage("scale")
+        self.libBVH.bvhConverter_scale.argtypes = [ctypes.c_float]
+        self.libBVH.bvhConverter_scale.restype  = ctypes.c_int
+        return str(self.libBVH.bvhConverter_scale(scaleRatio));
+  #--------------------------------------------------------
   def getJointName(self, jointID:int):
         self.stage("getJointName")
         self.libBVH.bvhConverter_getJointNameFromJointID.argtypes = [ctypes.c_int]
