@@ -1757,7 +1757,7 @@ void sleepUntilWeAchieveFramerate(unsigned long lastFrameStart,float targetFrame
      if (duration>0)
      {
       unsigned long sleepTime = ( 1000000/ (targetFramerate*duration));
-      usleep(sleepTime*1000);
+      usleep(sleepTime*2000);
       //fprintf(stderr,"Sleep time %lu\n",sleepTime);
      }
     }
@@ -1921,7 +1921,7 @@ int main(int argc,const char **argv)
                     {
                       staticRendering=1;
                     } else
-           if (strcmp(argv[i],"--face")==0)
+           if (strcmp(argv[i],"--zoomface")==0)
                     {
                        //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20 --set orbicularis03.l x 30 --set orbicularis03.r x 30
                        //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20
@@ -1936,6 +1936,22 @@ int main(int argc,const char **argv)
                        humanPose.x=0.0f;//(float)  (1000-rand()%2000);
                        humanPose.y=-1.476f;//(float) (100-rand()%200);
                        humanPose.z=0.69735f;//(float)  (700+rand()%1000);
+                    } else
+           if (strcmp(argv[i],"--zoomsign")==0)
+                    {
+                       //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20 --set orbicularis03.l x 30 --set orbicularis03.r x 30
+                       //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20
+                       //  ./gl3MeshTransform --face --bvh merged_neutral.bvh
+
+                       //Regular DAE align global=local
+                       humanPose.x=0.0f;//(float)  (1000-rand()%2000);
+                       humanPose.y=-14.976f;//(float) (100-rand()%200);
+                       humanPose.z=7.99735f;//(float)  (700+rand()%1000);
+
+                       //MHX2
+                       humanPose.x=0.0f;//(float)  (1000-rand()%2000);
+                       humanPose.y=-1.176f;//(float) (100-rand()%200);
+                       humanPose.z=1.19735f;//(float)  (700+rand()%1000);
                     } else
            if (strcmp(argv[i],"--dump2D")==0)
                     {

@@ -37,9 +37,18 @@ int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,un
 
   GLint ext_format, ext_type;
 
-  #warning "GL_IMPLEMENTATION_COLOR_READ_TYPE manually declared .."
-  #define GL_IMPLEMENTATION_COLOR_READ_TYPE   		0x8B9A
-  #define GL_IMPLEMENTATION_COLOR_READ_FORMAT 		0x8B9B
+  //On some platforms these definitions are missing so we insert them here..
+
+  #ifndef GL_IMPLEMENTATION_COLOR_READ_TYPE
+     #warning "GL_IMPLEMENTATION_COLOR_READ_TYPE manually declared .."
+     #define GL_IMPLEMENTATION_COLOR_READ_TYPE   		0x8B9A
+  #endif // GL_IMPLEMENTATION_COLOR_READ_TYPE
+
+  #ifndef GL_IMPLEMENTATION_COLOR_READ_FORMAT
+     #warning "GL_IMPLEMENTATION_COLOR_READ_FORMAT manually declared .."
+     #define GL_IMPLEMENTATION_COLOR_READ_FORMAT 		0x8B9B
+  #endif // GL_IMPLEMENTATION_COLOR_READ_FORMAT
+
   glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
   glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
 
