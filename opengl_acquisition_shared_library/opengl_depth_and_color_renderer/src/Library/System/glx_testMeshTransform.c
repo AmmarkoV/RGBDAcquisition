@@ -1712,11 +1712,11 @@ int getTextureActivation(unsigned char * pixels,unsigned int width,unsigned int 
 
 int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,unsigned int y)
 {
-      memset(
+    memset(
              model->textureData,
              0, //rand()%255,
              sizeof(char) * model->header.textureDataWidth * model->header.textureDataHeight * model->header.textureDataChannels
-            );
+          );
 
     unsigned char aR = flashR;
     unsigned char aG = flashG;
@@ -1742,6 +1742,7 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
                                model->header.textureDataChannels,
                                24
                              );
+   return 1;
 }
 
 

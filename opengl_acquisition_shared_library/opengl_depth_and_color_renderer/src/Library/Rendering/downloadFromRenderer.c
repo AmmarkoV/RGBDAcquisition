@@ -31,13 +31,12 @@
 
 int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
-   if (color==0) { return 0; }  
-   if (width==0) { return 0; }  
-   if (height==0) { return 0; }  
-   
+   if (color==0) { return 0; }
+   if (width==0) { return 0; }
+   if (height==0) { return 0; }
+
   GLint ext_format, ext_type;
-  
-  //fprintf(stderr,"glGetIntegerv..\n");
+
   #warning "GL_IMPLEMENTATION_COLOR_READ_TYPE manually declared .."
   #define GL_IMPLEMENTATION_COLOR_READ_TYPE   		0x8B9A
   #define GL_IMPLEMENTATION_COLOR_READ_FORMAT 		0x8B9B
@@ -46,7 +45,7 @@ int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,un
 
   //fprintf(stderr,"glReadPixels..\n");
     #if FLIP_OPEN_GL_IMAGES
-       char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
+       unsigned char * inverter = (unsigned char *) malloc(3*(width-x)*(height-y)*sizeof(unsigned char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
@@ -58,8 +57,8 @@ int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,un
 
        for (yp=0; yp<height; yp++)
        {
-         char * where_to = &color[yp*stride];
-         char * where_from = &inverter[(height-1-yp)*stride];
+         unsigned char * where_to = &color[yp*stride];
+         unsigned char * where_from = &inverter[(height-1-yp)*stride];
          memcpy(where_to , where_from , stride * sizeof(char));
        }
       free(inverter);

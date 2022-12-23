@@ -634,5 +634,7 @@ int bvh_symmetricflipLeftAndRight(
                                              );
             }
         }
+        return 1;
     }
+ return 0;
 }
