@@ -795,6 +795,28 @@ const static int alignRotationOfTRIVsBVH(
 
 
 
+const static int alignAllRotationsOfTRIVsBVH(
+                                             struct TRI_Model * modelOriginal,
+                                             struct BVH_MotionCapture * bvh,
+                                             const unsigned int * humanMap
+                                            )
+{
+  //unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
+  /*
+  alignRotationOfTRIVsBVH(
+                          modelOriginal,
+                          bvh,
+                          triJointName,
+                          bvhJointName,
+                          childOfTriChild
+                          );
+*/
+return 0;
+}
+
+
+
+
 const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOutput,
                                                  struct TRI_Model * modelOriginal,

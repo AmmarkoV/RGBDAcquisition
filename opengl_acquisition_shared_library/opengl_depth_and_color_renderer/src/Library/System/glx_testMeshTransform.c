@@ -2328,6 +2328,20 @@ int main(int argc,const char **argv)
         }
    //------------------------------------------------------
 
+   //We need to free this after application is done..
+   unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
+
+
+   //Test hand
+   alignAllRotationsOfTRIVsBVH(&indexedHumanModel,&mc,humanMap);
+
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.l","finger4-1.l",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.r","finger4-1.r",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.l","finger4-2.l",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.r","finger4-2.r",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.l","finger4-3.l",0);
+   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.r","finger4-3.r",0);
+
    //Test
    alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow",0);
    alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"relbow","relbow",0);
@@ -2335,8 +2349,6 @@ int main(int argc,const char **argv)
    alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder",1);
    //exit(0);
 
-   //We need to free this after application is done..
-   unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
 
    if (maxFrames==0)
    {
