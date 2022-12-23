@@ -50,7 +50,7 @@ struct computeShaderObject  * loadComputeShader(char * computeShaderPath)
   sh->compMem=loadShaderFileToMem(computeShaderPath,&sh->compMemLength);
   if ( (sh->compMem==0)||(sh->compMemLength==0)) { fprintf(stderr,"Could not load compute shader in memory..\n"); }
 
-  fprintf(stderr,"COMPUTE SHADER (%lu bytes long) \n\n%s\n",sh->compMemLength,sh->compMem);
+  fprintf(stderr,"COMPUTE SHADER (%u bytes long) \n\n%s\n",sh->compMemLength,sh->compMem);
   glShaderSource(sh->computeShaderObject, 1, &sh->compMem, &sh->compMemLength);
   glCompileShader(sh->computeShaderObject);
   glGetShaderiv(sh->computeShaderObject, GL_COMPILE_STATUS, &isok);

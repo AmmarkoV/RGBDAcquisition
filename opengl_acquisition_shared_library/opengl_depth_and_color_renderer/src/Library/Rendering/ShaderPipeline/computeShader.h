@@ -12,7 +12,7 @@ struct computeShaderObject
   int computeShaderProgram;
 
   char * compMem;
-  unsigned long compMemLength;
+  int compMemLength;
 };
 
 

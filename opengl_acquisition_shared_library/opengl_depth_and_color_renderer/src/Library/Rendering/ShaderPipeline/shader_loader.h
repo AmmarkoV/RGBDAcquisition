@@ -24,14 +24,14 @@ struct shaderObject
   int fragmentShaderObject;
 
   char * vertMem;
-  unsigned long vertMemLength;
+  int vertMemLength;
 
   char * fragMem;
-  unsigned long fragMemLength;
+  int fragMemLength;
 };
 
 
-char * loadShaderFileToMem(char * filename,unsigned long * file_length);
+char * loadShaderFileToMem(char * filename,int * file_length);
 
 int useShader(struct shaderObject * shader);
 

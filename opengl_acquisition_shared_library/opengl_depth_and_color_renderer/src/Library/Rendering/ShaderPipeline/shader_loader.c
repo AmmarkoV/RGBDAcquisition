@@ -38,7 +38,7 @@ static const char *fragment_source =
 };
 
 
-char * loadShaderFileToMem(char * filename,unsigned long * file_length)
+char * loadShaderFileToMem(char * filename,int * file_length)
 {
   if (filename==0)  { fprintf(stderr,"Could not load shader incorrect filename \n"); return 0; }
   if (file_length==0)  { fprintf(stderr,"Could not load shader %s , incorrect file length parameter \n",filename); return 0; }
