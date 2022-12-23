@@ -59,7 +59,7 @@ struct computeShaderObject  * loadComputeShader(char * computeShaderPath)
       fprintf(stderr,"Could not compile  compute shader %s \n",computeShaderPath);
 
       GLchar info[1024]; GLsizei length;
-      glGetShaderInfoLog(sh->computeShaderObject,1024, &length,&info);
+      glGetShaderInfoLog(sh->computeShaderObject,1024, &length,(GLchar *) &info);
       fprintf(stderr,"Shader error : %s \n",info);
 
       free(sh->compMem); free(sh);
@@ -80,7 +80,7 @@ struct computeShaderObject  * loadComputeShader(char * computeShaderPath)
      fprintf(stderr,"Could not link shaders\n");
 
       GLchar info[1024]; GLsizei length;
-      glGetProgramInfoLog(sh->computeShaderProgram, 1024  , &length , &info);
+      glGetProgramInfoLog(sh->computeShaderProgram, 1024  , &length ,(GLchar *) &info);
       fprintf(stderr,"Shader error : %s \n",info);
 
       unloadComputeShader(sh);

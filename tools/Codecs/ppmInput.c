@@ -51,7 +51,7 @@ int swapDepthEndianness(struct Image * img)
 }
 
 
-unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp , unsigned int * bytesPerPixel , unsigned int * channels)
+unsigned char * ReadPNM(unsigned char * buffer ,const char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp , unsigned int * bytesPerPixel , unsigned int * channels)
 {
    * bytesPerPixel = 0;
    * channels = 0;
@@ -152,7 +152,7 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
 }
 
 
-int ReadPPM(char * filename,struct Image * pic,char read_only_header)
+int ReadPPM(const char * filename,struct Image * pic,char read_only_header)
 {
   pic->pixels = ReadPNM(pic->pixels , filename, &pic->width, &pic->height, &pic->timestamp ,&pic->bitsperpixel , &pic->channels );
   pic->bitsperpixel = pic->bitsperpixel * 8; // ( we go from bytes to bits )
@@ -162,7 +162,7 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
 
 
 
-int ReadSwappedPPM(char * filename,struct Image * pic,char read_only_header)
+int ReadSwappedPPM(const char * filename,struct Image * pic,char read_only_header)
 {
   ReadPPM(filename,pic,read_only_header);
   swapDepthEndianness(pic);
@@ -170,7 +170,7 @@ int ReadSwappedPPM(char * filename,struct Image * pic,char read_only_header)
 }
 
 
-int WritePPM(char * filename,struct Image * pic)
+int WritePPM(const char * filename,struct Image * pic)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
     if (pic==0) { return 0; }
@@ -219,7 +219,7 @@ int WritePPM(char * filename,struct Image * pic)
 
 
 
-int WriteSwappedPPM(char * filename,struct Image * pic)
+int WriteSwappedPPM(const char * filename,struct Image * pic)
 {
    swapDepthEndianness(pic);
    return WritePPM(filename,pic);

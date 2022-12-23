@@ -276,7 +276,7 @@ def getHeadTailDir(pb):
     tail = head + pb.bone.length * vec
     return head, tail, vec
 */
-const static unsigned int * createLookupTableFromTRItoBVH(
+static unsigned int * createLookupTableFromTRItoBVH(
                                                           struct TRI_Model * modelOriginal,
                                                           struct BVH_MotionCapture * bvh,
                                                           int printDebugMessages
@@ -799,7 +799,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOutput,
                                                  struct TRI_Model * modelOriginal,
                                                  struct BVH_MotionCapture * bvh,
-                                                 unsigned int * lookupTableFromTRIToBVH,
+                                                 const unsigned int * lookupTableFromTRIToBVH,
                                                  unsigned int frameID,
                                                  int performTransformsInCPU,
                                                  int printDebugMessages
@@ -817,8 +817,7 @@ const static int animateTRIModelUsingBVHArmature(
      }
 
     unsigned int numberOfBones = modelOriginal->header.numberOfBones;
-
-    //----------------------------------------------------
+    //----------------------------------------------------------------
 
     struct MotionBuffer * frameMotionBuffer = mallocNewMotionBuffer(bvh);
 
@@ -862,6 +861,7 @@ const static int animateTRIModelUsingBVHArmature(
                     if (lookupTableFromTRIToBVH[boneID]!=0)
                     {
                         BVHJointID jID = lookupTableFromTRIToBVH[boneID];
+                        //fprintf(stderr,GREEN "Do TRI To BVH\n" NORMAL);
 
                          //To Setup the dynamic transformation we must first get values from our bvhMotion structure
                          if (bhv_retrieveDataFromMotionBuffer(bvh,jID,frameMotionBuffer->motion,data,sizeof(data)))

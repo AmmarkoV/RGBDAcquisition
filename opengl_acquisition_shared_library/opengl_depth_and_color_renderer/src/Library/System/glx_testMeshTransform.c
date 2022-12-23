@@ -26,6 +26,7 @@
 #include "../ModelLoader/tri_bvh_controller.h"
 
 #include "../MotionCaptureLoader/bvh_loader.h"
+#include "../MotionCaptureLoader/ik/bvh_inverseKinematics.h"
 #include "../MotionCaptureLoader/edit/bvh_rename.h"
 #include "../MotionCaptureLoader/edit/bvh_randomize.h"
 
@@ -78,7 +79,7 @@ char renderEyeHair = 1;
 char renderHair = 0;
 
 char VSYNC = 0;
-int performBoneTransformsInCPU = 1; // <- Experimental when 0
+int performBoneTransformsInCPU = 0; // <- Experimental when 0
 
 //Virtual Camera Intrinsics
 float fX = 1235.423889;
@@ -536,7 +537,7 @@ int doOGLDrawing(
                               &viewportMatrix
                          );
 
-  unsigned int viewportWidth = (unsigned int) width;
+  unsigned int viewportWidth  = (unsigned int) width;
   unsigned int viewportHeight = (unsigned int) height;
   glViewport(0,0,viewportWidth,viewportHeight);
 
@@ -981,8 +982,8 @@ int doDrawing(
 	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
 	 //Uniforms
-	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
-	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
+	 GLuint texID        = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 GLuint timeID       = glGetUniformLocation(programFrameBufferID, "iTime");
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 	 do
@@ -992,13 +993,13 @@ int doDrawing(
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
        //-----------------------------------------------
-        if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
+        if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f fps                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
         //This works better
         //glClearColor(0.2,0.2,0.2,1);
 	    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],0.0f);
-
+        //----------------------------------------------------------------------------
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         doOGLDrawing(
@@ -1745,6 +1746,30 @@ int setTexturePixel(GLuint programID,struct TRI_Model * model, unsigned int x,un
 
 
 
+
+void sleepUntilWeAchieveFramerate(unsigned long lastFrameStart,float targetFramerate)
+{
+ if (targetFramerate!=0.0)
+   {
+     unsigned long duration = GetTickCountMicrosecondsIK() - lastFrameStart;
+
+     if (duration>0)
+     {
+      unsigned long sleepTime = ( 1000000/ (targetFramerate*duration));
+      usleep(sleepTime*1000);
+      //fprintf(stderr,"Sleep time %lu\n",sleepTime);
+     }
+    }
+}
+
+
+
+
+
+
+
+
+
 int main(int argc,const char **argv)
 {
   //Disable VSYNC
@@ -1840,6 +1865,7 @@ int main(int argc,const char **argv)
    int dumpVideo = 0;
    int dumpSnapshot = 0;
    unsigned int maxFrames=0;
+   float targetFramerate = 0.0;
 
    int axisRendering = 0;
    int staticRendering = 0;
@@ -1874,6 +1900,10 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    for (int i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"--fps")==0)
+                    {
+                      targetFramerate=atof(argv[i+1]);
+                    } else
            if (strcmp(argv[i],"--limit")==0)
                     {
                       limit=atoi(argv[i+1]);
@@ -1982,6 +2012,8 @@ int main(int argc,const char **argv)
           fprintf(stderr,"Cannot find the merged_neutral.bvh file..\n");
           return 0;
         }
+   //Change joint names..
+   bvh_renameJointsForCompatibility(&mc);
    bvh_renameJointsToLowercase(&mc);
    //------------------------------------------------------
    if (axisRendering)
@@ -2305,6 +2337,7 @@ int main(int argc,const char **argv)
 
     for (BVHFrameID fID=0; fID<maxFrames; fID++)
     {
+     unsigned long startFrameRenderTime = GetTickCountMicrosecondsIK();
      fprintf(stderr,CYAN "\nBVH %s Frame %u/%u (BVH has %u frames total) \n" NORMAL,mc.fileName,fID,maxFrames,mc.numberOfFrames);
      //-------------------------------------------
 
@@ -2483,6 +2516,10 @@ int main(int argc,const char **argv)
              break;
            }
      }
+
+
+      sleepUntilWeAchieveFramerate(startFrameRenderTime,targetFramerate);
+
 
      if ( (limit>0) && (fID>=limit) )
      {
