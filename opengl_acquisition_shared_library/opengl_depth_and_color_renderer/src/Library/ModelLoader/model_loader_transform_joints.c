@@ -509,10 +509,10 @@ int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, 
       unsigned int x2 = x + width;
       unsigned int y2 = y + height;
 
-      char * ptr = in->textureData + (y1 * imageWidth * 3) + (x1 * 3);
-      char * lineStart = ptr;
-      char * lineEnd   = ptr + (width * 3);
-      char * imageEnd  = in->textureData + (y2 * imageWidth * 3) + (x2 * 3);
+      unsigned char * ptr = in->textureData + (y1 * imageWidth * 3) + (x1 * 3);
+      unsigned char * lineStart = ptr;
+      unsigned char * lineEnd   = ptr + (width * 3);
+      unsigned char * imageEnd  = in->textureData + (y2 * imageWidth * 3) + (x2 * 3);
 
       while (ptr<imageEnd)
       {
@@ -520,11 +520,11 @@ int tri_colorCodeTexture(struct TRI_Model * in, unsigned int x, unsigned int y, 
        {
         unsigned int thisPixel = currentColor;
         //------------------------------------
-        char c1 = (char) thisPixel % 255;
+        unsigned char c1 = (unsigned char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        char c2 = (char) thisPixel % 255;
+        unsigned char c2 = (unsigned char) thisPixel % 255;
         thisPixel = thisPixel / 255;
-        char c3 = (char)  thisPixel % 255;
+        unsigned char c3 = (unsigned char) thisPixel % 255;
         //------------------------------------
         *ptr = c3;  ++ptr; // R
         *ptr = c2;  ++ptr; // G

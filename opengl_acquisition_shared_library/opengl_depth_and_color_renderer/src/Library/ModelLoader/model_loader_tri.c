@@ -579,7 +579,7 @@ void tri_copyModel(struct TRI_Model * triModelOUT , struct TRI_Model * triModelI
     itemSize=sizeof(char); count=triModelIN->header.textureDataChannels * triModelIN->header.textureDataWidth * triModelIN->header.textureDataHeight ; allocationSize = itemSize * count;
     //fprintf(stderr,"Copying %u bytes of textureData ..\n", allocationSize);
     if (triModelOUT->textureData!=0)  { free(triModelOUT->textureData); triModelOUT->textureData=0; }
-    if ((triModelIN->textureData!=0) && (allocationSize>0))  { triModelOUT->textureData = (char *) malloc(allocationSize); }
+    if ((triModelIN->textureData!=0) && (allocationSize>0))  { triModelOUT->textureData = (unsigned char *) malloc(allocationSize); }
     memcpy(triModelOUT->textureData , triModelIN->textureData , allocationSize);
   }
 
@@ -779,9 +779,9 @@ int tri_loadModel(const char * filename , struct TRI_Model * triModel)
 
         if ( triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels > 0 )
         {
-         itemSize=sizeof(char); count = triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
+         itemSize=sizeof(unsigned char); count = triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
          fprintf(stderr,"Reading %u bytes of texture data\n",itemSize * count);
-         triModel->textureData = ( char * ) malloc ( itemSize * count );
+         triModel->textureData = (unsigned char * ) malloc ( itemSize * count );
          n = fread(triModel->textureData , itemSize , count , fd);
          tri_warnIncompleteReads("texture data",count,n);
         } else {  fprintf(stderr,"No texture data specified \n"); }
@@ -1080,14 +1080,14 @@ int tri_dropAlphaFromTexture(struct TRI_Model * triModel)
         {
           if (triModel->header.textureDataChannels==4)
            {
-             char * trgPtr = triModel->textureData;
-             char * srcPtr = triModel->textureData;
-             char * srcPtrLimit = triModel->textureData + triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
+             unsigned char * trgPtr = triModel->textureData;
+             unsigned char * srcPtr = triModel->textureData;
+             unsigned char * srcPtrLimit = triModel->textureData + triModel->header.textureDataWidth * triModel->header.textureDataHeight * triModel->header.textureDataChannels;
              while (srcPtr<srcPtrLimit)
              {
-               char r = *srcPtr; ++srcPtr;
-               char g = *srcPtr; ++srcPtr;
-               char b = *srcPtr; ++srcPtr;
+               unsigned char r = *srcPtr; ++srcPtr;
+               unsigned char g = *srcPtr; ++srcPtr;
+               unsigned char b = *srcPtr; ++srcPtr;
                //char a = *srcPtr;
                ++srcPtr;
                //--------------------------
@@ -1120,11 +1120,11 @@ int tri_packTextureInModel(struct TRI_Model * triModel,unsigned char * pixels , 
     triModel->header.textureUploadedToGPU = 0;
     triModel->header.textureBindGLBuffer  = 0;
 
-    triModel->textureData = (char*) malloc(sizeof(char) * width * height * channels);
+    triModel->textureData = (unsigned char*) malloc(sizeof(unsigned char) * width * height * channels);
 
     if (triModel->textureData!=0)
     {
-      memcpy(triModel->textureData,pixels,sizeof(char) * width * height * channels);
+      memcpy(triModel->textureData,pixels,sizeof(unsigned char) * width * height * channels);
       return 1;
     } else
     {

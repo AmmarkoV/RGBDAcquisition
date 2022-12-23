@@ -801,16 +801,21 @@ const static int alignAllRotationsOfTRIVsBVH(
                                              const unsigned int * humanMap
                                             )
 {
-  //unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
-  /*
-  alignRotationOfTRIVsBVH(
-                          modelOriginal,
-                          bvh,
-                          triJointName,
-                          bvhJointName,
-                          childOfTriChild
-                          );
-*/
+    TRIBoneID boneID=0;
+
+    for (boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
+     {
+         BVHJointID jID=humanMap[boneID];
+         alignRotationOfTRIVsBVH(
+                                  modelOriginal,
+                                  bvh,
+                                  modelOriginal->bones[boneID].boneName,
+                                  bvh->jointHierarchy[jID].jointName,
+                                  0//childOfTriChild
+                               );
+     }
+
+
 return 0;
 }
 

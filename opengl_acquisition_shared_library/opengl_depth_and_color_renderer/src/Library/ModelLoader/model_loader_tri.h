@@ -164,7 +164,7 @@ struct TRI_Model
    float * colors;
    struct TRI_Bones * bones;
    unsigned int * indices;
-   char * textureData;
+   unsigned char * textureData;
 };
 
 
