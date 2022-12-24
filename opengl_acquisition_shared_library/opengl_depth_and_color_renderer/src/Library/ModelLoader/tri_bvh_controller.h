@@ -795,20 +795,20 @@ const static int alignRotationOfTRIVsBVH(
  if ((testsMatch(&bvhResult[1],&triResult[6])) && (testsMatch(&bvhResult[2],&triResult[5]))) { fprintf(stderr,"Match Z -> -Y\n"); ++matched; *coordA='y'; *signA=-1; }
 
  // -- -- --  X axis check  -- -- --
- if ((testsMatch(&bvhResult[3],&triResult[1])) && (testsMatch(&bvhResult[4],&triResult[2]))) { fprintf(stderr,"Match X ->  Z\n"); ++matched; } else //TODO
- if ((testsMatch(&bvhResult[3],&triResult[2])) && (testsMatch(&bvhResult[4],&triResult[1]))) { fprintf(stderr,"Match X -> -Z\n"); ++matched; } else
- if ((testsMatch(&bvhResult[3],&triResult[3])) && (testsMatch(&bvhResult[4],&triResult[4]))) { fprintf(stderr,"Match X ->  X\n"); ++matched; } else
- if ((testsMatch(&bvhResult[3],&triResult[4])) && (testsMatch(&bvhResult[4],&triResult[3]))) { fprintf(stderr,"Match X -> -X\n"); ++matched; } else
- if ((testsMatch(&bvhResult[3],&triResult[5])) && (testsMatch(&bvhResult[4],&triResult[6]))) { fprintf(stderr,"Match X ->  Y\n"); ++matched; } else
- if ((testsMatch(&bvhResult[3],&triResult[6])) && (testsMatch(&bvhResult[4],&triResult[5]))) { fprintf(stderr,"Match X -> -Y\n"); ++matched; }
+ if ((testsMatch(&bvhResult[3],&triResult[1])) && (testsMatch(&bvhResult[4],&triResult[2]))) { fprintf(stderr,"Match X ->  Z\n"); ++matched; *coordB='z'; *signB=1;  } else
+ if ((testsMatch(&bvhResult[3],&triResult[2])) && (testsMatch(&bvhResult[4],&triResult[1]))) { fprintf(stderr,"Match X -> -Z\n"); ++matched; *coordB='z'; *signB=-1; } else
+ if ((testsMatch(&bvhResult[3],&triResult[3])) && (testsMatch(&bvhResult[4],&triResult[4]))) { fprintf(stderr,"Match X ->  X\n"); ++matched; *coordB='x'; *signB=1;  } else
+ if ((testsMatch(&bvhResult[3],&triResult[4])) && (testsMatch(&bvhResult[4],&triResult[3]))) { fprintf(stderr,"Match X -> -X\n"); ++matched; *coordB='x'; *signB=-1; } else
+ if ((testsMatch(&bvhResult[3],&triResult[5])) && (testsMatch(&bvhResult[4],&triResult[6]))) { fprintf(stderr,"Match X ->  Y\n"); ++matched; *coordB='y'; *signB=1;  } else
+ if ((testsMatch(&bvhResult[3],&triResult[6])) && (testsMatch(&bvhResult[4],&triResult[5]))) { fprintf(stderr,"Match X -> -Y\n"); ++matched; *coordB='y'; *signB=-1; }
 
  // -- -- --  Y axis check  -- -- --
- if ((testsMatch(&bvhResult[5],&triResult[1])) && (testsMatch(&bvhResult[6],&triResult[2]))) { fprintf(stderr,"Match Y ->  Z\n"); ++matched; } else
- if ((testsMatch(&bvhResult[5],&triResult[2])) && (testsMatch(&bvhResult[6],&triResult[1]))) { fprintf(stderr,"Match Y -> -Z\n"); ++matched; } else
- if ((testsMatch(&bvhResult[5],&triResult[3])) && (testsMatch(&bvhResult[6],&triResult[4]))) { fprintf(stderr,"Match Y ->  X\n"); ++matched; } else
- if ((testsMatch(&bvhResult[5],&triResult[4])) && (testsMatch(&bvhResult[6],&triResult[3]))) { fprintf(stderr,"Match Y -> -X\n"); ++matched; } else
- if ((testsMatch(&bvhResult[5],&triResult[5])) && (testsMatch(&bvhResult[6],&triResult[6]))) { fprintf(stderr,"Match Y ->  Y\n"); ++matched; } else
- if ((testsMatch(&bvhResult[5],&triResult[6])) && (testsMatch(&bvhResult[6],&triResult[5]))) { fprintf(stderr,"Match Y -> -Y\n"); ++matched; }
+ if ((testsMatch(&bvhResult[5],&triResult[1])) && (testsMatch(&bvhResult[6],&triResult[2]))) { fprintf(stderr,"Match Y ->  Z\n"); ++matched; *coordC='z'; *signC=1;  } else
+ if ((testsMatch(&bvhResult[5],&triResult[2])) && (testsMatch(&bvhResult[6],&triResult[1]))) { fprintf(stderr,"Match Y -> -Z\n"); ++matched; *coordC='z'; *signC=-1; } else
+ if ((testsMatch(&bvhResult[5],&triResult[3])) && (testsMatch(&bvhResult[6],&triResult[4]))) { fprintf(stderr,"Match Y ->  X\n"); ++matched; *coordC='x'; *signC=1;  } else
+ if ((testsMatch(&bvhResult[5],&triResult[4])) && (testsMatch(&bvhResult[6],&triResult[3]))) { fprintf(stderr,"Match Y -> -X\n"); ++matched; *coordC='x'; *signC=-1; } else
+ if ((testsMatch(&bvhResult[5],&triResult[5])) && (testsMatch(&bvhResult[6],&triResult[6]))) { fprintf(stderr,"Match Y ->  Y\n"); ++matched; *coordC='y'; *signC=1;  } else
+ if ((testsMatch(&bvhResult[5],&triResult[6])) && (testsMatch(&bvhResult[6],&triResult[5]))) { fprintf(stderr,"Match Y -> -Y\n"); ++matched; *coordC='y'; *signC=-1; }
 
  if (matched<3) { fprintf(stderr,RED "failed to map..\n" NORMAL); }
  return (matched==3);
