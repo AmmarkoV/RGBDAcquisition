@@ -767,51 +767,51 @@ const static int alignRotationOfTRIVsBVH(
                                           char        *coordC
                                         )
 {
-    int matched = 0;
-    struct testResult bvhResult[7]={0};
-    checkBVHRotation(
+ int matched = 0;
+ struct testResult bvhResult[7]={0};
+ checkBVHRotation(
                       (struct testResult*) &bvhResult,
                        bvh,
                        bvhJointName
                     );
 
-    struct testResult triResult[7]={0};
-    checkTRIRotation(
+ struct testResult triResult[7]={0};
+ checkTRIRotation(
                       (struct testResult*) &triResult,
                       modelOriginal,
                       triJointName,
                       childOfTriChild
                     );
 
-    fprintf(stderr,GREEN "BVH(%s) to TRI(%s)\n" NORMAL,triJointName,bvhJointName);
-    if  (testsMatch(&bvhResult[0],&triResult[0]))                                                  { fprintf(stderr,"Neutral Match\n");   }
+ fprintf(stderr,GREEN "BVH(%s) to TRI(%s)\n" NORMAL,triJointName,bvhJointName);
+ if  (testsMatch(&bvhResult[0],&triResult[0]))                                                  { fprintf(stderr,"Neutral Match\n");   }
 
-    // -- -- --  Z axis check  -- -- --
-    if  ( (testsMatch(&bvhResult[1],&triResult[1])) && (testsMatch(&bvhResult[2],&triResult[2])) ) { fprintf(stderr,"Match Z ->  Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[1],&triResult[2])) && (testsMatch(&bvhResult[2],&triResult[1])) ) { fprintf(stderr,"Match Z -> -Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[1],&triResult[3])) && (testsMatch(&bvhResult[2],&triResult[4])) ) { fprintf(stderr,"Match Z ->  X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[1],&triResult[4])) && (testsMatch(&bvhResult[2],&triResult[3])) ) { fprintf(stderr,"Match Z -> -X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[1],&triResult[5])) && (testsMatch(&bvhResult[2],&triResult[6])) ) { fprintf(stderr,"Match Z ->  Y\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[1],&triResult[6])) && (testsMatch(&bvhResult[2],&triResult[5])) ) { fprintf(stderr,"Match Z -> -Y\n");  ++matched; }
+ // -- -- --  Z axis check  -- -- --
+ if ((testsMatch(&bvhResult[1],&triResult[1])) && (testsMatch(&bvhResult[2],&triResult[2]))) { fprintf(stderr,"Match Z ->  Z\n"); ++matched; *coordA='z'; *signA=1;  } else
+ if ((testsMatch(&bvhResult[1],&triResult[2])) && (testsMatch(&bvhResult[2],&triResult[1]))) { fprintf(stderr,"Match Z -> -Z\n"); ++matched; *coordA='z'; *signA=-1; } else
+ if ((testsMatch(&bvhResult[1],&triResult[3])) && (testsMatch(&bvhResult[2],&triResult[4]))) { fprintf(stderr,"Match Z ->  X\n"); ++matched; *coordA='x'; *signA=1;  } else
+ if ((testsMatch(&bvhResult[1],&triResult[4])) && (testsMatch(&bvhResult[2],&triResult[3]))) { fprintf(stderr,"Match Z -> -X\n"); ++matched; *coordA='x'; *signA=-1; } else
+ if ((testsMatch(&bvhResult[1],&triResult[5])) && (testsMatch(&bvhResult[2],&triResult[6]))) { fprintf(stderr,"Match Z ->  Y\n"); ++matched; *coordA='y'; *signA=1;  } else
+ if ((testsMatch(&bvhResult[1],&triResult[6])) && (testsMatch(&bvhResult[2],&triResult[5]))) { fprintf(stderr,"Match Z -> -Y\n"); ++matched; *coordA='y'; *signA=-1; }
 
-    // -- -- --  X axis check  -- -- --
-    if  ( (testsMatch(&bvhResult[3],&triResult[1])) && (testsMatch(&bvhResult[4],&triResult[2])) ) { fprintf(stderr,"Match X ->  Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[3],&triResult[2])) && (testsMatch(&bvhResult[4],&triResult[1])) ) { fprintf(stderr,"Match X -> -Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[3],&triResult[3])) && (testsMatch(&bvhResult[4],&triResult[4])) ) { fprintf(stderr,"Match X ->  X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[3],&triResult[4])) && (testsMatch(&bvhResult[4],&triResult[3])) ) { fprintf(stderr,"Match X -> -X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[3],&triResult[5])) && (testsMatch(&bvhResult[4],&triResult[6])) ) { fprintf(stderr,"Match X ->  Y\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[3],&triResult[6])) && (testsMatch(&bvhResult[4],&triResult[5])) ) { fprintf(stderr,"Match X -> -Y\n");  ++matched; }
+ // -- -- --  X axis check  -- -- --
+ if ((testsMatch(&bvhResult[3],&triResult[1])) && (testsMatch(&bvhResult[4],&triResult[2]))) { fprintf(stderr,"Match X ->  Z\n"); ++matched; } else //TODO
+ if ((testsMatch(&bvhResult[3],&triResult[2])) && (testsMatch(&bvhResult[4],&triResult[1]))) { fprintf(stderr,"Match X -> -Z\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[3],&triResult[3])) && (testsMatch(&bvhResult[4],&triResult[4]))) { fprintf(stderr,"Match X ->  X\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[3],&triResult[4])) && (testsMatch(&bvhResult[4],&triResult[3]))) { fprintf(stderr,"Match X -> -X\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[3],&triResult[5])) && (testsMatch(&bvhResult[4],&triResult[6]))) { fprintf(stderr,"Match X ->  Y\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[3],&triResult[6])) && (testsMatch(&bvhResult[4],&triResult[5]))) { fprintf(stderr,"Match X -> -Y\n"); ++matched; }
 
-    // -- -- --  Y axis check  -- -- --
-    if  ( (testsMatch(&bvhResult[5],&triResult[1])) && (testsMatch(&bvhResult[6],&triResult[2])) ) { fprintf(stderr,"Match Y ->  Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[5],&triResult[2])) && (testsMatch(&bvhResult[6],&triResult[1])) ) { fprintf(stderr,"Match Y -> -Z\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[5],&triResult[3])) && (testsMatch(&bvhResult[6],&triResult[4])) ) { fprintf(stderr,"Match Y ->  X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[5],&triResult[4])) && (testsMatch(&bvhResult[6],&triResult[3])) ) { fprintf(stderr,"Match Y -> -X\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[5],&triResult[5])) && (testsMatch(&bvhResult[6],&triResult[6])) ) { fprintf(stderr,"Match Y ->  Y\n");  ++matched; } else
-    if  ( (testsMatch(&bvhResult[5],&triResult[6])) && (testsMatch(&bvhResult[6],&triResult[5])) ) { fprintf(stderr,"Match Y -> -Y\n");  ++matched; }
+ // -- -- --  Y axis check  -- -- --
+ if ((testsMatch(&bvhResult[5],&triResult[1])) && (testsMatch(&bvhResult[6],&triResult[2]))) { fprintf(stderr,"Match Y ->  Z\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[5],&triResult[2])) && (testsMatch(&bvhResult[6],&triResult[1]))) { fprintf(stderr,"Match Y -> -Z\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[5],&triResult[3])) && (testsMatch(&bvhResult[6],&triResult[4]))) { fprintf(stderr,"Match Y ->  X\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[5],&triResult[4])) && (testsMatch(&bvhResult[6],&triResult[3]))) { fprintf(stderr,"Match Y -> -X\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[5],&triResult[5])) && (testsMatch(&bvhResult[6],&triResult[6]))) { fprintf(stderr,"Match Y ->  Y\n"); ++matched; } else
+ if ((testsMatch(&bvhResult[5],&triResult[6])) && (testsMatch(&bvhResult[6],&triResult[5]))) { fprintf(stderr,"Match Y -> -Y\n"); ++matched; }
 
-    if (matched<3) { fprintf(stderr,RED "failed to map..\n" NORMAL); }
-    return (matched==3);
+ if (matched<3) { fprintf(stderr,RED "failed to map..\n" NORMAL); }
+ return (matched==3);
 }
 
 
