@@ -30,6 +30,21 @@
 #define WHITE   "\033[37m"      /* White */
 
 
+struct alignmentTRIBVHJoint
+{
+    int rotationOrder;
+    char signX;
+    char signY;
+    char signZ;
+};
+
+struct alignmentTRIBVH
+{
+  unsigned int numberOfJoints;
+  struct alignmentTRIBVHJoint * joint;
+  unsigned int * jointAssociations;
+};
+
 const static int makeAllTRIBoneNamesLowerCaseWithoutUnderscore(struct TRI_Model * triModel)
 {
     if (triModel==0) { return 0; }
@@ -743,7 +758,13 @@ const static int alignRotationOfTRIVsBVH(
                                           struct BVH_MotionCapture * bvh,
                                           const char * triJointName,
                                           const char * bvhJointName,
-                                          int childOfTriChild
+                                          int childOfTriChild,
+                                          signed char *signA,
+                                          char        *coordA,
+                                          signed char *signB,
+                                          char        *coordB,
+                                          signed char *signC,
+                                          char        *coordC
                                         )
 {
     int matched = 0;
@@ -795,30 +816,91 @@ const static int alignRotationOfTRIVsBVH(
 
 
 
-const static int alignAllRotationsOfTRIVsBVH(
-                                             struct TRI_Model * modelOriginal,
-                                             struct BVH_MotionCapture * bvh,
-                                             const unsigned int * humanMap
-                                            )
+static struct alignmentTRIBVH* createTRIBVHAlignment(
+                                                      struct TRI_Model * modelOriginal,
+                                                      struct BVH_MotionCapture * bvh,
+                                                      const unsigned int * humanMap
+                                                    )
 {
-    TRIBoneID boneID=0;
 
-    for (boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
+    /*
+    struct alignmentTRIBVHJoint
+{
+    int rotationOrder;
+    char signX;
+    char signY;
+    char signZ;
+};
+*/
+    struct alignmentTRIBVH * result = (struct alignmentTRIBVH*) malloc(sizeof(struct alignmentTRIBVH));
+    if (result!=0)
+    {
+     result->jointAssociations = createLookupTableFromTRItoBVH(modelOriginal,bvh,1);
+
+     result->joint = (struct alignmentTRIBVHJoint * ) malloc(sizeof(struct alignmentTRIBVHJoint) * modelOriginal->header.numberOfBones);
+
+     if (result->joint!=0)
      {
+     TRIBoneID boneID=0;
+
+     //-----------------
+     signed char signA;
+     char        coordA;
+     signed char signB;
+     char        coordB;
+     signed char signC;
+     char        coordC;
+     //-----------------
+
+     for (boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
+      {
          BVHJointID jID=humanMap[boneID];
          alignRotationOfTRIVsBVH(
                                   modelOriginal,
                                   bvh,
                                   modelOriginal->bones[boneID].boneName,
                                   bvh->jointHierarchy[jID].jointName,
-                                  0//childOfTriChild
+                                  0,//childOfTriChild
+                                  &signA,
+                                  &coordA,
+                                  &signB,
+                                  &coordB,
+                                  &signC,
+                                  &coordC
                                );
+      }
+
      }
+    }
 
 
-return 0;
+return result;
 }
 
+
+
+const static int destroyTRIBVHAlignment(struct alignmentTRIBVH* alignment)
+{
+  if(alignment!=0)
+  {
+    if (alignment->joint!=0)
+    {
+      free(alignment->joint);
+      alignment->joint = 0;
+    }
+
+    if (alignment->jointAssociations!=0)
+    {
+        free(alignment->jointAssociations);
+        alignment->jointAssociations = 0;
+    }
+
+    free(alignment);
+    alignment=0;
+    return 1;
+  }
+    return 0;
+}
 
 
 
@@ -826,7 +908,7 @@ const static int animateTRIModelUsingBVHArmature(
                                                  struct TRI_Model * modelOutput,
                                                  struct TRI_Model * modelOriginal,
                                                  struct BVH_MotionCapture * bvh,
-                                                 const unsigned int * lookupTableFromTRIToBVH,
+                                                 struct alignmentTRIBVH* alignmentData,
                                                  unsigned int frameID,
                                                  int performTransformsInCPU,
                                                  int printDebugMessages
@@ -836,6 +918,10 @@ const static int animateTRIModelUsingBVHArmature(
     if (modelOutput==0)    { return 0; }
     if (bvh==0)            { return 0; }
     //----------------------------------
+
+    const unsigned int * lookupTableFromTRIToBVH = alignmentData->jointAssociations;
+
+
    if (performTransformsInCPU)
      {
         //If we are doing CPU bone transforms we have to copy our input to our output

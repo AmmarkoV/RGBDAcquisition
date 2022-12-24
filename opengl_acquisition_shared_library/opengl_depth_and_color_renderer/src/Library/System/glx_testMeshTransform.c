@@ -2331,22 +2331,26 @@ int main(int argc,const char **argv)
    //We need to free this after application is done..
    unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
 
+   struct alignmentTRIBVH* alignmentData = createTRIBVHAlignment(&indexedHumanModel,&mc,humanMap);
+   if (alignmentData==0)
+   {
+       fprintf(stderr,"Could not perform alignment\n");
+       return 0;
+   }
 
-   //Test hand
-   alignAllRotationsOfTRIVsBVH(&indexedHumanModel,&mc,humanMap);
-
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.l","finger4-1.l",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.r","finger4-1.r",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.l","finger4-2.l",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.r","finger4-2.r",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.l","finger4-3.l",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.r","finger4-3.r",0);
+   //Test Hands
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.l","finger4-1.l",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-1.r","finger4-1.r",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.l","finger4-2.l",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-2.r","finger4-2.r",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.l","finger4-3.l",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"finger4-3.r","finger4-3.r",0);
 
    //Test
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"relbow","relbow",0);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lshoulder","lshoulder",1);
-   alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder",1);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lelbow","lelbow",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"relbow","relbow",0);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"lshoulder","lshoulder",1);
+   //alignRotationOfTRIVsBVH(&indexedHumanModel,&mc,"rshoulder","rshoulder",1);
    //exit(0);
 
 
@@ -2389,11 +2393,11 @@ int main(int argc,const char **argv)
      {
        //We animate the model in CPU instead of the shader!
        //And just give the final calculated vertices for rendering
-       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc,humanMap,fID,performBoneTransformsInCPU,0);
-       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc,humanMap,fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&humanModel    ,&indexedHumanModel    ,&mc, alignmentData, fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyeModel      ,&indexedEyeModel      ,&mc, alignmentData, fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&hairModel     ,&indexedHairModel     ,&mc, alignmentData, fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyebrowsModel ,&indexedEyebrowsModel ,&mc, alignmentData, fID,performBoneTransformsInCPU,0);
+       animateTRIModelUsingBVHArmature(&eyelashesModel,&indexedEyelashesModel,&mc, alignmentData, fID,performBoneTransformsInCPU,0);
 
        if (performBoneTransformsInCPU)
        {
@@ -2585,7 +2589,8 @@ int main(int argc,const char **argv)
    }
 
    //We free our TRI to BVH Map
-   free(humanMap);
+   //free(humanMap); //<- this is freed by destroyTRIBVHAlignment
+   destroyTRIBVHAlignment(alignmentData);
 
    deallocateGpuTRI(&gpuEyelashes);
    deallocateGpuTRI(&gpuEyebrows);
