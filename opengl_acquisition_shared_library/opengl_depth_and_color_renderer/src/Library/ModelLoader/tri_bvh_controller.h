@@ -33,6 +33,7 @@
 struct alignmentTRIBVHJoint
 {
     int rotationOrder;
+    char isSet;
     char signX;
     char signY;
     char signZ;
@@ -773,7 +774,7 @@ const static int alignRotationOfTRIVsBVH(
                       (struct testResult*) &bvhResult,
                        bvh,
                        bvhJointName
-                    );
+                 );
 
  struct testResult triResult[7]={0};
  checkTRIRotation(
@@ -781,7 +782,7 @@ const static int alignRotationOfTRIVsBVH(
                       modelOriginal,
                       triJointName,
                       childOfTriChild
-                    );
+                 );
 
  fprintf(stderr,GREEN "BVH(%s) to TRI(%s)\n" NORMAL,triJointName,bvhJointName);
  if  (testsMatch(&bvhResult[0],&triResult[0]))                                                  { fprintf(stderr,"Neutral Match\n");   }
@@ -841,33 +842,83 @@ static struct alignmentTRIBVH* createTRIBVHAlignment(
 
      if (result->joint!=0)
      {
-     TRIBoneID boneID=0;
+      TRIBoneID boneID=0;
 
-     //-----------------
-     signed char signA;
-     char        coordA;
-     signed char signB;
-     char        coordB;
-     signed char signC;
-     char        coordC;
-     //-----------------
+      //-----------------
+      signed char signA;
+      char        coordA;
+      signed char signB;
+      char        coordB;
+      signed char signC;
+      char        coordC;
+      //-----------------
 
      for (boneID=0; boneID<modelOriginal->header.numberOfBones; boneID++)
       {
          BVHJointID jID=humanMap[boneID];
-         alignRotationOfTRIVsBVH(
-                                  modelOriginal,
-                                  bvh,
-                                  modelOriginal->bones[boneID].boneName,
-                                  bvh->jointHierarchy[jID].jointName,
-                                  0,//childOfTriChild
-                                  &signA,
-                                  &coordA,
-                                  &signB,
-                                  &coordB,
-                                  &signC,
-                                  &coordC
-                               );
+
+         if (
+              alignRotationOfTRIVsBVH(
+                                      modelOriginal,
+                                      bvh,
+                                      modelOriginal->bones[boneID].boneName,
+                                      bvh->jointHierarchy[jID].jointName,
+                                      0,//childOfTriChild
+                                      &signA,
+                                      &coordA,
+                                      &signB,
+                                      &coordB,
+                                      &signC,
+                                      &coordC
+                                     )
+             )
+             {
+                result->joint[boneID].isSet=1;
+               //This can become nested switches
+               if ( (coordA=='x') && (coordB=='y') && (coordC=='z') )
+                {
+                   result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_XYZ;
+                   result->joint[boneID].signX=signA;
+                   result->joint[boneID].signY=signB;
+                   result->joint[boneID].signZ=signC;
+                } else
+               if ( (coordA=='x') && (coordB=='z') && (coordC=='y') )
+                {  result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_XZY;
+                   result->joint[boneID].signX=signA;
+                   result->joint[boneID].signZ=signB;
+                   result->joint[boneID].signY=signC;
+                } else
+               if ( (coordA=='y') && (coordB=='x') && (coordC=='z') )
+                {  result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_YXZ;
+                   result->joint[boneID].signY=signA;
+                   result->joint[boneID].signX=signB;
+                   result->joint[boneID].signZ=signC;
+                } else
+               if ( (coordA=='y') && (coordB=='z') && (coordC=='x') )
+                {  result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_YZX;
+                   result->joint[boneID].signY=signA;
+                   result->joint[boneID].signZ=signB;
+                   result->joint[boneID].signX=signC;
+                } else
+               if ( (coordA=='z') && (coordB=='x') && (coordC=='y') )
+                {  result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_ZXY;
+                   result->joint[boneID].signZ=signA;
+                   result->joint[boneID].signX=signB;
+                   result->joint[boneID].signY=signC;
+                } else
+               if ( (coordA=='z') && (coordB=='y') && (coordC=='x') )
+                {  result->joint[boneID].rotationOrder=BVH_ROTATION_ORDER_ZYX;
+                   result->joint[boneID].signZ=signA;
+                   result->joint[boneID].signY=signB;
+                   result->joint[boneID].signX=signC;
+                }
+               else
+                {
+                  fprintf(stderr,"Unknown coordinate combination \n");
+                  result->joint[boneID].isSet=0;
+                }
+
+             }
       }
 
      }
@@ -1012,6 +1063,19 @@ const static int animateTRIModelUsingBVHArmature(
                                  float rSignY = -1.0;
                                  float rSignZ = -1.0;
                                  int rotationOrder = ROTATION_ORDER_ZXY;
+
+                                 rotationOrder = ROTATION_ORDER_YZX;
+                                 rSignX = 1.0;
+                                 rSignY = -1.0;
+                                 rSignZ = -1.0;
+
+                                 if (0)//(alignmentData->joint[boneID].isSet)
+                                 {
+                                   rSignX = -1.0 * (float) alignmentData->joint[boneID].signX;
+                                   rSignY = -1.0 * (float) alignmentData->joint[boneID].signY;
+                                   rSignZ = -1.0 * (float) alignmentData->joint[boneID].signZ;
+                                   rotationOrder = alignmentData->joint[boneID].rotationOrder;
+                                 }
                                  //  ./gl3MeshTransform --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
                                  //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z -45 --set lshoulder y 45
                                  //fprintf(stderr,"Rot %u ",rotationOrder);

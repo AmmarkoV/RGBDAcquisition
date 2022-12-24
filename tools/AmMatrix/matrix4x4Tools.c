@@ -681,6 +681,7 @@ void create4x4FRotationYZX(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //--------------
     //    Row 1
     //--------------
+    //{{Cos[Y], 0, -Sin[Y]}, {0, 1, 0}, {Cos[Z] Sin[Y], -(Cos[Y] Sin[X]) + Cos[X] Sin[Y] Sin[Z], Cos[X] Cos[Y] + Sin[X] Sin[Y] Sin[Z]}}
     m->m[0] = cosY;
     m->m[1] = 0;
     m->m[2] = -sinY;
