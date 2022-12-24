@@ -823,16 +823,6 @@ static struct alignmentTRIBVH* createTRIBVHAlignment(
                                                       const unsigned int * humanMap
                                                     )
 {
-
-    /*
-    struct alignmentTRIBVHJoint
-{
-    int rotationOrder;
-    char signX;
-    char signY;
-    char signZ;
-};
-*/
     struct alignmentTRIBVH * result = (struct alignmentTRIBVH*) malloc(sizeof(struct alignmentTRIBVH));
     if (result!=0)
     {
@@ -1064,10 +1054,10 @@ const static int animateTRIModelUsingBVHArmature(
                                  float rSignZ = -1.0;
                                  int rotationOrder = ROTATION_ORDER_ZXY;
 
-                                 rotationOrder = ROTATION_ORDER_YZX;
+                                 rotationOrder = ROTATION_ORDER_ZXY;
                                  rSignX = 1.0;
-                                 rSignY = -1.0;
-                                 rSignZ = -1.0;
+                                 rSignY = 1.0;
+                                 rSignZ = 1.0;
 
                                  if (0)//(alignmentData->joint[boneID].isSet)
                                  {

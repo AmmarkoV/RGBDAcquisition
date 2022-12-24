@@ -2293,6 +2293,8 @@ int main(int argc,const char **argv)
    //------------------------------------------------------
    //  ./gl3MeshTransform --set relbow z 90 --set hip y 180 --set lelbow x 90 --set rknee z 45 --set lshoulder y -45
    //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow y 90 --set rknee z -45 --set lshoulder x 45
+   //./testOpenGL3TestMeshTransform.sh --bvh tpose.bvh --fps 20 --zoomsig --set finger1-3.r z 90
+
    for (int i=0; i<argc; i++)
         {
            if (strcmp(argv[i],"--randomize")==0)
