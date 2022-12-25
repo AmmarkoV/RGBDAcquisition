@@ -30,6 +30,8 @@
 #include "../MotionCaptureLoader/edit/bvh_rename.h"
 #include "../MotionCaptureLoader/edit/bvh_randomize.h"
 
+#include "../MotionCaptureLoader/export/bvh_to_bvh.h"
+
 #include "glx3.h"
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -2295,6 +2297,7 @@ int main(int argc,const char **argv)
    //  ./gl3MeshTransform --bvhaxis --set relbow z 90 --set hip y 180 --set lelbow y 90 --set rknee z -45 --set lshoulder x 45
    //./testOpenGL3TestMeshTransform.sh --bvh tpose.bvh --fps 20 --zoomsig --set finger1-3.r z 90
 
+   int alteredBVH = 0;
    for (int i=0; i<argc; i++)
         {
            if (strcmp(argv[i],"--randomize")==0)
@@ -2304,10 +2307,14 @@ int main(int argc,const char **argv)
                     } else
            if (strcmp(argv[i],"--set")==0)
                     {
+                      alteredBVH=1;
                       const char * jointName = argv[i+1];
                       const char * jointAxis = argv[i+2];
                       float  jointValue = atof(argv[i+3]);
                       BVHJointID jID;
+
+                      fprintf(stderr,"Setting axis %s of joint %s to %0.2f\n",jointAxis,jointName,jointValue);
+                      //exit(0);
 
                       if (bvh_getJointIDFromJointNameNocase(&mc,jointName,&jID))
                       {
@@ -2322,12 +2329,25 @@ int main(int argc,const char **argv)
                           if (strcmp("z",jointAxis)==0)
                           {
                               bvh_setJointRotationZAtFrame(&mc,jID,0,jointValue);
+                          } else
+                          {
+                              fprintf(stderr,"Could not find joint axis %s , terminating\n",jointAxis);
+                              exit(1);
                           }
+                      } else
+                      {
+                          fprintf(stderr,"Could not find joint %s , terminating\n",jointName);
+                          exit(1);
                       }
 
                       mc.numberOfFrames=1;
                     }
         }
+
+   if (alteredBVH)
+   {
+   if (!dumpBVHToBVH("debug.bvh",&mc)) { fprintf(stderr,"Error dumping debug BVH file..\n"); }
+   }
    //------------------------------------------------------
 
    //We need to free this after application is done..
@@ -2336,7 +2356,7 @@ int main(int argc,const char **argv)
    struct alignmentTRIBVH* alignmentData = createTRIBVHAlignment(&indexedHumanModel,&mc,humanMap);
    if (alignmentData==0)
    {
-       fprintf(stderr,"Could not perform alignment\n");
+       fprintf(stderr,"Could not perform alignment, terminating\n");
        return 0;
    }
 
@@ -2380,7 +2400,7 @@ int main(int argc,const char **argv)
      if (flashTexturePixels)
      {
        flashX+=1;
-       if (flashX>endFlashX)  {  flashX=startFlashX; flashY+=1;            }
+       if (flashX>endFlashX)   {  flashX=startFlashX; flashY+=1;            }
        if (flashY>=endFlashY)  {  /*flashX=startFlashX; flashY=startFlashY;*/ exit(0); break; }
        else
        {

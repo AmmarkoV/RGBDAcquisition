@@ -316,8 +316,13 @@ int drawVertexArrayWithMVPMatrices(
   //-------------------------------------------------------------------
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-  //Our flipped view needs front culling..
-  glCullFace(GL_FRONT);
+
+  //Our flipped view used to need front culling..
+  //glCullFace(GL_FRONT);
+  //glEnable(GL_CULL_FACE);
+
+  //After fixing rendering we now use back culling again
+  glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
 
   //-------------------------------------------------

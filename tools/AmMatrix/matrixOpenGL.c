@@ -269,9 +269,7 @@ void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajor
    frustum.m[12]= 0.0f;                 frustum.m[13]= 0.0f;                 frustum.m[14]=-2.0f*F_mul_N/(F_sub_N);            frustum.m[15] = 0.0f;
    //Matrix already in OpenGL column major format
 
-
-
-   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
+   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-2015
    struct Matrix4x4OfFloats identMat;
    struct Matrix4x4OfFloats finalFrustrum;
    create4x4FIdentityMatrix(&identMat);
@@ -889,7 +887,7 @@ void prepareRenderingMatrices(
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
-     create4x4FScalingMatrix(viewMatrix,-1.0,1.0,1.0);
+     create4x4FScalingMatrix(viewMatrix,1.0,1.0,1.0);
 
      glGetViewportMatrix(viewportMatrix->m,viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }

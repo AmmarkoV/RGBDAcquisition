@@ -850,6 +850,7 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        //{ { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
        //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} } * { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }
        //4% speedup on IK by not using the multiplyThree4x4 Matrix call and using the precalculated version..!
+       //fprintf(stderr,"create4x4FRotationZXY(%0.2f,%0.2f,%0.2f)\n",degreesEulerX,degreesEulerY,degreesEulerZ);
        create4x4FRotationZXY(m,degreesEulerX,degreesEulerY,degreesEulerZ);
      break;
      case ROTATION_ORDER_ZYX :
@@ -874,11 +875,11 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        create4x4FIdentityMatrix(m);
      break;
     };
-    return;
-   }
-  }
 
-  create4x4FIdentityMatrix(m);
+   } else { create4x4FIdentityMatrix(m); }
+  }  else { create4x4FIdentityMatrix(m); }
+
+
   return;
 }
 
