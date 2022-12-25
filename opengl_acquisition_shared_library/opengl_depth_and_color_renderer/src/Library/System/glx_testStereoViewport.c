@@ -134,7 +134,7 @@ int drawObjectAT(GLuint programID,
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         //Our flipped view needs front culling..
-        glCullFace(GL_FRONT);
+        glCullFace(GL_BACK);
         glEnable(GL_CULL_FACE);
 
          //-------------------------------------------------
@@ -293,11 +293,13 @@ int doDrawing()
 
     GLuint cubeVAO;
     GLuint cubeArrayBuffer;
+    GLuint cubeElementBuffer=0;
     unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
     pushObjectToBufferData(
                              1,
                              &cubeVAO,
                              &cubeArrayBuffer,
+                             &cubeElementBuffer,
                              programID  ,
                              cubeCoords  ,  sizeof(cubeCoords) ,
                              cubeNormals ,  sizeof(cubeNormals) ,
@@ -309,11 +311,13 @@ int doDrawing()
 
     GLuint humanVAO;
     GLuint humanArrayBuffer;
+    GLuint humanElementBuffer=0;
     unsigned int humanTriangleCount  =  (unsigned int)  triModel.header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
                              &humanVAO,
                              &humanArrayBuffer,
+                             &humanElementBuffer,
                              programID  ,
                              triModel.vertices  ,  triModel.header.numberOfVertices * sizeof(float) ,
                              triModel.normal    ,  triModel.header.numberOfNormals  * sizeof(float),

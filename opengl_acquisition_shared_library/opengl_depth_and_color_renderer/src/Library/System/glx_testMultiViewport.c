@@ -134,7 +134,7 @@ int drawObjectAT(GLuint programID,
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         //Our flipped view needs front culling..
-        glCullFace(GL_FRONT);
+        glCullFace(GL_BACK);
         glEnable(GL_CULL_FACE);
 
          //-------------------------------------------------
