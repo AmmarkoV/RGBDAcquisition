@@ -1023,12 +1023,6 @@ int doModelTransform(
   #endif
 
 
-
-
-
-
-
-
   if (performVertexTransform)
   {
     //Past checks..
