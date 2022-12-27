@@ -794,6 +794,9 @@ int tri_loadModel(const char * filename , struct TRI_Model * triModel)
         fclose(fd);
 
         return 1;
+    } else
+    {
+       fprintf(stderr,"Failed reading file %s \n",filename);
     }
   return 0;
 }

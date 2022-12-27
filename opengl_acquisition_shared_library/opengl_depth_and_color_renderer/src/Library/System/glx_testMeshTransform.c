@@ -2472,7 +2472,7 @@ int main(int argc,const char **argv)
                                            &bvhTransform,
                                            0
                                          )
-             )
+           )
           {
               humanPose.roll=180.0;//(float)  (rand()%90);
               humanPose.pitch=180.0;//(float) (rand()%90);

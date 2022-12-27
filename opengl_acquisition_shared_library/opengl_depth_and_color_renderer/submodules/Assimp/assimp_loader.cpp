@@ -454,9 +454,9 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
          }
     }
 
-   triModel->header.rootBone=0; //Initial bone is always the root bone..!
+   triModel->header.rootBone              = 0; //Initial bone is always the root bone..!
    triModel->header.numberOfBones         = countNumberOfNodes( scene  , mesh );
-   unsigned int bonesSize                 =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
+   unsigned int bonesSize                 = triModel->header.numberOfBones * sizeof(struct TRI_Bones);
    fprintf(stderr,"  %d bytes of bones ( %u nodes ) \n",bonesSize , triModel->header.numberOfBones);
 
 
@@ -487,13 +487,71 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 	 for (i = 0; i < scene->mNumMeshes; i++)
      {
       struct aiMesh * mesh = scene->mMeshes[i];
-      fprintf(stderr,"Mesh #%u (%s)   \n",i , mesh->mName.data);
+      fprintf(stderr,"Mesh #%u/%u (%s) ---  \n",i,scene->mNumMeshes,mesh->mName.data);
       fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
       fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
       fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
       fprintf(stderr,"  %d or %d bones\n",mesh->mNumBones,countNumberOfNodes(scene,mesh));
      }
     }
+
+
+
+  if (scene->HasTextures())
+        {
+          fprintf(stderr,GREEN "Scene has %u textures.. \n" NORMAL,scene->mNumTextures);
+          //scene->mTextures
+          for (unsigned int i = 0; i < scene->mNumTextures; i++)
+            {
+                const aiTexture* texture = scene->mTextures[i];
+                aiString texturePath = texture->mFilename;
+                fprintf(stderr,"Texture #%u/%u  (%s) ---  \n",i,scene->mNumTextures,texturePath.C_Str());
+            }
+        } else
+        {
+          fprintf(stderr,GREEN "Could not find textures in scene.. \n" NORMAL);
+        }
+
+  if (scene->HasMaterials())
+        {
+          fprintf(stderr,GREEN "Scene has %u materials.. \n" NORMAL,scene->mNumMaterials);
+            for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+            {
+                const aiMaterial* material = scene->mMaterials[i];
+                aiString texturePath;
+
+                unsigned int numTextures;
+                fprintf(stderr,"Material #%u/%u  ---  \n",i,scene->mNumMaterials);
+                numTextures = material->GetTextureCount(aiTextureType_AMBIENT);   // always 0
+                fprintf(stderr,"  %u ambient textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_DIFFUSE);   // always 0
+                fprintf(stderr,"  %u diffuse textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_DISPLACEMENT);   // always 0
+                fprintf(stderr,"  %u displacement textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_EMISSIVE);   // always 0
+                fprintf(stderr,"  %u emissive textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_HEIGHT);   // always 0
+                fprintf(stderr,"  %u height textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_SPECULAR);   // always 0
+                fprintf(stderr,"  %u specular textures\n",numTextures);
+                numTextures = material->GetTextureCount(aiTextureType_UNKNOWN);   // always 0
+                fprintf(stderr,"  %u unknown textures\n",numTextures);
+                //const aiTextureInfo * info = material->getTextureInfo (AiTextureType type, int index)
+
+                if (
+                      (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) &&
+                      (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+                   )
+                {
+                   // never happens..
+                   // scene->mNumTextures is always 0 aswell.
+                  fprintf(stderr,"Material %u/%u -> %s\n",i,scene->mNumMaterials,texturePath.C_Str());
+                }
+            }
+        } else
+        {
+          fprintf(stderr,GREEN "Could not find materials in scene.. \n" NORMAL);
+        }
 
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene, selectMesh ,  originalModel );
@@ -542,6 +600,8 @@ int prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triC
   triContainer->header.numberOfMeshes = scene->mNumMeshes;
   triContainer->mesh = (struct TRI_Model *) malloc(sizeof(struct TRI_Model) * triContainer->header.numberOfMeshes);
 
+
+
   if (triContainer->mesh!=0)
   {
    for (unsigned int selectedMesh=0; selectedMesh<triContainer->header.numberOfMeshes; selectedMesh++)
@@ -580,6 +640,8 @@ int convertAssimpToTRIContainer(const char * filename  , struct TRI_Container * 
 		flags |= aiProcess_GenUVCoords;
 		flags |= aiProcess_TransformUVCoords;
 		flags |= aiProcess_RemoveComponent;
+		flags |= aiProcess_OptimizeMeshes;
+		//flags |= aiProcess_PreTransformVertices;
 
 		g_scene = (struct aiScene*) aiImportFile( filename, flags);
 		if (g_scene)
@@ -613,6 +675,8 @@ int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , st
 		flags |= aiProcess_GenUVCoords;
 		flags |= aiProcess_TransformUVCoords;
 		flags |= aiProcess_RemoveComponent;
+		flags |= aiProcess_OptimizeMeshes;
+		//flags |= aiProcess_PreTransformVertices;
 
 		g_scene = (struct aiScene*) aiImportFile( filename, flags);
 		if (g_scene)
