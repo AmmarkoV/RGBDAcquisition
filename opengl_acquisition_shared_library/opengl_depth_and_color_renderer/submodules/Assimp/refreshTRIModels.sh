@@ -6,13 +6,17 @@ cd "$DIR"
 
 MHX2MODEL="makehuman2ThroughMHX2.dae"
 PREFIX="Test_"
+
 MHX2MODEL="makehuman2ThroughMHX2Default.dae"
 PREFIX="Testexp_"
+
+MHX2MODEL="untitled.dae"
+PREFIX="Test_"
 
 #Export Collada:
 #Select SL + OpenSim rigged from presets
 
-./assimpTester --merge axis.dae axis.tri
+#./assimpTester --merge axis.dae axis.tri
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 

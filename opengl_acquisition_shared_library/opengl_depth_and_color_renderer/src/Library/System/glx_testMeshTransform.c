@@ -1923,6 +1923,13 @@ int main(int argc,const char **argv)
                     {
                       staticRendering=1;
                     } else
+           if (strcmp(argv[i],"--pos")==0)
+                    {
+                       //MHX2
+                       humanPose.x=atoi(argv[i+1]);
+                       humanPose.y=atoi(argv[i+2]);
+                       humanPose.z=atoi(argv[i+3]);
+                    } else
            if (strcmp(argv[i],"--zoomface")==0)
                     {
                        //  ./gl3MeshTransform --face --set eye.l x 20 --set eye.r x 20 --set eye.l z 20 --set eye.r z 20 --set orbicularis03.l x 30 --set orbicularis03.r x 30
