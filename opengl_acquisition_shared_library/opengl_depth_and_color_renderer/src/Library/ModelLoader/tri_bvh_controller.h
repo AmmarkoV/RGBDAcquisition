@@ -1051,8 +1051,8 @@ const static int animateTRIModelUsingBVHArmature(
 
                                  float rSignX = 1.0;
                                  float rSignY = 1.0;
-                                 float rSignZ = 1.0;
-                                 int rotationOrder = ROTATION_ORDER_ZXY;
+                                 float rSignZ = -1.0;
+                                 int rotationOrder = ROTATION_ORDER_ZYX;
                                  //./testOpenGL3TestMeshTransform.sh --bvh tpose.bvh --fps 20  --set rshoulder y 45 --set rshoulder z 45 --set finger4-1.l z -90
 /*
                                  if (0)//(alignmentData->joint[boneID].isSet)
