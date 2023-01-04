@@ -392,10 +392,10 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
     {
        ++bvhMotion->linesParsed;
        //printf("Retrieved line of length %zu :\n %s", read,line);
-       int num = InputParser_SeperateWords(ipc,line,1);
+       int numberOfTokensInBVHFileLineA = InputParser_SeperateWords(ipc,line,1);
 
 
-      if (num>0)
+      if (numberOfTokensInBVHFileLineA>0)
       { //We have content..
        if (!atHeaderSection)
        {
@@ -403,8 +403,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
           if (InputParser_WordCompareAuto(ipc,0,"HIERARCHY"))  { atHeaderSection=1; }
        } else
        {
-         int numB = InputParser_SeperateWords(ipcB,line,1);
-         if (numB>0)
+         int numberOfTokensInBVHFileLineB = InputParser_SeperateWords(ipcB,line,1);
+         if (numberOfTokensInBVHFileLineB>0)
          {
          if (InputParser_WordCompareAuto(ipcB,0,"ROOT"))
               {
@@ -535,9 +535,16 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
                   unsigned int parentID=bvhMotion->jointHierarchy[currentJoint].parentJoint;
 
                   //Read number of Channels
+                  unsigned int parsedChannels = numberOfTokensInBVHFileLineB-2;
                   unsigned int loadedChannels = InputParser_GetWordInt(ipcB,1);
                   bvhMotion->jointHierarchy[currentJoint].loadedChannels=loadedChannels;
                   if (debug) {fprintf(stderr,"(%u)-",loadedChannels);}
+
+                  if ( parsedChannels != loadedChannels)
+                  {
+                      fprintf(stderr,RED "Encountered %u channels while %u channels declared in file `%s`\n" NORMAL,parsedChannels,loadedChannels,line);
+                      fprintf(stderr,RED "Sticking with declared channel number \n" NORMAL);
+                  }
 
                   //In any case wipe channels to make sure they are clean
                   memset(bvhMotion->jointHierarchy[currentJoint].channelType,0,sizeof(char) * BVH_VALID_CHANNEL_NAMES);
@@ -627,8 +634,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion,FILE * fd)
               if (debug) {fprintf(stderr,"-O-");}
 
               //Store offsets..
-              //TODO: could check numB to make sure all offsets are present..
-              if (numB==4)
+              //TODO: could check numberOfTokensInBVHFileLineB to make sure all offsets are present..
+              if (numberOfTokensInBVHFileLineB==4)
                 {
                  bvhMotion->jointHierarchy[currentJoint].offset[0]=InputParser_GetWordFloat(ipcB,1);
                  bvhMotion->jointHierarchy[currentJoint].offset[1]=InputParser_GetWordFloat(ipcB,2);

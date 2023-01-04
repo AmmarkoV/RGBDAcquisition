@@ -10,8 +10,9 @@ PREFIX="Test_"
 MHX2MODEL="makehuman2ThroughMHX2Default.dae"
 PREFIX="Testexp_"
 
-MHX2MODEL="untitled.dae"
-PREFIX="Test_"
+MHX2MODEL="newgirl.dae"
+PREFIX="Human_rig_"
+PREFIX2="newgirl_"
 
 #Export Collada:
 #Select SL + OpenSim rigged from presets
@@ -21,13 +22,13 @@ PREFIX="Test_"
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --num-callers=20 --track-fds=yes ./assimpTester --merge axis.obj axis.tri $@ 2>error.txt
 
 #Mesh import from MHX2 intermediate format.. young_lightskinned_female_diffuse4.png
-./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --removeprefix $PREFIX --packtexture young_lightskinned_female_diffuse4.png  --applytexture young_lightskinned_female_diffuse4.png --droptexturealpha
-./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --packtexture darkmaggiehair.png --applytexture darkmaggiehair.png --droptexturealpha
-./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --packtexture brown_eye.png --applytexture brown_eye.png --droptexturealpha
-./assimpTester --mesh 3 --convert $MHX2MODEL eyebrows.tri --removeprefix $PREFIX --packtexture eyebrow001.png --applytexture eyebrow001.png --droptexturealpha
-./assimpTester --mesh 4 --convert $MHX2MODEL eyelashes.tri --removeprefix $PREFIX --packtexture eyelashes02.png --applytexture eyelashes02.png --droptexturealpha
-./assimpTester --mesh 5 --convert $MHX2MODEL teeth.tri --removeprefix $PREFIX --packtexture Mind_Teeth_01.png --applytexture Mind_Teeth_01.png --droptexturealpha
-./assimpTester --mesh 6 --convert $MHX2MODEL tongue.tri --removeprefix $PREFIX --packtexture tongue01_diffuse.png --applytexture tongue01_diffuse.png --droptexturealpha
+./assimpTester --mesh 0 --convert $MHX2MODEL makehuman.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture young_lightskinned_female_diffuse4.png  --applytexture young_lightskinned_female_diffuse4.png --droptexturealpha
+./assimpTester --mesh 1 --convert $MHX2MODEL hair.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture darkmaggiehair.png --applytexture darkmaggiehair.png --droptexturealpha
+./assimpTester --mesh 2 --convert $MHX2MODEL eyes.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture brown_eye.png --applytexture brown_eye.png --droptexturealpha
+./assimpTester --mesh 3 --convert $MHX2MODEL eyebrows.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture eyebrow001.png --applytexture eyebrow001.png --droptexturealpha
+./assimpTester --mesh 4 --convert $MHX2MODEL eyelashes.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture eyelashes02.png --applytexture eyelashes02.png --droptexturealpha
+./assimpTester --mesh 5 --convert $MHX2MODEL teeth.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture Mind_Teeth_01.png --applytexture Mind_Teeth_01.png --droptexturealpha
+./assimpTester --mesh 6 --convert $MHX2MODEL tongue.tri --removeprefix $PREFIX --removeprefix $PREFIX2 --packtexture tongue01_diffuse.png --applytexture tongue01_diffuse.png --droptexturealpha
 
 
 exit 0

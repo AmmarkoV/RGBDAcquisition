@@ -338,12 +338,13 @@ static unsigned int * createLookupTableFromTRItoBVH(
             {
                 if (printDebugMessages)
                 {
-                    printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
                     bvh_printBVH(bvh);
                 }
+                printTRIBoneStructure(modelOriginal,0 /*alsoPrintMatrices*/);
                 fprintf(stderr,RED "Could not resolve any joints, freeing empty map..!\n" NORMAL);
                 free(lookupTableFromTRIToBVH);
                 lookupTableFromTRIToBVH = 0;
+                return 0;
             } else
             {
                 fprintf(stderr,CYAN "Resolved %u joints..!\n" NORMAL,resolvedJoints);
@@ -1049,8 +1050,8 @@ const static int animateTRIModelUsingBVHArmature(
                                          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
                                          data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z]);*/
 
-                                 float rSignX = 1.0;
-                                 float rSignY = 1.0;
+                                 float rSignX = -1.0;
+                                 float rSignY = -1.0;
                                  float rSignZ = -1.0;
                                  int rotationOrder = ROTATION_ORDER_ZYX;
                                  //./testOpenGL3TestMeshTransform.sh --bvh tpose.bvh --fps 20  --set rshoulder y 45 --set rshoulder z 45 --set finger4-1.l z -90

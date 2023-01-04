@@ -2359,6 +2359,12 @@ int main(int argc,const char **argv)
 
    //We need to free this after application is done..
    unsigned int * humanMap = createLookupTableFromTRItoBVH(&indexedHumanModel,&mc,1);
+   if (humanMap==0)
+   {
+       fprintf(stderr,"Could not perform alignment, are you using a skeleton with weird/new names? Terminating\n");
+       return 0;
+   }
+
 
    struct alignmentTRIBVH* alignmentData = createTRIBVHAlignment(&indexedHumanModel,&mc,humanMap);
    if (alignmentData==0)

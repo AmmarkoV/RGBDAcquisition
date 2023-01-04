@@ -114,9 +114,107 @@ int enumerateRotationChannelOrderFromTypes(char typeA,char typeB,char typeC)
 }
 
 
+int enumerateRotationChannelOrderFromTypePositions(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint,int posA,int posB,int posC)
+{
+  int channelOrder=enumerateRotationChannelOrderFromTypes(
+                                                           bvhMotion->jointHierarchy[currentJoint].channelType[posA],
+                                                           bvhMotion->jointHierarchy[currentJoint].channelType[posB],
+                                                           bvhMotion->jointHierarchy[currentJoint].channelType[posC]
+                                                         );
+  return channelOrder;
+}
 
 
+#define NEW_CHANNELROTATION_ENUMERATION_CODE 1
 
+
+#if NEW_CHANNELROTATION_ENUMERATION_CODE
+int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint)
+{
+  int channelOrder=BVH_ROTATION_ORDER_NONE;
+  //-----------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------
+  bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation = 0;
+  bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels = 0;
+  bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels = 0;
+  bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation  = 0;
+  //-----------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------
+  for (unsigned int i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
+  {
+    if (
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_POSITION_X) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_POSITION_Y) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_POSITION_Z)
+       )
+    {  bvhMotion->jointHierarchy[currentJoint].hasPositionalChannels=1; }
+    //-----------------------------------------------------------------------------------
+    if (
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_X) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_Y) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_Z)
+       )
+    { bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;  }
+    //-----------------------------------------------------------------------------------
+    if (
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_RODRIGUES_X) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_RODRIGUES_Y) ||
+          (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_RODRIGUES_Z)
+       )
+    {
+      bvhMotion->jointHierarchy[currentJoint].hasRotationalChannels=1;
+      bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=1;
+    }
+    //-----------------------------------------------------------------------------------
+    if (bvhMotion->jointHierarchy[currentJoint].channelType[i]==BVH_ROTATION_W)
+    { bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation=1;  }
+    //-----------------------------------------------------------------------------------
+  }
+ //-----------------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------------
+ if (bvhMotion->jointHierarchy[currentJoint].hasQuaternionRotation) //QBVH
+ { //QBVH Rotation Order when Quaternions are invloved
+     if (
+          (bvhMotion->jointHierarchy[currentJoint].channelType[3]==BVH_ROTATION_W) &&
+          (BVH_ROTATION_ORDER_XYZ==enumerateRotationChannelOrderFromTypePositions(bvhMotion,currentJoint,4,5,6) )
+        )
+          {
+              fprintf(stderr,GREEN "Root Quaternion detected..!\n" NORMAL);
+              return BVH_ROTATION_ORDER_QWQXQYQZ;
+          } else
+     if (
+          (bvhMotion->jointHierarchy[currentJoint].channelType[0]==BVH_ROTATION_W) &&
+          (BVH_ROTATION_ORDER_XYZ==enumerateRotationChannelOrderFromTypePositions(bvhMotion,currentJoint,1,2,3) )
+        )
+          {
+              fprintf(stderr,GREEN "Joint Quaternion detected..!\n" NORMAL);
+              return BVH_ROTATION_ORDER_QWQXQYQZ;
+          }
+ } else //QBVH Rotation Order when Quaternions are involved
+ { // Regular rotation order resolution
+   channelOrder=enumerateRotationChannelOrderFromTypePositions(bvhMotion,currentJoint,0,1,2);
+
+   if (channelOrder==BVH_ROTATION_ORDER_NONE)
+    {
+      channelOrder=enumerateRotationChannelOrderFromTypePositions(bvhMotion,currentJoint,3,4,5);
+      if (channelOrder==BVH_ROTATION_ORDER_NONE)
+        {
+            fprintf(stderr,"Failed to resolve rotation order.. :(\n");
+        }
+    }
+ }  // Regular rotation order resolution
+
+  if (channelOrder==BVH_ROTATION_ORDER_NONE)
+  {
+    fprintf(stderr,RED "BUG: Channel order still wrong, TODO smarter channel order enumeration..\n" NORMAL);
+  }
+
+ return channelOrder;
+}
+#else
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint)
 {
   int channelOrder=BVH_ROTATION_ORDER_NONE;
@@ -142,7 +240,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
   */
 
  if (quaternionUsed) //QBVH
- {
+ { //QBVH Rotation Order when Quaternions are invloved
      if (
           (bvhMotion->jointHierarchy[currentJoint].channelType[3]==BVH_ROTATION_W) &&
           (bvhMotion->jointHierarchy[currentJoint].channelType[4]==BVH_ROTATION_X) &&
@@ -176,9 +274,8 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
               bvhMotion->jointHierarchy[currentJoint].hasRodriguesRotation=0;
               return BVH_ROTATION_ORDER_QWQXQYQZ;
           }
- } else
- {
-
+ } else //QBVH Rotation Order when Quaternions are involved
+ { // Regular rotation order resolution
    channelOrder=enumerateRotationChannelOrderFromTypes(
                                                        bvhMotion->jointHierarchy[currentJoint].channelType[0],
                                                        bvhMotion->jointHierarchy[currentJoint].channelType[1],
@@ -225,7 +322,7 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
             fprintf(stderr,"Failed to resolve rotation order.. :(\n");
         }
     }
- }
+ }  // Regular rotation order resolution
 
   if (channelOrder==BVH_ROTATION_ORDER_NONE)
   {
@@ -234,8 +331,8 @@ int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int cu
 
  return channelOrder;
 }
+#endif // NEW_CHANNELROTATION_ENUMERATION_CODE
 
-#define NEW_RESOLVE_CODE 1
 
 
 
