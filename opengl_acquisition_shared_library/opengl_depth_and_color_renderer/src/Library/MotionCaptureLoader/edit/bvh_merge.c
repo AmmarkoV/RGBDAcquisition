@@ -545,10 +545,7 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
 // ---------------------------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------------------------
-
-int bvh_mergeOffsetsInMotions(
-                               struct BVH_MotionCapture * mc
-                             )
+int bvh_mergeOffsetsInMotions(struct BVH_MotionCapture * mc)
 {
     // Test : ./GroundTruthDumper --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
 
@@ -558,7 +555,7 @@ int bvh_mergeOffsetsInMotions(
 
     //2) We need to update numberOfValuesPerFrame motionValuesSize
 
-    //3)We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
+    //3) We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
 
    if (mc->motionValues!=0)
    {
@@ -615,6 +612,62 @@ int bvh_mergeOffsetsInMotions(
 
        }
    }
+
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------
+int bvh_mergeMotionsInOffsetsBasedOnFrame(struct BVH_MotionCapture * mc,BVHFrameID fID)
+{
+    // Test : ./GroundTruthDumper --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
+
+    //We need to update 3 things..!
+
+    //1) First allocate a brand new motion buffer that will hold the new offsets + the old rotations+offsets, and swap it for the old one..
+
+    //2) We need to update numberOfValuesPerFrame motionValuesSize
+
+    //3) We then need to update the  jointToMotionLookup/motionToJointLookup maps to their new values
+
+   //TODO
+   fprintf(stderr,"TODO: Implement this\n");
+   /*
+   if (mc->motionValues!=0)
+   {
+         BVHMotionChannelID oldMID=0,newMID=0;
+         for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
+          {
+           for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              //All joints will gain a positional channel
+              if (!mc->jointHierarchy[jID].hasPositionalChannels)
+              {
+                  //If this joint did not have a positional component we will add it..!
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[0]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[1]; ++newMID;
+                  newMotionValues[newMID] = mc->jointHierarchy[jID].offset[2]; ++newMID;
+                  mc->jointHierarchy[jID].hasPositionalChannels = 1;
+              }
+
+            }
+       }
+   }*/
 
    return 0;
 }

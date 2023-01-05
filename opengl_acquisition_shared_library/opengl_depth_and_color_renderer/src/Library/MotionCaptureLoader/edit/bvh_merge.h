@@ -26,10 +26,11 @@ int bvh_mergeWith(
 
 
 
-int bvh_mergeOffsetsInMotions(
-                               struct BVH_MotionCapture * mc
-                             );
+int bvh_mergeOffsetsInMotions(struct BVH_MotionCapture * mc);
 
+
+
+int bvh_mergeMotionsInOffsetsForFrame(struct BVH_MotionCapture * mc,BVHFrameID fID);
 
 int bvh_mergeFacesRobot(
                          int startAt,

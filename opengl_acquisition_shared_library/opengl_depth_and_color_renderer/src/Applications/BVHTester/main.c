@@ -1311,7 +1311,6 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--addpositionalchannels")==0)
         {
            // ./BVHTester --from dataset/head.bvh --addpositionalchannels --bvh test.bvh
-
            bvh_mergeOffsetsInMotions(&bvhMotion);
         } else
         //-----------------------------------------------------

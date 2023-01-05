@@ -151,6 +151,14 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
     fprintf(stderr,"Motion Expected had %u parameters we received %u\n",bvhMotion->numberOfValuesPerFrame,numberOfParameters);
     fprintf(stderr,"Unexpected line num (%u)  :\n" , bvhMotion->linesParsed);
     fprintf(stderr,"%s\n", parameters);
+
+    fprintf(stderr,"For reference a motion vector should look like : ");
+    for (unsigned int i=0; i<bvhMotion->numberOfValuesPerFrame; i++)
+    {
+       fprintf(stderr,"0 ");
+    }
+
+    fprintf(stderr,"\n");
     //exit(0);
    }
 
