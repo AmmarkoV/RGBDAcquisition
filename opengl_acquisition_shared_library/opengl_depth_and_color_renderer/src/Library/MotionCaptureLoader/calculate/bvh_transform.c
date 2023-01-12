@@ -109,8 +109,23 @@ int bvh_populateTorso3DFromTransform(
                                                  bvhTransform->torso.rectangle3D.z2 +
                                                  bvhTransform->torso.rectangle3D.z3 +
                                                  bvhTransform->torso.rectangle3D.z4 ) / 4;
-            return 1;
          }
+
+
+       found=0;
+       if ( bvh_getJointIDFromJointName(mc,"neck",&jID) )      { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"neck01",&jID) )    { found=1; }
+
+       if (found)
+       {
+           bvhTransform->torso.point5Exists=1;
+           bvhTransform->torso.rectangle3D.x5=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torso.rectangle3D.y5=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torso.rectangle3D.z5=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.jID[4]=jID;
+       }
+       //---
+
        //-------------------------------------------------------------
 
   //fprintf(stderr,"%u %u %u %u\n",bvhTransform->torso.point1Exists,bvhTransform->torso.point2Exists,bvhTransform->torso.point3Exists,bvhTransform->torso.point4Exists);

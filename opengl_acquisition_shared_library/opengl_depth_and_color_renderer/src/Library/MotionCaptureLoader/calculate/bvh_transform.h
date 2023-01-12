@@ -29,6 +29,7 @@ struct rectangle3DPointsArea
   float x2,y2,z2;
   float x3,y3,z3;
   float x4,y4,z4;
+  float x5,y5,z5; //<- this is an alternate point
 };
 
 
@@ -39,6 +40,7 @@ struct rectangle2DPointsArea
   float x2,y2;
   float x3,y3;
   float x4,y4;
+  float x5,y5; //<- this is an alternate point
 
   float x,y,width,height;
 };
@@ -46,8 +48,8 @@ struct rectangle2DPointsArea
 
 struct rectangleArea
 {
-  char exists,point1Exists,point2Exists,point3Exists,point4Exists;
-  int jID[4];
+  char exists,point1Exists,point2Exists,point3Exists,point4Exists,point5Exists;
+  int jID[5];
   float averageDepth;
   struct rectangle2DPointsArea rectangle2D;
   struct rectangle3DPointsArea rectangle3D;
