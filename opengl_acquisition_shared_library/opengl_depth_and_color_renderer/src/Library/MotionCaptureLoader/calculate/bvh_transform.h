@@ -22,17 +22,17 @@ extern "C"
    8  9 10 11
   12 13 14 15
 */
-
+//--------------------------------
+//--------------------------------
+//--------------------------------
 struct rectangle3DPointsArea
 {
   float x1,y1,z1;
   float x2,y2,z2;
   float x3,y3,z3;
   float x4,y4,z4;
-  float x5,y5,z5; //<- this is an alternate point
 };
-
-
+//--------------------------------
 struct rectangle2DPointsArea
 {
   char calculated;
@@ -40,20 +40,49 @@ struct rectangle2DPointsArea
   float x2,y2;
   float x3,y3;
   float x4,y4;
-  float x5,y5; //<- this is an alternate point
 
   float x,y,width,height;
 };
-
-
+//--------------------------------
 struct rectangleArea
 {
-  char exists,point1Exists,point2Exists,point3Exists,point4Exists,point5Exists;
-  int jID[5];
+  char exists,point1Exists,point2Exists,point3Exists,point4Exists;
+  int jID[4];
   float averageDepth;
   struct rectangle2DPointsArea rectangle2D;
   struct rectangle3DPointsArea rectangle3D;
 };
+//--------------------------------
+//--------------------------------
+//--------------------------------
+struct triangle3DPointsArea
+{
+  float x1,y1,z1;
+  float x2,y2,z2;
+  float x3,y3,z3;
+};
+//--------------------------------
+struct triangle2DPointsArea
+{
+  char calculated;
+  float x1,y1;
+  float x2,y2;
+  float x3,y3;
+
+  float x,y,width,height;
+};
+//--------------------------------
+struct triangleArea
+{
+  char exists,point1Exists,point2Exists,point3Exists;
+  int jID[3];
+  float averageDepth;
+  struct triangle2DPointsArea triangle2D;
+  struct triangle3DPointsArea triangle3D;
+};
+//--------------------------------
+//--------------------------------
+//--------------------------------
 
 
 struct BVH_TransformedJoint
@@ -127,6 +156,7 @@ struct BVH_Transform
   #endif
 
   //Actual Transformation data
+  struct triangleArea torsoTriangle;
   struct rectangleArea torso;
   #if DYNAMIC_TRANSFORM_ALLOCATIONS
    struct BVH_TransformedJoint * joint;

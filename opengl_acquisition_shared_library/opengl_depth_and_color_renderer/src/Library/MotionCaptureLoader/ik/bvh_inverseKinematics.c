@@ -456,7 +456,7 @@ float calculateChainLoss(
                    if (problem->chain[chainID].part[partID].jointImportance!=0.0)
                     //If the joint importance is zero then why go through all this trouble..
                    {
-                        unsigned int jID=problem->chain[chainID].part[partID].jID;
+                        BVHJointID jID=problem->chain[chainID].part[partID].jID;
 
                         ///Warning: When you change this please change meanBVH2DDistance as well!
                         float sX=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0];
@@ -469,6 +469,14 @@ float calculateChainLoss(
                         {
                             loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;
+
+                            //Add weight for backwards joints..
+                            /*
+                            loss+= bvh_DistanceOfJointFromTorsoPlane(
+                                                                     problem->mc,
+                                                                     &problem->chain[chainID].current2DProjectionTransform,
+                                                                     jID
+                                                                    );*/
                         }
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
                 } //We add ever part of this chain

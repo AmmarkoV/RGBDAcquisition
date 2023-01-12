@@ -32,6 +32,68 @@ float min(float a,float b)
   return b;
 }
 
+
+
+struct Point3D
+{
+    float x;
+    float y;
+    float z;
+};
+
+struct Triangle3D
+{
+    struct Point3D p1;
+    struct Point3D p2;
+    struct Point3D p3;
+};
+
+float bvh_DistanceOfJointFromTorsoPlane(struct BVH_MotionCapture * mc,
+                                        struct BVH_Transform * bvhTransform,
+                                        BVHJointID jID)
+{
+ float dist = 0.0;
+ if ( bvhTransform->torsoTriangle.exists )
+  {
+    struct Point3D point = { bvhTransform->joint[jID].pos3D[0], bvhTransform->joint[jID].pos3D[1], bvhTransform->joint[jID].pos3D[2] };
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+    struct Point3D triangleA = { bvhTransform->torsoTriangle.triangle3D.x1, bvhTransform->torsoTriangle.triangle3D.y1, bvhTransform->torsoTriangle.triangle3D.z1 };
+    struct Point3D triangleB = { bvhTransform->torsoTriangle.triangle3D.x2, bvhTransform->torsoTriangle.triangle3D.y2, bvhTransform->torsoTriangle.triangle3D.z2 };
+    struct Point3D triangleC = { bvhTransform->torsoTriangle.triangle3D.x3, bvhTransform->torsoTriangle.triangle3D.y3, bvhTransform->torsoTriangle.triangle3D.z3 };
+    struct Triangle3D triangle = { triangleA,triangleB,triangleC};
+    //Point3D point, Triangle3D triangle
+    struct Point3D v1 = {triangle.p2.x - triangle.p1.x, triangle.p2.y - triangle.p1.y, triangle.p2.z - triangle.p1.z};
+    struct Point3D v2 = {triangle.p3.x - triangle.p1.x, triangle.p3.y - triangle.p1.y, triangle.p3.z - triangle.p1.z};
+    struct Point3D v3 = {point.x - triangle.p1.x, point.y - triangle.p1.y, point.z - triangle.p1.z};
+
+    float dot1 = v1.x * v3.x + v1.y * v3.y + v1.z * v3.z;
+    float dot2 = v2.x * v3.x + v2.y * v3.y + v2.z * v3.z;
+
+    if (dot1 < 0 || dot2 < 0)
+     {
+        struct Point3D p1 = point;
+        struct Point3D p2 = triangle.p1;
+        dist = sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z));
+
+        p2 = triangle.p2;
+        float dist2 = sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z));
+
+        if (dist < dist2) { return dist;  }
+        else              { return dist2; }
+     }
+
+     struct Point3D norm = {
+                             v1.y * v2.z - v1.z * v2.y,
+                             v1.z * v2.x - v1.x * v2.z,
+                             v1.x * v2.y - v1.y * v2.x
+                           };
+
+     dist = fabs(norm.x * v3.x + norm.y * v3.y + norm.z * v3.z) / sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z);
+  }
+ return dist;
+}
+
+
 int bvh_populateTorso3DFromTransform(
                                       struct BVH_MotionCapture * mc ,
                                       struct BVH_Transform * bvhTransform
@@ -76,11 +138,19 @@ int bvh_populateTorso3DFromTransform(
 
        if (found)
        {
+           //--------------------------------------------------------------------------
            bvhTransform->torso.point3Exists=1;
            bvhTransform->torso.rectangle3D.x3=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y3=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
+           //--------------------------------------------------------------------------
+           bvhTransform->torsoTriangle.point1Exists=1;
+           bvhTransform->torsoTriangle.triangle3D.x1=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torsoTriangle.triangle3D.y1=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torsoTriangle.triangle3D.z1=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torsoTriangle.jID[0]=jID;
+           //--------------------------------------------------------------------------
        }
        //---
        found=0;
@@ -89,11 +159,19 @@ int bvh_populateTorso3DFromTransform(
 
        if (found)
        {
+           //--------------------------------------------------------------------------
            bvhTransform->torso.point4Exists=1;
            bvhTransform->torso.rectangle3D.x4=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y4=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z4=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[3]=jID;
+           //--------------------------------------------------------------------------
+           bvhTransform->torsoTriangle.point2Exists=1;
+           bvhTransform->torsoTriangle.triangle3D.x2=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torsoTriangle.triangle3D.y2=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torsoTriangle.triangle3D.z2=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torsoTriangle.jID[1]=jID;
+           //--------------------------------------------------------------------------
        }
        //---
 
@@ -118,16 +196,27 @@ int bvh_populateTorso3DFromTransform(
 
        if (found)
        {
-           bvhTransform->torso.point5Exists=1;
-           bvhTransform->torso.rectangle3D.x5=bvhTransform->joint[jID].pos3D[0];
-           bvhTransform->torso.rectangle3D.y5=bvhTransform->joint[jID].pos3D[1];
-           bvhTransform->torso.rectangle3D.z5=bvhTransform->joint[jID].pos3D[2];
-           bvhTransform->torso.jID[4]=jID;
+           //--------------------------------------------------------------------------
+           bvhTransform->torsoTriangle.point3Exists=1;
+           bvhTransform->torsoTriangle.triangle3D.x3=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torsoTriangle.triangle3D.y3=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torsoTriangle.triangle3D.z3=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torsoTriangle.jID[2]=jID;
+           //--------------------------------------------------------------------------
        }
-       //---
-
        //-------------------------------------------------------------
 
+       if (
+            (bvhTransform->torsoTriangle.point1Exists) &&
+            (bvhTransform->torsoTriangle.point2Exists) &&
+            (bvhTransform->torsoTriangle.point3Exists)
+          )
+         {
+            bvhTransform->torsoTriangle.exists=1;
+            bvhTransform->torsoTriangle.averageDepth = ( bvhTransform->torsoTriangle.triangle3D.z1 +
+                                                         bvhTransform->torsoTriangle.triangle3D.z2 +
+                                                         bvhTransform->torsoTriangle.triangle3D.z3 ) / 3;
+         }
   //fprintf(stderr,"%u %u %u %u\n",bvhTransform->torso.point1Exists,bvhTransform->torso.point2Exists,bvhTransform->torso.point3Exists,bvhTransform->torso.point4Exists);
   return 0;
 }
@@ -967,9 +1056,9 @@ int bvh_loadTransformForMotionBuffer(
   bvhTransform->centerPosition[2]=bvhTransform->joint[bvhMotion->rootJointID].pos3D[2];
 
   //Regardless of torso return 1!
-  return 1;
+  //return 1;
 
-/*
+
   if (!populateTorso)
   {
     //Fast path out of here
@@ -982,7 +1071,7 @@ int bvh_loadTransformForMotionBuffer(
        return 0;
      }
     return 1;
-  }*/
+  }
  }
 
  return 0;
