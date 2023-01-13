@@ -475,11 +475,14 @@ float calculateChainLoss(
                             //Add weight for backwards joints..
                             if (penalizeSymmetryIn)
                             {
-                              loss+= bvh_DistanceOfJointFromTorsoPlane(
-                                                                        problem->mc,
-                                                                        &problem->chain[chainID].current2DProjectionTransform,
-                                                                        jID
-                                                                       );
+                              float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
+                                                                                     problem->mc,
+                                                                                     &problem->chain[chainID].current2DProjectionTransform,
+                                                                                     jID
+                                                                                    );
+                              //Only negative contribution..
+                              if (symmetriesLoss>0.0)
+                                  { loss+=symmetriesLoss; }
                             }
                         }
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
