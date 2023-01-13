@@ -424,7 +424,7 @@ float calculateChainLoss(
                                                                   problem->mc,
                                                                   problem->chain[chainID].currentSolution->motion,
                                                                   &problem->chain[chainID].current2DProjectionTransform,
-                                                                  0//Dont populate extra structures we dont need them they just take time
+                                                                  PENALIZE_SYMMETRY_HEURISTIC//Dont populate extra structures we dont need them they just take time
                                                                 );
         }
 
@@ -482,7 +482,10 @@ float calculateChainLoss(
                                                                                     );
                               //Only negative contribution..
                               if (symmetriesLoss>0.0)
-                                  { loss+=symmetriesLoss; }
+                                  {
+                                      fprintf(stderr,"Symmetry Loss %0.2f \n",symmetriesLoss);
+                                      loss+=symmetriesLoss;
+                                  }
                             }
                         }
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
@@ -1725,9 +1728,9 @@ int ensureFinalProposedSolutionIsBetterInParts(
    struct BVH_Transform bvhCurrentTransform  = {0};
    struct BVH_Transform bvhPreviousTransform = {0};
    //------------------------------------------------
-   if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
+   if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
            {
-            if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
+            if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
              {
                compareChainsAndAdoptBest(
                                          mc,
@@ -1802,9 +1805,9 @@ int springToZeroParts(
                     }
                 }
 
-     if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
+     if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
            {
-            if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,0))// We don't need extra structures
+            if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
              {
                compareChainsAndAdoptBest(
                                          mc,
@@ -1995,7 +1998,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     struct BVH_Transform bvhCurrentTransform= {0};
 
 
-    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,0))// We don't need extra structures
+    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
     {
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
@@ -2069,7 +2072,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                            mc,
                                            solution->motion,
                                            &bvhCurrentTransform,
-                                           0// dont use extra structures
+                                           PENALIZE_SYMMETRY_HEURISTIC// dont use extra structures
                                           )
       )
     {
@@ -2088,7 +2091,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
            //Perform projection on previous solution
            //-----------------------------------------------
            struct BVH_Transform bvhPreviousTransform = {0};
-           if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,0))// We don't need extra structures
+           if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
            {
             float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
 
