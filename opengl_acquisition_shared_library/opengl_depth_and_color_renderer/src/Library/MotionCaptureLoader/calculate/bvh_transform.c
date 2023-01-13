@@ -1069,7 +1069,8 @@ int bvh_loadTransformForMotionBuffer(
    if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
      {
        //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
-       return 0;
+       //This is not a very important failure so w still consider it a success..
+       //return 0;
      }
     return 1;
   }
