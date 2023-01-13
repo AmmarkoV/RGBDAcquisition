@@ -473,19 +473,29 @@ float calculateChainLoss(
                             ++numberOfSamples;
 
                             //Add weight for backwards joints..
+                            //This is a heuristic *patch* on the loss to prevent hands from bending backwards!
                             if (penalizeSymmetryIn)
                             {
-                              float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
+                              if (
+                                   (strstr(problem->mc->jointHierarchy[jID].jointName,"Arm")!=0 ) ||
+                                   (strstr(problem->mc->jointHierarchy[jID].jointName,"Hand")!=0 )
+                                  )
+                              { //Crude and slow debug ..
+                               float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
                                                                                      problem->mc,
                                                                                      &problem->chain[chainID].current2DProjectionTransform,
                                                                                      jID
                                                                                     );
                               //Only negative contribution..
+                              float gain = 1.0;
+                              symmetriesLoss = -1.0 * symmetriesLoss * gain; // <- Easy flip
                               if (symmetriesLoss>0.0)
                                   {
-                                      fprintf(stderr,"Symmetry Loss %0.2f \n",symmetriesLoss);
+                                      fprintf(stderr,"Symmetry Loss %0.2f @ %s \n",symmetriesLoss,problem->mc->jointHierarchy[jID].jointName);
                                       loss+=symmetriesLoss;
                                   }
+
+                              }
                             }
                         }
                    } //We might want to ignore the error of the particular joint, useful when observation is misaligned to hypothesis..
