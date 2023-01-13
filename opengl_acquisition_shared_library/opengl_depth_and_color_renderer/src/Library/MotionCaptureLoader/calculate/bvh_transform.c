@@ -476,8 +476,9 @@ int bvh_markAllJointsAsUsefullInTransform(
 {
   if (bvhMotion==0)    { return 0; }
   if (bvhTransform==0) { return 0; }
-  bvhTransform->useOptimizations=0; //We dont use optimizations..
+  bvhTransform->useOptimizations=0; //When all joints are useful in a nutshell, we don't use optimizations..
 
+   //But we also set the skip flag for each joint to zero in case the useOptimization flag is toggled somewhere else
    for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
      bvhTransform->skipCalculationsForJoint[jID]=0;
