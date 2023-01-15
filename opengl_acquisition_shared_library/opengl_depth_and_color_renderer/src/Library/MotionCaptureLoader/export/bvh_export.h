@@ -16,6 +16,7 @@ struct filteringResults
 {
  unsigned int invisibleJoints;
  unsigned int visibleJoints;
+ unsigned int filteredOutOccludedPoses;
  unsigned int filteredOutCSVBehindPoses;
  unsigned int filteredOutCSVOutPoses;
  unsigned int filteredOutCSVPoses;

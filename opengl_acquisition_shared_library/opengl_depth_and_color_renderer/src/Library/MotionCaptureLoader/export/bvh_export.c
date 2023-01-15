@@ -118,6 +118,84 @@ int bvhExportSkeletonFilter(
 }
 
 
+
+int  bvh_filterOccludedJoints(
+                                struct BVH_MotionCapture * mc ,
+                                struct BVH_Transform * bvhTransform,
+                                struct filteringResults * filterStats,
+                                int disableFilter
+                              )
+{
+  if (!disableFilter) { return 1; }
+
+  //--------------------------------
+  //bvh_printBVH(mc);
+  //fprintf(stderr,"FILTER CALLED \n");
+  int fails = 0;
+  float test;
+  BVHJointID jID;
+  //-----------------------------------------------------------------------
+  if ( bvh_getJointIDFromJointNameNocase(mc,"rshoulder",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"rshoulder = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"relbow",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"relbow = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"rhand = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  //-----------------------------------------------------------------------
+  if (fails>=2)
+  {
+      fprintf(stderr,RED "RIGHT ARM OCCLUDED..!\n" NORMAL);
+      ++filterStats->filteredOutCSVPoses;
+      ++filterStats->filteredOutOccludedPoses;
+      return 0;
+  }
+
+  fails = 0;
+  //-----------------------------------------------------------------------
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lshoulder",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lshoulder = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lelbow",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lelbow = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lhand = %0.2f ",test);
+           if (test<0.0) { fails+=1; }
+        }
+  //-----------------------------------------------------------------------
+  if (fails>=2)
+  {
+      fprintf(stderr,RED "LEFT ARM OCCLUDED..!\n" NORMAL);
+      ++filterStats->filteredOutCSVPoses;
+      ++filterStats->filteredOutOccludedPoses;
+      return 0;
+  }
+  return 1;
+}
+
+
+
+
 int performPointProjectionsForFrameForcingPositionAndRotation(
                                                               struct BVH_MotionCapture * mc,
                                                               struct BVH_Transform * bvhTransform,
@@ -432,7 +510,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                                         &bvhTransform,
                                         fID,
                                         &renderer,
-                                        occlusions,
+                                        ( (occlusions) || (filterOccludedJoints) ),
                                         renderConfig->isDefined
                                        )
        )
@@ -452,6 +530,7 @@ int dumpBVHTo_JSON_SVG_CSV(
            bvh_filterOccludedJoints(
                                     mc,
                                     &bvhTransform,
+                                    filterStats,
                                     (filterOccludedJoints==0)
                                    )
           ) )
@@ -601,6 +680,12 @@ int dumpBVHTo_JSON_SVG_CSV(
   fprintf(stderr,"Filtered out CSV poses : %u\n",filterStats->filteredOutCSVPoses);
   fprintf(stderr,"Filtered behind camera : %u\n",filterStats->filteredOutCSVBehindPoses);
   fprintf(stderr,"Filtered out of camera frame : %u\n",filterStats->filteredOutCSVOutPoses);
+  if (filterOccludedJoints)
+  {
+    fprintf(stderr,"Filtered occluded poses : %u\n",filterStats->filteredOutOccludedPoses);
+  }
+
+
   if (mc->numberOfFrames!=0)
   {
    float usedPercentage = (float) 100*(mc->numberOfFrames-filterStats->filteredOutCSVPoses)/mc->numberOfFrames;
