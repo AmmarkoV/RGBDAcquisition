@@ -126,7 +126,7 @@ int  bvh_filterOccludedJoints(
                                 int disableFilter
                               )
 {
-  if (!disableFilter) { return 1; }
+  if (disableFilter) { return 1; }
 
   //--------------------------------
   //bvh_printBVH(mc);
