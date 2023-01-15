@@ -823,6 +823,7 @@ int bvhConverter(int argc,const char **argv)
     //unsigned int flipOrientation = 0;
     //unsigned int flipRandomizationOrientation = 0;
 
+    unsigned int filterOccludedJoints=0;
     unsigned int filterBehindCamera=1;
     unsigned int filterIfAnyJointOutsideof2DFrame=1;
     unsigned int filterTopWeirdRandomSkeletons=1;
@@ -1223,6 +1224,12 @@ int bvhConverter(int argc,const char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           scaleWorld=atof(argv[i+1]);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--filterOccludedJoints")==0)
+        {
+          //TEST: ./BVHTester --from brokenHand.bvh --svg ./ --filterOccludedJoints
+          filterOccludedJoints=1;
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--scaleOffsets")==0)
@@ -1917,6 +1924,7 @@ int bvhConverter(int argc,const char **argv)
                             &filterStats,
                             sampleSkip,
                             occlusions,
+                            filterOccludedJoints,
                             filterBehindCamera,//Filter out all poses where even one joint is behind camera
                             filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame
                             filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )

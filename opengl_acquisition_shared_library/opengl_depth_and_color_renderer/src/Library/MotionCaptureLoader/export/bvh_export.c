@@ -255,6 +255,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            struct filteringResults * filterStats,
                            unsigned int sampleSkip,
                            unsigned int occlusions,
+                           unsigned int filterOccludedJoints,
                            unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                            unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                            unsigned int filterWeirdSkeletons,
@@ -450,6 +451,16 @@ int dumpBVHTo_JSON_SVG_CSV(
     {
 
   //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
+
+  if ( filterOccludedJoints )
+  {
+      //Debug under construction..
+      bvh_filterOccludedJoints(
+                                mc,
+                                &bvhTransform
+                              );
+  }
+
 
   //CSV output
   //------------------------------------------------------------------------------------------

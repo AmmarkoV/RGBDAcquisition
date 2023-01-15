@@ -220,6 +220,15 @@ struct BVH_Transform
   unsigned int jointsOccludedIn2DProjection;
 };
 
+
+
+
+int  bvh_filterOccludedJoints(
+                                struct BVH_MotionCapture * mc ,
+                                struct BVH_Transform * bvhTransform
+                              );
+
+
 /**
     @brief Calculates the distance of a joint from the torso plane in a BVH motion capture file.
     @param mc Pointer to a BVH_MotionCapture struct containing the motion capture data.

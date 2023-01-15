@@ -90,6 +90,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            struct filteringResults * filterStats,
                            unsigned int sampleSkip,
                            unsigned int occlusions,
+                           unsigned int filterOccludedJoints,
                            unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                            unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                            unsigned int filterWeirdSkeletons,

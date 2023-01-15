@@ -262,6 +262,54 @@ t  *             Po
 }
 
 
+int  bvh_filterOccludedJoints(
+                                struct BVH_MotionCapture * mc ,
+                                struct BVH_Transform * bvhTransform
+                              )
+{
+  //bvh_printBVH(mc);
+  fprintf(stderr,"FILTER CALLED \n");
+  float test;
+  BVHJointID jID;
+  //-----------------------------------------------------------------------
+  if ( bvh_getJointIDFromJointNameNocase(mc,"rshoulder",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"rshoulder = %0.2f ",test);
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"relbow",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"relbow = %0.2f ",test);
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"rhand = %0.2f ",test);
+        }
+  //-----------------------------------------------------------------------
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lshoulder",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lshoulder = %0.2f ",test);
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lelbow",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lelbow = %0.2f ",test);
+        }
+  if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
+        {
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           fprintf(stderr,"lhand = %0.2f ",test);
+        }
+  //-----------------------------------------------------------------------
+  return 1;
+}
+
+
+
+
 int bvh_populateTorso3DFromTransform(
                                       struct BVH_MotionCapture * mc ,
                                       struct BVH_Transform * bvhTransform
