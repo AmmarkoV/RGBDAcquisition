@@ -37,15 +37,22 @@ def point_triangle_distance(point, triangle):
 
 
 #---------------------------------------------- 
-point = [14.85,32.82,-120.67] 
-P0 = [8.02,38.77,-158.73] 
-P1 = [-0.82,-2.51,-190.33] 
-P2 = [16.70,-1.84,-191.22] 
-n = [0.06,-0.62,0.79] 
+point = [4.72,-7.19,-114.86] 
+P0 = [-2.19,5.42,-126.98] 
+P1 = [-8.60,-44.86,-141.50] 
+P2 = [8.65,-43.18,-144.33] 
+n = [0.18,-0.29,0.94] 
+dist = 16.34 
 
 #----------------------------------------------
 triangle = [P0,P1,P2]
-print(point_triangle_distance(point,triangle))
+pyDist = point_triangle_distance(point,triangle) 
+if (pyDist == dist ) : 
+   print("Correct !!! ",pyDist)
+else:
+   print("Wrong !!! Py ",pyDist," vs C ",dist)
+
+
 sys.exit(0)
 
 

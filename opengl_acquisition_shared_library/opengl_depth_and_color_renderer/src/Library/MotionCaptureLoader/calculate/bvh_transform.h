@@ -225,7 +225,8 @@ struct BVH_Transform
 
 int  bvh_filterOccludedJoints(
                                 struct BVH_MotionCapture * mc ,
-                                struct BVH_Transform * bvhTransform
+                                struct BVH_Transform * bvhTransform,
+                                int disableFilter
                               );
 
 

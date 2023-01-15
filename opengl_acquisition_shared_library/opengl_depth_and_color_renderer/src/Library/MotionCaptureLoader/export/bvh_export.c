@@ -437,33 +437,29 @@ int dumpBVHTo_JSON_SVG_CSV(
                                        )
        )
     {
-     if (
-         bvhExportSkeletonFilter(
-                                mc,
-                                &bvhTransform,
-                                &renderer,
-                                filterStats,
-                                filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                                filterOutSkeletonsWithAnyLimbsOutOfImage,
-                                filterWeirdSkeletons
-                               )
-        )
+     if ( (
+           bvhExportSkeletonFilter(
+                                   mc,
+                                   &bvhTransform,
+                                   &renderer,
+                                   filterStats,
+                                   filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                                   filterOutSkeletonsWithAnyLimbsOutOfImage,
+                                   filterWeirdSkeletons
+                                  )
+          ) &&
+          (
+           bvh_filterOccludedJoints(
+                                    mc,
+                                    &bvhTransform,
+                                    (filterOccludedJoints==0)
+                                   )
+          ) )
     {
+     //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
 
-  //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
-
-  if ( filterOccludedJoints )
-  {
-      //Debug under construction..
-      bvh_filterOccludedJoints(
-                                mc,
-                                &bvhTransform
-                              );
-  }
-
-
-  //CSV output
-  //------------------------------------------------------------------------------------------
+     //CSV output
+     //------------------------------------------------------------------------------------------
       if (convertToCSV)
       {
             dumpBVHToCSVBody(
