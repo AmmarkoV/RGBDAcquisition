@@ -244,6 +244,7 @@ t  *             Po
           { dist = -1* dist; } //(n.x * (point.x - p0.x)) + (n.y * (point.y - p0.y)) + (n.z * (point.z - p0.z));
 
   //if (dist<0.0)
+  if (0) //<- DEBUG
   {   //Python debug code..
       fprintf(stderr,"#for joint %s we have : \n",mc->jointHierarchy[jID].jointName);
       fprintf(stderr,"point = [%0.2f,%0.2f,%0.2f] \n",point.x,point.y,point.z);
