@@ -484,7 +484,7 @@ float calculateChainLoss(
                                                                                       jID
                                                                                      );
                                //Only negative contribution..
-                               if (symmetriesLoss>10.0)
+                               if ( (symmetriesLoss>10.0) || (problem->chain[chainID].current2DProjectionTransform.joint[jID].isOccluded) )
                                   {
                                       float gain = 225.0;
                                       symmetriesLoss = 1.0 * symmetriesLoss * gain; // <- Easy flip

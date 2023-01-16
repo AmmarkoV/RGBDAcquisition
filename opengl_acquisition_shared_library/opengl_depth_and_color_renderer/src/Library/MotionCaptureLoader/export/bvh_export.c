@@ -131,6 +131,10 @@ int  bvh_filterOccludedJoints(
 
   BVHJointID rootID = mc->rootJointID;
   float rootAngleY = bvh_getJointRotationYAtFrame(mc,rootID,fID);
+
+
+  //For front facing skeletons ( -45 < orientation < 45 )
+  // If RHand or LHand are too far behind we disable this pose to reduce symmetry problems..
   if ( (-45.0<rootAngleY) && (rootAngleY<45.0) )
   {
   //--------------------------------
