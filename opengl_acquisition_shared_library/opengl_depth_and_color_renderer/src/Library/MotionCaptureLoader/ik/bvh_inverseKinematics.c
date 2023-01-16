@@ -414,7 +414,7 @@ float calculateChainLoss(
                                                                   problem->mc,
                                                                   problem->chain[chainID].currentSolution->motion,
                                                                   &problem->chain[chainID].current2DProjectionTransform,
-                                                                  0,//Dont populate extra structures we dont need them they just take time
+                                                                  PENALIZE_SYMMETRY_HEURISTIC,//Dont populate extra structures we dont need them they just take time
                                                                   problem->chain[chainID].current2DProjectionTransform.listOfJointIDsToTransform,
                                                                   problem->chain[chainID].current2DProjectionTransform.lengthOfListOfJointIDsToTransform
                                                                 );
