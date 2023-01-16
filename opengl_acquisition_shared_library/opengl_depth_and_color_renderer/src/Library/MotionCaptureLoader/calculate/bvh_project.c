@@ -51,6 +51,8 @@ int bvh_projectTo2DHandleOcclusions(
          bvhTransform->joint[jID].isOccluded=0;
        }
 
+       //CONTROLS HERE..
+       #define USE_JOINT_TO_JOINT_OCCLUSIONS 0
        #define USE_TORSO_OCCLUSIONS 1
        #define DEBUG_TORSO_OCCLUSIONS 0
        #define OCCLUSION_THRESHOLD 6 // pixels
@@ -117,7 +119,7 @@ int bvh_projectTo2DHandleOcclusions(
          }
          #endif // USE_TORSO_OCCLUSIONS
 
-
+         #if USE_JOINT_TO_JOINT_OCCLUSIONS
          //If the joint is still not occluded then do extra checks, otherwise conserve our CPU
          if (!bvhTransform->joint[jID].isOccluded)
          {
@@ -152,6 +154,7 @@ int bvh_projectTo2DHandleOcclusions(
           } // Compare to all other joints
           //------------------------------------------------------------------------------------------
          }//If joint not already occluded
+         #endif // USE_JOINT_TO_JOINT_OCCLUSIONS
 
         }
        }

@@ -475,7 +475,7 @@ float calculateChainLoss(
                             //Add weight for backwards joints..
                             //This is a heuristic *patch* on the loss to prevent hands from bending backwards!
                             if (penalizeSymmetryIn)
-                            {
+                            { //PENALIZE_SYMMETRY_HEURISTIC
                               if (strstr(problem->mc->jointHierarchy[jID].jointName,"Hand")!=0 )
                               {//Crude and slow debug ..
                                float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
@@ -484,7 +484,7 @@ float calculateChainLoss(
                                                                                       jID
                                                                                      );
                                //Only negative contribution..
-                               if (symmetriesLoss>0.0)
+                               if (symmetriesLoss>10.0)
                                   {
                                       float gain = 225.0;
                                       symmetriesLoss = 1.0 * symmetriesLoss * gain; // <- Easy flip

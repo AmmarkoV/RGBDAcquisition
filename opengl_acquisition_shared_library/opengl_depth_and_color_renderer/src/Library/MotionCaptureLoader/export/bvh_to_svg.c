@@ -106,6 +106,11 @@ int dumpBVHToSVGFrame(
                    mc->jointHierarchy[parentJID].jointName,
                    mc->jointHierarchy[jID].jointName
                    );
+            fprintf(
+                  fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"3.00\" stroke=\"rgb(255,0,0)\" stroke-width=\"3\" fill=\"rgb(255,0,0)\" />\n",
+                  bvhTransform->joint[jID].pos2D[0],
+                  bvhTransform->joint[jID].pos2D[1]
+                 );
 
         } else
         {

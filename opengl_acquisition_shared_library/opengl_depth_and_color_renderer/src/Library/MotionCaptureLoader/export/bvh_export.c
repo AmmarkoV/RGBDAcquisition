@@ -122,12 +122,17 @@ int bvhExportSkeletonFilter(
 int  bvh_filterOccludedJoints(
                                 struct BVH_MotionCapture * mc ,
                                 struct BVH_Transform * bvhTransform,
+                                BVHFrameID fID,
                                 struct filteringResults * filterStats,
                                 int disableFilter
                               )
 {
   if (disableFilter) { return 1; }
 
+  BVHJointID rootID = mc->rootJointID;
+  float rootAngleY = bvh_getJointRotationYAtFrame(mc,rootID,fID);
+  if ( (-45.0<rootAngleY) && (rootAngleY<45.0) )
+  {
   //--------------------------------
   //bvh_printBVH(mc);
   //fprintf(stderr,"FILTER CALLED \n");
@@ -141,14 +146,24 @@ int  bvh_filterOccludedJoints(
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"relbow = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
+           if (test>10.0)
+             {
+               fails+=1;
+               bvhTransform->joint[jID].isOccluded=1;
+               ++bvhTransform->jointsOccludedIn2DProjection;
+             }
            testSum+=test;
         }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"rhand = %0.2f ",test);
-           if (test<-5.0) { fails+=1; }
+           if (test>10.0)
+             {
+               fails+=1;
+               bvhTransform->joint[jID].isOccluded=1;
+               ++bvhTransform->jointsOccludedIn2DProjection;
+             }
            testSum+=test;
         }
   //-----------------------------------------------------------------------
@@ -157,6 +172,7 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "RIGHT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
+      return 1;
       return 0;
   }
 
@@ -168,14 +184,24 @@ int  bvh_filterOccludedJoints(
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"lelbow = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
+           if (test>10.0)
+             {
+               fails+=1;
+               bvhTransform->joint[jID].isOccluded=1;
+               ++bvhTransform->jointsOccludedIn2DProjection;
+             }
            testSum+=test;
         }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"lhand = %0.2f ",test);
-           if (test<-5.0) { fails+=1; }
+           if (test>10.0)
+             {
+               fails+=1;
+               bvhTransform->joint[jID].isOccluded=1;
+               ++bvhTransform->jointsOccludedIn2DProjection;
+             }
            testSum+=test;
         }
   //-----------------------------------------------------------------------
@@ -184,8 +210,12 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "LEFT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
+      return 1;
       return 0;
   }
+  //
+  }
+
   return 1;
 }
 
@@ -493,7 +523,7 @@ int dumpBVHTo_JSON_SVG_CSV(
   //                                    For every frame
   //------------------------------------------------------------------------------------------
   unsigned int framesDumped=0;
-  unsigned int fID=0;
+  BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    if (fID%10==0) { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",csvFilenameBVH,fID,mc->numberOfFrames,(float) (100*fID)/mc->numberOfFrames); }
@@ -526,6 +556,7 @@ int dumpBVHTo_JSON_SVG_CSV(
            bvh_filterOccludedJoints(
                                     mc,
                                     &bvhTransform,
+                                    fID,
                                     filterStats,
                                     (filterOccludedJoints==0)
                                    )
