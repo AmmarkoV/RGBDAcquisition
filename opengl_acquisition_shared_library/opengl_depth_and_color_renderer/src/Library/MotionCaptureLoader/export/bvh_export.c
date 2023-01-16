@@ -161,9 +161,9 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"rhand = %0.2f ",test);
            if (test>10.0)
              {
+               fprintf(stderr,"rhand = %0.2f ",test);
                fails+=1;
                bvhTransform->joint[jID].isOccluded=1;
                ++bvhTransform->jointsOccludedIn2DProjection;
@@ -199,9 +199,9 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"lhand = %0.2f ",test);
            if (test>10.0)
              {
+               fprintf(stderr,"lhand = %0.2f ",test);
                fails+=1;
                bvhTransform->joint[jID].isOccluded=1;
                ++bvhTransform->jointsOccludedIn2DProjection;
