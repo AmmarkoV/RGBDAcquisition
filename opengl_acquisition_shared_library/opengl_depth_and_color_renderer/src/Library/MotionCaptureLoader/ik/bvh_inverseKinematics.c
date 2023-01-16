@@ -477,7 +477,7 @@ float calculateChainLoss(
                             if (penalizeSymmetryIn)
                             {
                               if (
-                                   (strstr(problem->mc->jointHierarchy[jID].jointName,"Arm")!=0 ) ||
+                                   //(strstr(problem->mc->jointHierarchy[jID].jointName,"Arm")!=0 ) ||
                                    (strstr(problem->mc->jointHierarchy[jID].jointName,"Hand")!=0 )
                                   )
                               { //Crude and slow debug ..
@@ -487,7 +487,7 @@ float calculateChainLoss(
                                                                                      jID
                                                                                     );
                               //Only negative contribution..
-                              float gain = 1.0;
+                              float gain = 5.0;
                               symmetriesLoss = -1.0 * symmetriesLoss * gain; // <- Easy flip
                               if (symmetriesLoss>0.0)
                                   {

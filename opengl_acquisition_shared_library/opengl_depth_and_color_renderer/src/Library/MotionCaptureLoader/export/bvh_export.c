@@ -136,29 +136,23 @@ int  bvh_filterOccludedJoints(
   float testSum = 0.0;
   BVHJointID jID;
   //-----------------------------------------------------------------------
-  if ( bvh_getJointIDFromJointNameNocase(mc,"rshoulder",&jID) )
-        {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"rshoulder = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
-           testSum+=test;
-        }
+  /*
   if ( bvh_getJointIDFromJointNameNocase(mc,"relbow",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"relbow = %0.2f ",test);
            if (test<0.0) { fails+=1; }
            testSum+=test;
-        }
+        }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"rhand = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
+           if (test<-5.0) { fails+=1; }
            testSum+=test;
         }
   //-----------------------------------------------------------------------
-  if ( (fails>=2) && (testSum<-20.0) )
+  if ( (fails>=1) )
   {
       fprintf(stderr,RED "RIGHT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
@@ -169,29 +163,23 @@ int  bvh_filterOccludedJoints(
   fails = 0;
   testSum=0;
   //-----------------------------------------------------------------------
-  if ( bvh_getJointIDFromJointNameNocase(mc,"lshoulder",&jID) )
-        {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"lshoulder = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
-           testSum+=test;
-       }
+  /*
   if ( bvh_getJointIDFromJointNameNocase(mc,"lelbow",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"lelbow = %0.2f ",test);
            if (test<0.0) { fails+=1; }
            testSum+=test;
-        }
+        }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
            fprintf(stderr,"lhand = %0.2f ",test);
-           if (test<0.0) { fails+=1; }
+           if (test<-5.0) { fails+=1; }
            testSum+=test;
         }
   //-----------------------------------------------------------------------
-  if ( (fails>=2) && (testSum<-20.0) )
+  if ( (fails>=1) )
   {
       fprintf(stderr,RED "LEFT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
