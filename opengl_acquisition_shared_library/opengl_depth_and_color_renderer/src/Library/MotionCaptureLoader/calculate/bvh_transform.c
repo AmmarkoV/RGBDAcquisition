@@ -399,6 +399,7 @@ int bvh_populateTorso3DFromTransform(
 
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"neck",&jID) )      { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"neck1",&jID) )     { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"neck01",&jID) )    { found=1; }
 
        if (
