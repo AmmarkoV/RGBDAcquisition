@@ -172,7 +172,7 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "RIGHT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
-      return 1;
+      //return 1;
       return 0;
   }
 
@@ -210,7 +210,7 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "LEFT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
-      return 1;
+      //return 1;
       return 0;
   }
   //
