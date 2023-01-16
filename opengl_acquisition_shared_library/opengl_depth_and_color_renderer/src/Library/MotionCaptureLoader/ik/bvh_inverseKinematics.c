@@ -476,22 +476,19 @@ float calculateChainLoss(
                             //This is a heuristic *patch* on the loss to prevent hands from bending backwards!
                             if (penalizeSymmetryIn)
                             {
-                              if (
-                                   //(strstr(problem->mc->jointHierarchy[jID].jointName,"Arm")!=0 ) ||
-                                   (strstr(problem->mc->jointHierarchy[jID].jointName,"Hand")!=0 )
-                                  )
-                              { //Crude and slow debug ..
+                              if (strstr(problem->mc->jointHierarchy[jID].jointName,"Hand")!=0 )
+                              {//Crude and slow debug ..
                                float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
                                                                                       problem->mc,
                                                                                       &problem->chain[chainID].current2DProjectionTransform,
                                                                                       jID
                                                                                      );
-                              //Only negative contribution..
-                              if (symmetriesLoss<0.0)
+                               //Only negative contribution..
+                               if (symmetriesLoss>0.0)
                                   {
-                                      float gain = 15.0;
-                                      symmetriesLoss = -1.0 * symmetriesLoss * gain; // <- Easy flip
-                                      fprintf(stderr,"Symmetry Loss %0.2f @ %s \n",symmetriesLoss,problem->mc->jointHierarchy[jID].jointName);
+                                      float gain = 225.0;
+                                      symmetriesLoss = 1.0 * symmetriesLoss * gain; // <- Easy flip
+                                      fprintf(stderr,"Symmetry Loss %0.2f / %0.2f @ %s \n",symmetriesLoss,loss,problem->mc->jointHierarchy[jID].jointName);
                                       loss+=symmetriesLoss;
                                   }
 
