@@ -482,15 +482,15 @@ float calculateChainLoss(
                                   )
                               { //Crude and slow debug ..
                                float symmetriesLoss=bvh_DistanceOfJointFromTorsoPlane(
-                                                                                     problem->mc,
-                                                                                     &problem->chain[chainID].current2DProjectionTransform,
-                                                                                     jID
-                                                                                    );
+                                                                                      problem->mc,
+                                                                                      &problem->chain[chainID].current2DProjectionTransform,
+                                                                                      jID
+                                                                                     );
                               //Only negative contribution..
-                              float gain = 5.0;
-                              symmetriesLoss = -1.0 * symmetriesLoss * gain; // <- Easy flip
-                              if (symmetriesLoss>0.0)
+                              if (symmetriesLoss<0.0)
                                   {
+                                      float gain = 15.0;
+                                      symmetriesLoss = -1.0 * symmetriesLoss * gain; // <- Easy flip
                                       fprintf(stderr,"Symmetry Loss %0.2f @ %s \n",symmetriesLoss,problem->mc->jointHierarchy[jID].jointName);
                                       loss+=symmetriesLoss;
                                   }
