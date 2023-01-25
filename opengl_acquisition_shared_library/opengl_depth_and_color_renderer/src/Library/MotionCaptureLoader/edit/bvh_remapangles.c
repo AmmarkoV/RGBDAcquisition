@@ -89,6 +89,53 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 
 
 
+int bvh_normalizeRotations(struct BVH_MotionCapture * bvh)
+{
+ if (bvh!=0)
+ {
+   char * motionIDsWhereToExecuteNormalization = (char *) malloc(sizeof(char) * bvh->numberOfValuesPerFrame);
+   if (motionIDsWhereToExecuteNormalization!=0)
+   {
+     memset(motionIDsWhereToExecuteNormalization,0,sizeof(char) * bvh->numberOfValuesPerFrame);
+
+     BVHMotionChannelID globalMID = 0;
+     BVHFrameID fID = 0;
+     BVHMotionChannelID mID = 0;
+
+     //Decide which motion IDs need to be normalized (a.k.a. are euler/degrees rotations)
+     for (mID=0; mID<bvh->numberOfValuesPerFrame; mID++)
+         {
+             char isQuaternion = bvh->jointHierarchy[bvh->motionToJointLookup[mID].jointID].hasQuaternionRotation;
+             char hasRotation  = bvh->jointHierarchy[bvh->motionToJointLookup[mID].jointID].hasRotationalChannels;
+             if ( (!isQuaternion) && (hasRotation) )
+             {
+                if (
+                      (BVH_ROTATION_X<=bvh->motionToJointLookup[mID].channelID) &&
+                      (bvh->motionToJointLookup[mID].channelID<=BVH_ROTATION_Z)
+                    )
+                   { motionIDsWhereToExecuteNormalization[mID]=1; }
+             }
+         }
+
+     //Execute said normalization
+     for (fID=0; fID<bvh->numberOfFrames; fID++)
+     {
+         for (mID=0; mID<bvh->numberOfValuesPerFrame; mID++)
+         {
+           if (motionIDsWhereToExecuteNormalization)
+           { bvh->motionValues[globalMID] = bvh_constrainAngleCentered0(bvh->motionValues[globalMID],0); }
+           globalMID +=1;
+         }
+     }
+
+    //Free memory
+    free(motionIDsWhereToExecuteNormalization);
+    return 1;
+   }
+  }
+ return 0;
+}
+
 int bvh_swapJointRotationAxis(struct BVH_MotionCapture * bvh,char inputRotationOrder,char swappedRotationOrder)
 {
   if ( (bvh!=0) && (bvh->jointHierarchy!=0) )

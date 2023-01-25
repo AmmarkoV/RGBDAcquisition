@@ -1358,6 +1358,11 @@ int bvhConverter(int argc,const char **argv)
                                                          );
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--normalizeRotations")==0)
+        {
+          bvh_normalizeRotations(&bvhMotion);
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--360")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
