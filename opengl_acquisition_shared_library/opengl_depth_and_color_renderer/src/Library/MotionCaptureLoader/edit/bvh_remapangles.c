@@ -93,6 +93,7 @@ int bvh_normalizeRotations(struct BVH_MotionCapture * bvh)
 {
  if (bvh!=0)
  {
+   fprintf(stderr,"Performing angle normalization on %u frames..\n",bvh->numberOfFrames);
    char * motionIDsWhereToExecuteNormalization = (char *) malloc(sizeof(char) * bvh->numberOfValuesPerFrame);
    if (motionIDsWhereToExecuteNormalization!=0)
    {
@@ -117,13 +118,23 @@ int bvh_normalizeRotations(struct BVH_MotionCapture * bvh)
              }
          }
 
+     fprintf(stderr,"affected mIDs : [");
+     for (mID=0; mID<bvh->numberOfValuesPerFrame; mID++)
+         {
+          if (motionIDsWhereToExecuteNormalization[mID]) { fprintf(stderr,"Y"); } else { fprintf(stderr,"N"); }
+         }
+     fprintf(stderr,"]\n");
+
      //Execute said normalization
      for (fID=0; fID<bvh->numberOfFrames; fID++)
      {
          for (mID=0; mID<bvh->numberOfValuesPerFrame; mID++)
          {
-           if (motionIDsWhereToExecuteNormalization)
-           { bvh->motionValues[globalMID] = bvh_constrainAngleCentered0(bvh->motionValues[globalMID],0); }
+           if (motionIDsWhereToExecuteNormalization[mID])
+                 {
+                    //fprintf(stderr,"frame %u / mID %u / gMID %u\n",fID,mID,globalMID);
+                    bvh->motionValues[globalMID] = bvh_constrainAngleCentered0(bvh->motionValues[globalMID],0);
+                 }
            globalMID +=1;
          }
      }
