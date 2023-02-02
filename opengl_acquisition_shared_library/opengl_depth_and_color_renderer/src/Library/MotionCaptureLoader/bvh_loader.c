@@ -53,7 +53,7 @@
 
 
 //A very brief documentation of the BVH spec :
-//http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0BopXj4Kft_RAEE41VLblkkPGHVF8-mon3xSCBMZueRtyb9LCSZDZhXPA
+//http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
@@ -1309,9 +1309,7 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 
-
-
-float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID)
 {
   if (bvhMotion!=0)
   {
@@ -1325,7 +1323,7 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID)
 }
 
 
-int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float * value)
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID,float * value)
 {
   if (bvhMotion!=0)
   {
@@ -1340,6 +1338,25 @@ int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,flo
 }
 
 
+float bvh_getMotionValueOfFrame(struct BVH_MotionCapture * bvhMotion,BVHFrameID fID,BVHMotionChannelID mID)
+{
+  if (bvhMotion!=0)
+  {
+   BVHMotionChannelID resolvedMID = fID*bvhMotion->numberOfValuesPerFrame + mID;
+   return  bvh_getMotionValue(bvhMotion,resolvedMID);
+  }
+  return 0.0;
+}
+
+int bvh_setMotionValueOfFrame(struct BVH_MotionCapture * bvhMotion,BVHFrameID fID,BVHMotionChannelID mID,float * value)
+{
+  if (bvhMotion!=0)
+  {
+   BVHMotionChannelID resolvedMID = fID*bvhMotion->numberOfValuesPerFrame + mID;
+   return bvh_setMotionValue(bvhMotion,resolvedMID,value);
+  }
+  return 0;
+}
 
 int bvh_copyMotionFrameToMotionBuffer(
                                        struct BVH_MotionCapture * bvhMotion,

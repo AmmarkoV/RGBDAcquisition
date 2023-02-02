@@ -631,9 +631,9 @@ int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJ
 * @ingroup BVH
 * @param  BVH Structure
 * @param  Motion element we want to read
-* @return Motion Value
+* @return Motion Value, 0.0 on failure
 */
-float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion ,BVHMotionChannelID mID);
 
 
 /**
@@ -641,11 +641,30 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
 * @ingroup BVH
 * @param  BVH Structure
 * @param  Motion element we want to write
-* @return Motion ID to change
-* @return Motion Value Pointer to Value to set
+* @param  Motion ID to change
+* @return 1=Success/0=Failure
 */
-int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,unsigned int mID,float * value);
+int bvh_setMotionValue(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID,float * value);
 
+/**
+* @brief Direct access to the motion data, without Joint hierarchy for a particular frame, should not be used unless you really know what you are doing..
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Frame we want to access
+* @param  Motion element we want to read
+* @return Motion Value, 0.0 on failure
+*/
+float bvh_getMotionValueOfFrame(struct BVH_MotionCapture * bvhMotion,BVHFrameID fID,BVHMotionChannelID mID);
+
+/**
+* @brief Direct access to the motion data, without Joint hierarchy for a particular frame, should not be used unless you really know what you are doing..
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Frame we want to access
+* @param  Motion ID to change
+* @return 1=Success/0=Failure
+*/
+int bvh_setMotionValueOfFrame(struct BVH_MotionCapture * bvhMotion,BVHFrameID fID,BVHMotionChannelID mID,float * value);
 
 /**
 * @brief Perform a select query marking all the children of a specific joint ..

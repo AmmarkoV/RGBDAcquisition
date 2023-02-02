@@ -128,9 +128,22 @@ class BVH():
             jointList.append(int(self.getJointParent(jointID)))
         return jointList
   #--------------------------------------------------------
+  def setMotionValueOfFrame(self, frameID:int, jointID:int, value:float):
+        self.stage("setMotionValueOfFrame")
+        self.libBVH.bvh_setMotionValueOfFrame.argtypes = [ctypes.c_int,ctypes.c_int,ctypes.c_float]
+        self.libBVH.bvh_setMotionValueOfFrame.restype  = ctypes.c_int
+        jointID = self.libBVH.bvh_setMotionValueOfFrame(jointID)
+        return jointID
+  #--------------------------------------------------------
+  def getNumberOfMotionValuesPerFrame(self):
+        self.stage("getNumberOfMotionValuesPerFrame")
+        self.libBVH.bvhConverter_getNumberOfMotionValuesPerFrame.argtypes = []
+        self.libBVH.bvhConverter_getNumberOfMotionValuesPerFrame.restype  = ctypes.c_int
+        jointID = self.libBVH.bvhConverter_getNumberOfMotionValuesPerFrame()
+        return jointID
+  #--------------------------------------------------------
   def getNumberOfJoints(self):
         self.stage("getNumberOfJoints")
-        arg1 = jointName.encode('utf-8') 
         self.libBVH.bvhConverter_getNumberOfJoints.argtypes = []
         self.libBVH.bvhConverter_getNumberOfJoints.restype  = ctypes.c_int
         jointID = self.libBVH.bvhConverter_getNumberOfJoints()

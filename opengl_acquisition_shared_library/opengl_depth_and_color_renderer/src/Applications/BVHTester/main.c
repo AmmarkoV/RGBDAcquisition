@@ -221,6 +221,19 @@ int bvhConverter_getNumberOfJoints()
  return bvhAtomicMotion.jointHierarchySize;
 }
 
+
+
+int bvhConverter_getMotionValueOfFrame(int fID,int mID)
+{
+ return bvh_getMotionValueOfFrame(&bvhAtomicMotion,fID,mID);
+}
+
+int bvhConverter_setMotionValueOfFrame(int fID,int mID,float value)
+{
+ float localValue = value;
+ return bvh_setMotionValueOfFrame(&bvhAtomicMotion,fID,mID,&localValue);
+}
+
 int bvhConverter_getJointNameJointID(const char * jointName)
 {
   //fprintf(stderr,"Asked to resolve %s\n",jointName);
