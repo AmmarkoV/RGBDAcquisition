@@ -128,6 +128,14 @@ class BVH():
             jointList.append(int(self.getJointParent(jointID)))
         return jointList
   #--------------------------------------------------------
+  def getNumberOfJoints(self):
+        self.stage("getNumberOfJoints")
+        arg1 = jointName.encode('utf-8') 
+        self.libBVH.bvhConverter_getNumberOfJoints.argtypes = []
+        self.libBVH.bvhConverter_getNumberOfJoints.restype  = ctypes.c_int
+        jointID = self.libBVH.bvhConverter_getNumberOfJoints()
+        return jointID
+  #--------------------------------------------------------
   def getJointID(self, jointName:str):
         self.stage("getJointID")
         arg1 = jointName.encode('utf-8') 

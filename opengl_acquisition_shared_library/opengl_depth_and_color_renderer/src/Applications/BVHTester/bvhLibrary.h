@@ -22,6 +22,8 @@ int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * 
 int bvhConverter_processFrame(int frameID);
 int bvhConverter_getJointNameJointID(const char * jointName);
 
+
+int bvhConverter_getNumberOfMotionValuesPerFrame();
 int bvhConverter_getNumberOfJoints();
 const char * bvhConverter_getJointNameFromJointID(int jointID);
 

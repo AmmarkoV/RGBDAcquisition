@@ -211,6 +211,10 @@ int bvhConverter_scale(float scaleRatio)
                             );
 }
 
+int bvhConverter_getNumberOfMotionValuesPerFrame()
+{
+ return bvhAtomicMotion.numberOfValuesPerFrame;
+}
 
 int bvhConverter_getNumberOfJoints()
 {
