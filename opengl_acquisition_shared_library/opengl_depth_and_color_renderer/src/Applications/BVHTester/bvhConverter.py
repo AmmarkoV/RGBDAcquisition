@@ -128,12 +128,25 @@ class BVH():
             jointList.append(int(self.getJointParent(jointID)))
         return jointList
   #--------------------------------------------------------
+  def getMotionValueOfFrame(self, frameID:int, jointID:int):
+        self.stage("getMotionValueOfFrame")
+        self.libBVH.bvhConverter_getMotionValueOfFrame.argtypes = [ctypes.c_int,ctypes.c_int]
+        self.libBVH.bvhConverter_getMotionValueOfFrame.restype  = ctypes.c_float
+        value = self.libBVH.bvhConverter_getMotionValueOfFrame(frameID,jointID)
+        return value
+  #--------------------------------------------------------
+  def getAllMotionValuesOfFrame(self, frameID:int):
+        allMIDs=list()
+        for mID in range(0,self.getNumberOfMotionValuesPerFrame()):
+          allMIDs.append(self.getMotionValueOfFrame(frameID,mID))
+        return allMIDs
+  #--------------------------------------------------------
   def setMotionValueOfFrame(self, frameID:int, jointID:int, value:float):
         self.stage("setMotionValueOfFrame")
-        self.libBVH.bvh_setMotionValueOfFrame.argtypes = [ctypes.c_int,ctypes.c_int,ctypes.c_float]
-        self.libBVH.bvh_setMotionValueOfFrame.restype  = ctypes.c_int
-        jointID = self.libBVH.bvh_setMotionValueOfFrame(jointID)
-        return jointID
+        self.libBVH.bvhConverter_setMotionValueOfFrame.argtypes = [ctypes.c_int,ctypes.c_int,ctypes.c_float]
+        self.libBVH.bvhConverter_setMotionValueOfFrame.restype  = ctypes.c_int
+        success = self.libBVH.bvhConverter_setMotionValueOfFrame(frameID,jointID,value)
+        return success
   #--------------------------------------------------------
   def getNumberOfMotionValuesPerFrame(self):
         self.stage("getNumberOfMotionValuesPerFrame")
