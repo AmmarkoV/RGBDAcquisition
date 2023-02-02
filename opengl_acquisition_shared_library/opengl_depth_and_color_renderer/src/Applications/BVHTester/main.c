@@ -221,7 +221,15 @@ int bvhConverter_getNumberOfJoints()
  return bvhAtomicMotion.jointHierarchySize;
 }
 
-
+int bvhConverter_writeBVH(char * filename,int writeHierarchy,int writeMotion)
+{
+ return dumpBVHToBVH(
+                     filename,
+                     &bvhAtomicMotion,
+                     writeHierarchy,
+                     writeMotion
+                    );
+}
 
 int bvhConverter_getMotionValueOfFrame(int fID,int mID)
 {
@@ -1865,7 +1873,9 @@ int bvhConverter(int argc,const char **argv)
           if (
                !dumpBVHToBVH(
                              toBVHFile,
-                             &bvhMotion
+                             &bvhMotion,
+                             1,  //Write Hierarchy
+                             1   //Write Motion
                             )
              ) { haltOnError(immediatelyHaltOnError,"Error while outputing a BVH file.."); }
         } else

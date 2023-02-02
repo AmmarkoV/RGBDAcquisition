@@ -94,7 +94,9 @@ int writeBVHHierarchyOpenningSection(
 
 int dumpBVHToBVH(
                   const char * bvhFilename,
-                  struct BVH_MotionCapture * mc
+                  struct BVH_MotionCapture * mc,
+                  int writeHierarchy,
+                  int writeMotion
                 )
 {
    BVHJointID rootJID;
@@ -104,6 +106,9 @@ int dumpBVHToBVH(
    FILE * fp = fopen(bvhFilename,"w");
    if (fp!=0)
    {
+
+     if (writeHierarchy)
+     {
      fprintf(fp,"HIERARCHY\n");
      //--------------------------------------------------------------------------------------
      unsigned int nextHierarchyLevel; // This gets always overwritten.. = 0;
@@ -130,7 +135,11 @@ int dumpBVHToBVH(
                                           );
           }
         }
+      }
 
+
+     if (writeMotion)
+     {
       fprintf(fp,"MOTION\n");
       //--------------------------------------------------------------------------------------
       fprintf(fp,"Frames: %u\n",mc->numberOfFrames);
@@ -150,6 +159,7 @@ int dumpBVHToBVH(
          }
         fprintf(fp,"\n");
       }
+     }
      fclose(fp);
      return 1;
    }

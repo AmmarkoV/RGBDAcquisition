@@ -14,6 +14,7 @@ extern "C"
 #endif
 
 
+int bvhConverter_writeBVH(char * filename,int writeHierarchy,int writeMotion);
 int bvhConverter_getMotionValueOfFrame(int fID,int mID);
 int bvhConverter_setMotionValueOfFrame(int fID,int mID,float value);
 

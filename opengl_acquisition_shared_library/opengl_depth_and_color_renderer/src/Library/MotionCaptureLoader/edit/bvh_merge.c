@@ -507,7 +507,9 @@ int bvh_mergeFacesRobot(int startAt,int argc,const char **argv)
                 snprintf(filename,1024,"%s/merged_%s",pathToPrependToFilesOfList,record);
                 dumpBVHToBVH(
                              filename,
-                             &bvhFaceFileToBeMerged
+                             &bvhFaceFileToBeMerged,
+                             1, //Write Hierarchy
+                             1  //Write Motion
                             );
               } else
               {

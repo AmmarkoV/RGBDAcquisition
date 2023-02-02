@@ -5,7 +5,7 @@
 #include "../bvh_loader.h"
 #include "../calculate/bvh_transform.h"
 #include "../mathLibrary.h"
- 
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -13,7 +13,9 @@ extern "C"
 
 int dumpBVHToBVH(
                   const char * bvhFilename,
-                  struct BVH_MotionCapture * mc
+                  struct BVH_MotionCapture * mc,
+                  int writeHierarchy,
+                  int writeMotion
                 );
 
 #ifdef __cplusplus

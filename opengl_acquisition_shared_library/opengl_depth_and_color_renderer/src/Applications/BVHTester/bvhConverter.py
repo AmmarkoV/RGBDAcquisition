@@ -141,6 +141,13 @@ class BVH():
           allMIDs.append(self.getMotionValueOfFrame(frameID,mID))
         return allMIDs
   #--------------------------------------------------------
+  def saveBVHFileFromList(self, allMotionData:list):
+        numberOfFrames = len(allMotionData)
+        for fID in range(0,numberOfFrames):
+          for mID in allMotionData[fID]:
+
+        return allMIDs
+  #--------------------------------------------------------
   def setMotionValueOfFrame(self, frameID:int, jointID:int, value:float):
         self.stage("setMotionValueOfFrame")
         self.libBVH.bvhConverter_setMotionValueOfFrame.argtypes = [ctypes.c_int,ctypes.c_int,ctypes.c_float]
