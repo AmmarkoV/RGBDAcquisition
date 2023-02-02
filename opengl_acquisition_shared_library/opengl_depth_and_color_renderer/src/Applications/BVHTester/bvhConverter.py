@@ -141,12 +141,34 @@ class BVH():
           allMIDs.append(self.getMotionValueOfFrame(frameID,mID))
         return allMIDs
   #--------------------------------------------------------
-  def saveBVHFileFromList(self, allMotionData:list):
-        numberOfFrames = len(allMotionData)
-        for fID in range(0,numberOfFrames):
+  def saveBVHFileFromList(self, filename:str, allMotionData:list):
+        self.stage("saveBVHFileFromList")
+        arg1 = filename.encode('utf-8') 
+        #int bvhConverter_writeBVH(char * filename,int writeHierarchy,int writeMotion)
+        self.libBVH.bvhConverter_writeBVH.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_int]
+        self.libBVH.bvhConverter_writeBVH.restype  = ctypes.c_int
+        success = self.libBVH.bvhConverter_writeBVH(arg1,1,0) #Just write the Hierarchy part of the BVH file
+        
+        if (success):
+         numberOfFrames = len(allMotionData)
+         f = open(filename, 'a')
+         f.write("MOTION\n");
+         f.write("Frames: %u\n"%numberOfFrames);
+         f.write("Frame Time: %0.8f\n"%(float(1/24)) );
+         for fID in range(0,numberOfFrames):
+          i=0
           for mID in allMotionData[fID]:
+           if (i>0):
+            f.write(' ')
+           if (mID==0.0):
+             f.write("0")
+           else:
+             f.write("%0.4f" % mID)
+           i=i+1
+          f.write('\n')  
+         f.close()    
 
-        return allMIDs
+        return success
   #--------------------------------------------------------
   def setMotionValueOfFrame(self, frameID:int, jointID:int, value:float):
         self.stage("setMotionValueOfFrame")
