@@ -168,6 +168,26 @@ class BVH():
           f.write('\n')  
          f.close()    
 
+        #--------------------------------------------
+        os.system("sed -i 's/rcollar/rCollar/g' out.bvh")
+        os.system("sed -i 's/rshoulder/rShldr/g' out.bvh")
+        os.system("sed -i 's/relbow/rForeArm/g' out.bvh")
+        os.system("sed -i 's/rhand/rHand/g' out.bvh")
+        #--------------------------------------------
+        os.system("sed -i 's/lcollar/lCollar/g' out.bvh")
+        os.system("sed -i 's/lshoulder/lShldr/g' out.bvh")
+        os.system("sed -i 's/lelbow/lForeArm/g' out.bvh")
+        os.system("sed -i 's/lhand/lHand/g' out.bvh")
+        #--------------------------------------------
+        os.system("sed -i 's/rhip/rThigh/g' out.bvh")
+        os.system("sed -i 's/rknee/rShin/g' out.bvh")
+        os.system("sed -i 's/rfoot/rFoot/g' out.bvh")
+        #------------------------------------------------------ 
+        os.system("sed -i 's/lhip/lThigh/g' out.bvh")
+        os.system("sed -i 's/lknee/lShin/g' out.bvh")
+        os.system("sed -i 's/lfoot/lFoot/g' out.bvh")
+
+
         return success
   #--------------------------------------------------------
   def setMotionValueOfFrame(self, frameID:int, jointID:int, value:float):
