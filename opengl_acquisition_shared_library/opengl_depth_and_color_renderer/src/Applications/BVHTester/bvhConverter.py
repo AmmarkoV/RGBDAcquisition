@@ -354,11 +354,10 @@ class BVH():
     self.libBVH.bvhConverter_IKFineTune.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_float, ctypes.c_float, ctypes.c_float,ctypes.c_float]
     self.libBVH.bvhConverter_IKFineTune.restype  = ctypes.c_int
     success = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff,langevinDynamics)
-    if (success==1):
-       print("Retrieving HCD results for ",iterations," iterations!")
-       return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
+    print("Retrieving HCD results for ",iterations," iterations!")
+    return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
 
-    return dict()  
+   #return dict()  
   #--------------------------------------------------------
 
 

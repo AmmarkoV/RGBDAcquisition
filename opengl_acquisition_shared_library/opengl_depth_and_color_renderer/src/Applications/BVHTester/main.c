@@ -537,9 +537,14 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff,float langevinDynamics)
+float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff,float langevinDynamics)
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
+
+        float initialMAEInPixels = 0.0;
+        float finalMAEInPixels = 0.0;
+        float initialMAEInMM = 0.0;
+        float finalMAEInMM = 0.0;
 
   //-----------------------------
   int initializeIK = 0;
@@ -593,10 +598,6 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
          //------------------------------------
 
         int multiThreading = 0;
-        float initialMAEInPixels = 0.0;
-        float finalMAEInPixels = 0.0;
-        float initialMAEInMM = 0.0;
-        float finalMAEInMM = 0.0;
 
          //======================================================================================================
          //======================================================================================================
@@ -702,17 +703,19 @@ int bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const flo
 
 
 
-              return bvh_copyMotionBufferToMotionFrame(
+              if(!bvh_copyMotionBufferToMotionFrame(
                                                        &bvhAtomicMotion,
                                                        frameID,
                                                        atomicSolution
-                                                      );
+                                                      )
+                )
+                {
+                    fprintf(stderr,"Failed bvh_copyMotionBufferToMotionFrame\n");
+                }
             }
         }
 
-
-
-  return 0;
+  return finalMAEInPixels;
 }
 
 
