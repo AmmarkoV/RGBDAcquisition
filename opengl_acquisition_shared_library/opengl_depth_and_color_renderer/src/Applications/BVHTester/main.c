@@ -522,7 +522,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
     if (problem==0)
     {
-      fprintf(stderr,"bvhConverter_IKFineTune: Unrecognized body part `%s` \n",bodyPart);
+      fprintf(stderr,"bvhConverter_IKSetup: Unrecognized body part `%s` \n",bodyPart);
       return 0;
     } else
     {
@@ -541,10 +541,11 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
-        float initialMAEInPixels = 0.0;
-        float finalMAEInPixels = 0.0;
-        float initialMAEInMM = 0.0;
-        float finalMAEInMM = 0.0;
+  //-----------------------------
+  float initialMAEInPixels = 0.0;
+  float finalMAEInPixels = 0.0;
+  float initialMAEInMM = 0.0;
+  float finalMAEInMM = 0.0;
 
   //-----------------------------
   int initializeIK = 0;
@@ -692,7 +693,6 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
                                                                     )
             )
             {
-
               if ( (fSampling>0.0) && (fCutoff>0.0) )
               { //Only perform smoothing if sampling/cutoff is set..
                for (int mID=0; mID<atomicSolution->bufferSize; mID++)

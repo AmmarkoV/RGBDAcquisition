@@ -146,7 +146,7 @@ float meanBVH2DDistance(
         //-----------------
         float sumOf2DDistances=0.0;
         unsigned int numberOfSamples=0;
-        for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+        for (BVHJointID jID=0; jID<mc->jointHierarchySize; jID++)
         {
             int isSelected = 1;
 
@@ -164,9 +164,7 @@ float meanBVH2DDistance(
                 float tX=bvhTargetTransform->joint[jID].pos2D[0];
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
 
-                if (
-                     (  (sX!=0.0) || (sY!=0.0) ) && (  (tX!=0.0) || (tY!=0.0) )
-                   )
+                if ( ( (sX!=0.0) || (sY!=0.0) ) && ( (tX!=0.0) || (tY!=0.0) ) )
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
 
@@ -192,7 +190,7 @@ float meanBVH2DDistance(
         }
     } //-----------------
 
-    return 0;
+    return 0.0;
 }
 
 
@@ -2087,7 +2085,15 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         if (finalMAEInPixels!=0)
         {
         //We calculate the new 2D distance achieved..
-        *finalMAEInPixels  = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
+        *finalMAEInPixels  = meanBVH2DDistance(
+                                                mc,
+                                                renderer,
+                                                1, //useAllJoints
+                                                0, //onlyConsiderChildrenOfThisJoint
+                                                &bvhCurrentTransform,
+                                                bvhTargetTransform,
+                                                ikConfig->verbose
+                                               );
 
         //Was our solution perfect? If it was we don't need to compare to previous
         //----------------------------------------------------
