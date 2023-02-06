@@ -74,9 +74,10 @@ def splitDictionaryInLabelsAndFloats(arguments):
 class BVH():
   def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False):
         print("Initializing BVH file ",bvhPath," from ",libraryPath)
-        self.libBVH         = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
-        self.numberOfJoints = 0
-        self.traceStages    = False #If set to true each call will be emitted in stdout to speed-up debugging
+        self.libBVH               = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
+        self.numberOfJoints       = 0
+        self.lastMAEErrorInPixels = 0.0
+        self.traceStages          = False #If set to true each call will be emitted in stdout to speed-up debugging
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
   def stage(self,message):
@@ -355,6 +356,7 @@ class BVH():
     self.libBVH.bvhConverter_IKFineTune.restype  = ctypes.c_float
     accuracy2D = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff,langevinDynamics)
     print("HCD results for ",iterations," iterations ~> %0.2f pixels!" % accuracy2D)
+    self.lastMAEErrorInPixels = accuracy2D 
     return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
 
    #return dict()  
