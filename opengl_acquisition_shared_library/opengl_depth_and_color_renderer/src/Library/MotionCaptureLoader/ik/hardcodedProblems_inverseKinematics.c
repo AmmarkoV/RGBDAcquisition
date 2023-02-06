@@ -3148,6 +3148,9 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
+    //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 25 26 27
+    //                                                     minX/maxX     minY/maxY     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
 
 
      ++correct;
@@ -3162,8 +3165,8 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
-    //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,30.0,    -60.0,60.0,   -170.0,0.0);
+    //                                                     minX/maxX      minY/maxY       minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
 
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -3202,6 +3205,8 @@ int prepareDefaultBodyProblem(
      partID=0;
 
      ++correct;
+     //head -n3 bvh_upperbody_all.csv  | cut -d ',' -f 25
+
      checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
@@ -3213,6 +3218,9 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
+    //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 34 35 36
+    //                                                     minX/maxX     minY/maxY     minZ/maxZ
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
 
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -3227,7 +3235,7 @@ int prepareDefaultBodyProblem(
                               0,0,0 //Automatic mID Start/End assignment
                              );
     //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,30.0,    -60.0,60.0,   0.0,170.0);
+    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
 
      ++correct;
      checksum+=addNewPartToChainProblem(
@@ -3362,7 +3370,6 @@ int prepareDefaultBodyProblem(
 
 
      #if DUALFOOT
-
      //Next chain is the Right Sole
      //----------------------------------------------------------
      //----------------------------------------------------------

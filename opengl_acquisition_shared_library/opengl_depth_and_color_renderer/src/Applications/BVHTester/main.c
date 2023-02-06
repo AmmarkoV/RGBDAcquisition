@@ -670,7 +670,7 @@ float bvhConverter_IKFineTune(
                   }
                 } else
                 {
-                    fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
+                  //fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
                 }
             }
 
