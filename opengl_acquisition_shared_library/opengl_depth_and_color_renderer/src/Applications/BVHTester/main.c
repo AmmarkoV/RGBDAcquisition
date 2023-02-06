@@ -537,7 +537,19 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 
 
 
-float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff,float langevinDynamics)
+float bvhConverter_IKFineTune(
+                               const char * bodyPart,
+                               const char ** labels,
+                               const float * values,
+                               int numberOfElements,
+                               int frameID,
+                               int iterations,
+                               int epochs,
+                               float lr,
+                               float fSampling,
+                               float fCutoff,
+                               float langevinDynamics
+                             )
 {
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
@@ -644,13 +656,7 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
              if (  (coord[0]=='2') && (  (coord[2]=='x') || (coord[2]=='y') ) )
              {
               BVHJointID jID=0;
-              if (
-                  bvh_getJointIDFromJointNameNocase(
-                                                    &bvhAtomicMotion,
-                                                    dof,
-                                                    &jID
-                                                   )
-                )
+              if ( bvh_getJointIDFromJointNameNocase(&bvhAtomicMotion,dof,&jID) )
                 {
                   if (coord[2]=='x')
                   {
@@ -664,7 +670,7 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
                   }
                 } else
                 {
-                   //fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
+                    fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
                 }
             }
 
@@ -703,14 +709,17 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
 
 
               if(!bvh_copyMotionBufferToMotionFrame(
-                                                       &bvhAtomicMotion,
-                                                       frameID,
-                                                       atomicSolution
-                                                      )
+                                                    &bvhAtomicMotion,
+                                                    frameID,
+                                                    atomicSolution
+                                                   )
                 )
                 {
                     fprintf(stderr,"Failed bvh_copyMotionBufferToMotionFrame\n");
                 }
+
+                //Perform and update projections for new results..!
+                bvhConverter_processFrame(frameID);
             }
         }
 

@@ -556,22 +556,9 @@ int prepareDefaultFaceProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
-                              "eye.r",0,  // Eye control
+                              "eye.r","endsite_eye.r",  // Eye control
                                1.0,     //Importance
                                0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_eye.r",0,  // Eye projection
-                               1.0,     //Importance
-                               1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -604,22 +591,9 @@ int prepareDefaultFaceProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
-                              "eye.l",0,  // Eye control
+                              "eye.l","endsite_eye.l",  // Eye control
                                1.0,     //Importance
                                0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_eye.l",0,  // Eye projection
-                               1.0,     //Importance
-                               1,       //IsEndEffector
                               //-----------------------------------------
                               &groupID,&jobID,&chainID,&partID,
                               //-----------------------------------------
@@ -2877,7 +2851,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                                         problem,mc,
                                         //-----------------------------------------
-                                        "eye.l",0,// Joint
+                                        "eye.l","endsite_eye.l",// Joint
                                          1.5,     //Importance
                                          1,       //IsEndEffector
                                         //-----------------------------------------
@@ -2889,7 +2863,7 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                                         problem,mc,
                                         //-----------------------------------------
-                                        "eye.r",0,// Joint
+                                        "eye.r","endsite_eye.r",// Joint
                                          1.5,     //Importance
                                          1,       //IsEndEffector
                                         //-----------------------------------------
@@ -3113,34 +3087,6 @@ int prepareDefaultBodyProblem(
      checksum+=addNewPartToChainProblem(
                               problem,mc,
                               //-----------------------------------------
-                              "eye.l",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.r",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
                               "ear.l","__temporalis02.l",// Joint
                                2.5,     //Importance
                                1,       //IsEndEffector
@@ -3231,8 +3177,6 @@ int prepareDefaultBodyProblem(
                               //-----------------------------------------
                               0,0,0 //Automatic mID Start/End assignment
                              );
-
-
     //----------------------------------------------------------
     if (correct!=checksum)
          { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
