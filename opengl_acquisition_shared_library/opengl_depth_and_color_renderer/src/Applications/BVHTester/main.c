@@ -543,10 +543,9 @@ float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const f
 
   //-----------------------------
   float initialMAEInPixels = 0.0;
-  float finalMAEInPixels = 0.0;
-  float initialMAEInMM = 0.0;
-  float finalMAEInMM = 0.0;
-
+  float finalMAEInPixels   = 0.0;
+  float initialMAEInMM     = 0.0;
+  float finalMAEInMM       = 0.0;
   //-----------------------------
   int initializeIK = 0;
   if (strcmp(bodyPart,"body")==0)

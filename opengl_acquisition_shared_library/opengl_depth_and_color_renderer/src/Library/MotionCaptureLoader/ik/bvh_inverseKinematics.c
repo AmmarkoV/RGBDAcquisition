@@ -2109,14 +2109,13 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
 
             if (previousMAEInPixels<*finalMAEInPixels)
-            {
+              {
                 if (ikConfig->considerPreviousSolution)
                 {
                     fprintf(stderr,RED "After all this work we where not smart enough to understand that previous solution was better all along..\n" NORMAL);
                     copyMotionBuffer(solution,previousSolution);
                 }
-            }
-
+              }
             }
             bvh_freeTransform(&bvhPreviousTransform);
            //-----------------------------------------------
@@ -2149,7 +2148,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                           );
         */
 
-
         if ( (!ikConfig->dontUseSolutionHistory) && (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from previous solution
@@ -2173,8 +2171,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    );
         }
 
-
-
         if ( (!ikConfig->dontUseSolutionHistory) && (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from pre-previous solution
@@ -2197,7 +2193,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    //---------------------------------
                                                    );
         }
-
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
