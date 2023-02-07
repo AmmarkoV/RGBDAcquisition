@@ -578,74 +578,53 @@ int prepareDefaultRightHandProblem(
        //Two modes, if we use a body then we will rely on its positional soluton
        //-----------------------------------------------------------------------
        //-----------------------------------------------------------------------
-       //-----------------------------------------------------------------------
-       checksum=0;
-       correct=0;
-       data.partID=0;
-
+       checksum=0; correct=0; startAddingNewPartsToChain(&data);
        //                                                     minX/maxX     minY/maxY     minZ/maxZ
        addLimitsToNextPartOfChain(&data,    -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
        ++correct; checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
-
        //                                                     minX/maxX      minY/maxY       minZ/maxZ
        addLimitsToNextPartOfChain(&data,   -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
        ++correct; checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,OPTIMIZE_JOINT);
-
        //                                                    minX/maxX        minY/maxY        minZ/maxZ
        addLimitsToNextPartOfChain(&data,  -180.0,10.0,      -20.0,20.0,     -60.0,60.0);
        ++correct; checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
-
-      //----------------------------------------------------------
-      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-      //----------------------------------------------------------
-
-
-      nextChainAndJob(&data);
-      //----------------------------------------------------------
-      //----------------------------------------------------------
-      //----------------------------------------------------------
+       //----------------------------------------------------------
+       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+       //----------------------------------------------------------
+       nextChainAndJob(&data);
+       //----------------------------------------------------------
+       //----------------------------------------------------------
 
 
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //We add a specific kinematic chain that will just handle the wrist pose since the pose retrieved when concatenating
-    //seperate hands and bodies can be difficult to estimate..
-     checksum=0;
-     correct=0;
-    data.partID=0;
-
-     //                                                    minX/maxX        minY/maxY        minZ/maxZ
-     addLimitsToNextPartOfChain(&data,   -20.0,20.0,      -180.0,90.0,     -30.0,30.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,OPTIMIZE_JOINT);
-
-
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
-     //----------------------------------------------------------
-     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-     //----------------------------------------------------------
-
-    nextChainAndJob(&data);
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //We add a specific kinematic chain that will just handle the wrist pose since the pose retrieved when concatenating
+      //seperate hands and bodies can be difficult to estimate..
+       checksum=0; correct=0; startAddingNewPartsToChain(&data);
+       //                                   minX/maxX        minY/maxY        minZ/maxZ
+       addLimitsToNextPartOfChain(&data,   -20.0,20.0,      -180.0,90.0,     -30.0,30.0);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,OPTIMIZE_JOINT);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,END_EFFECTOR);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,END_EFFECTOR);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,END_EFFECTOR);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,END_EFFECTOR);
+       ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
+       //----------------------------------------------------------
+       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+       //----------------------------------------------------------
+       nextChainAndJob(&data);
+       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      } //end of non-standalone mode that also has a body..
       else
      {
        //Second mode, assuming no body
        //-----------------------------------------------------------------------
        //-----------------------------------------------------------------------
-       //-----------------------------------------------------------------------
-       checksum=0;
-       correct=0;
-       data.partID=0;
-
+       checksum=0; correct=0; startAddingNewPartsToChain(&data);
        expectBigValueChangesForNextPart(&data);
        ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
@@ -679,14 +658,10 @@ int prepareDefaultRightHandProblem(
          //Since quaternions have 4 coordinates, and the main loop of optimization only handles 3
          //We add another "chain" to cover everything
          fprintf(stderr,"Initialization of rhand uses quaternion..\n"); //ignore w
-
-         //Add quaternion limit to previous
-         //                                                  minQW/maxQW    minQX/maxQX     minQY/maxQY
+         //Add quaternion limit to previous        minQW/maxQW    minQX/maxQX     minQY/maxQY
          addLimitsToPreviousPartOfChain(&data,     -1.0,1.0,      -1.0,1.0,        -1.0,1.0);
          //                                                       mAE qW    mAE qX    mAE qY
          addEstimatedMAEToPartOfChain_AfterAddingNewPart(&data,  0.25,      0.34,     0.25 );
-
-
 
          //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
          addLimitsToNextPartOfChain(&data,  -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
@@ -710,7 +685,7 @@ int prepareDefaultRightHandProblem(
       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
 
-     //The rest is common for both standalone and non standalone hands..!
+      //The rest is common for both standalone and non standalone hands..!
       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
@@ -719,7 +694,6 @@ int prepareDefaultRightHandProblem(
       //----------------------------------------------------------
       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
-
       nextChainAndJob(&data);
       //----------------------------------------------------------
       //----------------------------------------------------------
@@ -732,13 +706,8 @@ int prepareDefaultRightHandProblem(
      //CHAIN 1 ----------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     data.partID=0;
-
-
-     //                                                  minX/maxX    minY/maxY     minZ/maxZ
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     //                                  minX/maxX    minY/maxY     minZ/maxZ
      //addLimitsToNextPartOfChain(&data,-15.0,15.0,  -45.0,90.0,   -17.0,45.0);
      //++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",0,2.0,OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,END_EFFECTOR);
@@ -746,82 +715,68 @@ int prepareDefaultRightHandProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
-     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    nextChain(&data);
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     nextChain(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
 
 
     //Chain 2 is the Finger 2
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-    data.partID=0; // Reset counter..
-
-    //                                                  -------    minY/maxY     minZ/maxZ
-    addLimitsToNextPartOfChain(&data, 0.0,0.0,  -20.0,20.0,   -10.0,90.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.3,    3.2 );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
+     //                                -------    minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -20.0,20.0,   -10.0,90.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.3,    3.2 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,OPTIMIZE_JOINT);
-
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
-    //                                                         mAE X    mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.2 );
-    ++correct; checksum+=addNewPartToChainProblem(&data,"finger2-2.r",0,1.0,OPTIMIZE_JOINT);
-
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,45.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      7.8 );
-    ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-3.r",0,1.0,OPTIMIZE_JOINT);
-
-    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger2-3.r",0,1.0,END_EFFECTOR);
-    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
-    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
-    nextChain(&data);
+     //                                 -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+     //                                                         mAE X    mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.2 );
+     ++correct; checksum+=addNewPartToChainProblem(&data,"finger2-2.r",0,1.0,OPTIMIZE_JOINT);
+     //                                -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,45.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      7.8 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-3.r",0,1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger2-3.r",0,1.0,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
 
 
 
     //Chain 3 is the Finger 3
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-    data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                  -------    minY/maxY     minZ/maxZ
-    addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
-
+     //                                                  -------    minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-2.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
-
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-3.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
-
-    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.r",0,1.0,END_EFFECTOR);
-
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
-    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.r",0,1.0,END_EFFECTOR);
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -831,34 +786,27 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //Chain 4 is the Finger 4
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-    data.partID=0; // Reset counter..
+     checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,OPTIMIZE_JOINT);
      //                                                  -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.7,     13.7 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-2.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
-
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-3.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
-
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger4-3.r",0,1.0,END_EFFECTOR);
-
-
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
-    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -871,33 +819,27 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //Chain 5 is the Finger 5
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-    data.partID=0; // Reset counter..
+     checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,OPTIMIZE_JOINT);
      //                                                  -------    minY/maxY    minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -25.0,8.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.0,     13.7 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-2.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
-
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-3.r",0,1.0,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
-    //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
-
+     //                                                   -------   -------     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+     //                                                         mAE X     mAE Y    mAE Z
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger5-3.r",0,1.0,END_EFFECTOR);
-
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
-    thisChainCanBeRunInParallel(&data);//This has to be done after adding parts Fingers can be solved in parallel
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data);//This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -907,11 +849,7 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //Thumb is complex so it has a minichain
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-    data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumbBase","__rthumb",1.0,OPTIMIZE_JOINT);
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
      //addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
@@ -919,11 +857,11 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.r",0,3.0,END_EFFECTOR);
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
      thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
-    //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
     #endif
@@ -936,39 +874,31 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //Chain 6 is the Finger 1 ( Thumb )
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumbBase","__rthumb",1.0,OPTIMIZE_JOINT);
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
      addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,OPTIMIZE_JOINT);
      //                                                   minX/maxX    minY/maxY   minZ/maxZ
      addLimitsToNextPartOfChain(&data, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.r",0,1.5,OPTIMIZE_JOINT);
      //                                                   minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.r",0,2.0,OPTIMIZE_JOINT);
      //                                                    minX/max   -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -50.0,0.0,  0.0,0.0,    0.0,50.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.r",0,5.0,END_EFFECTOR);
-
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
      thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
     //----------------------------------------------------------
@@ -1067,7 +997,7 @@ int prepareDefaultLeftHandProblem(
      {
      //Next chain is the L Shoulder
      //----------------------------------------------------------
-      checksum=0; correct=0; data.partID=0;
+      checksum=0; correct=0; startAddingNewPartsToChain(&data);
       //                                                     minX/maxX     minY/maxY     minZ/maxZ
       addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",0.5,OPTIMIZE_JOINT);
@@ -1090,7 +1020,7 @@ int prepareDefaultLeftHandProblem(
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //We add a specific kinematic chain that will just handle the wrist pose since the pose retreived when concatenating
     //seperate hands and bodies can be difficult to estimate..
-     checksum=0; correct=0; data.partID=0;
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                    minX/maxX        minY/maxY        minZ/maxZ
      addLimitsToNextPartOfChain(&data, -20.0,20.0,      -90.0,180.0,     -30.0,30.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT); //What importance does this joint give in the rotation..
@@ -1177,7 +1107,6 @@ int prepareDefaultLeftHandProblem(
       //----------------------------------------------------------
       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
-
       nextChainAndJob(&data);
       //----------------------------------------------------------
       //----------------------------------------------------------
@@ -1190,31 +1119,31 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
-     //                                                  -------    minY/maxY     minZ/maxZ
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     //                                -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -20.0,20.0,   -90.0,10.0);
-     //                                                         mAE X     mAE Y    mAE Z
+     //                                                       mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.3,    3.2 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X    mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.2 );
     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      7.8 );
     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger2-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
-      //----------------------------------------------------------
-      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-      //----------------------------------------------------------
+    //----------------------------------------------------------
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+    //----------------------------------------------------------
 
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
-     nextChain(&data);
+    nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1227,8 +1156,7 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                  -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
@@ -1262,30 +1190,26 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                  -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.7,     13.7 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
     //                                                   -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
     //                                                   -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger4-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
-      //----------------------------------------------------------
-      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-      //----------------------------------------------------------
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
      thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      nextChain(&data);
     //----------------------------------------------------------
@@ -1298,25 +1222,22 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                  -------    minY/maxY      minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -8.0,25.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.0,     13.7 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
     //                                                   -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
     //                                                   -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger5-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
       //----------------------------------------------------------
       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1334,8 +1255,7 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
 
      expectBigValueChangesForNextPart(&data);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumbBase","__lthumb",BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
@@ -1365,34 +1285,29 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0; correct=0; data.partID=0; // Reset counter..
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                   minX/maxX     minY/maxY   minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   13.0,     20.0,     20.0 );
      //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
      ++correct; checksum+=addNewPartToChainProblem(&data,"lthumbBase","__lthumb",BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
      //                                                   minX/maxX     minY/maxY    minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   15.3,     40.0,     40.0 );
      //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumb",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
      //                                                   minX/maxX    minY/maxY      0minZ/maxZ
      addLimitsToNextPartOfChain(&data, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT); // should this be 0 ?
-
      //                                                   minX/maxX    -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  0.0,50.0,    0.0,0.0,    -50.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
       //----------------------------------------------------------
       if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1512,7 +1427,6 @@ int prepareDefaultBodyProblem(
     //----------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
-
     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1549,21 +1463,17 @@ int prepareDefaultBodyProblem(
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
-
-
      //++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",0,0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      //addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",0,0.5,OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",2.5,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",2.5,END_EFFECTOR);
-    //----------------------------------------------------------
-    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
-
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
     //----------------------------------------------------------
@@ -1581,20 +1491,17 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-    //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 25 26 27
-    //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
-    ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
-
-
-    //                                                     minX/maxX      minY/maxY       minZ/maxZ
-    addLimitsToNextPartOfChain(&data,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
+     //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 25 26 27
+     //                                                     minX/maxX     minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
+     //                                                     minX/maxX      minY/maxY       minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
     //----------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
-
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
     //----------------------------------------------------------
