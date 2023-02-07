@@ -246,7 +246,7 @@ int bvhConverter_getJointNameJointID(const char * jointName)
 {
   //fprintf(stderr,"Asked to resolve %s\n",jointName);
   BVHJointID jID=0;
-  if (
+  if  (
         bvh_getJointIDFromJointNameNocase(
                                           &bvhAtomicMotion,
                                           jointName,
@@ -421,7 +421,7 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   int everythingOk = 1;
-  char jointName[512]={0};
+  //char jointName[512]={0};
   for (int i=0; i<numberOfElements; i++)
   {
       if (!bvhConverter_modifySingleAtomic(labels[i],values[i],frameID))

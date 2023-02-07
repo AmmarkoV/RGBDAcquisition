@@ -43,7 +43,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-#define PENALIZE_SYMMETRY_HEURISTIC 1
+#define PENALIZE_SYMMETRY_HEURISTIC 0
 
 unsigned long tickBaseIK = 0;
 
@@ -487,10 +487,9 @@ float calculateChainLoss(
                                   {
                                       float gain = 225.0;
                                       symmetriesLoss = 1.0 * symmetriesLoss * gain; // <- Easy flip
-                                      fprintf(stderr,"Symmetry Loss %0.2f / %0.2f @ %s \n",symmetriesLoss,loss,problem->mc->jointHierarchy[jID].jointName);
+                                      //fprintf(stderr,"Symmetry Loss %0.2f / %0.2f @ %s \n",symmetriesLoss,loss,problem->mc->jointHierarchy[jID].jointName);
                                       loss+=symmetriesLoss;
                                   }
-
                               }
                             }
                         }
@@ -511,7 +510,6 @@ float calculateChainLoss(
                             { return NAN; }
     //----------------------------------------------------------------------------------------------------------
 }
-
 
 
 
@@ -558,14 +556,11 @@ int examineSolutionAndKeepIfItIsBetterSingleTry(
         return 0;
 }
 
-
 float randomNoise(float noiseMagnitude)
 {
   float x = ((float)rand()/(float)(RAND_MAX)) * noiseMagnitude;
-
   return x-(float) (noiseMagnitude/2);
 }
-
 
 int examineSolutionAndKeepIfItIsBetter(
                                        struct ikProblem * problem,
@@ -616,7 +611,6 @@ int examineSolutionAndKeepIfItIsBetter(
         return (accepted!=0);
 }
 
-
 void ensureValuesInLimits(float vals[3],float mins[3],float maxes[3])
 {
  //-------------------------------------------------------------------------------------
@@ -630,7 +624,6 @@ void ensureValuesInLimits(float vals[3],float mins[3],float maxes[3])
  if (vals[2]>maxes[2]) { vals[2]=maxes[2]; }
  //-------------------------------------------------------------------------------------
 }
-
 
 void updateLimitsBasedOnMAE(
                             struct ikProblem * problem,
