@@ -39,7 +39,6 @@ struct problemData
  struct ikProblem * problem;
  struct BVH_MotionCapture * mc;
  //---------------------------
- unsigned int groupID;
  unsigned int jobID;
  unsigned int chainID;
  unsigned int partID;
@@ -115,7 +114,6 @@ int addNewPartToChainProblemDetailed(
     float importance,
     int isEndEffector,
     //-----------------------------------------
-    unsigned int * groupID,
     unsigned int * jobID,
     unsigned int * chainID,
     unsigned int * partID,
@@ -139,7 +137,6 @@ int addNewPartToChainProblemDetailed(
 
     //Chain 0 is the RHand and all of the rigid torso
     //----------------------------------------------------------
-    problem->chain[*chainID].groupID=*groupID;
     problem->chain[*chainID].jobID=*jobID;
     problem->chain[*chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
     problem->chain[*chainID].status = BVH_IK_NOTSTARTED;
@@ -233,7 +230,6 @@ int addNewPartToChainProblem(
     return addNewPartToChainProblemDetailed(data->problem,
                                             data->mc,
                                             partName,alternatePartName,importance,isEndEffector,
-                                            &data->groupID,
                                             &data->jobID,
                                             &data->chainID,
                                             &data->partID,
@@ -634,7 +630,7 @@ int prepareDefaultRightHandProblem(
                               "rhand",NO_ALTERNATE_NAME,
                                2.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               0, //We assume the root joint is the first and the X pos has index 0
@@ -648,7 +644,7 @@ int prepareDefaultRightHandProblem(
                               "rhand",NO_ALTERNATE_NAME,
                                1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               3, //We assume the root joint is the first and the first rotation component has index 3
@@ -676,7 +672,7 @@ int prepareDefaultRightHandProblem(
                               "rhand",NO_ALTERNATE_NAME,
                                1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
@@ -1024,7 +1020,7 @@ int prepareDefaultLeftHandProblem(
                               "lhand",NO_ALTERNATE_NAME,
                                1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               0, //We have a position which since it comes from root joint should start at 0
@@ -1038,7 +1034,7 @@ int prepareDefaultLeftHandProblem(
                               "lhand",NO_ALTERNATE_NAME,
                                BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               3, //We have a rotation which since it comes from root joint should start at 3
@@ -1066,7 +1062,7 @@ int prepareDefaultLeftHandProblem(
                               "lhand",NO_ALTERNATE_NAME,
                                BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                              &data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
@@ -1310,7 +1306,7 @@ int prepareDefaultBodyProblem(
                             )
 {
     //----------------------------------------------------------
-     float allTuningInOne[]={0.5,1.0,1.5,2.0,2.5};
+     float allTuningInOne[]     = {0.5,1.0,1.5,2.0,2.5};
      float MINIMAL_IMPORTANCE   = allTuningInOne[0];
      float LOW_IMPORTANCE       = allTuningInOne[1];
      float MEDIUM_IMPORTANCE    = allTuningInOne[2];
@@ -1359,19 +1355,19 @@ int prepareDefaultBodyProblem(
                                                              //-----------------------------------------
                                                              "hip","Hips",HIGH_IMPORTANCE,OPTIMIZE_JOINT,
                                                              //-----------------------------------------
-                                                             &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                                                             &data.jobID,&data.chainID,&data.partID,
                                                              //-----------------------------------------
                                                              1, //Force specific mIDStart/mIDEnd
                                                              0, //We have a position which since it comes from root joint should start at 0
                                                              2  //We have a position which since it comes from root joint should end at 2
                                                             );
-     expectSmallValueChangesForNextPart(&data); //Small changes
+     //expectSmallValueChangesForNextPart(&data); //Small changes for rotation? (not)
      ++correct;   checksum+=addNewPartToChainProblemDetailed(
                                                              problem,mc,
                                                              //-----------------------------------------
                                                              "hip","Hips",MINIMAL_IMPORTANCE,OPTIMIZE_JOINT,
                                                              //-----------------------------------------
-                                                             &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                                                             &data.jobID,&data.chainID,&data.partID,
                                                              //-----------------------------------------
                                                              1, //Force specific mIDStart/mIDEnd
                                                              3, //We have a rotation which since it comes from root joint should start at 3
@@ -1435,10 +1431,15 @@ int prepareDefaultBodyProblem(
      //                               minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
-     addLimitsToNextPartOfChain(&data,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
+     addLimitsToNextPartOfChain(&data,-7.0,22.0,  -22.0,22.0,   -10.0,10.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris02",NO_ALTERNATE_NAME, VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+
+
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //-------------------------------------------------------------
@@ -1458,8 +1459,8 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      //                                  minX/maxX      minY/maxY       minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,      OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,   END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       MEDIUM_IMPORTANCE,      OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, VERY_HIGH_IMPORTANCE,   END_EFFECTOR);
     //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //-------------------------------------------------------------
@@ -1479,8 +1480,8 @@ int prepareDefaultBodyProblem(
      ++correct; checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",        MINIMAL_IMPORTANCE,   OPTIMIZE_JOINT);
      //                                  minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       LOW_IMPORTANCE,       OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,    END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       MEDIUM_IMPORTANCE,       OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, VERY_HIGH_IMPORTANCE,    END_EFFECTOR);
     //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //-------------------------------------------------------------
@@ -1499,11 +1500,11 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",                     MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",                     LOW_IMPORTANCE,      OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",                     MEDIUM_IMPORTANCE,      OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,           LOW_IMPORTANCE,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,MEDIUM_IMPORTANCE,   END_EFFECTOR);  // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,           HIGH_IMPORTANCE,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,HIGH_IMPORTANCE,   END_EFFECTOR);  // Big Toe
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,MEDIUM_IMPORTANCE,   END_EFFECTOR);  // Small Toe
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1519,8 +1520,8 @@ int prepareDefaultBodyProblem(
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,             LOW_IMPORTANCE,     OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,  MEDIUM_IMPORTANCE,  END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,             MEDIUM_IMPORTANCE,     OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,  HIGH_IMPORTANCE,  END_EFFECTOR); // Big Toe
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,  MEDIUM_IMPORTANCE,  END_EFFECTOR); // Small Toe
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1539,11 +1540,11 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",                            MINIMAL_IMPORTANCE,    OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",                            LOW_IMPORTANCE,        OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",                            MEDIUM_IMPORTANCE,        OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                  LOW_IMPORTANCE,        OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,     END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                  HIGH_IMPORTANCE,        OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,       HIGH_IMPORTANCE,     END_EFFECTOR); // Big Toe
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,     END_EFFECTOR); // Small Toe
     //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1560,8 +1561,8 @@ int prepareDefaultBodyProblem(
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                LOW_IMPORTANCE,          OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,     MEDIUM_IMPORTANCE,       END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                MEDIUM_IMPORTANCE,          OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,     HIGH_IMPORTANCE,       END_EFFECTOR); // Big Toe
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,     MEDIUM_IMPORTANCE,       END_EFFECTOR); // Small Toe
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }

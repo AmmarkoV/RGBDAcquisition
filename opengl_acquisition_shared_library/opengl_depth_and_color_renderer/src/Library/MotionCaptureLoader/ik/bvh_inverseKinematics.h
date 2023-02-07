@@ -12,18 +12,16 @@ extern "C"
 {
 #endif
 
-#define IK_VERSION 0.38
+#define IK_VERSION 0.39
 
 #define MAXIMUM_CHAINS 16
 #define MAXIMUM_PARTS_OF_CHAIN 24
 #define MAXIMUM_PROBLEM_DESCRIPTION 64
 
-
 #define HCD_DEFAULT_EPOCHS 10
 #define HCD_DEFAULT_ITERATIONS 15
 #define HCD_DEFAULT_LEARNING_RATE 0.002
 #define HCD_DEFAULT_LANGEVIN 0.0
-
 
 enum bvhIKSolutionStatus
 {
@@ -83,7 +81,7 @@ struct ikChain
   unsigned int encounteredWorseSolutionsThanPrevious;
   // --------------------------------------------------------------------------
   unsigned int jobID;
-  unsigned int groupID;
+  //unsigned int groupID;
   // --------------------------------------------------------------------------
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN+1];

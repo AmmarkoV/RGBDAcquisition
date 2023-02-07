@@ -634,31 +634,35 @@ void updateLimitsBasedOnMAE(
                             float maximumLimitValues[3]
                            )
 {
-       char limitsEngaged = problem->chain[chainID].part[partID].limits;
-       //Update Minima ------------------------------------------------------------
-       float newMin = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[0]); }
-       minimumLimitValues[0]=newMin;
+ char limitsEngaged = problem->chain[chainID].part[partID].limits;
 
-       newMin = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[1]); }
-       minimumLimitValues[1]=newMin;
+ //Update Minima ------------------------------------------------------------
+ float newMinA = originalValues[0]-problem->chain[chainID].part[partID].mAE[0];
+ float newMinB = originalValues[1]-problem->chain[chainID].part[partID].mAE[1];
+ float newMinC = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
 
-       newMin = originalValues[2]-problem->chain[chainID].part[partID].mAE[2];
-       if (limitsEngaged) { newMin = fmax(newMin,minimumLimitValues[2]); }
-       minimumLimitValues[2]=newMin;
-       //---------------------------------------------------------------------------
-       float newMax = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[0]); }
-       maximumLimitValues[0]=newMax;
+ //Update Maxima ------------------------------------------------------------
+ float newMaxA = originalValues[0]+problem->chain[chainID].part[partID].mAE[0];
+ float newMaxB = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
+ float newMaxC = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
 
-       newMax = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[1]); }
-       maximumLimitValues[1]=newMax;
+ if (limitsEngaged) {
+                      newMinA = fmax(newMinA,minimumLimitValues[0]);
+                      newMinB = fmax(newMinB,minimumLimitValues[1]);
+                      newMinC = fmax(newMinC,minimumLimitValues[2]);
+                      newMaxA = fmin(newMaxA,maximumLimitValues[0]);
+                      newMaxB = fmin(newMaxB,maximumLimitValues[1]);
+                      newMaxC = fmin(newMaxC,maximumLimitValues[2]);
+                    }
 
-       newMax = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
-       if (limitsEngaged) { newMax = fmin(newMax,maximumLimitValues[2]); }
-       maximumLimitValues[2]=newMax;
+  //---------------------------------------------------------------------------
+  minimumLimitValues[0]=newMinA;
+  minimumLimitValues[1]=newMinB;
+  minimumLimitValues[2]=newMinC;
+  //---------------------------------------------------------------------------
+  maximumLimitValues[0]=newMaxA;
+  maximumLimitValues[1]=newMaxB;
+  maximumLimitValues[2]=newMaxC;
 }
 
 
@@ -688,18 +692,15 @@ int weAreAtALocalOptimum(
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
-                //if (verbose)  { fprintf(stderr,"Initial #%u value seems to be locally optimal..!\n",i); }
                 delta[i] = d; // Why d ? and not 0
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
             {
-                //if (verbose)  { fprintf(stderr,"Initial #%u needs to be positively changed..!\n",i); }
                 delta[i] = d;
             }
             else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
             {
-                //if (verbose) { fprintf(stderr,"Initial #%u needs to be negatively changed..!\n",i); }
                 delta[i] = -d;
             }
             else if (verbose)
@@ -713,6 +714,25 @@ int weAreAtALocalOptimum(
   //-------------------------------------------------------------------------------------------------------
   return (badLosses==3);
 }
+
+
+
+int limitDeltasToThreshold(
+                           float * delta,
+                           float gradientExplosionThreshold
+                          )
+{
+ if (delta[0]>0.0) { delta[0]=fmin(fabs(delta[0]),gradientExplosionThreshold); } else
+                   { delta[0]=fmax(fabs(delta[0]),-gradientExplosionThreshold); }
+ //-----------------------------------------------------------------------------------
+ if (delta[1]>0.0) { delta[1]=fmin(fabs(delta[1]),gradientExplosionThreshold); } else
+                   { delta[1]=fmax(fabs(delta[1]),-gradientExplosionThreshold); }
+ //-----------------------------------------------------------------------------------
+ if (delta[2]>0.0) { delta[2]=fmin(fabs(delta[2]),gradientExplosionThreshold); } else
+                   { delta[2]=fmax(fabs(delta[2]),-gradientExplosionThreshold); }
+}
+
+
 
 
 float iteratePartLoss(
@@ -1065,7 +1085,7 @@ if (iterationID==0)
         unsigned int deltaExploded       = ( (fabs(delta[0])>gradientExplosionThreshold) || (fabs(delta[1])>gradientExplosionThreshold) || (fabs(delta[2])>gradientExplosionThreshold) );
         unsigned int encounteredNaNDelta = ( (delta[0]!=delta[0]) || (delta[1]!=delta[1]) || (delta[2]!=delta[2]) );
 
-        if  ( (deltaExploded) || (encounteredNaNDelta) )
+        if  (encounteredNaNDelta)
         {
             ++problem->chain[chainID].encounteredExplodingGradients;
             fprintf(stderr,RED "EXPLODED %s @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
@@ -1081,7 +1101,17 @@ if (iterationID==0)
              //Just stop after an explosion..
             executedEpochs=currentEpoch;
             break;
+        } else
+        if  (deltaExploded)
+        {
+            ++problem->chain[chainID].encounteredExplodingGradients;
+            fprintf(stderr,RED "SUPPRESSED EXPLOSION %s @ %u/%u | d{%0.1f,%0.1f,%0.1f}/%0.1f | mIDS{%u,%u,%u}\n" NORMAL,jointName,currentEpoch,epochs,delta[0],delta[1],delta[2],gradientExplosionThreshold,mIDS[0],mIDS[1],mIDS[2]);
+            limitDeltasToThreshold(delta,gradientExplosionThreshold);
+             //Just stop after an explosion..
+            executedEpochs=currentEpoch;
+            break;
         }
+
 
         //----------------------------------------------
         //Remember previous loss/values
@@ -1222,16 +1252,6 @@ int iterateChainLoss(
                      struct ikConfiguration * config,
                      unsigned int iterationID,
                      unsigned int chainID
-                     /*,
-                     float lr,
-                     float maximumAcceptableStartingLoss,
-                     unsigned int epochs,
-                     unsigned int tryMaintainingLocalOptima,
-                     float spring,
-                     float gradientExplosionThreshold,
-                     char useSolutionHistory,
-                     float useLangevinDynamics,
-                     unsigned int verbose*/
                     )
 {
     problem->chain[chainID].status = BVH_IK_STARTED;
