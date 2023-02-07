@@ -43,7 +43,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-#define PENALIZE_SYMMETRY_HEURISTIC 0
+#define PENALIZE_SYMMETRY_HEURISTIC 1
 
 unsigned long tickBaseIK = 0;
 
@@ -840,7 +840,7 @@ float iteratePartLoss(
     }
 
     //Shorthand to access joint ID and joint Name witout having to traverse the problem
-    unsigned int jointID = problem->chain[chainID].part[partID].jID;
+    unsigned int jointID   = problem->chain[chainID].part[partID].jID;
     const char * jointName = problem->mc->jointHierarchy[jointID].jointName;
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
