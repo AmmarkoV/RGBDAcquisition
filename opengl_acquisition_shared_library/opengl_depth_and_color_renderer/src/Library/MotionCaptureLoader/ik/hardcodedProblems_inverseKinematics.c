@@ -24,7 +24,87 @@
 //Attempt to add a second thumb solution chain
 #define DUALTHUMB 1
 
-int addNewPartToChainProblem(
+
+// Variable Shortcut
+//------------------------------
+const int END_EFFECTOR      = 1;
+const int OPTIMIZE_JOINT    = 0;
+char * NO_ALTERNATE_NAME    = 0;
+//------------------------------
+
+struct problemData
+{
+ struct ikProblem * problem;
+ struct BVH_MotionCapture * mc;
+ //---------------------------
+ unsigned int groupID;
+ unsigned int jobID;
+ unsigned int chainID;
+ unsigned int partID;
+};
+
+
+int failedPreparingChain(struct problemData * data,int correct,int checksum)
+{
+  if (correct!=checksum)
+         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",data->chainID,checksum,correct); return 1; }
+  return 0;
+}
+
+void expectBigValueChangesForNextPart(struct problemData * data)
+{
+  if ( (data!=0) && (data->problem!=0) && (data->chainID<MAXIMUM_CHAINS) && (data->partID<MAXIMUM_PARTS_OF_CHAIN) )
+  {
+     unsigned int chainID = data->chainID;
+     unsigned int partID  = data->partID;
+     fprintf(stderr,"Asked to signal big changes to chain %u part %u",chainID,partID);
+     data->problem->chain[chainID].part[partID].bigChanges=1; //Big changes
+  } else
+  {
+      fprintf(stderr,"ERROR: You need to increase the MAXIMUM_CHAINS declaration from %u to %u",MAXIMUM_CHAINS,data->chainID+1);
+      fprintf(stderr,"ERROR: You need to increase the MAXIMUM_PARTS_OF_CHAIN declaration from %u to %u",MAXIMUM_PARTS_OF_CHAIN,data->partID+1);
+  }
+}
+
+void expectSmallValueChangesForNextPart(struct problemData * data)
+{
+  if ( (data!=0) && (data->problem!=0) && (data->chainID<MAXIMUM_CHAINS) && (data->partID<MAXIMUM_PARTS_OF_CHAIN) )
+  {
+   data->problem->chain[data->chainID].part[data->partID].smallChanges=1;
+  } else
+  {
+      fprintf(stderr,"ERROR: You need to increase the MAXIMUM_CHAINS declaration from %u to %u",MAXIMUM_CHAINS,data->chainID+1);
+      fprintf(stderr,"ERROR: You need to increase the MAXIMUM_PARTS_OF_CHAIN declaration from %u to %u",MAXIMUM_PARTS_OF_CHAIN,data->partID+1);
+  }
+}
+
+void thisChainCanBeRunInParallel(struct problemData * data)
+{
+  if ( (data!=0) && (data->problem!=0) && (data->chainID<MAXIMUM_CHAINS) )
+    { data->problem->chain[data->chainID].parallel=1; }
+}
+
+void nextChain(struct problemData * data)
+{
+  data->chainID+=1;
+  if ((data->chainID>=MAXIMUM_CHAINS) )
+  {
+      fprintf(stderr,"ERROR: You need to increase the MAXIMUM_CHAINS declaration from %u to %u",MAXIMUM_CHAINS,data->chainID+1);
+  }
+}
+
+void nextChainAndJob(struct problemData * data)
+{
+  data->jobID+=1;
+  nextChain(data);
+}
+
+void startAddingNewPartsToChain(struct problemData * data)
+{
+    data->partID=0;
+}
+
+int addNewPartToChainProblemDetailed(
     struct ikProblem * problem,
     struct BVH_MotionCapture * mc,
     //-----------------------------------------
@@ -55,7 +135,6 @@ int addNewPartToChainProblem(
       return 0;
     }
 
-
     //Chain 0 is the RHand and all of the rigid torso
     //----------------------------------------------------------
     problem->chain[*chainID].groupID=*groupID;
@@ -74,13 +153,11 @@ int addNewPartToChainProblem(
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
 
     unsigned int thisJID=0;
-
     unsigned int foundJoint = bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID);
     if  ( (!foundJoint) && (alternatePartName!=0) )
     {
         foundJoint = bvh_getJointIDFromJointNameNocase(mc,alternatePartName,&thisJID);
     }
-
 
     if (foundJoint)
     {
@@ -138,20 +215,32 @@ int addNewPartToChainProblem(
         {
          fprintf(stderr,RED "Also checked for the alternate %s name in armature..\n" NORMAL,alternatePartName);
         }
-        //------
-        //exit(0); <- this is extreme..
         return 0;
     }
 }
 
-
+int addNewPartToChainProblem(
+    struct problemData * data,
+    //-----------------------------------------
+    char * partName,
+    char * alternatePartName,
+    float importance,
+    int isEndEffector
+    )
+{
+    return addNewPartToChainProblemDetailed(data->problem,
+                                            data->mc,
+                                            partName,alternatePartName,importance,isEndEffector,
+                                            &data->groupID,
+                                            &data->jobID,
+                                            &data->chainID,
+                                            &data->partID,
+                                            0,0,0);
+}
 
 
 int addLimitsToPartOfChain(
-                           struct ikProblem * problem,
-                           struct BVH_MotionCapture * mc,
-                           //-----------------------------------------
-                           unsigned int chainID,
+                           struct problemData * data,
                            unsigned int partID,
                            //-----------------------------------------
                            float minimumX,
@@ -162,6 +251,9 @@ int addLimitsToPartOfChain(
                            float maximumZ
                           )
 {
+    struct ikProblem * problem    = data->problem;
+    unsigned int chainID          = data->chainID;
+
     if (chainID >= MAXIMUM_CHAINS)
     {
       fprintf(stderr,RED "Reached limit of maximum chains.. (%d) \n" NORMAL,MAXIMUM_CHAINS);
@@ -175,26 +267,28 @@ int addLimitsToPartOfChain(
     }
 
     problem->chain[chainID].part[partID].limits=1;
-    //Z X Y
     problem->chain[chainID].part[partID].minimumLimitMID[0]=minimumZ;
     problem->chain[chainID].part[partID].maximumLimitMID[0]=maximumZ;
     problem->chain[chainID].part[partID].minimumLimitMID[1]=minimumX;
     problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
     problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
     problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY;
-   //------
-   return 1;
+    //------
+    return 1;
 }
 
+int addLimitsToNextPartOfChain(struct problemData * data,float minimumX,float maximumX,float minimumY,float maximumY,float minimumZ,float maximumZ)
+{
+    return addLimitsToPartOfChain(data,data->partID,minimumX,maximumX,minimumY,maximumY,minimumZ,maximumZ);
+}
 
-
-
+int addLimitsToPreviousPartOfChain(struct problemData * data,float minimumX,float maximumX,float minimumY,float maximumY,float minimumZ,float maximumZ)
+{
+    return addLimitsToPartOfChain(data,data->partID-1,minimumX,maximumX,minimumY,maximumY,minimumZ,maximumZ);
+}
 
 int addEstimatedMAEToPartOfChain(
-                                 struct ikProblem * problem,
-                                 struct BVH_MotionCapture * mc,
-                                 //-----------------------------------------
-                                 unsigned int chainID,
+                                 struct problemData * data,
                                  unsigned int partID,
                                  //-----------------------------------------
                                  float mAE_X,
@@ -202,6 +296,9 @@ int addEstimatedMAEToPartOfChain(
                                  float mAE_Z
                                 )
 {
+    struct ikProblem * problem    = data->problem;
+    unsigned int chainID          = data->chainID;
+
     if (chainID >= MAXIMUM_CHAINS)
     {
       fprintf(stderr,RED "Reached limit of maximum chains.. (%d) \n" NORMAL,MAXIMUM_CHAINS);
@@ -223,20 +320,25 @@ int addEstimatedMAEToPartOfChain(
    return 1;
 }
 
+int addEstimatedMAEToPartOfChain_AfterAddingNewPart(struct problemData * data,float mAE_X,float mAE_Y,float mAE_Z)
+{
+  return addEstimatedMAEToPartOfChain(data,data->partID-1,mAE_X,mAE_Y,mAE_Z);
+}
 
-
-
-
+int addEstimatedMAEToPartOfChain_BeforeAddingNewPart(struct problemData * data,float mAE_X,float mAE_Y,float mAE_Z)
+{
+  return addEstimatedMAEToPartOfChain(data,data->partID,mAE_X,mAE_Y,mAE_Z);
+}
 
 int prepareDefaultFaceProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform,
-    int standalone
-)
+                               struct ikProblem * problem,
+                               struct BVH_MotionCapture * mc,
+                               struct simpleRenderer *renderer,
+                               struct MotionBuffer * previousSolution,
+                               struct MotionBuffer * solution,
+                               struct BVH_Transform * bvhTargetTransform,
+                               int standalone
+                              )
 {
     if (problem==0)
          {
@@ -249,7 +351,6 @@ int prepareDefaultFaceProblem(
 
     problem->mc = mc;
     problem->renderer = renderer;
-
     problem->previousSolution = mallocNewMotionBufferAndCopy(mc,previousSolution);
     problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
     problem->currentSolution  = mallocNewMotionBufferAndCopy(mc,solution);
@@ -265,13 +366,11 @@ int prepareDefaultFaceProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    struct problemData data = {0};
+    data.problem = problem;
+    data.mc      = mc;
     unsigned int correct=0;
     unsigned int checksum=0;
-    unsigned int groupID=0;
-    unsigned int jobID=0;
-    unsigned int chainID=0;
-    unsigned int partID=0;
-    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -279,119 +378,26 @@ int prepareDefaultFaceProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-     /*
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "chest",0,// Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
-                             */
-
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     //++correct; checksum+=addNewPartToChainProblem(&data"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      if (!standalone)
      {
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck1",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      }
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "head",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "special04",0,// Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.l",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.r",0,// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"eye.l",NO_ALTERNATE_NAME,2.5,END_EFFECTOR);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"eye.r",NO_ALTERNATE_NAME,2.5,END_EFFECTOR);
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    ++chainID;
-    ++jobID;
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
-
 
 
 
@@ -400,73 +406,20 @@ int prepareDefaultFaceProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"orbicularis03.r",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"endsite_orbicularis03.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"orbicularis04.r",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"endsite_orbicularis04.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "orbicularis03.r",0,  // Top eyelid
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_orbicularis03.r",0,  // Top eyelid
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "orbicularis04.r",0,  // Bottom eyelid
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_orbicularis04.r",0,  // Bottom eyelid
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
+     //----------------------------------------------------------
 
 
 
@@ -474,70 +427,17 @@ int prepareDefaultFaceProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "orbicularis03.l",0,  // Top eyelid
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_orbicularis03.l",0,  // Top eyelid
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "orbicularis04.l",0,  // Bottom eyelid
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_orbicularis04.l",0,  // Bottom eyelid
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"orbicularis03.l",0,1.0,OPTIMIZE_JOINT);  // Top eyelid
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_orbicularis03.l",0,1.0,END_EFFECTOR); // Top eyelid
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"orbicularis04.l",0,1.0,OPTIMIZE_JOINT);// Bottom eyelid
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_orbicularis04.l",0,1.0,END_EFFECTOR); // Bottom eyelid
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    ++chainID;
-    ++jobID;
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -548,33 +448,16 @@ int prepareDefaultFaceProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",1.0,OPTIMIZE_JOINT);// Eye control
+     thisChainCanBeRunInParallel(&data);  //This has to be done after adding parts Fingers can be solved in parallel
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.r","endsite_eye.r",  // Eye control
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
     //----------------------------------------------------------
 
 
@@ -582,35 +465,16 @@ int prepareDefaultFaceProblem(
      //Next chain is the L Eye
      //----------------------------------------------------------
      //----------------------------------------------------------
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",1.0,OPTIMIZE_JOINT);// Eye control
+     thisChainCanBeRunInParallel(&data);  //This has to be done after adding parts Fingers can be solved in parallel
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "eye.l","endsite_eye.l",  // Eye control
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
 
 
 
@@ -618,194 +482,44 @@ int prepareDefaultFaceProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"jaw",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);       // Bottom mouth/center
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris01",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);    // Bottom mouth/center
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris07.r",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);  // Bottom mouth/right
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris07.l",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);  // Bottom mouth/left
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris05",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);    // Top mouth/center
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris03.r",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);  // Top mouth/right
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris03.l",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);  // Top mouth/left
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "jaw",0,  // Bottom mouth/center
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris01",0,  // Bottom mouth/center
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris07.r",0,  // Bottom mouth/right
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris07.l",0,  // Bottom mouth/left
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris05",0,  // Top mouth/center
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris03.r",0,  // Top mouth/right
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "oris03.l",0,  // Top mouth/left
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
 
-
-
-     //Next chain is the Mouth
+     //Next chain is the Cheeks
      //----------------------------------------------------------
      //----------------------------------------------------------
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"risorius03.l",0,1.0,OPTIMIZE_JOINT);// Left Cheek middle
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"levator05.l",0,1.0,OPTIMIZE_JOINT);// Left Cheek middle
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"risorius03.r",0,1.0,OPTIMIZE_JOINT);// Right Cheek middle
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"levator05.r",0,1.0,OPTIMIZE_JOINT); // Right Cheek middle
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "risorius03.l",0,  // Left Cheek middle
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "levator05.l",0,  // Left Cheek middle
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "risorius03.r",0,  // Right Cheek middle
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "levator05.r",0,  // Left Cheek middle
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
+     nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
-
-
-
-    problem->numberOfChains = chainID;
-    //problem->numberOfGroups = groupID;
-    problem->numberOfJobs = jobID;
+    //Done!
+    problem->numberOfChains = data.chainID;
+    problem->numberOfJobs = data.jobID;
 
      return 1;
 }
@@ -851,13 +565,11 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    struct problemData data = {0};
+    data.problem = problem;
+    data.mc      = mc;
     unsigned int correct=0;
     unsigned int checksum=0;
-    unsigned int groupID=0;
-    unsigned int jobID=0;
-    unsigned int chainID=0;
-    unsigned int partID=0;
-    //BVHJointID thisJID=0;
     //----------------------------------------------------------
 
 
@@ -869,58 +581,26 @@ int prepareDefaultRightHandProblem(
        //-----------------------------------------------------------------------
        checksum=0;
        correct=0;
-       partID=0;
+       data.partID=0;
 
-       ++correct;
-       checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rshoulder","rShldr",  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+       //                                                     minX/maxX     minY/maxY     minZ/maxZ
+       addLimitsToNextPartOfChain(&data,    -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+       ++correct; checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
 
+       //                                                     minX/maxX      minY/maxY       minZ/maxZ
+       addLimitsToNextPartOfChain(&data,   -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
+       ++correct; checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,OPTIMIZE_JOINT);
 
-       ++correct;
-       checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "relbow","rForeArm",  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-       ++correct;
-       checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhand",0,// Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     //                                                    minX/maxX        minY/maxY        minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,10.0,      -20.0,20.0,     -60.0,60.0);
+       //                                                    minX/maxX        minY/maxY        minZ/maxZ
+       addLimitsToNextPartOfChain(&data,  -180.0,10.0,      -20.0,20.0,     -60.0,60.0);
+       ++correct; checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
 
       //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at non-standalone rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
 
-      ++chainID;
-      ++jobID;
+
+      nextChainAndJob(&data);
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
@@ -930,91 +610,27 @@ int prepareDefaultRightHandProblem(
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //We add a specific kinematic chain that will just handle the wrist pose since the pose retreived when concatenating
+    //We add a specific kinematic chain that will just handle the wrist pose since the pose retrieved when concatenating
     //seperate hands and bodies can be difficult to estimate..
      checksum=0;
      correct=0;
-     partID=0;
+    data.partID=0;
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhand",0,// Joint
-                               1.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    //                                                    minX/maxX        minY/maxY        minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
+     //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToNextPartOfChain(&data,   -20.0,20.0,      -180.0,90.0,     -30.0,30.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,OPTIMIZE_JOINT);
 
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
 
-      //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at common non-standalone rHand wrist chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-      //----------------------------------------------------------
-
-      ++chainID;
-      ++jobID;
+    nextChainAndJob(&data);
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1028,45 +644,35 @@ int prepareDefaultRightHandProblem(
        //-----------------------------------------------------------------------
        checksum=0;
        correct=0;
-       partID=0;
+       data.partID=0;
 
-
-       ++correct;
-       checksum+=addNewPartToChainProblem(
+       expectBigValueChangesForNextPart(&data);
+       ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "rhand",0,    // Joint
-                               2.0,     //Importance
-                               0,       //IsEndEffector
+                              "rhand",NO_ALTERNATE_NAME,
+                               2.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               0, //We assume the root joint is the first and the X pos has index 0
                               2  //We assume the root joint is the first and the Z pos has index 2
                              );
-       problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
-       //problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-       //problem->chain[chainID].part[partID-1].mIDEnd=2; //First Position
 
-       ++correct;
-       checksum+=addNewPartToChainProblem(
+       expectSmallValueChangesForNextPart(&data);
+       ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "rhand",0,    // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
+                              "rhand",NO_ALTERNATE_NAME,
+                               1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               3, //We assume the root joint is the first and the first rotation component has index 3
                               5  //We assume the root joint is the first and the last rotation component has index 5
                              );
-
-       problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-       //problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-       //problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
 
        if(mc->jointHierarchy[0].channelRotationOrder==BVH_ROTATION_ORDER_QWQXQYQZ)
        {
@@ -1076,106 +682,47 @@ int prepareDefaultRightHandProblem(
 
          //Add quaternion limit to previous
          //                                                  minQW/maxQW    minQX/maxQX     minQY/maxQY
-         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,        -1.0,1.0);
-         //                                                         mAE qW    mAE qX    mAE qY
-         addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.25,      0.34,     0.25 );
+         addLimitsToPreviousPartOfChain(&data,     -1.0,1.0,      -1.0,1.0,        -1.0,1.0);
+         //                                                       mAE qW    mAE qX    mAE qY
+         addEstimatedMAEToPartOfChain_AfterAddingNewPart(&data,  0.25,      0.34,     0.25 );
 
-         ++correct;
-         checksum+=addNewPartToChainProblem(
+
+
+         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
+         addLimitsToNextPartOfChain(&data,  -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
+         //                                                         mAE qX    mAE qY    mAE qZ
+         addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,  0.34,      0.25,     0.34 );
+         expectSmallValueChangesForNextPart(&data);
+         ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "rhand",0,    // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
+                              "rhand",NO_ALTERNATE_NAME,
+                               1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
                               6  //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components ending at 4
                              );
-        problem->chain[chainID].part[partID-1].smallChanges=1; //Small changes
-        //problem->chain[chainID].part[partID-1].mIDStart=4;
-        //problem->chain[chainID].part[partID-1].mIDEnd=6;
-         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
-         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
-         //                                                         mAE qX    mAE qY    mAE qZ
-         addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.34,      0.25,     0.34 );
        }
-
       //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at standalone rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
 
      //The rest is common for both standalone and non standalone hands..!
-       ++correct;
-       checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
       //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at standalone/non-standalone common rHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
 
-      ++chainID;
-      ++jobID;
+      nextChainAndJob(&data);
       //----------------------------------------------------------
       //----------------------------------------------------------
-      //----------------------------------------------------------
-
      } //End of standalone chain mode
 
 
@@ -1188,84 +735,19 @@ int prepareDefaultRightHandProblem(
      //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0;
+     data.partID=0;
 
-     /*
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhand",0, // Joint
-                               2.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-15.0,15.0,  -45.0,90.0,   -17.0,45.0);*/
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    ++chainID;
+     //addLimitsToNextPartOfChain(&data,-15.0,15.0,  -45.0,90.0,   -17.0,45.0);
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",0,2.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+    nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1276,72 +758,31 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
+    data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                  -------    minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -20.0,20.0,   -10.0,90.0);
+    addLimitsToNextPartOfChain(&data, 0.0,0.0,  -20.0,20.0,   -10.0,90.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.3,    3.2 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.3,    3.2 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.r",0,1.0,OPTIMIZE_JOINT);
 
-    ++correct;
-    checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-2.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
     //                                                         mAE X    mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,    13.2 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.2 );
+    ++correct; checksum+=addNewPartToChainProblem(&data,"finger2-2.r",0,1.0,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-3.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,45.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,45.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,      7.8 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      7.8 );
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-3.r",0,1.0,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger2-3.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger2-3.r",0,1.0,END_EFFECTOR);
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+    nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1356,73 +797,32 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
+    data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,OPTIMIZE_JOINT);
     //                                                  -------    minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
+    addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     1.3,     13.2 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-2.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-2.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,     13.6 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-3.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-3.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,      8.4 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger3-3.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.r",0,1.0,END_EFFECTOR);
 
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1434,73 +834,32 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+    data.partID=0; // Reset counter..
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.r",0,1.0,OPTIMIZE_JOINT);
      //                                                  -------    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     1.7,     13.7 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.7,     13.7 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-2.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-2.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,    13.1 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-3.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-3.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,      0.0,     8.3 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger4-3.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger4-3.r",0,1.0,END_EFFECTOR);
 
 
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1515,72 +874,31 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+    data.partID=0; // Reset counter..
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.r",0,1.0,OPTIMIZE_JOINT);
      //                                                  -------    minY/maxY    minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -25.0,8.0,   -10.0,90.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -25.0,8.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.0,     13.7 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.0,     13.7 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-2.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-2.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    0.0,90.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,      0.0,     13.9 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-3.r",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-3.r",0,1.0,OPTIMIZE_JOINT);
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,     0.0,45.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,     4.6 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger5-3.r",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger5-3.r",0,1.0,END_EFFECTOR);
 
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+    thisChainCanBeRunInParallel(&data);//This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1592,55 +910,19 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
+    data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumbBase","__rthumb", // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumbBase","__rthumb",1.0,OPTIMIZE_JOINT);
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     //addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
-     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
+     //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.r",0,3.0,END_EFFECTOR);
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger1-3.r",0, // Joint
-                              3.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -1657,95 +939,42 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0;
      correct=0;
-     partID=0; // Reset counter..
+     data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumbBase","__rthumb", // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumbBase","__rthumb",1.0,OPTIMIZE_JOINT);
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rthumb",0, // Joint
-                              1.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",0,1.0,OPTIMIZE_JOINT);
      //                                                   minX/maxX    minY/maxY   minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
+     addLimitsToNextPartOfChain(&data, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   5.5,     14.8,     11.1 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger1-2.r",0, // Joint
-                              1.5,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.r",0,1.5,OPTIMIZE_JOINT);
      //                                                   minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
+     addLimitsToNextPartOfChain(&data, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   6.7,     6.1,      2.8 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger1-3.r",0, // Joint
-                              2.0,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.r",0,2.0,OPTIMIZE_JOINT);
      //                                                    minX/max   -------     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -50.0,0.0,  0.0,0.0,    0.0,50.0);
+     addLimitsToNextPartOfChain(&data,  -50.0,0.0,  0.0,0.0,    0.0,50.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   9.0,     0.0,      3.9 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger1-3.r",0, // Joint
-                              5.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.r",0,5.0,END_EFFECTOR);
 
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-    problem->numberOfChains = chainID;
-    //problem->numberOfGroups = groupID;
-    problem->numberOfJobs = jobID;
+    problem->numberOfChains = data.chainID;
+    problem->numberOfJobs = data.jobID;
 
   return 1;
 }
@@ -1796,12 +1025,11 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    struct problemData data = {0};
+    data.problem = problem;
+    data.mc      = mc;
     unsigned int correct=0;
     unsigned int checksum=0;
-    unsigned int groupID=0;
-    unsigned int jobID=0;
-    unsigned int chainID=0;
-    unsigned int partID=0;
     //----------------------------------------------------------
 
 
@@ -1839,65 +1067,21 @@ int prepareDefaultLeftHandProblem(
      {
      //Next chain is the L Shoulder
      //----------------------------------------------------------
+      checksum=0; correct=0; data.partID=0;
+      //                                                     minX/maxX     minY/maxY     minZ/maxZ
+      addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",0.5,OPTIMIZE_JOINT);
+      //                                                     minX/maxX     minY/maxY     minZ/maxZ
+      addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,OPTIMIZE_JOINT);
+      //                                                    minX/maxX        minY/maxY        minZ/maxZ
+      addLimitsToNextPartOfChain(&data, -10.0,180.0,      -20.0,20.0,     -60.0,60.0);
+      ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+       nextChainAndJob(&data);
      //----------------------------------------------------------
-     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lshoulder","lShldr",  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lelbow","lForeArm",  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lhand",0,// Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    //                                                    minX/maxX        minY/maxY        minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -10.0,180.0,      -20.0,20.0,     -60.0,60.0);
-
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at non-standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
 
 
 
@@ -1906,25 +1090,10 @@ int prepareDefaultLeftHandProblem(
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //We add a specific kinematic chain that will just handle the wrist pose since the pose retreived when concatenating
     //seperate hands and bodies can be difficult to estimate..
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lhand",0,// Joint
-                               BASE_ENDPOINT_IMPORTANCE,     //Importance What importance does this joint give in the rotation..
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    //                                                    minX/maxX        minY/maxY        minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -180.0,180.0,      -20.0,20.0,     -60.0,60.0);
-
+     checksum=0; correct=0; data.partID=0;
+     //                                                    minX/maxX        minY/maxY        minZ/maxZ
+     addLimitsToNextPartOfChain(&data, -20.0,20.0,      -90.0,180.0,     -30.0,30.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT); //What importance does this joint give in the rotation..
      } //end of non-standalone mode that also has a body..
       else
      {
@@ -1932,150 +1101,84 @@ int prepareDefaultLeftHandProblem(
        //-----------------------------------------------------------------------
        //-----------------------------------------------------------------------
        //-----------------------------------------------------------------------
-       checksum=0;
-       correct=0;
-       partID=0;
+       checksum=0; correct=0;
 
-       ++correct;
-       checksum+=addNewPartToChainProblem(
+       expectBigValueChangesForNextPart(&data);
+       ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "lhand",0,    // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
+                              "lhand",0,
+                               1.0,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               0, //We have a position which since it comes from root joint should start at 0
                               2  //We have a position which since it comes from root joint should end at 2
                              );
-       unsigned int partThatJustWasCreated = partID - 1;
-       problem->chain[chainID].part[partThatJustWasCreated].bigChanges=1; //Big changes
 
-       ++correct;
-       checksum+=addNewPartToChainProblem(
+       expectSmallValueChangesForNextPart(&data);
+       ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "lhand",0,    // Joint
-                               BASE_ENDPOINT_IMPORTANCE,     //Importance
-                               0,       //IsEndEffector
+                              "lhand",0,
+                               BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               3, //We have a rotation which since it comes from root joint should start at 3
                               5  //We have a rotation which since it comes from root joint should end at 5
                              );
-       partThatJustWasCreated = partID - 1;
-       problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
 
        if(mc->jointHierarchy[0].channelRotationOrder==BVH_ROTATION_ORDER_QWQXQYQZ)
        {
          //Since quaternions have 4 coordinates, and the main loop of optimization only handles 3
          //We add another "chain" to cover everything
-         fprintf(stderr,"Initialization of lhand uses quaternion..\n"); //ignore w
 
          //                                                  minQW/maxQW    minQX/maxQX     minQY/maxQY
-         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,       -1.0,1.0,       -1.0,1.0);
+         addLimitsToPreviousPartOfChain(&data,    -1.0,1.0,       -1.0,1.0,       -1.0,1.0);
          //                                                         mAE qW    mAE qX    mAE qY
-         addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.25,      0.34,     0.25 );
+         addEstimatedMAEToPartOfChain_AfterAddingNewPart(&data,  0.25,      0.34,     0.25 );
+         fprintf(stderr,"Initialization of lhand uses quaternion..\n"); //ignore w
 
-         ++correct;
-         checksum+=addNewPartToChainProblem(
+
+         expectSmallValueChangesForNextPart(&data);
+         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
+         addLimitsToNextPartOfChain(&data, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
+         //                                                         mAE qX    mAE qY    mAE qZ
+         addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,  0.34,      0.25,     0.34 );
+         ++correct; checksum+=addNewPartToChainProblemDetailed(
                               problem,mc,
                               //-----------------------------------------
-                              "lhand",0,    // Joint
-                               BASE_ENDPOINT_IMPORTANCE,     //Importance
-                               0,       //IsEndEffector
+                              "lhand",0,
+                               BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT,
                               //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
+                              &data.groupID,&data.jobID,&data.chainID,&data.partID,
                               //-----------------------------------------
                               1, //Force specific mIDStart/mIDEnd
                               4, //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components starting from 4
                               6  //We have a quaternion which doesnt fit the 3 element structure so  we add one more part with the last 3 rotational components ending at 4
                              );
-
-         partThatJustWasCreated = partID - 1;
-         problem->chain[chainID].part[partThatJustWasCreated].smallChanges=1; //Small changes
-         //fprintf(stderr,"mIDS Q2 %u -> %u ..\n", problem->chain[chainID].part[partThatJustWasCreated].mIDStart, problem->chain[chainID].part[partThatJustWasCreated].mIDEnd );
-         //                                                  minQX/maxQX    minQY/maxQY     minQZ/maxQZ
-         addLimitsToPartOfChain(problem,mc,chainID,partID-1, -1.0,1.0,      -1.0,1.0,     -1.0,1.0);
-         //                                                         mAE qX    mAE qY    mAE qZ
-         addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,  0.34,      0.25,     0.34 );
        }
 
       //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
     }
 
 
     //This is the common bases of fingers
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.l",0, // Joint Priority
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.l",0, // Joint
-                              0.9,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.l",0, // Joint
-                              0.9,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.l",0, // Joint Priority
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lthumb",0, // Joint
-                              1.0,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.l",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.l",NO_ALTERNATE_NAME,0.9,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.l",NO_ALTERNATE_NAME,0.9,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.l",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumb",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
       //----------------------------------------------------------
-      if (correct!=checksum)
-         { fprintf(stderr,"Failed at common standalone/non-standalone lHand chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
       //----------------------------------------------------------
 
-      ++chainID;
-      ++jobID;
+      nextChainAndJob(&data);
       //----------------------------------------------------------
       //----------------------------------------------------------
       //----------------------------------------------------------
@@ -2087,75 +1190,31 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-1.l",0,           // Joint
-                              BASE_ENDPOINT_IMPORTANCE,  //Importance
-                              0,                         //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; data.partID=0; // Reset counter..
      //                                                  -------    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -20.0,20.0,   -90.0,10.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -20.0,20.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.3,    3.2 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.3,    3.2 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-2.l",0,             //Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE, //Importance
-                              0,                           //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X    mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,    13.2 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.2 );
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger2-3.l",0,            //Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE, //Importance
-                              0,                          //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,      7.8 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      7.8 );
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"finger2-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger2-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger2-3.l",0,      // Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE, //Importance
-                              1,                            //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -2168,75 +1227,32 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
+     checksum=0; correct=0; data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-1.l",0,          // Joint
-                              BASE_ENDPOINT_IMPORTANCE, //Importance
-                              0,                        //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                  -------    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     1.3,     13.2 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-2.l",0,              //Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE,  //Importance
-                              0,                            //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X    mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,     13.6 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-2.l",NO_ALTERNATE_NAME,  CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger3-3.l",0,            //Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE, //Importance
-                              0,                          //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,      8.4 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger3-3.l",0,       //Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE,  //Importance
-                              1,                             //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -2246,79 +1262,34 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
+     checksum=0; correct=0; data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-1.l",0,           // Joint
-                              BASE_ENDPOINT_IMPORTANCE,  //Importance
-                              0,                         //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                  -------    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     1.7,     13.7 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.7,     13.7 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-2.l",0,              // Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE,  //Importance
-                              0,                            //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,    13.1 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger4-3.l",0,              // Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE,   //Importance
-                              0,                            //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,      0.0,     8.3 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger4-3.l",0, // Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger4-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
 
 
 
@@ -2327,74 +1298,31 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-1.l",0,              // Joint
-                              BASE_ENDPOINT_IMPORTANCE,     //Importance
-                              0,                            //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; data.partID=0; // Reset counter..
      //                                                  -------    minY/maxY      minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,0.0,  -8.0,25.0,   -90.0,10.0);
+     addLimitsToNextPartOfChain(&data, 0.0,0.0,  -8.0,25.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     2.0,     13.7 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.0,     13.7 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-2.l",0,                 // Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
-                              0,                               //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,      0.0,     13.9 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger5-3.l",0,                // Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE,     //Importance
-                              0,                              //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                   -------   -------     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
+    addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
-    addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   0.0,     0.0,     4.6 );
+    addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger5-3.l",0, // Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
-                              1,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger5-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -2406,58 +1334,23 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
+     checksum=0; correct=0; data.partID=0; // Reset counter..
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lthumbBase","__lthumb", // Joint
-                              BASE_ENDPOINT_IMPORTANCE,     //Importance
-                              0,       //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-     problem->chain[chainID].part[partID-1].bigChanges=1;
+
+     expectBigValueChangesForNextPart(&data);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumbBase","__lthumb",BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
+
      //                                                    minX/maxX   minY/maxY    minZ/maxZ
-     //addLimitsToPartOfChain(problem,mc,chainID,partID-1,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
+     //addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
-     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lthumb",0,                      // Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE,     //Importance
-                              1,                               //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger1-3.l",0,          // Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE,     //Importance
-                              1,                                //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumb",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -2472,100 +1365,45 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0; // Reset counter..
+     checksum=0; correct=0; data.partID=0; // Reset counter..
 
-     ++correct;
-
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lthumbBase","__lthumb",                // Joint
-                              BASE_ENDPOINT_IMPORTANCE,               //Importance
-                              0,                                      //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                   minX/maxX     minY/maxY   minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
+     addLimitsToNextPartOfChain(&data,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   13.0,     20.0,     20.0 );
-     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   3.0,     2.6,     2.6 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   13.0,     20.0,     20.0 );
+     //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
+     ++correct; checksum+=addNewPartToChainProblem(&data,"lthumbBase","__lthumb",BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lthumb",0,                     // Joint
-                              CLOSEST_ENDPOINT_IMPORTANCE,    //Importance
-                              0,                              //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                   minX/maxX     minY/maxY    minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
+     addLimitsToNextPartOfChain(&data,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   15.3,     40.0,     40.0 );
-     //addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   5.5,     14.8,     11.1 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   15.3,     40.0,     40.0 );
+     //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumb",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger1-2.l",0,               // Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE,    //Importance / should this be 0 ?
-                              0,                             //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                   minX/maxX    minY/maxY      0minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
+     addLimitsToNextPartOfChain(&data, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   6.7,     6.1,      2.8 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT); // should this be 0 ?
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "finger1-3.l",0,               // Joint
-                              MEDIAN_ENDPOINT_IMPORTANCE,    //Importance
-                              0,                             //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                   minX/maxX    -------     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,  0.0,50.0,    0.0,0.0,    -50.0,0.0);
+     addLimitsToNextPartOfChain(&data,  0.0,50.0,    0.0,0.0,    -50.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
-     addEstimatedMAEToPartOfChain(problem,mc,chainID,partID-1,   9.0,     0.0,      3.9 );
+     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_finger1-3.l",0,        // Joint
-                              FURTHEST_ENDPOINT_IMPORTANCE,   //Importance
-                              1,                              //IsEndEffector
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts Fingers can be solved in parallel
-     ++chainID;
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+      //----------------------------------------------------------
+      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+      //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
+     nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
-    problem->numberOfChains = chainID;
-    //problem->numberOfGroups = groupID;
-    problem->numberOfJobs = jobID;
+    problem->numberOfChains = data.chainID;
+    problem->numberOfJobs = data.jobID;
 
   return 1;
 }
@@ -2599,10 +1437,8 @@ int prepareDefaultBodyProblem(
     //Cleanup problem structure..
     memset(problem,0,sizeof(struct ikProblem));
 
-
     problem->mc = mc;
     problem->renderer = renderer;
-
     //problem->penultimateSolution = mallocNewMotionBufferAndCopy(mc,solution);
     problem->previousSolution = mallocNewMotionBufferAndCopy(mc,solution); //previousSolution
     problem->initialSolution  = mallocNewMotionBufferAndCopy(mc,solution);
@@ -2611,513 +1447,125 @@ int prepareDefaultBodyProblem(
     //2D Projections Targeted
     //----------------------------------------------------------
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
-
     snprintf(problem->problemDescription,MAXIMUM_PROBLEM_DESCRIPTION,"Body");
-
 
     //Chain #0 is Joint Hip-> to all its children
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
+    struct problemData data = {0};
+    data.problem = problem;
+    data.mc      = mc;
     unsigned int checksum=0;
     unsigned int correct=0;
-    unsigned int groupID=0;
-    unsigned int jobID=0;
-    unsigned int chainID=0;
-    unsigned int partID=0;
-    //BVHJointID thisJID=0;
     //----------------------------------------------------------
-
-
-
-
-
-
 
      //First chain is the Hip and all of the rigid torso
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+     expectBigValueChangesForNextPart(&data); //Big changes
+     ++correct;   checksum+=addNewPartToChainProblemDetailed(
                                         problem,mc,
                                         //-----------------------------------------
-                                        "hip","Hips", // Joint
-                                         2.0,         //Importance
-                                         0,           //IsEndEffector
+                                        "hip","Hips",
+                                         2.0,OPTIMIZE_JOINT,
                                         //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
+                                        &data.groupID,&data.jobID,&data.chainID,&data.partID,
                                         //-----------------------------------------
                                         1, //Force specific mIDStart/mIDEnd
                                         0, //We have a position which since it comes from root joint should start at 0
                                         2  //We have a position which since it comes from root joint should end at 2
                                        );
-     problem->chain[chainID].part[partID-1].bigChanges=1; //Big changes
-     //problem->chain[chainID].part[partID-1].mIDStart=0; //First Position
-     //problem->chain[chainID].part[partID-1].mIDEnd=2;   //First Position
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
+     ++correct;   checksum+=addNewPartToChainProblemDetailed(
                                         problem,mc,
                                         //-----------------------------------------
-                                        "hip","Hips", // Joint
-                                         1.0,         //Importance
-                                         0,           //IsEndEffector
+                                        "hip","Hips",
+                                         1.0,OPTIMIZE_JOINT,
                                         //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
+                                        &data.groupID,&data.jobID,&data.chainID,&data.partID,
                                         //-----------------------------------------
                                         1, //Force specific mIDStart/mIDEnd
                                         3, //We have a rotation which since it comes from root joint should start at 3
                                         5  //We have a rotation which since it comes from root joint should end at 5
                                        );
-     //problem->chain[chainID].part[partID-1].mIDStart=3; //First Position
-     //problem->chain[chainID].part[partID-1].mIDEnd=5; //First Position
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "neck",0, // Joint
-                                         1.0,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "head",0, // Joint
-                                         1.0,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "rshoulder","rShldr", // Joint
-                                         1.0,                 //Importance
-                                         1,                   //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "relbow","rForeArm", // Joint
-                                         1.0,                //Importance
-                                         1,                  //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "rhand",0,// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lshoulder","lShldr", // Joint
-                                         1.0,                 //Importance
-                                         1,                   //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lelbow","lForeArm", // Joint
-                                         1.0,                //Importance
-                                         1,                  //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lhand",0,// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "rhip","rThigh", // Joint
-                                         1.0,            //Importance
-                                         1,              //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "rknee","rShin",  // Joint
-                                         1.0,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "rfoot",0, // Joint
-                                         1.0,      //Importance
-                                         1,        //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lhip","lThigh", // Joint
-                                         1.0,            //Importance
-                                         1,              //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lknee","lShin",  // Joint
-                                         1.0,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "lfoot",0, // Joint
-                                         1.0,      //Importance
-                                         1,        //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "eye.l","endsite_eye.l",// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "eye.r","endsite_eye.r",// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "ear.l","__temporalis02.l",// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "ear.r","__temporalis02.r",// Joint
-                                         1.5,     //Importance
-                                         1,       //IsEndEffector
-                                        //-----------------------------------------
-                                        &groupID,&jobID,&chainID,&partID,
-                                        //-----------------------------------------
-                                        0,0,0 //Automatic mID Start/End assignment
-                                       );
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",1.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",1.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",1.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",1.5,END_EFFECTOR);
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    ++chainID;
+    nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
 
-
-
-
-
-
-
-     //Next chain is the Chest
+     //Next chain is the Chest/Neck area ? There is no point
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-    /*
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "abdomen",0,// Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     //Unfortunately there is no Chest/Abdomen joint in the Body25 and trying to solve for one introduces wobblyness..
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"abdomen",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-     */
-
-
-    /* //Unfortunately there is no Chest joint in the Body25 and trying to solve for one introduces wobblyness..
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "chest",0,// Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     //addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-    */
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck",0, // Joint
-                               0.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rshoulder","rShldr", // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lshoulder","lForeArm",    // Joint
-                               1.0,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-
-
-    //These are first group..
-    ++groupID;
-
-
-
+     //addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",1.0,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lForeArm",1.0,END_EFFECTOR);
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
 
 
      //Next chain is the Head
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-     /*
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "chest",0,// Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID
-                             );
-                             */
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     // ++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
+     addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
 
-     /*
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "neck1",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",0,0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-     */
+     //addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "head",0,  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "ear.l","__temporalis02.l",// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "ear.r","__temporalis02.r",// Joint
-                               2.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+     addLimitsToNextPartOfChain(&data,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",0,0.5,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",2.5,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",2.5,END_EFFECTOR);
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -3132,62 +1580,23 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rshoulder","rShldr",  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
     //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 25 26 27
     //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+    addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
 
 
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "relbow","rForeArm",  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
     //                                                     minX/maxX      minY/maxY       minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhand",0,// Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+    addLimitsToNextPartOfChain(&data,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
@@ -3200,73 +1609,24 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     //head -n3 bvh_upperbody_all.csv  | cut -d ',' -f 25
-
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lshoulder","lShldr",   // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 34 35 36
-    //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lelbow","lForeArm",  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-    //                                                     minX/maxX     minY/maxY     minZ/maxZ
-    addLimitsToPartOfChain(problem,mc,chainID,partID-1,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lhand",0,  // Joint
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
+     //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 34 35 36
+     //                                                     minX/maxX     minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",0.5,OPTIMIZE_JOINT);
+     //                                                     minX/maxX     minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
-
-
-
 
 
 
@@ -3275,354 +1635,97 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rhip","rThigh", // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -40.0,50.0,   -10.0,80.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rknee","rShin", // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data, -135.0,45.0,  -40.0,50.0,   -10.0,80.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rfoot",0,  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",1.0,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe1-2.r",0,  // Big Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe5-3.r",0,  // Small Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
+     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);  // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME, 1.5,END_EFFECTOR); // Small Toe
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
+    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
-
-
-
-
 
      #if DUALFOOT
      //Next chain is the Right Sole
      //----------------------------------------------------------
-     //----------------------------------------------------------
-     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "rfoot",0,  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe1-2.r",0,  // Big Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe5-3.r",0,  // Small Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
-
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR); // Small Toe
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
     #endif
-
-
-
-
-
-
-
-
-
-
 
 
      //Next chain  is the Left Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lhip","lThigh",  // Joint
-                               0.5,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                   minX/maxX     minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, -135.0,45.0,  -50.0,40.0,   -80.0,10.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lknee","lShin",  // Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data, -135.0,45.0,  -50.0,40.0,   -80.0,10.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",0.5,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lfoot",0,// Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",1.0,OPTIMIZE_JOINT);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe1-2.l",0, // Big Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe5-3.l",0,  // Small Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",0,1.5,END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",0,1.5,END_EFFECTOR); // Small Toe
     //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
+    thisChainCanBeRunInParallel(&data);//This has to be done after adding parts / Limbs can be solved in parallel
+    nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
-
-
-
-
-
-
 
 
 
 
      #if DUALFOOT
-
      //Next chain  is the Left Sole
      //----------------------------------------------------------
-     //----------------------------------------------------------
-     //----------------------------------------------------------
-     checksum=0;
-     correct=0;
-     partID=0;
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "lfoot",0,// Joint
-                               1.0,     //Importance
-                               0,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToPartOfChain(problem,mc,chainID,partID-1,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe1-2.l",0, // Big Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
-
-     #if DUALFOOT
-     ++correct;
-     checksum+=addNewPartToChainProblem(
-                              problem,mc,
-                              //-----------------------------------------
-                              "endsite_toe5-3.l",0,  // Small Toe
-                               1.5,     //Importance
-                               1,       //IsEndEffector
-                              //-----------------------------------------
-                              &groupID,&jobID,&chainID,&partID,
-                              //-----------------------------------------
-                              0,0,0 //Automatic mID Start/End assignment
-                             );
+     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",0,1.5,END_EFFECTOR);// Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",0,1.5,END_EFFECTOR); // Small Toe
+     //----------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //----------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
     #endif
-    //----------------------------------------------------------
-    if (correct!=checksum)
-         { fprintf(stderr,"Failed at Chain %u (%u/%u)\n",chainID,checksum,correct); return 0; }
-    //----------------------------------------------------------
 
-    problem->chain[chainID].parallel=1; //This has to be done after adding parts / Limbs can be solved in parallel
-    ++chainID;
-    ++jobID;
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-   #endif
-
-
-
-
-
-
-
-
-    ++groupID;
-
-    problem->numberOfChains = chainID;
-    //problem->numberOfGroups = groupID;
-    problem->numberOfJobs = jobID;
+    problem->numberOfChains = data.chainID;
+    problem->numberOfJobs = data.jobID;
 
     fprintf(stderr,"Body Problem : \n");
     viewProblem(problem);
-
     return 1;
 }
 
@@ -3734,7 +1837,7 @@ float bvhTestIK(
                 char verboseAndDumpFiles
                )
 {
-    int result=0;
+    //int result=0;
 
     struct BVH_Transform bvhTargetTransform= {0};
 
@@ -3871,7 +1974,7 @@ float bvhTestIK(
                     {
                         //Important :)
                         //=======
-                        result=1;
+                        //result=1;
                         //=======
                         unsigned long endTime = GetTickCountMicrosecondsIK();
 

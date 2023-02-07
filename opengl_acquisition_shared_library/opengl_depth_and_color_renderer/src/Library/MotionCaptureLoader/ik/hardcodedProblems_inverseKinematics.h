@@ -9,43 +9,43 @@ extern "C"
 #endif
 
 int prepareDefaultFaceProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform,
-    int standalone
-);
+                              struct ikProblem * problem,
+                              struct BVH_MotionCapture * mc,
+                              struct simpleRenderer *renderer,
+                              struct MotionBuffer * previousSolution,
+                              struct MotionBuffer * solution,
+                              struct BVH_Transform * bvhTargetTransform,
+                              int standalone
+                             );
 
 int prepareDefaultRightHandProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform,
-    int standalone
-);
+                                   struct ikProblem * problem,
+                                   struct BVH_MotionCapture * mc,
+                                   struct simpleRenderer *renderer,
+                                   struct MotionBuffer * previousSolution,
+                                   struct MotionBuffer * solution,
+                                   struct BVH_Transform * bvhTargetTransform,
+                                   int standalone
+                                  );
 
 int prepareDefaultLeftHandProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform,
-    int standalone
-);
+                                  struct ikProblem * problem,
+                                  struct BVH_MotionCapture * mc,
+                                  struct simpleRenderer *renderer,
+                                  struct MotionBuffer * previousSolution,
+                                  struct MotionBuffer * solution,
+                                  struct BVH_Transform * bvhTargetTransform,
+                                  int standalone
+                                 );
 
 int prepareDefaultBodyProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
-);
+                              struct ikProblem * problem,
+                              struct BVH_MotionCapture * mc,
+                              struct simpleRenderer *renderer,
+                              struct MotionBuffer * previousSolution,
+                              struct MotionBuffer * solution,
+                              struct BVH_Transform * bvhTargetTransform
+                             );
 
 float convertStartEndTimeFromMicrosecondsToFPSIK(unsigned long startTime, unsigned long endTime);
 

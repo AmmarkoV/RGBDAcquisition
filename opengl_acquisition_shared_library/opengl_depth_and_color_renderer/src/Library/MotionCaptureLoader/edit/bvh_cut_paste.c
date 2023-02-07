@@ -222,9 +222,13 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
       return 0;
   }
 
-
-  float * newMotionValues = (float*) malloc(sizeof(float) * ( mc->motionValuesSize + mcSource->motionValuesSize + 2 ) );
+  //The new memory size will be the added memory size!
+  unsigned int newMCSize = sizeof(float) * ( mc->motionValuesSize + mcSource->motionValuesSize);
+  float * newMotionValues = (float*) malloc(newMCSize);
   if (newMotionValues==0) { fprintf(stderr,"Could not allocate new motion values\n"); return 0; }
+
+  //Make sure new motion values are set to 0 to keep things tidy
+  memset(newMotionValues,0,newMCSize);
 
   float * oldMotionValues = mc->motionValues;
   float * ptr=newMotionValues;
@@ -235,7 +239,8 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
   ptr+=mc->motionValuesSize;
   //Copy extra data
   memcpy(ptr,mcSource->motionValues,sizeof(float) * mcSource->motionValuesSize);
-  fprintf(stderr," Done\n");
+  ptr+=mcSource->motionValuesSize;
+  fprintf(stderr," Done (offset %u/%u) \n",newMotionValues-ptr,newMCSize);
 
   mc->numberOfFrames            += mcSource->numberOfFrames;
   mc->numberOfFramesEncountered += mcSource->numberOfFrames;

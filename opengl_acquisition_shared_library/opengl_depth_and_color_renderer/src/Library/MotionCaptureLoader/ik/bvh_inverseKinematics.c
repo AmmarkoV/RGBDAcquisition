@@ -170,8 +170,9 @@ float meanBVH2DDistance(
 
                     if (verbose)
                     {
-                        fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : ",sX,sY,tX,tY);
-                        fprintf(stderr,"2D %s distance = %0.1f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+                        fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : 2D ",sX,sY,tX,tY);
+                        if (mc->jointHierarchy[jID].jointName!=0) { fprintf(stderr,"%s ",mc->jointHierarchy[jID].jointName);}
+                        fprintf(stderr,"distance = %0.1f\n",this2DDistance);
                     }
 
                     numberOfSamples+=1;

@@ -456,6 +456,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicBodyProblem==0)
            {
+            fprintf(stderr,GREEN "Initializing Body Problem for the first time..\n" NORMAL);
             atomicBodyProblem = allocateEmptyIKProblem();
             prepareDefaultBodyProblem(
                                           atomicBodyProblem,
@@ -472,6 +473,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
       if (atomicFaceProblem==0)
            {
+            fprintf(stderr,GREEN "Initializing Face Problem for the first time..\n" NORMAL);
               atomicFaceProblem = allocateEmptyIKProblem();
               prepareDefaultFaceProblem(
                                         atomicFaceProblem,
@@ -489,6 +491,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicRHandProblem==0)
            {
+            fprintf(stderr,GREEN "Initializing RHand Problem for the first time..\n" NORMAL);
             atomicRHandProblem = allocateEmptyIKProblem();
             prepareDefaultLeftHandProblem(
                                           atomicRHandProblem,
@@ -506,6 +509,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
     {
        if (atomicLHandProblem==0)
            {
+            fprintf(stderr,GREEN "Initializing LHand Problem for the first time..\n" NORMAL);
             atomicLHandProblem = allocateEmptyIKProblem();
             prepareDefaultLeftHandProblem(
                                           atomicLHandProblem,
@@ -989,10 +993,9 @@ int bvhConverter(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testIK")==0)
         {
-          // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 80 4 130 0.001 5 100 1
-
+          // ./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 80 130 1 0.1 15 100 0 0 1 1 1
           if (i+12>=argc)  {
-                             fprintf(stderr,"--testIK requires 8 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin verbosity..");
+                             fprintf(stderr,"--testIK requires 12 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin verbosity..");
                              fprintf(stderr,"got %u ",argc-i);
                              incorrectArguments();
                           }
