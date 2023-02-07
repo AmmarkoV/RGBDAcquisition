@@ -24,6 +24,8 @@
 //Attempt to add a second thumb solution chain
 #define DUALTHUMB 1
 
+#define USE_CHEST 0
+
 
 // Variable Shortcut
 //------------------------------
@@ -754,17 +756,17 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data); // Reset counter..
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.r",0,1.0,OPTIMIZE_JOINT);
-     //                                                  -------    minY/maxY     minZ/maxZ
+     //                                -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -10.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-2.r",0,1.0,OPTIMIZE_JOINT);
-     //                                                   -------   -------     minZ/maxZ
+     //                                -------   -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    0.0,90.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-3.r",0,1.0,OPTIMIZE_JOINT);
-     //                                                   -------   -------     minZ/maxZ
+     //                                 -------   -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,     0.0,45.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
@@ -865,22 +867,22 @@ int prepareDefaultRightHandProblem(
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumbBase","__rthumb",1.0,OPTIMIZE_JOINT);
-     //                                                    minX/maxX   minY/maxY    minZ/maxZ
+     //                                  minX/maxX   minY/maxY    minZ/maxZ
      addLimitsToNextPartOfChain(&data,   0.0,35.0,  -60.0,0.0,   -60.0,0.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rthumb",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
-     //                                                   minX/maxX    minY/maxY   minZ/maxZ
+     //                                  minX/maxX    minY/maxY   minZ/maxZ
      addLimitsToNextPartOfChain(&data, -48.0,30.0,  -85.0,0.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.r",NO_ALTERNATE_NAME,1.5,OPTIMIZE_JOINT);
-     //                                                   minX/maxX    minY/maxY     minZ/maxZ
+     //                                 minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, -45.0,45.0,  -35.0,70.0,    0.0,35.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.r",NO_ALTERNATE_NAME,2.0,OPTIMIZE_JOINT);
-     //                                                    minX/max   -------     minZ/maxZ
+     //                                 minX/max   -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -50.0,0.0,  0.0,0.0,    0.0,50.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
@@ -1133,17 +1135,17 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     //                                                  -------    minY/maxY     minZ/maxZ
+     //                                -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.3,     13.2 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X    mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     13.6 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-2.l",NO_ALTERNATE_NAME,  CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
@@ -1164,17 +1166,17 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     //                                                  -------    minY/maxY     minZ/maxZ
+     //                                -------    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -10.0,10.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     1.7,     13.7 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,    13.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger4-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     8.3 );
@@ -1196,17 +1198,17 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     //                                                  -------    minY/maxY      minZ/maxZ
+     //                               -------    minY/maxY      minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,0.0,  -8.0,25.0,   -90.0,10.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     2.0,     13.7 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-1.l",NO_ALTERNATE_NAME,BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -90.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,      0.0,     13.9 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger5-2.l",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-    //                                                   -------   -------     minZ/maxZ
+    //                                 -------   -------     minZ/maxZ
     addLimitsToNextPartOfChain(&data,  0.0,0.0,  0.0,0.0,    -45.0,0.0);
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,     4.6 );
@@ -1259,26 +1261,26 @@ int prepareDefaultLeftHandProblem(
     //----------------------------------------------------------
     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     //                                                   minX/maxX     minY/maxY   minZ/maxZ
+     //                                  minX/maxX     minY/maxY   minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -35.0,0.0,    0.0,60.0,    0.0,60.0);
-     //                                                         mAE X     mAE Y    mAE Z
+     //                                                        mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   13.0,     20.0,     20.0 );
      //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   3.0,     2.6,     2.6 );
      ++correct; checksum+=addNewPartToChainProblem(&data,"lthumbBase","__lthumb",BASE_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-     //                                                   minX/maxX     minY/maxY    minZ/maxZ
+     //                                 minX/maxX     minY/maxY    minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -30.0,48.0,   0.0,85.0,   -85.0,85.0);
      //                                                         mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   15.3,     40.0,     40.0 );
      //addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   5.5,     14.8,     11.1 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lthumb",NO_ALTERNATE_NAME,CLOSEST_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-     //                                                   minX/maxX    minY/maxY      0minZ/maxZ
+     //                                 minX/maxX    minY/maxY      0minZ/maxZ
      addLimitsToNextPartOfChain(&data, -40.0,45.0,   -70.0,35.0,   -35.0,0.0);
-     //                                                         mAE X     mAE Y    mAE Z
+     //                                                        mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   6.7,     6.1,      2.8 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-2.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT); // should this be 0 ?
-     //                                                   minX/maxX    -------     minZ/maxZ
+     //                                 minX/maxX    -------     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  0.0,50.0,    0.0,0.0,    -50.0,0.0);
-     //                                                         mAE X     mAE Y    mAE Z
+     //                                                        mAE X     mAE Y    mAE Z
      addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   9.0,     0.0,      3.9 );
      ++correct;   checksum+=addNewPartToChainProblem(&data,"finger1-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger1-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
@@ -1298,24 +1300,24 @@ int prepareDefaultLeftHandProblem(
 
 
 
-
-
-
-
-
-
-
-
-
 int prepareDefaultBodyProblem(
-    struct ikProblem * problem,
-    struct BVH_MotionCapture * mc,
-    struct simpleRenderer *renderer,
-    struct MotionBuffer * previousSolution,
-    struct MotionBuffer * solution,
-    struct BVH_Transform * bvhTargetTransform
-)
+                              struct ikProblem * problem,
+                              struct BVH_MotionCapture * mc,
+                              struct simpleRenderer *renderer,
+                              struct MotionBuffer * previousSolution,
+                              struct MotionBuffer * solution,
+                              struct BVH_Transform * bvhTargetTransform
+                            )
 {
+    //----------------------------------------------------------
+     float allTuningInOne[]={0.5,1.0,1.5,2.0,2.5};
+     float MINIMAL_IMPORTANCE   = allTuningInOne[0];
+     float LOW_IMPORTANCE       = allTuningInOne[1];
+     float MEDIUM_IMPORTANCE    = allTuningInOne[2];
+     float HIGH_IMPORTANCE      = allTuningInOne[3];
+     float VERY_HIGH_IMPORTANCE = allTuningInOne[4];
+    //----------------------------------------------------------
+
     if (problem==0)
          {
            fprintf(stderr,"prepareDefaultBodyProblem called without an ikProblem structure\n");
@@ -1340,12 +1342,11 @@ int prepareDefaultBodyProblem(
     //Chain #0 is Joint Hip-> to all its children
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
+    unsigned int checksum=0;
+    unsigned int correct=0;
     struct problemData data = {0};
     data.problem = problem;
     data.mc      = mc;
-    unsigned int checksum=0;
-    unsigned int correct=0;
     //----------------------------------------------------------
 
      //First chain is the Hip and all of the rigid torso
@@ -1354,124 +1355,116 @@ int prepareDefaultBodyProblem(
 
      expectBigValueChangesForNextPart(&data); //Big changes
      ++correct;   checksum+=addNewPartToChainProblemDetailed(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "hip","Hips",
-                                         2.0,OPTIMIZE_JOINT,
-                                        //-----------------------------------------
-                                        &data.groupID,&data.jobID,&data.chainID,&data.partID,
-                                        //-----------------------------------------
-                                        1, //Force specific mIDStart/mIDEnd
-                                        0, //We have a position which since it comes from root joint should start at 0
-                                        2  //We have a position which since it comes from root joint should end at 2
-                                       );
+                                                             problem,mc,
+                                                             //-----------------------------------------
+                                                             "hip","Hips",HIGH_IMPORTANCE,OPTIMIZE_JOINT,
+                                                             //-----------------------------------------
+                                                             &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                                                             //-----------------------------------------
+                                                             1, //Force specific mIDStart/mIDEnd
+                                                             0, //We have a position which since it comes from root joint should start at 0
+                                                             2  //We have a position which since it comes from root joint should end at 2
+                                                            );
+     expectSmallValueChangesForNextPart(&data); //Small changes
      ++correct;   checksum+=addNewPartToChainProblemDetailed(
-                                        problem,mc,
-                                        //-----------------------------------------
-                                        "hip","Hips",
-                                         1.0,OPTIMIZE_JOINT,
-                                        //-----------------------------------------
-                                        &data.groupID,&data.jobID,&data.chainID,&data.partID,
-                                        //-----------------------------------------
-                                        1, //Force specific mIDStart/mIDEnd
-                                        3, //We have a rotation which since it comes from root joint should start at 3
-                                        5  //We have a rotation which since it comes from root joint should end at 5
-                                       );
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",1.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",1.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",1.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",1.5,END_EFFECTOR);
-    //----------------------------------------------------------
+                                                             problem,mc,
+                                                             //-----------------------------------------
+                                                             "hip","Hips",MINIMAL_IMPORTANCE,OPTIMIZE_JOINT,
+                                                             //-----------------------------------------
+                                                             &data.groupID,&data.jobID,&data.chainID,&data.partID,
+                                                             //-----------------------------------------
+                                                             1, //Force specific mIDStart/mIDEnd
+                                                             3, //We have a rotation which since it comes from root joint should start at 3
+                                                             5  //We have a rotation which since it comes from root joint should end at 5
+                                                            );
+     //45.38
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",      LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+    //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
+    //-------------------------------------------------------------
     nextChain(&data);
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+    //-------------------------------------------------------------
+    //-------------------------------------------------------------
 
 
+    #if USE_CHEST
      //Next chain is the Chest/Neck area ? There is no point
      //----------------------------------------------------------
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //Unfortunately there is no Chest/Abdomen joint in the Body25 and trying to solve for one introduces wobblyness..
-     //++correct;   checksum+=addNewPartToChainProblem(&data,"abdomen",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"abdomen",NO_ALTERNATE_NAME,MINIMAL_IMPORTANCE,OPTIMIZE_JOINT);
      //                                  minX/maxX    minY/maxY     minZ/maxZ
-     //addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-     //++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+     addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,MINIMAL_IMPORTANCE,OPTIMIZE_JOINT);
      //                                  minX/maxX    minY/maxY     minZ/maxZ
-     //addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",1.0,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lForeArm",1.0,END_EFFECTOR);
+     addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",     LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lForeArm",   LOW_IMPORTANCE,END_EFFECTOR);
      //----------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //----------------------------------------------------------
      nextChainAndJob(&data);
      //----------------------------------------------------------
      //----------------------------------------------------------
+    #endif // USE_CHEST
 
 
      //Next chain is the Head
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     // ++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      //                               minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
-     //                                                  minX/maxX    minY/maxY     minZ/maxZ
-     //addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-     //++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",0,0.5,OPTIMIZE_JOINT);
-     //                                minX/maxX    minY/maxY     minZ/maxZ
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      addLimitsToNextPartOfChain(&data,-7.0,22.0,  -45.0,45.0,   -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",0,0.5,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",2.5,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",2.5,END_EFFECTOR);
-     //----------------------------------------------------------
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-     //----------------------------------------------------------
+     //-------------------------------------------------------------
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
-
 
 
      //Next chain is the R Shoulder
-     //----------------------------------------------------------
      //----------------------------------------------------------
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 25 26 27
      //                                  minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",0.5,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      //                                  minX/maxX      minY/maxY       minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -68.5,8.37,    -110.0,164.0,   -47.34,35.64);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
-    //----------------------------------------------------------
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,      OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,   END_EFFECTOR);
+    //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
+    //-------------------------------------------------------------
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
-    //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1479,23 +1472,20 @@ int prepareDefaultBodyProblem(
      //Next chain  is the L Shoulder
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //./getBVHColumnStats.sh generated/bvh_upperbody_all.csv 34 35 36
      //                                  minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
-     ++correct; checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",0.5,OPTIMIZE_JOINT);
+     ++correct; checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",        MINIMAL_IMPORTANCE,   OPTIMIZE_JOINT);
      //                                  minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);
-    //----------------------------------------------------------
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       LOW_IMPORTANCE,       OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,    END_EFFECTOR);
+    //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
-
+    //-------------------------------------------------------------
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
-    //----------------------------------------------------------
     //----------------------------------------------------------
     //----------------------------------------------------------
 
@@ -1503,41 +1493,38 @@ int prepareDefaultBodyProblem(
      //Next chain is the Right Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, -135.0,45.0,  -40.0,50.0,   -10.0,80.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",0.5,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",                     MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",1.0,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",                     LOW_IMPORTANCE,      OPTIMIZE_JOINT);
      //                                minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR);  // Big Toe
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME, 1.5,END_EFFECTOR); // Small Toe
-    //----------------------------------------------------------
-    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
-
-    thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
-    nextChainAndJob(&data);
-    //----------------------------------------------------------
-    //----------------------------------------------------------
-    //----------------------------------------------------------
+     addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,           LOW_IMPORTANCE,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,MEDIUM_IMPORTANCE,   END_EFFECTOR);  // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,MEDIUM_IMPORTANCE,   END_EFFECTOR);  // Small Toe
+     //-------------------------------------------------------------
+     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+     //-------------------------------------------------------------
+     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
+     nextChainAndJob(&data);
+     //----------------------------------------------------------
+     //----------------------------------------------------------
 
      #if DUALFOOT
      //Next chain is the Right Sole
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR); // Big Toe
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,1.5,END_EFFECTOR); // Small Toe
-     //----------------------------------------------------------
+     addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME,             LOW_IMPORTANCE,     OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.r",NO_ALTERNATE_NAME,  MEDIUM_IMPORTANCE,  END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.r",NO_ALTERNATE_NAME,  MEDIUM_IMPORTANCE,  END_EFFECTOR); // Small Toe
+     //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-     //----------------------------------------------------------
+     //-------------------------------------------------------------
      thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
      nextChainAndJob(&data);
      //----------------------------------------------------------
@@ -1546,42 +1533,39 @@ int prepareDefaultBodyProblem(
      //Next chain  is the Left Foot
      //----------------------------------------------------------
      //----------------------------------------------------------
-     //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     //                                 minX/maxX     minY/maxY     minZ/maxZ
+     //                                minX/maxX     minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, -135.0,45.0,  -50.0,40.0,   -80.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",0.5,OPTIMIZE_JOINT);
-     //                                 minX/maxX    minY/maxY     minZ/maxZ
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",                            MINIMAL_IMPORTANCE,    OPTIMIZE_JOINT);
+     //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data, 0.0,135.0,    0.0,0.0,    -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",1.0,OPTIMIZE_JOINT);
-     //                                 minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",0,1.5,END_EFFECTOR); // Big Toe
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",0,1.5,END_EFFECTOR); // Small Toe
-    //----------------------------------------------------------
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",                            LOW_IMPORTANCE,        OPTIMIZE_JOINT);
+     //                                minX/maxX    minY/maxY     minZ/maxZ
+     addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                  LOW_IMPORTANCE,        OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,     END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,     END_EFFECTOR); // Small Toe
+    //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-    //----------------------------------------------------------
-
+    //-------------------------------------------------------------
     thisChainCanBeRunInParallel(&data);//This has to be done after adding parts / Limbs can be solved in parallel
     nextChainAndJob(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
-    //----------------------------------------------------------
 
 
-     #if DUALFOOT
+    #if DUALFOOT
      //Next chain  is the Left Sole
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                                minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,-10.0,38.0,    0.0,0.0,    -45.0,45.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,1.0,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",0,1.5,END_EFFECTOR);// Big Toe
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",0,1.5,END_EFFECTOR); // Small Toe
-     //----------------------------------------------------------
+     addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                LOW_IMPORTANCE,          OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,     MEDIUM_IMPORTANCE,       END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,     MEDIUM_IMPORTANCE,       END_EFFECTOR); // Small Toe
+     //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-     //----------------------------------------------------------
+     //-------------------------------------------------------------
      thisChainCanBeRunInParallel(&data); //This has to be done after adding parts / Limbs can be solved in parallel
      nextChainAndJob(&data);
      //----------------------------------------------------------
@@ -1615,7 +1599,7 @@ int writeHTML(
                int dumpScreenshots
              )
 {
-    char command[1024];
+    char command[1025]={0};
     if (dumpScreenshots)
     {
         snprintf(command,1024,"convert initial.svg initial_%u_%u.png&",fIDSource,fIDTarget);
@@ -1899,7 +1883,3 @@ float bvhTestIK(
     bvh_freeTransform(&bvhTargetTransform);
     return finalMAEInMM*10;
 }
-
-
-
-

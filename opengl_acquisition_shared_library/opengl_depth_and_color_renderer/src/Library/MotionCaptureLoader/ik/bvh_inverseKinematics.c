@@ -768,15 +768,7 @@ float iteratePartLoss(
     if  (momentum==0.0)                  { momentum = (float) 0.4; } // Momentum | 0.9 Large / 0.2 Small
     //-----------------------------------------------------------------------------
 
-
-
     if (verbose) { startTime = GetTickCountMicrosecondsIK(); }
-
-    if (problem->chain[chainID].part[partID].endEffector)
-        {
-          fprintf(stderr,RED "What are we doing iteratePartLoss of endEffector..\n" NORMAL);
-          return 0.0;
-        }
 
     //Modifiers in case of magnitude differences in problem chain
     //---------------------------------------------------------------
@@ -788,8 +780,9 @@ float iteratePartLoss(
          } else
     if (problem->chain[chainID].part[partID].smallChanges)
          {
-           lr=lr/1000;
-           gradientExplosionThreshold=gradientExplosionThreshold/15;
+           lr=lr/10;
+           learningRateDecayRate=learningRateDecayRate*2;
+           gradientExplosionThreshold=gradientExplosionThreshold/10;
          }
     //---------------------------------------------------------------
 
@@ -872,6 +865,11 @@ float iteratePartLoss(
    unsigned int initialLossIsNaN  = (initialLoss!=initialLoss);
    unsigned int initialLossIsZero = (initialLoss==0.0);
    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    if (problem->chain[chainID].part[partID].endEffector)
+        {
+          fprintf(stderr,RED "What are we doing iteratePartLoss of endEffector..\n" NORMAL);
+          return initialLoss;
+        }
 
    if (initialLossIsNaN)
    {

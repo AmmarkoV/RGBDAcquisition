@@ -600,7 +600,7 @@ float bvhConverter_IKFineTune(
          ikConfig.learningRate = lr;
          ikConfig.iterations = iterations;
          ikConfig.epochs = epochs;
-         ikConfig.maximumAcceptableStartingLoss = 30000;//12000; //WARING < -  consider setting this to 0
+         ikConfig.maximumAcceptableStartingLoss = 50000;//12000; //WARING < -  consider setting this to 0
          ikConfig.gradientExplosionThreshold    = 20; //50 default
          ikConfig.iterationEarlyStopping        = 1;  //<-
          ikConfig.iterationMinimumLossDelta     = 10; //<- losses seem to be numbers 2000 -> 300 so 10 is a good limit
@@ -998,7 +998,7 @@ int bvhConverter(int argc,const char **argv)
                              fprintf(stderr,"--testIK requires 12 arguments, previousFrame sourceFrame targetFrame stepFrame learningRate iterations epochs spring langevin verbosity..");
                              fprintf(stderr,"got %u ",argc-i);
                              incorrectArguments();
-                          }
+                           }
 
           unsigned int previousFrame=atoi(argv[i+1]);
           unsigned int sourceFrame=atoi(argv[i+2]);
@@ -1124,8 +1124,8 @@ int bvhConverter(int argc,const char **argv)
              }
           //----------------------------------------------------
           //----------------------------------------------------
-
-          exit(0);
+          int i=system("xdg-open report.html");
+          exit(i);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--probefilter")==0)

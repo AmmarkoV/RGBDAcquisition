@@ -240,7 +240,8 @@ int bvh_GrowMocapFileByCopyingOtherMocapFile(
   //Copy extra data
   memcpy(ptr,mcSource->motionValues,sizeof(float) * mcSource->motionValuesSize);
   ptr+=mcSource->motionValuesSize;
-  fprintf(stderr," Done (offset %u/%u) \n",newMotionValues-ptr,newMCSize);
+  fprintf(stderr," Done \n");
+  //fprintf(stderr," (offset %u/%u) \n",newMotionValues-ptr,newMCSize);
 
   mc->numberOfFrames            += mcSource->numberOfFrames;
   mc->numberOfFramesEncountered += mcSource->numberOfFrames;
