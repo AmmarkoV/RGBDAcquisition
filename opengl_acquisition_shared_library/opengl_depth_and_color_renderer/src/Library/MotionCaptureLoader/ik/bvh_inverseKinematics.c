@@ -62,7 +62,7 @@ void clear_line()
 char fileExistsIK(const char * filename)
 {
     FILE *fp = fopen(filename,"r");
-    if( fp )
+    if(fp)
         {
             /* exists */
             fclose(fp);
@@ -163,18 +163,18 @@ float meanBVH2DDistance(
                 float sY=bvhSourceTransform->joint[jID].pos2D[1];
                 float tX=bvhTargetTransform->joint[jID].pos2D[0];
                 float tY=bvhTargetTransform->joint[jID].pos2D[1];
+                float notZeroIfAllPointsExist = sX*sY*tX*tY;
 
-                if ( ( (sX!=0.0) || (sY!=0.0) ) && ( (tX!=0.0) || (tY!=0.0) ) )
+                //if ( ( (sX!=0.0) || (sY!=0.0) ) && ( (tX!=0.0) || (tY!=0.0) ) )
+                if (notZeroIfAllPointsExist!=0.0)
                 {
                     float this2DDistance=get2DPointDistance(sX,sY,tX,tY);
-
                     if (verbose)
                     {
                         fprintf(stderr,"src(%0.1f,%0.1f)->tar(%0.1f,%0.1f) : 2D ",sX,sY,tX,tY);
                         if (mc->jointHierarchy[jID].jointName!=0) { fprintf(stderr,"%s ",mc->jointHierarchy[jID].jointName);}
                         fprintf(stderr,"distance = %0.1f\n",this2DDistance);
                     }
-
                     numberOfSamples+=1;
                     sumOf2DDistances+=this2DDistance;
                 }
@@ -208,9 +208,7 @@ float meanBVH3DDistance(
                        )
 {
     if (targetMotionBuffer==0)
-    {
-        return NAN;
-    }
+          { return NAN; }
 
     if (
         (
@@ -253,8 +251,10 @@ float meanBVH3DDistance(
                 float tX=bvhTargetTransform->joint[jID].pos3D[0];
                 float tY=bvhTargetTransform->joint[jID].pos3D[1];
                 float tZ=bvhTargetTransform->joint[jID].pos3D[2];
+                float notZeroIfAllPointsExist = tX*tY*tZ;
 
-                if ( (tX!=0.0) || (tY!=0.0) || (tZ!=0.0) )
+                //if ( (tX!=0.0) || (tY!=0.0) || (tZ!=0.0) )
+                if (notZeroIfAllPointsExist!=0.0)
                 {
                     float this3DDistance=get3DPointDistance(
                                              (float) bvhSourceTransform->joint[jID].pos3D[0],
@@ -515,18 +515,18 @@ float calculateChainLoss(
 
 
 int examineSolutionAndKeepIfItIsBetterSingleTry(
-                                             struct ikProblem * problem,
-                                             unsigned int iterationID,
-                                             unsigned int chainID,
-                                             unsigned int partID,
-                                             unsigned int * mIDS,
-                                             float * originalValues,
-                                             float * bestValues,
-                                             float * bestLoss,
-                                             float spring,
-                                             //-------------------------
-                                             float * solutionToTest
-                                            )
+                                                struct ikProblem * problem,
+                                                unsigned int iterationID,
+                                                unsigned int chainID,
+                                                unsigned int partID,
+                                                unsigned int * mIDS,
+                                                float * originalValues,
+                                                float * bestValues,
+                                                float * bestLoss,
+                                                float spring,
+                                                //-------------------------
+                                                float * solutionToTest
+                                               )
 {
       float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
@@ -647,6 +647,7 @@ void updateLimitsBasedOnMAE(
  float newMaxB = originalValues[1]+problem->chain[chainID].part[partID].mAE[1];
  float newMaxC = originalValues[2]+problem->chain[chainID].part[partID].mAE[2];
 
+ //This unrolling does only one jump instruction and is thus faster
  if (limitsEngaged) {
                       newMinA = fmax(newMinA,minimumLimitValues[0]);
                       newMinB = fmax(newMinB,minimumLimitValues[1]);
@@ -693,7 +694,7 @@ int weAreAtALocalOptimum(
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
             {
-                delta[i] = d; // Why d ? and not 0
+                delta[i] = -d/10;  //very slight gradient // Why d ? and not 0
                 ++badLosses;
             }
             else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
@@ -708,7 +709,7 @@ int weAreAtALocalOptimum(
             {
                 fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
                 fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
-                delta[i] = d;
+                delta[i] = -d/10;  //very slight gradient // Why d ? and not 0
                 ++badLosses;
             }
         }

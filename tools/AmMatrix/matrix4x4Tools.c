@@ -1922,8 +1922,7 @@ return 0;
 
 int normalize3DPointFVector(float * vec)
 {
-  if ( vec[3]==1.0 ) { return 1; }
-  else
+  if ( vec[3]==1.0 ) { return 1; } else
   if ( vec[3]!=0.0 )
   {
     vec[0]=vec[0]/vec[3];
@@ -1931,10 +1930,11 @@ int normalize3DPointFVector(float * vec)
     vec[2]=vec[2]/vec[3];
     vec[3]=1.0; // vec[3]=vec[3]/vec[3];
     return 1;
+  } else
+  {
+    fprintf(stderr,"normalize3DPointFVector cannot be normalized since element 3 is zero\n");
+    return 0;
   }
-
- fprintf(stderr,"normalize3DPointFVector cannot be normalized since element 3 is zero\n");
- return 0;
 }
 
 int normalize3DPointDVector(double * vec)

@@ -893,11 +893,11 @@ static inline void bvh_prepareMatricesForTransform(
             unsigned int channelRotationOrder = (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder;
             create4x4FMatrixFromEulerAnglesWithRotationOrder(
                                                              &bvhTransform->joint[jID].dynamicRotation,
-                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
-                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
-                                                            -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
-                                                            channelRotationOrder
-                                                           );
+                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_X],
+                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Y],
+                                                             -1*data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_ROTATION_Z],
+                                                             channelRotationOrder
+                                                            );
           }
        } else
        {
@@ -911,7 +911,6 @@ static inline void bvh_prepareMatricesForTransform(
                 fprintf(stderr,"No channel rotation order for joint jID=%u jointName=%s, using identity matrix\n",jID,bvhMotion->jointHierarchy[jID].jointName);
               }
        }
-
      } else
      {
       fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);

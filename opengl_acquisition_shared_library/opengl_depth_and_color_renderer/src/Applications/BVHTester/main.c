@@ -329,10 +329,8 @@ float  bvhConverter_get2DY(int jointID)
 
 int bvhConverter_isJointEndSite(int jointID)
 {
-    if (jointID<bvhAtomicMotion.jointHierarchySize)
-    {
-        return bvhAtomicMotion.jointHierarchy[jointID].isEndSite;
-    }
+  if (jointID<bvhAtomicMotion.jointHierarchySize)
+     { return bvhAtomicMotion.jointHierarchy[jointID].isEndSite; }
   fprintf(stderr,RED "BVH library could not resolve if joint is an EndSite because joint is out bounds \"%u\" \n" NORMAL,jointID);
   return 0;
 }
