@@ -57,6 +57,10 @@ enum mat4x4EItem
     12  13  14  15
 */
 
+const float __attribute__((aligned(16))) identityMatrix4x4[16]={1.0,0.0,0.0,0.0,
+                                                                0.0,1.0,0.0,0.0,
+                                                                0.0,0.0,1.0,0.0,
+                                                                0.0,0.0,0.0,1.0};
 
 void print4x4FMatrix(const char * str , float * matrix4x4,int forcePrint)
 {
@@ -180,17 +184,17 @@ void copy4x4DMatrixTo4x4F(float * dest, double * m )
 }
 
 
-
-
 void create4x4FIdentityMatrixDirect(float * m)
 {
     if (m!=0)
     {
+     memcpy(m,identityMatrix4x4,16*sizeof(float));
+     /*
      memset(m,0,16*sizeof(float));
      m[0] = 1.0;
      m[5] = 1.0;
      m[10] = 1.0;
-     m[15] = 1.0;
+     m[15] = 1.0;*/
     }
 }
 
@@ -208,7 +212,13 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     _mm_store_ps(&m->m[12], zero);
     m->m[15] = 1.0;
     return;
-   #else*/
+   #else
+   */
+
+   //0.60
+   memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+
+/*
    #if OPTIMIZED
     // 0.61 instruction fetch
     memset(m->m,0,16*sizeof(float));
@@ -225,6 +235,7 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
     m->m[12]= 0.0;  m->m[13]= 0.0;  m->m[14] = 0.0;  m->m[15] = 1.0;
     return;
   #endif // OPTIMIZED
+  */
  // #endif //INTEL optimizations are more optimizing.. :P
 }
 
@@ -233,7 +244,7 @@ void create4x4FIdentityMatrix(struct Matrix4x4OfFloats * m)
 //static inline
 float degrees_to_radF(float degrees)
 {
-    return (float) degrees * ( (float) M_PI / 180.0 );
+ return (float) degrees * ((float) M_PI / 180.0);
 }
 
 
@@ -344,10 +355,12 @@ int create4x4FMatrixFromRodriguez(struct Matrix4x4OfFloats * m,float rodriguezX,
     }
 
    //NORMAL RESULT
-   m->m[0]=x*x * (1 - cosTh) + cosTh;          m->m[1]=x*y*(1 - cosTh) - z*sin(th);      m->m[2]=x*z*(1 - cosTh) + y*sin(th);   m->m[3]=0.0;
-   m->m[4]=x*y*(1 - cosTh) + z*sin(th);        m->m[5]=y*y*(1 - cosTh) + cosTh;          m->m[6]=y*z*(1 - cosTh) - x*sin(th);   m->m[7]=0.0;
-   m->m[8]=x*z*(1 - cosTh) - y*sin(th);        m->m[9]=y*z*(1 - cosTh) + x*sin(th);      m->m[10]=z*z*(1 - cosTh) + cosTh;      m->m[11]=0.0;
-   m->m[12]=0.0;                               m->m[13]=0.0;                             m->m[14]=0.0;                          m->m[15]=1.0;
+   memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+   //-------------------------------------------------------------------------------------------
+   m->m[0]=x*x * (1 - cosTh) + cosTh;          m->m[1]=x*y*(1 - cosTh) - z*sin(th);      m->m[2]=x*z*(1 - cosTh) + y*sin(th);   //m->m[3]=0.0;
+   m->m[4]=x*y*(1 - cosTh) + z*sin(th);        m->m[5]=y*y*(1 - cosTh) + cosTh;          m->m[6]=y*z*(1 - cosTh) - x*sin(th);   //m->m[7]=0.0;
+   m->m[8]=x*z*(1 - cosTh) - y*sin(th);        m->m[9]=y*z*(1 - cosTh) + x*sin(th);      m->m[10]=z*z*(1 - cosTh) + cosTh;      //m->m[11]=0.0;
+   //m->m[12]=0.0;                               m->m[13]=0.0;                             m->m[14]=0.0;                          m->m[15]=1.0;
 
   #if PRINT_MATRIX_DEBUGGING
    fprintf(stderr,"rodriguez %f %f %f\n ",rodriguezX,rodriguezY,rodriguezZ);
@@ -374,10 +387,12 @@ void create4x4FMatrixFromEulerAnglesXYZAllInOne(struct Matrix4x4OfFloats * m ,fl
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    m->m[0] = cp*cy;          m->m[1] = cp*sy;           m->m[2] = -sp;    m->m[3] = 0;
-    m->m[4] = srsp*cy-cr*sy;  m->m[5] = srsp*sy+cr*cy;   m->m[6] = sr*cp;  m->m[7] = 0;
-    m->m[8] =  crsp*cy+sr*sy; m->m[9] =  crsp*sy-sr*cy;  m->m[10]= cr*cp;  m->m[11]= 0;
-    m->m[12]= 0;              m->m[13]= 0;               m->m[14]= 0;      m->m[15]= 1.0;
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //-------------------------------------------------------------------------------------------
+    m->m[0] = cp*cy;          m->m[1] = cp*sy;           m->m[2] = -sp;    //m->m[3] = 0;
+    m->m[4] = srsp*cy-cr*sy;  m->m[5] = srsp*sy+cr*cy;   m->m[6] = sr*cp;  //m->m[7] = 0;
+    m->m[8] =  crsp*cy+sr*sy; m->m[9] =  crsp*sy-sr*cy;  m->m[10]= cr*cp;  //m->m[11]= 0;
+    //m->m[12]= 0;              m->m[13]= 0;               m->m[14]= 0;      m->m[15]= 1.0;
 }
 
 
@@ -398,10 +413,12 @@ void create4x4FMatrixFromEulerAnglesZYX(struct Matrix4x4OfFloats * m ,float eulX
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    m->m[0]  = cr*cp;  m->m[1]  = crsp*sy - sr*cy;   m->m[2]  = crsp*cy + sr*sy;  m->m[3]  = 0.0;
-    m->m[4]  = sr*cp;  m->m[5]  = srsp*sy + cr*cy;   m->m[6]  = srsp*cy - cr*sy;  m->m[7]  = 0.0;
-    m->m[8]  = -sp;    m->m[9]  = cp*sy;             m->m[10] = cp*cy;            m->m[11] = 0.0;
-    m->m[12] = 0;      m->m[13] = 0;                 m->m[14] = 0;                m->m[15] = 1.0;
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //-------------------------------------------------------------------------------------------
+    m->m[0]  = cr*cp;  m->m[1]  = crsp*sy - sr*cy;   m->m[2]  = crsp*cy + sr*sy;  //m->m[3]  = 0.0;
+    m->m[4]  = sr*cp;  m->m[5]  = srsp*sy + cr*cy;   m->m[6]  = srsp*cy - cr*sy;  //m->m[7]  = 0.0;
+    m->m[8]  = -sp;    m->m[9]  = cp*sy;             m->m[10] = cp*cy;            //m->m[11] = 0.0;
+    //m->m[12] = 0;      m->m[13] = 0;                 m->m[14] = 0;                m->m[15] = 1.0;
 }
 
 
@@ -419,10 +436,12 @@ void create4x4FMatrixFromEulerAnglesZXY(struct Matrix4x4OfFloats * m ,float eulX
     float cosX = cos(x);
     float sinX = sin(x);
 
-    m->m[0]  = cosY*cosZ + sinX*sinY*sinZ;    m->m[1]  = cosX * sinZ;    m->m[2]  = cosY*sinX*sinZ - cosZ*sinY;  m->m[3]  = 0.0;
-    m->m[4]  = -cosY*sinZ + cosZ*sinX*sinY;   m->m[5]  = cosX * cosZ;    m->m[6]  = cosY*cosZ*sinX + sinY*sinZ;  m->m[7]  = 0.0;
-    m->m[8]  = cosX*sinY;                     m->m[9]  = -sinX;          m->m[10] = cosX*cosY;                   m->m[11] = 0.0;
-    m->m[12] = 0;                             m->m[13] = 0;              m->m[14] = 0;                           m->m[15] = 1.0;
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //-------------------------------------------------------------------------------------------
+    m->m[0]  = cosY*cosZ + sinX*sinY*sinZ;    m->m[1]  = cosX * sinZ;    m->m[2]  = cosY*sinX*sinZ - cosZ*sinY;  //m->m[3]  = 0.0;
+    m->m[4]  = -cosY*sinZ + cosZ*sinX*sinY;   m->m[5]  = cosX * cosZ;    m->m[6]  = cosY*cosZ*sinX + sinY*sinZ;  //m->m[7]  = 0.0;
+    m->m[8]  = cosX*sinY;                     m->m[9]  = -sinX;          m->m[10] = cosX*cosY;                   //m->m[11] = 0.0;
+    //m->m[12] = 0;                             m->m[13] = 0;              m->m[14] = 0;                           m->m[15] = 1.0;
 }
 
 
@@ -432,23 +451,22 @@ void create4x4FRotationX(struct Matrix4x4OfFloats * m,float degrees)
     if (degrees!=0.0)
     {
     float radians = (float) degrees * ( (float) M_PI / 180.0 ); //degrees_to_radF(degrees);
-    float cosX = (float) cosf((float)radians);
-    float sinX = (float) sinf((float)radians);
+    float cosX    = (float) cosf((float)radians);
+    float sinX    = (float) sinf((float)radians);
 
-    m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
-    m->m[4] = 0.0;  m->m[5] = cosX;    m->m[6]  = sinX;   m->m[7]  = 0.0;
-    m->m[8] = 0.0;  m->m[9] = -1*sinX; m->m[10] = cosX;   m->m[11] = 0.0;
-    m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0;
+
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //-------------------------------------------------------------------------------------------
+    //m->m[0] = 1.0;  m->m[1] = 0.0;     m->m[2]  = 0.0;    m->m[3]  = 0.0;
+    //m->m[4] = 0.0;
+    m->m[5] = cosX;    m->m[6]  = sinX;   //m->m[7]  = 0.0;
+    //m->m[8] = 0.0;
+    m->m[9] = -1*sinX; m->m[10] = cosX;   //m->m[11] = 0.0;
+    //m->m[12]= 0.0;  m->m[13]= 0.0;     m->m[14] = 0.0;    m->m[15] = 1.0;
     } else
     {
       create4x4FIdentityMatrix(m);
     }
-    // Rotate X formula.
-    //create4x4FIdentityMatrix(m);
-    //m->m[5] =    cosV; // [1,1]
-    //m->m[9] = -1*sinV; // [1,2]
-    //m->m[6] =    sinV; // [2,1]
-    //m->m[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
 void create4x4FRotationY(struct Matrix4x4OfFloats * m,float degrees)
@@ -734,34 +752,38 @@ void create4x4FRotationZXY(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //https://www.wolframalpha.com/input?i=%7B+%7B+cosZ%2C+sinZ%2C+0+%7D+%2C+%7B+-sinZ%2C+cosZ+%2C+0%7D+%2C+%7B0%2C0%2C1%7D++%7D+*+%7B+%7B1%2C+0+%2C0%7D+%2C+%7B0%2C+cosX%2C+sinX%7D%2C+%7B0%2C+-sinX%2C+cosX%7D+%7D+*+%7B+%7B+cosY%2C+0%2C+-sinY+%7D%2C+%7B0%2C+1+%2C0+%7D%2C+%7B+sinY%2C+0+%2C+cosY+%7D+%7D
     //{{cosZ,sinZ,0,0},{-sinZ,cosZ,0,0},{0,0,1,0},{0,0,0,1}}*{{1,0,0,0},{0,cosX,sinX,0},{0,-sinX,cosX,0},{0,0,0,1}}*{{cosY,0,-sinY,0},{0,1,0,0},{sinY,0,cosY,0},{0,0,0,1}}
     //https://www.wolframalpha.com/input?key=&i=%7B%7BcosZ%2CsinZ%2C0%2C0%7D%2C%7B-sinZ%2CcosZ%2C0%2C0%7D%2C%7B0%2C0%2C1%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D*%7B%7B1%2C0%2C0%2C0%7D%2C%7B0%2CcosX%2CsinX%2C0%7D%2C%7B0%2C-sinX%2CcosX%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D*%7B%7BcosY%2C0%2C-sinY%2C0%7D%2C%7B0%2C1%2C0%2C0%7D%2C%7BsinY%2C0%2CcosY%2C0%7D%2C%7B0%2C0%2C0%2C1%7D%7D
+
+    //1.50
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //1.69 without memcpy
     //--------------
     //    Row 1
     //--------------
     m->m[0] = (sinX * sinY * sinZ) + (cosY * cosZ);
     m->m[1] = cosX * sinZ;
     m->m[2] = (sinX * cosY * sinZ) - (sinY * cosZ);
-    m->m[3] = 0.0;
+    //m->m[3] = 0.0;
     //--------------
     //    Row 2
     //--------------
     m->m[4] = (sinX * sinY * cosZ) - (cosY * sinZ);
     m->m[5] = cosX * cosZ;
     m->m[6] = (sinX * cosY * cosZ) + (sinY * sinZ);
-    m->m[7] = 0.0;
+    //m->m[7] = 0.0;
     //--------------
     //    Row 3
     //--------------
     m->m[8]  = cosX * sinY;
     m->m[9]  = -sinX;
     m->m[10] = cosX * cosY;
-    m->m[11] = 0.0;
+    //m->m[11] = 0.0;
     //--------------
     //    Row 4
     //--------------
-    m->m[12] = 0.0;
-    m->m[13] = 0.0;
-    m->m[14] = 0.0;
-    m->m[15] = 1.0;
+    //m->m[12] = 0.0;
+    //m->m[13] = 0.0;
+    //m->m[14] = 0.0;
+    //m->m[15] = 1.0;
     //--------------
     return;
 }
@@ -784,34 +806,36 @@ void create4x4FRotationZYX(struct Matrix4x4OfFloats * m,float degreesX,float deg
     //                       == RZ ==                                        == RY ==                                                  == RX ==
     //{ { cosZ, sinZ, 0 } , { -sinZ, cosZ , 0} , {0,0,1}  } *  { { cosY, 0, -sinY }, {0, 1 ,0 }, { sinY, 0 , cosY } }  * { {1, 0 ,0} , {0, cosX, sinX}, {0, -sinX, cosX} }
     //https://www.wolframalpha.com/input?i=%7B+%7B+cosZ%2C+sinZ%2C+0+%7D+%2C+%7B+-sinZ%2C+cosZ+%2C+0%7D+%2C+%7B0%2C0%2C1%7D++%7D+*++%7B+%7B+cosY%2C+0%2C+-sinY+%7D%2C+%7B0%2C+1+%2C0+%7D%2C+%7B+sinY%2C+0+%2C+cosY+%7D+%7D++*+%7B+%7B1%2C+0+%2C0%7D+%2C+%7B0%2C+cosX%2C+sinX%7D%2C+%7B0%2C+-sinX%2C+cosX%7D+%7D+
+
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
     //--------------
     //    Row 1
     //--------------
     m->m[0] = cosY * cosZ;
     m->m[1] = (sinX * sinY * cosZ) + (cosX * sinZ);
     m->m[2] = (sinX * sinZ) - (cosX * sinY * cosZ);
-    m->m[3] = 0.0;
+    //m->m[3] = 0.0;
     //--------------
     //    Row 2
     //--------------
     m->m[4] = -cosY * sinZ;
     m->m[5] = (cosX * cosZ) - (sinX * sinY * sinZ);
     m->m[6] = (cosX * sinY * sinZ) + (sinX * cosZ);
-    m->m[7] = 0.0;
+    //m->m[7] = 0.0;
     //--------------
     //    Row 3
     //--------------
     m->m[8]  = sinY;
     m->m[9]  = sinX * (-cosY);
     m->m[10] = cosX * cosY;
-    m->m[11] = 0.0;
+    //m->m[11] = 0.0;
     //--------------
     //    Row 4
     //--------------
-    m->m[12] = 0.0;
-    m->m[13] = 0.0;
-    m->m[14] = 0.0;
-    m->m[15] = 1.0;
+    //m->m[12] = 0.0;
+    //m->m[13] = 0.0;
+    //m->m[14] = 0.0;
+    //m->m[15] = 1.0;
     //--------------
     return;
 }
@@ -827,7 +851,11 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
    char rZisIdentity = (degreesEulerZ==0.0);
    char numberOfIdentityMatrices = rXisIdentity+rYisIdentity+rZisIdentity;
 
-   if ( numberOfIdentityMatrices!=3 )
+   if (numberOfIdentityMatrices==3)
+   {
+     create4x4FIdentityMatrix(m);
+   } else
+   //if ( numberOfIdentityMatrices!=3 )
    {
     switch (rotationOrder)
     {
@@ -875,10 +903,8 @@ void create4x4FMatrixFromEulerAnglesWithRotationOrder(struct Matrix4x4OfFloats *
        create4x4FIdentityMatrix(m);
      break;
     };
-
-   } else { create4x4FIdentityMatrix(m); }
+   } //else { create4x4FIdentityMatrix(m); }
   }  else { create4x4FIdentityMatrix(m); }
-
 
   return;
 }
@@ -1017,22 +1043,25 @@ void create4x4FRotationMatrix(struct Matrix4x4OfFloats * m , float angle, float 
     float y_mul_s = y * s;
     float z_mul_s = z * s;
 
+
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //----------------------------------------------
     m->m[0] = xx * one_min_c + c;
     m->m[1] = xy * one_min_c - z_mul_s;
     m->m[2] = xz * one_min_c + y_mul_s;
-    m->m[3] = 0;
+    //m->m[3] = 0;
     m->m[4] = xy * one_min_c + z_mul_s;
     m->m[5] = yy * one_min_c + c;
     m->m[6] = yz * one_min_c - x_mul_s;
-    m->m[7] = 0;
+    //m->m[7] = 0;
     m->m[8] = xz * one_min_c - y_mul_s;
     m->m[9] = yz * one_min_c + x_mul_s;
     m->m[10]= zz * one_min_c + c;
-    m->m[11]= 0;
-    m->m[12]= 0;
-    m->m[13]= 0;
-    m->m[14]= 0;
-    m->m[15]= 1;
+    //m->m[11]= 0;
+    //m->m[12]= 0;
+    //m->m[13]= 0;
+    //m->m[14]= 0;
+    //m->m[15]= 1;
 }
 
 void create4x4FQuaternionMatrix(struct Matrix4x4OfFloats * m,float qX,float qY,float qZ,float qW)
@@ -1046,28 +1075,39 @@ void create4x4FQuaternionMatrix(struct Matrix4x4OfFloats * m,float qX,float qY,f
     float wy2 = 2.0f * qW * qY;
     float wx2 = 2.0f * qW * qX;
     float xx2 = 2.0f * qX * qX;
+
+    memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+    //----------------------------------------------
     m->m[0]  = - yy2 - zz2 + 1.0f;
     m->m[1]  = xy2 + wz2;
     m->m[2]  = xz2 - wy2;
-    m->m[3]  = 0;
+    //m->m[3]  = 0;
     m->m[4]  = xy2 - wz2;
     m->m[5]  = - xx2 - zz2 + 1.0f;
     m->m[6]  = yz2 + wx2;
-    m->m[7]  = 0;
+    //m->m[7]  = 0;
     m->m[8]  = xz2 + wy2;
     m->m[9]  = yz2 - wx2;
     m->m[10] = - xx2 - yy2 + 1.0f;
-    m->m[11] = 0.0f;
-    m->m[12] = 0.0;
-    m->m[13] = 0.0;
-    m->m[14] = 0.0;
-    m->m[15] = 1.0f;
+    //m->m[11] = 0.0f;
+    //m->m[12] = 0.0;
+    //m->m[13] = 0.0;
+    //m->m[14] = 0.0;
+    //m->m[15] = 1.0f;
 }
 
 
 void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y, float z)
 {
+  //perf 0.95
+  memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+  m->m[3]= x;
+  m->m[7]= y;
+  m->m[11]=z;
+
+  /*
   #if OPTIMIZED
+   //perf 1.35
    memset(m->m,0,16*sizeof(float));
    m->m[0] = 1.0;
    m->m[3] = x;
@@ -1081,12 +1121,19 @@ void create4x4FTranslationMatrix(struct Matrix4x4OfFloats * m , float x, float y
     // Translate slots.
     m->m[3] = x; m->m[7] = y; m->m[11] = z;
   #endif // OPTIMIZED
+  */
 }
 
 
 
 void create4x4FScalingMatrix(struct Matrix4x4OfFloats * m, float scaleX, float scaleY, float scaleZ)
 {
+  memcpy(m->m,identityMatrix4x4,16*sizeof(float));
+  m->m[0]  = scaleX;
+  m->m[5]  = scaleY;
+  m->m[10] = scaleZ;
+
+  /*
    #if OPTIMIZED
    memset(m->m,0,16*sizeof(float));
    m->m[0]  = scaleX;
@@ -1099,6 +1146,7 @@ void create4x4FScalingMatrix(struct Matrix4x4OfFloats * m, float scaleX, float s
     // Scale slots.
     m->m[0] = scaleX; m->m[5] = scaleY; m->m[10] = scaleZ;
   #endif // OPTIMIZED
+  */
 }
 
 float det4x4FMatrix(const float * mat)

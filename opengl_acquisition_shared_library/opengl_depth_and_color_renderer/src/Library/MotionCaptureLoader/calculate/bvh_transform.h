@@ -120,7 +120,7 @@ struct triangleArea
     Flag indicating if the joint is behind the camera.
     @var BVH_TransformedJoint::isOccluded
     Flag indicating if the joint is occluded.
-    @var BVH_TransformedJoint::isChainTrasformationComputed
+    @var BVH_TransformedJoint::isChainTransformationComputed
     Flag indicating if the chain transformation has been computed.
     @var BVH_TransformedJoint::localToWorldTransformation
     The local to world transformation matrix.
@@ -143,7 +143,7 @@ struct BVH_TransformedJoint
   char isBehindCamera;
   char isOccluded;
   //char skipCalculations;
-  char isChainTrasformationComputed;
+  char isChainTransformationComputed;
 
   //Transforms
   //-----------------

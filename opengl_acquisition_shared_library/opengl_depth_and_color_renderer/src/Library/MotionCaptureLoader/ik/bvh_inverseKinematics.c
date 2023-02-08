@@ -453,9 +453,8 @@ float calculateChainLoss(
            #endif
                 for (unsigned int partID=partIDStart; partID<problem->chain[chainID].numberOfParts; partID++)
                 {
-                   //if (!problem->chain[chainID].part[partID].ignoreJointOwnError)
-                   if (problem->chain[chainID].part[partID].jointImportance!=0.0)
-                    //If the joint importance is zero then why go through all this trouble..
+                   //There should never be a joint with Importance 0.0, If the joint importance is zero it is bad problem design.. there shouldn't be millions of checks for this
+                   //if (problem->chain[chainID].part[partID].jointImportance!=0.0)
                    {
                         BVHJointID jID=problem->chain[chainID].part[partID].jID;
 
@@ -464,9 +463,11 @@ float calculateChainLoss(
                         float sY=(float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1];
                         float tX=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0];
                         float tY=(float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1];
+                        float notZeroIfAllPointsExist = sX*sY*tX*tY;
 
                         //Only use source/target joints  that exist and are not occluded..
-                        if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
+                        //if ( ((sX!=0.0) || (sY!=0.0)) && ((tX!=0.0) || (tY!=0.0)) )
+                        if (notZeroIfAllPointsExist!=0.0)
                         {
                             loss+= getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
                             ++numberOfSamples;

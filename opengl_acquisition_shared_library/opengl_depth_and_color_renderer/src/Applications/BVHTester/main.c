@@ -365,7 +365,7 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
 {
  //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   int everythingOk = 1;
-  char jointName[512]={0};
+  char jointName[513]={0};
   snprintf(jointName,512,"%s",label);
   char * delimeter = strchr(jointName,'_');
   *delimeter = 0;
@@ -379,21 +379,32 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
      fprintf(stderr,RED "Endsites can't be modified..!\n" NORMAL);
      return 0;
   }
+
+  if (strcmp(jointName,"neck01")==0)
+  {
+    snprintf(jointName,512,"neck1"); //Fix ?
+  }
+  if (strcmp(jointName,"lthumbbase")==0)
+  {
+    snprintf(jointName,512,"__lthumb"); //Fix ?
+  }
+
+
   //fprintf(stderr," %u - %s->%0.2f ",i,label,value);
   //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
   //=======================================================
   //int jointID = bvhConverter_getJointNameJointID(jointName);
   BVHJointID jointID=0;
-  if (
-            bvh_getJointIDFromJointNameNocase(
-                                               &bvhAtomicMotion,
-                                               jointName,
-                                               &jointID
-                                             )
+  if  (
+        bvh_getJointIDFromJointNameNocase(
+                                          &bvhAtomicMotion,
+                                          jointName,
+                                          &jointID
+                                         )
       )
       {
       // The next line is a debug message that spams a *lot*!
-      //fprintf(stderr,"Joint ID %u / %s => %0.2f \n",jointID,dof,value);
+      //fprintf(stderr,"Joint ID %u / %s|%s => %0.2f \n",jointID,bvhAtomicMotion.jointHierarchy[jointID].jointName,dof,value);
       //==============================================================================================================
       if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
       if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
@@ -409,7 +420,7 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
       //==============================================================================================================
       } else
       {
-          fprintf(stderr,RED "\n\n\nBVH library modification could not resolve joint \"%s\" \n\n\n" NORMAL,jointName);
+          fprintf(stderr,RED "\nBVH library modification could not resolve joint \"%s\" \n" NORMAL,jointName);
           everythingOk=0;
       }
   return everythingOk;
@@ -421,7 +432,6 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   int everythingOk = 1;
-  //char jointName[512]={0};
   for (int i=0; i<numberOfElements; i++)
   {
       if (!bvhConverter_modifySingleAtomic(labels[i],values[i],frameID))
@@ -719,11 +729,14 @@ float bvhConverter_IKFineTune(
                                                    )
                 )
                 {
-                    fprintf(stderr,"Failed bvh_copyMotionBufferToMotionFrame\n");
+                    fprintf(stderr,RED "Failed bvh_copyMotionBufferToMotionFrame\n" NORMAL);
                 }
 
                 //Perform and update projections for new results..!
                 bvhConverter_processFrame(frameID);
+            } else
+            {
+              fprintf(stderr,RED "Failed approximateBodyFromMotionBufferUsingInverseKinematics\n" NORMAL);
             }
         }
 

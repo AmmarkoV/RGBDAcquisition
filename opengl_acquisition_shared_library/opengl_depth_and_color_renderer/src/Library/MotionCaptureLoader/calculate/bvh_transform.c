@@ -608,7 +608,7 @@ void bvh_printBVHTransform(const char * label,struct BVH_MotionCapture * bvhMoti
          fprintf(stderr,"            bvhTransform->joint[%u].pos2DCalculated=%u\n",jID,(unsigned int) bvhTransform->joint[jID].pos2DCalculated);
          fprintf(stderr,"            bvhTransform->joint[%u].isBehindCamera=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isBehindCamera);
          fprintf(stderr,"            bvhTransform->joint[%u].isOccluded=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isOccluded);
-         fprintf(stderr,"            bvhTransform->joint[%u].isChainTrasformationComputed=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isChainTrasformationComputed);
+         fprintf(stderr,"            bvhTransform->joint[%u].isChainTransformationComputed=%u\n",jID,(unsigned int) bvhTransform->joint[jID].isChainTransformationComputed);
 
          fprintf(stderr,"\n            bvhTransform->joint[%u].pos2D={%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos2D[0],bvhTransform->joint[jID].pos2D[1]);
          fprintf(stderr,"\n            bvhTransform->joint[%u].pos3D={%0.2f,%0.2f,%0.2f,%0.2f}\n",jID,bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2],bvhTransform->joint[jID].pos3D[3]);
@@ -934,13 +934,7 @@ static inline void bvh_performActualTransform(
         //If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
 
-        if (!bvhTransform->joint[parentID].isChainTrasformationComputed)
-        {
-         //This is needed because we access the chain transform of our parent so at some point this will get used..
-         if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels)
-          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhMotion->jointHierarchy[jID].staticTransformation.m); } else
-          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhTransform->joint[jID].dynamicTranslation.m);   }
-        } else
+        if (bvhTransform->joint[parentID].isChainTransformationComputed)
         {
          if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels)
          {
@@ -965,7 +959,18 @@ static inline void bvh_performActualTransform(
                                   &bvhTransform->joint[jID].dynamicTranslation
                                  );
          }
+        } else
+        {
+         //This is needed because we access the chain transform of our parent so at some point this will get used..
+         if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels)
+          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhMotion->jointHierarchy[jID].staticTransformation.m); } else
+          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhTransform->joint[jID].dynamicTranslation.m);   }
         }
+
+
+
+
+
       } else
       {
        //If we are the root node there is no parent so we skip the multiplication with the "Identity" chainTransformation..
@@ -987,7 +992,7 @@ static inline void bvh_performActualTransform(
                              &bvhTransform->joint[jID].localToWorldTransformation,  //A
                              &bvhTransform->joint[jID].dynamicRotation              //B
                             );
-    bvhTransform->joint[jID].isChainTrasformationComputed=1;
+    bvhTransform->joint[jID].isChainTransformationComputed=1;
 
 
    //Also do 3D position output calculation..
