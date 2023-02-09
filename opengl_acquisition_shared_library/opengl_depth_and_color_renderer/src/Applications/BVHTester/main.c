@@ -386,7 +386,10 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
   {
     snprintf(jointName,512,"__lthumb"); //Fix ?
   }
-
+  if (strcmp(jointName,"rthumbbase")==0)
+  {
+    snprintf(jointName,512,"__rthumb"); //Fix ?
+  }
 
   //fprintf(stderr," %u - %s->%0.2f ",i,label,value);
   //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
@@ -501,7 +504,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
            {
             fprintf(stderr,GREEN "Initializing RHand Problem for the first time..\n" NORMAL);
             atomicRHandProblem = allocateEmptyIKProblem();
-            prepareDefaultLeftHandProblem(
+            prepareDefaultRightHandProblem(
                                           atomicRHandProblem,
                                           &bvhAtomicMotion,
                                           &rendererAtomic,
@@ -612,7 +615,7 @@ float bvhConverter_IKFineTune(
          ikConfig.gradientExplosionThreshold    = 25; //50 default
          ikConfig.iterationEarlyStopping        = 1;  //<-
          ikConfig.iterationMinimumLossDelta     = 10; //<- losses seem to be numbers 2000 -> 300 so 10 is a good limit
-         ikConfig.spring= 20;
+         ikConfig.spring = 20;
          ikConfig.dumpScreenshots = 0; // Dont thrash disk
          ikConfig.verbose = 0; //Dont spam console
          ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima

@@ -58,7 +58,6 @@ void clear_line()
     }
 }
 
-
 char fileExistsIK(const char * filename)
 {
     FILE *fp = fopen(filename,"r");
@@ -88,12 +87,10 @@ unsigned long GetTickCountMicrosecondsIK()
     return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBaseIK;
 }
 
-
 unsigned long GetTickCountMillisecondsIK()
 {
     return (unsigned long) GetTickCountMicrosecondsIK()/1000;
 }
-
 
 float getSquared3DPointDistance(float aX,float aY,float aZ,float bX,float bY,float bZ)
 {
@@ -104,12 +101,10 @@ float getSquared3DPointDistance(float aX,float aY,float aZ,float bX,float bY,flo
     return (diffX*diffX) + (diffY*diffY) + (diffZ*diffZ);
 }
 
-
 float get3DPointDistance(float aX,float aY,float aZ,float bX,float bY,float bZ)
 {
     return sqrt(getSquared3DPointDistance(aX,aY,aZ,bX,bY,bZ));
 }
-
 
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 {
@@ -119,13 +114,10 @@ float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
     return (diffX*diffX) + (diffY*diffY);
 }
 
-
 float get2DPointDistance(float aX,float aY,float bX,float bY)
 {
     return sqrt(getSquared2DPointDistance(aX,aY,bX,bY));
 }
-
-
 
 float meanBVH2DDistance(
                         struct BVH_MotionCapture * mc,
@@ -194,8 +186,6 @@ float meanBVH2DDistance(
     return 0.0;
 }
 
-
-
 float meanBVH3DDistance(
                         struct BVH_MotionCapture * mc,
                         struct simpleRenderer *renderer,
@@ -212,26 +202,12 @@ float meanBVH3DDistance(
 
     if (
         (
-            performPointProjectionsForMotionBuffer(
-                mc,
-                bvhSourceTransform,
-                sourceMotionBuffer,
-                renderer,
-                0,
-                0
-            )
+         performPointProjectionsForMotionBuffer(mc,bvhSourceTransform,sourceMotionBuffer,renderer,0,0)
         ) &&
         (
-            performPointProjectionsForMotionBuffer(
-                mc,
-                bvhTargetTransform,
-                targetMotionBuffer,
-                renderer,
-                0,
-                0
-            )
+         performPointProjectionsForMotionBuffer(mc,bvhTargetTransform,targetMotionBuffer,renderer,0,0)
         )
-    )
+       )
     {
         //-----------------
         float sumOf3DDistances=0.0;
@@ -287,7 +263,6 @@ float meanBVH3DDistance(
 
     return 0.0;
 }
-
 
 int updateProblemSolutionToAllChains(struct ikProblem * problem,struct MotionBuffer * updatedSolution)
 {
