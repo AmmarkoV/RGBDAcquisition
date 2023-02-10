@@ -1437,7 +1437,8 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", HIGH_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"oris02",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,END_EFFECTOR);
+     //This causes the head to tilt up!
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"oris02",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,END_EFFECTOR);
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //-------------------------------------------------------------
