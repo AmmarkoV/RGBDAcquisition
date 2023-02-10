@@ -24,6 +24,7 @@
 #include "bvh_inverseKinematics.h"
 #include "levmar.h"
 
+#include "../edit/bvh_remapangles.h"
 #include "../export/bvh_to_svg.h"
 #include "../edit/bvh_cut_paste.h"
 
@@ -1961,10 +1962,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
 
     //Remap all motion buffers
-    remapMotionBufferValues(mc,penultimateSolution);
-    remapMotionBufferValues(mc,previousSolution);
-    remapMotionBufferValues(mc,solution);
-    remapMotionBufferValues(mc,groundTruth);
+    //remapMotionBufferValues(mc,penultimateSolution);
+    //remapMotionBufferValues(mc,previousSolution);
+    //remapMotionBufferValues(mc,solution);
+    //remapMotionBufferValues(mc,groundTruth);
 
 
 
