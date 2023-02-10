@@ -1887,6 +1887,27 @@ int doExtrapolatedGuess(
 
 
 
+int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * buffer)
+{
+ if ( (buffer!=0) && (buffer->motion!=0) && (buffer->bufferSize == mc->numberOfValuesPerFrame) )
+ {
+  BVHMotionChannelID mID = 0;
+  for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+  {
+      if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_X)
+         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); } else
+      if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_Y)
+         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); } else
+      if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_Z)
+         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); }
+  }
+   return 1;
+ }
+ return 0;
+}
+
+
+
 int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                           struct BVH_MotionCapture * mc,
                                                           struct simpleRenderer *renderer,
@@ -1938,6 +1959,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         fprintf(stderr,RED "There is something wrong with your setup, halting execution..\n" NORMAL);
         exit(0);
     }
+
+    //Remap all motion buffers
+    remapMotionBufferValues(mc,penultimateSolution);
+    remapMotionBufferValues(mc,previousSolution);
+    remapMotionBufferValues(mc,solution);
+    remapMotionBufferValues(mc,groundTruth);
+
+
 
     //Make sure renderer gets its MV matrix calculated.. (since this is no longer done automatically)
     simpleRendererUpdateMovelViewTransform(renderer);
