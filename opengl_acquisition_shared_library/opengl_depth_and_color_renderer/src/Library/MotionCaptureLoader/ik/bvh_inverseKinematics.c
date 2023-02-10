@@ -839,7 +839,13 @@ float iteratePartLoss(
         previousSolution[0] = problem->previousSolution->motion[mIDS[0]];
         previousSolution[1] = problem->previousSolution->motion[mIDS[1]];
         previousSolution[2] = problem->previousSolution->motion[mIDS[2]];
+        if (limitsEngaged)
+           {
+             ensureValuesInLimits(previousSolution,minimumLimitValues,maximumLimitValues);
+           }
     }
+
+
 
     //Shorthand to access joint ID and joint Name witout having to traverse the problem
     unsigned int jointID   = problem->chain[chainID].part[partID].jID;
