@@ -699,13 +699,13 @@ int limitDeltasToThreshold(
                            float gradientExplosionThreshold
                           )
 {
- if (delta[0]>0.0) { delta[0]=fmin(fabs(delta[0]),gradientExplosionThreshold); } else
+ if (delta[0]>0.0) { delta[0]=fmin(fabs(delta[0]),gradientExplosionThreshold);  } else
                    { delta[0]=fmax(fabs(delta[0]),-gradientExplosionThreshold); }
  //-----------------------------------------------------------------------------------
- if (delta[1]>0.0) { delta[1]=fmin(fabs(delta[1]),gradientExplosionThreshold); } else
+ if (delta[1]>0.0) { delta[1]=fmin(fabs(delta[1]),gradientExplosionThreshold);  } else
                    { delta[1]=fmax(fabs(delta[1]),-gradientExplosionThreshold); }
  //-----------------------------------------------------------------------------------
- if (delta[2]>0.0) { delta[2]=fmin(fabs(delta[2]),gradientExplosionThreshold); } else
+ if (delta[2]>0.0) { delta[2]=fmin(fabs(delta[2]),gradientExplosionThreshold);  } else
                    { delta[2]=fmax(fabs(delta[2]),-gradientExplosionThreshold); }
 }
 
@@ -796,13 +796,17 @@ float iteratePartLoss(
         problem->chain[chainID].part[partID].mIDStart+2  //This is ok because we have checked for 3 elements above
     };
 
-    /*
-    if (mIDS[2] >= problem->chain[chainID].currentSolution->bufferSize)
-    {
-        fprintf(stderr,RED "Part loss for chain %u / part %u out of motion vector\n" NORMAL,chainID,partID);
-       return NAN;
-    }*/
 
+    //-------------------------------------------
+    char limitsEngaged = problem->chain[chainID].part[partID].limits;
+    //---------------------------------------------------------------------------------------
+    float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
+                                    problem->chain[chainID].part[partID].minimumLimitMID[1],
+                                    problem->chain[chainID].part[partID].minimumLimitMID[2] };
+    float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
+                                    problem->chain[chainID].part[partID].maximumLimitMID[1],
+                                    problem->chain[chainID].part[partID].maximumLimitMID[2] };
+    //---------------------------------------------------------------------------------------
     //The original values we want to improve
     float originalValues[3] =
     {
@@ -810,6 +814,14 @@ float iteratePartLoss(
          problem->chain[chainID].currentSolution->motion[mIDS[1]],
          problem->chain[chainID].currentSolution->motion[mIDS[2]]
     };
+    //NEW functionality refuse to accept off-limit input..!
+    if (limitsEngaged)
+           {
+             ensureValuesInLimits(originalValues,minimumLimitValues,maximumLimitValues);
+             problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0];
+             problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1];
+             problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2];
+           }
 
     //The original values we want to improve
     unsigned int weHaveAPreviousSolutionHistory=(problem->previousSolution!=0);
@@ -947,16 +959,6 @@ if (iterationID==0)
 }
 //-------------------------------------------
 //-------------------------------------------
-//-------------------------------------------
-    char limitsEngaged = problem->chain[chainID].part[partID].limits;
-    //---------------------------------------------------------------------------------------
-    float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
-                                    problem->chain[chainID].part[partID].minimumLimitMID[1],
-                                    problem->chain[chainID].part[partID].minimumLimitMID[2] };
-    float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
-                                    problem->chain[chainID].part[partID].maximumLimitMID[1],
-                                    problem->chain[chainID].part[partID].maximumLimitMID[2] };
-    //---------------------------------------------------------------------------------------
     if ( problem->chain[chainID].part[partID].maeDeclared )
     {
       updateLimitsBasedOnMAE(
