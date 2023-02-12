@@ -14,6 +14,7 @@ extern "C"
 float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation);
 
 float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation);
+float bvh_normalizeAngle(float angle);
 
 
 int bvh_normalizeRotations(struct BVH_MotionCapture * bvh);

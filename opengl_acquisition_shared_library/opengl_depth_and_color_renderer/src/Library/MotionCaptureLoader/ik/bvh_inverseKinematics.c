@@ -1903,11 +1903,11 @@ int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * 
          )
       {
        if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_X)
-         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); } else
+         { buffer->motion[mID] = bvh_normalizeAngle(buffer->motion[mID]); } else
        if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_Y)
-         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); } else
+         { buffer->motion[mID] = bvh_normalizeAngle(buffer->motion[mID]); } else
        if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_Z)
-         { buffer->motion[mID] = bvh_constrainAngleCentered0(buffer->motion[mID],0); }
+         { buffer->motion[mID] = bvh_normalizeAngle(buffer->motion[mID]); }
       }
   }
    return 1;

@@ -90,7 +90,7 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 
 
 //We want to add 180 degrees to the model so 0 is oriented towards us..!
-float bvh_NormalizeAngle(float angle)
+float bvh_normalizeAngle(float angle)
 {
     float angleRotated = angle;
 
@@ -152,7 +152,7 @@ int bvh_normalizeRotations(struct BVH_MotionCapture * bvh)
            if (motionIDsWhereToExecuteNormalization[mID])
                  {
                     //fprintf(stderr,"frame %u / mID %u / gMID %u\n",fID,mID,globalMID);
-                    bvh->motionValues[globalMID] = bvh_constrainAngleCentered0(bvh->motionValues[globalMID],0);
+                    bvh->motionValues[globalMID] = bvh_normalizeAngle(bvh->motionValues[globalMID]);
                  }
            globalMID +=1;
          }
