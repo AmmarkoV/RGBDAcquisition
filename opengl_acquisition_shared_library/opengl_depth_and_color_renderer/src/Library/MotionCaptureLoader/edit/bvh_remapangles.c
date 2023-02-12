@@ -13,7 +13,7 @@
 //THIS IS NOT USED ANYWHERE
 float bvh_constrainAngleCentered180(float angle)
 {
-   angle = fmod(angle,360.0);
+   angle = fmodf(angle,360.0);
    if (angle<0.0)
      { angle+=360.0; }
    return angle;
@@ -49,10 +49,10 @@ float bvh_constrainAngleCentered0(float angle,unsigned int flipOrientation)
 
      if (angleRotated<0.0)
      {
-       angleFrom_minus360_to_plus360 = (-1*fmod(-1*(angleRotated),360.0))+180;
+       angleFrom_minus360_to_plus360 = (-1*fmodf(-1*(angleRotated),360.0))+180;
      } else
      {
-       angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
+       angleFrom_minus360_to_plus360 = (fmodf((angleRotated),360.0))-180;
      }
 
     //If we want to flip orientation we just add or subtract 180 depending on the case
@@ -92,18 +92,24 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 //We want to add 180 degrees to the model so 0 is oriented towards us..!
 float bvh_normalizeAngle(float angle)
 {
-    float angleRotated = angle;
-
-    if (angle<-180.0)
-     {
-        //TODO
-     } else
-    if (angle>180.0)
-     {
-        //TODO
-     }
-
-   return angleRotated;
+    if ((-180.0<=angle) && (angle<=180.0))
+    {
+      //This is an already normalized angle..!
+      return angle;
+    } else
+    {
+      float intermediateAngle = fmodf(angle,360.0);
+      if (intermediateAngle>180.0)
+      { //180.0 --> 360.0
+          return -360.0 + intermediateAngle;
+      } else
+      if (intermediateAngle<-180.0)
+      { //180.0 --> 360.0
+          return  360.0 + intermediateAngle;
+      }
+    }
+ //This should never trigger
+ return angle;
 }
 
 

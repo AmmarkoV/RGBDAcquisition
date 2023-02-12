@@ -54,7 +54,7 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
   }
 
   memset(framesToRemove,0,sizeof(unsigned int) * mc->numberOfFrames);
- 
+
   unsigned int framesThatWillBeHidden=0;
   for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
   {
@@ -80,7 +80,7 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
           float minThreshold = threshold;
           float maxThreshold = 90.0 - threshold;
           float value = mc->motionValues[mIDOffset + mID];
-          float modValue = fmod(fabs(value),90.0);
+          float modValue = fmodf(fabs(value),90.0);
 
           if  (
                 (value>45.0) && ( ( modValue <= minThreshold) || (maxThreshold <= modValue) )
