@@ -1970,10 +1970,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
 
     //Remap all motion buffers
-    //remapMotionBufferValues(mc,penultimateSolution);
-    //remapMotionBufferValues(mc,previousSolution);
-    //remapMotionBufferValues(mc,solution);
-    //remapMotionBufferValues(mc,groundTruth);
+    remapMotionBufferValues(mc,penultimateSolution);
+    remapMotionBufferValues(mc,previousSolution);
+    remapMotionBufferValues(mc,solution);
+    remapMotionBufferValues(mc,groundTruth);
 
 
 
