@@ -1975,8 +1975,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     remapMotionBufferValues(mc,solution);
     remapMotionBufferValues(mc,groundTruth);
 
-
-
     //Make sure renderer gets its MV matrix calculated.. (since this is no longer done automatically)
     simpleRendererUpdateMovelViewTransform(renderer);
 
