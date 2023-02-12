@@ -89,6 +89,25 @@ float bvh_RemapAngleCentered0(float angle, unsigned int constrainOrientation)
 
 
 
+//We want to add 180 degrees to the model so 0 is oriented towards us..!
+float bvh_NormalizeAngle(float angle)
+{
+    float angleRotated = angle;
+
+    if (angle<-180.0)
+     {
+        //TODO
+     } else
+    if (angle>180.0)
+     {
+        //TODO
+     }
+
+   return angleRotated;
+}
+
+
+
 int bvh_normalizeRotations(struct BVH_MotionCapture * bvh)
 {
  if (bvh!=0)
