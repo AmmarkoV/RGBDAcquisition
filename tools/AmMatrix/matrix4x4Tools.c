@@ -2013,6 +2013,9 @@ void create4x4FModelTransformation(
                                  z
                                );
       translationSpecified=1;
+    } else
+    {
+      create4x4FIdentityMatrix(&intermediateMatrixTranslation); //This can be skipped to reduce cycles
     }
     //----------------------------------------------------------
 
@@ -2026,7 +2029,7 @@ void create4x4FModelTransformation(
       if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
         {
           fprintf(stderr,"create4x4FModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
-          //create4x4FIdentityMatrix(&intermediateMatrixRotation);  It will get automatically skipped..!
+          create4x4FIdentityMatrix(&intermediateMatrixRotation); //This can be skipped to reduce cycles
           rotationSpecified=0;
         } else
       if (rotationOrder==ROTATION_ORDER_RPY)
@@ -2051,6 +2054,9 @@ void create4x4FModelTransformation(
                                                           );
           rotationSpecified=1;
          }
+    } else
+    {
+      create4x4FIdentityMatrix(&intermediateMatrixRotation); //This can be skipped to reduce cycles
     }
     //----------------------------------------------------------
 
@@ -2063,6 +2069,9 @@ void create4x4FModelTransformation(
       {
         create4x4FScalingMatrix(&intermediateScalingMatrix,scaleX,scaleY,scaleZ);
         scaleSpecified=1;
+      } else
+      {
+       create4x4FIdentityMatrix(&intermediateScalingMatrix); //This can be skipped to reduce cycles
       }
 
      //Re-use already optimized code-path

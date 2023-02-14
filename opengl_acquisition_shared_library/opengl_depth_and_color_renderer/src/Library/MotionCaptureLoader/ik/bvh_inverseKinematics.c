@@ -554,7 +554,7 @@ int examineSolutionAndKeepIfItIsBetter(
                                       )
 {
         int accepted = 0;
-        float currentLoss = *bestValues;
+        //float currentLoss = *bestValues;
         //---------------------------------------------------
         float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
@@ -565,7 +565,7 @@ int examineSolutionAndKeepIfItIsBetter(
         // Calculate loss of try
         //-------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
-        currentLoss = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        float currentLoss = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
                 { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }

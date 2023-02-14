@@ -516,9 +516,9 @@ int bvh_symmetricJointNameParser(struct BVH_MotionCapture * mc)
 {
   if (!mc->checkedForSymmetricJoints)
   {
-  BVHJointID jIDA,jIDB;
-  unsigned int rangeOfJIDA,rangeOfJIDB;
-  unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
+  //BVHJointID jIDA,jIDB;
+  //unsigned int rangeOfJIDA,rangeOfJIDB;
+  //unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
   //-------------------------
   BVHJointID symmetricJID=0;
   char symmetricTo[512]={0};

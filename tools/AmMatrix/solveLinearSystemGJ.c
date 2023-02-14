@@ -201,7 +201,8 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
 {
   double newval =0.0;
   double multiplier = 0.0;
-  unsigned int i=0,line=0;
+  unsigned int i=0;
+  unsigned int line=0;
 
 
   for (line=0;/*activeLine;*/ line<totalLines; line++)
@@ -285,7 +286,7 @@ int gatherResultOLD(double * result , double * mat  , unsigned int totalLines )
 
 int gatherResult(double * result , double * mat  , unsigned int totalLines )
 {
-  unsigned int line=0,i=0,ok=0;
+  signed int line=0,i=0,ok=0;
 
   line=totalLines-1;
   while (line>=0)
