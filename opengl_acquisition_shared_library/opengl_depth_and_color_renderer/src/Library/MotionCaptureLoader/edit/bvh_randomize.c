@@ -17,8 +17,8 @@
 
 float randomFloatA( float minVal, float maxVal )
 {
-  if (minVal!=maxVal) 
-   { 
+  if (minVal!=maxVal)
+   {
     if (maxVal<minVal)
     {
       float buf = minVal;
@@ -36,7 +36,7 @@ float randomFloatA( float minVal, float maxVal )
     if (value>maxVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",minVal,maxVal,value); }
 
     return value;
-  } 
+  }
   else
   {
    return minVal;
@@ -51,19 +51,19 @@ int bvh_RandomizeBasedOnIKProblem(
                                  )
 {
    fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: starting..\n");
-   if (mc==0) 
-       { 
+   if (mc==0)
+       {
           fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot work without a motion capture file\n");
-          return 0; 
+          return 0;
        }
-   if (ikProblemName==0) 
-       { 
+   if (ikProblemName==0)
+       {
           fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot work without the name of the IK problem\n");
-          return 0; 
+          return 0;
        }
-       
+
    int success=0;
-   
+
    //struct ikProblem tP={0};
    struct ikProblem * tP = allocateEmptyIKProblem();
    if (tP==0)
@@ -71,8 +71,8 @@ int bvh_RandomizeBasedOnIKProblem(
        fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: cannot allocateEmptyIKProblem\n");
        return 0;
    }
-   
-   
+
+
    fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",ikProblemName);
    if (strcmp(ikProblemName,"lhand")==0)
    {
@@ -100,46 +100,46 @@ int bvh_RandomizeBasedOnIKProblem(
                                          0,//struct BVH_Transform * bvhTargetTransform,
                                          1//standalone
                                         );
-          fprintf(stderr," result = %d !\n",success); 
+          fprintf(stderr," result = %d !\n",success);
    } else
    {
        fprintf(stderr,"bvh_RandomizeBasedOnIKProblem: Could not identify %s ik problem!\n",ikProblemName);
-       
+
        free(tP);
        return 0;
    }
- 
-  
-  //Now to actually do randomizations..! 
+
+
+  //Now to actually do randomizations..!
   //-----------------------------------------------------------------------------------------------
   float * minimumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
   float * maximumRandomizationLimit = (float *) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
   char * hasRandomization           = (char *)  malloc(sizeof(char)  * mc->numberOfValuesPerFrame);
-  
+
   if ( (minimumRandomizationLimit!=0) && (maximumRandomizationLimit!=0) && (hasRandomization!=0) )
   {
    memset(minimumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
    memset(maximumRandomizationLimit,0,sizeof(float) * mc->numberOfValuesPerFrame);
    memset(hasRandomization,         0,sizeof(char)  * mc->numberOfValuesPerFrame);
-   
-   
+
+
    //unsigned int mIDOffset;
    float minimumLimit;
    float maximumLimit;
    unsigned int channelID;
-   
+
    //First retrieve the minimum maximum limits from problem chains..!
    for (unsigned int chainID=0; chainID<tP->numberOfChains; chainID++)
     {
       for (unsigned int partID=0; partID<tP->chain[chainID].numberOfParts; partID++)
-       { 
+       {
            if (tP->chain[chainID].part[partID].limits)
            {
-             unsigned int jID = tP->chain[chainID].part[partID].jID; 
+             unsigned int jID = tP->chain[chainID].part[partID].jID;
              fprintf(stderr,"Limits declared for => ChainID(%u) / PartID(%u) [jID=%u|%s]\n",chainID,partID,jID,mc->jointHierarchy[jID].jointName);
-             
+
              const char * jName = mc->jointHierarchy[jID].jointName;
-             
+
              unsigned int mIDOffset = tP->chain[chainID].part[partID].mIDStart;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
@@ -156,7 +156,7 @@ int bvh_RandomizeBasedOnIKProblem(
               hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
               fprintf(stderr,"Channel #0(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
-             
+
              mIDOffset = tP->chain[chainID].part[partID].mIDStart+1;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
@@ -173,7 +173,7 @@ int bvh_RandomizeBasedOnIKProblem(
               hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
               fprintf(stderr,"Channel #1(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
-             
+
              mIDOffset = tP->chain[chainID].part[partID].mIDEnd;
              if (jID==mc->motionToJointLookup[mIDOffset].jointID)
              {
@@ -193,9 +193,9 @@ int bvh_RandomizeBasedOnIKProblem(
            }
         }
     }
-       
-       
-    //minimumRandomizationLimit and maximumRandomizationLimit 
+
+
+    //minimumRandomizationLimit and maximumRandomizationLimit
      unsigned int fID=0;
      for (fID=0; fID<mc->numberOfFrames; fID++)
       {
@@ -205,21 +205,21 @@ int bvh_RandomizeBasedOnIKProblem(
        for (unsigned int mID=mIDStart; mID<mIDEnd; mID++)
          {
              unsigned int localMID = mID - mIDStart;
-             
+
              if (hasRandomization[localMID])
                 {
-                  mc->motionValues[mID] = randomFloatA(minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]); 
+                  mc->motionValues[mID] = randomFloatA(minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]);
                   //fprintf(stderr,"mID(%u)=%f[%0.2f/%0.2f] ",mID,mc->motionValues[mID],minimumRandomizationLimit[localMID],maximumRandomizationLimit[localMID]);
                 }
          }
       }
-  //----------------------------------------------------------------------------------------------- 
+  //-----------------------------------------------------------------------------------------------
   }
-   
+
   if (minimumRandomizationLimit!=0) { free(minimumRandomizationLimit); }
   if (maximumRandomizationLimit!=0) { free(maximumRandomizationLimit); }
   if (hasRandomization!=0)          { free(hasRandomization);          }
-  
+
   free(tP);
   return success;
 }
@@ -351,16 +351,16 @@ int bvh_RandomizeSingleMIDInRange(
     {
      BVHJointID jID = mc->motionToJointLookup[mID].jointID;
      fprintf(stderr,GREEN "Asked to randomize Joint %s (jID=%u) using range %0.2f - %0.2f across %u frames\n" NORMAL,mc->jointHierarchy[jID].jointName,jID,start,end,mc->numberOfFrames);
-    
+
      unsigned int fID=0;
      for (fID=0; fID<mc->numberOfFrames; fID++)
       {
        unsigned int mIDOfSpecificFrame=mID + fID*mc->numberOfValuesPerFrame;
- 
+
        mc->motionValues[mIDOfSpecificFrame]=randomFloatA(start,end);
       }
-      
-     return 1; 
+
+     return 1;
     }
    return 0;
 }
@@ -478,13 +478,13 @@ int bvh_RandomizePositionsOfFrameBasedOn3D(
   bvh_setJointPositionXAtFrame(mc,jID,fID,randomFloatA(minimumPosition[0],maximumPosition[0]));
   bvh_setJointPositionYAtFrame(mc,jID,fID,randomFloatA(minimumPosition[1],maximumPosition[1]));
   bvh_setJointPositionZAtFrame(mc,jID,fID,randomFloatA(minimumPosition[2],maximumPosition[2]));
-     
+
   //Old code, no one guarantees the 0,1,2 offsets are correct
   //unsigned int mID=fID*mc->numberOfValuesPerFrame;
   //mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
   //mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
-  //mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]); 
-  return 1;     
+  //mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]);
+  return 1;
  }
 
   fprintf(stderr,"bvh_RandomizePositionsBasedOn3D: Cannot be done without positional channels on root joint\n");
@@ -504,17 +504,17 @@ int bvh_RandomizePositionsBasedOn3D(
   fprintf(stderr,"Randomizing Positions of %u frames based on 3D coordinates\n",mc->numberOfFrames);
   fprintf(stderr,"min(%0.2f,%0.2f,%0.2f) ",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
   fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)\n",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
-  
+
   if (mc->jointHierarchy[mc->rootJointID].hasPositionalChannels)
   {
-   BVHJointID rootJID = mc->rootJointID; 
+   BVHJointID rootJID = mc->rootJointID;
    BVHFrameID fID=0;
-   
+
    for (fID=0; fID<mc->numberOfFrames; fID++)
-    { 
+    {
      bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPosition,maximumPosition);
     }
-   return 1;    
+   return 1;
   }
  }
 
@@ -537,39 +537,42 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
 {
 
  if (mc!=0)
- { 
+ {
      //There is a dilemma here..!
      //The DAZ-friendly bvh files I use as source use a Zrotation Yrotation Xrotation channel rotation order for root joint and
-     //Zrotation Xrotation Yrotation for the rest of the joints, supposedly the minimumPosition[0-3] and maximumPosition[0-3] 
-     //should give information for the X rotation axis, then the Y rotation axis and then the Z rotation axis that would work 
+     //Zrotation Xrotation Yrotation for the rest of the joints, supposedly the minimumPosition[0-3] and maximumPosition[0-3]
+     //should give information for the X rotation axis, then the Y rotation axis and then the Z rotation axis that would work
      //regardless of rotation order, however to keep things compatible with the initial implementation I have I will just assume
-     //the initial convention and will have to change this at some point in the future..  
-     
+     //the initial convention and will have to change this at some point in the future..
+
      if (mc->jointHierarchy[mc->rootJointID].hasRotationalChannels)
      {
        float randomRotations[3] = {
-                                    randomFloatA(minimumRotation[0],maximumRotation[0]), 
-                                    randomFloatA(minimumRotation[1],maximumRotation[1]), 
-                                    randomFloatA(minimumRotation[2],maximumRotation[2]) 
-                                  }; 
+                                    randomFloatA(minimumRotation[0],maximumRotation[0]),
+                                    randomFloatA(minimumRotation[1],maximumRotation[1]),
+                                    randomFloatA(minimumRotation[2],maximumRotation[2])
+                                  };
        if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
        {
          //This is a very important part of the code..
          //We assume a ZYX Rotation order we have inherited from https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/daz-friendly-release
-         float randomQuaternion[4]; 
-        
+         float randomQuaternion[4];
+
         //TODO: this or not todo ?
-        //fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL ); 
+        //fprintf(stderr,YELLOW "Maybe the random rotations that are converted to a quaternion don't need to be swapped?\n" NORMAL );
         float buffer = randomRotations[0];
         randomRotations[0]=randomRotations[2];
         randomRotations[2]=buffer;
-        
+
         //BVH Quaternion
-        euler2Quaternions(randomQuaternion,randomRotations,qWqXqYqZ); 
+        euler2Quaternions(randomQuaternion,randomRotations,qWqXqYqZ);
+        //Make sure quaternion is normalized!
+        normalizeQuaternions(&randomQuaternion[1],&randomQuaternion[2],&randomQuaternion[3],&randomQuaternion[0]);
+
         bvh_setJointRotationWAtFrame(mc,jID,fID,randomQuaternion[0]);
         bvh_setJointRotationXAtFrame(mc,jID,fID,randomQuaternion[1]);
         bvh_setJointRotationYAtFrame(mc,jID,fID,randomQuaternion[2]);
-        bvh_setJointRotationZAtFrame(mc,jID,fID,randomQuaternion[3]); 
+        bvh_setJointRotationZAtFrame(mc,jID,fID,randomQuaternion[3]);
        } else
        {
         bvh_setJointRotationZAtFrame(mc,jID,fID,randomRotations[0]);
@@ -577,10 +580,10 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
         bvh_setJointRotationXAtFrame(mc,jID,fID,randomRotations[2]);
        }
      }
-     
-   return 1;  
+
+   return 1;
   }
-  
+
  fprintf(stderr,"bvh_RandomizeRotationsOfFrameBasedOn3D: Cannot be done without positional channels on root joint\n");
  return 0;
 }
@@ -602,20 +605,20 @@ int bvh_RandomizeRotationsBasedOn3D(
   fprintf(stderr,"Randomizing Rotations of %u frames based on 3D coordinates\n",mc->numberOfFrames);
   fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumRotation[0],minimumRotation[1],minimumRotation[2]);
   fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumRotation[0],maximumRotation[1],maximumRotation[2]);
-  
+
   if (mc->jointHierarchy[mc->rootJointID].hasRotationalChannels)
   {
-   BVHJointID rootJID = mc->rootJointID; 
+   BVHJointID rootJID = mc->rootJointID;
    BVHFrameID fID=0;
-   
+
    for (fID=0; fID<mc->numberOfFrames; fID++)
-    {  
+    {
       bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotation,maximumRotation);
     }
    return 1;
-  } 
+  }
  }
- 
+
  fprintf(stderr,"bvh_RandomizeRotationsBasedOn3D: Cannot be done without positional channels on root joint\n");
  return 0;
 }
@@ -631,9 +634,9 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  )
 {
-  return ( 
+  return (
             (bvh_RandomizePositionsBasedOn3D(mc,minimumPosition,maximumPosition)) &&
-            (bvh_RandomizeRotationsBasedOn3D(mc,minimumPosition,maximumPosition)) 
+            (bvh_RandomizeRotationsBasedOn3D(mc,minimumPosition,maximumPosition))
          );
 }
 
@@ -665,22 +668,22 @@ int bvh_RandomizePositionRotation2Ranges(
 
   //fprintf(stderr,"Exiting\n");
   //exit(0);
-  BVHJointID rootJID = mc->rootJointID; 
+  BVHJointID rootJID = mc->rootJointID;
   BVHFrameID fID=0;
-   
+
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
    float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
 
    if (whichHalf<0.5)
-           { 
-             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA); 
-             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeA,maximumPositionRangeA); 
+           {
+             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeA,maximumRotationRangeA);
+             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeA,maximumPositionRangeA);
            } else
            {
-             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB); 
-             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeB,maximumPositionRangeB); 
+             bvh_RandomizeRotationsOfFrameBasedOn3D(mc,rootJID,fID,minimumRotationRangeB,maximumRotationRangeB);
+             bvh_RandomizePositionsOfFrameBasedOn3D(mc,rootJID,fID,minimumPositionRangeB,maximumPositionRangeB);
            }
   }
  return 1;
@@ -710,7 +713,7 @@ int bvh_RandomizePositionFrom2D(
                                 )
 {
   fprintf(stderr,"Randomizing %u frames  using 2D randomizations \n",mc->numberOfFrames);
-  
+
   if (mc->jointHierarchy[mc->rootJointID].hasQuaternionRotation)
           {
               fprintf(stderr,"TODO: Handle quaternion rotation here..!\n");
@@ -723,13 +726,13 @@ int bvh_RandomizePositionFrom2D(
   float positionX,positionY,positionZ;
 
 
-  BVHJointID rootJID = mc->rootJointID; 
+  BVHJointID rootJID = mc->rootJointID;
   BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
-   
+
    positionZ = randomFloatA(minimumDepth,maximumDepth);
    //mc->motionValues[mID+2]=randomFloatA(minimumDepth,maximumDepth);
    unsigned int x2D = borderX+ rand()%(width-borderX*2);
@@ -747,7 +750,7 @@ int bvh_RandomizePositionFrom2D(
    //mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
    //mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
   }
- 
+
  bvh_RandomizeRotationsBasedOn3D(mc,minimumRotation,maximumRotation);
  return 1;
 }
@@ -775,10 +778,10 @@ int bvh_RandomizePositionFrom2DRotation2Ranges(
                               );
 
   //Just Randomize Rotations like bvh_RandomizePositionRotation2Ranges
-  BVHJointID rootJID = mc->rootJointID; 
+  BVHJointID rootJID = mc->rootJointID;
   BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
-  { 
+  {
    float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
 
    if (whichHalf<0.5)
