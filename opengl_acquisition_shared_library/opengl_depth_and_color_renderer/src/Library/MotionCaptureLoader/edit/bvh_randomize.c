@@ -568,6 +568,7 @@ int bvh_RandomizeRotationsOfFrameBasedOn3D(
         euler2Quaternions(randomQuaternion,randomRotations,qWqXqYqZ);
         //Make sure quaternion is normalized!
         normalizeQuaternions(&randomQuaternion[1],&randomQuaternion[2],&randomQuaternion[3],&randomQuaternion[0]);
+        //TODO: make sure quaternions are normalized!
 
         bvh_setJointRotationWAtFrame(mc,jID,fID,randomQuaternion[0]);
         bvh_setJointRotationXAtFrame(mc,jID,fID,randomQuaternion[1]);
