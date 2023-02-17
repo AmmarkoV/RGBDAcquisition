@@ -1021,30 +1021,51 @@ if (iterationID==0)
     unsigned int executedEpochs=epochs;
     for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
-        #define DO_3_LOSSES 1
-        #if DO_3_LOSSES
+        #define DO_INDIVIDUAL_ROLLBACK_LOSSES 0
+        #define DO_COMBINED_LOSS 1
+
+        #if DO_INDIVIDUAL_ROLLBACK_LOSSES
         //Calculate losses
+        //  Spring to initial -> distanceFromInitial=fabs(currentValues[0..2] - originalValues[0..2]);
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
-        //float distanceFromInitial=fabs(currentValues[0] - originalValues[0]);
         currentLoss[0]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss[0]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
-        //distanceFromInitial=fabs(currentValues[1] - originalValues[1]);
         currentLoss[1]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss[1]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
-        //distanceFromInitial=fabs(currentValues[2] - originalValues[2]);
         currentLoss[2]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss[2]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         #else
-            currentLoss[0]=loss;
-            currentLoss[1]=loss;
-            currentLoss[2]=loss;
-        #endif // DO_3_LOSSES
+         //Calculate losses
+         //  Spring to initial -> distanceFromInitial=fabs(currentValues[0..2] - originalValues[0..2]);
+         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+         currentLoss[0] = loss;
+         if (currentLoss[0]>bestLoss) {
+                                        problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0];
+                                        currentLoss[0] = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+                                        loss = currentLoss[0];
+                                      }
+         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+         currentLoss[1] = loss;
+         if (currentLoss[1]>bestLoss) {
+                                        problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1];
+                                        currentLoss[1]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+                                        loss = currentLoss[1];
+                                      }
+         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+         currentLoss[2] = loss;
+         if (currentLoss[2]>bestLoss) {
+                                        problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2];
+                                        currentLoss[2]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+                                        loss = currentLoss[2];
+                                      }
+         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+        #endif // DO_INDIVIDUAL_ROLLBACK_LOSSES
 
 
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
@@ -1128,7 +1149,12 @@ if (iterationID==0)
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
         //----------------------------------------------
-        float loss=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+        #if DO_COMBINED_LOSS
+          loss=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+        #else
+          //Just use final loss without reconfirming new delta limits
+          loss=currentLoss[2];
+        #endif
         //----------------------------------------------
 
         // If loss is NaN
