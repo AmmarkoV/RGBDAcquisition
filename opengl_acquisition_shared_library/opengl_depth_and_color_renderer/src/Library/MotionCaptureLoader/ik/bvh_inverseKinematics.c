@@ -1021,7 +1021,7 @@ if (iterationID==0)
     unsigned int executedEpochs=epochs;
     for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
-        #define DO_3_LOSSES 0
+        #define DO_3_LOSSES 1
         #if DO_3_LOSSES
         //Calculate losses
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
