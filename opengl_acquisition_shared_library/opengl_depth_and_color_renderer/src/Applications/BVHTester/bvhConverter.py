@@ -45,11 +45,21 @@ def loadLibrary(filename,relativePath="",forceUpdate=False):
 
 
 def splitDictionaryInLabelsAndFloats(arguments):
+    
+
     #First prepare the labels of the joints we want to transmit
     #-------------------------------------------------- 
     labels = list(arguments.keys())
     labelsBytes = []
     for i in range(len(labels)):
+        #Potential renaming..
+        #---------------------------------------------
+        if ("endsite_" in labels[i]):
+          if ("eye" in labels[i]):
+           datasplit = labels[i].split("endsite_",1)
+           newLabel="%s%s" % (datasplit[0],datasplit[1])  
+           print(labels[i]," renamed to -> ",newLabel)
+        #---------------------------------------------
         labelsBytes.append(bytes(labels[i], 'utf-8'))
     labelsCStr = (ctypes.c_char_p * len(labelsBytes))()
     labelsCStr[:] = labelsBytes 
@@ -346,7 +356,7 @@ class BVH():
     #-------------------------------------------------------
     return data2D,data3D,dataBVH 
   #--------------------------------------------------------
-  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0,langevinDynamics=0.3):
+  def fineTuneToMatch(self,bodyPart:str,target:dict,frameID=0,iterations=20,epochs=30,lr=0.01,fSampling=30.0,fCutoff=5.0,langevinDynamics=0.0):
     self.stage("fineTuneToMatch ")
     bodyPartCStr = bytes(bodyPart, 'utf-8')
 

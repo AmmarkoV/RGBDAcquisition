@@ -667,7 +667,6 @@ float bvhConverter_IKFineTune(
              lowercase(coord);
              lowercase(dof);
 
-
              if (  (coord[0]=='2') && (  (coord[2]=='x') || (coord[2]=='y') ) )
              {
               BVHJointID jID=0;
