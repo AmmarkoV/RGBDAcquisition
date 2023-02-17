@@ -1021,10 +1021,10 @@ if (iterationID==0)
     unsigned int executedEpochs=epochs;
     for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
-        #define DO_INDIVIDUAL_ROLLBACK_LOSSES 0
+        #define DO_FULL_ROLLBACK_LOSSES 0
         #define DO_COMBINED_LOSS 1
 
-        #if DO_INDIVIDUAL_ROLLBACK_LOSSES
+        #if DO_FULL_ROLLBACK_LOSSES
         //Calculate losses
         //  Spring to initial -> distanceFromInitial=fabs(currentValues[0..2] - originalValues[0..2]);
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
@@ -1041,8 +1041,9 @@ if (iterationID==0)
         if (currentLoss[2]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         #else
-         //Calculate losses
-         //  Spring to initial -> distanceFromInitial=fabs(currentValues[0..2] - originalValues[0..2]);
+         // Calculate losses only when needed
+         // This logic avoids *two thirds* of calculateChainLoss codes and thus uses half the number of 4x4 Matrix Multiplications!
+         // It is a big improvement doing the same work as the old code segment above..!
          //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
          currentLoss[0] = loss;
          if (currentLoss[0]>bestLoss) {
@@ -1065,7 +1066,7 @@ if (iterationID==0)
                                         loss = currentLoss[2];
                                       }
          //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
-        #endif // DO_INDIVIDUAL_ROLLBACK_LOSSES
+        #endif // DO_FULL_ROLLBACK_LOSSES
 
 
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
