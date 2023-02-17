@@ -1138,7 +1138,7 @@ int bvhConverter(int argc,const char **argv)
              }
           //----------------------------------------------------
           //----------------------------------------------------
-          int i=system("xdg-open report.html");
+          int i=0; //int i=system("xdg-open report.html");
           exit(i);
         } else
         //-----------------------------------------------------

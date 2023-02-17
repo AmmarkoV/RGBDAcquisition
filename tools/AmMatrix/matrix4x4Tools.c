@@ -1708,7 +1708,6 @@ void multiplyThree4x4FMatrices(struct Matrix4x4OfFloats * result,const struct Ma
   return;
 }
 
-
 enum THREE_4X4_MATRICES_CASES
 {
     MAT_4x4_CASE_NO_ACTIVE_MATRICES=0,            // 0
@@ -1741,7 +1740,6 @@ int multiplyThree4x4FMatricesWithIdentityHints(
     multiplicationCase += (!matrixCIsIdentity) * MAT_4x4_CASE_MATRIXC;
     //fprintf(stderr,"Mult A:%u B:%u C:%u => %u\n",matrixAIsIdentity,matrixBIsIdentity,matrixCIsIdentity,multiplicationCase);
     //----------------------------------------------------
-
     switch (multiplicationCase)
     {
       //---------------------------------------------------------------------------------------------------------------------------
@@ -1940,19 +1938,18 @@ int normalize3DPointFVector(float * vec)
 int normalize3DPointDVector(double * vec)
 {
   if ( vec[3]==1.0 ) { return 1; } else
-  if ( vec[3]==0.0 )
+  if ( vec[3]!=0.0 )
+  {
+    vec[0]=vec[0]/vec[3];
+    vec[1]=vec[1]/vec[3];
+    vec[2]=vec[2]/vec[3];
+    vec[3]=1.0; // vec[3]=vec[3]/vec[3];
+    return 1;
+  } else
   {
     fprintf(stderr,"normalize3DPointDVector cannot be normalized since element 3 is zero\n");
     return 0;
   }
-
-
-  vec[0]=vec[0]/vec[3];
-  vec[1]=vec[1]/vec[3];
-  vec[2]=vec[2]/vec[3];
-  vec[3]=1.0; // vec[3]=vec[3]/vec[3];
-
-  return 1;
 }
 
 

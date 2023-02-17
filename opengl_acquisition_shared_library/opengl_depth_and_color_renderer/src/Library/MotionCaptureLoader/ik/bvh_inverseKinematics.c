@@ -554,7 +554,6 @@ int examineSolutionAndKeepIfItIsBetter(
                                       )
 {
         int accepted = 0;
-        //float currentLoss = *bestValues;
         //---------------------------------------------------
         float previousValues[3]={
                                 problem->chain[chainID].currentSolution->motion[mIDS[0]],
@@ -581,9 +580,6 @@ int examineSolutionAndKeepIfItIsBetter(
         if (currentLoss<*bestLoss)
                 { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
-        //-------------------  -------------------  -------------------  -------------------
-        //if (accepted>0)
-        //  { fprintf(stderr,GREEN "Accepted %u changes\n" NORMAL,accepted); }
         //-------------------  -------------------  -------------------  -------------------
         return (accepted!=0);
 }
@@ -988,6 +984,7 @@ if (iterationID==0)
     float gradient[3]       = { 0.0,0.0,0.0 };
     //----------------------------------------------------------------------------------
     float bestLoss = initialLoss;
+    float loss     = initialLoss;
 
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
@@ -1021,11 +1018,11 @@ if (iterationID==0)
     }
    ///--------------------------------------------------------------------------------------------------------------
    ///--------------------------------------------------------------------------------------------------------------
-
-
     unsigned int executedEpochs=epochs;
     for (unsigned int currentEpoch=0; currentEpoch<epochs; currentEpoch++)
     {
+        #define DO_3_LOSSES 0
+        #if DO_3_LOSSES
         //Calculate losses
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
@@ -1043,6 +1040,12 @@ if (iterationID==0)
         currentLoss[2]=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);// + spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss[2]>bestLoss) { problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
+        #else
+            currentLoss[0]=loss;
+            currentLoss[1]=loss;
+            currentLoss[2]=loss;
+        #endif // DO_3_LOSSES
+
 
         //We multiply by 0.5 to do a "One Half Mean Squared Error"
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
@@ -1059,7 +1062,7 @@ if (iterationID==0)
         delta[2]         = momentum * delta[2] + (float) lr * gradient[2];
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
 
-        if (useLangevinDynamics!=0)
+        if (useLangevinDynamics!=0.0)
         {
            //Attempt to use Langevin dynamics for annealed gradient descent
            delta[0]+=randomNoise(useLangevinDynamics);
@@ -1229,10 +1232,6 @@ if (iterationID==0)
     return bestLoss;
 }
 
-
-
-
-
 int iterateChainLoss(
                      struct ikProblem * problem,
                      struct ikConfiguration * config,
@@ -1268,7 +1267,6 @@ int iterateChainLoss(
 
     return 1;
 }
-
 
 float calculateCachedProblemLoss(struct ikProblem * problem)
 {
@@ -1342,8 +1340,6 @@ int singleThreadedSolver(
    return 1;
 }
 
-
-
 ///=====================================================================================
 ///=====================================================================================
 ///=====================================================================================
@@ -1351,8 +1347,6 @@ int singleThreadedSolver(
 ///=====================================================================================
 ///=====================================================================================
 ///=====================================================================================
-
-
 
 void * iterateChainLossWorkerThread(void * arg)
 {
@@ -1757,9 +1751,6 @@ int ensureFinalProposedSolutionIsBetterInParts(
    return 0;
 }
 
-
-
-
 int springToZeroParts(
                        struct BVH_MotionCapture * mc,
                        struct simpleRenderer *renderer,
@@ -1780,11 +1771,10 @@ int springToZeroParts(
    fprintf(stderr,GREEN "springToZeroParts running \n" NORMAL);
    //------------------------------------------------
    struct BVH_Transform bvhCurrentTransform  = {0};
-   struct BVH_Transform bvhZeroTransform = {0};
+   struct BVH_Transform bvhZeroTransform     = {0};
    //------------------------------------------------
-
    struct MotionBuffer * zeroSolution = mallocNewMotionBufferAndCopy(mc,currentSolution);
-
+   //------------------------------------------------
    if (zeroSolution!=0)
    {
     if ( (currentSolution->bufferSize==zeroSolution->bufferSize) )
@@ -1836,7 +1826,6 @@ int springToZeroParts(
    }
    return 0;
 }
-
 
 int doExtrapolatedGuess(
                         struct BVH_MotionCapture * mc,
@@ -1890,11 +1879,11 @@ int doExtrapolatedGuess(
 
 int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * buffer)
 {
- if ( (buffer!=0) && (buffer->motion!=0) && (buffer->bufferSize == mc->numberOfValuesPerFrame) )
+ if ( (buffer!=0) && (buffer->motion!=0) && (buffer->bufferSize==mc->numberOfValuesPerFrame) )
  {
   BVHMotionChannelID mID = 0;
   for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
-  {
+   {
       BVHJointID jID = mc->motionToJointLookup[mID].jointID;
       if (
            (!mc->jointHierarchy[jID].hasQuaternionRotation) &&
@@ -1909,7 +1898,7 @@ int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * 
        if ( mc->motionToJointLookup[mID].channelID == BVH_ROTATION_Z)
          { buffer->motion[mID] = bvh_normalizeAngle(buffer->motion[mID]); }
       }
-  }
+   }
    return 1;
  }
  return 0;
@@ -1997,20 +1986,16 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //Make sure our problem has the correct details ..
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
 
-
     if (!updateProblemSolutionToAllChains(problem,solution))
            {
              fprintf(stderr,RED "Failed broadcasting current solution to all chains\n" NORMAL);
              return 0;
            }
-
-
     if (!copyMotionBuffer(problem->previousSolution,previousSolution) )
            {
              fprintf(stderr,RED "Failed copying previous solution to problem\n" NORMAL);
              return 0;
            }
-
 
     //Extrapolated guess
     doExtrapolatedGuess(
@@ -2026,15 +2011,10 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                         bvhTargetTransform
                        );
 
-
-
-
-
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     struct BVH_Transform bvhCurrentTransform= {0};
-
 
     if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
     {
@@ -2044,8 +2024,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             *initialMAEInPixels = meanBVH2DDistance(mc,renderer,1,0,&bvhCurrentTransform,bvhTargetTransform,ikConfig->verbose);
         }
         //----------------------------------------------------
-
-
         if ( (initialMAEInMM!=0) && (groundTruth!=0) )
         {
             *initialMAEInMM = meanBVH3DDistance(mc,renderer,1,0,problem->initialSolution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
@@ -2060,9 +2038,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
-
-
-
      if (useMultipleThreads)
      {
       //Solve the problem using multiple threads..!
@@ -2077,7 +2052,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Retrieve regressed solution
     copyMotionBuffer(solution,problem->currentSolution);
-
 
     if (ikConfig->verbose)
      {
@@ -2099,7 +2073,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
        fprintf(stderr,"Final Position/Location was %0.2f,%0.2f,%0.2f %0.2f,%0.2f,%0.2f\n",m[0],m[1],m[2],m[3],m[4],m[5]);
       }
      }
-
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------
@@ -2161,7 +2134,6 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             *finalMAEInMM = meanBVH3DDistance(mc,renderer,1,0,solution->motion,&bvhCurrentTransform,groundTruth->motion,bvhTargetTransform);
         }
         //----------------------------------------------------
-
         /*
         //This is smoother but worse..
         springToZeroParts(
@@ -2180,27 +2152,20 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                            //---------------------------------
                           );
         */
-
         if ( (!ikConfig->dontUseSolutionHistory) && (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
         {
         //This removes some weird noise from previous solution
         ensureFinalProposedSolutionIsBetterInParts(
                                                    mc,
                                                    renderer,
-                                                   //---------------------------------
                                                    "Previous",
-                                                   //---------------------------------
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains-1, //End Chain
-                                                   //---------------------------------
                                                    ikConfig,
-                                                   //---------------------------------
                                                    solution,
                                                    previousSolution,
-                                                   //---------------------------------
                                                    bvhTargetTransform
-                                                   //---------------------------------
                                                    );
         }
 
@@ -2210,20 +2175,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         ensureFinalProposedSolutionIsBetterInParts(
                                                    mc,
                                                    renderer,
-                                                   //---------------------------------
                                                    "Penultimate",
-                                                   //---------------------------------
                                                    problem,
                                                    2, //Start Chain
                                                    problem->numberOfChains-1, //End Chain
-                                                   //---------------------------------
                                                    ikConfig,
-                                                   //---------------------------------
                                                    solution,
                                                    penultimateSolution,
-                                                   //---------------------------------
                                                    bvhTargetTransform
-                                                   //---------------------------------
                                                    );
         }
     }
@@ -2245,13 +2204,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     if (ikConfig->useLangevinDynamics)
         { fprintf(stderr,RED "L" NORMAL); }
 
-    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|maxStartLoss=%0.1f|Iterations=%u|epochs=%u\n",
+    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|bestLoss=%0.1f|Iterations=%u|epochs=%u\n",
                                                endTime-startTime,
                                                problem->problemDescription,
                                                ikConfig->learningRate,
-                                               ikConfig->maximumAcceptableStartingLoss,
+                                               problem->chain[0].currentLoss,
                                                ikConfig->iterations,
-                                               ikConfig->epochs );
+                                               ikConfig->epochs
+                                               );
     bvh_freeTransform(&bvhCurrentTransform);
 
     return 1;

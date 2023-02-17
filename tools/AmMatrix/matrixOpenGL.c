@@ -16,7 +16,6 @@ int convertRodriguezTo3x3(float * result,float * matrix)
 {
   if ( (matrix==0) ||  (result==0) ) { return 0; }
 
-
   float x = matrix[0] , y = matrix[1] , z = matrix[2];
   float th = sqrt( x*x + y*y + z*z );
   float cosTh = cos(th);
@@ -700,15 +699,15 @@ int _glhProjectf(float * position3D, float *modelview, float *projection, int *v
       //Transformation vectors
       float fTempo[8];
       //Modelview transform
-      fTempo[0]=modelview[0]*objx+modelview[4]*objy+modelview[8]*objz+modelview[12];  //w is always 1
-      fTempo[1]=modelview[1]*objx+modelview[5]*objy+modelview[9]*objz+modelview[13];
-      fTempo[2]=modelview[2]*objx+modelview[6]*objy+modelview[10]*objz+modelview[14];
-      fTempo[3]=modelview[3]*objx+modelview[7]*objy+modelview[11]*objz+modelview[15];
+      fTempo[0]=(modelview[0]*objx)+(modelview[4]*objy)+(modelview[8]*objz) +modelview[12];  //w is always 1
+      fTempo[1]=(modelview[1]*objx)+(modelview[5]*objy)+(modelview[9]*objz) +modelview[13];
+      fTempo[2]=(modelview[2]*objx)+(modelview[6]*objy)+(modelview[10]*objz)+modelview[14];
+      fTempo[3]=(modelview[3]*objx)+(modelview[7]*objy)+(modelview[11]*objz)+modelview[15];
       //Projection transform, the final row of projection matrix is always [0 0 -1 0]
       //so we optimize for that.
-      fTempo[4]=projection[0]*fTempo[0]+projection[4]*fTempo[1]+projection[8]*fTempo[2]+projection[12]*fTempo[3];
-      fTempo[5]=projection[1]*fTempo[0]+projection[5]*fTempo[1]+projection[9]*fTempo[2]+projection[13]*fTempo[3];
-      fTempo[6]=projection[2]*fTempo[0]+projection[6]*fTempo[1]+projection[10]*fTempo[2]+projection[14]*fTempo[3];
+      fTempo[4]=(projection[0]*fTempo[0])+(projection[4]*fTempo[1])+(projection[8]*fTempo[2]) +(projection[12]*fTempo[3]);
+      fTempo[5]=(projection[1]*fTempo[0])+(projection[5]*fTempo[1])+(projection[9]*fTempo[2]) +(projection[13]*fTempo[3]);
+      fTempo[6]=(projection[2]*fTempo[0])+(projection[6]*fTempo[1])+(projection[10]*fTempo[2])+(projection[14]*fTempo[3]);
       fTempo[7]=-fTempo[2];
       //The result normalizes between -1 and 1
       if(fTempo[7]!=0.0)	//The w value
@@ -888,7 +887,6 @@ void prepareRenderingMatrices(
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
      create4x4FScalingMatrix(viewMatrix,1.0,1.0,1.0);
-
      glGetViewportMatrix(viewportMatrix->m,viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
 
@@ -914,17 +912,16 @@ void correctProjectionMatrixForDifferentViewport(
     float newViewportWidth = newViewport[2];
     float newViewportHeight = newViewport[3];
 
-	float xC = (newViewportX - 0.5f * originalViewportWidth - originalViewportX) / originalViewportWidth;
+	float xC =  (newViewportX - 0.5f * originalViewportWidth  - originalViewportX) / originalViewportWidth;
 	float yC = -(newViewportY - 0.5f * originalViewportHeight - originalViewportY) / originalViewportHeight;
 	float wC = (float) newViewportWidth/originalViewportWidth;
 	float hC = (float) newViewportHeight/originalViewportHeight;
 
 	float correction[16]={0};
-
 	correction[0]= (1.0 / wC);
-	correction[3]= -2.0 * (xC + wC / 2.f) * (1.0 / wC);
-	correction[5]= (1.f / hC);
-	correction[7]= -2.0 * (yC - hC / 2.f) * (1.f / hC);
+	correction[3]= -2.0 * (xC + wC / 2.0) * (1.0 / wC);
+	correction[5]= (1.0 / hC);
+	correction[7]= -2.0 * (yC - hC / 2.0) * (1.0 / hC);
     //transpose4x4DMatrix(correction);
 
     multiplyTwoRaw4x4FMatricesS(out,correction,projectionMatrix);

@@ -32,7 +32,6 @@ float min(float a,float b)
   return b;
 }
 
-
 struct Vector3D
 {
     float x;
@@ -53,7 +52,6 @@ struct Triangle3D
     struct Point3D p2;
     struct Point3D p3;
 };
-
 
 /*
 import sys
@@ -456,7 +454,6 @@ unsigned char bvh_shouldJointBeTransformedGivenOurOptimizations(const struct BVH
   return (((bvhTransform->useOptimizations) && (!bvhTransform->skipCalculationsForJoint[jID])) + (!bvhTransform->useOptimizations) );
 
   //The old implementation is retained here for historical reasons :P
-
   //unsigned char res;
   //Normaly we should check if the bvhTransform structure is null but given that this call is called millions of times only if you have a transform
   //we skip the check
@@ -718,7 +715,6 @@ int bvh_markJointAndParentsAsUselessInTransform(
   if (jID>=bvhMotion->jointHierarchySize) { return 0; }
   bvhTransform->useOptimizations=1;
 
-
   while (jID!=0)
       {
            if (jID<bvhTransform->numberOfJointsSpaceAllocated)
@@ -896,18 +892,13 @@ static inline void bvh_performActualTransform(
          //This is needed because we access the chain transform of our parent so at some point this will get used..
          if (!bvhMotion->jointHierarchy[jID].hasPositionalChannels)
           { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhMotion->jointHierarchy[jID].staticTransformation.m); } else
-          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhTransform->joint[jID].dynamicTranslation.m);   }
+          { copy4x4FMatrix(bvhTransform->joint[jID].localToWorldTransformation.m , bvhTransform->joint[jID].dynamicTranslation.m);         }
         }
-
-
-
-
-
-      } else
+      } // not bvhMotion->jointHierarchy[jID].isRoot
+       else
       {
        //If we are the root node there is no parent so we skip the multiplication with the "Identity" chainTransformation..
        //If there is no parent we will only set our position and copy to the final transform
-
        //Skip the matrix multiplication..
        create4x4FTranslationMatrix(
                                      &bvhTransform->joint[jID].localToWorldTransformation,
@@ -933,12 +924,12 @@ static inline void bvh_performActualTransform(
    bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].chainTransformation.m[7];
    bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].chainTransformation.m[11];
    bvhTransform->joint[jID].pos3D[3]=bvhTransform->joint[jID].chainTransformation.m[15];
-   normalize3DPointFVector(bvhTransform->joint[jID].pos3D);
-
+   //------------------------------------------------------------------------------------
+   if (bvhTransform->joint[jID].pos3D[3]!=1.0)
+      { normalize3DPointFVector(bvhTransform->joint[jID].pos3D); }
+   //------------------------------------------------------------------------------------
    return;
 }
-
-
 
 
 int bvh_allocateTransform(struct BVH_MotionCapture * bvhMotion,struct BVH_Transform * bvhTransform)
