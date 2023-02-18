@@ -1931,10 +1931,13 @@ int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * 
 }
 
 
-int diagnoseMissing2DJoints(struct BVH_MotionCapture * mc,
+int diagnoseMissing2DJoints(
+                            struct BVH_MotionCapture * mc,
                             struct ikProblem * problem,
-                            struct BVH_Transform * bvhTargetTransform)
+                            struct BVH_Transform * bvhTargetTransform
+                           )
 {
+    int missing = 0;
     for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
     {
       for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
@@ -1945,6 +1948,7 @@ int diagnoseMissing2DJoints(struct BVH_MotionCapture * mc,
           if ( (tX==0.0) && (tY==0.0) )
           {
              fprintf(stderr,"Joint %u(%s) is missing \n",jID,mc->jointHierarchy[jID].jointName);
+             missing+=1;
           }
         }
     }
@@ -2030,6 +2034,11 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     //Make sure our problem has the correct details ..
     problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
+    if (diagnoseMissing2DJoints(mc,problem,bvhTargetTransform))
+    {
+      fprintf(stderr,RED "There are missing joints\n" NORMAL);
+    }
 
     if (!updateProblemSolutionToAllChains(problem,solution))
            {
