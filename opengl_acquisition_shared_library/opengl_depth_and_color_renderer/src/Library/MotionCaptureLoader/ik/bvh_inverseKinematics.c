@@ -1952,6 +1952,8 @@ int diagnoseMissing2DJoints(
           }
         }
     }
+
+    return missing;
 }
 
 
@@ -2037,7 +2039,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
     if (diagnoseMissing2DJoints(mc,problem,bvhTargetTransform))
     {
-      fprintf(stderr,RED "There are missing joints\n" NORMAL);
+      fprintf(stderr,RED "IK has missing target joints\n" NORMAL);
     }
 
     if (!updateProblemSolutionToAllChains(problem,solution))

@@ -640,8 +640,6 @@ float bvhConverter_IKFineTune(
                                            frameID
                                           );
 
-
-
          char jointName[512]={0};
          struct BVH_Transform bvhTargetTransform={0};
          int occlusions=1;
@@ -653,7 +651,6 @@ float bvhConverter_IKFineTune(
                                            occlusions,
                                            renderingAtomicConfiguration.isDefined
                                           );
-
 
          for (int i=0; i<numberOfElements; i++)
          {
@@ -684,11 +681,10 @@ float bvhConverter_IKFineTune(
                   }
                 } else
                 {
-                  //fprintf(stderr,"Could not resolve Joint %s for Number %u => %s with %0.2f \n",dof,i,labels[i],values[i] );
+                  fprintf(stderr,RED "IK: Could not resolve Joint %s for Number %u => %s with %0.2f \n" NORMAL,dof,i,labels[i],values[i] );
                 }
-            }
-
-         }
+            }//2DX/Y
+         }//Loop over received elements
 
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                      &bvhAtomicMotion,
