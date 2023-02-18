@@ -1903,7 +1903,6 @@ int doExtrapolatedGuess(
 }
 
 
-
 int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * buffer)
 {
  if ( (buffer!=0) && (buffer->motion!=0) && (buffer->bufferSize==mc->numberOfValuesPerFrame) )
@@ -1931,6 +1930,25 @@ int remapMotionBufferValues(struct BVH_MotionCapture * mc,struct MotionBuffer * 
  return 0;
 }
 
+
+int diagnoseMissing2DJoints(struct BVH_MotionCapture * mc,
+                            struct ikProblem * problem,
+                            struct BVH_Transform * bvhTargetTransform)
+{
+    for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+    {
+      for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+        {
+          BVHJointID jID = problem->chain[chainID].part[partID].jID;
+          float tX=(float) bvhTargetTransform->joint[jID].pos2D[0];
+          float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
+          if ( (tX==0.0) && (tY==0.0) )
+          {
+             fprintf(stderr,"Joint %u(%s) is missing \n",jID,mc->jointHierarchy[jID].jointName);
+          }
+        }
+    }
+}
 
 
 int approximateBodyFromMotionBufferUsingInverseKinematics(
