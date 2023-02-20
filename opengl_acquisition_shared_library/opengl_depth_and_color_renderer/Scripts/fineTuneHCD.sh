@@ -36,11 +36,11 @@ MOMENTUM="0.42"
 #do
  #for MOMENTUM in ` seq 0.12 0.1 0.92 | tr "," "." `
  #do
-  for EPOCHS in ` seq 5 1 10 | tr "," "." `
+  for EPOCHS in ` seq 5 1 35 | tr "," "." `
   do
-   for ITERATIONS in ` seq 5 1 15 | tr "," "." `
+   for ITERATIONS in ` seq 5 1 35 | tr "," "." `
    do
-    for LR  in ` seq 0.018 0.001 0.076 | tr "," "." `
+    for LR  in ` seq 0.01 0.01 0.03 | tr "," "." `
     do
      #for LANGEVIN_DYNAMICS  in `seq 0.0 0.001 0.0 | tr "," "."`
      #do
