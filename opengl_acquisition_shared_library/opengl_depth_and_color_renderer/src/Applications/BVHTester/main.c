@@ -361,11 +361,21 @@ float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID)
 
 int bvhConverter_modifySingleAtomic(const char * label,const float value,int frameID)
 {
- //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
+  if (label==0) { return 0; }
+  if (frameID>=bvhAtomicMotion.numberOfFrames) { return 0; }
+  //------------------------------------------------------------
+  //fprintf(stderr,"bvhConverter_modifyAtomic received element %s with value %0.2f for frame %u\n",label,value,frameID);
+  //------------------------------------------------------------
   int everythingOk = 1;
   char jointName[513]={0};
   snprintf(jointName,512,"%s",label);
   char * delimeter = strchr(jointName,'_');
+  if (delimeter==0)
+  {
+      fprintf(stderr,"bvhConverter_modifyAtomic received element %s with value %0.2f for frame %u ",label,value,frameID);
+      fprintf(stderr,"it doesn't have a degree of freedom associated so ignoring it..");
+      return 0;
+  }
   *delimeter = 0;
   char * dof = delimeter+1;
   //=======================================================

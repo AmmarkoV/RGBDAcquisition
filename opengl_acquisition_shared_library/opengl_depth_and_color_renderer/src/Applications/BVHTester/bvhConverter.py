@@ -302,6 +302,10 @@ class BVH():
   #--------------------------------------------------------
   def modify(self,arguments:dict,frameID=0):
     self.stage("modify")
+    #print("BVH modify called with : ",arguments)
+    if (not arguments):
+        print("BVH modify called without arguments")
+        return 0
     #Arguments is a dict with a lot of key/value pairs we want to transmit to the C code
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_modifyAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int]
