@@ -681,7 +681,7 @@ float bvhConverter_IKFineTune(
                   }
                 } else
                 {
-                  fprintf(stderr,RED "IK: Could not resolve Joint %s for Number %u => %s with %0.2f \n" NORMAL,dof,i,labels[i],values[i] );
+                  //fprintf(stderr,RED "IK: Could not resolve Joint %s for Number %u => %s with %0.2f \n" NORMAL,dof,i,labels[i],values[i] );
                 }
             }//2DX/Y
          }//Loop over received elements

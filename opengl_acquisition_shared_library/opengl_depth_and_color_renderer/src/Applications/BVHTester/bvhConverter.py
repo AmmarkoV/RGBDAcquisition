@@ -54,11 +54,11 @@ def splitDictionaryInLabelsAndFloats(arguments):
     for i in range(len(labels)):
         #Potential renaming..
         #---------------------------------------------
-        if ("endsite_" in labels[i]):
-          if ("eye" in labels[i]):
-           datasplit = labels[i].split("endsite_",1)
-           newLabel="%s%s" % (datasplit[0],datasplit[1])  
-           print(labels[i]," renamed to -> ",newLabel)
+        #if ("endsite_" in labels[i]):
+        #  if ("eye" in labels[i]):
+        #   datasplit = labels[i].split("endsite_",1)
+        #   newLabel="%s%s" % (datasplit[0],datasplit[1])  
+        #   print(labels[i]," renamed to -> ",newLabel)
         #---------------------------------------------
         labelsBytes.append(bytes(labels[i], 'utf-8'))
     labelsCStr = (ctypes.c_char_p * len(labelsBytes))()

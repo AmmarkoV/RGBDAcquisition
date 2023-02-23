@@ -152,11 +152,14 @@ int addNewPartToChainProblemDetailed(
     bvh_markAllJointsAsUselessInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform);
 
     unsigned int thisJID=0;
+    //Resolve Joint Name
+    //---------------------------------------------------------------------------------
     unsigned int foundJoint = bvh_getJointIDFromJointNameNocase(mc,partName,&thisJID);
     if  ( (!foundJoint) && (alternatePartName!=0) )
     {
         foundJoint = bvh_getJointIDFromJointNameNocase(mc,alternatePartName,&thisJID);
     }
+    //----------------------------------------------------------------------------------
 
     if (foundJoint)
     {
@@ -385,8 +388,8 @@ int prepareDefaultFaceProblem(
      }
      ++correct;  checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      ++correct;  checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
-     ++correct;  checksum+=addNewPartToChainProblem(&data,"eye.l",NO_ALTERNATE_NAME,2.5,END_EFFECTOR);
-     ++correct;  checksum+=addNewPartToChainProblem(&data,"eye.r",NO_ALTERNATE_NAME,2.5,END_EFFECTOR);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",2.5,END_EFFECTOR);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",2.5,END_EFFECTOR);
     //----------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
 if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -447,7 +450,7 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //----------------------------------------------------------
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",1.0,OPTIMIZE_JOINT);// Eye control
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",1.0,OPTIMIZE_JOINT);// Eye control
      thisChainCanBeRunInParallel(&data);  //This has to be done after adding parts Fingers can be solved in parallel
      //----------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -465,7 +468,7 @@ if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
 
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",1.0,OPTIMIZE_JOINT);// Eye control
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",1.0,OPTIMIZE_JOINT);// Eye control
      thisChainCanBeRunInParallel(&data);  //This has to be done after adding parts Fingers can be solved in parallel
      //----------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
@@ -1376,10 +1379,10 @@ int prepareDefaultBodyProblem(
      //45.38
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.l","ear.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.r","ear.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
@@ -1433,10 +1436,10 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      addLimitsToNextPartOfChain(&data,-7.0,22.0,  -22.0,22.0,   -10.0,10.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.l","endsite_eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"eye.r","endsite_eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.l","ear.l", HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.r","ear.r", HIGH_IMPORTANCE,END_EFFECTOR);
      //This causes the head to tilt up!?
      ++correct;   checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,END_EFFECTOR); //"oris02"
      //-------------------------------------------------------------
