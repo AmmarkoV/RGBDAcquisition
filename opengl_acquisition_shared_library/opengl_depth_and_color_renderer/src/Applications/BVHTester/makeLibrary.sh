@@ -112,7 +112,7 @@ $BVHTESTER_DIR/main.c
 
 INTEL_OPTIMIZATIONS=`cat /proc/cpuinfo | grep sse3`
 
-if [[ -n $var ]] ; then
+if [ -z "$var" ] ; then
  echo "No intel optimizations available"
  EXTRA_FLAGS=" "
 else
