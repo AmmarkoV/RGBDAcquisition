@@ -285,6 +285,10 @@ class BVH():
         self.libBVH.bvhConverter_get2DY.restype  = ctypes.c_float
         y2D = self.libBVH.bvhConverter_get2DY(jointID)
 
+        #Flip X
+        if (x2D!=0.0) or (y2D!=0.0):
+           x2D = 1.0 - x2D
+
         return x2D,y2D 
   #--------------------------------------------------------
   def getJoint3DUsingJointName(self, jointName:str):
