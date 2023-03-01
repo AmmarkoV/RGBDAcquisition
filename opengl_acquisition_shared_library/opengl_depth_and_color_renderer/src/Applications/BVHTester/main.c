@@ -260,8 +260,6 @@ int bvhConverter_getJointNameJointID(const char * jointName)
   return -1;
 }
 
-
-
 const char * bvhConverter_getJointNameFromJointID(int jointID)
 {
     if (jointID<bvhAtomicMotion.jointHierarchySize)
@@ -271,7 +269,6 @@ const char * bvhConverter_getJointNameFromJointID(int jointID)
   fprintf(stderr,RED "BVH library could not resolve joint name for joint out bounds \"%u\" \n" NORMAL,jointID);
   return "";
 }
-
 
 int bvhConverter_getJointParent(int jointID)
 {
@@ -306,8 +303,6 @@ float  bvhConverter_get3DZ(int jointID)
      { return bvhTransformAtomic.joint[jointID].pos3D[2]; }
   return 0.0;
 }
-
-
 
 float bvhConverter_get2DX(int jointID)
 {
@@ -1287,6 +1282,7 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--filterOccludedJoints")==0)
         {
           //TEST: ./BVHTester --from brokenHand.bvh --svg ./ --filterOccludedJoints
+          // ./BVHTester --from Motions/02_03.bvh --filterOccludedJoints --bvh test.bvh
           filterOccludedJoints=1;
         } else
         //-----------------------------------------------------

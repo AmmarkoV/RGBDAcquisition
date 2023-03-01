@@ -118,7 +118,8 @@ int bvhExportSkeletonFilter(
 }
 
 
-
+// ./BVHTester --from Motions/MotionCapture/needFix/35/35_25.bvh --filterOccludedJoints --bvh test.bvh
+// ./BVHTester --from Motions/MotionCapture/needFix/35/35_25.bvh --set 2 -300 --filterOccludedJoints --svg ./
 int  bvh_filterOccludedJoints(
                                 struct BVH_MotionCapture * mc ,
                                 struct BVH_Transform * bvhTransform,
@@ -161,7 +162,8 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           if (test>10.0)
+           if (test>10.0) //This filters hands that are in front..
+           //if (test<-10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"rhand = %0.2f ",test);
                fails+=1;
@@ -199,7 +201,8 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           if (test>10.0)
+           if (test>10.0) //This filters hands that are in front..
+           //if (test<-10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"lhand = %0.2f ",test);
                fails+=1;
@@ -217,7 +220,6 @@ int  bvh_filterOccludedJoints(
       //return 1;
       return 0;
   }
-  //
   }
 
   return 1;
