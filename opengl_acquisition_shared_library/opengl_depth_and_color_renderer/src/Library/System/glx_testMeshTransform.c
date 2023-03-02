@@ -2353,7 +2353,7 @@ int main(int argc,const char **argv)
 
    if (alteredBVH)
    {
-   if (!dumpBVHToBVH("debug.bvh",&mc)) { fprintf(stderr,"Error dumping debug BVH file..\n"); }
+   if (!dumpBVHToBVH("debug.bvh",&mc,1,1)) { fprintf(stderr,"Error dumping debug BVH file..\n"); }
    }
    //------------------------------------------------------
 
