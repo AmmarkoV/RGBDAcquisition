@@ -136,7 +136,7 @@ int  bvh_filterOccludedJoints(
 
   //For front facing skeletons ( -45 < orientation < 45 )
   // If RHand or LHand are too far behind we disable this pose to reduce symmetry problems..
-  if ( (-45.0<rootAngleY) && (rootAngleY<45.0) )
+  //if ( (-45.0<rootAngleY) && (rootAngleY<45.0) ) <- BUG: this makes orientations not uniform any more..
   {
   //--------------------------------
   //bvh_printBVH(mc);
