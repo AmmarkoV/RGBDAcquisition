@@ -123,6 +123,8 @@ int bvhExportSkeletonFilter(
 int  bvh_filterOccludedJoints(
                                 struct BVH_MotionCapture * mc ,
                                 struct BVH_Transform * bvhTransform,
+                                struct simpleRenderer * renderer,
+                                struct BVH_RendererConfiguration * renderConfig,
                                 BVHFrameID fID,
                                 struct filteringResults * filterStats,
                                 int disableFilter
@@ -130,8 +132,42 @@ int  bvh_filterOccludedJoints(
 {
   if (disableFilter) { return 1; }
 
-  BVHJointID rootID = mc->rootJointID;
-  float rootAngleY = bvh_getJointRotationYAtFrame(mc,rootID,fID);
+  struct BVH_Transform bvhTransformFrontal={0};
+  struct BVH_Transform * bvhTransformSelected = &bvhTransformFrontal;
+  //--------------------------------------------------------------
+  BVHJointID jID;
+  BVHJointID rootJID = mc->rootJointID;
+  float rootAngleY = bvh_getJointRotationYAtFrame(mc,rootJID,fID);
+
+  if ( bvh_getJointIDFromJointNameNocase(mc,"hip",&jID) )
+  {
+  if (jID==rootJID)
+    {
+        bvh_setJointRotationYAtFrame(mc,rootJID,fID,0);
+        if (!performPointProjectionsForFrame(
+                                             mc,
+                                             &bvhTransformFrontal,
+                                             fID,
+                                             renderer,
+                                             0,
+                                             renderConfig->isDefined
+                                            )
+          )
+        {
+         fprintf(stderr,"bvh_filterOccludedJoints could not render frontal view \n");
+         return 1;
+        }
+        bvh_setJointRotationYAtFrame(mc,rootJID,fID,rootAngleY);
+    } else
+    {
+      fprintf(stderr,"bvh_filterOccludedJoints only works on armatures with hip \n");
+      return 1;
+    }
+   } else
+   {
+     fprintf(stderr,"bvh_filterOccludedJoints only works on armatures with hip \n");
+     return 1;
+   }
 
 
   //For front facing skeletons ( -45 < orientation < 45 )
@@ -139,36 +175,20 @@ int  bvh_filterOccludedJoints(
   //if ( (-45.0<rootAngleY) && (rootAngleY<45.0) ) <- BUG: this makes orientations not uniform any more..
   {
   //--------------------------------
-  //bvh_printBVH(mc);
-  //fprintf(stderr,"FILTER CALLED \n");
   int fails = 0;
   float test;
   float testSum = 0.0;
-  BVHJointID jID;
   //-----------------------------------------------------------------------
-  /*
-  if ( bvh_getJointIDFromJointNameNocase(mc,"relbow",&jID) )
-        {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"relbow = %0.2f ",test);
-           if (test>10.0)
-             {
-               fails+=1;
-               bvhTransform->joint[jID].isOccluded=1;
-               ++bvhTransform->jointsOccludedIn2DProjection;
-             }
-           testSum+=test;
-        }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransformSelected,jID);
            if (test>10.0) //This filters hands that are in front..
            //if (test<-10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"rhand = %0.2f ",test);
                fails+=1;
-               bvhTransform->joint[jID].isOccluded=1;
-               ++bvhTransform->jointsOccludedIn2DProjection;
+               bvhTransformSelected->joint[jID].isOccluded=1;
+               ++bvhTransformSelected->jointsOccludedIn2DProjection;
              }
            testSum+=test;
         }
@@ -178,36 +198,22 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "RIGHT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
-      //return 1;
       return 0;
   }
 
   fails = 0;
   testSum=0;
   //-----------------------------------------------------------------------
-  /*
-  if ( bvh_getJointIDFromJointNameNocase(mc,"lelbow",&jID) )
-        {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
-           fprintf(stderr,"lelbow = %0.2f ",test);
-           if (test>10.0)
-             {
-               fails+=1;
-               bvhTransform->joint[jID].isOccluded=1;
-               ++bvhTransform->jointsOccludedIn2DProjection;
-             }
-           testSum+=test;
-        }*/
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
-           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransform,jID);
+           test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransformSelected,jID);
            if (test>10.0) //This filters hands that are in front..
            //if (test<-10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"lhand = %0.2f ",test);
                fails+=1;
-               bvhTransform->joint[jID].isOccluded=1;
-               ++bvhTransform->jointsOccludedIn2DProjection;
+               bvhTransformSelected->joint[jID].isOccluded=1;
+               ++bvhTransformSelected->jointsOccludedIn2DProjection;
              }
            testSum+=test;
         }
@@ -217,7 +223,6 @@ int  bvh_filterOccludedJoints(
       fprintf(stderr,RED "LEFT ARM OCCLUDED..!\n" NORMAL);
       ++filterStats->filteredOutCSVPoses;
       ++filterStats->filteredOutOccludedPoses;
-      //return 1;
       return 0;
   }
   }
@@ -562,6 +567,8 @@ int dumpBVHTo_JSON_SVG_CSV(
            bvh_filterOccludedJoints(
                                     mc,
                                     &bvhTransform,
+                                    &renderer,
+                                    renderConfig,
                                     fID,
                                     filterStats,
                                     (filterOccludedJoints==0)
