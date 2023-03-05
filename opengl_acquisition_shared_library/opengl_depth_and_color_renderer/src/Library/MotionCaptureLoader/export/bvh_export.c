@@ -182,8 +182,8 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"rhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransformSelected,jID);
-           if (test>10.0) //This filters hands that are in front..
            //if (test<-10.0) //This filters hands that are in front..
+           if (test>10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"rhand = %0.2f ",test);
                fails+=1;
@@ -207,8 +207,8 @@ int  bvh_filterOccludedJoints(
   if ( bvh_getJointIDFromJointNameNocase(mc,"lhand",&jID) )
         {
            test = bvh_DistanceOfJointFromTorsoPlane(mc,bvhTransformSelected,jID);
-           if (test>10.0) //This filters hands that are in front..
            //if (test<-10.0) //This filters hands that are in front..
+           if (test>10.0) //This filters hands that are in front..
              {
                fprintf(stderr,"lhand = %0.2f ",test);
                fails+=1;
