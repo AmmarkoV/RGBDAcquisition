@@ -44,7 +44,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-#define PENALIZE_SYMMETRY_HEURISTIC 0
+#define PENALIZE_SYMMETRY_HEURISTIC 1
 
 unsigned long tickBaseIK = 0;
 
@@ -459,11 +459,13 @@ float calculateChainLoss(
                                                                                       &problem->chain[chainID].current2DProjectionTransform,
                                                                                       jID
                                                                                      );
+                               symmetriesLoss += 15.0;
+
                                //Only negative contribution..
                                if ( (symmetriesLoss>10.0) || (problem->chain[chainID].current2DProjectionTransform.joint[jID].isOccluded) )
                                   {
                                       float gain = 225.0;
-                                      symmetriesLoss = 1.0 * symmetriesLoss * gain; // <- Easy flip
+                                      symmetriesLoss = 1.0 * fabs(symmetriesLoss) * gain; // <- Easy flip
                                       //fprintf(stderr,"Symmetry Loss %0.2f / %0.2f @ %s \n",symmetriesLoss,loss,problem->mc->jointHierarchy[jID].jointName);
                                       loss+=symmetriesLoss;
                                   }
