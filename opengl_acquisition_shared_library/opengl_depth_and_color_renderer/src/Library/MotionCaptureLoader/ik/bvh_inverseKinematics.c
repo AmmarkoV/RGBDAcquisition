@@ -2301,11 +2301,12 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     }
 
     //---------------------------------------------
+    /*
     enforceLimitsDirectlyOnMotionBuffer(
                                          mc,
                                          problem,
                                          solution
-                                        );
+                                        );*/
     //---------------------------------------------
 
     unsigned long endTime = GetTickCountMicrosecondsIK();
