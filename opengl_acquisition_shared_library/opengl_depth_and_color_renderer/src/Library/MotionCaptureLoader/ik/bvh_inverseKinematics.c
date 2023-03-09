@@ -1502,7 +1502,6 @@ int multiThreadedSolver(
 ///=====================================================================================
 ///=====================================================================================
 
-
 int extrapolateSolution(
                         struct MotionBuffer * a,
                         struct MotionBuffer * b,
@@ -1968,7 +1967,7 @@ void enforceLimitsDirectlyOnMotionBuffer(
                  unsigned int mIDS[3] =
                  {
                      problem->chain[chainID].part[partID].mIDStart,
-                     problem->chain[chainID].part[partID].mIDStart+1
+                     problem->chain[chainID].part[partID].mIDStart+1,
                      problem->chain[chainID].part[partID].mIDStart+2
                  };
                  //--------------------------------------------------
@@ -1982,10 +1981,15 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                                  problem->chain[chainID].part[partID].maximumLimitMID[1],
                                                  problem->chain[chainID].part[partID].maximumLimitMID[2] };
                  //---------------------------------------------------------------------------------------
-                 solution->motion[mIDS[0]],
-                 solution->motion[mIDS[1]],
-                 solution->motion[mIDS[2]],
 
+                 if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; } else
+                 if (solution->motion[mIDS[0]]>maximumLimitValues[0])  { solution->motion[mIDS[0]]=maximumLimitValues[0]; }
+                 //-------------------------------------------------------------------------------------
+                 if (solution->motion[mIDS[1]]<minimumLimitValues[1])  { solution->motion[mIDS[1]]=minimumLimitValues[1]; } else
+                 if (solution->motion[mIDS[1]]>maximumLimitValues[1])  { solution->motion[mIDS[1]]=maximumLimitValues[1]; }
+                 //-------------------------------------------------------------------------------------
+                 if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; } else
+                 if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; }
                }
         }
 }
@@ -2295,6 +2299,14 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
         dumpBVHToSVGFrame("target.svg",mc,bvhTargetTransform,1,renderer);
         dumpBVHToSVGFrame("solution.svg",mc,&bvhCurrentTransform,0,renderer);
     }
+
+    //---------------------------------------------
+    enforceLimitsDirectlyOnMotionBuffer(
+                                         mc,
+                                         problem,
+                                         solution
+                                        );
+    //---------------------------------------------
 
     unsigned long endTime = GetTickCountMicrosecondsIK();
 
