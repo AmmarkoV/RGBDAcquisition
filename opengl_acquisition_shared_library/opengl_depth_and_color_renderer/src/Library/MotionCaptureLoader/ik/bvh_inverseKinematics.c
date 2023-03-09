@@ -63,10 +63,9 @@ char fileExistsIK(const char * filename)
 {
     FILE *fp = fopen(filename,"r");
     if(fp)
-        {
-            /* exists */
-            fclose(fp);
-            return 1;
+        { //exists
+          fclose(fp);
+          return 1;
         }
     return 0;
 }
@@ -623,12 +622,14 @@ void updateLimitsBasedOnMAE(
 
  //This unrolling does only one jump instruction and is thus faster
  if (limitsEngaged) {
-                      newMinA = fmax(newMinA,minimumLimitValues[0]);
-                      newMinB = fmax(newMinB,minimumLimitValues[1]);
-                      newMinC = fmax(newMinC,minimumLimitValues[2]);
-                      newMaxA = fmin(newMaxA,maximumLimitValues[0]);
-                      newMaxB = fmin(newMaxB,maximumLimitValues[1]);
-                      newMaxC = fmin(newMaxC,maximumLimitValues[2]);
+                      if (newMinA<minimumLimitValues[0])  { newMinA=minimumLimitValues[0];  } else
+                      if (newMaxA>maximumLimitValues[0])  { newMaxA=maximumLimitValues[0];  }
+                      //---------------------------------------------------------------------------
+                      if (newMinB<minimumLimitValues[1])  { newMinB=minimumLimitValues[1];  } else
+                      if (newMaxB>maximumLimitValues[1])  { newMaxB=maximumLimitValues[1];  }
+                      //---------------------------------------------------------------------------
+                      if (newMinC<minimumLimitValues[2])  { newMinC=minimumLimitValues[2];  } else
+                      if (newMaxC>maximumLimitValues[2])  { newMaxC=maximumLimitValues[2];  }
                     }
 
   //---------------------------------------------------------------------------
@@ -736,22 +737,6 @@ float iteratePartLoss(
     unsigned int verbose                         = config->verbose;
     //-----------------------------------------------------------------------------
     //Sensible Defaults
-    //Learning rate decay..
-        //3/4  Mean   :10.4969
-        //3/5  Mean   :10.34537
-        //2/5  Mean   :10.2781
-        //1/6  Mean   :10.2230
-        //2/6  Mean   :10.12284
-        //2/7  Mean   :10.0943
-        //3/8  Mean   :10.1463
-        //3/10 Mean   :10.1280
-        //25/70 Mean   :10.22975
-        //15/70 Mean   :10.1823
-        //Distance to -350
-        //2/7   Mean   :10.1286
-        //Distance to -330
-        //2/7   Mean   : 9.9858
-        //2/7 Mean   : 9.93695
     if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 0.8; }
     if  (maximumConsecutiveBadEpochs==0) { maximumConsecutiveBadEpochs=1; } //By default 3
     if  (momentum==0.0)                  { momentum = (float) 0.4; } // Momentum | 0.9 Large / 0.2 Small
@@ -781,9 +766,7 @@ float iteratePartLoss(
        fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
        fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
        fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
-
        fprintf(stderr,RED "forcing 3 elements from %u -> %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart,problem->chain[chainID].part[partID].mIDStart+2);
-       //return NAN;
     }
 
 
@@ -796,7 +779,7 @@ float iteratePartLoss(
     };
 
 
-    //-------------------------------------------
+    //---------------------------------------------------------------------------------------
     char limitsEngaged = problem->chain[chainID].part[partID].limits;
     //---------------------------------------------------------------------------------------
     float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
@@ -807,12 +790,12 @@ float iteratePartLoss(
                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
     //---------------------------------------------------------------------------------------
     //The original values we want to improve
-    float originalValues[3] =
-    {
-         problem->chain[chainID].currentSolution->motion[mIDS[0]],
-         problem->chain[chainID].currentSolution->motion[mIDS[1]],
-         problem->chain[chainID].currentSolution->motion[mIDS[2]]
-    };
+    float originalValues[3] =     {
+                                    problem->chain[chainID].currentSolution->motion[mIDS[0]],
+                                    problem->chain[chainID].currentSolution->motion[mIDS[1]],
+                                    problem->chain[chainID].currentSolution->motion[mIDS[2]]
+                                  };
+    //---------------------------------------------------------------------------------------
     //NEW functionality refuse to accept off-limit input..!
     if (limitsEngaged)
            {
@@ -821,6 +804,7 @@ float iteratePartLoss(
              problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1];
              problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2];
            }
+    //---------------------------------------------------------------------------------------
 
     //The original values we want to improve
     unsigned int weHaveAPreviousSolutionHistory=(problem->previousSolution!=0);
@@ -1957,6 +1941,64 @@ int diagnoseMissing2DJoints(
 
     return missing;
 }
+
+
+
+
+void enforceLimitsDirectlyOnMotionBuffer(
+                                         struct BVH_MotionCapture * mc,
+                                         struct ikProblem * problem,
+                                         struct MotionBuffer * solution
+                                        )
+{
+  for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+        {
+          for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+               {
+                 //--------------------------------------------------
+                 unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
+                 if (numberOfMIDElements!=3)
+                 {
+                    fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
+                    fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
+                    fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
+                    fprintf(stderr,RED "forcing 3 elements from %u -> %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart,problem->chain[chainID].part[partID].mIDStart+2);
+                 }
+                 //--------------------------------------------------
+                 unsigned int mIDS[3] =
+                 {
+                     problem->chain[chainID].part[partID].mIDStart,
+                     problem->chain[chainID].part[partID].mIDStart+1
+                     problem->chain[chainID].part[partID].mIDStart+2
+                 };
+                 //--------------------------------------------------
+
+                 char limitsEngaged = problem->chain[chainID].part[partID].limits;
+                 //---------------------------------------------------------------------------------------
+                 float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
+                                                 problem->chain[chainID].part[partID].minimumLimitMID[1],
+                                                 problem->chain[chainID].part[partID].minimumLimitMID[2] };
+                 float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
+                                                 problem->chain[chainID].part[partID].maximumLimitMID[1],
+                                                 problem->chain[chainID].part[partID].maximumLimitMID[2] };
+                 //---------------------------------------------------------------------------------------
+                 solution->motion[mIDS[0]],
+                 solution->motion[mIDS[1]],
+                 solution->motion[mIDS[2]],
+
+               }
+        }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 int approximateBodyFromMotionBufferUsingInverseKinematics(

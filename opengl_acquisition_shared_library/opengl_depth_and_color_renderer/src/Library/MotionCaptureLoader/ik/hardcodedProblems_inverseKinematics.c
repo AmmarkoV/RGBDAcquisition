@@ -44,7 +44,6 @@ struct problemData
  unsigned int partID;
 };
 
-
 int failedPreparingChain(struct problemData * data,int correct,int checksum)
 {
   if (correct!=checksum)
@@ -136,7 +135,7 @@ int addNewPartToChainProblemDetailed(
     }
 
     //Chain 0 is the RHand and all of the rigid torso
-    //----------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
     problem->chain[*chainID].jobID=*jobID;
     problem->chain[*chainID].currentSolution=mallocNewMotionBufferAndCopy(mc,problem->initialSolution);
     problem->chain[*chainID].status = BVH_IK_NOTSTARTED;
@@ -180,7 +179,7 @@ int addNewPartToChainProblemDetailed(
         if (!forceSpecificMIDs)
         {
          BVHMotionChannelID mIDAutoStart = mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation encountered
-         BVHMotionChannelID mIDAutoEnd = mIDAutoStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+         BVHMotionChannelID mIDAutoEnd   = mIDAutoStart + mc->jointHierarchy[thisJID].loadedChannels-1;
          //-------------------------------------------------------------------------------------------------------------------------
          if ( (mIDStart > problem->mc->numberOfValuesPerFrame) || (mIDEnd > problem->mc->numberOfValuesPerFrame) )
              {
@@ -250,6 +249,7 @@ int addLimitsToPartOfChain(
                            float maximumY,
                            float minimumZ,
                            float maximumZ
+                           //-----------------------------------------
                           )
 {
     struct ikProblem * problem    = data->problem;
@@ -268,10 +268,13 @@ int addLimitsToPartOfChain(
     }
 
     problem->chain[chainID].part[partID].limits=1;
+    //---------------------------------------------------------------
     problem->chain[chainID].part[partID].minimumLimitMID[0]=minimumZ;
     problem->chain[chainID].part[partID].maximumLimitMID[0]=maximumZ;
+    //---------------------------------------------------------------
     problem->chain[chainID].part[partID].minimumLimitMID[1]=minimumX;
     problem->chain[chainID].part[partID].maximumLimitMID[1]=maximumX;
+    //---------------------------------------------------------------
     problem->chain[chainID].part[partID].minimumLimitMID[2]=minimumY;
     problem->chain[chainID].part[partID].maximumLimitMID[2]=maximumY;
     //------
