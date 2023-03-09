@@ -1973,23 +1973,25 @@ void enforceLimitsDirectlyOnMotionBuffer(
                  //--------------------------------------------------
 
                  char limitsEngaged = problem->chain[chainID].part[partID].limits;
-                 //---------------------------------------------------------------------------------------
-                 float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
-                                                 problem->chain[chainID].part[partID].minimumLimitMID[1],
-                                                 problem->chain[chainID].part[partID].minimumLimitMID[2] };
-                 float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
-                                                 problem->chain[chainID].part[partID].maximumLimitMID[1],
-                                                 problem->chain[chainID].part[partID].maximumLimitMID[2] };
-                 //---------------------------------------------------------------------------------------
-
-                 if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; } else
-                 if (solution->motion[mIDS[0]]>maximumLimitValues[0])  { solution->motion[mIDS[0]]=maximumLimitValues[0]; }
-                 //-------------------------------------------------------------------------------------
-                 if (solution->motion[mIDS[1]]<minimumLimitValues[1])  { solution->motion[mIDS[1]]=minimumLimitValues[1]; } else
-                 if (solution->motion[mIDS[1]]>maximumLimitValues[1])  { solution->motion[mIDS[1]]=maximumLimitValues[1]; }
-                 //-------------------------------------------------------------------------------------
-                 if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; } else
-                 if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; }
+                 if (limitsEngaged)
+                 {
+                    //---------------------------------------------------------------------------------------
+                    float minimumLimitValues[3] = { problem->chain[chainID].part[partID].minimumLimitMID[0],
+                                                    problem->chain[chainID].part[partID].minimumLimitMID[1],
+                                                    problem->chain[chainID].part[partID].minimumLimitMID[2] };
+                    float maximumLimitValues[3] = { problem->chain[chainID].part[partID].maximumLimitMID[0],
+                                                    problem->chain[chainID].part[partID].maximumLimitMID[1],
+                                                    problem->chain[chainID].part[partID].maximumLimitMID[2] };
+                    //---------------------------------------------------------------------------------------
+                    if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; } else
+                    if (solution->motion[mIDS[0]]>maximumLimitValues[0])  { solution->motion[mIDS[0]]=maximumLimitValues[0]; }
+                    //-------------------------------------------------------------------------------------
+                    if (solution->motion[mIDS[1]]<minimumLimitValues[1])  { solution->motion[mIDS[1]]=minimumLimitValues[1]; } else
+                    if (solution->motion[mIDS[1]]>maximumLimitValues[1])  { solution->motion[mIDS[1]]=maximumLimitValues[1]; }
+                    //-------------------------------------------------------------------------------------
+                    if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; } else
+                    if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; }
+                 }
                }
         }
 }
