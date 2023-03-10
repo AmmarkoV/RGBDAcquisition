@@ -1152,12 +1152,12 @@ int prepareDefaultLeftHandProblem(
     //                                                         mAE X     mAE Y    mAE Z
     addEstimatedMAEToPartOfChain_BeforeAddingNewPart(&data,   0.0,     0.0,      8.4 );
     ++correct;   checksum+=addNewPartToChainProblem(&data,"finger3-3.l",NO_ALTERNATE_NAME,MEDIAN_ENDPOINT_IMPORTANCE,OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
-      //----------------------------------------------------------
-      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-      //----------------------------------------------------------
+    ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_finger3-3.l",NO_ALTERNATE_NAME,FURTHEST_ENDPOINT_IMPORTANCE,END_EFFECTOR);
+    //----------------------------------------------------------
+    if (failedPreparingChain(&data,correct,checksum)) { return 0; }
+    //----------------------------------------------------------
     thisChainCanBeRunInParallel(&data); //This has to be done after adding parts Fingers can be solved in parallel
-     nextChain(&data);
+    nextChain(&data);
     //----------------------------------------------------------
     //----------------------------------------------------------
 
