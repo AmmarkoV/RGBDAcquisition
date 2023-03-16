@@ -1955,6 +1955,8 @@ void enforceLimitsDirectlyOnMotionBuffer(
   fprintf(stderr,MAGENTA " enforceLimitsDirectlyOnMotionBuffer on problem %s with %u chains \n" NORMAL,problem->problemDescription,problem->numberOfChains);
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
+          fprintf(stderr,MAGENTA," Chain %u has %u parts\n",NORMAL,chainID,problem->chain[chainID].numberOfParts);
+
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
                {
                 BVHJointID jID = problem->chain[chainID].part[partID].jID;
