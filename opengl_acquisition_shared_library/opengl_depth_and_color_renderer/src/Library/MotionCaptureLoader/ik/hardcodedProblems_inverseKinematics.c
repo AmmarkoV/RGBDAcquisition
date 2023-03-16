@@ -163,7 +163,7 @@ int addNewPartToChainProblemDetailed(
     if (foundJoint)
     {
         bvh_markJointAndParentsAsUsefulInTransform(mc,&problem->chain[*chainID].current2DProjectionTransform,thisJID);
-        problem->chain[*chainID].part[*partID].limits=0;
+        //problem->chain[*chainID].part[*partID].limits=0; //<- if this is 0 it erases limits ( .. bug found 16/3/23 :( )
         problem->chain[*chainID].part[*partID].evaluated=0; //Not evaluated yet
         problem->chain[*chainID].part[*partID].jID=thisJID;
         problem->chain[*chainID].part[*partID].jointImportance=importance;
