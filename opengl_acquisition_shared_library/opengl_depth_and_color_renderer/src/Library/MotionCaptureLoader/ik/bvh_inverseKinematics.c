@@ -1959,10 +1959,10 @@ void enforceLimitsDirectlyOnMotionBuffer(
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
                {
                 BVHJointID jID = problem->chain[chainID].part[partID].jID;
-                fprintf(stderr,MAGENTA " Chain %u / Part %u / Joint %s / jID=%u\n" NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID);
+                char limitsEngaged = problem->chain[chainID].part[partID].limits;
+                fprintf(stderr,MAGENTA " Chain %u / Part %u / Joint %s / jID=%u / limits=%u\n" NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID,limitsEngaged);
                 if (!problem->chain[chainID].part[partID].endEffector)
                 {
-                 char limitsEngaged = problem->chain[chainID].part[partID].limits;
 
                  if (limitsEngaged)
                  {
