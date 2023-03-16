@@ -1090,9 +1090,18 @@ int bvhConverter(int argc,const char **argv)
             maeSamples+=1;
             //------------------------------------------------------------------------------------------------
            }
+
+           float         maeAverage         = 0.0;
+           unsigned long elapsedTimeAverage = 0;
+           if (maeSamples>0)
+                            {
+                               maeAverage         = (float) maeSum/maeSamples;
+                               elapsedTimeAverage = (unsigned long) elapsedTime/maeSamples;
+                            }
+
            fprintf(fp,"</table>");
-           fprintf(fp,"<br><br>Total M.A.E. for %u samples : %0.2f mm<br>\n",maeSamples,(float) maeSum/maeSamples);
-           fprintf(fp,"Elapsed Time : %lu microseconds (%0.2f fps) <br>\n",(unsigned long) elapsedTime,convertStartEndTimeFromMicrosecondsToFPSIK(0,(unsigned long) elapsedTime/maeSamples));
+           fprintf(fp,"<br><br>Total M.A.E. for %u samples : %0.2f mm<br>\n",maeSamples,maeAverage);
+           fprintf(fp,"Elapsed Time : %lu microseconds (%0.2f fps) <br>\n",(unsigned long) elapsedTime,convertStartEndTimeFromMicrosecondsToFPSIK(0,elapsedTimeAverage));
            fprintf(fp,"</body></html>");
            fclose(fp);
           }
@@ -1138,8 +1147,8 @@ int bvhConverter(int argc,const char **argv)
              }
           //----------------------------------------------------
           //----------------------------------------------------
-          int i=0; //int i=system("xdg-open report.html");
-          exit(i);
+          int r=0; //int r=system("xdg-open report.html");
+          exit(r);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--probefilter")==0)

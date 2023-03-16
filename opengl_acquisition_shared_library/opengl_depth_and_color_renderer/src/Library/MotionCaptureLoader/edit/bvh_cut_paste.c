@@ -612,7 +612,6 @@ int bvh_symmetricflipLeftAndRight(
     {
       //-------------------------------------------------------
       BVHJointID jIDA=0;
-      BVHJointID jIDB=0;
       //-------------------------------------------------------
       bvh_setJointPositionXAtFrame(mc,mc->rootJointID,fID,-1.0*bvh_getJointPositionXAtFrame(mc,mc->rootJointID,fID));
       //-------------------------------------------------------
@@ -630,7 +629,7 @@ int bvh_symmetricflipLeftAndRight(
         {
             if (mc->jointHierarchy[jIDA].symmetryIsLeftJoint)
             {
-               jIDB=mc->jointHierarchy[jIDA].symmetricJoint;
+               BVHJointID jIDB = mc->jointHierarchy[jIDA].symmetricJoint;
                bvh_swapJointMotionsForFrameID(
                                                mc,
                                                fID,

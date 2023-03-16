@@ -713,7 +713,7 @@ const static int checkTRIRotation(
 
          for (int i=0; i<7; i++)
          {
-            fprintf(stderr,"Test %u (mID=%u set to %0.2f) ",i,triResult[i].mID,triResult[i].value);
+            fprintf(stderr,"Test %d (mID=%u set to %0.2f) ",i,triResult[i].mID,triResult[i].value);
             if (triResult[i].value>0.0) { fprintf(stderr," "); }
             fprintf(stderr," | ");
 

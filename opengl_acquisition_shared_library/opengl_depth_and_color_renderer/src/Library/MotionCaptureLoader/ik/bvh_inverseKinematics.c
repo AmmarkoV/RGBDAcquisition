@@ -699,14 +699,16 @@ int limitDeltasToThreshold(
                            float gradientExplosionThreshold
                           )
 {
- if (delta[0]>0.0) { delta[0]=fmin(fabs(delta[0]),gradientExplosionThreshold);  } else
-                   { delta[0]=fmax(fabs(delta[0]),-gradientExplosionThreshold); }
+ int triggered = 0;
+ if (delta[0]>0.0) { delta[0]=fmin(fabs(delta[0]), gradientExplosionThreshold); triggered=1; } else
+                   { delta[0]=fmax(fabs(delta[0]),-gradientExplosionThreshold); triggered=1; }
  //-----------------------------------------------------------------------------------
- if (delta[1]>0.0) { delta[1]=fmin(fabs(delta[1]),gradientExplosionThreshold);  } else
-                   { delta[1]=fmax(fabs(delta[1]),-gradientExplosionThreshold); }
+ if (delta[1]>0.0) { delta[1]=fmin(fabs(delta[1]), gradientExplosionThreshold); triggered=1; } else
+                   { delta[1]=fmax(fabs(delta[1]),-gradientExplosionThreshold); triggered=1; }
  //-----------------------------------------------------------------------------------
- if (delta[2]>0.0) { delta[2]=fmin(fabs(delta[2]),gradientExplosionThreshold);  } else
-                   { delta[2]=fmax(fabs(delta[2]),-gradientExplosionThreshold); }
+ if (delta[2]>0.0) { delta[2]=fmin(fabs(delta[2]), gradientExplosionThreshold); triggered=1; } else
+                   { delta[2]=fmax(fabs(delta[2]),-gradientExplosionThreshold); triggered=1; }
+ return triggered;
 }
 
 
@@ -1955,6 +1957,8 @@ void enforceLimitsDirectlyOnMotionBuffer(
         {
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
                {
+                if (!problem->chain[chainID].part[partID].endEffector)
+                {
                  //--------------------------------------------------
                  BVHJointID jID = problem->chain[chainID].part[partID].jID;
                  unsigned int numberOfMIDElements = 1 + problem->chain[chainID].part[partID].mIDEnd - problem->chain[chainID].part[partID].mIDStart;
@@ -1986,7 +1990,7 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                                     problem->chain[chainID].part[partID].maximumLimitMID[1],
                                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
                     //---------------------------------------------------------------------------------------
-                    fprintf(stderr,"checking Joint %s ",mc->jointHierarchy[jID]);
+                    fprintf(stderr,"limits engaged for Joint %s ",mc->jointHierarchy[jID].jointName);
                     fprintf(stderr," %f/%f/%f => ",solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
                     fprintf(stderr," [ min %f/%f/%f -> max %f/%f/%f ]",minimumLimitValues[0],minimumLimitValues[1],minimumLimitValues[2],maximumLimitValues[0],maximumLimitValues[1],maximumLimitValues[2]);
                     char trigger = 0;
@@ -2000,8 +2004,10 @@ void enforceLimitsDirectlyOnMotionBuffer(
                     if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; trigger=1; } else
                     if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; trigger=1; }
 
-                    fprintf(stderr,RED " = %f/%f/%f " NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
+                    if (trigger) { fprintf(stderr,RED); }
+                    fprintf(stderr," = %f/%f/%f \n" NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
                  }
+                } //not end effector
                }
         }
 }
