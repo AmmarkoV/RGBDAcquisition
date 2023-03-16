@@ -1950,6 +1950,7 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                          struct MotionBuffer * solution
                                         )
 {
+  fprintf(stderr,MAGENTA " enforceLimitsDirectlyOnMotionBuffer on %u chains " NORMAL,problem->numberOfChains);
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
