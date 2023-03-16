@@ -110,6 +110,7 @@ struct ikConfiguration
   float gradientExplosionThreshold;
   unsigned int dumpScreenshots;
   unsigned int verbose;
+  unsigned int penalizeSymmetriesHeuristic;
   char dontUseSolutionHistory;
   float useLangevinDynamics;
   float hcdMomentum; // Momentum | 0.9 Large / 0.2 Small

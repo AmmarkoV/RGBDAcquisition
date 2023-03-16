@@ -44,7 +44,6 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-#define PENALIZE_SYMMETRY_HEURISTIC 1
 
 unsigned long tickBaseIK = 0;
 
@@ -388,7 +387,7 @@ float calculateChainLoss(
                                                                   problem->mc,
                                                                   problem->chain[chainID].currentSolution->motion,
                                                                   &problem->chain[chainID].current2DProjectionTransform,
-                                                                  PENALIZE_SYMMETRY_HEURISTIC,//Dont populate extra structures we dont need them they just take time
+                                                                  penalizeSymmetryIn,//Dont populate extra structures we dont need them they just take time
                                                                   problem->chain[chainID].current2DProjectionTransform.listOfJointIDsToTransform,
                                                                   problem->chain[chainID].current2DProjectionTransform.lengthOfListOfJointIDsToTransform
                                                                 );
@@ -398,7 +397,7 @@ float calculateChainLoss(
                                                                   problem->mc,
                                                                   problem->chain[chainID].currentSolution->motion,
                                                                   &problem->chain[chainID].current2DProjectionTransform,
-                                                                  PENALIZE_SYMMETRY_HEURISTIC//Dont populate extra structures we dont need them they just take time
+                                                                  penalizeSymmetryIn//Dont populate extra structures we dont need them they just take time
                                                                 );
         }
 
@@ -502,7 +501,9 @@ int examineSolutionAndKeepIfItIsBetterSingleTry(
                                                 float * bestLoss,
                                                 float spring,
                                                 //-------------------------
-                                                float * solutionToTest
+                                                float * solutionToTest,
+                                                //-------------------------
+                                                int penalizeSymmetryIn
                                                )
 {
       float previousValues[3]={
@@ -515,7 +516,7 @@ int examineSolutionAndKeepIfItIsBetterSingleTry(
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
-        float currentLoss =calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        float currentLoss =calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         //-------------------  -------------------  -------------------  -------------------  -------------------  -------------------  -------------------
         if (currentLoss<*bestLoss)
         {
@@ -551,7 +552,9 @@ int examineSolutionAndKeepIfItIsBetter(
                                        float * bestLoss,
                                        float spring,
                                        //-------------------------
-                                       float * solutionToTest
+                                       float * solutionToTest,
+                                       //-------------------------
+                                       int penalizeSymmetryIn
                                       )
 {
         int accepted = 0;
@@ -565,19 +568,19 @@ int examineSolutionAndKeepIfItIsBetter(
         // Calculate loss of try
         //-------------------  -------------------  -------------------  -------------------
         problem->chain[chainID].currentSolution->motion[mIDS[0]] = solutionToTest[0];
-        float currentLoss = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        float currentLoss = calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
                 { *bestLoss = currentLoss; bestValues[0] = solutionToTest[0]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[0]] = previousValues[0]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[1]] = solutionToTest[1];
-        currentLoss = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        currentLoss = calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
                 { *bestLoss = currentLoss; bestValues[1] = solutionToTest[1]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[1]] = previousValues[1]; }
         //------------------------------------------------------------------------------
         problem->chain[chainID].currentSolution->motion[mIDS[2]] = solutionToTest[2];
-        currentLoss = calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
+        currentLoss = calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/) ;//+ spring * distanceFromInitial * distanceFromInitial;
         if (currentLoss<*bestLoss)
                 { *bestLoss = currentLoss; bestValues[2] = solutionToTest[2]; accepted+=1;       } else //Roll Back..!
                 {  problem->chain[chainID].currentSolution->motion[mIDS[2]] = previousValues[2]; }
@@ -652,7 +655,8 @@ int weAreAtALocalOptimum(
                          float currentValues[3],
                          float delta[3],
                          unsigned int mIDS[3],
-                         unsigned int verbose
+                         unsigned int verbose,
+                         int penalizeSymmetryIn
                         )
 {
   assert(d!=0.0);
@@ -662,9 +666,9 @@ int weAreAtALocalOptimum(
         {
             float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
-            float lossPlusD=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+            float lossPlusD=calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
-            float lossMinusD=calculateChainLoss(problem,chainID,partID,PENALIZE_SYMMETRY_HEURISTIC,1/*Be economic*/);
+            float lossMinusD=calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
 
             if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
@@ -737,6 +741,7 @@ float iteratePartLoss(
     char useSolutionHistory                      = !config->dontUseSolutionHistory;
     float useLangevinDynamics                    = config->useLangevinDynamics;
     unsigned int verbose                         = config->verbose;
+    int PENALIZE_SYMMETRY_HEURISTIC              = config->penalizeSymmetriesHeuristic;
     //-----------------------------------------------------------------------------
     //Sensible Defaults
     if  (learningRateDecayRate==0.0)     { learningRateDecayRate = (float) 0.8; }
@@ -993,7 +998,8 @@ if (iterationID==0)
                                   currentValues,
                                   delta,
                                   mIDS,
-                                  verbose
+                                  verbose,
+                                  PENALIZE_SYMMETRY_HEURISTIC
                                  )
             ) { return initialLoss; }
     } // tryMaintainingLocalOptima
@@ -1211,7 +1217,9 @@ if (iterationID==0)
                                               &bestLoss,
                                               spring,
                                               //-------------------------
-                                              previousSolution
+                                              previousSolution,
+                                              //-------------------------
+                                              PENALIZE_SYMMETRY_HEURISTIC
                                             )
          )
          {
@@ -1739,9 +1747,9 @@ int ensureFinalProposedSolutionIsBetterInParts(
    struct BVH_Transform bvhCurrentTransform  = {0};
    struct BVH_Transform bvhPreviousTransform = {0};
    //------------------------------------------------
-   if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+   if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
            {
-            if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+            if (bvh_loadTransformForMotionBuffer(mc,previousSolution->motion,&bvhPreviousTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
              {
                compareChainsAndAdoptBest(
                                          mc,
@@ -1812,9 +1820,9 @@ int springToZeroParts(
                     }
                 }
 
-     if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+     if (bvh_loadTransformForMotionBuffer(mc,currentSolution->motion,&bvhCurrentTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
            {
-            if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+            if (bvh_loadTransformForMotionBuffer(mc,zeroSolution->motion,&bvhZeroTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
              {
                compareChainsAndAdoptBest(
                                          mc,
@@ -2142,7 +2150,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     //---------------------------------------------------------------------------------------
     struct BVH_Transform bvhCurrentTransform= {0};
 
-    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+    if (bvh_loadTransformForMotionBuffer(mc,problem->initialSolution->motion,&bvhCurrentTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
     {
         //----------------------------------------------------
         if (initialMAEInPixels!=0)
@@ -2209,7 +2217,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                            mc,
                                            solution->motion,
                                            &bvhCurrentTransform,
-                                           PENALIZE_SYMMETRY_HEURISTIC// dont use extra structures
+                                           ikConfig->penalizeSymmetriesHeuristic// dont use extra structures
                                           )
       )
     {
@@ -2236,7 +2244,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
            //Perform projection on previous solution
            //-----------------------------------------------
            struct BVH_Transform bvhPreviousTransform = {0};
-           if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,PENALIZE_SYMMETRY_HEURISTIC))// We don't need extra structures
+           if (bvh_loadTransformForMotionBuffer(mc,problem->previousSolution->motion,&bvhPreviousTransform,ikConfig->penalizeSymmetriesHeuristic))// We don't need extra structures
            {
             float previousMAEInPixels =  meanBVH2DDistance(mc,renderer,1,0,&bvhPreviousTransform,bvhTargetTransform,ikConfig->verbose);
 
