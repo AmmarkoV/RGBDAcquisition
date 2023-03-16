@@ -1952,15 +1952,15 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                          struct MotionBuffer * solution
                                         )
 {
-  fprintf(stderr,MAGENTA " enforceLimitsDirectlyOnMotionBuffer on problem %s with %u chains \n" NORMAL,problem->problemDescription,problem->numberOfChains);
+  //fprintf(stderr,MAGENTA " enforceLimitsDirectlyOnMotionBuffer on problem %s with %u chains \n" NORMAL,problem->problemDescription,problem->numberOfChains);
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
-          fprintf(stderr,MAGENTA " Chain %u has %u parts\n" NORMAL,chainID,problem->chain[chainID].numberOfParts);
+          //fprintf(stderr,MAGENTA " Chain %u has %u parts\n" NORMAL,chainID,problem->chain[chainID].numberOfParts);
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
                {
                 BVHJointID jID = problem->chain[chainID].part[partID].jID;
                 char limitsEngaged = problem->chain[chainID].part[partID].limits;
-                fprintf(stderr,MAGENTA " Chain %u / Part %u / Joint %s / jID=%u / limits=%u\n" NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID,limitsEngaged);
+                //fprintf(stderr,MAGENTA " Chain %u / Part %u / Joint %s / jID=%u / limits=%u\n" NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID,limitsEngaged);
                 if (!problem->chain[chainID].part[partID].endEffector)
                 {
 
@@ -1993,9 +1993,9 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                                     problem->chain[chainID].part[partID].maximumLimitMID[1],
                                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
                     //---------------------------------------------------------------------------------------
-                    fprintf(stderr,"limits engaged for Joint %s ",mc->jointHierarchy[jID].jointName);
-                    fprintf(stderr," %f/%f/%f => ",solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
-                    fprintf(stderr," [ min %f/%f/%f -> max %f/%f/%f ]",minimumLimitValues[0],minimumLimitValues[1],minimumLimitValues[2],maximumLimitValues[0],maximumLimitValues[1],maximumLimitValues[2]);
+                    //fprintf(stderr,"limits engaged for Joint %s ",mc->jointHierarchy[jID].jointName);
+                    //fprintf(stderr," %f/%f/%f => ",solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
+                    //fprintf(stderr," [ min %f/%f/%f -> max %f/%f/%f ]",minimumLimitValues[0],minimumLimitValues[1],minimumLimitValues[2],maximumLimitValues[0],maximumLimitValues[1],maximumLimitValues[2]);
                     char trigger = 0;
                     //---------------------------------------------------------------------------------------
                     if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; trigger=1; } else
@@ -2006,9 +2006,10 @@ void enforceLimitsDirectlyOnMotionBuffer(
                     //-------------------------------------------------------------------------------------
                     if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; trigger=1; } else
                     if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; trigger=1; }
-
-                    if (trigger) { fprintf(stderr,RED " "); }
-                    fprintf(stderr," = %f/%f/%f \n" NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
+                    //-------------------------------------------------------------------------------------
+                    //if (trigger) { fprintf(stderr,RED " "); }
+                    //fprintf(stderr," = %f/%f/%f \n" NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
+                    //-------------------------------------------------------------------------------------
                  } //Joint has a limit thus it makes sense to test it
                 } //not end effector
                } //loop over all parts
