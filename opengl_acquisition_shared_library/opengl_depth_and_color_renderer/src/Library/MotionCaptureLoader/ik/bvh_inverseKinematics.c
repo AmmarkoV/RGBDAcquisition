@@ -1983,14 +1983,22 @@ void enforceLimitsDirectlyOnMotionBuffer(
                                                     problem->chain[chainID].part[partID].maximumLimitMID[1],
                                                     problem->chain[chainID].part[partID].maximumLimitMID[2] };
                     //---------------------------------------------------------------------------------------
-                    if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; } else
-                    if (solution->motion[mIDS[0]]>maximumLimitValues[0])  { solution->motion[mIDS[0]]=maximumLimitValues[0]; }
+                    BVHJointID jID = problem->chain[chainID].part[partID].jID;
+                    fprintf(stderr,"checking Joint %s ",mc->jointHierarchy[jID]);
+                    fprintf(stderr," %f/%f/%f => ",solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
+                    fprintf(stderr," [ min %f/%f/%f -> max %f/%f/%f ]",minimumLimitValues[0],minimumLimitValues[1],minimumLimitValues[2],maximumLimitValues[0],maximumLimitValues[1],maximumLimitValues[2]);
+                    char trigger = 0;
+                    //---------------------------------------------------------------------------------------
+                    if (solution->motion[mIDS[0]]<minimumLimitValues[0])  { solution->motion[mIDS[0]]=minimumLimitValues[0]; trigger=1; } else
+                    if (solution->motion[mIDS[0]]>maximumLimitValues[0])  { solution->motion[mIDS[0]]=maximumLimitValues[0]; trigger=1; }
                     //-------------------------------------------------------------------------------------
-                    if (solution->motion[mIDS[1]]<minimumLimitValues[1])  { solution->motion[mIDS[1]]=minimumLimitValues[1]; } else
-                    if (solution->motion[mIDS[1]]>maximumLimitValues[1])  { solution->motion[mIDS[1]]=maximumLimitValues[1]; }
+                    if (solution->motion[mIDS[1]]<minimumLimitValues[1])  { solution->motion[mIDS[1]]=minimumLimitValues[1]; trigger=1; } else
+                    if (solution->motion[mIDS[1]]>maximumLimitValues[1])  { solution->motion[mIDS[1]]=maximumLimitValues[1]; trigger=1; }
                     //-------------------------------------------------------------------------------------
-                    if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; } else
-                    if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; }
+                    if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; trigger=1; } else
+                    if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; trigger=1; }
+
+                    fprintf(stderr,RED " = %f/%f/%f " NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
                  }
                }
         }
