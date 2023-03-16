@@ -1955,12 +1955,11 @@ void enforceLimitsDirectlyOnMotionBuffer(
   fprintf(stderr,MAGENTA " enforceLimitsDirectlyOnMotionBuffer on problem %s with %u chains \n" NORMAL,problem->problemDescription,problem->numberOfChains);
   for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
         {
-          fprintf(stderr,MAGENTA," Chain %u has %u parts\n",NORMAL,chainID,problem->chain[chainID].numberOfParts);
-
+          fprintf(stderr,MAGENTA " Chain %u has %u parts\n" NORMAL,chainID,problem->chain[chainID].numberOfParts);
           for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
                {
                 BVHJointID jID = problem->chain[chainID].part[partID].jID;
-                fprintf(stderr,MAGENTA," Chain %u / Part %u / Joint %s / jID=%u\n",NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID);
+                fprintf(stderr,MAGENTA " Chain %u / Part %u / Joint %s / jID=%u\n" NORMAL,chainID,partID,mc->jointHierarchy[jID].jointName,jID);
                 if (!problem->chain[chainID].part[partID].endEffector)
                 {
                  char limitsEngaged = problem->chain[chainID].part[partID].limits;
@@ -1972,7 +1971,7 @@ void enforceLimitsDirectlyOnMotionBuffer(
                   if (numberOfMIDElements!=3)
                   {
                     fprintf(stderr,RED "iteratePartLoss: %s Only 3 elements acceptable( got %u @ chain %u / part %u ) ..\n" NORMAL,problem->problemDescription,numberOfMIDElements,chainID,partID);
-                    fprintf(stderr,RED "Joint %s / jID=%u\n",NORMAL,mc->jointHierarchy[jID].jointName,jID);
+                    fprintf(stderr,RED "Joint %s / jID=%u\n" NORMAL,mc->jointHierarchy[jID].jointName,jID);
                     fprintf(stderr,RED "mIDStart: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart);
                     fprintf(stderr,RED "mIDEnd: %u\n" NORMAL,problem->chain[chainID].part[partID].mIDEnd);
                     fprintf(stderr,RED "forcing 3 elements from %u -> %u\n" NORMAL,problem->chain[chainID].part[partID].mIDStart,problem->chain[chainID].part[partID].mIDStart+2);
@@ -2008,12 +2007,12 @@ void enforceLimitsDirectlyOnMotionBuffer(
                     if (solution->motion[mIDS[2]]<minimumLimitValues[2])  { solution->motion[mIDS[2]]=minimumLimitValues[2]; trigger=1; } else
                     if (solution->motion[mIDS[2]]>maximumLimitValues[2])  { solution->motion[mIDS[2]]=maximumLimitValues[2]; trigger=1; }
 
-                    if (trigger) { fprintf(stderr,RED); }
+                    if (trigger) { fprintf(stderr,RED " "); }
                     fprintf(stderr," = %f/%f/%f \n" NORMAL,solution->motion[mIDS[0]],solution->motion[mIDS[1]],solution->motion[mIDS[2]]);
                  } //Joint has a limit thus it makes sense to test it
                 } //not end effector
-               }
-        }
+               } //loop over all parts
+        } //loop over all chains
 }
 
 
