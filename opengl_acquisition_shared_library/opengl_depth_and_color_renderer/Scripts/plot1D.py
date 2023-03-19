@@ -6,15 +6,21 @@ import sys
 np.random.seed(19860811)
 
 def readData(filename):
+    linesRead = 0
+    hasNonZeroElements=False
     columnA = list()
  
     fp = open(filename, 'r')
     lines = fp.readlines()
 
     for line in lines:
-       columnA.append(float(line))
+       if (linesRead>0): #<- skip label..!
+         if (float(line)!=0.0):
+          hasNonZeroElements=True
+         columnA.append(float(line))
+       linesRead = linesRead + 1
  
-    return columnA
+    return columnA,hasNonZeroElements
 
 filename="study.dat"
 output="out.png"
@@ -35,24 +41,32 @@ if (len(sys.argv)>1):
              filename=sys.argv[i+1]
            if (sys.argv[i]=="--to"):
              output=sys.argv[i+1]
+             jointName=sys.argv[i+1]
            if (sys.argv[i]=="--joint"):
              jointName=sys.argv[i+1]
 
 
 fig = plt.figure()
 
-data = readData(filename)
-plt.hist(data, bins=150)
+data,hasNonZeroElements = readData(filename)
 
-# Add labels and title
-plt.xlabel('Value')
-plt.ylabel('Frequency')
-plt.title('Histogram of %s '%jointName)
+if (hasNonZeroElements):
+   plt.hist(data, bins=150)
 
-# Save figure as PNG file
-plt.savefig(output)
+   # Add labels and title
+   plt.xlabel('Value')
+   plt.ylabel('Frequency')
+   plt.title('Histogram of %s '%jointName)
 
-#ax.set_title(jointName) # Title of the plot 
+   # Save figure as PNG file
+   plt.savefig(output)
 
-fig.savefig(output)
-#plt.show()
+   #ax.set_title(jointName) # Title of the plot 
+
+   fig.savefig(output)
+   #plt.show()
+else: 
+   print("File %s has only zero elements so not plotting anything.." % filename)
+
+
+
