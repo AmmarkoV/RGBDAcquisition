@@ -3,30 +3,22 @@ import numpy as np
 import sys
 
 # Fixing random state for reproducibility
-np.random.seed(19680801)
+np.random.seed(19860811)
 
 def readData(filename):
-
-    columnA = list()  
-    columnB = list()  
-    columnC = list()  
-    columnD = list()  
+    columnA = list()
  
     fp = open(filename, 'r')
     lines = fp.readlines()
 
     for line in lines:
-       d = line.split(' ')
-       columnA.append(float(d[0]))
-       columnB.append(float(d[1]))
-       columnC.append(float(d[2]))
-       columnD.append(float(d[3]))
+       columnA.append(float(line))
  
-    return columnA, columnB, columnC, columnD
+    return columnA
 
 filename="study.dat"
 output="out.png"
-jointName=" Title "
+jointName=" Unknown Joint "
 xLabel=" X "
 yLabel=" Y "
 zLabel=" Z "
@@ -45,37 +37,22 @@ if (len(sys.argv)>1):
              output=sys.argv[i+1]
            if (sys.argv[i]=="--joint"):
              jointName=sys.argv[i+1]
-           if (sys.argv[i]=="--x"):
-             xLabel=sys.argv[i+1]
-           if (sys.argv[i]=="--y"):
-             yLabel=sys.argv[i+1]
-           if (sys.argv[i]=="--z"):
-             zLabel=sys.argv[i+1]
-           if (sys.argv[i]=="--s"):
-             scale=float(sys.argv[i+1])
-           if (sys.argv[i]=="--view"):
-             viewAzimuth=int(sys.argv[i+1])
-             viewElevation=int(sys.argv[i+2])
 
 
 fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
 
-xs,ys,zs,vs = readData(filename)
+data = readData(filename)
+plt.hist(data, bins=150)
 
-maxValue = scale * max(vs)
-svs = [(maxValue-x)/maxValue for x in vs]
+# Add labels and title
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Histogram of %s '%jointName)
 
-ax.view_init(viewAzimuth,viewElevation) 
+# Save figure as PNG file
+plt.savefig(output)
 
-cm = plt.cm.get_cmap('RdYlBu')
-sc = ax.scatter(xs, ys, zs, c=vs, s=svs, cmap=cm, alpha=transparency)
-plt.colorbar(sc) 
-
-ax.set_title(jointName) # Title of the plot
-ax.set_xlabel(xLabel)
-ax.set_ylabel(yLabel)
-ax.set_zlabel(zLabel)
+#ax.set_title(jointName) # Title of the plot 
 
 fig.savefig(output)
 #plt.show()
