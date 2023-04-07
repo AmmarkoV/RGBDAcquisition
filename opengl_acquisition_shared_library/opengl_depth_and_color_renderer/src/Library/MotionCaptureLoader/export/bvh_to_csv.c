@@ -404,34 +404,28 @@ int dumpBVHToCSVBody(
 
 
 
-int countLinesInFile(const char *filename, size_t block_size)
+unsigned int countLinesInFile(const char *filename, size_t block_size)
 {
-    FILE *file;
     char buffer[block_size];
-    int lineCount = 0;
+    unsigned int lineCount = 0;
 
     // Open the file in read mode
-    file = fopen(filename, "r");
+    FILE * file = fopen(filename, "r");
 
     // Check if file was opened successfully
-    if (file == 0)
+    if (file != 0)
     {
-        printf("Failed to open the file.\n");
-        return -1;
-    }
-
-    // Count lines in the file
-    while (fgets(buffer, block_size, file) != NULL)
-    {
+     // Count lines in the file
+     while (fgets(buffer, block_size, file) != NULL)
+     {
         for (int i = 0; i < block_size && buffer[i] != '\0'; i++)
         {
-            if (buffer[i] == '\n')
-                     { lineCount++; }
+            if (buffer[i] == '\n') { lineCount++; }
         }
+     }
+     // Close the file
+     fclose(file);
     }
-
-    // Close the file
-    fclose(file);
 
     return lineCount;
 }
@@ -478,17 +472,69 @@ int bvh_ImportCSVPoses(
 
                       } else
                       {
+                       //Resolve CSV header to -> unsigned int * mID
                        fprintf(stderr,"Header %s \n",line);
                        numberOfHeaderParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                        fprintf(stderr,"numberOfHeaderParameters %u \n",numberOfHeaderParameters);
                        mID = (unsigned int *) malloc(numberOfHeaderParameters * sizeof(unsigned int));
+                       if (mID!=0)
+                       {
                        int i;
                        for (i=0; i<numberOfHeaderParameters; i++)
                        {
                          InputParser_GetLowercaseWord(csvLine,i,whereToStoreItems,512);
                          fprintf(stderr,"Column %u / %s \n",i,whereToStoreItems);
-                       }
-                      }
+                         unsigned int length = strlen(whereToStoreItems);
+                         if (length>10)
+                         {
+                           char * jointName = whereToStoreItems;
+                           char * dof   = whereToStoreItems;
+                           if ( whereToStoreItems[length-10] == '_' )
+                           {
+                               whereToStoreItems[length-10] = 0;
+                               dof = whereToStoreItems + (length-9);
+                           } else
+                           {
+                               fprintf(stderr,"CSV file does not have the label format expected..!\n");
+                               break;
+                           }
+                           fprintf(stderr,"Joint %s / DoF %s \n",jointName,dof);
+                           //Resolve degree of freedom..
+                           //========================================================================
+                           int channelID = BVH_CHANNEL_NONE;
+                           if (strcmp(dof,"xposition")==0)  { channelID = BVH_POSITION_X; } else
+                           if (strcmp(dof,"yposition")==0)  { channelID = BVH_POSITION_Y; } else
+                           if (strcmp(dof,"zposition")==0)  { channelID = BVH_POSITION_Z; } else
+                           if (strcmp(dof,"wrotation")==0)  { channelID = BVH_ROTATION_W; } else
+                           if (strcmp(dof,"xrotation")==0)  { channelID = BVH_ROTATION_X; } else
+                           if (strcmp(dof,"yrotation")==0)  { channelID = BVH_ROTATION_Y; } else
+                           if (strcmp(dof,"zrotation")==0)  { channelID = BVH_ROTATION_Z; } else
+                           if (strcmp(dof,"xrodrigues")==0) { channelID = BVH_RODRIGUES_X; } else
+                           if (strcmp(dof,"yrodrigues")==0) { channelID = BVH_RODRIGUES_Y; } else
+                           if (strcmp(dof,"zrodrigues")==0) { channelID = BVH_RODRIGUES_Z; } else
+                            {
+                               fprintf(stderr,"Unknown degree of freedom (%s)..!\n",dof);
+                               break;
+                            }
+                           //========================================================================
+
+                           //Resolve jointName -> jID..
+                           //========================================================================
+                           BVHJointID jID = 0;
+                           if ( bvh_getJointIDFromJointNameNocase(mc,jointName,&jID) )
+                           {
+                               fprintf(stderr,"Resolve jointID(%u)/channel(%u)..!\n",jID,channelID);
+
+                           } else
+                            {
+                               fprintf(stderr,"Unknown joint (%s)..!\n",jointName);
+                               break;
+                            }
+                           //========================================================================
+                         }
+                       } //Parse each input column
+                       } //We could allocate mID
+                      } //End parsing header..
 
                       fileNumber+=1;
                   }
@@ -498,6 +544,8 @@ int bvh_ImportCSVPoses(
         }
    //-----------------------------------------------------------
    InputParser_Destroy(csvLine);
+   if (mID!=0) { free(mID); mID=0; }
+   //-----------------------------------------------------------
    return result;
 }
 
