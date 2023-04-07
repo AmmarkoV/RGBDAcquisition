@@ -9,6 +9,8 @@
 #include "../bvh_loader.h"
 #include "../calculate/bvh_project.h"
 #include "../edit/bvh_remapangles.h"
+#include "../edit/bvh_cut_paste.h"
+
 
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
@@ -454,6 +456,7 @@ int bvh_ImportCSVPoses(
   unsigned int numberOfHeaderParameters = 0;
   unsigned int * mID = 0;
   unsigned int fID = 0;
+  unsigned int i;
   //-----------------------------------------------------------
   FILE * fp = fopen(filenameOfCSVFile,"r");
   if (fp!=0)
@@ -470,19 +473,30 @@ int bvh_ImportCSVPoses(
                       if (fileNumber>0)
                       {
                        fprintf(stderr," ");
-
+                        for (fID=0; fID<lineCount-1; fID++)
+                        {
+                          for (i=0; i<numberOfHeaderParameters; i++)
+                           {
+                           }
+                        }
                       } else
                       {
                        //Resolve CSV header to -> unsigned int * mID
                        fprintf(stderr,"Header %s \n",line);
                        numberOfHeaderParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                        fprintf(stderr,"numberOfHeaderParameters %u \n",numberOfHeaderParameters);
+
+                       if (!bvh_GrowMocapFileByCopyingExistingMotions(mc,lineCount-1))
+                       {
+                        fprintf(stderr,"Could not grow motion capture..!\n");
+                        break;
+                       }
+
                        mID = (unsigned int *) malloc(numberOfHeaderParameters * sizeof(unsigned int));
                        if (mID!=0)
                        {
-                       int i;
-                       for (i=0; i<numberOfHeaderParameters; i++)
-                       {
+                        for (i=0; i<numberOfHeaderParameters; i++)
+                        {
                          InputParser_GetLowercaseWord(csvLine,i,whereToStoreItems,512);
                          fprintf(stderr,"Column %u / %s \n",i,whereToStoreItems);
                          unsigned int length = strlen(whereToStoreItems);
@@ -535,7 +549,7 @@ int bvh_ImportCSVPoses(
                            }
                            //========================================================================
                          } //We have a big enough label to have xxxx_channelName
-                       } //Parse each input column
+                        } //Parse each input column
                        } //We could allocate mID
                       } //End parsing header..
 
