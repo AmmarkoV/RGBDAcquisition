@@ -400,3 +400,93 @@ int dumpBVHToCSVBody(
  return (dumped==requestedToDump);
 }
 
+
+
+int countLinesInFile(const char *filename, size_t block_size)
+{
+    FILE *file;
+    char buffer[block_size];
+    int lineCount = 0;
+
+    // Open the file in read mode
+    file = fopen(filename, "r");
+
+    // Check if file was opened successfully
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return -1;
+    }
+
+    // Count lines in the file
+    while (fgets(buffer, block_size, file) != NULL) {
+        for (int i = 0; i < block_size && buffer[i] != '\0'; i++) {
+            if (buffer[i] == '\n') {
+                lineCount++;
+            }
+        }
+    }
+
+    // Close the file
+    fclose(file);
+
+    return lineCount;
+}
+
+
+
+
+
+int bvh_ImportCSVPoses(
+                        struct BVH_MotionCapture * mc,
+                        const char * filenameOfCSVFile
+                      )
+{
+ int result = 0;
+ int lineCount = countLinesInFile(filenameOfCSVFile,1024);
+ fprintf(stderr,"File %s has %u lines \n",filenameOfCSVFile,lineCount);
+
+
+  struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,4);
+  if (ipc==0) { return 0; }
+
+  InputParser_SetDelimeter(ipc,0,',');
+  InputParser_SetDelimeter(ipc,1,'\t');
+  InputParser_SetDelimeter(ipc,2,10);
+  InputParser_SetDelimeter(ipc,3,13);
+
+
+
+ FILE * fp = fopen(filenameOfCSVFile,"r");
+ if (fp!=0)
+        {
+            char * line = NULL;
+            size_t len = 0;
+            ssize_t read;
+
+            unsigned int fileNumber=0;
+            while ( (read = getline(&line, &len, fp)) != -1)
+                {
+                  if (line!=0)
+                  {
+                      if (fileNumber>0)
+                      {
+                       fprintf(stderr,"");
+
+                      } else
+                      {
+                       fprintf(stderr,"Header %s \n",line);
+
+                      }
+
+                      fileNumber+=1;
+                  }
+                }
+            fclose(fp);
+            result = 1;
+        }
+
+
+   InputParser_Destroy(ipc);
+  return result;
+}
+

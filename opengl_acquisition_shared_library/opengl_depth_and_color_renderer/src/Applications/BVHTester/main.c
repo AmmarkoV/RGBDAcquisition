@@ -20,6 +20,7 @@
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_csv.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_c.h"
 
 #include "../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h"
@@ -1593,6 +1594,21 @@ int bvhConverter(int argc,const char **argv)
                  )  { haltOnError(immediatelyHaltOnError,"Error while randomizing joint angles"); }
             }
             //exit(0);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--importCSVPoses")==0)
+        {
+          //./BVHTester --from lhand.qbvh --importCSVPoses sobolLHand_131072.csv
+          if (i+1>=argc)  { incorrectArguments(); }
+          const char * filenameOfCSVFile=argv[i+1];
+          fprintf(stderr,"bvh_ImportCSVPoses(%s)\n",filenameOfCSVFile);
+          srand(time(NULL));
+              if (
+                   !bvh_ImportCSVPoses(
+                                        &bvhMotion,
+                                        filenameOfCSVFile
+                                      )
+                 )  { haltOnError(immediatelyHaltOnError,"Error while importing CSV poses"); }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeBasedOnIKConstrains")==0)

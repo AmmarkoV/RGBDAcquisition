@@ -42,6 +42,11 @@ int dumpBVHToCSVBody(
                       );
 
 
+int bvh_ImportCSVPoses(
+                        struct BVH_MotionCapture * mc,
+                        const char * filenameOfCSVFile
+                      );
+
 #ifdef __cplusplus
 }
 #endif
