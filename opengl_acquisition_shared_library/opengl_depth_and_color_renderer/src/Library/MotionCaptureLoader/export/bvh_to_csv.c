@@ -11,7 +11,6 @@
 #include "../edit/bvh_remapangles.h"
 #include "../edit/bvh_cut_paste.h"
 
-
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
@@ -20,9 +19,6 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
-
-
-
 
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
@@ -42,11 +38,6 @@ int dumpBVHToCSVHeader(
      fclose(fpMap);
     }
    }
-
-
-
-
-
 
    int isJointSelected=1;
    int isJointEndSiteSelected=1;
@@ -452,6 +443,7 @@ int bvh_ImportCSVPoses(
   InputParser_SetDelimeter(csvLine,1,'\t');
   InputParser_SetDelimeter(csvLine,2,10);
   InputParser_SetDelimeter(csvLine,3,13);
+  //-----------------------------------------------------------
   char whereToStoreItems[512]={0};
   unsigned int numberOfHeaderParameters = 0;
   unsigned int * mID = 0;
