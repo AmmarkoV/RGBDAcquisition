@@ -4,6 +4,8 @@
 #include "bvh_to_csv.h"
 #include "bvh_export.h"
 
+#include "../../TrajectoryParser/InputParser_C.h"
+
 #include "../bvh_loader.h"
 #include "../calculate/bvh_project.h"
 #include "../edit/bvh_remapangles.h"
@@ -412,17 +414,19 @@ int countLinesInFile(const char *filename, size_t block_size)
     file = fopen(filename, "r");
 
     // Check if file was opened successfully
-    if (file == NULL) {
+    if (file == 0)
+    {
         printf("Failed to open the file.\n");
         return -1;
     }
 
     // Count lines in the file
-    while (fgets(buffer, block_size, file) != NULL) {
-        for (int i = 0; i < block_size && buffer[i] != '\0'; i++) {
-            if (buffer[i] == '\n') {
-                lineCount++;
-            }
+    while (fgets(buffer, block_size, file) != NULL)
+    {
+        for (int i = 0; i < block_size && buffer[i] != '\0'; i++)
+        {
+            if (buffer[i] == '\n')
+                     { lineCount++; }
         }
     }
 
@@ -445,13 +449,16 @@ int bvh_ImportCSVPoses(
  int lineCount = countLinesInFile(filenameOfCSVFile,1024);
  fprintf(stderr,"File %s has %u lines \n",filenameOfCSVFile,lineCount);
   //-----------------------------------------------------------
-  struct InputParserC * csvHeader = InputParser_Create(1024,4);
-  if (csvHeader==0) { return 0; }
+  struct InputParserC * csvLine = InputParser_Create(1024,4);
+  if (csvLine==0) { return 0; }
   //-----------------------------------------------------------
-  InputParser_SetDelimeter(csvHeader,0,',');
-  InputParser_SetDelimeter(csvHeader,1,'\t');
-  InputParser_SetDelimeter(csvHeader,2,10);
-  InputParser_SetDelimeter(csvHeader,3,13);
+  InputParser_SetDelimeter(csvLine,0,',');
+  InputParser_SetDelimeter(csvLine,1,'\t');
+  InputParser_SetDelimeter(csvLine,2,10);
+  InputParser_SetDelimeter(csvLine,3,13);
+  char whereToStoreItems[512]={0};
+  unsigned int numberOfHeaderParameters = 0;
+  unsigned int * mID = 0;
   //-----------------------------------------------------------
   FILE * fp = fopen(filenameOfCSVFile,"r");
   if (fp!=0)
@@ -472,7 +479,15 @@ int bvh_ImportCSVPoses(
                       } else
                       {
                        fprintf(stderr,"Header %s \n",line);
-
+                       numberOfHeaderParameters = InputParser_SeperateWordsCC(csvLine,line,1);
+                       fprintf(stderr,"numberOfHeaderParameters %u \n",numberOfHeaderParameters);
+                       mID = (unsigned int *) malloc(numberOfHeaderParameters * sizeof(unsigned int));
+                       int i;
+                       for (i=0; i<numberOfHeaderParameters; i++)
+                       {
+                         InputParser_GetLowercaseWord(csvLine,i,whereToStoreItems,512);
+                         fprintf(stderr,"Column %u / %s \n",i,whereToStoreItems);
+                       }
                       }
 
                       fileNumber+=1;
@@ -482,7 +497,7 @@ int bvh_ImportCSVPoses(
             result = 1;
         }
    //-----------------------------------------------------------
-   InputParser_Destroy(csvHeader);
+   InputParser_Destroy(csvLine);
    return result;
 }
 
