@@ -453,6 +453,7 @@ int bvh_ImportCSVPoses(
   char whereToStoreItems[512]={0};
   unsigned int numberOfHeaderParameters = 0;
   unsigned int * mID = 0;
+  unsigned int fID = 0;
   //-----------------------------------------------------------
   FILE * fp = fopen(filenameOfCSVFile,"r");
   if (fp!=0)
@@ -468,7 +469,7 @@ int bvh_ImportCSVPoses(
                   {
                       if (fileNumber>0)
                       {
-                       fprintf(stderr,"");
+                       fprintf(stderr," ");
 
                       } else
                       {
@@ -499,16 +500,17 @@ int bvh_ImportCSVPoses(
                                break;
                            }
                            fprintf(stderr,"Joint %s / DoF %s \n",jointName,dof);
+                           //========================================================================
                            //Resolve degree of freedom..
                            //========================================================================
                            int channelID = BVH_CHANNEL_NONE;
-                           if (strcmp(dof,"xposition")==0)  { channelID = BVH_POSITION_X; } else
-                           if (strcmp(dof,"yposition")==0)  { channelID = BVH_POSITION_Y; } else
-                           if (strcmp(dof,"zposition")==0)  { channelID = BVH_POSITION_Z; } else
-                           if (strcmp(dof,"wrotation")==0)  { channelID = BVH_ROTATION_W; } else
-                           if (strcmp(dof,"xrotation")==0)  { channelID = BVH_ROTATION_X; } else
-                           if (strcmp(dof,"yrotation")==0)  { channelID = BVH_ROTATION_Y; } else
-                           if (strcmp(dof,"zrotation")==0)  { channelID = BVH_ROTATION_Z; } else
+                           if (strcmp(dof,"xposition")==0)  { channelID = BVH_POSITION_X;  } else
+                           if (strcmp(dof,"yposition")==0)  { channelID = BVH_POSITION_Y;  } else
+                           if (strcmp(dof,"zposition")==0)  { channelID = BVH_POSITION_Z;  } else
+                           if (strcmp(dof,"wrotation")==0)  { channelID = BVH_ROTATION_W;  } else
+                           if (strcmp(dof,"xrotation")==0)  { channelID = BVH_ROTATION_X;  } else
+                           if (strcmp(dof,"yrotation")==0)  { channelID = BVH_ROTATION_Y;  } else
+                           if (strcmp(dof,"zrotation")==0)  { channelID = BVH_ROTATION_Z;  } else
                            if (strcmp(dof,"xrodrigues")==0) { channelID = BVH_RODRIGUES_X; } else
                            if (strcmp(dof,"yrodrigues")==0) { channelID = BVH_RODRIGUES_Y; } else
                            if (strcmp(dof,"zrodrigues")==0) { channelID = BVH_RODRIGUES_Z; } else
@@ -518,30 +520,31 @@ int bvh_ImportCSVPoses(
                             }
                            //========================================================================
 
+                           //========================================================================
                            //Resolve jointName -> jID..
                            //========================================================================
                            BVHJointID jID = 0;
                            if ( bvh_getJointIDFromJointNameNocase(mc,jointName,&jID) )
                            {
                                fprintf(stderr,"Resolve jointID(%u)/channel(%u)..!\n",jID,channelID);
-
+                               mID[i] = bvh_resolveFrameAndJointAndChannelToMotionID(mc,jID,fID,channelID);
                            } else
-                            {
+                           {
                                fprintf(stderr,"Unknown joint (%s)..!\n",jointName);
                                break;
-                            }
+                           }
                            //========================================================================
-                         }
+                         } //We have a big enough label to have xxxx_channelName
                        } //Parse each input column
                        } //We could allocate mID
                       } //End parsing header..
 
                       fileNumber+=1;
-                  }
-                }
+                  } //We have read a non-null line from the file
+                }//We have read a line from the file
             fclose(fp);
             result = 1;
-        }
+        } //We have opened a text file for reading
    //-----------------------------------------------------------
    InputParser_Destroy(csvLine);
    if (mID!=0) { free(mID); mID=0; }

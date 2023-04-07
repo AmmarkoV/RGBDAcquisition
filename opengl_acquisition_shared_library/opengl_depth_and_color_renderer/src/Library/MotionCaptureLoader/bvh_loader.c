@@ -428,8 +428,6 @@ unsigned int bvh_resolveFrameAndJointAndChannelToMotionID(struct BVH_MotionCaptu
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 
-
-
 int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
   if (bvhMotion==0) { return 0; }
