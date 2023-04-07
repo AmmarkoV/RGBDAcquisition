@@ -444,20 +444,17 @@ int bvh_ImportCSVPoses(
  int result = 0;
  int lineCount = countLinesInFile(filenameOfCSVFile,1024);
  fprintf(stderr,"File %s has %u lines \n",filenameOfCSVFile,lineCount);
-
-
-  struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,4);
-  if (ipc==0) { return 0; }
-
-  InputParser_SetDelimeter(ipc,0,',');
-  InputParser_SetDelimeter(ipc,1,'\t');
-  InputParser_SetDelimeter(ipc,2,10);
-  InputParser_SetDelimeter(ipc,3,13);
-
-
-
- FILE * fp = fopen(filenameOfCSVFile,"r");
- if (fp!=0)
+  //-----------------------------------------------------------
+  struct InputParserC * csvHeader = InputParser_Create(1024,4);
+  if (csvHeader==0) { return 0; }
+  //-----------------------------------------------------------
+  InputParser_SetDelimeter(csvHeader,0,',');
+  InputParser_SetDelimeter(csvHeader,1,'\t');
+  InputParser_SetDelimeter(csvHeader,2,10);
+  InputParser_SetDelimeter(csvHeader,3,13);
+  //-----------------------------------------------------------
+  FILE * fp = fopen(filenameOfCSVFile,"r");
+  if (fp!=0)
         {
             char * line = NULL;
             size_t len = 0;
@@ -484,9 +481,8 @@ int bvh_ImportCSVPoses(
             fclose(fp);
             result = 1;
         }
-
-
-   InputParser_Destroy(ipc);
-  return result;
+   //-----------------------------------------------------------
+   InputParser_Destroy(csvHeader);
+   return result;
 }
 
