@@ -154,7 +154,7 @@ int bvh_RandomizeBasedOnIKProblem(
               minimumRandomizationLimit[mIDOffset]=minimumLimit;
               maximumRandomizationLimit[mIDOffset]=maximumLimit;
               hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
-              fprintf(stderr,"Channel #0(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+              fprintf(stderr,"IKRAND Channel #0 %s_%s [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
 
              mIDOffset = tP->chain[chainID].part[partID].mIDStart+1;
@@ -171,7 +171,7 @@ int bvh_RandomizeBasedOnIKProblem(
               minimumRandomizationLimit[mIDOffset]=minimumLimit;
               maximumRandomizationLimit[mIDOffset]=maximumLimit;
               hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
-              fprintf(stderr,"Channel #1(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+              fprintf(stderr,"IKRAND Channel #1 %s_%s [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
 
              mIDOffset = tP->chain[chainID].part[partID].mIDEnd;
@@ -188,7 +188,7 @@ int bvh_RandomizeBasedOnIKProblem(
                minimumRandomizationLimit[mIDOffset]=minimumLimit;
                maximumRandomizationLimit[mIDOffset]=maximumLimit;
                hasRandomization[mIDOffset]=( (maximumLimit-minimumLimit) > 0.0001);
-               fprintf(stderr,"Channel #2(%s/%s)  => [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
+               fprintf(stderr,"IKRAND Channel #2 %s_%s [%0.2f,%0.2f]\n",jName,channelNames[channelID],minimumLimit,maximumLimit);
              }
            }
         }
