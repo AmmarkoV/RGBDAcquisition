@@ -467,9 +467,7 @@ int bvh_ImportCSVPoses(
                        if (lineNumber%10==0)
                         { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",filenameOfCSVFile,lineNumber,lineCount,(float) (100*lineNumber)/lineCount); }
 
-                       fID = lineNumber;
-                       //for (fID=0; fID<lineCount-1; fID++)
-                        {
+                          fID = lineNumber;
                           int numberOfRowParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                           if (numberOfRowParameters!=numberOfHeaderParameters)
                           {
@@ -483,7 +481,6 @@ int bvh_ImportCSVPoses(
                                BVHMotionChannelID resolvedChannelID = mID[i] + mIDOffset;
                                mc->motionValues[resolvedChannelID]  = InputParser_GetWordFloat(csvLine,i);
                            }
-                        }
                       } //Finished reading a body line from CSV
                         else
                       {
