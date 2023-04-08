@@ -426,7 +426,7 @@ unsigned int countLinesInFile(const char *filename, size_t block_size)
 
 
 
-
+// ./BVHTester --from lhand.qbvh --importCSVPoses sobolLHand_131072.csv --csv ./ lhand.csv 2d+3d+bvh
 int bvh_ImportCSVPoses(
                         struct BVH_MotionCapture * mc,
                         const char * filenameOfCSVFile
@@ -463,11 +463,12 @@ int bvh_ImportCSVPoses(
                   if (line!=0)
                   {
                       if (lineNumber>0)
-                      {
+                      { //Reading a body line from CSV
                        if (lineNumber%10==0)
                         { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",filenameOfCSVFile,lineNumber,lineCount,(float) (100*lineNumber)/lineCount); }
 
-                       for (fID=0; fID<lineCount-1; fID++)
+                       fID = lineNumber;
+                       //for (fID=0; fID<lineCount-1; fID++)
                         {
                           int numberOfRowParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                           if (numberOfRowParameters!=numberOfHeaderParameters)
@@ -476,13 +477,15 @@ int bvh_ImportCSVPoses(
                            break;
                           }
 
+                          unsigned int mIDOffset = fID * mc->numberOfValuesPerFrame;
                           for (i=0; i<numberOfHeaderParameters; i++)
                            {
-                               BVHMotionChannelID resolvedChannelID = mID[i] + fID * mc->numberOfValuesPerFrame;
+                               BVHMotionChannelID resolvedChannelID = mID[i] + mIDOffset;
                                mc->motionValues[resolvedChannelID]  = InputParser_GetWordFloat(csvLine,i);
                            }
                         }
-                      } else
+                      } //Finished reading a body line from CSV
+                        else
                       {
                        //Resolve CSV header to -> unsigned int * mID
                        fprintf(stderr,"Header %s \n",line);
@@ -541,6 +544,7 @@ int bvh_ImportCSVPoses(
                            //Resolve jointName -> jID..
                            //========================================================================
                            BVHJointID jID = 0;
+                           fID = 0;
                            if ( bvh_getJointIDFromJointNameNocase(mc,jointName,&jID) )
                            {
                                fprintf(stderr,"Resolve jointID(%u)/channel(%u)..!\n",jID,channelID);
