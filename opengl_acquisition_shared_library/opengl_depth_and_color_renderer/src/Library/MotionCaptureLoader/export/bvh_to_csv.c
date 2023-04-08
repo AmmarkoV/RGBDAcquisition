@@ -457,18 +457,29 @@ int bvh_ImportCSVPoses(
             size_t len = 0;
             ssize_t read;
 
-            unsigned int fileNumber=0;
+            unsigned int lineNumber=0;
             while ( (read = getline(&line, &len, fp)) != -1)
                 {
                   if (line!=0)
                   {
-                      if (fileNumber>0)
+                      if (lineNumber>0)
                       {
-                       fprintf(stderr," ");
-                        for (fID=0; fID<lineCount-1; fID++)
+                       if (lineNumber%10==0)
+                        { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",filenameOfCSVFile,lineNumber,lineCount,(float) (100*lineNumber)/lineCount); }
+
+                       for (fID=0; fID<lineCount-1; fID++)
                         {
+                          int numberOfRowParameters = InputParser_SeperateWordsCC(csvLine,line,1);
+                          if (numberOfRowParameters!=numberOfHeaderParameters)
+                          {
+                           fprintf(stderr,"Incorrect number of parameters vs header..!\n");
+                           break;
+                          }
+
                           for (i=0; i<numberOfHeaderParameters; i++)
                            {
+                               BVHMotionChannelID resolvedChannelID = mID[i] + fID * mc->numberOfValuesPerFrame;
+                               mc->motionValues[resolvedChannelID]  = InputParser_GetWordFloat(csvLine,i);
                            }
                         }
                       } else
@@ -545,7 +556,7 @@ int bvh_ImportCSVPoses(
                        } //We could allocate mID
                       } //End parsing header..
 
-                      fileNumber+=1;
+                      lineNumber+=1;
                   } //We have read a non-null line from the file
                 }//We have read a line from the file
             fclose(fp);
