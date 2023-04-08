@@ -501,7 +501,7 @@ int bvh_ImportCSVPoses(
                         for (i=0; i<numberOfHeaderParameters; i++)
                         {
                          InputParser_GetLowercaseWord(csvLine,i,whereToStoreItems,512);
-                         fprintf(stderr,"Column %u / %s \n",i,whereToStoreItems);
+                         fprintf(stderr,"Column %u / %s => ",i,whereToStoreItems);
                          unsigned int length = strlen(whereToStoreItems);
                          if (length>10)
                          {
@@ -516,7 +516,7 @@ int bvh_ImportCSVPoses(
                                fprintf(stderr,"CSV file does not have the label format expected..!\n");
                                break;
                            }
-                           fprintf(stderr,"Joint %s / DoF %s \n",jointName,dof);
+                           fprintf(stderr,"Joint %s / DoF %s => ",jointName,dof);
                            //========================================================================
                            //Resolve degree of freedom..
                            //========================================================================
