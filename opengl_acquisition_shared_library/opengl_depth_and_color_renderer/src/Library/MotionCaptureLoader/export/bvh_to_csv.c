@@ -426,7 +426,7 @@ unsigned int countLinesInFile(const char *filename, size_t block_size)
 
 
 
-// ./BVHTester --from lhand.qbvh --importCSVPoses sobolLHand_131072.csv --csv ./ lhand.csv 2d+3d+bvh
+// ./BVHTester --from lhand.qbvh --importCSVPoses sobolLHand_131072.csv --csv ./ lhand_all.csv 2d+3d+bvh
 int bvh_ImportCSVPoses(
                         struct BVH_MotionCapture * mc,
                         const char * filenameOfCSVFile
