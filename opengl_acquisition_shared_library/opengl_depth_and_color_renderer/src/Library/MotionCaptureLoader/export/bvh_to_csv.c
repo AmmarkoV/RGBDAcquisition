@@ -489,7 +489,7 @@ int bvh_ImportCSVPoses(
                        numberOfHeaderParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                        fprintf(stderr,"numberOfHeaderParameters %u \n",numberOfHeaderParameters);
 
-                       if (!bvh_GrowMocapFileByCopyingExistingMotions(mc,lineCount-1))
+                       if (!bvh_GrowMocapFileByCopyingExistingMotions(mc,lineCount-2))
                        {
                         fprintf(stderr,"Could not grow motion capture..!\n");
                         break;
