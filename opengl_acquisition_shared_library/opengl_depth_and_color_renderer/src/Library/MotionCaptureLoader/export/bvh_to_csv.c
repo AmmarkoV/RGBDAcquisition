@@ -467,7 +467,7 @@ int bvh_ImportCSVPoses(
                        if (lineNumber%10==0)
                         { fprintf(stderr,"\r   %s - Exporting Frame %u/%u %0.2f%%         \r",filenameOfCSVFile,lineNumber,lineCount,(float) (100*lineNumber)/lineCount); }
 
-                          fID = lineNumber;
+                          fID = lineNumber-1;
                           int numberOfRowParameters = InputParser_SeperateWordsCC(csvLine,line,1);
                           if (numberOfRowParameters!=numberOfHeaderParameters)
                           {
