@@ -74,14 +74,14 @@ int writeBVHHierarchyOpenningSection(
   {//----------------------------------------------------------------------------------------------
    indent(fp,in);
    fprintf(
-           fp,"CHANNELS %u ",
+           fp,"CHANNELS %u",
            mc->jointHierarchy[jID].loadedChannels
           );
 
    unsigned int channelID=0;
    for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
    {
-     fprintf(fp,"%s ",channelNames[(unsigned int)mc->jointHierarchy[jID].channelType[channelID]]);
+     fprintf(fp," %s",channelNames[(unsigned int)mc->jointHierarchy[jID].channelType[channelID]]);
    }
    fprintf(fp,"\n");
 
