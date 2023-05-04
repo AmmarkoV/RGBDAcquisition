@@ -667,6 +667,9 @@ float bvhConverter_IKFineTune(
              //fprintf(stderr,"Number %u => %s with %0.2f \n",i,labels[i],values[i] );
              snprintf(jointName,512,"%s",labels[i]);
              char * delimeter = strchr(jointName,'_');
+
+             if (delimeter!=0)
+             {
              *delimeter = 0;
              char * coord = jointName;
              char * dof   = delimeter+1;
@@ -694,6 +697,9 @@ float bvhConverter_IKFineTune(
                   //fprintf(stderr,RED "IK: Could not resolve Joint %s for Number %u => %s with %0.2f \n" NORMAL,dof,i,labels[i],values[i] );
                 }
             }//2DX/Y
+
+           } //Tag has an _ and we process it
+
          }//Loop over received elements
 
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(
