@@ -483,6 +483,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
                                           atomicSolution,
                                           &bvhTransformAtomic
                                          );
+            fprintf(stderr,GREEN "Done Initializing Body Problem ..\n" NORMAL);
            }
       problem = atomicBodyProblem;
     } else
@@ -501,6 +502,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
                                         &bvhTransformAtomic,
                                         1
                                        );
+            fprintf(stderr,GREEN "Done Initializing Face Problem ..\n" NORMAL);
            }
       problem = atomicFaceProblem;
     } else
@@ -519,6 +521,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
                                           &bvhTransformAtomic,
                                           1
                                          );
+            fprintf(stderr,GREEN "Done Initializing RHand Problem ..\n" NORMAL);
            }
        problem = atomicRHandProblem;
     } else
@@ -537,6 +540,7 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
                                           &bvhTransformAtomic,
                                           1
                                          );
+            fprintf(stderr,GREEN "Done Initializing LHand Problem ..\n" NORMAL);
            }
        problem = atomicLHandProblem;
     }

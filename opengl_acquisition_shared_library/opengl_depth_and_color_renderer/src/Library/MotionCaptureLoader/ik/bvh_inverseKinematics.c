@@ -354,6 +354,7 @@ int viewProblem(struct ikProblem * problem)
         }
         fprintf(stderr,"\n");
     }
+    fprintf(stderr,"End of problem " GREEN "\"%s\"" NORMAL " \n",problem->problemDescription); //problem->numberOfGroups
 
     return 1;
 }
