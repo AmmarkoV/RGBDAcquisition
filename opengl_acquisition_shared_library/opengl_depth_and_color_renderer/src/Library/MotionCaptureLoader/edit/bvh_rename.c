@@ -239,7 +239,7 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
     for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
         {
             char * jOr = bvhMotion->jointHierarchy[jID].jointName;
-            char * jN = bvhMotion->jointHierarchy[jID].jointNameLowercase;
+            char * jN  = bvhMotion->jointHierarchy[jID].jointNameLowercase;
             if (jN!=0)
                 {
                     //This is already lowercase
