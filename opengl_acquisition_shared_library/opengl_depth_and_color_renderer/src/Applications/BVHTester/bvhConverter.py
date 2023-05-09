@@ -389,10 +389,7 @@ class BVH():
     return result==1
 
    #return dict()  
-  #--------------------------------------------------------
-
-
-int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
+  #-------------------------------------------------------- 
 
 
 
