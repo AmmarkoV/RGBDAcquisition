@@ -380,6 +380,21 @@ class BVH():
    #return dict()  
   #--------------------------------------------------------
 
+  def smooth(self,frameID=0,fSampling=30.0,fCutoff=5.0):
+    self.stage("smooth ")
+    #This call assumes that is called after subsequent(?) calls to fineTuneToMatch that have transmitted the BVH state..!
+    self.libBVH.bvhConverter_smooth.argtypes = [ctypes.c_int, ctypes.c_float, ctypes.c_float]
+    self.libBVH.bvhConverter_smooth.restype  = ctypes.c_int
+    result = self.libBVH.bvhConverter_smooth(frameID,fSampling,fCutoff)
+    return result==1
+
+   #return dict()  
+  #--------------------------------------------------------
+
+
+int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
+
+
 
 if __name__== "__main__": 
    bvhFile = BVH(bvhPath="./headerWithHeadAndOneMotion.bvh",forceLibUpdate=True) 

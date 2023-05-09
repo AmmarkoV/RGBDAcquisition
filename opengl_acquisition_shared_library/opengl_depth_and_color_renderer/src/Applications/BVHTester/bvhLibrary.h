@@ -52,6 +52,9 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID);
 float bvhConverter_IKFineTune(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID,int iterations,int epochs,float lr,float fSampling,float fCutoff,float langevinDynamics);
 
+
+int bvhConverter_smooth(int frameID,float fSampling,float fCutoff);
+
 int bvhConverter(int argc,const char **argv);
 
 #ifdef __cplusplus

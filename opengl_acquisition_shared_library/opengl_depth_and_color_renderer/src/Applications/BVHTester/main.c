@@ -584,26 +584,29 @@ float bvhConverter_IKFineTune(
   float initialMAEInMM     = 0.0;
   float finalMAEInMM       = 0.0;
   //-----------------------------
+  //By default select no problem..
+  struct ikProblem * selectedProblem  = 0;
+  //-----------------------------
   int initializeIK = 0;
   if (strcmp(bodyPart,"body")==0)
     {
-       if (atomicBodyProblem==0)
-           { initializeIK=1; }
+       selectedProblem = atomicBodyProblem;
+       if (atomicBodyProblem==0)   { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"rhand")==0)
     {
-       if (atomicRHandProblem==0)
-           { initializeIK=1; }
+       selectedProblem = atomicRHandProblem;
+       if (atomicRHandProblem==0)  { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"lhand")==0)
     {
-       if (atomicLHandProblem==0)
-           { initializeIK=1; }
+       selectedProblem = atomicLHandProblem;
+       if (atomicLHandProblem==0)  { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"face")==0)
     {
-       if (atomicFaceProblem==0)
-           { initializeIK=1; }
+       selectedProblem = 0;//Just run Butterworth, no face IK
+       if (atomicFaceProblem==0)   { initializeIK=1; }
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
@@ -639,7 +642,7 @@ float bvhConverter_IKFineTune(
          //======================================================================================================
          //======================================================================================================
          //======================================================================================================
-        if (strcmp(bodyPart,"body")==0)
+        if ( (strcmp(bodyPart,"body")==0) || (strcmp(bodyPart,"lhand")==0) || (strcmp(bodyPart,"rhand")==0) )
         {
          //Keep history..!
          copyMotionBuffer(atomicPenultimateSolution,atomicPreviousSolution);
@@ -705,7 +708,7 @@ float bvhConverter_IKFineTune(
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(
                                                                      &bvhAtomicMotion,
                                                                      &rendererAtomic,
-                                                                     atomicBodyProblem,
+                                                                     selectedProblem,
                                                                      &ikConfig,
                                                                      //----------------
                                                                      atomicPenultimateSolution,
@@ -724,13 +727,15 @@ float bvhConverter_IKFineTune(
                                                                     )
             )
             {
+
+              /*  No longer automatically do this to avoid multiple smoothings per frame
               if ( (fSampling>0.0) && (fCutoff>0.0) )
               { //Only perform smoothing if sampling/cutoff is set..
                for (int mID=0; mID<atomicSolution->bufferSize; mID++)
                {
                    atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
                }
-              }
+              }*/
 
 
 
@@ -756,7 +761,33 @@ float bvhConverter_IKFineTune(
 }
 
 
+int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
+{
+   if ( (fSampling>0.0) && (fCutoff>0.0) )
+              { //Only perform smoothing if sampling/cutoff is set..
+               for (int mID=0; mID<atomicSolution->bufferSize; mID++)
+               {
+                   atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
+               }
 
+
+
+              if(!bvh_copyMotionBufferToMotionFrame(
+                                                    &bvhAtomicMotion,
+                                                    frameID,
+                                                    atomicSolution
+                                                   )
+                )
+                {
+                    fprintf(stderr,RED "Failed bvh_copyMotionBufferToMotionFrame\n" NORMAL);
+                }
+
+                //Perform and update projections for new results..!
+                bvhConverter_processFrame(frameID);
+                return 1;
+              }
+  return 0;
+}
 
 
 

@@ -138,6 +138,7 @@ int bvhMeasureIterationInfluence(
     {
 
       for (unsigned int startFrame=60; startFrame<mc->numberOfFrames; startFrame+=30)
+      {
       for (unsigned int testIteration=0; testIteration<4; testIteration++)
       {
         fIDTarget = startFrame;
@@ -314,6 +315,7 @@ int bvhMeasureIterationInfluence(
         }
 
        fprintf(stdout,"\n\n");
+      }
       } //Test loop
         freeMotionBuffer(&previousSolution);
         previousSolution = 0; // Double make sure that variable is clean
