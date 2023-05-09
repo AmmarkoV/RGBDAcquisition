@@ -612,9 +612,13 @@ float bvhConverter_IKFineTune(
     //--------------------------------------------------------------------------
     if (initializeIK)
     {
+     bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);
+    }
+
+    if (atomicSmoothingFilter==0)
+    {
      fprintf(stderr,"Butterworth Smoothing filter initialized with fSampling:%0.2f and fCutoff:%0.2f \n",fSampling,fCutoff);
      atomicSmoothingFilter = butterWorth_allocate(bvhAtomicMotion.numberOfValuesPerFrame,fSampling,fCutoff);
-     bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
@@ -763,29 +767,34 @@ float bvhConverter_IKFineTune(
 
 int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
 {
-   if ( (fSampling>0.0) && (fCutoff>0.0) )
-              { //Only perform smoothing if sampling/cutoff is set..
-               for (int mID=0; mID<atomicSolution->bufferSize; mID++)
+ if (atomicSolution==0) { fprintf(stderr,RED "bvhConverter_smooth has no solution to work with..\n" NORMAL); return 0; }
+ if (atomicSmoothingFilter==0) { fprintf(stderr,RED "bvhConverter_smooth has no initialized filter to work with..\n" NORMAL); return 0; }
+
+ if ( (fSampling>0.0) && (fCutoff>0.0) )
+   { //Only perform smoothing if sampling/cutoff is set..
+    fprintf(stderr,GREEN "bvhConverter_smooth going through motions\n" NORMAL);
+    for (int mID=0; mID<atomicSolution->bufferSize; mID++)
                {
                    atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
                }
 
 
 
-              if(!bvh_copyMotionBufferToMotionFrame(
-                                                    &bvhAtomicMotion,
-                                                    frameID,
-                                                    atomicSolution
-                                                   )
+    fprintf(stderr,GREEN "copyback..\n" NORMAL);
+    if(!bvh_copyMotionBufferToMotionFrame(
+                                          &bvhAtomicMotion,
+                                          frameID,
+                                          atomicSolution
+                                         )
                 )
                 {
                     fprintf(stderr,RED "Failed bvh_copyMotionBufferToMotionFrame\n" NORMAL);
                 }
 
-                //Perform and update projections for new results..!
-                bvhConverter_processFrame(frameID);
-                return 1;
-              }
+     //Perform and update projections for new results..!
+     bvhConverter_processFrame(frameID);
+     return 1;
+   }
   return 0;
 }
 
