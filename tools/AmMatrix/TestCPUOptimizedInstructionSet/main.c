@@ -26,6 +26,7 @@ unsigned long GetTickCountMicrosecondsMN()
 
 int main()
 {
+
     if (!codeHasSSE())
     {
       printf("SSE code is not compiled in..\n");
@@ -55,7 +56,7 @@ int main()
         matrixB.m[1] = tmp;
         
         unsigned long startUnoptimized = GetTickCountMicrosecondsMN();
-        multiplyTwo4x4FMatrices_Naive(testResultUnoptimized.m,matrixA.m,matrixB.m);
+        //multiplyTwo4x4FMatrices_Naive(testResultUnoptimized.m,matrixA.m,matrixB.m);
         unsigned long endUnoptimized = GetTickCountMicrosecondsMN();
         unoptimizedTime+=endUnoptimized - startUnoptimized;
 

@@ -5,7 +5,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
  
-add_executable(TestCPUOptimizedInstructionSet main.c )  
+add_executable(TestCPUOptimizedInstructionSet main.c ../matrix4x4Tools.c )  
 target_link_libraries(TestCPUOptimizedInstructionSet rt dl m AmMatrix )
 set_target_properties(TestCPUOptimizedInstructionSet PROPERTIES DEBUG_POSTFIX "D")
 add_dependencies(TestCPUOptimizedInstructionSet AmMatrix) 
