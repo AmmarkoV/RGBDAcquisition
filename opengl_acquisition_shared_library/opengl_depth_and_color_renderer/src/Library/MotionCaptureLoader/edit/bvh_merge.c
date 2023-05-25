@@ -104,8 +104,8 @@ int bvh_mergeWith(
      {
        for (unsigned int sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
        {
-         unsigned int sourceJID=sourceMC->motionToJointLookup[sourceMID].jointID;// channelIDMotionOffset
-         unsigned int channel=sourceMC->motionToJointLookup[sourceMID].channelID;
+         unsigned int sourceJID = sourceMC->motionToJointLookup[sourceMID].jointID;// channelIDMotionOffset
+         unsigned int channel   = sourceMC->motionToJointLookup[sourceMID].channelID;
          if (rules.jointAssociationSourceToTargetExists[sourceJID])
          {
              unsigned int targetJID=rules.jointAssociationSourceToTarget[sourceJID];
