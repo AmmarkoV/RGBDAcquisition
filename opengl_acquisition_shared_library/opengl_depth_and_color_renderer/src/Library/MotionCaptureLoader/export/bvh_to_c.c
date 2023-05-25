@@ -15,7 +15,8 @@ void bvh_print_profile(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"\n\n\n\n#PROFILE \n");
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
-   fprintf(stdout,"JOINT_ASSOCIATION_SAME(%s)\n",bvhMotion->jointHierarchy[i].jointName);
+    if (!bvhMotion->jointHierarchy[i].isEndSite)
+        { fprintf(stdout,"JOINT_ASSOCIATION_SAME(%s)\n",bvhMotion->jointHierarchy[i].jointName); }
   }
 }
 
