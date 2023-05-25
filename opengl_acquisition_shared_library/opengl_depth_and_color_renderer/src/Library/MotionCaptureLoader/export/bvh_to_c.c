@@ -1,6 +1,6 @@
 #include "bvh_to_c.h"
 #include "../edit/bvh_rename.h"
-#include <stdio.h> 
+#include <stdio.h>
 
 
 #define NORMAL   "\033[0m"
@@ -8,6 +8,24 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
+
+
+void bvh_print_profile(struct BVH_MotionCapture * bvhMotion)
+{
+  fprintf(stdout,"\n\n\n\n#PROFILE \n");
+  for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+   fprintf(stdout,"JOINT_ASSOCIATION_SAME(%s)\n",bvhMotion->jointHierarchy[i].jointName);
+  }
+}
+
+
+
+
+
+
+
+
 
 void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 {
@@ -34,8 +52,8 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 
     if (bvhMotion->jointHierarchy[i].hasRotationalChannels)
         {
-           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation) 
-           { 
+           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation)
+           {
             coord='W'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
             ++countOfChannels;
            }
@@ -92,8 +110,8 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//2 \n",label);
 
-           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation) 
-           { 
+           if (bvhMotion->jointHierarchy[i].hasQuaternionRotation)
+           {
             coord='W'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
             uppercase(label);
             fprintf(stdout,"BVH_MOTION_%s,//3 \n",label);
@@ -200,9 +218,9 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   for (unsigned int i=0; i<bvhMotion->jointHierarchySize; i++)
   {
      snprintf(label,512,"%s",bvhMotion->jointHierarchy[i].jointName);
-     uppercase(label); 
+     uppercase(label);
      fprintf(stdout,"BVH_JOINT_%s%c//%u \n",label,comma,countOfChannels);
-     ++countOfChannels; 
+     ++countOfChannels;
   }
   fprintf(stdout,"};\n\n\n");
 

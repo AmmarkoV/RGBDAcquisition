@@ -1011,6 +1011,10 @@ int bvhConverter(int argc,const char **argv)
         {
           bvh_print_C_Header(&bvhMotion);
         } else
+        if (strcmp(argv[i],"--printprofile")==0)
+        {
+          bvh_print_profile(&bvhMotion);
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--extractmotionrangeforlistoffiles")==0)
         {
