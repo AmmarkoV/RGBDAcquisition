@@ -1057,3 +1057,11 @@ int bvh_study3DJoint2DImpact(
   return 0;
 }
 
+
+
+int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,const char * to)
+{
+
+  return 0;
+}
+

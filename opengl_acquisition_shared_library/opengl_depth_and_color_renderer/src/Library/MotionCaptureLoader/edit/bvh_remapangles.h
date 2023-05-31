@@ -75,6 +75,8 @@ int bvh_study3DJoint2DImpact(
                            float *resolution
                           );
 
+
+int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,const char * to);
 #ifdef __cplusplus
 }
 #endif
