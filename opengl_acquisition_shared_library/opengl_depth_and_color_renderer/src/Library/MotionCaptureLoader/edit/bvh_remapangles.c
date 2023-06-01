@@ -1065,11 +1065,11 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
   float orgZ = *z;
 
   //XYZ -> X-ZY
-  if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
+  if ( (strcmp(from,"XYZ")==0)&& (strcmp(to,"X-ZY")==0) )
   {
     *x =  orgX;
-    *y = -orgZ;
-    *z =  orgY;
+    *y = orgZ;
+    *z = -orgY;
     return 1;
   } else
   {
@@ -1082,24 +1082,24 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
 
 int swapRotationalChannels(struct BVH_MotionCapture * bvh,BVHJointID jID,float * rX,float *rY, float *rZ,const char * from,const char * to)
 {
-  float orgX = *x;
-  float orgY = *y;
-  float orgZ = *z;
+  float orgX = *rX;
+  float orgY = *rY;
+  float orgZ = *rZ;
 
-  if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
+  if ( (strcmp(from,"XYZ")==0)&& (strcmp(to,"X-ZY")==0) )
   {
-  if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
-          {
-             *rX =  orgX;
-             *rY = -orgZ;
-             *rZ =  orgY;
-             return 1;
-          } else
   if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZYX )
           {
              *rX =  orgX;
-             *rY = -orgZ;
-             *rZ =  orgY;
+             *rY =  orgZ;
+             *rZ = -orgY;
+             return 1;
+          } else
+  if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
+          {
+             *rX = -orgY;
+             *rY =  orgZ;
+             *rZ =  orgX;
              return 1;
           } else
           {
@@ -1149,6 +1149,8 @@ int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,
     }
   }
 
-  return 0;
+  fprintf(stderr,"bvh_coordinateSystemChange finished\n");
+
+  return 1;
 }
 

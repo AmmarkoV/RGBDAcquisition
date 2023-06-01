@@ -1471,6 +1471,7 @@ int bvhConverter(int argc,const char **argv)
           //This call will try to do the coordinate change to return to our coordinate system
           //among other things : ( https://projects.blender.org/blender/blender-addons/issues/104549 )
           //hopefully this will solve the most major discrepancies..
+          //./BVHTester --from BLENDERheaderWithHeadAndOneMotionTEST.bvh --blenderCoordinateSystemChange --bvh test.bvh
           bvh_coordinateSystemChange(&bvhMotion,"XYZ","X-ZY");
         } else
         //-----------------------------------------------------
