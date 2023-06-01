@@ -62,12 +62,15 @@ int writeBVHHierarchyOpenningSection(
 
   ++in;
   indent(fp,in);
-  fprintf(
-          fp,"OFFSET %f %f %f\n",
-          mc->jointHierarchy[jID].offset[0],
-          mc->jointHierarchy[jID].offset[1],
-          mc->jointHierarchy[jID].offset[2]
-         );
+  //Write offset usign the least possible filesize
+  fprintf(fp,"OFFSET");
+  if (mc->jointHierarchy[jID].offset[0]!=0.0) { fprintf(fp," %f",mc->jointHierarchy[jID].offset[0]);   } else
+                                              { fprintf(fp," 0");   }
+  if (mc->jointHierarchy[jID].offset[1]!=0.0) { fprintf(fp," %f",mc->jointHierarchy[jID].offset[1]);   } else
+                                              { fprintf(fp," 0");   }
+  if (mc->jointHierarchy[jID].offset[2]!=0.0) { fprintf(fp," %f\n",mc->jointHierarchy[jID].offset[2]); } else
+                                              { fprintf(fp," 0\n"); }
+
 
 
   if (!mc->jointHierarchy[jID].isEndSite)

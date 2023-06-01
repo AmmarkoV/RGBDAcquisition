@@ -1040,8 +1040,6 @@ int bvh_study3DJoint2DImpact(
       i = system(command);
       //----------------------
 
-
-
       //----------------------
       //Remove intermediate data file which is large
       //----------------------
@@ -1050,13 +1048,23 @@ int bvh_study3DJoint2DImpact(
       i = system(command);
       //----------------------
 
-
       return (i==0);
   }
 
   return 0;
 }
 
+
+//It appears that when the coordinate change happens
+//there are some unwanted artifacts, by rounding down small
+//values appears to help with this..
+void roundChannel(float * value)
+{
+  if ( (-0.001<*value) && (*value<0.001) )
+  {
+    *value = 0.0;
+  }
+}
 
 int swapPositionalChannels(float * x,float *y, float *z,const char * from,const char * to)
 {
@@ -1070,6 +1078,10 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
     *x =  orgX;
     *y = orgZ;
     *z = -orgY;
+
+    roundChannel(x);
+    roundChannel(y);
+    roundChannel(z);
     return 1;
   } else
   {
@@ -1093,13 +1105,23 @@ int swapRotationalChannels(struct BVH_MotionCapture * bvh,BVHJointID jID,float *
              *rX =  orgX;
              *rY =  orgZ;
              *rZ = -orgY;
+             roundChannel(rX);
+             roundChannel(rY);
+             roundChannel(rZ);
              return 1;
           } else
   if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
           {
-             *rX = -orgY;
+             //This was using the test.bvh
+             //*rX = -orgY;
+             //*rY =  orgZ;
+             //*rZ =  orgX;
+             *rX =  orgX;
              *rY =  orgZ;
-             *rZ =  orgX;
+             *rZ = -orgY;
+             roundChannel(rX);
+             roundChannel(rY);
+             roundChannel(rZ);
              return 1;
           } else
           {
@@ -1153,4 +1175,10 @@ int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,
 
   return 1;
 }
+
+
+
+
+
+
 
