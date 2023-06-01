@@ -1060,14 +1060,14 @@ int bvh_study3DJoint2DImpact(
 
 int swapPositionalChannels(float * x,float *y, float *z,const char * from,const char * to)
 {
+  float rX = *x;
+  float rY = *y;
+  float rZ = *z;
+
   //XYZ -> X-ZY
   if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
   {
-    //float rX = *x;
-    float rY = *y;
-    float rZ = *z;
-
-    //*x = rX;
+    *x =  rX;
     *y = -rZ;
     *z =  rY;
     return 1;
@@ -1080,13 +1080,17 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
 }
 
 
-int swapRotationalChannels(float * x,float *y, float *z,const char * from,const char * to)
+int swapRotationalChannels(struct BVH_MotionCapture * bvh,BVHJointID jID,float * rX,float *rY, float *rZ,const char * from,const char * to)
 {
-    if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
+  float rX = *x;
+  float rY = *y;
+  float rZ = *z;
+
+  if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
           {
               //DO SWAP
           } else
-    if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZYX )
+  if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZYX )
           {
               //DO SWAP
           } else
@@ -1114,13 +1118,22 @@ int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,
     {
       if (bvh->jointHierarchy[jID].hasPositionalChannels)
       {
-       fprintf(stderr,"TODO: also swap positonal channels in motion part\n");
+        //---------------------------------------------------------------------------------------------------------------
+        BVHMotionChannelID posX = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_POSITION_X);
+        BVHMotionChannelID posY = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_POSITION_Y);
+        BVHMotionChannelID posZ = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_POSITION_Z);
+        swapPositionalChannels(&bvh->motionValues[posX],&bvh->motionValues[posY],&bvh->motionValues[posZ],from,to);
+        //---------------------------------------------------------------------------------------------------------------
       }
       if (bvh->jointHierarchy[jID].hasRotationalChannels)
       {
-
+        //---------------------------------------------------------------------------------------------------------------
+        BVHMotionChannelID posRX = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_ROTATION_X);
+        BVHMotionChannelID posRY = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_ROTATION_Y);
+        BVHMotionChannelID posRZ = bvh_resolveFrameAndJointAndChannelToMotionID(bvh,jID,frameID,BVH_ROTATION_Z);
+        swapRotationalChannels(bvh,jID,&bvh->motionValues[posRX],&bvh->motionValues[posRY],&bvh->motionValues[posRZ],from,to);
+        //---------------------------------------------------------------------------------------------------------------
       }
-
     }
   }
 
