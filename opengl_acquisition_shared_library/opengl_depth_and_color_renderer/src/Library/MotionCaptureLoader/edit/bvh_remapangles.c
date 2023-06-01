@@ -1060,16 +1060,16 @@ int bvh_study3DJoint2DImpact(
 
 int swapPositionalChannels(float * x,float *y, float *z,const char * from,const char * to)
 {
-  float rX = *x;
-  float rY = *y;
-  float rZ = *z;
+  float orgX = *x;
+  float orgY = *y;
+  float orgZ = *z;
 
   //XYZ -> X-ZY
   if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
   {
-    *x =  rX;
-    *y = -rZ;
-    *z =  rY;
+    *x =  orgX;
+    *y = -orgZ;
+    *z =  orgY;
     return 1;
   } else
   {
@@ -1082,22 +1082,34 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
 
 int swapRotationalChannels(struct BVH_MotionCapture * bvh,BVHJointID jID,float * rX,float *rY, float *rZ,const char * from,const char * to)
 {
-  float rX = *x;
-  float rY = *y;
-  float rZ = *z;
+  float orgX = *x;
+  float orgY = *y;
+  float orgZ = *z;
 
+  if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
+  {
   if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
           {
-              //DO SWAP
+             *rX =  orgX;
+             *rY = -orgZ;
+             *rZ =  orgY;
+             return 1;
           } else
   if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZYX )
           {
-              //DO SWAP
+             *rX =  orgX;
+             *rY = -orgZ;
+             *rZ =  orgY;
+             return 1;
           } else
           {
             fprintf(stderr,"Not implemented rotational swap from %s to %s for \n",from,to);
           }
-     return 0;
+  } else
+  {
+    fprintf(stderr,"Not implemented rotational swap from %s to %s\n",from,to);
+  }
+  return 0;
 }
 
 int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,const char * to)
