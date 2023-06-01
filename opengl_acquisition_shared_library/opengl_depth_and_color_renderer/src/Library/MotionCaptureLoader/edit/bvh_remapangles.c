@@ -1070,14 +1070,31 @@ int swapPositionalChannels(float * x,float *y, float *z,const char * from,const 
     //*x = rX;
     *y = -rZ;
     *z =  rY;
+    return 1;
   } else
   {
-    fprintf(stderr,"Unknown positional swap from %s to %s\n",from,to);
+    fprintf(stderr,"Not implemented positional swap from %s to %s\n",from,to);
   }
 
   return 0;
 }
 
+
+int swapRotationalChannels(float * x,float *y, float *z,const char * from,const char * to)
+{
+    if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZXY )
+          {
+              //DO SWAP
+          } else
+    if ( bvh->jointHierarchy[jID].channelRotationOrder == BVH_ROTATION_ORDER_ZYX )
+          {
+              //DO SWAP
+          } else
+          {
+            fprintf(stderr,"Not implemented rotational swap from %s to %s for \n",from,to);
+          }
+     return 0;
+}
 
 int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,const char * to)
 {
@@ -1090,13 +1107,19 @@ int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,
       swapPositionalChannels(&bvh->jointHierarchy[jID].offset[0],&bvh->jointHierarchy[jID].offset[1],&bvh->jointHierarchy[jID].offset[2],from,to);
     }
 
-
+  //After swapping positional offsets now to swap rotational offsets
   for (frameID = 0; frameID < bvh->numberOfFramesEncountered; frameID++)
   {
     for (jID=0; jID<bvh->jointHierarchySize; jID++)
     {
-      bvh->jointHierarchy[jID].offset;
+      if (bvh->jointHierarchy[jID].hasPositionalChannels)
+      {
+       fprintf(stderr,"TODO: also swap positonal channels in motion part\n");
+      }
+      if (bvh->jointHierarchy[jID].hasRotationalChannels)
+      {
 
+      }
 
     }
   }
