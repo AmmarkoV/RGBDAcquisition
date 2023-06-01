@@ -1058,9 +1058,48 @@ int bvh_study3DJoint2DImpact(
 }
 
 
+int swapPositionalChannels(float * x,float *y, float *z,const char * from,const char * to)
+{
+  //XYZ -> X-ZY
+  if ( (strcmp(from,"XYZ")==0)&& (strcmp(from,"X-ZY")==0) )
+  {
+    //float rX = *x;
+    float rY = *y;
+    float rZ = *z;
+
+    //*x = rX;
+    *y = -rZ;
+    *z =  rY;
+  } else
+  {
+    fprintf(stderr,"Unknown positional swap from %s to %s\n",from,to);
+  }
+
+  return 0;
+}
+
 
 int bvh_coordinateSystemChange(struct BVH_MotionCapture * bvh,const char * from,const char * to)
 {
+  BVHFrameID frameID = 0;
+  BVHJointID jID = 0;
+
+  //First swap positional offsets
+  for (jID=0; jID<bvh->jointHierarchySize; jID++)
+    {
+      swapPositionalChannels(&bvh->jointHierarchy[jID].offset[0],&bvh->jointHierarchy[jID].offset[1],&bvh->jointHierarchy[jID].offset[2],from,to);
+    }
+
+
+  for (frameID = 0; frameID < bvh->numberOfFramesEncountered; frameID++)
+  {
+    for (jID=0; jID<bvh->jointHierarchySize; jID++)
+    {
+      bvh->jointHierarchy[jID].offset;
+
+
+    }
+  }
 
   return 0;
 }

@@ -1465,6 +1465,15 @@ int bvhConverter(int argc,const char **argv)
           }
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--blenderCoordinateSystemChange")==0)
+        {
+          //Blender uses a different coordinate system for the BVH files
+          //This call will try to do the coordinate change to return to our coordinate system
+          //among other things : ( https://projects.blender.org/blender/blender-addons/issues/104549 )
+          //hopefully this will solve the most major discrepancies..
+          bvh_coordinateSystemChange(&bvhMotion,"XYZ","X-ZY");
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--swap")==0)
         {
           if (i+2>=argc)  { incorrectArguments(); }
