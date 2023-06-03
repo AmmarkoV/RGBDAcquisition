@@ -1484,7 +1484,8 @@ int prepareDefaultBodyProblem(
      addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
      ++correct; checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",        MINIMAL_IMPORTANCE,   OPTIMIZE_JOINT);
      //                                  minX/maxX     minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
+     //Original values where .. addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
+     addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -164.0,110.0,   -35.64,47.64); //changed to mirror right hand
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       MEDIUM_IMPORTANCE,       OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, VERY_HIGH_IMPORTANCE,    END_EFFECTOR);
     //-------------------------------------------------------------
