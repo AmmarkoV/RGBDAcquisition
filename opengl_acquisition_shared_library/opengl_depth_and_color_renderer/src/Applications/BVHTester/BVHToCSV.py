@@ -73,7 +73,20 @@ def bvh_to_csv(bvh_file_path_in,csv_file_path_out):
     f.close()
 
 
-# Example usage
-bvh_to_csv('headerWithHeadAndOneMotion.bvh','headerWithHeadAndOneMotion.csv')
+if __name__ == '__main__':
+      import sys
+      if (len(sys.argv)>1):
+        for i in range(1,len(sys.argv)):
+         baseFilename = sys.argv[i]
+         if (".bvh" in baseFilename):
+            print("Will convert ",baseFilename)
+            targetFilename = "%s.csv" % (baseFilename.rsplit(".")[0]) 
+            print("To ",targetFilename)
+            bvh_to_csv(baseFilename,targetFilename)
+         else:
+            print("Will NOT convert ",baseFilename," it does not have a .bvh extension")
+      else:
+         raise ValueError('Please call the utility with a single path of BVH file\n')
+
 
 
