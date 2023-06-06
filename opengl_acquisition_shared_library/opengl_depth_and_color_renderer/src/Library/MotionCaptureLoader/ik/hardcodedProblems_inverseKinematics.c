@@ -988,7 +988,7 @@ int prepareDefaultLeftHandProblem(
       addLimitsToNextPartOfChain(&data,  -103.6,104.2,  -192.3,194.6,  -194.54,194.91);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",0.5,OPTIMIZE_JOINT);
       //                                   minX/maxX     minY/maxY     minZ/maxZ
-      addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,15.7,   -12.36,47.64);
+      addLimitsToNextPartOfChain(&data,  -68.5,9.5,    -163.7,110.0,   -35.64,47.64);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",1.0,OPTIMIZE_JOINT);
       //                                   minX/maxX     minY/maxY     minZ/maxZ
       addLimitsToNextPartOfChain(&data, -10.0,180.0,    -20.0,20.0,     -60.0,60.0);
