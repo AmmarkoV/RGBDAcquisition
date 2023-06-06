@@ -5,8 +5,7 @@ import os
 import sys
 from ctypes import *
 from os.path import exists
-
-
+  
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -16,6 +15,144 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+#This mimics the calibration files like ;
+# https://github.com/AmmarkoV/RGBDAcquisition/blob/master/tools/Calibration/calibration.c
+def readCalibrationFromFile(filename):
+    calib = dict()
+    if filename is None:
+        return calib
+
+    fp = None
+    try:
+        fp = open(filename, "r")
+    except IOError:
+        return calib
+
+    # Our state
+    # ----------------------------
+    i = 0
+    category = 0
+    line_length = 0
+    lines_at_current_category = 0
+    # ----------------------------
+
+
+    for line in fp:
+        #--------------------------------------
+        line = line.rstrip("\r\n")
+        line_length = len(line)
+        #--------------------------------------
+        if line_length > 0:
+            if line[line_length - 1] == '\n':
+                line = line[:-1]
+            if line[line_length - 1] == '\r':
+                line = line[:-1]
+        #--------------------------------------
+        if line_length > 1:
+            if line[line_length - 2] == '\n':
+                line = line[:-2]
+            if line[line_length - 2] == '\r':
+                line = line[:-2]
+        #--------------------------------------
+        if line[0] == '%':
+            lines_at_current_category = 0
+        #--------------------------------------
+        # ---------------------------- ---------------------------- ----------------------------  
+        if line == "%I":
+            category = 1
+            calib["intrinsic"] = list()
+        elif line == "%D":
+            category = 2
+        elif line == "%T":
+            category = 3
+            calib["extrinsicTranslation"] = list()
+        elif line == "%R":
+            category = 4
+            calib["extrinsicRotationRodriguez"] = list()
+        elif line == "%NF":
+            category = 5
+        elif line == "%UNIT":
+            category = 6
+        elif line == "%RT4*4":
+            category = 7
+            calib["extrinsic"] = list()
+        elif line == "%Width":
+            category = 8
+        elif line == "%Height":
+            category = 9
+        else:
+        # ---------------------------- ---------------------------- ----------------------------  
+            if category == 1:
+                calib["intrinsicParametersSet"] = 1
+                lines_at_current_category = min(lines_at_current_category, 9)
+                calib["intrinsic"].append(float(line))
+                lines_at_current_category += 1
+                if (lines_at_current_category==9):
+                                                   category = 0
+            elif category == 2:
+                if lines_at_current_category == 0:
+                    calib["k1"] = float(line)
+                elif lines_at_current_category == 1:
+                    calib["k2"] = float(line)
+                elif lines_at_current_category == 2:
+                    calib["p1"] = float(line)
+                elif lines_at_current_category == 3:
+                    calib["p2"] = float(line)
+                elif lines_at_current_category == 4:
+                    calib["k3"] = float(line)
+                lines_at_current_category += 1
+                if (lines_at_current_category==4):
+                                                   category = 0
+            elif category == 3:
+                calib["extrinsicParametersSet"] = 1
+                lines_at_current_category = min(lines_at_current_category, 3)
+                calib["extrinsicTranslation"].append(float(line))
+                lines_at_current_category += 1
+                if (lines_at_current_category==3):
+                                                   category = 0
+            elif category == 4:
+                lines_at_current_category = min(lines_at_current_category, 3)
+                calib["extrinsicRotationRodriguez"].append(float(line))
+                lines_at_current_category += 1
+                if (lines_at_current_category==3):
+                                                   category = 0
+            elif category == 5:
+                calib["nearPlane"] = float(line)
+                category = 0
+            elif category == 6:
+                calib["farPlane"] = float(line)
+                category = 0
+            elif category == 7:
+                lines_at_current_category = min(lines_at_current_category, 16)
+                calib["extrinsic"].append(float(line))
+                lines_at_current_category += 1
+                category = 0
+            elif category == 8:
+                    calib["width"] = int(line)
+                    category = 0
+            elif category == 9:
+                    calib["height"] = int(line)
+                    category = 0
+        # ---------------------------- ---------------------------- ----------------------------  
+
+    fp.close()
+
+    try:
+        calib["fX"] = calib["intrinsic"][0]
+        calib["fY"] = calib["intrinsic"][4]
+        calib["cX"] = calib["intrinsic"][2]
+        calib["cY"] = calib["intrinsic"][5] 
+    except:
+        print("No intrinsic matrix declared in ", filename)
+        print("Cannot populate fX, fY, cX, cY")
+   
+  
+    print("New calibration loaded : ",calib)
+
+    return calib
+
 
 
 def loadLibrary(filename,relativePath="",forceUpdate=False):
@@ -45,8 +182,6 @@ def loadLibrary(filename,relativePath="",forceUpdate=False):
 
 
 def splitDictionaryInLabelsAndFloats(arguments):
-    
-
     #First prepare the labels of the joints we want to transmit
     #-------------------------------------------------- 
     labels = list(arguments.keys())
@@ -70,7 +205,11 @@ def splitDictionaryInLabelsAndFloats(arguments):
     values  = list(arguments.values())
     valuesF = list()
     for v in values:
-        valuesF.append(float(v))
+       try:
+         valuesF.append(float(v))
+       except:
+         print("Argument ",v,"cannot be casted to float..")
+         valuesF.append(0.0)
     valuesArray    = (ctypes.c_float * len(valuesF))()
     valuesArray[:] = valuesF
     #--------------------------------------------------  
@@ -96,13 +235,7 @@ class BVH():
         self.traceStages          = False #If set to true each call will be emitted in stdout to speed-up debugging
         self.calib                = dict()
         if (cameraCalibrationFile!=""): 
-          from calibration import readCalibration
-          self.calib = readCalibrationFromFile(cameraCalibrationFile)
-          if (self.calib):
-               print("We found a calibration in file ",cameraCalibrationFile)
-               print("calib : ",self.calib)
-               self.configureRenderer(self.calib)
-        
+          self.configureRendererFromFile(cameraCalibrationFile)
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
   def stage(self,message):
@@ -336,6 +469,14 @@ class BVH():
     labelsCStr,valuesArray,argc = splitDictionaryInLabelsAndFloats(arguments)
     self.libBVH.bvhConverter_rendererConfigurationAtomic.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int]
     self.libBVH.bvhConverter_rendererConfigurationAtomic(labelsCStr,valuesArray,argc)
+  #--------------------------------------------------------
+  def configureRendererFromFile(self,cameraCalibrationFile:str):
+    #from calibration import readCalibrationFromFile
+    self.calib = readCalibrationFromFile(cameraCalibrationFile)
+    if (self.calib):
+               print("We found a calibration in file ",cameraCalibrationFile)
+               print("calib : ",self.calib)
+               self.configureRenderer(self.calib)
   #--------------------------------------------------------
   def get2DAnd3DAndBVHDictsForFrame(self,frameID=0):
     self.stage("get2DAnd3DAndBVHDictsForFrame ")
