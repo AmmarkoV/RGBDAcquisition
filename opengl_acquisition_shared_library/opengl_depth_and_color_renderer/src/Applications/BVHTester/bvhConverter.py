@@ -82,12 +82,27 @@ def splitDictionaryInLabelsAndFloats(arguments):
 
 
 class BVH():
-  def __init__(self, bvhPath:str, libraryPath:str = "./libBVHConverter.so", forceLibUpdate=False):
+  def __init__(
+               self,
+               bvhPath:str,
+               libraryPath:str = "./libBVHConverter.so",
+               cameraCalibrationFile = "",
+               forceLibUpdate=False
+              ):
         print("Initializing BVH file ",bvhPath," from ",libraryPath)
         self.libBVH               = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints       = 0
         self.lastMAEErrorInPixels = 0.0
         self.traceStages          = False #If set to true each call will be emitted in stdout to speed-up debugging
+        self.calib                = dict()
+        if (cameraCalibrationFile!=""): 
+          from calibration import readCalibration
+          self.calib = readCalibrationFromFile(cameraCalibrationFile)
+          if (self.calib):
+               print("We found a calibration in file ",cameraCalibrationFile)
+               print("calib : ",self.calib)
+               self.configureRenderer(self.calib)
+        
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
   def stage(self,message):
