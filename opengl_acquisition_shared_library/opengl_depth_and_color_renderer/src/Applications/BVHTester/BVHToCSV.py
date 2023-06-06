@@ -37,11 +37,11 @@ def bvh_to_csv(bvh_file_path_in,csv_file_path_out):
     #print("Hierarchy To Motion IDS Mapping :")
     #for i in range(0,len(motionIDAssignments)):
     #    print(i, " - ",motionIDAssignments[i])
-
-   
+    numberOfMotionIDs = len(motionIDAssignments)
+     
     f = open(csv_file_path_out,'w')
     #------------------------------------------------------------------------  
-    for column in range(len(motionIDAssignments)):
+    for column in range(numberOfMotionIDs):
      if (column>0):
         f.write(',')
      f.write("%s"%(motionIDAssignments[column]))
@@ -56,11 +56,11 @@ def bvh_to_csv(bvh_file_path_in,csv_file_path_out):
              #Got a fresh motion line
              motionData = lines[i].split(" ")
              #Make sure it is consistent with our hierarchy length
-             if (len(motionData)!=len(motionIDAssignments)):
+             if (len(motionData)!=numberOfMotionIDs):
                    raise ValueError('Line %u: Mismatched number of motion values (%u) compared to our hierarchy (%u)' % (i,len(motionData),len(motionIDAssignments)) )
              #Dump it to CSV
              #----------------------------------------------
-             for column in range(len(motionIDAssignments)):
+             for column in range(numberOfMotionIDs):
               if (column>0):
                 f.write(',')
               f.write("%f"%(float(motionData[column])))
