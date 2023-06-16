@@ -82,8 +82,8 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
           float value = mc->motionValues[mIDOffset + mID];
           float modValue = fmodf(fabs(value),90.0);
 
-          if  (
-                (value>45.0) && ( ( modValue <= minThreshold) || (maxThreshold <= modValue) )
+          if  ( //Chat GPT recommended the fabs and is probably right :P
+                (fabs(value)>45.0) && ( ( modValue <= minThreshold) || (maxThreshold <= modValue) )
               )
          {
           //fprintf(stderr,"Value %0.2f offends gimbal rules\n",value);
