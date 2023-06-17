@@ -21,6 +21,10 @@ extern "C"
 #define C_TEXTFILETOMEMORY_VERSION 0.01
 
 
+/**
+ * @struct cTextFileToMemory
+ * @brief Structure representing a text file loaded into memory.
+ */
 struct cTextFileToMemory
 {
   char * ptr;
@@ -34,7 +38,15 @@ struct cTextFileToMemory
   char ** strings;
 };
 
-
+/**
+ * @brief Reads the contents of a file into memory.
+ *
+ * This function reads the contents of a file specified by the given filename into a memory buffer and returns a pointer to it. The size of the file is also returned through the `length` parameter.
+ *
+ * @param filename The name of the file to be read.
+ * @param length   Pointer to store the size of the file in bytes.
+ * @return A pointer to the memory buffer containing the file contents, or NULL if an error occurred.
+ */
 static unsigned char * ctftm_readFileToMemory(const char * filename,unsigned long *length)
 {
     *length = 0;
@@ -72,6 +84,14 @@ static unsigned char * ctftm_readFileToMemory(const char * filename,unsigned lon
 }
 
 
+/**
+ * @brief Counts the number of lines in the text file.
+ *
+ * This function counts the number of lines in the text file represented by the `cTextFileToMemory` structure and stores the result in the `numberOfLines` member variable.
+ *
+ * @param ctftm Pointer to the cTextFileToMemory structure.
+ * @return The number of lines counted in the text file.
+ */
 static int ctftm_countNumberOfLines(struct cTextFileToMemory * ctftm)
 {
     char * ptr = ctftm->buffer;
@@ -96,7 +116,14 @@ static int ctftm_countNumberOfLines(struct cTextFileToMemory * ctftm)
 
 
 
-
+/**
+ * @brief Parses the lines in the text file and populates the strings array.
+ *
+ * This function parses the lines in the text file represented by the `cTextFileToMemory` structure and populates the `strings` array with pointers to the beginning of each line.
+ *
+ * @param ctftm Pointer to the cTextFileToMemory structure.
+ * @return The number of characters parsed in the text file.
+ */
 static unsigned int ctftm_parselines(struct cTextFileToMemory * ctftm)
 {
     if (ctftm == NULL)
@@ -143,6 +170,15 @@ static unsigned int ctftm_parselines(struct cTextFileToMemory * ctftm)
 
 
 
+/**
+ * @brief Loads a text file into memory.
+ *
+ * This function loads the contents of the specified text file into the `cTextFileToMemory` structure. It reads the file, counts the number of lines, allocates memory for the strings array, and populates the array with line pointers.
+ *
+ * @param ctftm    Pointer to the cTextFileToMemory structure.
+ * @param filename The name of the text file to load.
+ * @return Returns 1 if the file was loaded successfully, or 0 if an error occurred.
+ */
 static int ctftm_loadTextFileToMemory(struct cTextFileToMemory * ctftm, const char * filename)
 {
     if (ctftm==0)    { return 0; }
@@ -175,12 +211,25 @@ static int ctftm_loadTextFileToMemory(struct cTextFileToMemory * ctftm, const ch
 }
 
 
-
+/**
+ * @brief Returns the number of records (lines) in the text file.
+ *
+ * @param ctftm Pointer to the cTextFileToMemory structure.
+ * @return The number of records (lines) in the text file.
+ */
 static unsigned int ctftm_getNumberOfRecords(struct cTextFileToMemory * ctftm)
 {
    return ctftm->numberOfLines;
 }
 
+
+/**
+ * @brief Returns a pointer to the specified record (line) in the text file.
+ *
+ * @param ctftm  Pointer to the cTextFileToMemory structure.
+ * @param record The index of the record (line) to retrieve.
+ * @return A pointer to the specified record (line) in the text file, or NULL if the index is out of range.
+ */
 static char * ctftm_getRecords(struct cTextFileToMemory * ctftm,unsigned int record)
 {
    return ctftm->strings[record];
