@@ -1,13 +1,11 @@
 #include "bvh_filter.h"
 
-
 #include "../export/bvh_export.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -19,7 +17,6 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
 float getDistanceBetweenJoints(struct BVH_Transform * bvhTransform,BVHJointID * jIDA,BVHJointID * jIDB)
 {
   float xA = bvhTransform->joint[*jIDA].pos2D[0];
@@ -30,10 +27,6 @@ float getDistanceBetweenJoints(struct BVH_Transform * bvhTransform,BVHJointID * 
 
   return sqrt( (xA-xB)*(xA-xB) + (yA-yB)*(yA-yB) );
 }
-
-
-
-
 
 
 int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float threshold)
@@ -59,23 +52,19 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
   for (unsigned int fID=0; fID<mc->numberOfFrames; fID++)
   {
      unsigned int mIDOffset = fID * mc->numberOfValuesPerFrame;
-
-     //Ignore initial xyz..
+     //Ignore initial XYZ Pos/Rot thats why we start at mID 6..
      for (unsigned int mID=6; mID<mc->numberOfValuesPerFrame; mID++)
      {
         #define USE_SIMPLE_THRESHOLD 0
-
         #if USE_SIMPLE_THRESHOLD
           float minThreshold = 90.0 - threshold;
           float maxThreshold = 90.0 + threshold;
           float value = mc->motionValues[mIDOffset + mID];
-          if  (
-               (minThreshold < value) && (value < maxThreshold)
-              )
-         {
-          framesToRemove[fID]=1;
-          ++framesThatWillBeHidden;
-         }
+          if  ( (minThreshold < value) && (value < maxThreshold) )
+          {
+           framesToRemove[fID]=1;
+           ++framesThatWillBeHidden;
+          }
         #else
           float minThreshold = threshold;
           float maxThreshold = 90.0 - threshold;
@@ -92,12 +81,8 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
           break;
          }
         #endif // USE_SIMPLE_THRESHOLD
-
-
         //fprintf(stderr,"fID %u, mID %u => %0.2f  ",fID,mID);
-
      }
-
   }
 
  if (framesThatWillBeHidden==0)
@@ -113,34 +98,17 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
 
  //Free temporary space required to select correct frames..
  free(framesToRemove);
-
  return 1;
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,const char **argv)
 {
-/*
- for (int i=0; i<argc; i++)
+/*for (int i=0; i<argc; i++)
  {
    fprintf(stderr,"%02u| %s \n",i,argv[i]);
- }
-*/
+ }*/
  if (argc<11)
  {
    fprintf(stderr,"filterOutPosesThatAreCloseToRules: Too few arguments..\n");
@@ -170,21 +138,17 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
 
   memset(framesToRemove,0,sizeof(unsigned int) * mc->numberOfFrames);
 
-
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
-
-   //This is the normal rendering where we just simulate our camera center
-   simpleRendererDefaults(
+  //This is the normal rendering where we just simulate our camera center
+  simpleRendererDefaults(
                           &renderer,
                           width,
                           height,
                           fX,
                           fY
                          );
-   simpleRendererInitialize(&renderer);
-
-
+  simpleRendererInitialize(&renderer);
 
   float forcePosition[3]={0.0,0.0,-130.0};
   forcePosition[0]=atof(argv[0]);
@@ -269,9 +233,8 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
  }
 
  if (framesThatWillBeHidden==0)
-  {
-    fprintf(stderr,GREEN "No frames matches our rules\n" NORMAL);
-  } else
+  { fprintf(stderr,GREEN "No frames matches our rules\n" NORMAL); }
+   else
   {
     fprintf(stderr,GREEN "%u/%u (%0.2f%%) frames match rules and will be hidden..\n" NORMAL,framesThatWillBeHidden,mc->numberOfFrames,(float) (framesThatWillBeHidden*100)/mc->numberOfFrames);
     fprintf(stderr,GREEN "BVH had %u frames and now " NORMAL,mc->numberOfFrames);
@@ -279,17 +242,11 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
     fprintf(stderr,GREEN "it has %u frames \n" NORMAL,mc->numberOfFrames);
   }
 
-
  bvh_freeTransform(&bvhTransform);
  free(framesToRemove);
 
  return 1;
 }
-
-
-
-
-
 
 
 int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv)
@@ -318,9 +275,6 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
    return 0;
  }
 
-
-
-
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
 
@@ -334,7 +288,6 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
                          );
    simpleRendererInitialize(&renderer);
 
-
   float forcePosition[3]={0.0,0.0,-130.0};
   forcePosition[0]=atof(argv[0]);
   forcePosition[1]=atof(argv[1]);
@@ -343,8 +296,6 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
   forceRotation[0]=atof(argv[3]);
   forceRotation[1]=atof(argv[4]);
   forceRotation[2]=atof(argv[5]);
-
-
 
   struct BVH_Transform bvhTransform;
   unsigned int fID=0;
@@ -412,11 +363,8 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
        //Frame matches our rules so we must hide it..!
        fprintf(stderr,GREEN "Frame %u Matches..\n" NORMAL,fID);
      }
-
   } //Transform correctly calculated..
  } //End of loop for every BVH frame
 
-
  return 1;
 }
-
