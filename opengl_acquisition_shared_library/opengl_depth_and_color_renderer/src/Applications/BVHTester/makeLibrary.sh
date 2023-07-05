@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-echo "Compilation handled by : "
+echo "JIT Python/C Compilation *made by AmmarTM* handled by : "
 gcc --version
 
 #in case of a build after ./batherFiles.sh
@@ -107,8 +107,10 @@ $BVH_DIRECTORY/tests/test.h
 $INPUTPARSER_DIRECTORY/InputParser_C.c
 $INPUTPARSER_DIRECTORY/InputParser_C.h
 $BVHTESTER_DIR/bvhLibrary.h
-$BVHTESTER_DIR/main.c
+$BVHTESTER_DIR/bvhConverter.c
 "
+
+#$BVHTESTER_DIR/main.c <- This used to be in the same binary with the BVHTester utility, now its split..
 
 INTEL_OPTIMIZATIONS=`cat /proc/cpuinfo | grep sse3`
 
