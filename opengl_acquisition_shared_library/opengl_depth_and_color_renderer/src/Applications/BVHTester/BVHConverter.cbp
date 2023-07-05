@@ -46,10 +46,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
+			<Add option="-DBVH_USE_AS_A_LIBRARY" />
 			<Add directory="../../" />
 		</Compiler>
 		<Linker>
 			<Add option="-static" />
+			<Add option="-shared" />
 			<Add option="-lm" />
 			<Add option="-no-pie" />
 			<Add directory="../../" />
