@@ -234,8 +234,16 @@ class BVH():
         self.lastMAEErrorInPixels = 0.0
         self.traceStages          = False #If set to true each call will be emitted in stdout to speed-up debugging
         self.calib                = dict()
+        #----------------------------------- 
         if (cameraCalibrationFile!=""): 
+          if not exists(cameraCalibrationFile):
+            print("Could not find renderer configuration file ",cameraCalibrationFile)
+            raise FileNotFoundError
           self.configureRendererFromFile(cameraCalibrationFile)
+        #----------------------------------- 
+        if not exists(bvhPath):
+            print("Could not find BVH file ",bvhPath)
+            raise FileNotFoundError
         self.loadBVHFile(bvhPath)
   #--------------------------------------------------------
   def stage(self,message):
@@ -569,10 +577,13 @@ if __name__== "__main__":
    print("Joint ID for ",jointName," is ",bvhFile.getJointID(jointName))
 
    frameID=0
-   bvhFile.processFrame(frameID)
-   x3D,y3D,z3D = bvhFile.getJoint3DUsingJointName(jointName)
-   print(" Joint ",jointName," 3D values for frame ",frameID," are ",x3D,",",y3D,",",z3D," ")
 
+   for i in range(0,10):
+     modifications["hip_Xposition"]=100.0 + i * 10.0
+     bvhFile.modify(modifications)
+     bvhFile.processFrame(frameID)
+     x3D,y3D,z3D = bvhFile.getJoint3DUsingJointName(jointName)
+     print(" I=",i," Joint=",jointName," 3D values for frame ",frameID," are ",x3D,",",y3D,",",z3D," ")
 
    x2D,y2D = bvhFile.getJoint2DUsingJointName(jointName)
    print(" Joint ",jointName," 2D values for frame ",frameID," are ",x2D,",",y2D)

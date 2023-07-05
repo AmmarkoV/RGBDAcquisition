@@ -461,10 +461,10 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
           { atomicPenultimateSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
     //=======================================================================================
     if (atomicPreviousSolution==0)
-          { atomicPreviousSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+          { atomicPreviousSolution    = mallocNewMotionBuffer(&bvhAtomicMotion); }
      //====================================================================
     if (atomicSolution==0)
-          { atomicSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+          { atomicSolution            = mallocNewMotionBuffer(&bvhAtomicMotion); }
      //====================================================================
 
 
