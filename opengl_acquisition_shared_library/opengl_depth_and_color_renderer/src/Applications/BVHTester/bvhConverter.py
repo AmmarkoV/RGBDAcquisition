@@ -175,7 +175,7 @@ def loadLibrary(filename,relativePath="",forceUpdate=False):
  libBVH = CDLL(filename)
  #call C function to check connection
  libBVH.connect() 
- libBVH.bvhConverter.restype = c_int
+ libBVH.bvhConverter.restype  = c_int
  libBVH.bvhConverter.argtypes = c_int,POINTER(c_char_p)
  return libBVH
 #--------------------------------------------------------
@@ -448,7 +448,7 @@ class BVH():
   def processFrame(self, frameID:int):
         self.stage("processFrame")
         self.libBVH.bvhConverter_processFrame.argtypes = [ctypes.c_int]
-        self.libBVH.bvhConverter_processFrame.restype = ctypes.c_int
+        self.libBVH.bvhConverter_processFrame.restype  = ctypes.c_int
         success = self.libBVH.bvhConverter_processFrame(frameID) 
         return success
   #--------------------------------------------------------

@@ -799,7 +799,14 @@ int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
 }
 
 
-int main()
+
+int bvhConverter(int argc,const char **argv)
+{
+    fprintf(stderr,RED "BVHConverter.c main is a stub please use the python code\n" NORMAL);
+    return 0;
+}
+
+int main(int argc,const char **argv)
 {
     fprintf(stderr,RED "BVHConverter.c main is a stub please use the python code\n" NORMAL);
     return 0;
