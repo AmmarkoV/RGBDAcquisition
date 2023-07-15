@@ -386,7 +386,7 @@ int prepareDefaultFaceProblem(
      //++correct; checksum+=addNewPartToChainProblem(&data"chest",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      if (!standalone)
      {
-      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+      //++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
      }
      ++correct;  checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
@@ -1380,7 +1380,7 @@ int prepareDefaultBodyProblem(
                                                              5  //We have a rotation which since it comes from root joint should end at 5
                                                             );
      //45.38
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
@@ -1418,7 +1418,7 @@ int prepareDefaultBodyProblem(
      ++correct;   checksum+=addNewPartToChainProblem(&data,"chest",NO_ALTERNATE_NAME,MINIMAL_IMPORTANCE,OPTIMIZE_JOINT);
      //                                  minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,45.0,  -45.0,45.0,   -15.0,15.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",     LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lForeArm",   LOW_IMPORTANCE,END_EFFECTOR);
      //----------------------------------------------------------
@@ -1435,8 +1435,8 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                               minX/maxX    minY/maxY     minZ/maxZ
-     addLimitsToNextPartOfChain(&data,-3.0,11.0,  -22.0,22.0,   -5.0,5.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
+     addLimitsToNextPartOfChain(&data,-10.0,10.0,  -22.0,22.0,   -15.0,15.0);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
      addLimitsToNextPartOfChain(&data,-7.0,22.0,  -22.0,22.0,   -10.0,10.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
