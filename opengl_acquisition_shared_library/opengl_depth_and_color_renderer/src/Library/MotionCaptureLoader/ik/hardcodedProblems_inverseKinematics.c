@@ -1380,12 +1380,12 @@ int prepareDefaultBodyProblem(
                                                              5  //We have a rotation which since it comes from root joint should end at 5
                                                             );
      //45.38
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.l","ear.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.r","ear.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
@@ -1436,15 +1436,14 @@ int prepareDefaultBodyProblem(
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
      //                               minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,10.0,  -22.0,22.0,   -15.0,15.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE,  OPTIMIZE_JOINT);
-     addLimitsToNextPartOfChain(&data,-7.0,22.0,  -22.0,22.0,   -10.0,10.0);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1",NO_ALTERNATE_NAME,  MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   HIGH_IMPORTANCE     ,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.l","ear.l", HIGH_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"__temporalis02.r","ear.r", HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
      //This causes the head to tilt up!?
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,END_EFFECTOR); //"oris02"
+     //++correct;   checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME, MEDIUM_IMPORTANCE,END_EFFECTOR); //"oris02"
      //-------------------------------------------------------------
      if (failedPreparingChain(&data,correct,checksum)) { return 0; }
      //-------------------------------------------------------------
@@ -1550,8 +1549,8 @@ int prepareDefaultBodyProblem(
      //                                minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,28.0,    0.0,0.0,    -35.0,35.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME,                  HIGH_IMPORTANCE,        OPTIMIZE_JOINT);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,       HIGH_IMPORTANCE,     END_EFFECTOR); // Big Toe
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,     END_EFFECTOR); // Small Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe1-2.l",NO_ALTERNATE_NAME,       HIGH_IMPORTANCE,        END_EFFECTOR); // Big Toe
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_toe5-3.l",NO_ALTERNATE_NAME,       MEDIUM_IMPORTANCE,      END_EFFECTOR); // Small Toe
     //-------------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //-------------------------------------------------------------

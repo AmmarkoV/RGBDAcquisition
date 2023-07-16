@@ -76,10 +76,10 @@ void incorrectArguments()
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
-struct BVH_MotionCapture         bvhAtomicMotion={0};
-struct BVH_Transform             bvhTransformAtomic={0};
-struct simpleRenderer            rendererAtomic={0};
-struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
+struct BVH_MotionCapture         bvhAtomicMotion              = {0};
+struct BVH_Transform             bvhTransformAtomic           = {0};
+struct simpleRenderer            rendererAtomic               = {0};
+struct BVH_RendererConfiguration renderingAtomicConfiguration = {0};
 struct ikProblem * atomicFaceProblem  = 0;
 struct ikProblem * atomicBodyProblem  = 0;
 struct ikProblem * atomicLHandProblem = 0;
@@ -684,7 +684,7 @@ float bvhConverter_IKFineTune(
              lowercase(coord);
              lowercase(dof);
 
-             if (  (coord[0]=='2') && (  (coord[2]=='x') || (coord[2]=='y') ) )
+             if (  (coord[0]=='2') && (coord[1]=='d') && (  (coord[2]=='x') || (coord[2]=='y') ) )
              {
               BVHJointID jID=0;
               if ( bvh_getJointIDFromJointNameNocase(&bvhAtomicMotion,dof,&jID) )
