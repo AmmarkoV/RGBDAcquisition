@@ -1943,7 +1943,7 @@ int diagnoseMissing2DJoints(
           float tY=(float) bvhTargetTransform->joint[jID].pos2D[1];
           if ( (tX==0.0) && (tY==0.0) )
           {
-             fprintf(stderr,RED "IK Joint %u(%s) is missing \n" NORMAL,jID,mc->jointHierarchy[jID].jointName);
+             fprintf(stderr,RED "Problem (%s) : IK Joint %u(%s) is missing \n" NORMAL,problem->problemDescription,jID,mc->jointHierarchy[jID].jointName);
              missing+=1;
           }
         }

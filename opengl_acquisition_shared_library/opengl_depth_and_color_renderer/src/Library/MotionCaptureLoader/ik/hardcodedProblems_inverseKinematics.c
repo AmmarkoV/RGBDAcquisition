@@ -390,7 +390,7 @@ int prepareDefaultFaceProblem(
       //++correct;   checksum+=addNewPartToChainProblem(&data,"neck",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
       ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1","neck",0.5,OPTIMIZE_JOINT); //If neck1 is not available ( mnet1-mnet3 ) fallback to old neck
      }
-     ++correct;  checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,0.5,OPTIMIZE_JOINT);
+     ++correct;  checksum+=addNewPartToChainProblem(&data,"head","special03",0.5,OPTIMIZE_JOINT); //special03 is roughly at the position of the head
      ++correct;  checksum+=addNewPartToChainProblem(&data,"special04",NO_ALTERNATE_NAME,1.0,END_EFFECTOR);
      ++correct;  checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",2.5,END_EFFECTOR);
      ++correct;  checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",2.5,END_EFFECTOR);
@@ -1381,7 +1381,7 @@ int prepareDefaultBodyProblem(
                                                             );
      //45.38
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1","neck", MINIMAL_IMPORTANCE,END_EFFECTOR); //If neck1 is not available ( mnet1-mnet3 ) fallback to old neck
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,  LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head","special03",  LOW_IMPORTANCE,END_EFFECTOR); ////special03 is roughly at the position of the head
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
@@ -1437,7 +1437,7 @@ int prepareDefaultBodyProblem(
      //                               minX/maxX    minY/maxY     minZ/maxZ
      addLimitsToNextPartOfChain(&data,-10.0,10.0,  -22.0,22.0,   -15.0,15.0);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1","neck",  MINIMAL_IMPORTANCE  ,OPTIMIZE_JOINT); //If neck1 is not available ( mnet1-mnet3 ) fallback to old neck
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head",NO_ALTERNATE_NAME,   HIGH_IMPORTANCE     ,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head","special03",   HIGH_IMPORTANCE     ,END_EFFECTOR); ////special03 is roughly at the position of the head
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",    VERY_HIGH_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l", VERY_HIGH_IMPORTANCE,END_EFFECTOR);
