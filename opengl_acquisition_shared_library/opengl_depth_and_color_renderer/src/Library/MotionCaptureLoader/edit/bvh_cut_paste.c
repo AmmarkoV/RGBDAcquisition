@@ -374,13 +374,9 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
 
-  if (
-       (bvh_getJointIDFromJointNameNocase(mc,jointNameA,&jIDA)) &&
-       (bvh_getJointIDFromJointNameNocase(mc,jointNameB,&jIDB))
-     )
+  if ( (bvh_getJointIDFromJointNameNocase(mc,jointNameA,&jIDA)) && (bvh_getJointIDFromJointNameNocase(mc,jointNameB,&jIDB)) )
   {
    fprintf(stderr,"We have resolved %s to %u and %s to %u\n",jointNameA,jIDA,jointNameB,jIDB);
-
    if (
         checkIfJointsHaveSameGraphOutline(
                                           mc,
@@ -393,7 +389,6 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
                                          )
       )
     {
-
      fprintf(stderr,"bvh_GrowMocapFileBySwappingJointAndItsChildren");
      unsigned int initialNumberOfFrames = mc->numberOfFrames;
      fprintf(stderr,"Initially had %u frames\n",initialNumberOfFrames);
@@ -403,11 +398,8 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
      {
       fprintf(stderr,"And we where asked to double them\n");
       if (
-         bvh_GrowMocapFileByCopyingExistingMotions(
-                                                   mc,
-                                                   1
-                                                  )
-        )
+          bvh_GrowMocapFileByCopyingExistingMotions(mc,1)
+         )
       {
           //Successfully Grew buffer to alsoIncludeOriginalMotion
       } else

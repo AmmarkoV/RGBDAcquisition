@@ -251,11 +251,7 @@ int bvh_PerturbJointAnglesRange(
       fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
       if (
            //bvh_getJointIDFromJointName(
-           bvh_getJointIDFromJointNameNocase(
-                                       mc,
-                                       argv[i],
-                                       &jID
-                                      )
+           bvh_getJointIDFromJointNameNocase(mc,argv[i],&jID)
          )
          {
            unsigned int channelsEncountered=0;

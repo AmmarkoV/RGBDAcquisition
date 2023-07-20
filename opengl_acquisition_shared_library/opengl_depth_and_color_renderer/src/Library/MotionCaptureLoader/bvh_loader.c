@@ -489,10 +489,10 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 
 
 int bvh_setMIDValue(
-               struct BVH_MotionCapture * mc,
-               unsigned int mID,
-               float value
-              )
+                    struct BVH_MotionCapture * mc,
+                    unsigned int mID,
+                    float value
+                   )
 {
   if (mc!=0)
   {
@@ -1777,7 +1777,6 @@ int bvh_selectJointsToHide2D(
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
-
 void freeMotionBuffer(struct MotionBuffer ** pointerToMB)
 {
  struct MotionBuffer *mb = *pointerToMB;
