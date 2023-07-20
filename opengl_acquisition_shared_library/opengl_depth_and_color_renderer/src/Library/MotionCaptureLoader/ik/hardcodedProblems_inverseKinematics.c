@@ -396,7 +396,6 @@ int prepareDefaultFaceProblem(
      ++correct;  checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",2.5,END_EFFECTOR);
     //----------------------------------------------------------
     if (failedPreparingChain(&data,correct,checksum)) { return 0; }
-if (failedPreparingChain(&data,correct,checksum)) { return 0; }
     //----------------------------------------------------------
 
     nextChainAndJob(&data);
