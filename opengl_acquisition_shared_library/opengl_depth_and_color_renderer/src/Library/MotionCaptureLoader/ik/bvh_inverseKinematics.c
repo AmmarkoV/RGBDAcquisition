@@ -1191,6 +1191,7 @@ if (iterationID==0)
         lr = (float) learningRateDecayRate * lr;
         //Gradual fine tuning.. On a first glance it works worse..
         //lr = lr * (learningRateDecayRate * iterationID); <- could also geometrically scale
+        momentum = momentum * 0.95; // Scale momentum!
         //----------------------------------------------
     } // for number of epochs
 

@@ -1380,22 +1380,22 @@ int prepareDefaultBodyProblem(
                                                              5  //We have a rotation which since it comes from root joint should end at 5
                                                             );
      //45.38
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1","neck", MINIMAL_IMPORTANCE,END_EFFECTOR); //If neck1 is not available ( mnet1-mnet3 ) fallback to old neck
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"head","special03",  LOW_IMPORTANCE,END_EFFECTOR); ////special03 is roughly at the position of the head
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"neck1","neck",            MINIMAL_IMPORTANCE,END_EFFECTOR); //If neck1 is not available ( mnet1-mnet3 ) fallback to old neck
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"head","special03",        LOW_IMPORTANCE,END_EFFECTOR); ////special03 is roughly at the position of the head
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.l","eye.l",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"endsite_eye.r","eye.r",   MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.l","__temporalis02.l",MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"ear.r","__temporalis02.r",MEDIUM_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rshoulder","rShldr",      MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"relbow","rForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",      LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lshoulder","lShldr",      MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lelbow","lForeArm",       LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lhand",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"rhip","rThigh",           MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rknee","rShin",           LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"rfoot",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
-     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",           LOW_IMPORTANCE,END_EFFECTOR);
+     ++correct;   checksum+=addNewPartToChainProblem(&data,"lhip","lThigh",           MEDIUM_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lknee","lShin",           LOW_IMPORTANCE,END_EFFECTOR);
      ++correct;   checksum+=addNewPartToChainProblem(&data,"lfoot",NO_ALTERNATE_NAME, MINIMAL_IMPORTANCE,END_EFFECTOR);
     //-------------------------------------------------------------
