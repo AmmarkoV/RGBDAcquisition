@@ -381,8 +381,15 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
   if (strstr(jointName,"endsite_")!=0)
   {
      fprintf(stderr,RED "Endsites can't be modified..!\n" NORMAL);
-     return 0;
+     return 1;
   }
+  if (strstr(jointName,"padding")!=0)
+  {
+     fprintf(stderr,RED "Paddings can't be modified..!\n" NORMAL);
+     return 1;
+  }
+
+
 
   if (strcmp(jointName,"neck01")==0)
   {

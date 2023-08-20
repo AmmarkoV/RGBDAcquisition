@@ -690,41 +690,47 @@ void lookAt(
 
 
 
-int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate)
+int _glhProjectf(
+                  float * position3D,
+                  float *modelview,
+                  float *projection,
+                  int *viewport,
+                  float *windowCoordinate
+                )
 {
       int result = 0;
-      float objx=position3D[0];
-      float objy=position3D[1];
-      float objz=position3D[2];
+      float objX=position3D[0];
+      float objY=position3D[1];
+      float objZ=position3D[2];
       //Transformation vectors
-      float fTempo[8];
+      float fTmp[8];
       //Modelview transform
-      fTempo[0]=(modelview[0]*objx)+(modelview[4]*objy)+(modelview[8]*objz) +modelview[12];  //w is always 1
-      fTempo[1]=(modelview[1]*objx)+(modelview[5]*objy)+(modelview[9]*objz) +modelview[13];
-      fTempo[2]=(modelview[2]*objx)+(modelview[6]*objy)+(modelview[10]*objz)+modelview[14];
-      fTempo[3]=(modelview[3]*objx)+(modelview[7]*objy)+(modelview[11]*objz)+modelview[15];
+      fTmp[0]=(modelview[0]*objX)+(modelview[4]*objY)+(modelview[8]*objZ) +modelview[12];  //w is always 1
+      fTmp[1]=(modelview[1]*objX)+(modelview[5]*objY)+(modelview[9]*objZ) +modelview[13];
+      fTmp[2]=(modelview[2]*objX)+(modelview[6]*objY)+(modelview[10]*objZ)+modelview[14];
+      fTmp[3]=(modelview[3]*objX)+(modelview[7]*objY)+(modelview[11]*objZ)+modelview[15];
       //Projection transform, the final row of projection matrix is always [0 0 -1 0]
       //so we optimize for that.
-      fTempo[4]=(projection[0]*fTempo[0])+(projection[4]*fTempo[1])+(projection[8]*fTempo[2]) +(projection[12]*fTempo[3]);
-      fTempo[5]=(projection[1]*fTempo[0])+(projection[5]*fTempo[1])+(projection[9]*fTempo[2]) +(projection[13]*fTempo[3]);
-      fTempo[6]=(projection[2]*fTempo[0])+(projection[6]*fTempo[1])+(projection[10]*fTempo[2])+(projection[14]*fTempo[3]);
-      fTempo[7]=-fTempo[2];
+      fTmp[4]=(projection[0]*fTmp[0])+(projection[4]*fTmp[1])+(projection[8]*fTmp[2]) +(projection[12]*fTmp[3]);
+      fTmp[5]=(projection[1]*fTmp[0])+(projection[5]*fTmp[1])+(projection[9]*fTmp[2]) +(projection[13]*fTmp[3]);
+      fTmp[6]=(projection[2]*fTmp[0])+(projection[6]*fTmp[1])+(projection[10]*fTmp[2])+(projection[14]*fTmp[3]);
+      fTmp[7]=-fTmp[2];
       //The result normalizes between -1 and 1
-      if(fTempo[7]!=0.0)	//The w value
+      if(fTmp[7]!=0.0)	//The w value
          {
-           fTempo[7]=1.0/fTempo[7];
+           fTmp[7]=1.0/fTmp[7];
            //Perspective division
-           fTempo[4]*=fTempo[7];
-           fTempo[5]*=fTempo[7];
-           fTempo[6]*=fTempo[7];
+           fTmp[4]*=fTmp[7];
+           fTmp[5]*=fTmp[7];
+           fTmp[6]*=fTmp[7];
 
            //Window coordinates
            //Map x, y to range 0-1
-           windowCoordinate[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
-           windowCoordinate[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
+           windowCoordinate[0]=(fTmp[4]*0.5+0.5)*viewport[2]+viewport[0];
+           windowCoordinate[1]=(fTmp[5]*0.5+0.5)*viewport[3]+viewport[1];
 
            //This is only correct when glDepthRange(0.0, 1.0)
-           windowCoordinate[2]=(1.0+fTempo[6])*0.5;	//Between 0 and 1
+           windowCoordinate[2]=(1.0+fTmp[6])*0.5;	//Between 0 and 1
            result = 1;
          }
    return result;
