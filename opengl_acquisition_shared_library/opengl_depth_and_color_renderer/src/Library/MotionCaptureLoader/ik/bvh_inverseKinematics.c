@@ -1881,8 +1881,8 @@ int doExtrapolatedGuess(
                                                    "Extrapolation",
                                                    //---------------------------------
                                                    problem,
-                                                   2, //Start Chain
-                                                   problem->numberOfChains-1, //End Chain
+                                                   0,                       //2, //Start Chain
+                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
                                                    //---------------------------------
                                                    ikConfig,
                                                    //---------------------------------
@@ -2296,8 +2296,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    renderer,
                                                    "Previous",
                                                    problem,
-                                                   2, //Start Chain
-                                                   problem->numberOfChains-1, //End Chain
+                                                   0,                       //2, //Start Chain
+                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
                                                    ikConfig,
                                                    solution,
                                                    previousSolution,
@@ -2313,8 +2313,8 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    renderer,
                                                    "Penultimate",
                                                    problem,
-                                                   2, //Start Chain
-                                                   problem->numberOfChains-1, //End Chain
+                                                   0,                       //2, //Start Chain
+                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
                                                    ikConfig,
                                                    solution,
                                                    penultimateSolution,
