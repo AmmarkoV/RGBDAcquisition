@@ -1882,7 +1882,7 @@ int doExtrapolatedGuess(
                                                    //---------------------------------
                                                    problem,
                                                    0,                       //2, //Start Chain
-                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
+                                                   problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
                                                    //---------------------------------
                                                    ikConfig,
                                                    //---------------------------------
@@ -2297,7 +2297,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    "Previous",
                                                    problem,
                                                    0,                       //2, //Start Chain
-                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
+                                                   problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
                                                    ikConfig,
                                                    solution,
                                                    previousSolution,
@@ -2314,7 +2314,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                                                    "Penultimate",
                                                    problem,
                                                    0,                       //2, //Start Chain
-                                                   problem->numberOfChains, //problem->numberOfChains-1, //End Chain
+                                                   problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
                                                    ikConfig,
                                                    solution,
                                                    penultimateSolution,
