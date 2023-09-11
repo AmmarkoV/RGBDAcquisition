@@ -1355,7 +1355,7 @@ int prepareDefaultBodyProblem(
      //----------------------------------------------------------
      checksum=0; correct=0; startAddingNewPartsToChain(&data);
 
-     expectBigValueChangesForNextPart(&data); //Big changes
+     //TEST expectBigValueChangesForNextPart(&data); //Big changes
      ++correct;   checksum+=addNewPartToChainProblemDetailed(
                                                              problem,mc,
                                                              //-----------------------------------------
