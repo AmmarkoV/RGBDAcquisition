@@ -653,7 +653,7 @@ float bvhConverter_IKFineTune(
          //======================================================================================================
          //======================================================================================================
          //======================================================================================================
-        if ( (strcmp(bodyPart,"body")==0) || (strcmp(bodyPart,"lhand")==0) || (strcmp(bodyPart,"rhand")==0) )
+        if ( (strcmp(bodyPart,"body")==0) || (strcmp(bodyPart,"lhand")==0) || (strcmp(bodyPart,"rhand")==0) || (strcmp(bodyPart,"face")==0) )
         {
          //Keep history..!
          copyMotionBuffer(atomicPenultimateSolution,atomicPreviousSolution);
@@ -667,14 +667,14 @@ float bvhConverter_IKFineTune(
          char jointName[512]={0};
          struct BVH_Transform bvhTargetTransform={0};
          int occlusions=1;
-          performPointProjectionsForFrame(
+         performPointProjectionsForFrame(
                                            &bvhAtomicMotion,
                                            &bvhTargetTransform,
                                            frameID,
                                            &rendererAtomic,
                                            occlusions,
                                            renderingAtomicConfiguration.isDefined
-                                          );
+                                        );
 
          for (int i=0; i<numberOfElements; i++)
          {
@@ -738,18 +738,6 @@ float bvhConverter_IKFineTune(
                                                                     )
             )
             {
-
-              /*  No longer automatically do this to avoid multiple smoothings per frame
-              if ( (fSampling>0.0) && (fCutoff>0.0) )
-              { //Only perform smoothing if sampling/cutoff is set..
-               for (int mID=0; mID<atomicSolution->bufferSize; mID++)
-               {
-                   atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
-               }
-              }*/
-
-
-
               if(!bvh_copyMotionBufferToMotionFrame(
                                                     &bvhAtomicMotion,
                                                     frameID,
@@ -766,6 +754,9 @@ float bvhConverter_IKFineTune(
             {
               fprintf(stderr,RED "Failed approximateBodyFromMotionBufferUsingInverseKinematics\n" NORMAL);
             }
+        } else
+        {
+          fprintf(stderr,RED "approximateBodyFromMotionBufferUsingInverseKinematics could not identify part `%s`\n" NORMAL,bodyPart);
         }
 
   return finalMAEInPixels;
