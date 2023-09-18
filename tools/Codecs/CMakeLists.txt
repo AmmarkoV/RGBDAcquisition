@@ -1,5 +1,5 @@
 project( Codecs )
-cmake_minimum_required( VERSION 2.8.7 )
+cmake_minimum_required(VERSION 3.5)
 
 
 set(CMAKE_CXX_FLAGS "-s -O3 -fPIC -march=native -mtune=native") # -fuse-ld=gold
