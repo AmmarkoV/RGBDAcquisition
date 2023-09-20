@@ -764,20 +764,20 @@ float bvhConverter_IKFineTune(
 
 int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
 {
- if (atomicSolution==0) { fprintf(stderr,RED "bvhConverter_smooth has no solution to work with..\n" NORMAL); return 0; }
+ if (atomicSolution==0)        { fprintf(stderr,RED "bvhConverter_smooth has no solution to work with..\n" NORMAL);           return 0; }
  if (atomicSmoothingFilter==0) { fprintf(stderr,RED "bvhConverter_smooth has no initialized filter to work with..\n" NORMAL); return 0; }
 
  if ( (fSampling>0.0) && (fCutoff>0.0) )
-   { //Only perform smoothing if sampling/cutoff is set..
-    fprintf(stderr,GREEN "bvhConverter_smooth going through motions\n" NORMAL);
+   {
+    //Only perform smoothing if sampling/cutoff is set..
+    //fprintf(stderr,GREEN "bvhConverter_smooth going through motions\n" NORMAL); //<- reduce spam
     for (int mID=0; mID<atomicSolution->bufferSize; mID++)
                {
                    atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
                }
+    //fprintf(stderr,GREEN "copyback..\n" NORMAL); //<- reduce spam
 
 
-
-    fprintf(stderr,GREEN "copyback..\n" NORMAL);
     if(!bvh_copyMotionBufferToMotionFrame(
                                           &bvhAtomicMotion,
                                           frameID,
