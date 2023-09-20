@@ -587,7 +587,7 @@ float bvhConverter_IKFineTune(
 
   //-----------------------------
   float initialMAEInPixels = 0.0;
-  float finalMAEInPixels   = 0.0;
+  float finalMAEInPixels   = 10000.0;
   float initialMAEInMM     = 0.0;
   float finalMAEInMM       = 0.0;
   //-----------------------------
