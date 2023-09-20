@@ -180,7 +180,11 @@ float meanBVH2DDistance(
         {
             return (float)  sumOf2DDistances/numberOfSamples;
         }
-    } //-----------------
+    } else //-----------------
+    {
+     fprintf(stderr,"meanBVH2DDistance failed bvh_projectTo2D call\n");
+    }
+
 
     return 0.0;
 }
@@ -1626,6 +1630,8 @@ void compareChainsAndAdoptBest(
     {
       for (unsigned int chainID=startChain; chainID<endChain; chainID++)
                 {
+                  unsigned int samplesCurrent     = 0;
+                  unsigned int samplesPrevious    = 0;
                   float currentSolutionChainLoss  = 0.0;
                   float previousSolutionChainLoss = 0.0;
 
@@ -1658,18 +1664,24 @@ void compareChainsAndAdoptBest(
                         {
                           //Our current solution
                           currentSolutionChainLoss += getSquared2DPointDistance(sX,sY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                          samplesCurrent = samplesCurrent + 1;
                         }
 
                         if ((cX!=0.0) || (cY!=0.0))
                         {
                           //The solution we want to check if is better
                           previousSolutionChainLoss += getSquared2DPointDistance(cX,cY,tX,tY) * problem->chain[chainID].part[partID].jointImportance;
+                          samplesPrevious = samplesPrevious + 1;
                         }
                       }
                      }
                     }
 
 
+                    if ( (samplesPrevious==0) || (samplesCurrent==0) )
+                    {
+                      fprintf(stderr,RED "compareChainsAndAdoptBest: Blocking update without samples..\n" NORMAL,chainID);
+                    } else
                     if (currentSolutionChainLoss > previousSolutionChainLoss)
                     {
                         ++problem->chain[chainID].encounteredAdoptedBest;
@@ -1705,9 +1717,9 @@ void compareChainsAndAdoptBest(
                               }
                          //----------------------------------------------------------------------------------
                          }
-                        }
-                    }
-                }
+                        } //part loop..
+                    } //We found a better chain.. take it!
+                } //chain loop..
   } else
   {
     fprintf(stderr,RED "compareChainsAndAdoptBest: Cannot operate on a chain [%u-%u] out of limits[%u]..\n" NORMAL,startChain,endChain,problem->numberOfChains);
@@ -2239,7 +2251,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
 
         //Was our solution perfect? If it was we don't need to compare to previous
         //----------------------------------------------------
-        if (*finalMAEInPixels!=0)
+        if (*finalMAEInPixels!=0) //there is no perfect solution!
         {
            if (!ikConfig->dontUseSolutionHistory)
            {
@@ -2262,6 +2274,9 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
             bvh_freeTransform(&bvhPreviousTransform);
            //-----------------------------------------------
            }
+        } else
+        {
+          fprintf(stderr,GREEN "We have a perfect solution(?) Too good to be true..\n" NORMAL);
         }
        }
         //----------------------------------------------------
@@ -2288,39 +2303,47 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
                            //---------------------------------
                           );
         */
+
+
+
         if ( (!ikConfig->dontUseSolutionHistory) && (previousSolution!=0) && (previousSolution->motion!=0) && (previousSolution->bufferSize==solution->bufferSize) )
         {
-        //This removes some weird noise from previous solution
-        ensureFinalProposedSolutionIsBetterInParts(
-                                                   mc,
-                                                   renderer,
-                                                   "Previous",
-                                                   problem,
-                                                   0,                       //2, //Start Chain
-                                                   problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
-                                                   ikConfig,
-                                                   solution,
-                                                   previousSolution,
-                                                   bvhTargetTransform
+         //This removes some weird noise from previous solution
+         ensureFinalProposedSolutionIsBetterInParts(
+                                                    mc,
+                                                    renderer,
+                                                    "Previous",
+                                                    problem,
+                                                    0,                       //2, //Start Chain
+                                                    problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
+                                                    ikConfig,
+                                                    solution,
+                                                    previousSolution,
+                                                    bvhTargetTransform
                                                    );
         }
 
         if ( (!ikConfig->dontUseSolutionHistory) && (penultimateSolution!=0) && (penultimateSolution->motion!=0) && (penultimateSolution->bufferSize==solution->bufferSize) )
         {
-        //This removes some weird noise from pre-previous solution
-        ensureFinalProposedSolutionIsBetterInParts(
-                                                   mc,
-                                                   renderer,
-                                                   "Penultimate",
-                                                   problem,
-                                                   0,                       //2, //Start Chain
-                                                   problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
-                                                   ikConfig,
-                                                   solution,
-                                                   penultimateSolution,
-                                                   bvhTargetTransform
+         //This removes some weird noise from pre-previous solution
+         ensureFinalProposedSolutionIsBetterInParts(
+                                                    mc,
+                                                    renderer,
+                                                    "Penultimate",
+                                                    problem,
+                                                    0,                       //2, //Start Chain
+                                                    problem->numberOfChains-1, //problem->numberOfChains-1, //End Chain
+                                                    ikConfig,
+                                                    solution,
+                                                    penultimateSolution,
+                                                    bvhTargetTransform
                                                    );
         }
+
+
+    } else
+    {
+      fprintf(stderr,RED "Failed loading solution transform for problem\n" NORMAL);
     }
     //---------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------

@@ -586,10 +586,10 @@ float bvhConverter_IKFineTune(
   printf("bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
   //-----------------------------
-  float initialMAEInPixels = 0.0;
+  float initialMAEInPixels = 10000.0;
   float finalMAEInPixels   = 10000.0;
-  float initialMAEInMM     = 0.0;
-  float finalMAEInMM       = 0.0;
+  float initialMAEInMM     = 10000.0;
+  float finalMAEInMM       = 10000.0;
   //-----------------------------
   //By default select no problem..
   struct ikProblem * selectedProblem  = 0;
@@ -631,21 +631,21 @@ float bvhConverter_IKFineTune(
     //--------------------------------------------------------------------------
 
     //------------------------------------
-         struct ikConfiguration ikConfig = {0};
-         ikConfig.learningRate = lr;
-         ikConfig.iterations = iterations;
-         ikConfig.epochs = epochs;
+         struct ikConfiguration ikConfig        = {0};
+         ikConfig.learningRate                  = lr;
+         ikConfig.iterations                    = iterations;
+         ikConfig.epochs                        = epochs;
          ikConfig.maximumAcceptableStartingLoss = 50000;//12000; //WARING < -  consider setting this to 0
          ikConfig.gradientExplosionThreshold    = 25; //50 default
          ikConfig.iterationEarlyStopping        = 1;  //<-
          ikConfig.iterationMinimumLossDelta     = 10; //<- losses seem to be numbers 2000 -> 300 so 10 is a good limit
-         ikConfig.spring = 20;
-         ikConfig.dumpScreenshots = 0; // Dont thrash disk
-         ikConfig.verbose = 0; //Dont spam console
-         ikConfig.tryMaintainingLocalOptima=1; //Less Jittery but can be stuck at local optima
-         ikConfig.dontUseSolutionHistory=0;
-         ikConfig.useLangevinDynamics = langevinDynamics;
-         ikConfig.ikVersion = IK_VERSION;
+         ikConfig.spring                        = 20;
+         ikConfig.dumpScreenshots               = 0; // Dont thrash disk
+         ikConfig.verbose                       = 0; //Dont spam console
+         ikConfig.tryMaintainingLocalOptima     = 1; //Less Jittery but can be stuck at local optima
+         ikConfig.dontUseSolutionHistory        = 0;
+         ikConfig.useLangevinDynamics           = langevinDynamics;
+         ikConfig.ikVersion                     = IK_VERSION;
          //------------------------------------
 
         int multiThreading = 0;
@@ -713,7 +713,6 @@ float bvhConverter_IKFineTune(
             }//2DX/Y
 
            } //Tag has an _ and we process it
-
          }//Loop over received elements
 
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(
