@@ -1680,7 +1680,7 @@ void compareChainsAndAdoptBest(
 
                     if ( (samplesPrevious==0) || (samplesCurrent==0) )
                     {
-                      fprintf(stderr,RED "compareChainsAndAdoptBest: Blocking update without samples..\n" NORMAL,chainID);
+                      fprintf(stderr,RED "compareChainsAndAdoptBest: Blocking chain %u update without samples..\n" NORMAL,chainID);
                     } else
                     if (currentSolutionChainLoss > previousSolutionChainLoss)
                     {
