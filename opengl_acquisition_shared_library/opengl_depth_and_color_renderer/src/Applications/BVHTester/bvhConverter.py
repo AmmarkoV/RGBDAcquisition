@@ -537,7 +537,7 @@ class BVH():
     self.libBVH.bvhConverter_IKFineTune.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p), ctypes.POINTER(ctypes.c_float), ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_float, ctypes.c_float, ctypes.c_float,ctypes.c_float]
     self.libBVH.bvhConverter_IKFineTune.restype  = ctypes.c_float
     accuracy2D = self.libBVH.bvhConverter_IKFineTune(bodyPartCStr,labelsCStr,valuesArray,argc,frameID,iterations,epochs,lr,fSampling,fCutoff,langevinDynamics)
-    print("HCD results for ",iterations," iterations ~> %0.2f pixels!" % accuracy2D)
+    #print("HCD results for ",iterations," iterations ~> %0.2f pixels!" % accuracy2D)
     self.lastMAEErrorInPixels = accuracy2D 
     return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
 
