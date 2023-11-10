@@ -114,7 +114,7 @@ $BVHTESTER_DIR/bvhConverter.c
 
 INTEL_OPTIMIZATIONS=`cat /proc/cpuinfo | grep sse3`
 
-if [ -z "$var" ] ; then
+if [ -z "$INTEL_OPTIMIZATIONS" ] ; then
  echo "No intel optimizations available"
  EXTRA_FLAGS=" "
 else
