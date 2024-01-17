@@ -226,7 +226,7 @@ else
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  libudev-dev
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
-     make 
+     make ALLOW_WARNINGS=1
 
      cd Bin/$ONIFOLDER/OpenNI2/Drivers/
      #ln -s ../../../../../libfreenect/build/lib/OpenNI2-FreenectDriver/libFreenectDriver.so   
