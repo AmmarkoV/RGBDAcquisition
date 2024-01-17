@@ -126,5 +126,11 @@ fi
 gcc -shared -o libBVHConverter.so -O3 -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
+if [ $? -ne 0 ]; then
+    echo "Error: Unable to compile BVH library, This probably means that you have library dependencies missing ..."
+    echo "Try : sudo apt install build-essential libglew-dev freeglut3-dev"
+fi
+
+
 
 exit 0

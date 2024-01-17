@@ -583,7 +583,7 @@ float bvhConverter_IKFineTune(
                                float langevinDynamics
                              )
 {
-  fprintf(stderr,"bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
+  //fprintf(stderr,"bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
   //-----------------------------
   float initialMAEInPixels = 10000.0;
