@@ -63,7 +63,7 @@ else
   if test "$answer" != "N" -a "$answer" != "n";
   then
      cd "$DIR"
-     git clone git://github.com/OpenKinect/libfreenect2.git
+     git clone https://github.com/OpenKinect/libfreenect2.git
      cd libfreenect2
      sudo depends/install_ubuntu.sh
      cd examples/protonect
@@ -98,7 +98,7 @@ else
   then
      cd "$DIR"
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
-     git clone git://github.com/OpenKinect/libfreenect.git
+     git clone https://github.com/OpenKinect/libfreenect.git
      cd libfreenect
      mkdir build
      cd build
@@ -165,7 +165,7 @@ else
 
 
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
-     git clone git://github.com/OpenNI/OpenNI.git 
+     git clone https://github.com/OpenNI/OpenNI.git 
      cd OpenNI/Platform/Linux/CreateRedist
      ./RedistMaker
      
@@ -224,7 +224,7 @@ else
   then
      cd "$DIR"
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  libudev-dev
-     git clone git://github.com/OpenNI/OpenNI2.git
+     git clone https://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
      make ALLOW_WARNINGS=1
 
