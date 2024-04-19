@@ -120,7 +120,7 @@ int ReadPNG(char *filename,struct Image * pic,char read_only_header)
     int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
     // glTexImage2d requires rows to be 4-byte aligned
-    rowbytes += 3 - ((rowbytes-1) % 4);
+    //rowbytes += 3 - ((rowbytes-1) % 4); <- This causes problems on portrait images
 
     // Allocate the image_data as a big block, to be given to opengl
     png_byte * image_data;
