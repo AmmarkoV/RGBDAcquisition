@@ -64,8 +64,8 @@ GLuint timeID;
 GLuint resolutionID;
 
 GLuint cubeVAO;
-GLuint cubeArrayBuffer;
-unsigned int cubeTriangleCount;
+GLuint cubeArrayBuffer; 
+//unsigned int cubeTriangleCount; opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/hardcoded_shapes.h:91:21: note: previous definition of ‘cubeTriangleCount’
 
 unsigned int colorTextureUploaded=0;
 GLuint colorTexture;
@@ -338,6 +338,7 @@ int acquisitionCreateDisplay(struct viewerSettings * config,ModuleIdentifier mod
                              1,
                              &cubeVAO,
                              &cubeArrayBuffer,
+                             0, //Todo: fix this 
                              sho->ProgramObject  ,
                              cubeCoords  ,  sizeof(cubeCoords) ,
                              cubeNormals ,  sizeof(cubeNormals) ,
@@ -346,8 +347,20 @@ int acquisitionCreateDisplay(struct viewerSettings * config,ModuleIdentifier mod
                              0, 0 //Not Indexed..
                            );
 
-
-
+/* TODO: fix this 
+     pushObjectToBufferData(
+                             int generateNewVao,
+                             GLuint *vao,
+                             GLuint *arrayBuffer,
+                             GLuint *elementBuffer,
+                             GLuint programID,
+                             const float * vertices , unsigned int sizeOfVertices,
+                             const float * normals , unsigned int sizeOfNormals,
+                             const float * textureCoords ,  unsigned int sizeOfTextureCoords,
+                             const float * colors , unsigned int sizeOfColors,
+                             const unsigned int * indices , unsigned int sizeOfIndices
+                      );
+*/
 
 
 
