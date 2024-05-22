@@ -133,6 +133,86 @@ unsigned int guessFilenameTypeStupid(char * filename)
 }
 
 
+//This was generated using https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer
+//To be exact : ./StringRecognizer codecs
+int scanFor_codecs(const char * str,unsigned int strLength)
+{
+ if (str==0)      { return 0; }
+ if (strLength<3) { return 0; }
+
+ switch (toupper(str[0]))
+ {
+ case 'A' :
+     if (strLength<5) { return 0; }
+     if ( strncasecmp(str,"ASCII",5) == 0 ) { return ASCII_CODEC; }
+ break;
+ case 'B' :
+     if (strLength<3) { return 0; }
+     if ( strncasecmp(str,"BMP",3) == 0 ) { return BMP_CODEC; }
+ break;
+ case 'C' :
+     if (strLength<4) { return 0; }
+     if ( strncasecmp(str,"CPNM",4) == 0 ) { return COMPATIBLE_PNM_CODEC; }
+ break;
+ case 'J' :
+     switch (toupper(str[1])) {
+     case 'P' :
+         switch (toupper(str[2])) {
+         case 'E' :
+             if ( (strLength >= 4 )&& ( strncasecmp(str,"JPEG",4) == 0 ) ) { return JPG_CODEC; }
+         break;
+         case 'G' :
+             if ( (strLength >= 3 )&& ( strncasecmp(str,"JPG",3) == 0 ) ) { return JPG_CODEC; }
+         break;
+        };
+     break;
+    };
+ break;
+ case 'P' :
+     switch (toupper(str[1])) {
+     case 'N' :
+         switch (toupper(str[2])) {
+         case 'G' :
+             if ( (strLength >= 3 )&& ( strncasecmp(str,"PNG",3) == 0 ) ) { return PNG_CODEC; }
+         break;
+         case 'M' :
+             if ( (strLength >= 3 )&& ( strncasecmp(str,"PNM",3) == 0 ) ) { return PNM_CODEC; }
+         break;
+        };
+     break;
+     case 'P' :
+         if (strLength<3) { return 0; }
+         if ( strncasecmp(str,"PPM",3) == 0 ) { return PPM_CODEC; }
+     break;
+    };
+ break;
+ case 'R' :
+     if (strLength<3) { return 0; }
+     if ( strncasecmp(str,"RLE",3) == 0 ) { return BMP_CODEC; }
+ break;
+ case 'T' :
+     switch (toupper(str[1])) {
+     case 'E' :
+         if (strLength<4) { return 0; }
+         if ( strncasecmp(str,"TEXT",4) == 0 ) { return ASCII_CODEC; }
+     break;
+     case 'X' :
+         if (strLength<3) { return 0; }
+         if ( strncasecmp(str,"TXT",3) == 0 ) { return ASCII_CODEC; }
+     break;
+    };
+ break;
+};
+ return NO_CODEC;
+}
+
+unsigned int guessFilenameTypeSmart(const char * filename)
+{
+    unsigned int extensionLength = 0;
+    const char * extension = getExtensionAndExtraCharacters(filename,&extensionLength);
+    return scanFor_codecs(extension,extensionLength);
+}
+
 
 struct Image * readImage( char *filename,unsigned int type,char read_only_header)
 {
