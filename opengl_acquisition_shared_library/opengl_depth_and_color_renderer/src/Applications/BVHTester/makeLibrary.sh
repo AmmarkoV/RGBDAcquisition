@@ -122,8 +122,8 @@ else
  EXTRA_FLAGS="-DINTEL_OPTIMIZATIONS"
 fi
  
-
-gcc -shared -o libBVHConverter.so -O3 -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
+#-O3 causes buffer overflow ? 
+gcc -shared -o libBVHConverter.so -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
 if [ $? -ne 0 ]; then
