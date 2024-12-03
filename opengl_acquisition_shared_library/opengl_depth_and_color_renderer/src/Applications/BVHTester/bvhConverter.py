@@ -542,14 +542,24 @@ class BVH():
     return self.get2DAnd3DAndBVHDictsForFrame(frameID=frameID)
 
    #return dict()  
-  #--------------------------------------------------------
-
+  #-------------------------------------------------------- 
   def smooth(self,frameID=0,fSampling=30.0,fCutoff=5.0):
     self.stage("smooth ")
     #This call assumes that is called after subsequent(?) calls to fineTuneToMatch that have transmitted the BVH state..!
     self.libBVH.bvhConverter_smooth.argtypes = [ctypes.c_int, ctypes.c_float, ctypes.c_float]
     self.libBVH.bvhConverter_smooth.restype  = ctypes.c_int
     result = self.libBVH.bvhConverter_smooth(frameID,fSampling,fCutoff)
+    return result==1
+
+   #return dict()  
+  #-------------------------------------------------------- 
+  def eraseHistory(self):
+    self.stage("erase ")
+    #This call assumes that is called after subsequent(?) calls to fineTuneToMatch that have transmitted the BVH state..!
+    self.libBVH.bvhConverter_eraseHistory.argtypes = [ctypes.c_int]
+    self.libBVH.bvhConverter_eraseHistory.restype  = ctypes.c_int
+    frameID =0 
+    result = self.libBVH.bvhConverter_smooth(frameID)
     return result==1
 
    #return dict()  

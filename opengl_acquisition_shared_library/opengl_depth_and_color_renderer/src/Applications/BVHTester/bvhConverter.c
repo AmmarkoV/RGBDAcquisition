@@ -458,6 +458,30 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 }
 
 
+int bvhConverter_eraseHistory(int frameID)
+{
+    int i=0;
+    if (atomicPenultimateSolution!=0)
+    {
+        for (i=0; i<atomicPenultimateSolution->bufferSize; i++)
+           { atomicPenultimateSolution->motion[i]=0.0; }
+    }
+
+    if (atomicPreviousSolution!=0)
+    {
+        for (i=0; i<atomicPreviousSolution->bufferSize; i++)
+           { atomicPreviousSolution->motion[i]=0.0; }
+    }
+
+    if (atomicSolution!=0)
+    {
+        for (i=0; i<atomicSolution->bufferSize; i++)
+           { atomicSolution->motion[i]=0.0; }
+    }
+ return 1;
+}
+
+
 int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
     struct ikProblem * problem = 0;
