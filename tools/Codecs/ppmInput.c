@@ -170,7 +170,7 @@ int ReadSwappedPPM(const char * filename,struct Image * pic,char read_only_heade
 }
 
 
-int WritePPM(const char * filename,struct Image * pic)
+int WritePPMOld(const char * filename,struct Image * pic)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
     if (pic==0) { return 0; }
@@ -197,6 +197,8 @@ int WritePPM(const char * filename,struct Image * pic)
             return 1;
         }
 
+        //TODO: Check if this is correct.. 
+        //unsigned int bitsperchannelpixel = pic->bitsperpixel / pic->channels;
         fprintf(fd, "%d %d\n%u\n", pic->width, pic->height , simplePowPPM(2 ,pic->bitsperpixel)-1);
 
         float tmp_n = (float) pic->bitsperpixel/ 8;
@@ -217,7 +219,69 @@ int WritePPM(const char * filename,struct Image * pic)
 }
 
 
+int WritePPM16bitMultiChannel(const char * filename, struct Image * pic)
+{
+    if (pic == 0) { return 0; }
+    if ((pic->width == 0) || (pic->height == 0) || (pic->channels == 0) || (pic->bitsperpixel == 0))
+    {
+        fprintf(stderr, "saveRawImageToFile(%s) called with zero dimensions ( %ux%u %u channels %u bpp\n", filename, pic->width, pic->height, pic->channels, pic->bitsperpixel);
+        return 0;
+    }
+    if (pic->pixels == 0)
+    {
+        fprintf(stderr, "saveRawImageToFile(%s) called for an unallocated (empty) frame, will not write any file output\n", filename);
+        return 0;
+    }
+    if (pic->bitsperpixel / pic->channels > 16)
+    {
+        fprintf(stderr, "PNM does not support more than 2 bytes per pixel..!\n");
+        return 0;
+    }
 
+    FILE *fd = fopen(filename, "wb");
+    if (fd != 0)
+        {
+         if (pic->channels == 3) { fprintf(fd, "P6\n"); } else
+         if (pic->channels == 1) { fprintf(fd, "P5\n"); } else
+         {
+            fprintf(stderr, "Invalid channels arg (%u) for SaveRawImageToFile\n", pic->channels);
+            fclose(fd);
+            return 1;
+         }
+
+         unsigned int bitsperchannelpixel = pic->bitsperpixel / pic->channels;
+         fprintf(fd, "%u %u\n%u\n", pic->width, pic->height, simplePowPPM(2, bitsperchannelpixel) - 1);
+
+         unsigned int n = pic->width * pic->height * pic->channels * (bitsperchannelpixel / 8);
+
+         fwrite(pic->pixels, 1, n, fd);
+         fflush(fd);
+         fclose(fd);
+         return 1;
+    } else
+    {
+        fprintf(stderr, "SaveRawImageToFile could not open output file %s\n", filename);
+        return 0;
+    }
+    return 0;
+}
+
+
+
+int WritePPM(const char * filename,struct Image * pic)
+{
+   return WritePPM16bitMultiChannel(filename,pic);
+       /*
+    if ( (pic->channels==3) && (pic->bitsperpixel==48) )
+    {
+       fprintf(stderr,"WritePPM16bitMultiChannel %s \n",filename);
+       return WritePPM16bitMultiChannel(filename,pic);
+    } else
+    {
+       return WritePPMOld(filename,pic);
+    }
+  return 0;*/
+}
 
 int WriteSwappedPPM(const char * filename,struct Image * pic)
 {
