@@ -559,7 +559,7 @@ class BVH():
     self.libBVH.bvhConverter_eraseHistory.argtypes = [ctypes.c_int]
     self.libBVH.bvhConverter_eraseHistory.restype  = ctypes.c_int
     frameID =0 
-    result = self.libBVH.bvhConverter_smooth(frameID)
+    result = self.libBVH.bvhConverter_eraseHistory(frameID)
     return result==1
 
    #return dict()  

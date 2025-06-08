@@ -123,7 +123,7 @@ else
 fi
  
 #-O3 causes buffer overflow ? 
-gcc -shared -o libBVHConverter.so -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
+gcc -shared -o libBVHConverter.so -D_GNU_SOURCE -O0 -g3 -fno-omit-frame-pointer -pg -Wstrict-overflow  -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
 if [ $? -ne 0 ]; then
