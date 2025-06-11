@@ -232,7 +232,7 @@ class BVH():
         self.libBVH               = loadLibrary(libraryPath,forceUpdate = forceLibUpdate)
         self.numberOfJoints       = 0
         self.lastMAEErrorInPixels = 0.0
-        self.traceStages          = False #If set to true each call will be emitted in stdout to speed-up debugging
+        self.traceStages          = True #False #If set to true each call will be emitted in stdout to speed-up debugging
         self.calib                = dict()
         #----------------------------------- 
         if (cameraCalibrationFile!=""): 

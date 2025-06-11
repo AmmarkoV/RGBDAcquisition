@@ -404,8 +404,8 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
     snprintf(jointName,512,"__rthumb"); //Fix ?
   }
 
-  //fprintf(stderr," %u - %s->%0.2f ",i,label,value);
-  //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
+  fprintf(stderr," %s->%0.2f ",label,value);
+  fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
   //=======================================================
   //int jointID = bvhConverter_getJointNameJointID(jointName);
   BVHJointID jointID=0;

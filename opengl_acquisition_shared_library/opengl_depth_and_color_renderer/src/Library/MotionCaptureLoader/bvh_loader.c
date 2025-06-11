@@ -682,17 +682,22 @@ int bvh_getJointIDFromJointNameNocase(
                                       BVHJointID * jID
                                      )
 {
- if ( (bvhMotion!=0) && (jointName!=0) && (jID!=0) )
+ if ( (bvhMotion!=0) && (bvhMotion->jointHierarchy!=0) && (jointName!=0) && (jID!=0) )
  {
    unsigned int jointNameLength = strlen(jointName);
    //-----------------------------------------------
+   if (jointNameLength==0)
+   {
+       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of 0 length joint name..\n");
+   } else
    if (jointNameLength<MAX_BVH_JOINT_NAME)
      {
        //Moved to heap @ 2021/04/21 trying to debug a stack overflow.. :P
+       //I still encounter a stack overflow here 2025/06/11 ..
        //char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
        char * jointNameLowercase = (char *) malloc(sizeof(char) * (jointNameLength+1)); //extra space for the null termination..
 
-       if (jointNameLowercase!=0)
+       if (jointNameLowercase!=NULL)
        {
         snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
         lowercase(jointNameLowercase);
@@ -711,7 +716,7 @@ int bvh_getJointIDFromJointNameNocase(
       }
      } else
      {
-       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
+       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..\n");
      }
  }
  return 0;
