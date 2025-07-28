@@ -723,52 +723,6 @@ int bvh_getJointIDFromJointNameNocase(
 }
 
 
-int bvh_getJointIDFromJointNameNocaseBUG(
-                                      struct BVH_MotionCapture * bvhMotion ,
-                                      const char * jointName,
-                                      BVHJointID * jID
-                                     )
-{
- if ( (bvhMotion!=0) && (bvhMotion->jointHierarchy!=0) && (jointName!=0) && (jID!=0) )
- {
-   unsigned int jointNameLength = strlen(jointName);
-   //-----------------------------------------------
-   if (jointNameLength==0)
-   {
-       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of 0 length joint name..\n");
-   } else
-   if (jointNameLength<MAX_BVH_JOINT_NAME)
-     {
-       //Moved to heap @ 2021/04/21 trying to debug a stack overflow.. :P
-       //I still encounter a stack overflow here 2025/06/11 ..
-       //char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
-       char * jointNameLowercase = (char *) malloc(sizeof(char) * (jointNameLength+1)); //extra space for the null termination..
-
-       if (jointNameLowercase!=NULL)
-       {
-        snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
-        lowercase(jointNameLowercase);
-
-        unsigned int i=0;
-        for (i=0; i<bvhMotion->jointHierarchySize; i++)
-         {
-           if (strcmp(bvhMotion->jointHierarchy[i].jointNameLowercase,jointNameLowercase)==0)
-           {
-            *jID=i;
-            free(jointNameLowercase);
-            return 1;
-           }
-          }
-       free(jointNameLowercase);
-      }
-     } else
-     {
-       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..\n");
-     }
- }
- return 0;
-}
-
 int bvh_getRootJointID(
                        struct BVH_MotionCapture * bvhMotion,
                        BVHJointID * jID
