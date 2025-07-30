@@ -2371,7 +2371,7 @@ int approximateBodyFromMotionBufferUsingInverseKinematics(
     if (ikConfig->useLangevinDynamics)
         { fprintf(stderr,RED "L" NORMAL); }
 
-    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|bestLoss=%0.1f|Iterations=%u|epochs=%u\n",
+    fprintf(stderr,"IK %lu μsec|%s|lr=%0.3f|b.loss=%0.1f|it.s=%u|epochs=%u\n",
                                                endTime-startTime,
                                                problem->problemDescription,
                                                ikConfig->learningRate,
