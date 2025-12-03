@@ -40,6 +40,8 @@
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
 
+// Opaque type so Python/C users don't need internal struct definitions
+typedef void * BVHHandle;
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -76,6 +78,29 @@ void incorrectArguments()
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
+
+// A single struct holding all previously-global state
+struct BVHContext
+{
+    struct BVH_MotionCapture         motion;
+    struct BVH_Transform             transform;
+    struct simpleRenderer            renderer;
+    struct BVH_RendererConfiguration rendererConfig;
+
+    struct ikProblem * face;
+    struct ikProblem * body;
+    struct ikProblem * lhand;
+    struct ikProblem * rhand;
+
+    struct MotionBuffer * penultimate;
+    struct MotionBuffer * previous;
+    struct MotionBuffer * solution;
+
+    struct ButterWorthArray * filter;
+
+};
+
+
 struct BVH_MotionCapture         bvhAtomicMotion              = {0};
 struct BVH_Transform             bvhTransformAtomic           = {0};
 struct simpleRenderer            rendererAtomic               = {0};
@@ -92,6 +117,8 @@ struct ButterWorthArray * atomicSmoothingFilter = 0;
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
+
+
 int bvhConverter_loadAtomic(const char *path)
 {
   float scaleWorld=1.0;
@@ -826,6 +853,38 @@ int bvhConverter(int argc,const char **argv)
     fprintf(stderr,RED "BVHConverter.c main is a stub please use the python code\n" NORMAL);
     return 0;
 }
+
+
+BVHHandle * bvh_createContext()
+{
+    BVHHandle *ctx = calloc(1, sizeof(struct BVHContext));
+    return ctx;
+}
+
+void bvh_destroyContext(BVHHandle *ctxHandle)
+{
+    if (!ctxHandle) { return; }
+
+    struct BVHContext * ctx = (struct BVHContext*) ctxHandle;
+/*
+    // cleanup problems
+    ikProblem_destroy(ctx->face);
+    ikProblem_destroy(ctx->body);
+    ikProblem_destroy(ctx->lhand);
+    ikProblem_destroy(ctx->rhand);
+
+    // cleanup motion buffers
+    motionBuffer_destroy(ctx->penultimate);
+    motionBuffer_destroy(ctx->previous);
+    motionBuffer_destroy(ctx->solution);
+
+    // cleanup smoothing filter
+    butterworth_destroy(ctx->filter);
+*/
+    free(ctx);
+}
+
+
 
 int main(int argc,const char **argv)
 {

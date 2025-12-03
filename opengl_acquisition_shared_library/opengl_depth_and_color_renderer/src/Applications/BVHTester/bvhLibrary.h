@@ -13,6 +13,8 @@ extern "C"
 {
 #endif
 
+// Opaque type so Python/C users don't need internal struct definitions
+typedef void * BVHHandle;
 
 int bvhConverter_writeBVH(char * filename,int writeHierarchy,int writeMotion);
 int bvhConverter_getMotionValueOfFrame(int fID,int mID);
