@@ -20,13 +20,13 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-float max(float a,float b)
+static inline float bvh_max(float a,float b)
 {
   if (a>b) {return a;}
   return b;
 }
 
-float min(float a,float b)
+static inline float bvh_min(float a,float b)
 {
   if (a<b) {return a;}
   return b;
@@ -420,10 +420,10 @@ int bvh_populateRectangle2DFromProjections(
     {
       area->rectangle2D.calculated=1;
 
-      float minimumX=min(area->rectangle2D.x1,min(area->rectangle2D.x2,min(area->rectangle2D.x3,area->rectangle2D.x4)));
-      float minimumY=min(area->rectangle2D.y1,min(area->rectangle2D.y2,min(area->rectangle2D.y3,area->rectangle2D.y4)));
-      float maximumX=max(area->rectangle2D.x1,max(area->rectangle2D.x2,max(area->rectangle2D.x3,area->rectangle2D.x4)));
-      float maximumY=max(area->rectangle2D.y1,max(area->rectangle2D.y2,max(area->rectangle2D.y3,area->rectangle2D.y4)));
+      float minimumX=bvh_min(area->rectangle2D.x1,bvh_min(area->rectangle2D.x2,bvh_min(area->rectangle2D.x3,area->rectangle2D.x4)));
+      float minimumY=bvh_min(area->rectangle2D.y1,bvh_min(area->rectangle2D.y2,bvh_min(area->rectangle2D.y3,area->rectangle2D.y4)));
+      float maximumX=bvh_max(area->rectangle2D.x1,bvh_max(area->rectangle2D.x2,bvh_max(area->rectangle2D.x3,area->rectangle2D.x4)));
+      float maximumY=bvh_max(area->rectangle2D.y1,bvh_max(area->rectangle2D.y2,bvh_max(area->rectangle2D.y3,area->rectangle2D.y4)));
       area->rectangle2D.x=minimumX;
       area->rectangle2D.y=minimumY;
       area->rectangle2D.width=maximumX-minimumX;
@@ -776,7 +776,7 @@ static inline void bvh_prepareMatricesForTransform(
   //----------------------------------------------------
 
   //To Setup the dynamic transformation we must first get values from our bvhMotion structure
-  if (bhv_retrieveDataFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
+  if (bvh_retrieveDataFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
        create4x4FTranslationMatrix(
                                     &bvhTransform->joint[jID].dynamicTranslation,
@@ -857,7 +857,7 @@ static inline void bvh_performActualTransform(
                                               unsigned int jID
                                              )
 {
-  if (!bvhMotion->jointHierarchy[jID].isRoot) //(bhv_jointHasParent(bvhMotion,jID))
+  if (!bvhMotion->jointHierarchy[jID].isRoot) //(bvh_jointHasParent(bvhMotion,jID))
       {
         //If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;

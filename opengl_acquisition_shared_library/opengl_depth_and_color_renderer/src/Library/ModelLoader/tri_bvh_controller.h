@@ -1019,7 +1019,7 @@ const static int animateTRIModelUsingBVHArmature(
                         //fprintf(stderr,GREEN "Do TRI To BVH\n" NORMAL);
 
                          //To Setup the dynamic transformation we must first get values from our bvhMotion structure
-                         if (bhv_retrieveDataFromMotionBuffer(bvh,jID,frameMotionBuffer->motion,data,sizeof(data)))
+                         if (bvh_retrieveDataFromMotionBuffer(bvh,jID,frameMotionBuffer->motion,data,sizeof(data)))
                                {
                                  //-----------------------------------------------
                                  //See https://github.com/makehumancommunity/makehuman/blob/master/makehuman/shared/bvh.py#L369
@@ -1137,7 +1137,7 @@ const static int animateTRIModelUsingBVHArmature(
                                    }
                                } else // Retrieved rotation data ..
                                {
-                                 fprintf(stderr,RED "Error: bhv_retrieveDataFromMotionBuffer \n" NORMAL);
+                                 fprintf(stderr,RED "Error: bvh_retrieveDataFromMotionBuffer \n" NORMAL);
                                }
                     }
                 }

@@ -31,7 +31,7 @@ void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
       if ( mc->jointHierarchy[jID].partOfHierarchy.isAPartOfTorso )     { connectorColorR=0; connectorColorG=0; connectorColorB=255; }
 
 
-      if (bhv_jointHasParent(mc,jID))
+      if (bvh_jointHasParent(mc,jID))
       {
         fprintf(fp,"CONNECTOR(s%u,s%u,%u,%u,%u,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint,connectorColorR,connectorColorG,connectorColorB);
       }
@@ -70,7 +70,7 @@ void dumpSphereBody(
              );
      }
      fprintf(fp,"\n");
-     
+
      bvh_freeTransform(bvhTransform);
     }
 }

@@ -105,7 +105,7 @@ int getAssociatedPositionsAndRotationsForJointID(
         }
 
   float data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
-  if (bhv_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
+  if (bvh_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
          {
            *posX=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_X];
            *posY=data[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_POSITION_Y];

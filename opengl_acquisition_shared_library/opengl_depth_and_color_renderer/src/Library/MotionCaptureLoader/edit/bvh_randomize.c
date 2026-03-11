@@ -411,7 +411,7 @@ int bvh_eraseJoints(
            if(includeEndSites)
            {
              BVHJointID jIDES=jID;
-             if (bhv_jointGetEndSiteChild(mc,jID,&jIDES))
+             if (bvh_jointGetEndSiteChild(mc,jID,&jIDES))
                {
                  mc->jointHierarchy[jIDES].erase2DCoordinates=1;
                  fprintf(stderr,GREEN "EndSite_%s " NORMAL,argv[i]);

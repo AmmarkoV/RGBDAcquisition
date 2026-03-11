@@ -294,7 +294,7 @@ struct BVH_MotionCapture
 };
 
 
-int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC);
+int enumerateRotationChannelOrderFromTypes(char typeA,char typeB,char typeC);
 
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint);
 
@@ -345,7 +345,7 @@ int bvh_OffsetPositionRotation(
 * @param  Joint ID we want to query
 * @return 1=HasParent/0=NoParent-Error
 */
-int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
+int bvh_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
 /**
@@ -372,13 +372,13 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 * @param  Joint ID we want to query
 * @return 1=HasParent/0=NoParent-Error
 */
-int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
+int bvh_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
 
 
 
-int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,BVHJointID * jChildID);
+int bvh_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,BVHJointID * jChildID);
 
 
 /**
@@ -388,7 +388,7 @@ int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID
 * @param  Joint ID we want to query
 * @return 1=HasRotation/0=NoRotation-Error
 */
-int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
+int bvh_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 
 /**
 * @brief Resolve a C-String from a Joint name to a Joint ID
@@ -588,7 +588,7 @@ int bvh_setJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJoint
 int bvh_setJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value);
 int bvh_setJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value);
 
-int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
+int bvh_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
 
 
 
@@ -602,7 +602,7 @@ int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , 
 * @param  Size of the output float array that should hold at least 6 floats
 * @return 1=Success/0=Failure
 */
-int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
+int bvh_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
 
 
 float  bvh_getJointRotationWAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,float * motionBuffer);
@@ -624,7 +624,7 @@ float  bvh_getJointPositionZAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,
 * @param  Size of the output float array that should hold at least 6 floats
 * @return 1=Success/0=Failure
 */
-int bhv_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData);
+int bvh_retrieveDataFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData);
 
 /**
 * @brief Direct access to the motion data, without Joint hierarchy,Frame separation etc, should not be used unless you really know what you are doing..

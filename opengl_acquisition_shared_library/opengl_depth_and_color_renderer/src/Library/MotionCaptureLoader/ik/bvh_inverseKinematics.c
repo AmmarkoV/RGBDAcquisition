@@ -18,8 +18,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <time.h>
-
 #include "hardcodedProblems_inverseKinematics.h"
 #include "bvh_inverseKinematics.h"
 #include "levmar.h"

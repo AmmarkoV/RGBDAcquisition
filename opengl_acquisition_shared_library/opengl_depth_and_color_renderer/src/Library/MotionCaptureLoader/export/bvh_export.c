@@ -258,7 +258,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
       }
 
    float dataOriginal[MOTIONBUFFER_TRANSACTION_DATA_FIELDS_NUMBER]={0};
-   if (!bhv_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
+   if (!bvh_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
       {
         fprintf(stderr,RED "Error accessing original position/rotation data for frame %u\n" NORMAL,fID);
         return 0;
@@ -278,7 +278,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
         return 0;
    }
 
-   if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
+   if (!bvh_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
       {
         fprintf(stderr,RED "Error adjusting position/rotation data for frame %u\n" NORMAL,fID);
         return 0;
@@ -290,7 +290,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
 
-        if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
+        if (!bvh_setPosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
         {
          fprintf(stderr,RED "Error restoring original data for frame %u\n" NORMAL,fID);
          return 0;
