@@ -40,7 +40,7 @@
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
 
-// Opaque type so Python/C users don't need internal struct definitions
+// Opaque handle type — callers only ever see void*
 typedef void * BVHHandle;
 
 #define NORMAL   "\033[0m"
@@ -79,7 +79,9 @@ void incorrectArguments()
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 
-// A single struct holding all previously-global state
+// All BVH state for one loaded file lives in this struct.
+// It is heap-allocated by bvhConverter_loadAtomic / bvh_createContext
+// and freed by bvhConverter_unloadAtomic / bvh_destroyContext.
 struct BVHContext
 {
     struct BVH_MotionCapture         motion;
@@ -97,186 +99,187 @@ struct BVHContext
     struct MotionBuffer * solution;
 
     struct ButterWorthArray * filter;
-
 };
 
-
-struct BVH_MotionCapture         bvhAtomicMotion              = {0};
-struct BVH_Transform             bvhTransformAtomic           = {0};
-struct simpleRenderer            rendererAtomic               = {0};
-struct BVH_RendererConfiguration renderingAtomicConfiguration = {0};
-struct ikProblem * atomicFaceProblem  = 0;
-struct ikProblem * atomicBodyProblem  = 0;
-struct ikProblem * atomicLHandProblem = 0;
-struct ikProblem * atomicRHandProblem = 0;
-struct MotionBuffer * atomicPenultimateSolution=0;
-struct MotionBuffer * atomicPreviousSolution=0;
-struct MotionBuffer * atomicSolution=0;
-struct ButterWorthArray * atomicSmoothingFilter = 0;
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 
+// Convenience macro: cast the opaque handle at the top of every function.
+#define CTX(h) ((struct BVHContext*)(h))
 
-int bvhConverter_loadAtomic(const char *path)
+
+BVHHandle bvhConverter_loadAtomic(const char *path)
 {
+  struct BVHContext *ctx = (struct BVHContext*) calloc(1, sizeof(struct BVHContext));
+  if (ctx == NULL)
+  {
+      fprintf(stderr,RED "bvhConverter_loadAtomic: failed to allocate BVHContext\n" NORMAL);
+      return NULL;
+  }
+
   float scaleWorld=1.0;
   int immediatelyHaltOnError = 1;
   fprintf(stderr,"Attempting to load %s\n",path);
-  if (!bvh_loadBVH(path, &bvhAtomicMotion, scaleWorld))
+  if (!bvh_loadBVH(path, &ctx->motion, scaleWorld))
           {
             haltOnError(immediatelyHaltOnError,"Error loading bvh file..");
           }
   //Change joint names..
-  bvh_renameJointsForCompatibility(&bvhAtomicMotion);
+  bvh_renameJointsForCompatibility(&ctx->motion);
 
 
   // Emulate GoPro Hero4 @ FullHD mode by default..
   // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-  renderingAtomicConfiguration.near   = 1.0;
-  renderingAtomicConfiguration.far    = 10000.0;
-  renderingAtomicConfiguration.width  = 1920;
-  renderingAtomicConfiguration.height = 1080;
-  renderingAtomicConfiguration.cX     = (float)renderingAtomicConfiguration.width/2;
-  renderingAtomicConfiguration.cY     = (float)renderingAtomicConfiguration.height/2;
-  renderingAtomicConfiguration.fX     = 582.18394;
-  renderingAtomicConfiguration.fY     = 582.52915;
+  ctx->rendererConfig.near   = 1.0;
+  ctx->rendererConfig.far    = 10000.0;
+  ctx->rendererConfig.width  = 1920;
+  ctx->rendererConfig.height = 1080;
+  ctx->rendererConfig.cX     = (float)ctx->rendererConfig.width/2;
+  ctx->rendererConfig.cY     = (float)ctx->rendererConfig.height/2;
+  ctx->rendererConfig.fX     = 582.18394;
+  ctx->rendererConfig.fY     = 582.52915;
   //----------------------------------------------
   simpleRendererDefaults(
-                          &rendererAtomic,
-                          renderingAtomicConfiguration.width,
-                          renderingAtomicConfiguration.height,
-                          renderingAtomicConfiguration.fX,
-                          renderingAtomicConfiguration.fY
+                          &ctx->renderer,
+                          ctx->rendererConfig.width,
+                          ctx->rendererConfig.height,
+                          ctx->rendererConfig.fX,
+                          ctx->rendererConfig.fY
                          );
   //----------------------------------------------
-  simpleRendererInitialize(&rendererAtomic);
+  simpleRendererInitialize(&ctx->renderer);
   //----------------------------------------------
-  return bvhAtomicMotion.jointHierarchySize;
+  return (BVHHandle) ctx;
 }
 
 
-int bvhConverter_unloadAtomic()
+int bvhConverter_unloadAtomic(BVHHandle ctxHandle)
 {
-    /* TODO: unload all this..!
-    struct BVH_MotionCapture         bvhAtomicMotion={0};
-struct BVH_Transform             bvhTransformAtomic={0};
-struct simpleRenderer            rendererAtomic={0};
-struct BVH_RendererConfiguration renderingAtomicConfiguration={0};
-struct ikProblem * atomicFaceProblem  = 0;
-struct ikProblem * atomicBodyProblem  = 0;
-struct ikProblem * atomicLHandProblem = 0;
-struct ikProblem * atomicRHandProblem = 0;
-struct MotionBuffer * atomicPreviousSolution=0;
-struct MotionBuffer * atomicSolution=0;
-*/
-  fprintf(stderr,"bvhConverter_unloadAtomic not implemented yet..\n");
-  return 0;
+    if (ctxHandle == NULL) { return 1; }
+    struct BVHContext *ctx = CTX(ctxHandle);
+
+    // Free heap-allocated sub-members (IK problems, motion buffers, smoothing filter).
+    // TODO: add dedicated free functions for BVH_MotionCapture and BVH_Transform internals.
+    if (ctx->face)        { free(ctx->face);        ctx->face        = NULL; }
+    if (ctx->body)        { free(ctx->body);         ctx->body        = NULL; }
+    if (ctx->lhand)       { free(ctx->lhand);        ctx->lhand       = NULL; }
+    if (ctx->rhand)       { free(ctx->rhand);        ctx->rhand       = NULL; }
+    if (ctx->penultimate) { free(ctx->penultimate);  ctx->penultimate = NULL; }
+    if (ctx->previous)    { free(ctx->previous);     ctx->previous    = NULL; }
+    if (ctx->solution)    { free(ctx->solution);     ctx->solution    = NULL; }
+    if (ctx->filter)      { free(ctx->filter);       ctx->filter      = NULL; }
+
+    free(ctx);
+    return 1;
 }
 
-int bvhConverter_rendererConfigurationAtomic(const char ** labels,const float * values,int numberOfElements)
+int bvhConverter_rendererConfigurationAtomic(BVHHandle ctxHandle,const char ** labels,const float * values,int numberOfElements)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   // Emulate GoPro Hero4 @ FullHD mode by default..
   // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-  renderingAtomicConfiguration.near   = 1.0;
-  renderingAtomicConfiguration.far    = 10000.0;
-  renderingAtomicConfiguration.width  = 1920;
-  renderingAtomicConfiguration.height = 1080;
-  renderingAtomicConfiguration.cX     = (float)renderingAtomicConfiguration.width/2;
-  renderingAtomicConfiguration.cY     = (float)renderingAtomicConfiguration.height/2;
-  renderingAtomicConfiguration.fX     = 582.18394;
-  renderingAtomicConfiguration.fY     = 582.52915;
+  ctx->rendererConfig.near   = 1.0;
+  ctx->rendererConfig.far    = 10000.0;
+  ctx->rendererConfig.width  = 1920;
+  ctx->rendererConfig.height = 1080;
+  ctx->rendererConfig.cX     = (float)ctx->rendererConfig.width/2;
+  ctx->rendererConfig.cY     = (float)ctx->rendererConfig.height/2;
+  ctx->rendererConfig.fX     = 582.18394;
+  ctx->rendererConfig.fY     = 582.52915;
 
   fprintf(stderr,"bvhConverter_rendererConfigurationAtomic received %u elements\n",numberOfElements);
   for (int i=0; i<numberOfElements; i++)
   {
       //fprintf(stderr," %u - %s->%0.2f\n",i,labels[i],values[i]);
-      if (strcmp(labels[i],"near")==0)   { renderingAtomicConfiguration.near   = values[i]; } else
-      if (strcmp(labels[i],"far")==0)    { renderingAtomicConfiguration.far    = values[i]; } else
-      if (strcmp(labels[i],"width")==0)  { renderingAtomicConfiguration.width  = (unsigned int) values[i]; } else
-      if (strcmp(labels[i],"height")==0) { renderingAtomicConfiguration.height = (unsigned int) values[i]; } else
-      if (strcmp(labels[i],"cX")==0)     { renderingAtomicConfiguration.cX     = values[i]; } else
-      if (strcmp(labels[i],"cY")==0)     { renderingAtomicConfiguration.cY     = values[i]; } else
-      if (strcmp(labels[i],"fX")==0)     { renderingAtomicConfiguration.fX     = values[i]; } else
-      if (strcmp(labels[i],"fY")==0)     { renderingAtomicConfiguration.fY     = values[i]; } else
+      if (strcmp(labels[i],"near")==0)   { ctx->rendererConfig.near   = values[i]; } else
+      if (strcmp(labels[i],"far")==0)    { ctx->rendererConfig.far    = values[i]; } else
+      if (strcmp(labels[i],"width")==0)  { ctx->rendererConfig.width  = (unsigned int) values[i]; } else
+      if (strcmp(labels[i],"height")==0) { ctx->rendererConfig.height = (unsigned int) values[i]; } else
+      if (strcmp(labels[i],"cX")==0)     { ctx->rendererConfig.cX     = values[i]; } else
+      if (strcmp(labels[i],"cY")==0)     { ctx->rendererConfig.cY     = values[i]; } else
+      if (strcmp(labels[i],"fX")==0)     { ctx->rendererConfig.fX     = values[i]; } else
+      if (strcmp(labels[i],"fY")==0)     { ctx->rendererConfig.fY     = values[i]; } else
         {
           fprintf(stderr,RED"bvhConverter_rendererConfigurationAtomic: Unknown command %u - %s->%0.2f\n" NORMAL,i,labels[i],values[i]);
         }
   }
 
    simpleRendererDefaults(
-                          &rendererAtomic,
-                          renderingAtomicConfiguration.width,
-                          renderingAtomicConfiguration.height,
-                          renderingAtomicConfiguration.fX,
-                          renderingAtomicConfiguration.fY
+                          &ctx->renderer,
+                          ctx->rendererConfig.width,
+                          ctx->rendererConfig.height,
+                          ctx->rendererConfig.fX,
+                          ctx->rendererConfig.fY
                          );
-    simpleRendererInitialize(&rendererAtomic);
+    simpleRendererInitialize(&ctx->renderer);
   return 1;
 }
 
-int bvhConverter_processFrame(int frameID)
+int bvhConverter_processFrame(BVHHandle ctxHandle,int frameID)
 {
+    struct BVHContext *ctx = CTX(ctxHandle);
     int occlusions=1;
     return performPointProjectionsForFrame(
-                                           &bvhAtomicMotion,
-                                           &bvhTransformAtomic,
+                                           &ctx->motion,
+                                           &ctx->transform,
                                            frameID,
-                                           &rendererAtomic,
+                                           &ctx->renderer,
                                            occlusions,
-                                           renderingAtomicConfiguration.isDefined
+                                           ctx->rendererConfig.isDefined
                                           );
 }
 
 
-int bvhConverter_scale(float scaleRatio)
+int bvhConverter_scale(BVHHandle ctxHandle,float scaleRatio)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   fprintf(stderr,"Offset scaling ratio = %0.2f \n",scaleRatio);
   return bvh_scaleAllOffsets(
-                              &bvhAtomicMotion,
+                              &ctx->motion,
                               scaleRatio
                             );
 }
 
-int bvhConverter_getNumberOfMotionValuesPerFrame()
+int bvhConverter_getNumberOfMotionValuesPerFrame(BVHHandle ctxHandle)
 {
- return bvhAtomicMotion.numberOfValuesPerFrame;
+ return CTX(ctxHandle)->motion.numberOfValuesPerFrame;
 }
 
-int bvhConverter_getNumberOfJoints()
+int bvhConverter_getNumberOfJoints(BVHHandle ctxHandle)
 {
- return bvhAtomicMotion.jointHierarchySize;
+ return CTX(ctxHandle)->motion.jointHierarchySize;
 }
 
-int bvhConverter_writeBVH(char * filename,int writeHierarchy,int writeMotion)
+int bvhConverter_writeBVH(BVHHandle ctxHandle,char * filename,int writeHierarchy,int writeMotion)
 {
  return dumpBVHToBVH(
                      filename,
-                     &bvhAtomicMotion,
+                     &CTX(ctxHandle)->motion,
                      writeHierarchy,
                      writeMotion
                     );
 }
 
-int bvhConverter_getMotionValueOfFrame(int fID,int mID)
+int bvhConverter_getMotionValueOfFrame(BVHHandle ctxHandle,int fID,int mID)
 {
- return bvh_getMotionValueOfFrame(&bvhAtomicMotion,fID,mID);
+ return bvh_getMotionValueOfFrame(&CTX(ctxHandle)->motion,fID,mID);
 }
 
-int bvhConverter_setMotionValueOfFrame(int fID,int mID,float value)
+int bvhConverter_setMotionValueOfFrame(BVHHandle ctxHandle,int fID,int mID,float value)
 {
  float localValue = value;
- return bvh_setMotionValueOfFrame(&bvhAtomicMotion,fID,mID,&localValue);
+ return bvh_setMotionValueOfFrame(&CTX(ctxHandle)->motion,fID,mID,&localValue);
 }
 
-int bvhConverter_getJointNameJointID(const char * jointName)
+int bvhConverter_getJointNameJointID(BVHHandle ctxHandle,const char * jointName)
 {
   //fprintf(stderr,"Asked to resolve %s\n",jointName);
   BVHJointID jID=0;
   if  (
         bvh_getJointIDFromJointNameNocase(
-                                          &bvhAtomicMotion,
+                                          &CTX(ctxHandle)->motion,
                                           jointName,
                                           &jID
                                          )
@@ -288,104 +291,116 @@ int bvhConverter_getJointNameJointID(const char * jointName)
   return -1;
 }
 
-const char * bvhConverter_getJointNameFromJointID(int jointID)
+const char * bvhConverter_getJointNameFromJointID(BVHHandle ctxHandle,int jointID)
 {
-    if (jointID<bvhAtomicMotion.jointHierarchySize)
+    struct BVHContext *ctx = CTX(ctxHandle);
+    if (jointID<ctx->motion.jointHierarchySize)
     {
-        return bvhAtomicMotion.jointHierarchy[jointID].jointName;
+        return ctx->motion.jointHierarchy[jointID].jointName;
     }
   fprintf(stderr,RED "BVH library could not resolve joint name for joint out bounds \"%u\" \n" NORMAL,jointID);
   return "";
 }
 
-int bvhConverter_getJointParent(int jointID)
+int bvhConverter_getJointParent(BVHHandle ctxHandle,int jointID)
 {
-    if (jointID<bvhAtomicMotion.jointHierarchySize)
+    struct BVHContext *ctx = CTX(ctxHandle);
+    if (jointID<ctx->motion.jointHierarchySize)
     {
-        return bvhAtomicMotion.jointHierarchy[jointID].parentJoint;
+        return ctx->motion.jointHierarchy[jointID].parentJoint;
     }
   fprintf(stderr,RED "BVH library could not resolve joint parent for joint out bounds \"%u\" \n" NORMAL,jointID);
   return 0;
 }
 
-float bvhConverter_get3DX(int jointID)
+float bvhConverter_get3DX(BVHHandle ctxHandle,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get3DX(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return bvhTransformAtomic.joint[jointID].pos3D[0]; }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return ctx->transform.joint[jointID].pos3D[0]; }
   return 0.0;
 }
 
-float  bvhConverter_get3DY(int jointID)
+float  bvhConverter_get3DY(BVHHandle ctxHandle,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get3DY(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return bvhTransformAtomic.joint[jointID].pos3D[1]; }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return ctx->transform.joint[jointID].pos3D[1]; }
   return 0.0;
 }
 
-float  bvhConverter_get3DZ(int jointID)
+float  bvhConverter_get3DZ(BVHHandle ctxHandle,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get3DZ(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return bvhTransformAtomic.joint[jointID].pos3D[2]; }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return ctx->transform.joint[jointID].pos3D[2]; }
   return 0.0;
 }
 
-float bvhConverter_get2DX(int jointID)
+float bvhConverter_get2DX(BVHHandle ctxHandle,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return (float) bvhTransformAtomic.joint[jointID].pos2D[0]/renderingAtomicConfiguration.width; }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return (float) ctx->transform.joint[jointID].pos2D[0]/ctx->rendererConfig.width; }
   return 0.0;
 }
 
-float  bvhConverter_get2DY(int jointID)
+float  bvhConverter_get2DY(BVHHandle ctxHandle,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get2DY(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return (float) bvhTransformAtomic.joint[jointID].pos2D[1]/renderingAtomicConfiguration.height; }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return (float) ctx->transform.joint[jointID].pos2D[1]/ctx->rendererConfig.height; }
   return 0.0;
 }
 
 
 
-int bvhConverter_isJointEndSite(int jointID)
+int bvhConverter_isJointEndSite(BVHHandle ctxHandle,int jointID)
 {
-  if (jointID<bvhAtomicMotion.jointHierarchySize)
-     { return bvhAtomicMotion.jointHierarchy[jointID].isEndSite; }
+  struct BVHContext *ctx = CTX(ctxHandle);
+  if (jointID<ctx->motion.jointHierarchySize)
+     { return ctx->motion.jointHierarchy[jointID].isEndSite; }
   fprintf(stderr,RED "BVH library could not resolve if joint is an EndSite because joint is out bounds \"%u\" \n" NORMAL,jointID);
   return 0;
 }
 
-float bvhConverter_getBVHJointRotationXForFrame(int frameID,int jointID)
+float bvhConverter_getBVHJointRotationXForFrame(BVHHandle ctxHandle,int frameID,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return (float) bvh_getJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationXAtFrame(&ctx->motion,jointID,frameID); }
   return 0.0;
 }
-float bvhConverter_getBVHJointRotationYForFrame(int frameID,int jointID)
+float bvhConverter_getBVHJointRotationYForFrame(BVHHandle ctxHandle,int frameID,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return (float) bvh_getJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationYAtFrame(&ctx->motion,jointID,frameID); }
   return 0.0;
 }
-float bvhConverter_getBVHJointRotationZForFrame(int frameID,int jointID)
+float bvhConverter_getBVHJointRotationZForFrame(BVHHandle ctxHandle,int frameID,int jointID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_get2DX(%u)\n",jointID);
-  if (jointID<bvhTransformAtomic.numberOfJointsToTransform)
-     { return (float) bvh_getJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID); }
+  if (jointID<ctx->transform.numberOfJointsToTransform)
+     { return (float) bvh_getJointRotationZAtFrame(&ctx->motion,jointID,frameID); }
   return 0.0;
 }
 
 
 
-int bvhConverter_modifySingleAtomic(const char * label,const float value,int frameID)
+int bvhConverter_modifySingleAtomic(BVHHandle ctxHandle,const char * label,const float value,int frameID)
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   if (label==0) { return 0; }
-  if (frameID>=bvhAtomicMotion.numberOfFrames) { return 0; }
+  if (frameID>=ctx->motion.numberOfFrames) { return 0; }
   //------------------------------------------------------------
   //fprintf(stderr,"bvhConverter_modifyAtomic received element %s with value %0.2f for frame %u\n",label,value,frameID);
   //------------------------------------------------------------
@@ -434,26 +449,26 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
   //fprintf(stderr," %s->%0.2f ",label,value);
   //fprintf(stderr," Joint:%s Control:%s\n",jointName,dof);
   //=======================================================
-  //int jointID = bvhConverter_getJointNameJointID(jointName);
+  //int jointID = bvhConverter_getJointNameJointID(ctxHandle,jointName);
   BVHJointID jointID=0;
   if  (
         bvh_getJointIDFromJointNameNocase(
-                                          &bvhAtomicMotion,
+                                          &ctx->motion,
                                           jointName,
                                           &jointID
                                          )
       )
       {
       // The next line is a debug message that spams a *lot*!
-      //fprintf(stderr,"Joint ID %u / %s|%s => %0.2f \n",jointID,bvhAtomicMotion.jointHierarchy[jointID].jointName,dof,value);
+      //fprintf(stderr,"Joint ID %u / %s|%s => %0.2f \n",jointID,ctx->motion.jointHierarchy[jointID].jointName,dof,value);
       //==============================================================================================================
-      if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
-      if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&bvhAtomicMotion,jointID,frameID,value); } else
+      if (strcmp(dof,"xposition")==0) { bvh_setJointPositionXAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"yposition")==0) { bvh_setJointPositionYAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"zposition")==0) { bvh_setJointPositionZAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"xrotation")==0) { bvh_setJointRotationXAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"yrotation")==0) { bvh_setJointRotationYAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"zrotation")==0) { bvh_setJointRotationZAtFrame(&ctx->motion,jointID,frameID,value); } else
+      if (strcmp(dof,"wrotation")==0) { bvh_setJointRotationWAtFrame(&ctx->motion,jointID,frameID,value); } else
                                       {
                                          fprintf(stderr,RED "\n\n\nBVH library could not perform modification  \"%s\" for joint \"%s\" \n\n\n" NORMAL,dof,jointName);
                                          everythingOk=0;
@@ -469,13 +484,13 @@ int bvhConverter_modifySingleAtomic(const char * label,const float value,int fra
 
 
 
-int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numberOfElements,int frameID)
+int bvhConverter_modifyAtomic(BVHHandle ctxHandle,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
   //fprintf(stderr,"bvhConverter_modifyAtomic received %u elements\n",numberOfElements);
   int everythingOk = 1;
   for (int i=0; i<numberOfElements; i++)
   {
-      if (!bvhConverter_modifySingleAtomic(labels[i],values[i],frameID))
+      if (!bvhConverter_modifySingleAtomic(ctxHandle,labels[i],values[i],frameID))
       {
           fprintf(stderr,RED "\n\n\nBVH library modification failed resolving all joints\n\n\n" NORMAL);
           everythingOk=0;
@@ -485,122 +500,124 @@ int bvhConverter_modifyAtomic(const char ** labels,const float * values,int numb
 }
 
 
-int bvhConverter_eraseHistory(int frameID)
+int bvhConverter_eraseHistory(BVHHandle ctxHandle,int frameID)
 {
+    struct BVHContext *ctx = CTX(ctxHandle);
     int i=0;
-    if (atomicPenultimateSolution!=0)
+    if (ctx->penultimate!=0)
     {
-        for (i=0; i<atomicPenultimateSolution->bufferSize; i++)
-           { atomicPenultimateSolution->motion[i]=0.0; }
+        for (i=0; i<ctx->penultimate->bufferSize; i++)
+           { ctx->penultimate->motion[i]=0.0; }
     }
 
-    if (atomicPreviousSolution!=0)
+    if (ctx->previous!=0)
     {
-        for (i=0; i<atomicPreviousSolution->bufferSize; i++)
-           { atomicPreviousSolution->motion[i]=0.0; }
+        for (i=0; i<ctx->previous->bufferSize; i++)
+           { ctx->previous->motion[i]=0.0; }
     }
 
-    if (atomicSolution!=0)
+    if (ctx->solution!=0)
     {
-        for (i=0; i<atomicSolution->bufferSize; i++)
-           { atomicSolution->motion[i]=0.0; }
+        for (i=0; i<ctx->solution->bufferSize; i++)
+           { ctx->solution->motion[i]=0.0; }
     }
  return 1;
 }
 
 
-int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
+int bvhConverter_IKSetup(BVHHandle ctxHandle,const char * bodyPart,const char ** labels,const float * values,int numberOfElements,int frameID)
 {
+    struct BVHContext *ctx = CTX(ctxHandle);
     struct ikProblem * problem = 0;
 
     //Handle current/previous solution (assuming bvhConverter_modifyAtomic has been called)..
     //=======================================================================================
-    if (atomicPenultimateSolution==0)
-          { atomicPenultimateSolution = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    if (ctx->penultimate==0)
+          { ctx->penultimate = mallocNewMotionBuffer(&ctx->motion); }
     //=======================================================================================
-    if (atomicPreviousSolution==0)
-          { atomicPreviousSolution    = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    if (ctx->previous==0)
+          { ctx->previous    = mallocNewMotionBuffer(&ctx->motion); }
      //====================================================================
-    if (atomicSolution==0)
-          { atomicSolution            = mallocNewMotionBuffer(&bvhAtomicMotion); }
+    if (ctx->solution==0)
+          { ctx->solution    = mallocNewMotionBuffer(&ctx->motion); }
      //====================================================================
 
 
     //Construct and/or select the correct problem to solve..!
     if (strcmp(bodyPart,"body")==0)
     {
-       if (atomicBodyProblem==0)
+       if (ctx->body==0)
            {
             fprintf(stderr,GREEN "Initializing Body Problem for the first time..\n" NORMAL);
-            atomicBodyProblem = allocateEmptyIKProblem();
+            ctx->body = allocateEmptyIKProblem();
             prepareDefaultBodyProblem(
-                                          atomicBodyProblem,
-                                          &bvhAtomicMotion,
-                                          &rendererAtomic,
-                                          atomicPreviousSolution,
-                                          atomicSolution,
-                                          &bvhTransformAtomic
+                                          ctx->body,
+                                          &ctx->motion,
+                                          &ctx->renderer,
+                                          ctx->previous,
+                                          ctx->solution,
+                                          &ctx->transform
                                          );
             fprintf(stderr,GREEN "Done Initializing Body Problem ..\n" NORMAL);
            }
-      problem = atomicBodyProblem;
+      problem = ctx->body;
     } else
     if (strcmp(bodyPart,"face")==0)
     {
-      if (atomicFaceProblem==0)
+      if (ctx->face==0)
            {
             fprintf(stderr,GREEN "Initializing Face Problem for the first time..\n" NORMAL);
-              atomicFaceProblem = allocateEmptyIKProblem();
+              ctx->face = allocateEmptyIKProblem();
               prepareDefaultFaceProblem(
-                                        atomicFaceProblem,
-                                        &bvhAtomicMotion,
-                                        &rendererAtomic,
-                                        atomicPreviousSolution,
-                                        atomicSolution,
-                                        &bvhTransformAtomic,
+                                        ctx->face,
+                                        &ctx->motion,
+                                        &ctx->renderer,
+                                        ctx->previous,
+                                        ctx->solution,
+                                        &ctx->transform,
                                         1
                                        );
             fprintf(stderr,GREEN "Done Initializing Face Problem ..\n" NORMAL);
            }
-      problem = atomicFaceProblem;
+      problem = ctx->face;
     } else
     if (strcmp(bodyPart,"rhand")==0)
     {
-       if (atomicRHandProblem==0)
+       if (ctx->rhand==0)
            {
             fprintf(stderr,GREEN "Initializing RHand Problem for the first time..\n" NORMAL);
-            atomicRHandProblem = allocateEmptyIKProblem();
+            ctx->rhand = allocateEmptyIKProblem();
             prepareDefaultRightHandProblem(
-                                          atomicRHandProblem,
-                                          &bvhAtomicMotion,
-                                          &rendererAtomic,
-                                          atomicPreviousSolution,
-                                          atomicSolution,
-                                          &bvhTransformAtomic,
+                                          ctx->rhand,
+                                          &ctx->motion,
+                                          &ctx->renderer,
+                                          ctx->previous,
+                                          ctx->solution,
+                                          &ctx->transform,
                                           1
                                          );
             fprintf(stderr,GREEN "Done Initializing RHand Problem ..\n" NORMAL);
            }
-       problem = atomicRHandProblem;
+       problem = ctx->rhand;
     } else
     if (strcmp(bodyPart,"lhand")==0)
     {
-       if (atomicLHandProblem==0)
+       if (ctx->lhand==0)
            {
             fprintf(stderr,GREEN "Initializing LHand Problem for the first time..\n" NORMAL);
-            atomicLHandProblem = allocateEmptyIKProblem();
+            ctx->lhand = allocateEmptyIKProblem();
             prepareDefaultLeftHandProblem(
-                                          atomicLHandProblem,
-                                          &bvhAtomicMotion,
-                                          &rendererAtomic,
-                                          atomicPreviousSolution,
-                                          atomicSolution,
-                                          &bvhTransformAtomic,
+                                          ctx->lhand,
+                                          &ctx->motion,
+                                          &ctx->renderer,
+                                          ctx->previous,
+                                          ctx->solution,
+                                          &ctx->transform,
                                           1
                                          );
             fprintf(stderr,GREEN "Done Initializing LHand Problem ..\n" NORMAL);
            }
-       problem = atomicLHandProblem;
+       problem = ctx->lhand;
     }
 
     if (problem==0)
@@ -614,13 +631,8 @@ int bvhConverter_IKSetup(const char * bodyPart,const char ** labels,const float 
 }
 
 
-
-
-
-
-
-
 float bvhConverter_IKFineTune(
+                               BVHHandle ctxHandle,
                                const char * bodyPart,
                                const char ** labels,
                                const float * values,
@@ -634,6 +646,7 @@ float bvhConverter_IKFineTune(
                                float langevinDynamics
                              )
 {
+  struct BVHContext *ctx = CTX(ctxHandle);
   //fprintf(stderr,"bvhConverter_IKFineTune(Part %s,Elements %u, Frame %u)\n",bodyPart,numberOfElements,frameID);
 
   //-----------------------------
@@ -648,35 +661,35 @@ float bvhConverter_IKFineTune(
   int initializeIK = 0;
   if (strcmp(bodyPart,"body")==0)
     {
-       selectedProblem = atomicBodyProblem;
-       if (atomicBodyProblem==0)   { initializeIK=1; }
+       selectedProblem = ctx->body;
+       if (ctx->body==0)   { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"rhand")==0)
     {
-       selectedProblem = atomicRHandProblem;
-       if (atomicRHandProblem==0)  { initializeIK=1; }
+       selectedProblem = ctx->rhand;
+       if (ctx->rhand==0)  { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"lhand")==0)
     {
-       selectedProblem = atomicLHandProblem;
-       if (atomicLHandProblem==0)  { initializeIK=1; }
+       selectedProblem = ctx->lhand;
+       if (ctx->lhand==0)  { initializeIK=1; }
     } else
   if (strcmp(bodyPart,"face")==0)
     {
        selectedProblem = 0;//Just run Butterworth, no face IK
-       if (atomicFaceProblem==0)   { initializeIK=1; }
+       if (ctx->face==0)   { initializeIK=1; }
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     if (initializeIK)
     {
-     bvhConverter_IKSetup(bodyPart,labels,values,numberOfElements,frameID);
+     bvhConverter_IKSetup(ctxHandle,bodyPart,labels,values,numberOfElements,frameID);
     }
 
-    if (atomicSmoothingFilter==0)
+    if (ctx->filter==0)
     {
      fprintf(stderr,"Butterworth Smoothing filter initialized with fSampling:%0.2f and fCutoff:%0.2f \n",fSampling,fCutoff);
-     atomicSmoothingFilter = butterWorth_allocate(bvhAtomicMotion.numberOfValuesPerFrame,fSampling,fCutoff);
+     ctx->filter = butterWorth_allocate(ctx->motion.numberOfValuesPerFrame,fSampling,fCutoff);
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
@@ -707,11 +720,11 @@ float bvhConverter_IKFineTune(
         if ( (strcmp(bodyPart,"body")==0) || (strcmp(bodyPart,"lhand")==0) || (strcmp(bodyPart,"rhand")==0) || (strcmp(bodyPart,"face")==0) )
         {
          //Keep history..!
-         copyMotionBuffer(atomicPenultimateSolution,atomicPreviousSolution);
-         copyMotionBuffer(atomicPreviousSolution,atomicSolution);
+         copyMotionBuffer(ctx->penultimate,ctx->previous);
+         copyMotionBuffer(ctx->previous,ctx->solution);
          bvh_copyMotionFrameToMotionBuffer(
-                                           &bvhAtomicMotion,
-                                           atomicSolution,
+                                           &ctx->motion,
+                                           ctx->solution,
                                            frameID
                                           );
 
@@ -719,12 +732,12 @@ float bvhConverter_IKFineTune(
          struct BVH_Transform bvhTargetTransform={0};
          int occlusions=1;
          performPointProjectionsForFrame(
-                                           &bvhAtomicMotion,
+                                           &ctx->motion,
                                            &bvhTargetTransform,
                                            frameID,
-                                           &rendererAtomic,
+                                           &ctx->renderer,
                                            occlusions,
-                                           renderingAtomicConfiguration.isDefined
+                                           ctx->rendererConfig.isDefined
                                         );
 
          for (int i=0; i<numberOfElements; i++)
@@ -745,17 +758,17 @@ float bvhConverter_IKFineTune(
              if (  (coord[0]=='2') && (coord[1]=='d') && (  (coord[2]=='x') || (coord[2]=='y') ) )
              {
               BVHJointID jID=0;
-              if ( bvh_getJointIDFromJointNameNocase(&bvhAtomicMotion,dof,&jID) )
+              if ( bvh_getJointIDFromJointNameNocase(&ctx->motion,dof,&jID) )
                 {
                   if (coord[2]=='x')
                   {
                    //fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
-                   bvhTargetTransform.joint[jID].pos2D[0] = (float) values[i]*renderingAtomicConfiguration.width;
+                   bvhTargetTransform.joint[jID].pos2D[0] = (float) values[i]*ctx->rendererConfig.width;
                   } else
                   if (coord[2]=='y')
                   {
                    //fprintf(stderr,GREEN "%s/%s \n" NORMAL,coord,dof);
-                   bvhTargetTransform.joint[jID].pos2D[1] = (float) values[i]*renderingAtomicConfiguration.height;
+                   bvhTargetTransform.joint[jID].pos2D[1] = (float) values[i]*ctx->rendererConfig.height;
                   }
                 } else
                 {
@@ -767,14 +780,14 @@ float bvhConverter_IKFineTune(
          }//Loop over received elements
 
          if (  approximateBodyFromMotionBufferUsingInverseKinematics(
-                                                                     &bvhAtomicMotion,
-                                                                     &rendererAtomic,
+                                                                     &ctx->motion,
+                                                                     &ctx->renderer,
                                                                      selectedProblem,
                                                                      &ikConfig,
                                                                      //----------------
-                                                                     atomicPenultimateSolution,
-                                                                     atomicPreviousSolution,
-                                                                     atomicSolution,
+                                                                     ctx->penultimate,
+                                                                     ctx->previous,
+                                                                     ctx->solution,
                                                                      0, //No ground truth..
                                                                      //----------------
                                                                      &bvhTargetTransform,
@@ -789,9 +802,9 @@ float bvhConverter_IKFineTune(
             )
             {
               if(!bvh_copyMotionBufferToMotionFrame(
-                                                    &bvhAtomicMotion,
+                                                    &ctx->motion,
                                                     frameID,
-                                                    atomicSolution
+                                                    ctx->solution
                                                    )
                 )
                 {
@@ -799,7 +812,7 @@ float bvhConverter_IKFineTune(
                 }
 
                 //Perform and update projections for new results..!
-                bvhConverter_processFrame(frameID);
+                bvhConverter_processFrame(ctxHandle,frameID);
             } else
             {
               fprintf(stderr,RED "Failed approximateBodyFromMotionBufferUsingInverseKinematics\n" NORMAL);
@@ -813,26 +826,27 @@ float bvhConverter_IKFineTune(
 }
 
 
-int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
+int bvhConverter_smooth(BVHHandle ctxHandle,int frameID,float fSampling,float fCutoff)
 {
- if (atomicSolution==0)        { fprintf(stderr,RED "bvhConverter_smooth has no solution to work with..\n" NORMAL);           return 0; }
- if (atomicSmoothingFilter==0) { fprintf(stderr,RED "bvhConverter_smooth has no initialized filter to work with..\n" NORMAL); return 0; }
+ struct BVHContext *ctx = CTX(ctxHandle);
+ if (ctx->solution==0) { fprintf(stderr,RED "bvhConverter_smooth has no solution to work with..\n" NORMAL);           return 0; }
+ if (ctx->filter==0)   { fprintf(stderr,RED "bvhConverter_smooth has no initialized filter to work with..\n" NORMAL); return 0; }
 
  if ( (fSampling>0.0) && (fCutoff>0.0) )
    {
     //Only perform smoothing if sampling/cutoff is set..
     //fprintf(stderr,GREEN "bvhConverter_smooth going through motions\n" NORMAL); //<- reduce spam
-    for (int mID=0; mID<atomicSolution->bufferSize; mID++)
+    for (int mID=0; mID<ctx->solution->bufferSize; mID++)
                {
-                   atomicSolution->motion[mID] = butterWorth_filterArrayElement(atomicSmoothingFilter,mID,atomicSolution->motion[mID]);
+                   ctx->solution->motion[mID] = butterWorth_filterArrayElement(ctx->filter,mID,ctx->solution->motion[mID]);
                }
     //fprintf(stderr,GREEN "copyback..\n" NORMAL); //<- reduce spam
 
 
     if(!bvh_copyMotionBufferToMotionFrame(
-                                          &bvhAtomicMotion,
+                                          &ctx->motion,
                                           frameID,
-                                          atomicSolution
+                                          ctx->solution
                                          )
                 )
                 {
@@ -840,7 +854,7 @@ int bvhConverter_smooth(int frameID,float fSampling,float fCutoff)
                 }
 
      //Perform and update projections for new results..!
-     bvhConverter_processFrame(frameID);
+     bvhConverter_processFrame(ctxHandle,frameID);
      return 1;
    }
   return 0;
@@ -855,32 +869,23 @@ int bvhConverter(int argc,const char **argv)
 }
 
 
-BVHHandle * bvh_createContext()
+BVHHandle bvh_createContext()
 {
-    BVHHandle *ctx = calloc(1, sizeof(struct BVHContext));
-    return ctx;
+    return calloc(1, sizeof(struct BVHContext));
 }
 
-void bvh_destroyContext(BVHHandle *ctxHandle)
+void bvh_destroyContext(BVHHandle ctxHandle)
 {
     if (!ctxHandle) { return; }
-
-    struct BVHContext * ctx = (struct BVHContext*) ctxHandle;
-/*
-    // cleanup problems
-    ikProblem_destroy(ctx->face);
-    ikProblem_destroy(ctx->body);
-    ikProblem_destroy(ctx->lhand);
-    ikProblem_destroy(ctx->rhand);
-
-    // cleanup motion buffers
-    motionBuffer_destroy(ctx->penultimate);
-    motionBuffer_destroy(ctx->previous);
-    motionBuffer_destroy(ctx->solution);
-
-    // cleanup smoothing filter
-    butterworth_destroy(ctx->filter);
-*/
+    struct BVHContext *ctx = CTX(ctxHandle);
+    if (ctx->face)        { free(ctx->face);        ctx->face        = NULL; }
+    if (ctx->body)        { free(ctx->body);         ctx->body        = NULL; }
+    if (ctx->lhand)       { free(ctx->lhand);        ctx->lhand       = NULL; }
+    if (ctx->rhand)       { free(ctx->rhand);        ctx->rhand       = NULL; }
+    if (ctx->penultimate) { free(ctx->penultimate);  ctx->penultimate = NULL; }
+    if (ctx->previous)    { free(ctx->previous);     ctx->previous    = NULL; }
+    if (ctx->solution)    { free(ctx->solution);     ctx->solution    = NULL; }
+    if (ctx->filter)      { free(ctx->filter);       ctx->filter      = NULL; }
     free(ctx);
 }
 
@@ -891,4 +896,3 @@ int main(int argc,const char **argv)
     fprintf(stderr,RED "BVHConverter.c main is a stub please use the python code\n" NORMAL);
     return 0;
 }
-

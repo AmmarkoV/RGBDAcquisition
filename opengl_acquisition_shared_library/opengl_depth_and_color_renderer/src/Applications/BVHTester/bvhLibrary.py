@@ -66,9 +66,19 @@ def loadLibrary(filename):
      sys.exit(0)
  libBVH = CDLL(filename)
  #call C function to check connection
- libBVH.connect() 
- libBVH.bvhConverter.restype = c_int
+ libBVH.connect()
+ libBVH.bvhConverter.restype  = c_int
  libBVH.bvhConverter.argtypes = c_int,POINTER(c_char_p)
+ # context lifecycle
+ libBVH.bvh_createContext.restype   = ctypes.c_void_p
+ libBVH.bvh_createContext.argtypes  = []
+ libBVH.bvh_destroyContext.restype  = None
+ libBVH.bvh_destroyContext.argtypes = [ctypes.c_void_p]
+ # load/unload — loadAtomic now returns the context pointer
+ libBVH.bvhConverter_loadAtomic.restype  = ctypes.c_void_p
+ libBVH.bvhConverter_loadAtomic.argtypes = [ctypes.c_char_p]
+ libBVH.bvhConverter_unloadAtomic.restype  = ctypes.c_int
+ libBVH.bvhConverter_unloadAtomic.argtypes = [ctypes.c_void_p]
  return libBVH
 #--------------------------------------------------------
 def bvhConvert(libBVH,arguments):
