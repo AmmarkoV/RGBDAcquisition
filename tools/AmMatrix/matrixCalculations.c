@@ -137,9 +137,9 @@ int slerp2RotTransMatrices4x4(float * result4, float * a4, float * b4 , float st
   quaternionSlerp( qOut, qA , qB, step);
   quaternion2Matrix4x4(result4 , qOut , conventionToUseInternally );
 
-  result4[3]  = (b4[3]-a4[3]) * step;
-  result4[7]  = (b4[7]-a4[7]) * step;
-  result4[11] = (b4[11]-a4[11]) * step;
+  result4[3]  = a4[3]  + (b4[3]-a4[3])   * step;
+  result4[7]  = a4[7]  + (b4[7]-a4[7])   * step;
+  result4[11] = a4[11] + (b4[11]-a4[11]) * step;
  return 1;
 }
 
@@ -368,9 +368,9 @@ float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y
     //sqrt_fast_approximation
   float dx,dy,dz;
 
-  if (*x1>=*x2) { dx=*x1-*x2; } else { dx=*x2-*x1; }
-  if (*y1>=*y2) { dy=*y1-*y2; } else { dy=*y2-*y1; }
-  if (*z1>=*z2) { dz=*z1-*z2; } else { dz=*z2-*z1; }
+  dx = *x1 - *x2;
+  dy = *y1 - *y2;
+  dz = *z1 - *z2;
 
   return (float) sqrt_fast_approximation( (dx * dx) + (dy * dy) + (dz * dz) );
 }
@@ -379,11 +379,11 @@ float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,floa
 {
   float dx,dy,dz;
 
-  if (*x1>=*x2) { dx=*x1-*x2; } else { dx=*x2-*x1; }
-  if (*y1>=*y2) { dy=*y1-*y2; } else { dy=*y2-*y1; }
-  if (*z1>=*z2) { dz=*z1-*z2; } else { dz=*z2-*z1; }
+  dx = *x1 - *x2;
+  dy = *y1 - *y2;
+  dz = *z1 - *z2;
 
-  return (float)  (dx * dx) + (dy * dy) + (dz * dz) ;
+  return (float)((dx * dx) + (dy * dy) + (dz * dz));
 }
 
 
@@ -432,7 +432,7 @@ float calculateDistance(float from_x,float from_y,float from_z,float to_x,float 
    float vect_y = from_y - to_y;
    float vect_z = from_z - to_z;
 
-   return  (sqrt(pow(vect_x, 2) + pow(vect_y, 2) + pow(vect_z, 2)));
+   return  (float)sqrt(vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
 
 }
 
@@ -443,7 +443,7 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
     *vect_y = src_y - targ_y;
     *vect_z = src_z - targ_z;
 
-    float len = (sqrt(pow(*vect_x, 2) + pow(*vect_y, 2) + pow(*vect_z, 2)));
+    float len = (float)sqrt((*vect_x)*(*vect_x) + (*vect_y)*(*vect_y) + (*vect_z)*(*vect_z));
     if(len == 0) len = 1.0f;
 
     *vect_x /= len ;
@@ -570,9 +570,9 @@ int pointFromAbsoluteToInRelationWithObject(float * relativeOutPoint3DUnrotated,
   transform3DPointFVectorUsing4x4FMatrix(&relativeOutPoint3DUnrotatedVector,&objectInvRotation4x4,&absoluteInPoint3DRotatedVector);
   
   relativeOutPoint3DUnrotated[0]=relativeOutPoint3DUnrotatedVector.m[0];
-  relativeOutPoint3DUnrotated[1]=relativeOutPoint3DUnrotatedVector.m[0];
-  relativeOutPoint3DUnrotated[2]=relativeOutPoint3DUnrotatedVector.m[0];
-  relativeOutPoint3DUnrotated[3]=relativeOutPoint3DUnrotatedVector.m[0];
+  relativeOutPoint3DUnrotated[1]=relativeOutPoint3DUnrotatedVector.m[1];
+  relativeOutPoint3DUnrotated[2]=relativeOutPoint3DUnrotatedVector.m[2];
+  relativeOutPoint3DUnrotated[3]=relativeOutPoint3DUnrotatedVector.m[3];
   
   
   return 1;

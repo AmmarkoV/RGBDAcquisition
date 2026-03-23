@@ -7,12 +7,25 @@
 #include "matrix4x4Tools.h"
 
 #define OPTIMIZED 1
-//#define INTEL_OPTIMIZATIONS 0
+
+#ifndef INTEL_OPTIMIZATIONS
+#define INTEL_OPTIMIZATIONS 0
+#endif
+
+// AVX2 + FMA code path.  Requires GCC/Clang flag: -mavx2 -mfma
+// Override via -DINTEL_AVX2_OPTIMIZATIONS=1 at build time (see makeLibrary.sh).
+#ifndef INTEL_AVX2_OPTIMIZATIONS
+#define INTEL_AVX2_OPTIMIZATIONS 0
+#endif
 
 
 #if INTEL_OPTIMIZATIONS
 #include <xmmintrin.h>
 #include <pmmintrin.h>
+#endif
+
+#if INTEL_AVX2_OPTIMIZATIONS
+#include <immintrin.h>   /* AVX2 + FMA3 */
 #endif
 
 int codeHasSSE()
@@ -22,6 +35,15 @@ int codeHasSSE()
 #else
  return 0;
 #endif // INTEL_OPTIMIZATIONS
+}
+
+int codeHasAVX2()
+{
+#if INTEL_AVX2_OPTIMIZATIONS
+ return 1;
+#else
+ return 0;
+#endif // INTEL_AVX2_OPTIMIZATIONS
 }
 
 #define PRINT_MATRIX_DEBUGGING 0
@@ -133,7 +155,11 @@ void copy4x4FMatrix(float * out,const float * in)
 {
   if ((out!=0) && (in!=0))
   {
-   #if OPTIMIZED
+   #if INTEL_AVX2_OPTIMIZATIONS
+    /* Two 256-bit stores cover all 16 floats in two cache-line halves */
+    _mm256_storeu_ps(&out[0], _mm256_loadu_ps(&in[0]));
+    _mm256_storeu_ps(&out[8], _mm256_loadu_ps(&in[8]));
+   #elif OPTIMIZED
     memcpy(out,in,16*sizeof(float));
    #else
     out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
@@ -252,10 +278,10 @@ float degrees_to_radF(float degrees)
 
 int floatPEq(float * element , float value )
 {
- const float machineFloatPercision= 0.0001; // 0.0001; original
+ const float machineFloatPrecision= 0.0001; // 0.0001; original
  if ( *element == value ) { return 1; }
 
- if ( ( value-machineFloatPercision<*element ) && (( *element<value+machineFloatPercision )) ) { return 1; }
+ if ( ( value-machineFloatPrecision<*element ) && (( *element<value+machineFloatPrecision )) ) { return 1; }
  return 0;
 }
 
@@ -1465,6 +1491,63 @@ static inline int multiplyTwo4x4FMatrices_CMMA(float * result ,const float * mat
  return res;
 }
 
+/*
+ * AVX2 + FMA 4x4 float matrix multiply.
+ *
+ * Strategy: compute two result rows per iteration using 256-bit registers.
+ *
+ *   YMM layout used here:
+ *     bits   0-127 = result row  i
+ *     bits 128-255 = result row i+1
+ *
+ *   For each B row k we duplicate it into both 128-bit halves of a YMM.
+ *   We then broadcast A[i][k] into the low half and A[i+1][k] into the
+ *   high half of a second YMM, then FMA the two together.
+ *
+ *   Total: 8 FMA256 instead of 16 MUL128 + 12 ADD128 (SSE2 path), giving
+ *   ~2× throughput on Haswell and later.
+ *
+ * Alignment note: uses _mm256_loadu/storeu so no 32-byte alignment
+ * requirement on the caller side (the structs are 16-byte aligned).
+ * On Haswell+ there is no penalty when the data is cache-line aligned.
+ *
+ * Build flags required: -mavx2 -mfma
+ */
+static inline void multiplyTwo4x4FMatrices_AVX2(float * result,
+                                                 const float * A,
+                                                 const float * B)
+{
+#if INTEL_AVX2_OPTIMIZATIONS
+    /* Load every row of B and duplicate it into both 128-bit lanes of a YMM.
+     * _mm256_set_m128(hi, lo) stores  lo  in bits 0-127,  hi  in bits 128-255. */
+    __m256 B0 = _mm256_set_m128(_mm_loadu_ps(&B[0]),  _mm_loadu_ps(&B[0]));
+    __m256 B1 = _mm256_set_m128(_mm_loadu_ps(&B[4]),  _mm_loadu_ps(&B[4]));
+    __m256 B2 = _mm256_set_m128(_mm_loadu_ps(&B[8]),  _mm_loadu_ps(&B[8]));
+    __m256 B3 = _mm256_set_m128(_mm_loadu_ps(&B[12]), _mm_loadu_ps(&B[12]));
+
+    /* --- Result rows 0 and 1 ---
+     * lo lane: A_row0 x B,  hi lane: A_row1 x B
+     * For step k: broadcast A[0][k] -> lo, A[1][k] -> hi */
+    __m256 row01 =
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[4]), _mm_set1_ps(A[0])), B0,
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[5]), _mm_set1_ps(A[1])), B1,
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[6]), _mm_set1_ps(A[2])), B2,
+        _mm256_mul_ps(  _mm256_set_m128(_mm_set1_ps(A[7]), _mm_set1_ps(A[3])), B3))));
+    _mm256_storeu_ps(&result[0], row01);
+
+    /* --- Result rows 2 and 3 ---
+     * lo lane: A_row2 x B,  hi lane: A_row3 x B */
+    __m256 row23 =
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[12]), _mm_set1_ps(A[8])),  B0,
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[13]), _mm_set1_ps(A[9])),  B1,
+        _mm256_fmadd_ps(_mm256_set_m128(_mm_set1_ps(A[14]), _mm_set1_ps(A[10])), B2,
+        _mm256_mul_ps(  _mm256_set_m128(_mm_set1_ps(A[15]), _mm_set1_ps(A[11])), B3))));
+    _mm256_storeu_ps(&result[8], row23);
+#else
+    multiplyTwo4x4FMatrices_Naive(result, A, B);
+#endif
+}
+
 //Interesting examples :
 //https://github.com/microsoft/DirectXMath/blob/main/Inc/DirectXMathMatrix.inl
 //https://github.com/romz-pl/matrix-matrix-multiply
@@ -1654,7 +1737,9 @@ static inline void multiplyTwo4x4FMatrices_SSE2(float * result ,const float * ma
 
 void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,const struct Matrix4x4OfFloats * matrixA ,const struct Matrix4x4OfFloats * matrixB)
 {
-#if INTEL_OPTIMIZATIONS
+#if INTEL_AVX2_OPTIMIZATIONS
+    multiplyTwo4x4FMatrices_AVX2(result->m,matrixA->m,matrixB->m);
+#elif INTEL_OPTIMIZATIONS
     multiplyTwo4x4FMatrices_SSE2(result->m,matrixA->m,matrixB->m); //109.53 fps in the sven dataset
     ////multiplyTwo4x4FMatrices_SSE3(result->m,matrixA->m,matrixB->m); // 107.77 fps in the sven dataset
 #else
@@ -1666,7 +1751,9 @@ void multiplyTwo4x4FMatricesS(struct Matrix4x4OfFloats * result ,const struct Ma
 
 void multiplyTwoRaw4x4FMatricesS(float * result ,const float * matrixA ,const float * matrixB)
 {
-#if INTEL_OPTIMIZATIONS
+#if INTEL_AVX2_OPTIMIZATIONS
+    multiplyTwo4x4FMatrices_AVX2(result,matrixA,matrixB);
+#elif INTEL_OPTIMIZATIONS
     multiplyTwo4x4FMatrices_SSE2(result,matrixA,matrixB); //109.53 fps in the sven dataset
     ////multiplyTwo4x4FMatrices_SSE3(result,matrixA,matrixB); // 107.77 fps in the sven dataset
 #else
@@ -1834,6 +1921,48 @@ int transform3DNormalVectorUsing3x3FPartOf4x4FMatrix(float * resultPoint3D,struc
 
 
 
+/*
+ * AVX2 + FMA 4x4 matrix * vec4 multiply.
+ *
+ * result = M * v  (row-major M, column vector v)
+ *
+ * Strategy: transpose M in registers so each 128-bit lane holds one
+ * column of M, then FMA each column scaled by the matching element of v.
+ * This avoids the horizontal-add (_mm_hadd_ps) used in the SSE3 path and
+ * replaces it with FMA vertical operations which have better throughput.
+ *
+ * The W-divide (perspective division) is kept scalar since it rarely fires
+ * in practice (W==1 for most BVH/pose usage) and mixing it with SIMD
+ * would add a branch anyway.
+ *
+ * Build flags required: -mavx2 -mfma
+ */
+#if INTEL_AVX2_OPTIMIZATIONS
+static inline void multiplyVectorWith4x4FMatrix_AVX2(float * result,
+                                                      const float * M,
+                                                      const float * v)
+{
+    /* Load the 4 rows of M */
+    __m128 r0 = _mm_loadu_ps(&M[0]);
+    __m128 r1 = _mm_loadu_ps(&M[4]);
+    __m128 r2 = _mm_loadu_ps(&M[8]);
+    __m128 r3 = _mm_loadu_ps(&M[12]);
+
+    /* Transpose M in registers: after this r0..r3 are the 4 columns of M.
+     * _MM_TRANSPOSE4_PS is defined in xmmintrin.h; immintrin.h also provides it. */
+    _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
+
+    /* result = col0*v[0] + col1*v[1] + col2*v[2] + col3*v[3]
+     * Each _mm_set1_ps broadcast is a single VPBROADCASTSS on AVX2. */
+    __m128 res = _mm_fmadd_ps(r0, _mm_set1_ps(v[0]),
+                 _mm_fmadd_ps(r1, _mm_set1_ps(v[1]),
+                 _mm_fmadd_ps(r2, _mm_set1_ps(v[2]),
+                 _mm_mul_ps(  r3, _mm_set1_ps(v[3])))));
+
+    _mm_storeu_ps(result, res);
+}
+#endif
+
 #if INTEL_OPTIMIZATIONS
 //__attribute__((aligned(16)))
 void multiplyVectorWith4x4FMatrix_SSE(float * result ,const float * matrixA ,const float * point3D)
@@ -1907,7 +2036,13 @@ int transform3DPointFVectorUsing4x4FMatrix(struct Vector4x1OfFloats * resultPoin
 {
 if ( (resultPoint3D!=0) && (transformation4x4!=0) && (point3D!=0) )
  {
-#if INTEL_OPTIMIZATIONS
+#if INTEL_AVX2_OPTIMIZATIONS
+  multiplyVectorWith4x4FMatrix_AVX2(resultPoint3D->m,transformation4x4->m,point3D->m);
+  /* W-divide: fast path for the common W==1 case (all BVH/pose joints) */
+  if (resultPoint3D->m[3] != 1.0f)
+   { return normalize3DPointFVector(resultPoint3D->m); }
+  return 1;
+#elif INTEL_OPTIMIZATIONS
   multiplyVectorWith4x4FMatrix_SSE(resultPoint3D->m,transformation4x4->m,point3D->m);
 #else
   //Use naive implementation

@@ -13,6 +13,7 @@ extern "C"
 #endif
 
 int codeHasSSE();
+int codeHasAVX2();
 
 //This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
 //Since this used to be a variable in some points of the code..

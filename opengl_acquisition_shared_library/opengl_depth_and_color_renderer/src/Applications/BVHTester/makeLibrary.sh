@@ -115,15 +115,25 @@ $BVHTESTER_DIR/bvhConverter.c
 INTEL_OPTIMIZATIONS=`cat /proc/cpuinfo | grep sse3`
 
 if [ -z "$INTEL_OPTIMIZATIONS" ] ; then
- echo "No intel optimizations available"
+ echo "No intel SSE3 optimizations available"
  EXTRA_FLAGS=" "
 else
- echo "Intel Optimizations available and will be used"
+ echo "Intel SSE3 optimizations available and will be used"
  EXTRA_FLAGS="-DINTEL_OPTIMIZATIONS"
 fi
- 
-#-O3 causes buffer overflow ?   -fsanitize=address  -lasan 
-gcc -shared -o libBVHConverter.so -D_GNU_SOURCE -O3 -Wstrict-overflow  -fPIC $EXTRA_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
+
+HAS_AVX2=`cat /proc/cpuinfo | grep avx2`
+
+if [ -z "$HAS_AVX2" ] ; then
+ echo "No AVX2 available"
+ AVX2_FLAGS=" "
+else
+ echo "AVX2 available and will be used (-mavx2 -mfma)"
+ AVX2_FLAGS="-DINTEL_AVX2_OPTIMIZATIONS=1 -mavx2 -mfma"
+fi
+
+#-O3 causes buffer overflow ?   -fsanitize=address  -lasan
+gcc -shared -o libBVHConverter.so -D_GNU_SOURCE -O3 -Wstrict-overflow  -fPIC $EXTRA_FLAGS $AVX2_FLAGS -march=native -mtune=native -lm -DBVH_USE_AS_A_LIBRARY $SOURCE
 
 
 if [ $? -ne 0 ]; then
