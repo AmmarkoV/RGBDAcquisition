@@ -206,6 +206,16 @@ int scanFor_codecs(const char * str,unsigned int strLength)
  return NO_CODEC;
 }
 
+static const char * getExtensionAndExtraCharacters(const char * filename, unsigned int * extensionLength)
+{
+    if (filename == 0) { *extensionLength = 0; return 0; }
+    const char * lastDot = strrchr(filename, '.');
+    if (lastDot == 0) { *extensionLength = 0; return 0; }
+    const char * ext = lastDot + 1;
+    *extensionLength = (unsigned int) strlen(ext);
+    return ext;
+}
+
 unsigned int guessFilenameTypeSmart(const char * filename)
 {
     unsigned int extensionLength = 0;
