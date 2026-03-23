@@ -668,31 +668,37 @@ int weAreAtALocalOptimum(
   for (unsigned int i=0; i<3; i++)
         {
             float rememberOriginalValue =  problem->chain[chainID].currentSolution->motion[mIDS[i]];
+
+            //Probe +d first
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]+d;
             float lossPlusD=calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/);
+
+            if (lossPlusD<initialLoss)
+            {
+                //+d improves loss: skip the -d probe entirely, we already know the direction
+                delta[i] = d;
+                problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
+                continue;
+            }
+
+            //+d did not help: probe -d to determine if local optimum or -d direction
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = currentValues[i]-d;
             float lossMinusD=calculateChainLoss(problem,chainID,partID,penalizeSymmetryIn,1/*Be economic*/);
             problem->chain[chainID].currentSolution->motion[mIDS[i]] = rememberOriginalValue;
 
-            if ( (initialLoss<=lossPlusD) && (initialLoss<=lossMinusD) )
-            {
-                delta[i] = -d/10;  //very slight gradient // Why d ? and not 0
-                ++badLosses;
-            }
-            else if ( (lossPlusD<initialLoss) && (lossPlusD<=lossMinusD) )
-            {
-                delta[i] = d;
-            }
-            else if ( (lossMinusD<initialLoss) && (lossMinusD<=lossPlusD) )
+            if (lossMinusD<initialLoss)
             {
                 delta[i] = -d;
             }
-            else if (verbose)
+            else
             {
-                fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
-                fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
-                delta[i] = -d/10;  //very slight gradient // Why d ? and not 0
+                delta[i] = -d/10;  //very slight gradient, likely at a local optimum
                 ++badLosses;
+                if (verbose)
+                {
+                    fprintf(stderr,RED "Dont know what to do with #%u value ..\n" NORMAL,i);
+                    fprintf(stderr,"-d = %0.2f,   +d = %0.2f, original = %0.2f\n",lossMinusD,lossPlusD,initialLoss);
+                }
             }
         }
   //-------------------------------------------------------------------------------------------------------
@@ -1207,7 +1213,12 @@ if (iterationID==0)
         fprintf(stderr,"correction rate of %0.2f,%0.2f,%0.2f deg\n",(bestValues[0]-originalValues[0])/executedEpochs,(bestValues[1]-originalValues[1])/executedEpochs,(bestValues[2]-originalValues[2])/executedEpochs);
     }
 
-    if (weHaveAPreviousSolutionHistory)
+    //Only compare against the previous frame's solution on the first iteration.
+    //For iterations > 0, bestValues already incorporates any improvements from the previous solution
+    //(via the iteration 0 group test and examineSolutionAndKeepIfItIsBetter). Re-running 3 FK calls
+    //per part per iteration for this comparison is wasteful when bestValues is already at least as
+    //good as the previous solution for all DOFs.
+    if (weHaveAPreviousSolutionHistory && (iterationID == 0))
     {
       if (
            examineSolutionAndKeepIfItIsBetter(
