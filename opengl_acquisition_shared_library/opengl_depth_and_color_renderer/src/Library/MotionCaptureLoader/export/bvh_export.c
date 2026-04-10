@@ -673,6 +673,7 @@ int dumpBVHTo_JSON_SVG_CSV(
      did2DOutputPreExist=1;
      did3DOutputPreExist=1;
      didBVHOutputPreExist=1;
+     ++filterStats->framesWritten;
 
    }//Skeleton is ok to be dumped
   } else //3D Projection was ok

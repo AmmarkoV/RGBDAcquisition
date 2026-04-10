@@ -20,6 +20,7 @@ struct filteringResults
  unsigned int filteredOutCSVBehindPoses;
  unsigned int filteredOutCSVOutPoses;
  unsigned int filteredOutCSVPoses;
+ unsigned int framesWritten;   // frames that passed all filters and were written to CSV
 };
 
 /*
