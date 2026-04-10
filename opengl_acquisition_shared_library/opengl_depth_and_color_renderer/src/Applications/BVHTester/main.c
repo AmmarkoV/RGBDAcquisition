@@ -185,20 +185,23 @@ void printCallingParameters(int argc,const char **argv)
 
 int bvhConverter(int argc,const char **argv)
 {
+    srand(time(NULL));
+    //----------------------------------------------
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
     const char * fromBVHFile="Motions/example.bvh";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
-    const char * toCSVFilename="data.csv";
+    const char * toCSVDirectory="tmp/";
+    const char * toCSVTag="data.csv";
+    const char * toJSONDirectory="tmp/";
+    const char * toJSONTag="data.json";
     unsigned int sampleSkip = 0;// <- If you want to artificially reduce the sample size
     unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0, convertToAngleHeatmap=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
     unsigned int occlusions = 0;
     unsigned int randomizeIntrinsics = 0;
-    float randomizeIntrinsics_fXmin = 400.0, randomizeIntrinsics_fXmax = 800.0;
-    float randomizeIntrinsics_fYmin = 400.0, randomizeIntrinsics_fYmax = 800.0;
     float scaleWorld=1.0;
     unsigned int multiThreaded = 0;
     //unsigned int flipOrientation = 0;
@@ -439,6 +442,11 @@ int bvhConverter(int argc,const char **argv)
 
           //----------------------------------------------------
           //----------------------------------------------------
+          if (maeSamples==0)
+          {
+            fprintf(stderr,RED "No frames were processed by --testIK (sourceFrame/targetFrame out of range?)\n" NORMAL);
+            exit(1);
+          }
           fprintf(stdout,"MAE:%0.2f",(float) maeSum/maeSamples);
           if (!fileExistsIK("report.csv"))
              {
@@ -877,7 +885,6 @@ int bvhConverter(int argc,const char **argv)
           if (i+2>=argc)  { incorrectArguments(); }
           unsigned int numberOfValues=atoi(argv[i+1]);
           float deviation=atof(argv[i+2]);
-          srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
               if (
@@ -894,6 +901,7 @@ int bvhConverter(int argc,const char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeMID")==0)
         {
+          if (i+3>=argc)  { incorrectArguments(); }
           //------------------------------------------
           BVHMotionChannelID mID=atoi(argv[i+1]);
           float startOfRandomization=atof(argv[i+2]);
@@ -918,7 +926,6 @@ int bvhConverter(int argc,const char **argv)
           float startOfRandomization=atof(argv[i+2]);
           float endOfRandomization=atof(argv[i+3]);
           unsigned int specificChannelRandomization=atoi(argv[i+4]);
-          srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
               if (
@@ -942,7 +949,6 @@ int bvhConverter(int argc,const char **argv)
           if (i+1>=argc)  { incorrectArguments(); }
           const char * filenameOfCSVFile=argv[i+1];
           fprintf(stderr,"bvh_ImportCSVPoses(%s)\n",filenameOfCSVFile);
-          srand(time(NULL));
               if (
                    !bvh_ImportCSVPoses(
                                         &bvhMotion,
@@ -957,7 +963,6 @@ int bvhConverter(int argc,const char **argv)
           if (i+1>=argc)  { incorrectArguments(); }
           const char * nameOfIKProblem=argv[i+1];
           fprintf(stderr,"bvh_RandomizeBasedOnIKProblem(%s)\n",nameOfIKProblem);
-          srand(time(NULL));
               if (
                    !bvh_RandomizeBasedOnIKProblem(
                                                    &bvhMotion,
@@ -1071,18 +1076,13 @@ int bvhConverter(int argc,const char **argv)
           // Place this BEFORE --randomize2D on the command line so the random
           // intrinsics are also used for 2D position projection.
           if (i+4>=argc)  { incorrectArguments(); }
-          srand(time(NULL));
           randomizeIntrinsics = 1;
-          randomizeIntrinsics_fXmin = atof(argv[i+1]);
-          randomizeIntrinsics_fXmax = atof(argv[i+2]);
-          randomizeIntrinsics_fYmin = atof(argv[i+3]);
-          randomizeIntrinsics_fYmax = atof(argv[i+4]);
           //Pick the random intrinsics and apply them immediately so that any
           //subsequent --randomize2D uses the same randomised camera parameters.
-          float rangeX = randomizeIntrinsics_fXmax - randomizeIntrinsics_fXmin;
-          float rangeY = randomizeIntrinsics_fYmax - randomizeIntrinsics_fYmin;
-          renderingConfiguration.fX = randomizeIntrinsics_fXmin + ((float)rand()/RAND_MAX) * rangeX;
-          renderingConfiguration.fY = randomizeIntrinsics_fYmin + ((float)rand()/RAND_MAX) * rangeY;
+          float rangeX = atof(argv[i+2]) - atof(argv[i+1]);
+          float rangeY = atof(argv[i+4]) - atof(argv[i+3]);
+          renderingConfiguration.fX = atof(argv[i+1]) + ((float)rand()/RAND_MAX) * rangeX;
+          renderingConfiguration.fY = atof(argv[i+3]) + ((float)rand()/RAND_MAX) * rangeY;
           renderingConfiguration.cX = (float)renderingConfiguration.width  / 2.0f;
           renderingConfiguration.cY = (float)renderingConfiguration.height / 2.0f;
           fprintf(stderr,"randomizeIntrinsics: fX=%0.3f fY=%0.3f cX=%0.3f cY=%0.3f\n",
@@ -1093,7 +1093,6 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--randomize")==0)
         {
           if (i+12>=argc)  { incorrectArguments(); }
-          srand(time(NULL));
 
           float minimumPosition[3];
           float minimumRotation[3];
@@ -1176,7 +1175,6 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--randomizeranges")==0)
         {
           if (i+24>=argc)  { incorrectArguments(); }
-          srand(time(NULL));
 
           float minimumPositionRangeA[3];
           float minimumRotationRangeA[3];
@@ -1309,8 +1307,8 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--csv")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
-          toSVGDirectory=argv[i+1];
-          toCSVFilename=argv[i+2];
+          toCSVDirectory=argv[i+1];
+          toCSVTag=argv[i+2];
           convertToCSV=1;
           if (strcmp(argv[i+3],"2d+3d+bvh")==0){ useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; } else
           if (strcmp(argv[i+3],"2d+bvh")==0 )  { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
@@ -1324,8 +1322,8 @@ int bvhConverter(int argc,const char **argv)
         {
           convertToJSON=1;
           if (i+2>=argc)  { incorrectArguments(); }
-          toSVGDirectory=argv[i+1];
-          toCSVFilename=argv[i+2];
+          toJSONDirectory=argv[i+1];
+          toJSONTag=argv[i+2];
           //if (i+3>=argc)  { incorrectArguments(); }
           //if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
           //if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
@@ -1358,31 +1356,63 @@ int bvhConverter(int argc,const char **argv)
         }*/
     }
 
-    //SVG or CSV output ..
+    //SVG or CSV or JSON output ..
     if ( (convertToJSON) || (convertToSVG) || (convertToCSV) )
     {
      struct filteringResults filterStats={0};
 
-     dumpBVHTo_JSON_SVG_CSV(
-                            toSVGDirectory,
-                            toCSVFilename,
-                            convertToJSON,
-                            convertToSVG,
-                            convertToCSV,
-                            convertToAngleHeatmap,
-                            useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
-                            wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
-                            &bvhMotion,
-                            &renderingConfiguration,
-                            &filterStats,
-                            sampleSkip,
-                            occlusions,
-                            filterOccludedJoints,
-                            filterBehindCamera,//Filter out all poses where even one joint is behind camera
-                            filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame
-                            filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )
-                            0//We don't want to convert to radians
-                           );
+     // CSV and JSON each carry their own directory/tag so they never collide.
+     // SVG reuses toSVGDirectory (set by --svg).  When both CSV and JSON are
+     // active they are dispatched as separate calls so neither overwrites the
+     // other's output files.
+     if (convertToCSV || convertToSVG)
+     {
+      dumpBVHTo_JSON_SVG_CSV(
+                             convertToCSV ? toCSVDirectory : toSVGDirectory,
+                             toCSVTag,
+                             0,            //JSON handled separately below
+                             convertToSVG,
+                             convertToCSV,
+                             convertToAngleHeatmap,
+                             useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                             wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
+                             &bvhMotion,
+                             &renderingConfiguration,
+                             &filterStats,
+                             sampleSkip,
+                             occlusions,
+                             filterOccludedJoints,
+                             filterBehindCamera,
+                             filterIfAnyJointOutsideof2DFrame,
+                             filterTopWeirdRandomSkeletons,
+                             0//We don't want to convert to radians
+                            );
+     }
+
+     if (convertToJSON)
+     {
+      struct filteringResults jsonFilterStats={0};
+      dumpBVHTo_JSON_SVG_CSV(
+                             toJSONDirectory,
+                             toJSONTag,
+                             1,            //JSON
+                             0,            //SVG handled above
+                             0,            //CSV handled above
+                             0,
+                             useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                             wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
+                             &bvhMotion,
+                             &renderingConfiguration,
+                             &jsonFilterStats,
+                             sampleSkip,
+                             occlusions,
+                             filterOccludedJoints,
+                             filterBehindCamera,
+                             filterIfAnyJointOutsideof2DFrame,
+                             filterTopWeirdRandomSkeletons,
+                             0
+                            );
+     }
 
      // After CSV export: if --randomizeIntrinsics was given, append one row per
      // written frame to intrinsics_<tag>.csv so that each output CSV file has a
@@ -1390,7 +1420,7 @@ int bvhConverter(int argc,const char **argv)
      if (randomizeIntrinsics && convertToCSV && filterStats.framesWritten > 0)
      {
        char csvFilenameIntrinsics[512]={0};
-       snprintf(csvFilenameIntrinsics,512,"%s/intrinsics_%s",toSVGDirectory,toCSVFilename);
+       snprintf(csvFilenameIntrinsics,512,"%s/intrinsics_%s",toCSVDirectory,toCSVTag);
        int intrinsicsPreExisted = bvhExportFileExists(csvFilenameIntrinsics);
        FILE * fpIntrinsics = fopen(csvFilenameIntrinsics,"a");
        if (fpIntrinsics)
@@ -1428,7 +1458,6 @@ int bvhConverter(int argc,const char **argv)
 #ifndef BVH_USE_AS_A_LIBRARY
 int main(int argc,const char **argv)
 {
-  srand(time(NULL)); // randomize seed
   fprintf(stderr,"BVH Loader code - v%s\n\n",BVH_LOADER_VERSION_STRING);
   return bvhConverter(argc,argv);
 }
