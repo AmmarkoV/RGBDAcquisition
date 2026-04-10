@@ -533,6 +533,21 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
   //                                    For every frame
   //------------------------------------------------------------------------------------------
+
+  // Per-frame intrinsics CSV — opened once here, written inside the frame loop.
+  char csvFilenameIntrinsics[512] = {0};
+  FILE * fpIntrinsics = NULL;
+  if (renderConfig->randomizeIntrinsicsPerFrame && convertToCSV)
+  {
+    snprintf(csvFilenameIntrinsics, 512, "%s/intrinsics_%s", directory, filename);
+    int intrinsicsPreExisted = bvhExportFileExists(csvFilenameIntrinsics);
+    fpIntrinsics = fopen(csvFilenameIntrinsics, "a");
+    if (fpIntrinsics && !intrinsicsPreExisted)
+    {
+      fprintf(fpIntrinsics, "fX,fY,cX,cY,width,height\n");
+    }
+  }
+
   unsigned int framesDumped=0;
   BVHFrameID fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
@@ -541,6 +556,20 @@ int dumpBVHTo_JSON_SVG_CSV(
 
    if ( (sampleSkip==0) || (fID%sampleSkip==0) )
    {
+    // Per-frame intrinsic randomization: pick new fX/fY and rebuild the
+    // renderer so that both the projection and the filter checks use the
+    // same camera for this frame.
+    if (renderConfig->randomizeIntrinsicsPerFrame)
+    {
+      renderer.fx = renderConfig->fXRandomMin + ((float)rand()/RAND_MAX)
+                    * (renderConfig->fXRandomMax - renderConfig->fXRandomMin);
+      renderer.fy = renderConfig->fYRandomMin + ((float)rand()/RAND_MAX)
+                    * (renderConfig->fYRandomMax - renderConfig->fYRandomMin);
+      renderer.cx = (float) renderConfig->width  / 2.0f;
+      renderer.cy = (float) renderConfig->height / 2.0f;
+      simpleRendererInitialize(&renderer);
+    }
+
     if (
         performPointProjectionsForFrame(
                                         mc,
@@ -675,6 +704,15 @@ int dumpBVHTo_JSON_SVG_CSV(
      didBVHOutputPreExist=1;
      ++filterStats->framesWritten;
 
+     // Write one intrinsics row for this frame, matching the other CSV files.
+     if (fpIntrinsics)
+     {
+       fprintf(fpIntrinsics, "%0.5f,%0.5f,%0.5f,%0.5f,%u,%u\n",
+               renderer.fx, renderer.fy,
+               renderer.cx, renderer.cy,
+               renderConfig->width, renderConfig->height);
+     }
+
    }//Skeleton is ok to be dumped
   } else //3D Projection was ok
   { fprintf(stderr,RED "Could not perform projection for frame %u\n" NORMAL,fID); }
@@ -687,6 +725,12 @@ int dumpBVHTo_JSON_SVG_CSV(
   //------------------------------------------------------------------------------------------
   } //For every frame.. ----------------------------------------------------------------------
   //------------------------------------------------------------------------------------------
+
+  if (fpIntrinsics) { fclose(fpIntrinsics); fpIntrinsics = NULL; }
+  if (csvFilenameIntrinsics[0] != '\0')
+  {
+    fprintf(stderr,"intrinsics: wrote %u rows to %s\n",filterStats->framesWritten,csvFilenameIntrinsics);
+  }
 
   //JSON output
   //------------------------------------------------------------------------------------------

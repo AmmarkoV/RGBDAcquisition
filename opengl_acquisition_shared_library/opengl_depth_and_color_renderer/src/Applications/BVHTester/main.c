@@ -201,7 +201,6 @@ int bvhConverter(int argc,const char **argv)
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
     unsigned int occlusions = 0;
-    unsigned int randomizeIntrinsics = 0;
     float scaleWorld=1.0;
     unsigned int multiThreaded = 0;
     //unsigned int flipOrientation = 0;
@@ -1071,23 +1070,20 @@ int bvhConverter(int argc,const char **argv)
         if (strcmp(argv[i],"--randomizeIntrinsics")==0)
         {
           // Usage: --randomizeIntrinsics fXmin fXmax fYmin fYmax
-          // Picks a random focal length within [fXmin,fXmax] x [fYmin,fYmax],
-          // sets cX=width/2, cY=height/2, and records it for intrinsics_<tag>.csv.
-          // Place this BEFORE --randomize2D on the command line so the random
-          // intrinsics are also used for 2D position projection.
+          // Every frame that passes the skeleton filter gets its own independently
+          // drawn (fX,fY) from [fXmin,fXmax] x [fYmin,fYmax].  The renderer is
+          // rebuilt per-frame so that both the 2D projection and the filter checks
+          // are consistent with the drawn intrinsics.  A matching row is appended
+          // to intrinsics_<tag>.csv for every frame written to the other CSVs.
           if (i+4>=argc)  { incorrectArguments(); }
-          randomizeIntrinsics = 1;
-          //Pick the random intrinsics and apply them immediately so that any
-          //subsequent --randomize2D uses the same randomised camera parameters.
-          float rangeX = atof(argv[i+2]) - atof(argv[i+1]);
-          float rangeY = atof(argv[i+4]) - atof(argv[i+3]);
-          renderingConfiguration.fX = atof(argv[i+1]) + ((float)rand()/RAND_MAX) * rangeX;
-          renderingConfiguration.fY = atof(argv[i+3]) + ((float)rand()/RAND_MAX) * rangeY;
-          renderingConfiguration.cX = (float)renderingConfiguration.width  / 2.0f;
-          renderingConfiguration.cY = (float)renderingConfiguration.height / 2.0f;
-          fprintf(stderr,"randomizeIntrinsics: fX=%0.3f fY=%0.3f cX=%0.3f cY=%0.3f\n",
-                  renderingConfiguration.fX, renderingConfiguration.fY,
-                  renderingConfiguration.cX, renderingConfiguration.cY);
+          renderingConfiguration.randomizeIntrinsicsPerFrame = 1;
+          renderingConfiguration.fXRandomMin = atof(argv[i+1]);
+          renderingConfiguration.fXRandomMax = atof(argv[i+2]);
+          renderingConfiguration.fYRandomMin = atof(argv[i+3]);
+          renderingConfiguration.fYRandomMax = atof(argv[i+4]);
+          fprintf(stderr,"randomizeIntrinsics: fX in [%0.3f,%0.3f]  fY in [%0.3f,%0.3f]  (per frame)\n",
+                  renderingConfiguration.fXRandomMin, renderingConfiguration.fXRandomMax,
+                  renderingConfiguration.fYRandomMin, renderingConfiguration.fYRandomMax);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -1414,38 +1410,6 @@ int bvhConverter(int argc,const char **argv)
                             );
      }
 
-     // After CSV export: if --randomizeIntrinsics was given, append one row per
-     // written frame to intrinsics_<tag>.csv so that each output CSV file has a
-     // matching intrinsics file with the same number of rows.
-     if (randomizeIntrinsics && convertToCSV && filterStats.framesWritten > 0)
-     {
-       char csvFilenameIntrinsics[512]={0};
-       snprintf(csvFilenameIntrinsics,512,"%s/intrinsics_%s",toCSVDirectory,toCSVTag);
-       int intrinsicsPreExisted = bvhExportFileExists(csvFilenameIntrinsics);
-       FILE * fpIntrinsics = fopen(csvFilenameIntrinsics,"a");
-       if (fpIntrinsics)
-       {
-         if (!intrinsicsPreExisted)
-         {
-           fprintf(fpIntrinsics,"fX,fY,cX,cY,width,height\n");
-         }
-         for (unsigned int row=0; row < filterStats.framesWritten; row++)
-         {
-           fprintf(fpIntrinsics,"%0.5f,%0.5f,%0.5f,%0.5f,%u,%u\n",
-                   renderingConfiguration.fX,
-                   renderingConfiguration.fY,
-                   renderingConfiguration.cX,
-                   renderingConfiguration.cY,
-                   renderingConfiguration.width,
-                   renderingConfiguration.height);
-         }
-         fclose(fpIntrinsics);
-         fprintf(stderr,"intrinsics: wrote %u rows to %s\n",filterStats.framesWritten,csvFilenameIntrinsics);
-       } else
-       {
-         fprintf(stderr,RED "Could not open %s for writing\n" NORMAL,csvFilenameIntrinsics);
-       }
-     }
     }
 
 

@@ -34,6 +34,16 @@ struct BVH_RendererConfiguration
   struct Matrix4x4OfFloats projection;
   struct Matrix4x4OfFloats viewMatrix;
   int viewport[4];
+
+  // Per-frame intrinsic randomization.
+  // When randomizeIntrinsicsPerFrame is set, dumpBVHTo_JSON_SVG_CSV picks a
+  // fresh (fX,fY) from [fXRandomMin,fXRandomMax] x [fYRandomMin,fYRandomMax]
+  // for every frame that passes the skeleton filter, rebuilds the renderer,
+  // re-projects the frame with the new intrinsics, and writes one row to
+  // intrinsics_<tag>.csv alongside the other output CSV files.
+  unsigned int randomizeIntrinsicsPerFrame;
+  float fXRandomMin, fXRandomMax;
+  float fYRandomMin, fYRandomMax;
 };
 
 /**
