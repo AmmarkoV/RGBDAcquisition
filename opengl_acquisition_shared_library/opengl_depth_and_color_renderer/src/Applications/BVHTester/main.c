@@ -1307,7 +1307,8 @@ int bvhConverter(int argc,const char **argv)
           toCSVDirectory=argv[i+1];
           toCSVTag=argv[i+2];
           convertToCSV=1;
-          if (strstr(argv[i+3],"2.5d")!=0) {
+          if (strstr(argv[i+3],"2.5d")!=0) 
+          {
             useCSV_2D5D_Output=1; useCSV_2D_Output=1;
             useCSV_3D_Output  = (strstr(argv[i+3],"3d") !=0) ? 1 : 0;
             useCSV_BVH_Output = (strstr(argv[i+3],"bvh")!=0) ? 1 : 0;
