@@ -311,8 +311,13 @@ int dumpBVHToCSVBody(
                               );
                        if (useCSV_2D5D_Output)
                        {
-                         //Depth relative to hip, normalized by image width (MediaPipe-style 2.5D z)
-                         float z_rel = (bvhTransform->joint[jID].pos3D[2] - hipZ) / renderer->width;
+                         //MediaPipe-style 2.5D z: hip-relative depth, projectively consistent with x/y scale.
+                         //Sign convention: negative = closer to camera than hip (matches MediaPipe).
+                         //Formula: (hipZ - Z_joint) * fx / (|hipZ| * width)  mirrors  x_norm = fx*X/(Z*width)
+                         float absHipZ = fabsf(hipZ);
+                         float z_rel = (absHipZ > 1e-6f)
+                                       ? (hipZ - bvhTransform->joint[jID].pos3D[2]) * renderer->fx / (absHipZ * renderer->width)
+                                       : 0.0f;
                          fprintf(fp2D,",%0.6f", z_rel);
                        }
                     }
