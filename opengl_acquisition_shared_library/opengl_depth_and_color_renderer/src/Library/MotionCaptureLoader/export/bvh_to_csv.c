@@ -318,6 +318,7 @@ int dumpBVHToCSVBody(
                          float z_rel = (absHipZ > 1e-6f)
                                        ? (hipZ - bvhTransform->joint[jID].pos3D[2]) * renderer->fx / (absHipZ * renderer->width)
                                        : 0.0f;
+                         if (!isfinite(z_rel)) { z_rel = 0.0f; }
                          fprintf(fp2D,",%0.6f", z_rel);
                        }
                     }
