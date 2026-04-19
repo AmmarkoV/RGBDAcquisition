@@ -21,7 +21,8 @@ int dumpBVHToCSVHeader(
                        const char * filename2D,
                        const char * filename3D,
                        const char * filenameBVH,
-                       const char * filenameMap
+                       const char * filenameMap,
+                       int useCSV_2D5D_Output
                       );
 
 
@@ -38,7 +39,8 @@ int dumpBVHToCSVBody(
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons,
-                       unsigned int encodeRotationsAsRadians
+                       unsigned int encodeRotationsAsRadians,
+                       int useCSV_2D5D_Output
                       );
 
 

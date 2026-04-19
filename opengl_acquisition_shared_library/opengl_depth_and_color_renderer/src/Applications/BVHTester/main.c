@@ -199,6 +199,7 @@ int bvhConverter(int argc,const char **argv)
     unsigned int sampleSkip = 0;// <- If you want to artificially reduce the sample size
     unsigned int convertToJSON=0 , convertToSVG=0 , convertToCSV=0, convertToAngleHeatmap=0;
     unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
+    unsigned int useCSV_2D5D_Output=0;
     unsigned int wipe_2D_Output=0,wipe_3D_Output=0,wipe_BVH_Output=0;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
@@ -1306,6 +1307,11 @@ int bvhConverter(int argc,const char **argv)
           toCSVDirectory=argv[i+1];
           toCSVTag=argv[i+2];
           convertToCSV=1;
+          if (strstr(argv[i+3],"2.5d")!=0) {
+            useCSV_2D5D_Output=1; useCSV_2D_Output=1;
+            useCSV_3D_Output  = (strstr(argv[i+3],"3d") !=0) ? 1 : 0;
+            useCSV_BVH_Output = (strstr(argv[i+3],"bvh")!=0) ? 1 : 0;
+          } else
           if (strcmp(argv[i+3],"2d+3d+bvh")==0){ useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; } else
           if (strcmp(argv[i+3],"2d+bvh")==0 )  { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
           if (strcmp(argv[i+3],"2d")==0 )      { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
@@ -1371,6 +1377,7 @@ int bvhConverter(int argc,const char **argv)
                              convertToCSV,
                              convertToAngleHeatmap,
                              useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                             useCSV_2D5D_Output,
                              wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
                              &bvhMotion,
                              &renderingConfiguration,
@@ -1396,6 +1403,7 @@ int bvhConverter(int argc,const char **argv)
                              0,            //CSV handled above
                              0,
                              useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
+                             useCSV_2D5D_Output,
                              wipe_2D_Output,wipe_3D_Output,wipe_BVH_Output,
                              &bvhMotion,
                              &renderingConfiguration,

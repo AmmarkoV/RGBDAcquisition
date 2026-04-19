@@ -25,7 +25,8 @@ int dumpBVHToCSVHeader(
                        const char * filename2D,
                        const char * filename3D,
                        const char * filenameBVH,
-                       const char * filenameMap
+                       const char * filenameMap,
+                       int useCSV_2D5D_Output
                       )
 {
    if ( (filenameMap!=0) && (filenameMap[0]!=0) && (!bvhExportFileExists(filenameMap)) )
@@ -72,6 +73,7 @@ int dumpBVHToCSVHeader(
             {
                 if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
                 fprintf(fp2D,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+                if (useCSV_2D5D_Output) { fprintf(fp2D,",2DZ_%s",mc->jointHierarchy[jID].jointName); }
             }
          }
          else
@@ -81,6 +83,7 @@ int dumpBVHToCSVHeader(
                unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
                if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
                fprintf(fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+               if (useCSV_2D5D_Output) { fprintf(fp2D,",2DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName); }
             }
          }
        }
@@ -203,7 +206,8 @@ int dumpBVHToCSVBody(
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons,
-                       unsigned int encodeRotationsAsRadians
+                       unsigned int encodeRotationsAsRadians,
+                       int useCSV_2D5D_Output
                       )
 {
    int isJointSelected=1;
@@ -264,6 +268,7 @@ int dumpBVHToCSVBody(
    if (fp2D!=0)
      {
       char comma=' ';
+      float hipZ = (useCSV_2D5D_Output) ? bvhTransform->joint[mc->rootJointID].pos3D[2] : 0.0f;
       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
        {
           bvh_considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
@@ -291,7 +296,8 @@ int dumpBVHToCSVBody(
                 if (mc->jointHierarchy[jID].erase2DCoordinates)
                     {
                        if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
-                        fprintf(fp2D,"0,0,0");
+                       if (useCSV_2D5D_Output) { fprintf(fp2D,"0,0,0,0"); }
+                       else                    { fprintf(fp2D,"0,0,0"); }
                     } else
                     {
                        if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
@@ -303,6 +309,12 @@ int dumpBVHToCSVBody(
                                (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                                (bvhTransform->joint[jID].isOccluded==0)
                               );
+                       if (useCSV_2D5D_Output)
+                       {
+                         //Depth relative to hip, normalized by image width (MediaPipe-style 2.5D z)
+                         float z_rel = (bvhTransform->joint[jID].pos3D[2] - hipZ) / renderer->width;
+                         fprintf(fp2D,",%0.6f", z_rel);
+                       }
                     }
          }
        }

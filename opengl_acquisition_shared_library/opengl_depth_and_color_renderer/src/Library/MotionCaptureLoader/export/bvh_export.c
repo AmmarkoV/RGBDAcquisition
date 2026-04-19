@@ -364,6 +364,7 @@ int dumpBVHTo_JSON_SVG_CSV(
                            int convertToCSV,
                            int convertToAngleHeatmap,
                            int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
+                           int useCSV_2D5D_Output,
                            int wipe_2D_Output,int wipe_3D_Output,int wipe_BVH_Output,
                            struct BVH_MotionCapture * mc,
                            struct BVH_RendererConfiguration * renderConfig,
@@ -467,7 +468,8 @@ int dumpBVHTo_JSON_SVG_CSV(
                         csvFilename2D,
                         csvFilename3D,
                         csvFilenameBVH,
-                        csvFilenameMap
+                        csvFilenameMap,
+                        useCSV_2D5D_Output
                       );
    }
   //------------------------------------------------------------------------------------------
@@ -623,7 +625,8 @@ int dumpBVHTo_JSON_SVG_CSV(
                              filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                              filterOutSkeletonsWithAnyLimbsOutOfImage,
                              filterWeirdSkeletons,
-                             encodeRotationsAsRadians
+                             encodeRotationsAsRadians,
+                             useCSV_2D5D_Output
                             );
       }
       //------------------------------------------------------------------------------------------
