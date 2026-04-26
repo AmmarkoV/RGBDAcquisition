@@ -1032,3 +1032,286 @@ int doModelTransform(
 
  return 1;
 }
+
+/* ============================================================================
+ * MHR Linear Blend Skinning — native C implementation
+ *
+ * Replicates body_model.pt forward pass:
+ *   blend_shape → parameter_transform → local_skeleton → FK → LBS
+ *
+ * All quaternions stored XYZW throughout.
+ * ============================================================================ */
+
+#define MHR_LBS_MAGIC   0x4C425300u  /* 'LBS\0' */
+#define MHR_LBS_VERSION 1u
+#define MHR_LN2         0.693147180559945f
+
+/* ── static quaternion / vector helpers ──────────────────────────────────── */
+
+/* Hamilton product r = a * b  (XYZW).
+ * mhr_qmul(r, parent_q, local_q)  →  local applied first, then parent. */
+static void mhr_qmul(float *r, const float *a, const float *b)
+{
+    r[0] = b[0]*a[3] + b[3]*a[0] + b[2]*a[1] - b[1]*a[2];
+    r[1] = b[1]*a[3] - b[2]*a[0] + b[3]*a[1] + b[0]*a[2];
+    r[2] = b[2]*a[3] + b[1]*a[0] - b[0]*a[1] + b[3]*a[2];
+    r[3] = b[3]*a[3] - b[0]*a[0] - b[1]*a[1] - b[2]*a[2];
+}
+
+/* Rotate vector v by unit quaternion q (XYZW). */
+static void mhr_qrot(float *out, const float *q, const float *v)
+{
+    float qx=q[0], qy=q[1], qz=q[2], qw=q[3];
+    float vx=v[0], vy=v[1], vz=v[2];
+    float tx = 2.f*(qy*vz - qz*vy);
+    float ty = 2.f*(qz*vx - qx*vz);
+    float tz = 2.f*(qx*vy - qy*vx);
+    out[0] = vx + qw*tx + (qy*tz - qz*ty);
+    out[1] = vy + qw*ty + (qz*tx - qx*tz);
+    out[2] = vz + qw*tz + (qx*ty - qy*tx);
+}
+
+/* Intrinsic XYZ Euler (radians) → unit quaternion (XYZW).
+ * q = Rx(ex) * Ry(ey) * Rz(ez)  — PyMomentum convention. */
+static void mhr_euler_xyz_to_quat(float ex, float ey, float ez, float *q)
+{
+    float hx=ex*0.5f, hy=ey*0.5f, hz=ez*0.5f;
+    float qx[4]={sinf(hx),0.f,     0.f,     cosf(hx)};
+    float qy[4]={0.f,     sinf(hy),0.f,     cosf(hy)};
+    float qz[4]={0.f,     0.f,     sinf(hz),cosf(hz)};
+    float tmp[4];
+    mhr_qmul(tmp, qx, qy);
+    mhr_qmul(q,   tmp, qz);
+}
+
+/* ── loader / free ────────────────────────────────────────────────────────── */
+
+struct MHR_LBS_Data *mhr_lbs_load(const char *path)
+{
+    FILE *f = fopen(path, "rb");
+    if (!f) { fprintf(stderr,"mhr_lbs_load: cannot open %s\n", path); return NULL; }
+
+    unsigned int hdr[8];
+    if (fread(hdr, sizeof(unsigned int), 8, f) != 8) {
+        fprintf(stderr,"mhr_lbs_load: short header\n"); fclose(f); return NULL;
+    }
+    if (hdr[0] != MHR_LBS_MAGIC || hdr[1] != MHR_LBS_VERSION) {
+        fprintf(stderr,"mhr_lbs_load: bad magic/version\n"); fclose(f); return NULL;
+    }
+
+    struct MHR_LBS_Data *d = (struct MHR_LBS_Data*)calloc(1, sizeof(*d));
+    if (!d) { fclose(f); return NULL; }
+
+    d->n_joints   = (int)hdr[2];
+    d->n_skin     = (int)hdr[3];
+    d->n_verts    = (int)hdr[4];
+    d->n_shape_pc = (int)hdr[5];
+    d->n_face_pc  = (int)hdr[6];
+    d->pt_cols    = (int)hdr[7];
+    d->pt_rows    = d->n_joints * 7;
+
+    fprintf(stderr,"mhr_lbs: joints=%d skin=%d verts=%d shape_pc=%d face_pc=%d\n",
+            d->n_joints, d->n_skin, d->n_verts, d->n_shape_pc, d->n_face_pc);
+
+#define LBS_ALLOC_F(field, n) \
+    d->field = (float*)malloc((size_t)(n)*sizeof(float)); if (!d->field) goto oom;
+#define LBS_ALLOC_I(field, n) \
+    d->field = (int*)malloc((size_t)(n)*sizeof(int));   if (!d->field) goto oom;
+#define LBS_READ_F(field, n) \
+    if (fread(d->field, sizeof(float), (size_t)(n), f) != (size_t)(n)) goto io_err;
+#define LBS_READ_I(field, n) \
+    if (fread(d->field, sizeof(int),   (size_t)(n), f) != (size_t)(n)) goto io_err;
+
+    LBS_ALLOC_F(PT,                 (size_t)d->pt_rows * d->pt_cols)
+    LBS_ALLOC_F(joint_offsets,      d->n_joints * 3)
+    LBS_ALLOC_F(joint_prerotations, d->n_joints * 4)
+    LBS_ALLOC_I(joint_parents,      d->n_joints)
+    LBS_ALLOC_F(inv_bind_pose,      d->n_joints * 8)
+    LBS_ALLOC_I(skin_joint_idx,     d->n_skin)
+    LBS_ALLOC_F(skin_weights,       d->n_skin)
+    LBS_ALLOC_I(skin_vert_idx,      d->n_skin)
+    LBS_ALLOC_F(base_shape,         d->n_verts * 3)
+    LBS_ALLOC_F(shape_vectors,      (size_t)d->n_shape_pc * d->n_verts * 3)
+    LBS_ALLOC_F(face_vectors,       (size_t)d->n_face_pc  * d->n_verts * 3)
+
+    LBS_READ_F(PT,                 (size_t)d->pt_rows * d->pt_cols)
+    LBS_READ_F(joint_offsets,      d->n_joints * 3)
+    LBS_READ_F(joint_prerotations, d->n_joints * 4)
+    LBS_READ_I(joint_parents,      d->n_joints)
+    LBS_READ_F(inv_bind_pose,      d->n_joints * 8)
+    LBS_READ_I(skin_joint_idx,     d->n_skin)
+    LBS_READ_F(skin_weights,       d->n_skin)
+    LBS_READ_I(skin_vert_idx,      d->n_skin)
+    LBS_READ_F(base_shape,         d->n_verts * 3)
+    LBS_READ_F(shape_vectors,      (size_t)d->n_shape_pc * d->n_verts * 3)
+    LBS_READ_F(face_vectors,       (size_t)d->n_face_pc  * d->n_verts * 3)
+
+#undef LBS_ALLOC_F
+#undef LBS_ALLOC_I
+#undef LBS_READ_F
+#undef LBS_READ_I
+
+    fclose(f);
+    fprintf(stderr,"mhr_lbs: loaded %s OK\n", path);
+    return d;
+
+oom:
+    fprintf(stderr,"mhr_lbs_load: out of memory\n");
+    fclose(f); mhr_lbs_free(d); return NULL;
+io_err:
+    fprintf(stderr,"mhr_lbs_load: short read on %s\n", path);
+    fclose(f); mhr_lbs_free(d); return NULL;
+}
+
+void mhr_lbs_free(struct MHR_LBS_Data *d)
+{
+    if (!d) return;
+    free(d->PT);               free(d->joint_offsets);
+    free(d->joint_prerotations); free(d->joint_parents);
+    free(d->inv_bind_pose);    free(d->skin_joint_idx);
+    free(d->skin_weights);     free(d->skin_vert_idx);
+    free(d->base_shape);       free(d->shape_vectors);
+    free(d->face_vectors);     free(d);
+}
+
+/* ── main per-frame compute ───────────────────────────────────────────────── */
+
+int mhr_lbs_compute(const struct MHR_LBS_Data *d,
+                    const float *model_params,  /* [204]        */
+                    const float *shape_coeffs,  /* [n_shape_pc] */
+                    const float *face_coeffs,   /* [n_face_pc]  */
+                    float       *out_verts)     /* [n_verts*3], caller-alloc */
+{
+    if (!d || !model_params || !shape_coeffs || !face_coeffs || !out_verts)
+        return 0;
+
+    int nj  = d->n_joints;
+    int ns  = d->n_skin;
+    int nv  = d->n_verts;
+    int npr = d->pt_rows;
+    int npc = d->pt_cols;
+
+    /* Step 1 — unposed vertices: base_shape + shape_bs + face_bs */
+    float *unposed = (float*)malloc((size_t)nv * 3 * sizeof(float));
+    if (!unposed) return 0;
+    memcpy(unposed, d->base_shape, (size_t)nv * 3 * sizeof(float));
+
+    for (int i = 0; i < d->n_shape_pc; i++) {
+        float c = shape_coeffs[i];
+        if (c == 0.f) continue;
+        const float *sv = d->shape_vectors + (size_t)i * nv * 3;
+        for (int k = 0; k < nv*3; k++) unposed[k] += c * sv[k];
+    }
+    for (int i = 0; i < d->n_face_pc; i++) {
+        float c = face_coeffs[i];
+        if (c == 0.f) continue;
+        const float *fv = d->face_vectors + (size_t)i * nv * 3;
+        for (int k = 0; k < nv*3; k++) unposed[k] += c * fv[k];
+    }
+
+    /* Step 2 — joint_params = PT [npr×npc] @ concat(model_params[204], zeros) */
+    float *joint_params = (float*)malloc((size_t)npr * sizeof(float));
+    float *input_vec    = (float*)calloc((size_t)npc,  sizeof(float));
+    if (!joint_params || !input_vec) {
+        free(joint_params); free(input_vec); free(unposed); return 0;
+    }
+    memcpy(input_vec, model_params, (size_t)(npc < 204 ? npc : 204) * sizeof(float));
+
+    for (int j = 0; j < npr; j++) {
+        float acc = 0.f;
+        const float *row = d->PT + (size_t)j * npc;
+        for (int k = 0; k < npc; k++) acc += row[k] * input_vec[k];
+        joint_params[j] = acc;
+    }
+    free(input_vec);
+
+    /* Step 3 — local skeleton state: t, q, s per joint */
+    float t_local[127*3];
+    float q_local[127*4];
+    float s_local[127];
+
+    for (int j = 0; j < nj; j++) {
+        const float *jp  = joint_params + j * 7;
+        const float *off = d->joint_offsets      + j * 3;
+        const float *pre = d->joint_prerotations + j * 4;
+
+        t_local[j*3+0] = off[0] + jp[0];
+        t_local[j*3+1] = off[1] + jp[1];
+        t_local[j*3+2] = off[2] + jp[2];
+
+        float q_euler[4];
+        mhr_euler_xyz_to_quat(jp[3], jp[4], jp[5], q_euler);
+        mhr_qmul(q_local + j*4, pre, q_euler);
+
+        s_local[j] = expf(jp[6] * MHR_LN2);
+    }
+    free(joint_params);
+
+    /* Step 4 — FK chain (joint_parents sorted: parent index < child index) */
+    float g_t[127*3];
+    float g_q[127*4];
+    float g_s[127];
+
+    for (int j = 0; j < nj; j++) {
+        int p = d->joint_parents[j];
+        if (p < 0) {
+            memcpy(g_t + j*3, t_local + j*3, 3*sizeof(float));
+            memcpy(g_q + j*4, q_local + j*4, 4*sizeof(float));
+            g_s[j] = s_local[j];
+        } else {
+            g_s[j] = g_s[p] * s_local[j];
+            mhr_qmul(g_q + j*4, g_q + p*4, q_local + j*4);
+            float rt[3];
+            mhr_qrot(rt, g_q + p*4, t_local + j*3);
+            g_t[j*3+0] = g_t[p*3+0] + g_s[p] * rt[0];
+            g_t[j*3+1] = g_t[p*3+1] + g_s[p] * rt[1];
+            g_t[j*3+2] = g_t[p*3+2] + g_s[p] * rt[2];
+        }
+    }
+
+    /* Step 5 — skin TRS per joint = global(j) ∘ inv_bind(j) */
+    float skin_t[127*3];
+    float skin_q[127*4];
+    float skin_s[127];
+
+    for (int j = 0; j < nj; j++) {
+        /* inv_bind_pose layout per joint: [tx,ty,tz, qx,qy,qz,qw, scale] */
+        const float *ib  = d->inv_bind_pose + j * 8;
+        float        ibs = ib[7];
+
+        skin_s[j] = g_s[j] * ibs;
+        mhr_qmul(skin_q + j*4, g_q + j*4, ib + 3);
+        float rt[3];
+        mhr_qrot(rt, g_q + j*4, ib);
+        skin_t[j*3+0] = g_t[j*3+0] + g_s[j] * rt[0];
+        skin_t[j*3+1] = g_t[j*3+1] + g_s[j] * rt[1];
+        skin_t[j*3+2] = g_t[j*3+2] + g_s[j] * rt[2];
+    }
+
+    /* Step 6 — LBS: sparse weighted accumulation */
+    memset(out_verts, 0, (size_t)nv * 3 * sizeof(float));
+
+    for (int k = 0; k < ns; k++) {
+        int   ji = d->skin_joint_idx[k];
+        int   vi = d->skin_vert_idx[k];
+        float w  = d->skin_weights[k];
+        float sx = skin_s[ji];
+
+        const float *vr = unposed + vi * 3;
+        float pv[3];
+        mhr_qrot(pv, skin_q + ji*4, vr);
+        out_verts[vi*3+0] += w * (skin_t[ji*3+0] + sx * pv[0]);
+        out_verts[vi*3+1] += w * (skin_t[ji*3+1] + sx * pv[1]);
+        out_verts[vi*3+2] += w * (skin_t[ji*3+2] + sx * pv[2]);
+    }
+
+    free(unposed);
+
+    /* Step 7 — coordinate flip: MHR applies verts[Y,Z] *= -1 after skinning */
+    for (int v = 0; v < nv; v++) {
+        out_verts[v*3+1] *= -1.f;
+        out_verts[v*3+2] *= -1.f;
+    }
+
+    return 1;
+}

@@ -16,6 +16,50 @@ extern "C"
 {
 #endif
 
+/* ── MHR Linear Blend Skinning ─────────────────────────────────────────────── */
+
+struct MHR_LBS_Data {
+    int n_joints;       /* 127  */
+    int n_skin;         /* 51337 */
+    int n_verts;        /* 18439 */
+    int n_shape_pc;     /* 45   */
+    int n_face_pc;      /* 72   */
+    int pt_rows;        /* 889 = n_joints * 7 */
+    int pt_cols;        /* 249  */
+
+    float *PT;                  /* [pt_rows × pt_cols]          */
+    float *joint_offsets;       /* [n_joints × 3]               */
+    float *joint_prerotations;  /* [n_joints × 4]  XYZW         */
+    int   *joint_parents;       /* [n_joints]  -1 = root        */
+    float *inv_bind_pose;       /* [n_joints × 8]  tx,ty,tz,qx,qy,qz,qw,scale */
+    int   *skin_joint_idx;      /* [n_skin]                     */
+    float *skin_weights;        /* [n_skin]                     */
+    int   *skin_vert_idx;       /* [n_skin]                     */
+    float *base_shape;          /* [n_verts × 3]                */
+    float *shape_vectors;       /* [n_shape_pc × n_verts × 3]  */
+    float *face_vectors;        /* [n_face_pc  × n_verts × 3]  */
+};
+
+/* Load body_model.lbs produced by tools/extract_lbs_data.py.
+ * Returns NULL on failure. Caller must call mhr_lbs_free(). */
+struct MHR_LBS_Data *mhr_lbs_load(const char *path);
+
+/* Free all buffers allocated by mhr_lbs_load(). */
+void mhr_lbs_free(struct MHR_LBS_Data *d);
+
+/* Run the full LBS forward pass for one person per frame.
+ *   model_params  [204]        from MHRResult.mhr_model_params
+ *   shape_coeffs  [n_shape_pc] from MHRResult.shape
+ *   face_coeffs   [n_face_pc]  from MHRResult.face_params
+ *   out_verts     [n_verts*3]  caller-allocated output (float[18439*3])
+ * Returns 1 on success, 0 on failure. */
+int mhr_lbs_compute(const struct MHR_LBS_Data *d,
+                    const float *model_params,
+                    const float *shape_coeffs,
+                    const float *face_coeffs,
+                    float       *out_verts);
+
+/* ── TRI bone transforms ────────────────────────────────────────────────────── */
 
 /**
 * @brief This is the maximum number of bones per vertice this is needed to allocate correctly the arrays on TRI_Bones_Per_Vertex_Vertice_Item , 4 is
