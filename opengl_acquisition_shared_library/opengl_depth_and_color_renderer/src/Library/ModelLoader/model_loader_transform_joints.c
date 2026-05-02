@@ -1043,13 +1043,24 @@ int doModelTransform(
  * ============================================================================ */
 
 #define MHR_LBS_MAGIC   0x4C425300u  /* 'LBS\0' */
-#define MHR_LBS_VERSION 1u
+#define MHR_LBS_VERSION 2u  /* v2 appends scale_mean[68] + scale_comps[28×68] */
 #define MHR_LN2         0.693147180559945f
 
 /* ── static quaternion / vector helpers ──────────────────────────────────── */
 
-/* Hamilton product r = a * b  (XYZW).
- * mhr_qmul(r, parent_q, local_q)  →  local applied first, then parent. */
+/* Hamilton product r = a * b  (XYZW storage: [x, y, z, w]).
+ *
+ * Rotation semantics: when you rotate a vector v with quaternion q,
+ * the result is q*v*q^{-1}.  For a composed quaternion r = a*b:
+ *   r*v*r^{-1} = a*(b*v*b^{-1})*a^{-1}
+ * meaning b's rotation is applied FIRST to v, then a's.
+ * Equivalently, the rotation matrix for r is R_a @ R_b.
+ *
+ * Usage patterns:
+ *   mhr_qmul(g_q, parent_q, child_q)  →  R_global = R_parent @ R_child  (FK)
+ *   mhr_qmul(q_local, pre_q, euler_q) →  R_local  = R_pre    @ R_euler  (Step 3)
+ *   mhr_qmul(skin_q,  g_q,   ib_q)   →  R_skin   = R_global @ R_inv_bind (Step 5)
+ */
 static void mhr_qmul(float *r, const float *a, const float *b)
 {
     r[0] = b[0]*a[3] + b[3]*a[0] + b[2]*a[1] - b[1]*a[2];
@@ -1058,7 +1069,7 @@ static void mhr_qmul(float *r, const float *a, const float *b)
     r[3] = b[3]*a[3] - b[0]*a[0] - b[1]*a[1] - b[2]*a[2];
 }
 
-/* Rotate vector v by unit quaternion q (XYZW). */
+/* Rotate vector v by unit quaternion q (XYZW): computes q*v*q^{-1}. */
 static void mhr_qrot(float *out, const float *q, const float *v)
 {
     float qx=q[0], qy=q[1], qz=q[2], qw=q[3];
@@ -1071,8 +1082,23 @@ static void mhr_qrot(float *out, const float *q, const float *v)
     out[2] = vz + qw*tz + (qx*ty - qy*tx);
 }
 
-/* Intrinsic XYZ Euler (radians) → unit quaternion (XYZW).
- * q = Rx(ex) * Ry(ey) * Rz(ez)  — PyMomentum convention. */
+/* Intrinsic XYZ Euler angles (radians) → unit quaternion (XYZW).
+ *
+ * PyMomentum local_skeleton convention: given joint euler params [ex, ey, ez],
+ * the joint rotation matrix is R = Rz(ez) * Ry(ey) * Rx(ex)  — i.e., X applied
+ * first to vectors, then Y, then Z.  This is "intrinsic XYZ" = "extrinsic ZYX".
+ * See pymomentum/trs.py  rotmat_from_euler_xyz("xyz", angles).
+ *
+ * Quaternion form: q = qz * qy * qx
+ *   because mhr_qmul(r,a,b) gives R_a @ R_b, so
+ *   mhr_qmul(tmp, qz, qy)  → R_tmp = R_z @ R_y
+ *   mhr_qmul(q,   tmp, qx) → R_q   = R_z @ R_y @ R_x  ✓
+ *
+ * The Euler angles (ex,ey,ez) arriving here are extracted by rot6d_to_euler
+ * (preprocess.hpp) using the ZYX decomposition: ex=rx, ey=ry, ez=rz such that
+ * R_original = Rz(rz)*Ry(ry)*Rx(rx).  They match what PyMomentum stores in
+ * joint_params[3:6] after the parameter transform.
+ */
 static void mhr_euler_xyz_to_quat(float ex, float ey, float ez, float *q)
 {
     float hx=ex*0.5f, hy=ey*0.5f, hz=ez*0.5f;
@@ -1080,8 +1106,8 @@ static void mhr_euler_xyz_to_quat(float ex, float ey, float ez, float *q)
     float qy[4]={0.f,     sinf(hy),0.f,     cosf(hy)};
     float qz[4]={0.f,     0.f,     sinf(hz),cosf(hz)};
     float tmp[4];
-    mhr_qmul(tmp, qx, qy);
-    mhr_qmul(q,   tmp, qz);
+    mhr_qmul(tmp, qz, qy);   /* R_tmp = Rz @ Ry */
+    mhr_qmul(q,   tmp, qx);  /* R_q   = Rz @ Ry @ Rx  (PyMomentum XYZ intrinsic) */
 }
 
 /* ── loader / free ────────────────────────────────────────────────────────── */
@@ -1095,9 +1121,12 @@ struct MHR_LBS_Data *mhr_lbs_load(const char *path)
     if (fread(hdr, sizeof(unsigned int), 8, f) != 8) {
         fprintf(stderr,"mhr_lbs_load: short header\n"); fclose(f); return NULL;
     }
-    if (hdr[0] != MHR_LBS_MAGIC || hdr[1] != MHR_LBS_VERSION) {
-        fprintf(stderr,"mhr_lbs_load: bad magic/version\n"); fclose(f); return NULL;
+    if (hdr[0] != MHR_LBS_MAGIC || (hdr[1] != 1u && hdr[1] != MHR_LBS_VERSION)) {
+        fprintf(stderr,"mhr_lbs_load: bad magic/version (got %u, expected 1 or %u)\n",
+                hdr[1], MHR_LBS_VERSION);
+        fclose(f); return NULL;
     }
+    unsigned int file_version = hdr[1];
 
     struct MHR_LBS_Data *d = (struct MHR_LBS_Data*)calloc(1, sizeof(*d));
     if (!d) { fclose(f); return NULL; }
@@ -1146,13 +1175,25 @@ struct MHR_LBS_Data *mhr_lbs_load(const char *path)
     LBS_READ_F(shape_vectors,      (size_t)d->n_shape_pc * d->n_verts * 3)
     LBS_READ_F(face_vectors,       (size_t)d->n_face_pc  * d->n_verts * 3)
 
+    /* version 2: scale PCA data (scale_mean [68], scale_comps [28×68]) */
+    if (file_version >= 2u) {
+        d->n_scale_pc  = 28;
+        d->n_scale_out = 68;
+        LBS_ALLOC_F(scale_mean,  d->n_scale_out)
+        LBS_ALLOC_F(scale_comps, d->n_scale_pc * d->n_scale_out)
+        LBS_READ_F(scale_mean,  d->n_scale_out)
+        LBS_READ_F(scale_comps, d->n_scale_pc * d->n_scale_out)
+        fprintf(stderr,"mhr_lbs: loaded scale PCA (mean[%d], comps[%dx%d])\n",
+                d->n_scale_out, d->n_scale_pc, d->n_scale_out);
+    }
+
 #undef LBS_ALLOC_F
 #undef LBS_ALLOC_I
 #undef LBS_READ_F
 #undef LBS_READ_I
 
     fclose(f);
-    fprintf(stderr,"mhr_lbs: loaded %s OK\n", path);
+    fprintf(stderr,"mhr_lbs: loaded %s OK (version %u)\n", path, file_version);
     return d;
 
 oom:
@@ -1171,16 +1212,50 @@ void mhr_lbs_free(struct MHR_LBS_Data *d)
     free(d->inv_bind_pose);    free(d->skin_joint_idx);
     free(d->skin_weights);     free(d->skin_vert_idx);
     free(d->base_shape);       free(d->shape_vectors);
-    free(d->face_vectors);     free(d);
+    free(d->face_vectors);     free(d->scale_mean);
+    free(d->scale_comps);      free(d);
 }
 
 /* ── main per-frame compute ───────────────────────────────────────────────── */
 
+/* mhr_lbs_compute — full LBS forward pass, replicating body_model.pt:
+ *
+ *  model_params [204] layout (see build_model_params in preprocess.hpp):
+ *    [0:3]    global_trans × 10  (zeroed for single-view)
+ *    [3:6]    global_rot   Euler ZYX (rx, ry, rz) extracted from the 6D head output
+ *    [6:136]  body_pose_params [130 of 133]  Euler ZYX per DOF (hands zeroed)
+ *    [136:204] scales
+ *
+ *  Pipeline stages:
+ *    1. unposed = base_shape + Σ shape_coeff[i]*shape_vec[i] + Σ face_coeff[i]*face_vec[i]
+ *    2. joint_params [n_joints×7] = PT [n_joints×7, pt_cols] @ model_params[:pt_cols]
+ *       Each joint row: [tx, ty, tz, rx, ry, rz, log2_scale]
+ *       rx,ry,rz are in PyMomentum XYZ intrinsic convention: R = Rz(rz)*Ry(ry)*Rx(rx).
+ *    3. local TRS per joint:
+ *         t_local[j] = joint_offsets[j] + jp[j][0:3]
+ *         q_local[j] = joint_prerotations[j] * euler_to_quat(jp[j][3:6])
+ *                      (pre-rotation establishes rest-frame; euler applied on top)
+ *         s_local[j] = exp2(jp[j][6])
+ *    4. FK (parent index < child index guaranteed by sorted order):
+ *         g_q[j] = g_q[parent] * q_local[j]   ← global = parent_global ∘ local
+ *         g_t[j] = g_t[parent] + g_s[parent] * rotate(g_q[parent], t_local[j])
+ *         g_s[j] = g_s[parent] * s_local[j]
+ *    5. skin TRS = global(j) ∘ inv_bind(j):
+ *         skin_q[j] = g_q[j] * ib_q[j]
+ *         skin_t[j] = g_t[j] + g_s[j] * rotate(g_q[j], ib_t[j])
+ *         skin_s[j] = g_s[j] * ib_s[j]
+ *    6. LBS: out_vert[vi] += Σ_j w[j,vi] * (skin_t[j] + skin_s[j]*rotate(skin_q[j], unposed[vi]))
+ *
+ *  On first call, model_params and key intermediate values are written to
+ *  /tmp/mhr_lbs_dump.bin for comparison with the Python dumper:
+ *    dump_joint_transforms.py --lbs body_model.lbs --dump /tmp/mhr_lbs_dump.bin
+ */
 int mhr_lbs_compute(const struct MHR_LBS_Data *d,
                     const float *model_params,  /* [204]        */
                     const float *shape_coeffs,  /* [n_shape_pc] */
                     const float *face_coeffs,   /* [n_face_pc]  */
-                    float       *out_verts)     /* [n_verts*3], caller-alloc */
+                    float       *out_verts,     /* [n_verts*3], caller-alloc */
+                    float       *out_joints)    /* [n_joints*3], optional */
 {
     if (!d || !model_params || !shape_coeffs || !face_coeffs || !out_verts)
         return 0;
@@ -1191,10 +1266,37 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
     int npr = d->pt_rows;
     int npc = d->pt_cols;
 
+    /* First-frame dump: write model_params [204 floats] to /tmp/mhr_lbs_dump.bin
+     * so dump_joint_transforms.py can reproduce and verify every stage offline. */
+    { static int dumped = 0;
+      if (!dumped) {
+          dumped = 1;
+          FILE *fp = fopen("/tmp/mhr_lbs_dump.bin","wb");
+          if (fp) {
+              /* header: n_joints, pt_cols so Python can replicate Step 2 */
+              int hdr[2] = {nj, npc};
+              fwrite(hdr, sizeof(int), 2, fp);
+              fwrite(model_params,  sizeof(float), 204,               fp);
+              fwrite(shape_coeffs,  sizeof(float), (size_t)d->n_shape_pc, fp);
+              fwrite(face_coeffs,   sizeof(float), (size_t)d->n_face_pc,  fp);
+              fclose(fp);
+              fprintf(stderr,"[LBS] wrote first-frame dump to /tmp/mhr_lbs_dump.bin\n");
+          }
+      }
+    }
+
     /* Step 1 — unposed vertices: base_shape + shape_bs + face_bs */
     float *unposed = (float*)malloc((size_t)nv * 3 * sizeof(float));
     if (!unposed) return 0;
     memcpy(unposed, d->base_shape, (size_t)nv * 3 * sizeof(float));
+
+    // Debug: base_shape bounds
+    { float bx=1e9f,by=1e9f,bz=1e9f;
+      for(int i=0;i<nv*3;i+=3) { if(d->base_shape[i]<bx)bx=d->base_shape[i]; if(d->base_shape[i+1]<by)by=d->base_shape[i+1]; if(d->base_shape[i+2]<bz)bz=d->base_shape[i+2]; }
+      float tx=-1e9f,ty=-1e9f,tz=-1e9f;
+      for(int i=0;i<nv*3;i+=3) { if(d->base_shape[i]>tx)tx=d->base_shape[i]; if(d->base_shape[i+1]>ty)ty=d->base_shape[i+1]; if(d->base_shape[i+2]>tz)tz=d->base_shape[i+2]; }
+      fprintf(stderr,"[LBS] base_shape: x[%.3f,%.3f] y[%.3f,%.3f] z[%.3f,%.3f]\n",bx,tx,by,ty,bz,tz);
+    }
 
     for (int i = 0; i < d->n_shape_pc; i++) {
         float c = shape_coeffs[i];
@@ -1207,6 +1309,22 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
         if (c == 0.f) continue;
         const float *fv = d->face_vectors + (size_t)i * nv * 3;
         for (int k = 0; k < nv*3; k++) unposed[k] += c * fv[k];
+    }
+
+    // Debug: unposed bounds
+    { float ux=1e9f,uy=1e9f,uz=1e9f;
+      for(int i=0;i<nv*3;i+=3) { if(unposed[i]<ux)ux=unposed[i]; if(unposed[i+1]<uy)uy=unposed[i+1]; if(unposed[i+2]<uz)uz=unposed[i+2]; }
+      float vx=-1e9f,vy=-1e9f,vz=-1e9f;
+      for(int i=0;i<nv*3;i+=3) { if(unposed[i]>vx)vx=unposed[i]; if(unposed[i+1]>vy)vy=unposed[i+1]; if(unposed[i+2]>vz)vz=unposed[i+2]; }
+      fprintf(stderr,"[LBS] unposed:    x[%.3f,%.3f] y[%.3f,%.3f] z[%.3f,%.3f]\n",ux,vx,uy,vy,uz,vz);
+    }
+
+    /* Debug: incoming coefficient magnitudes */
+    { float mp_max=0, sc_max=0, fc_max=0;
+      for(int i=0;i<204;i++) { float a=model_params[i]; if(a<0)a=-a; if(a>mp_max)mp_max=a; }
+      for(int i=0;i<d->n_shape_pc;i++) { float a=shape_coeffs[i]; if(a<0)a=-a; if(a>sc_max)sc_max=a; }
+      for(int i=0;i<d->n_face_pc;i++) { float a=face_coeffs[i]; if(a<0)a=-a; if(a>fc_max)fc_max=a; }
+      fprintf(stderr,"[LBS] input max abs: model_params=%.4f shape=%.4f face=%.4f  npc=%d\n", mp_max, sc_max, fc_max, npc);
     }
 
     /* Step 2 — joint_params = PT [npr×npc] @ concat(model_params[204], zeros) */
@@ -1225,7 +1343,18 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
     }
     free(input_vec);
 
-    /* Step 3 — local skeleton state: t, q, s per joint */
+    /* Step 3 — local skeleton state per joint: (t_local, q_local, s_local)
+     *
+     * joint_params row j: [tx, ty, tz, rx, ry, rz, log2_scale]
+     *   tx,ty,tz  are ADDITIVE offsets relative to joint_offsets[j] (rest-pose position).
+     *   rx,ry,rz  are ZYX Euler angles (PyMomentum XYZ intrinsic: R = Rz(rz)*Ry(ry)*Rx(rx)).
+     *   log2_scale is decoded as exp2(val) = 2^val.
+     *
+     * q_local[j] = joint_prerotations[j] * euler_to_quat(rx,ry,rz)
+     *   joint_prerotations establishes each joint's rest-pose orientation.
+     *   The pose quaternion (from Euler) is applied ON TOP via right-multiplication.
+     *   R_local = R_pre @ R_euler  (pre-rotation first, then the driven pose).
+     */
     float t_local[127*3];
     float q_local[127*4];
     float s_local[127];
@@ -1233,34 +1362,54 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
     for (int j = 0; j < nj; j++) {
         const float *jp  = joint_params + j * 7;
         const float *off = d->joint_offsets      + j * 3;
-        const float *pre = d->joint_prerotations + j * 4;
+        const float *pre = d->joint_prerotations + j * 4;  /* XYZW */
 
+        /* rest-pose offset + driven translation */
         t_local[j*3+0] = off[0] + jp[0];
         t_local[j*3+1] = off[1] + jp[1];
         t_local[j*3+2] = off[2] + jp[2];
 
+        /* jp[3]=rx jp[4]=ry jp[5]=rz  →  q representing Rz(rz)*Ry(ry)*Rx(rx)
+         * Then compose: q_local = pre * q_euler  so R_local = R_pre @ R_euler. */
         float q_euler[4];
         mhr_euler_xyz_to_quat(jp[3], jp[4], jp[5], q_euler);
-        mhr_qmul(q_local + j*4, pre, q_euler);
+        mhr_qmul(q_local + j*4, pre, q_euler);  /* R_local = R_pre @ R_euler */
 
-        s_local[j] = expf(jp[6] * MHR_LN2);
+        s_local[j] = expf(jp[6] * MHR_LN2);  /* exp2(log2_scale) */
     }
     free(joint_params);
 
-    /* Step 4 — FK chain (joint_parents sorted: parent index < child index) */
+    /* Step 4 — FK chain: accumulate global TRS from root to leaves.
+     *
+     * joint_parents is sorted so that parent index < child index, meaning a
+     * single forward pass is sufficient (no dependency ordering needed).
+     *
+     * For joint j with parent p:
+     *   g_q[j] = g_q[p] * q_local[j]     → R_global[j] = R_global[p] @ R_local[j]
+     *   g_t[j] = g_t[p] + g_s[p] * R_global[p] @ t_local[j]   (offset rotated by parent)
+     *   g_s[j] = g_s[p] * s_local[j]
+     *
+     * For the root joint (parent < 0), global = local directly.
+     */
     float g_t[127*3];
     float g_q[127*4];
     float g_s[127];
 
+    fprintf(stderr,"[LBS] root joint: t=(%.4f,%.4f,%.4f) s=%.6f\n",
+            t_local[0], t_local[1], t_local[2], s_local[0]);
+
     for (int j = 0; j < nj; j++) {
         int p = d->joint_parents[j];
         if (p < 0) {
+            /* root: global == local */
             memcpy(g_t + j*3, t_local + j*3, 3*sizeof(float));
             memcpy(g_q + j*4, q_local + j*4, 4*sizeof(float));
             g_s[j] = s_local[j];
         } else {
             g_s[j] = g_s[p] * s_local[j];
+            /* g_q[j] = g_q[p] * q_local[j]  →  R_global[j] = R_parent @ R_local[j] */
             mhr_qmul(g_q + j*4, g_q + p*4, q_local + j*4);
+            /* child offset rotated by parent global rotation, then scaled and added */
             float rt[3];
             mhr_qrot(rt, g_q + p*4, t_local + j*3);
             g_t[j*3+0] = g_t[p*3+0] + g_s[p] * rt[0];
@@ -1269,20 +1418,31 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
         }
     }
 
-    /* Step 5 — skin TRS per joint = global(j) ∘ inv_bind(j) */
+    /* Step 5 — skin TRS = global(j) ∘ inv_bind(j)
+     *
+     * inv_bind_pose[j] is the inverse of the joint's bind-pose transform.
+     * Composing global(j) with inv_bind(j) gives the net deformation applied
+     * to a vertex skinned to joint j when it moves from rest to the current pose.
+     *
+     * inv_bind layout per joint (8 floats): [tx, ty, tz, qx, qy, qz, qw, scale]
+     *
+     * Composition (TRS concatenation):
+     *   skin_q = g_q @ ib_q    → R_skin = R_global @ R_inv_bind
+     *   skin_t = g_t + g_s * rotate(g_q, ib_t)
+     *   skin_s = g_s * ib_scale
+     */
     float skin_t[127*3];
     float skin_q[127*4];
     float skin_s[127];
 
     for (int j = 0; j < nj; j++) {
-        /* inv_bind_pose layout per joint: [tx,ty,tz, qx,qy,qz,qw, scale] */
-        const float *ib  = d->inv_bind_pose + j * 8;
+        const float *ib  = d->inv_bind_pose + j * 8;  /* [tx,ty,tz, qx,qy,qz,qw, scale] */
         float        ibs = ib[7];
 
         skin_s[j] = g_s[j] * ibs;
-        mhr_qmul(skin_q + j*4, g_q + j*4, ib + 3);
+        mhr_qmul(skin_q + j*4, g_q + j*4, ib + 3);  /* R_skin = R_global @ R_inv_bind */
         float rt[3];
-        mhr_qrot(rt, g_q + j*4, ib);
+        mhr_qrot(rt, g_q + j*4, ib);   /* rotate inv_bind translation by global orientation */
         skin_t[j*3+0] = g_t[j*3+0] + g_s[j] * rt[0];
         skin_t[j*3+1] = g_t[j*3+1] + g_s[j] * rt[1];
         skin_t[j*3+2] = g_t[j*3+2] + g_s[j] * rt[2];
@@ -1311,6 +1471,20 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
     for (int v = 0; v < nv; v++) {
         out_verts[v*3+1] *= -1.f;
         out_verts[v*3+2] *= -1.f;
+    }
+
+    /* Step 8 — convert centimeters to meters (body model is in cm) */
+    for (int v = 0; v < nv * 3; v++) {
+        out_verts[v] *= 0.01f;
+    }
+
+    /* Step 9 — output joint coordinates (same flip + cm→m as vertices) */
+    if (out_joints) {
+        for (int j = 0; j < nj; j++) {
+            out_joints[j*3+0] = g_t[j*3+0] * 0.01f;
+            out_joints[j*3+1] = -g_t[j*3+1] * 0.01f;
+            out_joints[j*3+2] = -g_t[j*3+2] * 0.01f;
+        }
     }
 
     return 1;

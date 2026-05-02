@@ -26,6 +26,8 @@ struct MHR_LBS_Data {
     int n_face_pc;      /* 72   */
     int pt_rows;        /* 889 = n_joints * 7 */
     int pt_cols;        /* 249  */
+    int n_scale_pc;     /* 28   (0 if not loaded) */
+    int n_scale_out;    /* 68   (0 if not loaded) */
 
     float *PT;                  /* [pt_rows × pt_cols]          */
     float *joint_offsets;       /* [n_joints × 3]               */
@@ -38,6 +40,8 @@ struct MHR_LBS_Data {
     float *base_shape;          /* [n_verts × 3]                */
     float *shape_vectors;       /* [n_shape_pc × n_verts × 3]  */
     float *face_vectors;        /* [n_face_pc  × n_verts × 3]  */
+    float *scale_mean;          /* [n_scale_out]  NULL if not loaded */
+    float *scale_comps;         /* [n_scale_pc × n_scale_out]  NULL if not loaded */
 };
 
 /* Load body_model.lbs produced by tools/extract_lbs_data.py.
@@ -52,12 +56,14 @@ void mhr_lbs_free(struct MHR_LBS_Data *d);
  *   shape_coeffs  [n_shape_pc] from MHRResult.shape
  *   face_coeffs   [n_face_pc]  from MHRResult.face_params
  *   out_verts     [n_verts*3]  caller-allocated output (float[18439*3])
+ *   out_joints    [n_joints*3] caller-allocated output (float[127*3]), may be NULL
  * Returns 1 on success, 0 on failure. */
 int mhr_lbs_compute(const struct MHR_LBS_Data *d,
                     const float *model_params,
                     const float *shape_coeffs,
                     const float *face_coeffs,
-                    float       *out_verts);
+                    float       *out_verts,
+                    float       *out_joints);
 
 /* ── TRI bone transforms ────────────────────────────────────────────────────── */
 
