@@ -1043,7 +1043,8 @@ int doModelTransform(
  * ============================================================================ */
 
 #define MHR_LBS_MAGIC   0x4C425300u  /* 'LBS\0' */
-#define MHR_LBS_VERSION 2u  /* v2 appends scale_mean[68] + scale_comps[28×68] */
+#define MHR_LBS_VERSION 3u  /* v3 appends hand_pose_mean[54] + hand_pose_comps[54×54]
+                                + hand_joint_idxs_left[27] + hand_joint_idxs_right[27] */
 #define MHR_LN2         0.693147180559945f
 
 /* ── static quaternion / vector helpers ──────────────────────────────────── */
@@ -1121,8 +1122,8 @@ struct MHR_LBS_Data *mhr_lbs_load(const char *path)
     if (fread(hdr, sizeof(unsigned int), 8, f) != 8) {
         fprintf(stderr,"mhr_lbs_load: short header\n"); fclose(f); return NULL;
     }
-    if (hdr[0] != MHR_LBS_MAGIC || (hdr[1] != 1u && hdr[1] != MHR_LBS_VERSION)) {
-        fprintf(stderr,"mhr_lbs_load: bad magic/version (got %u, expected 1 or %u)\n",
+    if (hdr[0] != MHR_LBS_MAGIC || (hdr[1] != 1u && hdr[1] != 2u && hdr[1] != MHR_LBS_VERSION)) {
+        fprintf(stderr,"mhr_lbs_load: bad magic/version (got %u, expected 1, 2 or %u)\n",
                 hdr[1], MHR_LBS_VERSION);
         fclose(f); return NULL;
     }
@@ -1187,6 +1188,22 @@ struct MHR_LBS_Data *mhr_lbs_load(const char *path)
                 d->n_scale_out, d->n_scale_pc, d->n_scale_out);
     }
 
+    /* version 3: hand pose PCA + per-hand joint indices */
+    if (file_version >= 3u) {
+        d->n_hand_pca = 54;
+        d->n_hand_out = 27;
+        LBS_ALLOC_F(hand_pose_mean,  d->n_hand_pca)
+        LBS_ALLOC_F(hand_pose_comps, d->n_hand_pca * d->n_hand_pca)
+        LBS_ALLOC_I(hand_joint_idxs_left,  d->n_hand_out)
+        LBS_ALLOC_I(hand_joint_idxs_right, d->n_hand_out)
+        LBS_READ_F(hand_pose_mean,  d->n_hand_pca)
+        LBS_READ_F(hand_pose_comps, d->n_hand_pca * d->n_hand_pca)
+        LBS_READ_I(hand_joint_idxs_left,  d->n_hand_out)
+        LBS_READ_I(hand_joint_idxs_right, d->n_hand_out)
+        fprintf(stderr,"mhr_lbs: loaded hand PCA (mean[%d], comps[%dx%d]) + joint idxs L/R[%d]\n",
+                d->n_hand_pca, d->n_hand_pca, d->n_hand_pca, d->n_hand_out);
+    }
+
 #undef LBS_ALLOC_F
 #undef LBS_ALLOC_I
 #undef LBS_READ_F
@@ -1213,7 +1230,162 @@ void mhr_lbs_free(struct MHR_LBS_Data *d)
     free(d->skin_weights);     free(d->skin_vert_idx);
     free(d->base_shape);       free(d->shape_vectors);
     free(d->face_vectors);     free(d->scale_mean);
-    free(d->scale_comps);      free(d);
+    free(d->scale_comps);
+    free(d->hand_pose_mean);   free(d->hand_pose_comps);
+    free(d->hand_joint_idxs_left); free(d->hand_joint_idxs_right);
+    free(d->corr_sp1_row); free(d->corr_sp1_col); free(d->corr_sp1_val);
+    free(d->corr_sp2_row); free(d->corr_sp2_col); free(d->corr_sp2_val);
+    free(d);
+}
+
+/* ── correctives loader ──────────────────────────────────────────────────────
+ *
+ * correctives.bin format (all little-endian):
+ *   uint32  magic    = 0x43524543
+ *   uint32  version  = 1
+ *   int32   n_joints, n_verts, n_feat, n_hidden, n_out, nnz1, nnz2
+ *   int32   sp1_row[nnz1], sp1_col[nnz1], float sp1_val[nnz1]
+ *   int32   sp2_row[nnz2], sp2_col[nnz2], float sp2_val[nnz2]
+ */
+#define MHR_CORR_MAGIC 0x43524543u
+
+int mhr_correctives_load(struct MHR_LBS_Data *d, const char *path)
+{
+    if (!d || !path) return 0;
+    FILE *f = fopen(path, "rb");
+    if (!f) {
+        fprintf(stderr, "[corr] correctives.bin not found: %s\n", path);
+        return 0;
+    }
+
+    unsigned int magic, ver;
+    if (fread(&magic, 4, 1, f) != 1 || fread(&ver, 4, 1, f) != 1 ||
+        magic != MHR_CORR_MAGIC || ver != 1u) {
+        fprintf(stderr, "[corr] bad magic/version in %s\n", path);
+        fclose(f); return 0;
+    }
+
+    int nj, nv, nfeat, nhid, nout, nnz1, nnz2;
+    int hdr[7];
+    if (fread(hdr, 4, 7, f) != 7) { fclose(f); return 0; }
+    nj = hdr[0]; nv = hdr[1]; nfeat = hdr[2];
+    nhid = hdr[3]; nout = hdr[4]; nnz1 = hdr[5]; nnz2 = hdr[6];
+
+    if (nj != d->n_joints || nv != d->n_verts) {
+        fprintf(stderr, "[corr] mismatch: file says nj=%d nv=%d, lbs has nj=%d nv=%d\n",
+                nj, nv, d->n_joints, d->n_verts);
+        fclose(f); return 0;
+    }
+
+#define CORR_ALLOC_I(field, n) \
+    d->field = (int*)malloc((size_t)(n)*sizeof(int)); if (!d->field) goto oom;
+#define CORR_ALLOC_F(field, n) \
+    d->field = (float*)malloc((size_t)(n)*sizeof(float)); if (!d->field) goto oom;
+
+    CORR_ALLOC_I(corr_sp1_row, nnz1) CORR_ALLOC_I(corr_sp1_col, nnz1)
+    CORR_ALLOC_F(corr_sp1_val, nnz1)
+    CORR_ALLOC_I(corr_sp2_row, nnz2) CORR_ALLOC_I(corr_sp2_col, nnz2)
+    CORR_ALLOC_F(corr_sp2_val, nnz2)
+#undef CORR_ALLOC_I
+#undef CORR_ALLOC_F
+
+    if (fread(d->corr_sp1_row, 4, nnz1, f) != (size_t)nnz1) goto read_err;
+    if (fread(d->corr_sp1_col, 4, nnz1, f) != (size_t)nnz1) goto read_err;
+    if (fread(d->corr_sp1_val, 4, nnz1, f) != (size_t)nnz1) goto read_err;
+    if (fread(d->corr_sp2_row, 4, nnz2, f) != (size_t)nnz2) goto read_err;
+    if (fread(d->corr_sp2_col, 4, nnz2, f) != (size_t)nnz2) goto read_err;
+    if (fread(d->corr_sp2_val, 4, nnz2, f) != (size_t)nnz2) goto read_err;
+
+    d->corr_n_feat   = nfeat;
+    d->corr_n_hidden = nhid;
+    d->corr_n_out    = nout;
+    d->corr_nnz1     = nnz1;
+    d->corr_nnz2     = nnz2;
+    fclose(f);
+    fprintf(stderr, "[corr] loaded %s  nnz1=%d nnz2=%d\n", path, nnz1, nnz2);
+    return 1;
+
+read_err:
+    fprintf(stderr, "[corr] read error in %s\n", path);
+oom:
+    free(d->corr_sp1_row); free(d->corr_sp1_col); free(d->corr_sp1_val);
+    free(d->corr_sp2_row); free(d->corr_sp2_col); free(d->corr_sp2_val);
+    d->corr_sp1_row = d->corr_sp1_col = NULL; d->corr_sp1_val = NULL;
+    d->corr_sp2_row = d->corr_sp2_col = NULL; d->corr_sp2_val = NULL;
+    fclose(f); return 0;
+}
+
+/* Compute pose-corrective 6D features from joint_params.
+ * joint_params: [n_joints*7] (output of parameter transform)
+ * Joints 2..n_joints-1 contribute; joints 0,1 are skipped (matches Python).
+ * out_feat: [(n_joints-2)*6]
+ * R = Rz(ez) @ Ry(ey) @ Rx(ex), 6D = first 2 columns, then subtract identity. */
+static void mhr_compute_pose_features(const float *joint_params, int n_joints, float *out_feat)
+{
+    int feat_idx = 0;
+    for (int j = 2; j < n_joints; j++) {
+        float ex = joint_params[j*7 + 3];  /* rx */
+        float ey = joint_params[j*7 + 4];  /* ry */
+        float ez = joint_params[j*7 + 5];  /* rz */
+        float cx = cosf(ex), sx = sinf(ex);
+        float cy = cosf(ey), sy = sinf(ey);
+        float cz = cosf(ez), sz = sinf(ez);
+        /* col0 of R = Rz @ Ry @ Rx */
+        out_feat[feat_idx + 0] = cz*cy       - 1.f;  /* R[0,0] − 1 */
+        out_feat[feat_idx + 1] = sz*cy;               /* R[1,0]     */
+        out_feat[feat_idx + 2] = -sy;                  /* R[2,0]     */
+        /* col1 of R */
+        out_feat[feat_idx + 3] = -sz*cx + cz*sy*sx;  /* R[0,1]     */
+        out_feat[feat_idx + 4] = cz*cx + sz*sy*sx - 1.f; /* R[1,1] − 1 */
+        out_feat[feat_idx + 5] = cy*sx;               /* R[2,1]     */
+        feat_idx += 6;
+    }
+}
+
+/* Sparse matrix-vector product: y += A(sparse COO) * x, then clip negatives (ReLU).
+ * Accumulates into y (caller must zero-init). */
+static void mhr_spmv_relu(const int *rows, const int *cols, const float *vals,
+                           int nnz, const float *x, float *y)
+{
+    for (int k = 0; k < nnz; k++)
+        y[rows[k]] += vals[k] * x[cols[k]];
+    /* ReLU is applied outside since layer2 does NOT use it */
+}
+
+/* Apply pose correctives: adds corrective vertex offsets to unposed[nv*3] in-place.
+ * Returns 0 if correctives not loaded (no-op). */
+static int mhr_apply_correctives(const struct MHR_LBS_Data *d,
+                                  const float *joint_params,
+                                  float *unposed)
+{
+    if (!d->corr_sp1_row) return 0;  /* not loaded */
+
+    int nfeat  = d->corr_n_feat;
+    int nhid   = d->corr_n_hidden;
+    int nout   = d->corr_n_out;
+    int nnz1   = d->corr_nnz1;
+    int nnz2   = d->corr_nnz2;
+
+    float *feat   = (float*)calloc((size_t)nfeat, sizeof(float));
+    float *hidden = (float*)calloc((size_t)nhid,  sizeof(float));
+    float *out    = (float*)calloc((size_t)nout,  sizeof(float));
+    if (!feat || !hidden || !out) { free(feat); free(hidden); free(out); return 0; }
+
+    /* Feature extraction: euler angles of joints 2..N-1 → 6D centered */
+    mhr_compute_pose_features(joint_params, d->n_joints, feat);
+
+    /* Layer 1: sparse matmul → [nhid], then ReLU */
+    mhr_spmv_relu(d->corr_sp1_row, d->corr_sp1_col, d->corr_sp1_val, nnz1, feat, hidden);
+    for (int i = 0; i < nhid; i++) if (hidden[i] < 0.f) hidden[i] = 0.f;
+
+    /* Layer 2: sparse matmul → [nout], no ReLU (linear output) */
+    mhr_spmv_relu(d->corr_sp2_row, d->corr_sp2_col, d->corr_sp2_val, nnz2, hidden, out);
+
+    /* Add to unposed vertices */
+    for (int i = 0; i < nout; i++) unposed[i] += out[i];
+
+    free(feat); free(hidden); free(out);
+    return 1;
 }
 
 /* ── main per-frame compute ───────────────────────────────────────────────── */
@@ -1343,6 +1515,10 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
     }
     free(input_vec);
 
+    /* Step 2b — pose correctives: add corrective offsets to unposed (before LBS).
+     * Requires joint_params (computed above) which is freed in Step 3. */
+    mhr_apply_correctives(d, joint_params, unposed);
+
     /* Step 3 — local skeleton state per joint: (t_local, q_local, s_local)
      *
      * joint_params row j: [tx, ty, tz, rx, ry, rz, log2_scale]
@@ -1355,9 +1531,10 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
      *   The pose quaternion (from Euler) is applied ON TOP via right-multiplication.
      *   R_local = R_pre @ R_euler  (pre-rotation first, then the driven pose).
      */
-    float t_local[127*3];
-    float q_local[127*4];
-    float s_local[127];
+    float *t_local  = (float*)malloc((size_t)nj * 3 * sizeof(float));
+    float *q_local  = (float*)malloc((size_t)nj * 4 * sizeof(float));
+    float *s_local  = (float*)malloc((size_t)nj * sizeof(float));
+    if (!t_local || !q_local || !s_local) { free(t_local); free(q_local); free(s_local); return 0; }
 
     for (int j = 0; j < nj; j++) {
         const float *jp  = joint_params + j * 7;
@@ -1391,12 +1568,22 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
      *
      * For the root joint (parent < 0), global = local directly.
      */
-    float g_t[127*3];
-    float g_q[127*4];
-    float g_s[127];
+   float *g_t = (float*)malloc((size_t)nj * 3 * sizeof(float));
+    float *g_q = (float*)malloc((size_t)nj * 4 * sizeof(float));
+    float *g_s = (float*)malloc((size_t)nj * sizeof(float));
+    if (!g_t || !g_q || !g_s) { free(g_t); free(g_q); free(g_s); free(t_local); free(q_local); free(s_local); return 0; }
 
     fprintf(stderr,"[LBS] root joint: t=(%.4f,%.4f,%.4f) s=%.6f\n",
             t_local[0], t_local[1], t_local[2], s_local[0]);
+
+    /* Check for NaN/Inf in local transforms */
+    { int bad = 0;
+      for(int j=0;j<nj;j++) {
+          for(int c=0;c<4;c++) { if(!isfinite(q_local[j*4+c])) bad++; }
+          if(!isfinite(s_local[j])) bad++;
+      }
+      if(bad) fprintf(stderr,"[LBS] WARNING: %d NaN/Inf in local transforms\n", bad);
+    }
 
     for (int j = 0; j < nj; j++) {
         int p = d->joint_parents[j];
@@ -1418,6 +1605,8 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
         }
     }
 
+    fprintf(stderr,"[LBS] FK loop done\n");
+
     /* Step 5 — skin TRS = global(j) ∘ inv_bind(j)
      *
      * inv_bind_pose[j] is the inverse of the joint's bind-pose transform.
@@ -1431,9 +1620,10 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
      *   skin_t = g_t + g_s * rotate(g_q, ib_t)
      *   skin_s = g_s * ib_scale
      */
-    float skin_t[127*3];
-    float skin_q[127*4];
-    float skin_s[127];
+    float *skin_t = (float*)malloc((size_t)nj * 3 * sizeof(float));
+    float *skin_q = (float*)malloc((size_t)nj * 4 * sizeof(float));
+    float *skin_s = (float*)malloc((size_t)nj * sizeof(float));
+    if (!skin_t || !skin_q || !skin_s) { free(skin_t); free(skin_q); free(skin_s); free(g_t); free(g_q); free(g_s); free(t_local); free(q_local); free(s_local); return 0; }
 
     for (int j = 0; j < nj; j++) {
         const float *ib  = d->inv_bind_pose + j * 8;  /* [tx,ty,tz, qx,qy,qz,qw, scale] */
@@ -1448,8 +1638,23 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
         skin_t[j*3+2] = g_t[j*3+2] + g_s[j] * rt[2];
     }
 
+    fprintf(stderr,"[LBS] Skin TRS done\n");
+    { int bad2 = 0;
+      for(int j=0;j<nj;j++) {
+          for(int c=0;c<4;c++) { if(!isfinite(skin_q[j*4+c])) bad2++; }
+          if(!isfinite(skin_s[j])) bad2++;
+      }
+      if(bad2) fprintf(stderr,"[LBS] WARNING: %d NaN/Inf in skin transforms\n", bad2);
+    }
+
     /* Step 6 — LBS: sparse weighted accumulation */
     memset(out_verts, 0, (size_t)nv * 3 * sizeof(float));
+
+    fprintf(stderr,"[LBS] LBS loop start, ns=%d\n", ns);
+    { int ji_max=0, vi_max=0;
+      for(int k=0;k<ns;k++) { if(d->skin_joint_idx[k]>ji_max) ji_max=d->skin_joint_idx[k]; if(d->skin_vert_idx[k]>vi_max) vi_max=d->skin_vert_idx[k]; }
+      fprintf(stderr,"[LBS] skin indices: ji_max=%d/127 vi_max=%d/%d\n", ji_max, vi_max, nv);
+    }
 
     for (int k = 0; k < ns; k++) {
         int   ji = d->skin_joint_idx[k];
@@ -1465,27 +1670,34 @@ int mhr_lbs_compute(const struct MHR_LBS_Data *d,
         out_verts[vi*3+2] += w * (skin_t[ji*3+2] + sx * pv[2]);
     }
 
+    fprintf(stderr,"[LBS] LBS loop done\n");
+    fprintf(stderr,"[LBS] freeing unposed\n");
     free(unposed);
 
-    /* Step 7 — coordinate flip: MHR applies verts[Y,Z] *= -1 after skinning */
+    /* Step 7 — coordinate flip + cm→m.
+     * Body model data is stored in cm; Python mhr_forward divides by 100 to get metres.
+     * Apply the same conversion here so C output matches Python mhr_forward output. */
     for (int v = 0; v < nv; v++) {
-        out_verts[v*3+1] *= -1.f;
-        out_verts[v*3+2] *= -1.f;
+        out_verts[v*3+0] *=  0.01f;
+        out_verts[v*3+1] *= -0.01f;   /* Y flip + cm→m */
+        out_verts[v*3+2] *= -0.01f;   /* Z flip + cm→m */
     }
 
-    /* Step 8 — convert centimeters to meters (body model is in cm) */
-    for (int v = 0; v < nv * 3; v++) {
-        out_verts[v] *= 0.01f;
-    }
+    fprintf(stderr,"[LBS] coord flip done\n");
 
-    /* Step 9 — output joint coordinates (same flip + cm→m as vertices) */
+    /* Step 8 — output joint world positions with Y,Z flip + cm→m. */
     if (out_joints) {
         for (int j = 0; j < nj; j++) {
-            out_joints[j*3+0] = g_t[j*3+0] * 0.01f;
+            out_joints[j*3+0] =  g_t[j*3+0] * 0.01f;
             out_joints[j*3+1] = -g_t[j*3+1] * 0.01f;
             out_joints[j*3+2] = -g_t[j*3+2] * 0.01f;
         }
     }
 
+    fprintf(stderr,"[LBS] output joints done, returning\n");
+
+    free(t_local); free(q_local); free(s_local);
+    free(g_t); free(g_q); free(g_s);
+    free(skin_t); free(skin_q); free(skin_s);
     return 1;
 }

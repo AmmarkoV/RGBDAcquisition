@@ -28,6 +28,8 @@ struct MHR_LBS_Data {
     int pt_cols;        /* 249  */
     int n_scale_pc;     /* 28   (0 if not loaded) */
     int n_scale_out;    /* 68   (0 if not loaded) */
+    int n_hand_pca;     /* 54   (0 if not loaded; v3+) */
+    int n_hand_out;     /* 27   per-hand model_params dim (v3+) */
 
     float *PT;                  /* [pt_rows × pt_cols]          */
     float *joint_offsets;       /* [n_joints × 3]               */
@@ -42,11 +44,36 @@ struct MHR_LBS_Data {
     float *face_vectors;        /* [n_face_pc  × n_verts × 3]  */
     float *scale_mean;          /* [n_scale_out]  NULL if not loaded */
     float *scale_comps;         /* [n_scale_pc × n_scale_out]  NULL if not loaded */
+    /* v3: hand pose PCA + per-hand joint index tables */
+    float *hand_pose_mean;      /* [n_hand_pca]                  NULL if not loaded */
+    float *hand_pose_comps;     /* [n_hand_pca × n_hand_pca]     NULL if not loaded */
+    int   *hand_joint_idxs_left;/* [n_hand_out]                  NULL if not loaded */
+    int   *hand_joint_idxs_right;/*[n_hand_out]                  NULL if not loaded */
+
+    /* Pose correctives: sparse 2-layer network applied to unposed mesh before LBS.
+     * Loaded from correctives.bin via mhr_correctives_load().
+     * NULL when not loaded. */
+    int    corr_n_feat;         /* (n_joints-2)*6 = 750          */
+    int    corr_n_hidden;       /* 3000                          */
+    int    corr_n_out;          /* n_verts*3 = 55317             */
+    int    corr_nnz1;           /* nnz in sparse layer 1         */
+    int    corr_nnz2;           /* nnz in sparse layer 2 (dense but pruned) */
+    int   *corr_sp1_row;        /* [corr_nnz1]  row idx, layer 1 */
+    int   *corr_sp1_col;        /* [corr_nnz1]  col idx, layer 1 */
+    float *corr_sp1_val;        /* [corr_nnz1]  values,  layer 1 */
+    int   *corr_sp2_row;        /* [corr_nnz2]  row idx, layer 2 */
+    int   *corr_sp2_col;        /* [corr_nnz2]  col idx, layer 2 */
+    float *corr_sp2_val;        /* [corr_nnz2]  values,  layer 2 */
 };
 
 /* Load body_model.lbs produced by tools/extract_lbs_data.py.
  * Returns NULL on failure. Caller must call mhr_lbs_free(). */
 struct MHR_LBS_Data *mhr_lbs_load(const char *path);
+
+/* Load correctives.bin produced by tools/export_correctives.py and attach to d.
+ * Safe to call on d returned by mhr_lbs_load(); skipped if file not found.
+ * Returns 1 on success, 0 if file missing/incompatible (non-fatal). */
+int mhr_correctives_load(struct MHR_LBS_Data *d, const char *path);
 
 /* Free all buffers allocated by mhr_lbs_load(). */
 void mhr_lbs_free(struct MHR_LBS_Data *d);
@@ -57,6 +84,7 @@ void mhr_lbs_free(struct MHR_LBS_Data *d);
  *   face_coeffs   [n_face_pc]  from MHRResult.face_params
  *   out_verts     [n_verts*3]  caller-allocated output (float[18439*3])
  *   out_joints    [n_joints*3] caller-allocated output (float[127*3]), may be NULL
+ * Applies pose correctives from d if mhr_correctives_load() was called.
  * Returns 1 on success, 0 on failure. */
 int mhr_lbs_compute(const struct MHR_LBS_Data *d,
                     const float *model_params,
