@@ -710,7 +710,7 @@ void recursiveJointHierarchyTransformer(
   struct Matrix4x4OfFloats nodeLocalTransformation;
   copy4x4FMatrixToAlignedContainer(&nodeLocalTransformation,in->bones[curBone].info->localTransformation);
 
-  if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
+  if ( (joint4x4Data!=0) && ((unsigned int)curBone*16<joint4x4DataSize) )
      {
        struct Matrix4x4OfFloats joint4x4DataPacked   ={0};
        copy4x4FMatrixToAlignedContainer(&joint4x4DataPacked,&joint4x4Data[curBone*16]);
@@ -816,7 +816,7 @@ void recursiveJointHierarchyTransformerDirect(
   //We use nodeLocalTransformation as shorthand so that we don't have to access the bone structure every time
   float * nodeLocalTransformation = in->bones[curBone].info->localTransformation;
 
-  if ( (joint4x4Data!=0) && (curBone*16<joint4x4DataSize) )
+  if ( (joint4x4Data!=0) && ((unsigned int)curBone*16<joint4x4DataSize) )
      {
        //We do the transformation of our node with the new joint 4x4 data we received..!  nodeTransformationCopy
        multiplyTwoRaw4x4FMatricesS(nodeTransformation,nodeLocalTransformation,&joint4x4Data[curBone*16]);
