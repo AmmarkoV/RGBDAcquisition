@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )
 project( OGLDepthAndColorRendererProject ) 
-cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_CXX_FLAGS "-fPIC -march=native")
 set(CMAKE_C_FLAGS "-fPIC -march=native")
@@ -12,17 +12,11 @@ OPTION (ENABLE_ASSIMP OFF)
 OPTION (ENABLE_AMMARSERVER OFF)
 
 OPTION(INTEL_OPTIMIZATIONS OFF)
-OPTION(INTEL_AVX2_OPTIMIZATIONS OFF)
-
 
 if (INTEL_OPTIMIZATIONS)
 add_definitions(-DINTEL_OPTIMIZATIONS)
 endif(INTEL_OPTIMIZATIONS)
 
-
-if (INTEL_AVX2_OPTIMIZATIONS)
-add_definitions(-DINTEL_AVX2_OPTIMIZATIONS)
-endif(INTEL_AVX2_OPTIMIZATIONS)
 
 #Add the codecs needed for the correct building..
 #Depending on the build directory this might not work :S

@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( DisparityMapping ) 
-cmake_minimum_required( VERSION 2.8.7 )   
 find_package(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
   

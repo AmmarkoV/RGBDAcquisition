@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( Timers ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
 add_library(Timers STATIC timer.c timer.h  ) 
 target_link_libraries(Timers m rt ) 

@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( FreenectAcquisition ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 set(Freenect_DIR "${CMAKE_SOURCE_DIR}/3dparty/" ) 
 

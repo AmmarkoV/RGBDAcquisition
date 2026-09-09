@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( OpenNI1Acquisition ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 set(OpenNI1_DIR "${CMAKE_SOURCE_DIR}/3dparty")
 set(OpenNI1_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI/Include/ )

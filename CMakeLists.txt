@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION  3.5 )
 project( RGBDAcquisitionProject ) 
-cmake_minimum_required( VERSION 2.8.7 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/3dparty ${CMAKE_MODULE_PATH})
 

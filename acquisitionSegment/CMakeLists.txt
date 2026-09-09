@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( AcquisitionSegment ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
 add_library(AcquisitionSegment STATIC 
             AcquisitionSegment.c

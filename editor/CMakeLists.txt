@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( Editor ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 add_executable(Editor  
                EditorApp.cpp

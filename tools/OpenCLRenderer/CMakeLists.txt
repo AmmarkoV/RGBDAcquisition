@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )
 project( OpenCLRenderer )
-cmake_minimum_required( VERSION 2.8.7 )
  
 #Make fast, lean and platform independent binaries..
 set(CMAKE_CXX_FLAGS "-s -O3 -fPIC -march=native -mtune=native")

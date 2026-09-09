@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( V4L2StereoAcquisition ) 
-cmake_minimum_required( VERSION 2.8.7 )  
   
 add_library(V4L2StereoAcquisition SHARED 
             ../v4l2_acquisition_shared_library/PixelFormatConversions.c

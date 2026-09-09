@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( OperatingSystem ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 add_library(OperatingSystem STATIC main.c OperatingSystem.h  ) 
 #target_link_libraries(OperatingSystem rt ) 

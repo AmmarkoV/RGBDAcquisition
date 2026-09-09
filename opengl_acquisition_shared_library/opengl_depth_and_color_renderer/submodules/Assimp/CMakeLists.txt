@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( assimpLoader ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
   
 OPTION (ENABLE_JPG ON)

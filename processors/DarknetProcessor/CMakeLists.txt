@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( DarknetProcessor ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
 
 ADD_LIBRARY(Darknet SHARED IMPORTED)

@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( PointsDistance ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 add_executable(PointsDistance pointsDistance.c  ) 
 target_link_libraries(PointsDistance rt  m ) 

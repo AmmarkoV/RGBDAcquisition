@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 ) 
 project( Grabber ) 
-cmake_minimum_required( VERSION 2.8.7 ) 
      
 add_executable(Grabber main.c ) 
 target_link_libraries(Grabber rt dl m RGBDAcquisition OperatingSystem Timers CalibrationLibrary ${LocationService_Libs} )

@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )  
 project( V4L2Acquisition ) 
-cmake_minimum_required( VERSION 2.8.7 )  
 
 add_library(V4L2Acquisition SHARED 
             PixelFormatConversions.c

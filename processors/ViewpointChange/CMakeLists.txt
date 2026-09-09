@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( ViewpointChange ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
 add_library(ViewpointChange STATIC viewpoint_change.c viewpoint_change.c main.c  ) 
 target_link_libraries(ViewpointChange m rt ) 

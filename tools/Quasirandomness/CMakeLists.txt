@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( Timers ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
 add_library(Quasirandomness STATIC quasirandomness.c quasirandomness.h  ) 
 target_link_libraries(Quasirandomness m rt ) 

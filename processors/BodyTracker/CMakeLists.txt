@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.5 )   
 project( BodyTracker ) 
-cmake_minimum_required( VERSION 2.8.7 )   
  
  
 add_library(BodyTracker SHARED BodyTracker.h BodyTracker.c
